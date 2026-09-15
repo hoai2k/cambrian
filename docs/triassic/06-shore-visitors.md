@@ -69,9 +69,14 @@ step to actors currently inside reach. It is the only new per-step cost and is b
 ### Size gates
 
 *"Small enough creatures"* — for the boom, the victim must be **snack** or **prey** band relative
-to the Tanystropheus (`bandOf(shore, target)`). A snack is taken whole (`takeHold`/`startSwallow`
-as the design doc always intended: dragged up the beach, death unless a dash-out inside two
-seconds); prey is bitten and released with the shove. Anything larger is **ignored** — the neck
+to the Tanystropheus (`bandOf(shore, target)`). A snack is **one gulp**: the snap lands on it,
+`startSwallow` carries it in the jaws and it is eaten as the neck comes back up, with no escape
+window — small enough to be swallowed is small enough to be swallowed, and the two seconds of
+`Drag` the design doc once described are now the swallow itself. A player taken this way keeps
+their camera: it follows the **boom's head** through the swallow (the same `rideBlend` framing a
+ride uses, aimed at the shore animal's mouth anchor rather than its centre), so the last thing
+they see is the water dropping away under them and then the beach, and the death is understood
+rather than a cut to black. Prey is bitten and released with the shove. Anything larger is **ignored** — the neck
 does not lower at all — because a boom that reaches for something that bites it back is how the
 neck gets severed, and the animal should not volunteer for it. This is a change: today it strikes
 anything.
@@ -115,12 +120,17 @@ inland ──(schedule)──▶ approach ──(reach edge)──▶ peer ─�
                                                     └──────────────────────────────────────────────▶ retreat
 ```
 
-- **inland.** The runner stands at a *waiting spot* `INLAND_OFF` (≈ 14 units) up the beach from
-  its post, idle, out of the water's reach and mostly out of a submerged player's sight. It is
-  present in the world (rendered, pinned) so a player who surfaces sees something on the sand.
-- **approach.** It walks down to the water's edge on the `Run` clip at a walk rate (the clip
-  scrubbed slower, or a `Walk` clip if one is ever added). Duration is distance over a fixed
-  ground speed, so it is deterministic. Ends at the post position.
+- **inland.** The runner is **not in the world**: the phase is a timer on the post, no actor. All
+  of the play area is under water and a waiting runner fourteen units up the beach is behind the
+  sand's own slope from every submerged sightline, so a body there would be simulated, streamed
+  and drawn for nobody. (A player mid-breach looking shoreward for half a second is the one case
+  this cheats, and it cheats it in the player's favour.) A runner is therefore seen exactly when it
+  is a threat — at the edge, in the water, or carrying you — and the first excursion at a bank is
+  a surprise, which is wanted.
+- **approach.** The actor is spawned at `INLAND_OFF` and **runs** down to the water's edge on
+  `Run` at its run pace: there is no walk clip and none is wanted, a runner runs everywhere it
+  goes. Duration is distance over a fixed ground speed, so it is deterministic. Ends at the post
+  position.
 - **peer.** Head over the water, watching: the runner's version of the boom's `Fish`. It plays
   `Lower` (which both runners have) and holds the last frame. Stillness is measured here. If
   nothing is still within `PEER_MAX` seconds it gives up and retreats — so a runner at the edge
@@ -134,24 +144,30 @@ inland ──(schedule)──▶ approach ──(reach edge)──▶ peer ─�
   `SURFACE_Y - 1.5`. Plays `Charge`.
 - **snatch.** One frame of resolution at the end of the charge: if the victim is within
   `bodyRadius(runner) + bodyRadius(victim) + 0.6` of the runner's head, `applyHit` with the
-  runner's heavy; a snack-band victim is `takeHold` and carried back (the runner's retreat then
-  becomes a drag, and the victim's own dash-out rule applies exactly as it does against the boom).
-  A miss is simply a miss. Plays `Snatch` (Macrocnemus) or `SnapLeft/Right` (Coelophysis, which
+  runner's heavy; a snack-band victim is `takeHold` and **carried in the mouth back onto land**.
+  The ordinary grip rules run during the carry — a dash-out inside `GRIP_STRIKE` tears free and
+  leaves the runner retreating empty-mouthed — but a victim still in the jaws when the runner
+  reaches its inland spot is eaten there. A miss is simply a miss. Plays `Snatch` (Macrocnemus) or `SnapLeft/Right` (Coelophysis, which
   has no Snatch).
 - **retreat.** Back along the same line to the post, then up to the inland spot, on `Retreat`
-  then `Run`. If it is carrying, the victim rides the mouth anchor as any held animal does. At
-  the inland spot it eats what it caught (`Eat` clip, the victim consumed) or simply idles.
-  Cooldown `RUNNER_REST` (20–40 s, hashed) before the next approach.
+  then `Run`. If it is carrying, the victim rides the mouth anchor as any held animal does, and a
+  carried *player's* camera goes with it — framed on the runner's head, as with the boom — up the
+  sand and out of the water, which is the one time a player sees the beach. At the inland spot it
+  eats what it caught (`Eat` clip, the victim consumed, the camera released to the respawn) and
+  then the body leaves the world (below). Cooldown `RUNNER_REST` (20–40 s, hashed) before the
+  next approach.
 
-A runner is **never in the water for more than ~1.5 s** end to end. It cannot be lured out into
+A runner's body exists from `approach` to the end of `retreat` and not otherwise, and is
+**never in the water for more than ~1.5 s** end to end. It cannot be lured out into
 depth and cannot drown, because it is scripted rather than steered — the same reason the shore
 animals are brainless today. That is a constraint to keep: the moment a runner gets a brain, it
 gets stuck on a rock.
 
 **Being bitten during the excursion.** A runner in the water is an ordinary target for a player
 that is big enough. Damage lands (it has hp), and if it dies in the water it dies there, a corpse
-that drifts — carrion, as the severed boom is. If it dies inland it is a corpse on the sand until
-the next occupancy window replaces it. Neither has a special clip; `Death` is in every file.
+that drifts — carrion, as the severed boom is. It cannot die inland, because it is only a body on
+the way to or from the water; a corpse on the sand would be one more thing drawn where nobody
+looks. Neither case has a special clip; `Death` is in every file.
 
 ### Mystriosuchus — the lurker, unchanged in shape
 
@@ -176,14 +192,15 @@ occupied(k, seed, t):  window = floor(t / OCCUPANCY_WINDOW)
   every bank does not change over on the same beat.
 - `PRESENCE_P`: boom 0.7, phytosaur 0.6, runners 0.5. An empty bank is now the ordinary state a
   third of the time rather than a 22 % roll at spawn.
-- **Arrival**: the animal spawns at the inland spot (14 units up the beach — past the ramp, below
-  a submerged player's sightline in almost every case) and walks down on `Run`/`Crawl`. The boom
-  and the phytosaur walk to the post and take up `Fish`/`Breathe`; a runner goes to its inland
-  spot and waits.
+- **Arrival**: the boom and the phytosaur spawn at `INLAND_OFF` (14 units up the beach — past the
+  ramp, below a submerged player's sightline in almost every case), walk down on `Crawl` to the
+  post and take up `Fish`/`Breathe`. A runner's window simply starts its `inland` timer: its body
+  is spawned per excursion, not per window.
 - **Departure**: at the end of a window in which the next window is not occupied, the animal
   finishes whatever phase it is in (never mid-strike), walks back up the beach and is removed
-  once it is `DESPAWN_OFF` (≈ 24 units) up. A carcass (severed boom, killed runner) does not
-  depart; it lasts as long as a corpse does and the post is empty until then.
+  at `INLAND_OFF`; a runner's window simply does not start another excursion. A carcass (severed
+  boom, runner killed in the water) does not depart; it lasts as long as a corpse does and the
+  post is empty until then.
 - A post that has been **cleared** by a sever stays clear for the match, as now. That is the
   reward for the sever and the schedule must not undo it.
 
@@ -202,9 +219,9 @@ Everything a shore body needs is listed against what its file carries today.
 | `Lower` | have | have | — | have | telegraph (boom, phytosaur) / peer (runners). Macrocnemus lacks it — use `Idle` with the head pitched by the renderer, or **author `Peer`**. |
 | `SnapLeft/Right` | have | have | — | have | the strike / snatch. |
 | `Snatch` | — | — | have | — | Macrocnemus' snatch. |
-| `Drag` | have | — | — | — | carrying a snack up the beach. Runners carry on `Retreat`. |
+| `Drag` | have | — | — | — | the swallow: the neck coming up with the snack in the jaws, over `SWALLOW_TIME`. Runners carry on `Retreat`. |
 | `Retract` | have | have | — | have | recovery after a strike. |
-| `Run` | — | — | have | have | approach and the walk back inland; also arrivals and departures for the runners. |
+| `Run` | — | — | have | have | approach and the run back inland — a runner only ever runs; no `Walk` is authored. |
 | `Charge` | — | — | have | have | the dash into the water. |
 | `Retreat` | — | — | have | have | back out of the water. |
 | `Crawl` | have | have | have | have | arrivals and departures for the boom and the phytosaur (a walk; they do not run). |
@@ -235,6 +252,10 @@ already obeys.
   *SOMETHING ON THE SHORE · it is watching you* — so the first thing a player learns is that
   stopping here is noticed, before it is punished. Both survive sense-off (they are the player's
   own situation). The runners' peer phase raises the same flag.
+- **Camera.** Being taken is *seen*: a swallowed or carried player's camera frames the shore
+  animal's head (`rideBlend` onto the host, look point at its mouth anchor) until the eat resolves,
+  then eases to the respawn. This is the one place a Triassic camera goes up the beach, and it
+  goes there attached to something.
 - **Radar.** The design doc's hatched reach arc for an occupied post; nothing for an empty one, so
   the radar is also how you learn a bank has emptied.
 - **Recorder.** `?debug=game` samples should carry the nearest post's phase and this player's
@@ -249,24 +270,30 @@ In order, each step leaving `npm run triassic` green.
    Replace `reachable()` in the boom's `watch` with it. Tests: a swimmer passing the post at
    cruise is never struck; one that stops for 3 s is; one that stops for 2.5 s and moves is not;
    a giant that stops is ignored by the boom; a bot counts.
-2. **Boom size gate and the drag.** `bandOf` gate in `watch`; snack → `takeHold` + `Drag` clip in
-   `strike`/`rest`; prey → heavy + shove; else ignore. Tests: each band's outcome; the sever still
-   clears the bank; a held snack's dash-out still frees it inside two seconds.
+2. **Boom size gate and the gulp.** `bandOf` gate in `watch`; snack → `startSwallow` + `Drag`
+   clip in `strike`/`rest`, no escape; prey → heavy + shove; else ignore. Tests: each band's
+   outcome; a snack is dead at the end of the swallow whatever it pressed; the sever still clears
+   the bank.
 3. **Occupancy schedule.** `occupied(k, seed, t)` with the phase offset; arrival and departure
-   phases (`arrive`, `leave`) with pinned straight-line motion at walk pace; despawn past
-   `DESPAWN_OFF`. Tests: the same seed gives the same occupancy at the same time; a post empties
+   phases (`arrive`, `leave`) with pinned straight-line motion at walk pace; despawn at
+   `INLAND_OFF`. Tests: the same seed gives the same occupancy at the same time; a post empties
    and refills within one window's worth of time; a cleared post never refills; no step moves a
    shore animal further than a walk (`motion-test`'s jump rule); nothing departs mid-strike.
-4. **Runner excursion.** The five phases on Macrocnemus and Coelophysis; `reachOf` gives
-   Macrocnemus a real reach; `CHARGE_REACH` per kind; the straight-line dash committed at trigger
-   time; snatch resolution; carry-back. Tests: a still hatchling at the edge is charged and bitten;
-   one that moves after the commit is missed and the runner still retreats; the runner never goes
+4. **Runner excursion.** The five phases on Macrocnemus and Coelophysis, the body spawned on
+   `approach` and removed at the end of `retreat`; `reachOf` gives Macrocnemus a real reach;
+   `CHARGE_REACH` per kind; the straight-line dash committed at trigger time; snatch resolution;
+   carry-back and the inland eat. Tests: a still hatchling at the edge is charged and bitten; one
+   that moves after the commit is missed and the runner still retreats; the runner never goes
    below `SURFACE_Y - 1.5` or beyond `CHARGE_REACH`; a runner bitten in the water dies there as a
-   corpse; the excursion is never longer than 1.5 s in the water; a giant is never charged.
+   corpse; the excursion is never longer than 1.5 s in the water; a giant is never charged; a
+   carried snack that does not tear free is dead when the runner reaches `INLAND_OFF`; no runner
+   actor exists while its post is in `inland`.
 5. **Mystriosuchus.** Stillness gate on the lunge; `Breathe` for watch.
 6. **`Fish` clip** for Tanystropheus through its builder; `Peer` for Macrocnemus (or the
    `Idle` + head-pitch first pass, decided when step 4 is playable and can be looked at).
-7. **HUD and radar.** The "watching you" line; the arc only for occupied posts; recorder fields.
+7. **HUD, radar and camera.** The "watching you" line; the arc only for occupied posts; recorder
+   fields; the taken player's camera on the shore animal's head (`rideBlend` with the look point
+   on the mouth anchor), checked in `npm run swim` beside the ride framing.
 8. **Docs.** Fold the outcome into `01-triassic-design.md`'s shore section (which still describes
    the phytosaur's `Float`/`Lunge`/`Bask` clips that were never built — update to what exists) and
    add the CLAUDE.md note.
@@ -285,7 +312,8 @@ on the existing `Run`/`Charge`/`Snatch`/`Retreat` clips. Only step 6 waits on Bl
 | `CHARGE_REACH` Macrocnemus / Coelophysis | 3 L / 2 L | the little one goes further for less |
 | `CHARGE_TIME` | 0.7 s | never more than ~1.5 s in the water round trip |
 | `RUNNER_REST` | 20–40 s, hashed | |
-| `INLAND_OFF` / `DESPAWN_OFF` | 14 / 24 units up the beach | below a submerged sightline / out of any |
+| `INLAND_OFF` | 14 units up the beach | where a body appears for its approach and vanishes after its retreat: below every submerged sightline |
+| `SWALLOW_TIME` | ≈ `Drag`'s length | the boom's gulp, one clock with the clip |
 | `OCCUPANCY_WINDOW` | 150 s, per-post phase offset | banks do not all change on one beat |
 | `PRESENCE_P` boom / lurker / runners | 0.7 / 0.6 / 0.5 | an empty bank is ordinary |
 
@@ -303,15 +331,20 @@ never exceeds its reach) and not the numbers, so tuning does not churn the suite
 - **No playable shore animal.** Unchanged; `shoreReach` stays unused in the Triassic.
 - **No change to the other eras.** Everything above is behind `TRIASSIC_RULES` and `shore.ts`.
 
-## Open questions for the user
+## Decisions taken
 
-1. Should the boom take **prey**-band animals whole as well, or only snacks? (Plan: snacks whole,
-   prey bitten and released — it keeps the sever a live threat, since a prey-band victim is
-   exactly the size that can bite the neck.)
-2. Does a runner that catches something **eat it inland** (the victim dies) or just carry it up
-   and drop it? (Plan: eats it, so a runner is a real predator and not a nuisance.)
-3. Is a **`Walk`** clip for the runners worth authoring, or is `Run` scrubbed slow acceptable for
-   the approach and the departures? (Plan: scrub first, author if it reads badly.)
-4. How visible should an **inland** runner be to a submerged player? At 14 units up the beach it
-   is mostly not — which makes the first excursion a surprise. Is that wanted, or should the
-   waiting runner be glimpsable so a careful player can see it coming?
+The four questions the first draft left open, answered:
+
+1. **What the boom eats whole.** Anything small enough — the snack band — is one gulp, no escape
+   window, and the taken player's camera follows the boom's head through it. Prey is bitten and
+   shoved; larger is left alone.
+2. **What a runner does with a catch.** Carries it in its mouth onto land and eats it there, the
+   player's camera going with it. The standard grip escape during the carry stays; reaching the
+   inland spot still in the jaws is the death.
+3. **No `Walk` clip.** A runner only ever runs. `Run` carries the approach, the return and both
+   ends of an excursion, and nothing is scrubbed.
+4. **An inland runner is not drawn, because it is not there.** The waiting phase is a timer on the
+   post with no body behind it; the actor exists from the top of the ramp to the top of the ramp.
+   Everything a player can be is under water, so the only time one could be seen inland is a
+   breach aimed at the beach, and that case is accepted rather than paid for on every frame at
+   every bank.
