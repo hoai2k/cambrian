@@ -296,6 +296,11 @@ for (const c of ['Attack', 'Heavy']) {
     `${c}: the tentacles must out-reach the arms (${crown(c).minTentacleTravel.toFixed(3)} vs ${crown(c).meanArmTravel.toFixed(3)})`);
   need(anchor(c).anchor_attack_primary > 2 * anchor(c).anchor_mouth,
     `${c}: the attack anchor must out-travel the mouth (${anchor(c).anchor_attack_primary.toFixed(3)} vs ${anchor(c).anchor_mouth.toFixed(3)})`);
+  // A floor under the ratio as well. Most of what the mouth socket travels in these clips is the
+  // crown's own protraction, which carries the socket and the tentacle tip alike, so the ratio on
+  // its own would be satisfied by a tentacle that merely came along for the ride.
+  need(anchor(c).anchor_attack_primary > 0.55,
+    `${c}: the attack anchor must travel (${anchor(c).anchor_attack_primary.toFixed(3)})`);
 }
 need(anchor('Grab').anchor_grasp > 0.2, `Grab: the grasp anchor must reach (${anchor('Grab').anchor_grasp.toFixed(3)})`);
 // **The beak is not animated, in any clip, and that is the check.** It sits at the bottom of a well

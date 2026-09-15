@@ -206,6 +206,12 @@ for (const c of ['Attack', 'Grab', 'Heavy']) {
 for (const c of ['Attack', 'Grab']) {
   need(anchor(c).anchor_attack_primary > 2 * anchor(c).anchor_mouth,
     `${c}: the attack anchor must out-travel the mouth (${anchor(c).anchor_attack_primary.toFixed(3)} vs ${anchor(c).anchor_mouth.toFixed(3)})`);
+  // **And a floor under it, because that ratio is now free.** With the beak held still the mouth
+  // socket does not move at all in these clips, so "twice the mouth" is twice nothing and passes
+  // whatever the crown does. What the rule is actually for is that the attack anchor is on the bone
+  // that delivers the blow, so the arm tip has to go somewhere: a tenth of a body length.
+  need(anchor(c).anchor_attack_primary > 0.5,
+    `${c}: the attack anchor must travel (${anchor(c).anchor_attack_primary.toFixed(3)})`);
   need(anchor(c).anchor_grasp > 0.2, `${c}: the grasp anchor must reach (${anchor(c).anchor_grasp.toFixed(3)})`);
 }
 // **The beak is not animated, in any clip, and that is the check.** It sits at the bottom of a
