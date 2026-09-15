@@ -111,8 +111,11 @@ function makeVisitor(era: EraId, def: CreatureDef): Visitor {
  * `asset-sizes.json` has no model shipped, and a pickable animal with nothing to draw is worse than
  * an absent one. That gate is why this reads the shipped sizes rather than a hand-kept list.
  *
- * They are guests in the Triassic too. A guest is not on that roster either, so it visits the game
- * whose folder its files happen to sit in exactly as it visits the other two.
+ * A guest visits **one** game: the one whose folder holds its files, which for these two is the
+ * Triassic. A Cretaceous marine reptile in the Cambrian is not a reward anybody earned — it is an
+ * animal two hundred and fifty million years early, standing on the pick screen of a sea it has
+ * nothing to do with — and the earned visitors, which a player has actually worked for, are the
+ * ones that get to break that rule. So `playing` is a real gate here rather than a formality.
  */
 const GUESTS: Record<EraId, readonly CreatureDef[]> = {
   cambrian: [], devonian: [], triassic: TRIASSIC_GUESTS,
@@ -128,6 +131,7 @@ const GUEST_ORIGIN: Record<string, string> = {
 export function standingVisitors(playing: EraId): Visitor[] {
   const out: Visitor[] = [];
   for (const era of ERA_IDS) {
+    if (era !== playing) continue;              // a guest visits its own game and no other
     for (const def of GUESTS[era]) {
       if (!SHIPPED[era][def.id]) continue;      // no body has landed: not pickable anywhere
       const scale = APEX_SCALE[era];
@@ -137,7 +141,6 @@ export function standingVisitors(playing: EraId): Visitor[] {
       });
     }
   }
-  void playing;   // a guest belongs to no roster, so it is a guest in every game including this one
   return out;
 }
 
