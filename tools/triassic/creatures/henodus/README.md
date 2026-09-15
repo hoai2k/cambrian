@@ -34,11 +34,15 @@ CYCLES on CPU throughout: EEVEE and Workbench want EGL, which this container has
 | Surface distance, authored to twin | p95 **0.014**, p99 0.028, max 0.075; nothing over 0.15 |
 | Joints | **25** — root, body, chest, neck, skull, jaw, carapace, six caudals, four limbs of three |
 | Clips | **24** — the 21 contract clips plus Crawl, Graze and Breathe |
-| Triangles | authored **19,272**, twin **7,584**; LOD fraction 0.394 |
+| Triangles | authored **20,280**, twin **7,584**; LOD fraction 0.374 |
 | Skin tears | worst **4.81×** (Dodge, `fore_paddle_L`, 0.045 → 0.215) |
 | Gape solid | **PASS**, 9 px of 378,000 seen through the body at worst, tolerance 12 |
-| Limb sweep per cycle | Swim 39.6°, Sprint ~48°, Crawl 45–59° at every limb root |
+| Limb sweep per cycle | Swim 39.6°, Sprint 47.5°, Crawl 45–59° at every limb root |
 | Anchors | `anchor_mouth` (jaw), `anchor_mouth_inside` (skull), `anchor_attack_primary` (skull) |
+
+Recorded for the neutral-pose pass: mean curvature radius over mean half-section — tail **10.2**,
+spine **21.2**, neck **4.8** — and paired-limb asymmetry, which on this generation is small: 0.002
+of a body length at every limb joint, and 0.005 of reach between the two forelimbs.
 
 ## The mouth
 
