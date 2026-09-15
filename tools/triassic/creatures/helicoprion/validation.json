@@ -46,8 +46,10 @@
     }
   },
   "restingGape": {
-    "closingRotationDegrees": 18.46,
-    "closingRotationRadians": 0.3223,
+    "closingRotationDegrees": 23.49,
+    "closingRotationRadians": 0.41,
+    "chosenBy": "the largest rotation that keeps 0.95 of the whorl under the palate",
+    "whatTheMidlineGapeAloneWouldAskFor": 0.3223,
     "stations": 13,
     "gapPerStation": [
       {
@@ -149,12 +151,110 @@
     ],
     "verdict": "the generation arrived GAPING: the bind pose carries that gape, so Idle sits at JAW_SHUT and Eat closes through it to swallow. Swim keeps the open mouth, which is what a ram-feeding eugeneodont is doing anyway.",
     "whorl": {
+      "closingSweep": [
+        {
+          "closingRadians": 0.1,
+          "fractionUnderThePalate": 1.0,
+          "worstProtrusionRaw": -0.00701
+        },
+        {
+          "closingRadians": 0.15,
+          "fractionUnderThePalate": 1.0,
+          "worstProtrusionRaw": -0.00441
+        },
+        {
+          "closingRadians": 0.2,
+          "fractionUnderThePalate": 1.0,
+          "worstProtrusionRaw": -0.00189
+        },
+        {
+          "closingRadians": 0.25,
+          "fractionUnderThePalate": 0.9972,
+          "worstProtrusionRaw": 0.00053
+        },
+        {
+          "closingRadians": 0.3,
+          "fractionUnderThePalate": 0.9901,
+          "worstProtrusionRaw": 0.00307
+        },
+        {
+          "closingRadians": 0.35,
+          "fractionUnderThePalate": 0.9788,
+          "worstProtrusionRaw": 0.00551
+        },
+        {
+          "closingRadians": 0.4,
+          "fractionUnderThePalate": 0.9591,
+          "worstProtrusionRaw": 0.00829
+        },
+        {
+          "closingRadians": 0.45,
+          "fractionUnderThePalate": 0.9351,
+          "worstProtrusionRaw": 0.01108
+        },
+        {
+          "closingRadians": 0.5,
+          "fractionUnderThePalate": 0.9196,
+          "worstProtrusionRaw": 0.01373
+        },
+        {
+          "closingRadians": 0.55,
+          "fractionUnderThePalate": 0.8928,
+          "worstProtrusionRaw": 0.01623
+        },
+        {
+          "closingRadians": 0.6,
+          "fractionUnderThePalate": 0.8575,
+          "worstProtrusionRaw": 0.01862
+        },
+        {
+          "closingRadians": 0.65,
+          "fractionUnderThePalate": 0.8166,
+          "worstProtrusionRaw": 0.02107
+        },
+        {
+          "closingRadians": 0.7,
+          "fractionUnderThePalate": 0.7659,
+          "worstProtrusionRaw": 0.02338
+        },
+        {
+          "closingRadians": 0.75,
+          "fractionUnderThePalate": 0.7193,
+          "worstProtrusionRaw": 0.02586
+        },
+        {
+          "closingRadians": 0.8,
+          "fractionUnderThePalate": 0.67,
+          "worstProtrusionRaw": 0.02822
+        },
+        {
+          "closingRadians": 0.85,
+          "fractionUnderThePalate": 0.6234,
+          "worstProtrusionRaw": 0.03043
+        },
+        {
+          "closingRadians": 0.9,
+          "fractionUnderThePalate": 0.5882,
+          "worstProtrusionRaw": 0.03248
+        },
+        {
+          "closingRadians": 0.95,
+          "fractionUnderThePalate": 0.5458,
+          "worstProtrusionRaw": 0.03441
+        },
+        {
+          "closingRadians": 1.0,
+          "fractionUnderThePalate": 0.512,
+          "worstProtrusionRaw": 0.03619
+        }
+      ],
+      "fitFloor": 0.95,
       "method": "every whorl vertex carried through the closing rotation about the jaw hinge and measured against the palate's own ventral surface, which is the roof of the topmost void on the vertical line at that station",
       "whorlVerticesMeasured": 709,
-      "fractionUnderThePalate": 0.9873,
-      "worstProtrusionRaw": 0.00417,
-      "worstProtrusionOverBodyLength": 0.00417,
-      "meanProtrusionOfTheVerticesThatDo": 0.00236
+      "fractionUnderThePalate": 0.952,
+      "worstProtrusionRaw": 0.00886,
+      "worstProtrusionOverBodyLength": 0.00886,
+      "meanProtrusionOfTheVerticesThatDo": 0.0033
     }
   },
   "bones": 23,
@@ -241,7 +341,7 @@
     "Idle": [
       [
         -1.2486679553985596,
-        -2.516855001449585,
+        -2.517362117767334,
         -1.1058669090270996
       ],
       [
@@ -385,7 +485,7 @@
     "Guard": [
       [
         -1.2541264295578003,
-        -2.528475522994995,
+        -2.5285427570343018,
         -1.2824130058288574
       ],
       [
@@ -421,7 +521,7 @@
     "Eat": [
       [
         -1.2486679553985596,
-        -2.516855001449585,
+        -2.517362117767334,
         -1.1058669090270996
       ],
       [

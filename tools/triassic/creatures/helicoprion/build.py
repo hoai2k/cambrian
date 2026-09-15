@@ -696,9 +696,9 @@ def _crossings(y, x=0.):
     return out
 
 
-def _lumen(y):
-    """(floor, roof) of the topmost void inside the head on the line at y, or None."""
-    c = _crossings(y)
+def _lumen(y, x=0.):
+    """(floor, roof) of the topmost void inside the head on the line at (x, y), or None."""
+    c = _crossings(y, x)
     if len(c) < 4 or len(c) % 2:
         return None
     return (c[-3], c[-2])
@@ -706,12 +706,47 @@ def _lumen(y):
 
 _gape = []
 for _y in GAPE_STATIONS:
-    _l = _lumen(_y)
-    if _l is None or _l[1] - _l[0] < 1e-4:
+    # **On the midline, because the mouth has no lateral section to measure.** The flanks were tried
+    # first, on the reasoning that the whorl fills the middle of the lumen and a line down the centre
+    # therefore measures the sliver between the whorl's crown and the palate rather than the gape.
+    # They are the wrong place on this body: the jaw here is a *skinned hinge* in a watertight shell,
+    # so the open mouth is a forward-facing aperture modelled into continuous skin and not a notch
+    # cut through the cheek -- a vertical line at 0.05 off the midline passes through solid head at
+    # every station from the snout to the hinge, two crossings and no void. What the midline does
+    # measure is real and is the thing that bounds the closing: how far the whorl's crown is from
+    # the palate it has to come up to meet.
+    _mid = _lumen(_y, 0.)
+    if _mid is None or _mid[1] - _mid[0] < 1e-4:
         continue
-    _gape.append({'y': round(float(_y), 4), 'floor': round(_l[0], 5), 'roof': round(_l[1], 5),
-                  'gap': round(_l[1] - _l[0], 5),
-                  'closingRadians': round((_l[1] - _l[0]) / abs(_y - MOUTH_HINGE_Y), 4)})
+    _gape.append({'y': round(float(_y), 4), 'floor': round(_mid[0], 5), 'roof': round(_mid[1], 5),
+                  'gap': round(_mid[1] - _mid[0], 5),
+                  'closingRadians': round((_mid[1] - _mid[0]) / abs(_y - MOUTH_HINGE_Y), 4)})
+if os.environ.get('GAPE_PROBE'):
+    for _y in np.linspace(-.470, -.360, 12):
+        _hw = half_width(float(_y))
+        row = ['y %.3f hw %.4f' % (_y, _hw)]
+        for _x in (0., .02, .035, .05, .065, .08):
+            row.append('x%.3f:%s' % (_x, [round(v, 4) for v in _crossings(float(_y), _x)]))
+        print('GAPE_PROBE', ' | '.join(row))
+if os.environ.get('JAW_PROBE'):
+    _jw = np.array([jaw_weight(tuple(q)) for q in raw_co])
+    _head = raw_co[:, 1] < -.30
+    print('JAW_PROBE jaw-owned vertices %d of %d head vertices (%.1f%% of the whole body)'
+          % (int((_jw > .5).sum()), int(_head.sum()), 100. * (_jw > .5).mean()))
+    for _y in (-.46, -.44, -.42, -.40, -.38, -.36):
+        _m = np.abs(raw_co[:, 1] - _y) < .006
+        _sec = raw_co[_m]
+        _w = _jw[_m]
+        if len(_sec) < 4:
+            continue
+        print('JAW_PROBE y %.3f  section %d verts, jaw %d, jaw |x| max %.4f, skull |x| max %.4f, '
+              'jaw z range %.4f..%.4f, skull z min %.4f'
+              % (_y, len(_sec), int((_w > .5).sum()),
+                 float(np.abs(_sec[_w > .5][:, 0]).max()) if (_w > .5).any() else -1,
+                 float(np.abs(_sec[_w <= .5][:, 0]).max()) if (_w <= .5).any() else -1,
+                 float(_sec[_w > .5][:, 2].min()) if (_w > .5).any() else 0,
+                 float(_sec[_w > .5][:, 2].max()) if (_w > .5).any() else 0,
+                 float(_sec[_w <= .5][:, 2].min()) if (_w <= .5).any() else 0))
 assert len(_gape) >= 8, ('no modelled gape found along the head', len(_gape))
 # One rigid rotation cannot close a gape that is not proportional to the distance from the hinge, so
 # the median is taken and the spread is recorded rather than smoothed away. Only the stations with a
@@ -720,8 +755,7 @@ assert len(_gape) >= 8, ('no modelled gape found along the head', len(_gape))
 # the mouth. The front of the mouth is also what a viewer reads as shut or not shut.
 _front = [r for r in _gape if abs(r['y'] - MOUTH_HINGE_Y) > .040]
 assert len(_front) >= 6, ('the gape did not measure forward of the hinge', len(_front))
-JAW_CLOSE = float(np.median([r['closingRadians'] for r in _front]))
-JAW_SHUT = -JAW_CLOSE                     # the jaw channel's own units: positive opens
+GAPE_MEDIAN = float(np.median([r['closingRadians'] for r in _front]))
 
 
 def _roof_at(y):
@@ -729,19 +763,45 @@ def _roof_at(y):
     return float(np.interp(y, ys, [r['roof'] for r in _gape]))
 
 
-# **Does the whorl fit inside when the mouth shuts?** The whorl rides the jaw, so closing carries it
-# up into the mouth; the question is whether it then pushes through the palate. Measured against the
-# palate's own ventral surface -- the roof of the lumen above -- with no normals anywhere in it.
+# **What bounds the closing is the whorl, not the gape.** The rotation the midline gape asks for
+# brings the whorl's crown onto the palate and leaves the *aperture* -- a forward-facing opening
+# modelled into continuous skin, with no lateral section a vertical line can measure -- still plainly
+# parted in a front view. The mouth has to travel further than that to read as shut, and the thing
+# that says how much further is the coil: rotate until the whorl starts pushing through the palate,
+# and stop just before. So the fit is swept rather than evaluated once and `JAW_CLOSE` is the largest
+# rotation that keeps `WHORL_FIT_FLOOR` of the whorl under the palate -- which is also the number the
+# review asked for, "the whorl should mostly fit inside when he does that", measured rather than
+# judged.
 _wh = raw_co[(np.abs(raw_co[:, 0]) < WHORL_HALF_WIDTH)
              & (raw_co[:, 1] > WHORL_BAND[0]) & (raw_co[:, 1] < WHORL_BAND[1])]
 _wh = np.array([p for p in _wh if jaw_weight(tuple(p)) > .5])
 assert len(_wh) >= 40, ('the whorl did not measure', len(_wh))
-_ca, _sa = cos(JAW_SHUT), sin(JAW_SHUT)
-_wy = MOUTH_HINGE_Y + (_wh[:, 1] - MOUTH_HINGE_Y) * _ca - (_wh[:, 2] - MOUTH_HINGE_Z) * _sa
-_wz = MOUTH_HINGE_Z + (_wh[:, 1] - MOUTH_HINGE_Y) * _sa + (_wh[:, 2] - MOUTH_HINGE_Z) * _ca
-_above = np.array([_wz[i] - _roof_at(float(_wy[i])) for i in range(len(_wh))])
+WHORL_FIT_FLOOR = .95
+
+
+def _whorl_above_palate(close):
+    """Every whorl vertex's height above the palate after closing by `close` radians."""
+    ca, sa = cos(-close), sin(-close)
+    wy = MOUTH_HINGE_Y + (_wh[:, 1] - MOUTH_HINGE_Y) * ca - (_wh[:, 2] - MOUTH_HINGE_Z) * sa
+    wz = MOUTH_HINGE_Z + (_wh[:, 1] - MOUTH_HINGE_Y) * sa + (_wh[:, 2] - MOUTH_HINGE_Z) * ca
+    return np.array([wz[i] - _roof_at(float(wy[i])) for i in range(len(_wh))])
+
+
+_sweep = []
+for _c in np.linspace(.10, 1.00, 91):
+    _a = _whorl_above_palate(float(_c))
+    _sweep.append({'closingRadians': round(float(_c), 3),
+                   'fractionUnderThePalate': round(float((_a <= 0).mean()), 4),
+                   'worstProtrusionRaw': round(float(_a.max()), 5)})
+_ok = [r for r in _sweep if r['fractionUnderThePalate'] >= WHORL_FIT_FLOOR]
+assert _ok, ('the whorl never fits under the palate at any closing rotation', _sweep[0])
+JAW_CLOSE = float(max(r['closingRadians'] for r in _ok))
+JAW_SHUT = -JAW_CLOSE                     # the jaw channel's own units: positive opens
+_above = _whorl_above_palate(JAW_CLOSE)
 _inside = float((_above <= 0).mean())
 WHORL_FIT = {
+    'closingSweep': _sweep[::5],
+    'fitFloor': WHORL_FIT_FLOOR,
     'method': 'every whorl vertex carried through the closing rotation about the jaw hinge and '
               'measured against the palate\'s own ventral surface, which is the roof of the '
               'topmost void on the vertical line at that station',
@@ -754,6 +814,8 @@ WHORL_FIT = {
 RESTING_GAPE = {
     'closingRotationDegrees': round(math.degrees(JAW_CLOSE), 2),
     'closingRotationRadians': round(JAW_CLOSE, 4),
+    'chosenBy': 'the largest rotation that keeps %g of the whorl under the palate' % WHORL_FIT_FLOOR,
+    'whatTheMidlineGapeAloneWouldAskFor': round(GAPE_MEDIAN, 4),
     'stations': len(_gape),
     'gapPerStation': _gape,
     'stationsWithALeverUnderThem': len(_front),
@@ -1098,14 +1160,21 @@ meta = {
         'Breath is gill ventilation held in place, not a surface breath: this animal has gills and '
         'never goes up.',
         'This generation was authored gaping, so the bind pose is a gape and not an occlusion. '
-        '`restingGape` measures the rotation that brings the mandible onto the palate -- 18.5 '
-        'degrees, from the topmost void on a vertical line through the head at thirteen stations '
-        '-- and Idle and Guard sit at it, Eat opens off it and shuts through the bind pose to '
-        'swallow, and Swim and Sprint keep the open mouth, which is what a ram-feeding eugeneodont '
-        'is doing anyway. At the shut pose 98.7 % of the whorl is under the palate and the worst '
-        'that is not stands 0.42 % of a body length through it, so the coil does fit in the closed '
-        'mouth; the arc that stays visible below the chin is the front arc the canonical pose '
-        'draws, not the jaw failing to shut.',
+        '`restingGape` measures the closing rotation and Idle and Guard sit at it, Eat opens off it '
+        'and shuts back through the bind pose to swallow, and Swim and Sprint keep the open mouth, '
+        'which is what a ram-feeding eugeneodont is doing anyway. The rotation is bounded by the '
+        'whorl rather than by the gape: it is the largest one that keeps 95 % of the coil under the '
+        'palate, 23.5 degrees against the 18.5 the midline gape alone would ask for.',
+        'What that rotation CANNOT do, and it is a defect in the generation rather than in the rig: '
+        'the modelled gape is a notch cut into the front of the head, and the rim of that notch is '
+        'the skull almost everywhere off the midline. At the mouth stations the jaw owns skin only '
+        'within 0.018 to 0.039 of the centre line while the skull reaches 0.071 to 0.082 and its own '
+        'ventral surface sits above the mandible -- there is no mandibular flank in the mesh to '
+        'raise. So the jaw and the whorl come up and shut the mouth in profile, which is the view '
+        'this animal is seen in, and a straight-on front view still shows an aperture that no jaw '
+        'rotation can close. Fixing that is a regeneration with the mouth shut, which is what this '
+        'era asks its generations for and did not get here. `JAW_PROBE=1` on this builder prints '
+        'the section-by-section evidence and `GAPE_PROBE=1` the vertical crossings behind it.',
         'The whorl is the generated surface, measured and kept rather than re-modelled: 97.9 % of '
         'it is seated inside the lower jaw with only its front arc exposed, as the canonical pose '
         'draws it. Its own narrow gaps are shut here by moving its own walls together; no coil is '
