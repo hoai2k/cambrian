@@ -66,9 +66,14 @@
       "deliveredAt": "2026-09-15"
     },
     "atopodentatus": {
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "turnaround": "not-started",
-      "decidedAt": "2026-09-13T01:02:09.321Z"
+      "decidedAt": "2026-09-13T01:02:09.321Z",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T01:02:09.321Z",
+      "deliveredAt": "2026-09-15"
     },
     "askeptosaurus": {
       "canonical": "greenlit",
@@ -171,9 +176,14 @@
     },
     "odontochelys": {
       "turnaround": "not-started",
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "decidedAt": "2026-09-13T13:57:25.792Z",
-      "promotedFrom": "candidate02"
+      "promotedFrom": "candidate02",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T13:57:25.792Z",
+      "deliveredAt": "2026-09-15"
     },
     "ceratites": {
       "canonical": "delivered",
