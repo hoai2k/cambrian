@@ -312,6 +312,22 @@ for o in (auth, puppet):
     T.bisect_on_curve(o, seam, HINGE_Y, JAW_FRONT_Y - .004, margin=.03)
     T.split_part(o, 'lower jaw', is_jaw, parts)
 
+# **Close the cross-section the cut leaves through the head.** A plane cut leaves the head open
+# across its whole section, and where the mandible is taken away that opening is the back wall of
+# the mouth -- except that there is no wall. A line of sight into the crease between the swung
+# mandible and the cheek runs in through it and out of the far side of the animal: casting a ray
+# through the last failing pixels of this body's gape proof found **one** surface on the whole line,
+# backfacing, and no oral geometry anywhere near it. A hinge envelope is an ellipsoid and fills the
+# middle of a section while leaving its corners; this fills the section itself, out of vertices the
+# cut already made. See `T.cap_cut`, which was written for this and had never been wired to a body.
+CAP = {}
+for _o, _out in ((auth, Vector((0, -1, 0))), (puppet, Vector((0, -1, 0))),
+                 (parts['lower jaw'][auth.name], Vector((0, 1, 0))),
+                 (parts['lower jaw'][puppet.name], Vector((0, 1, 0)))):
+    CAP[_o.name] = T.cap_cut(_o, (lambda c: c.y > HINGE_Y - .004), _out)
+print('CAP', json.dumps(CAP))
+assert all(v > 2 for v in CAP.values()), ('the cut left no section to cap', CAP)
+
 # Every measured tooth patch must belong whole to one jaw or the other. Placodus' first delivery
 # cut its chisels in half with a straight ramp; the measurement is what stops that happening here.
 tooth_report = []

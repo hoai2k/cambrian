@@ -828,9 +828,9 @@
       "radiusOuter": 0.06119582561443898
     }
   },
-  "authoredTriangles": 20600,
-  "twinTriangles": 7982,
-  "twinTriangleFraction": 0.3874757281553398,
+  "authoredTriangles": 20728,
+  "twinTriangles": 8064,
+  "twinTriangleFraction": 0.38903898108838286,
   "twinRemeshTriangles": 56404,
   "twinDecimateRatio": 0.11701297760009766,
   "twinVerticesHeldBackFromRelaxation": 9104,
@@ -1328,23 +1328,23 @@
   "weights": {
     "Cymbospondylus authored body": {
       "maxInfluences": 4,
-      "vertices": 9336,
+      "vertices": 9337,
       "verticesPerBone": {
         "tail_01": 1689,
-        "tail_00": 1836,
-        "tail_02": 2232,
+        "tail_00": 1835,
+        "tail_02": 2231,
         "fore_mid_R": 546,
-        "fore_tip_R": 256,
-        "chest": 3989,
-        "body": 4364,
+        "fore_tip_R": 254,
+        "chest": 4161,
+        "body": 4462,
         "tail_04": 636,
         "tail_03": 1757,
-        "tail_05": 478,
+        "tail_05": 472,
         "hind_upper_R": 733,
-        "neck": 1321,
-        "skull": 957,
+        "neck": 1397,
+        "skull": 981,
         "fore_mid_L": 616,
-        "fore_upper_L": 922,
+        "fore_upper_L": 914,
         "fore_tip_L": 287,
         "fore_upper_R": 871,
         "hind_mid_R": 472,
@@ -1361,7 +1361,7 @@
     },
     "Cymbospondylus procedural volume twin": {
       "maxInfluences": 4,
-      "vertices": 3339,
+      "vertices": 3340,
       "verticesPerBone": {
         "caudal_lower": 183,
         "tail_08": 225,
@@ -1384,17 +1384,17 @@
         "chest": 1570,
         "fore_upper_L": 380,
         "fore_upper_R": 377,
-        "neck": 638,
+        "neck": 639,
         "fore_mid_R": 255,
         "fore_tip_R": 117,
         "fore_mid_L": 276,
         "fore_tip_L": 122,
-        "skull": 527
+        "skull": 528
       }
     }
   },
   "maxInfluences": 4,
-  "meanInfluences": 3.0738461538461537,
+  "meanInfluences": 3.101285793168731,
   "mouth": {
     "method": "modelled cavity",
     "note": "Placodus' geometric method: every head vertex casts its own outward normal back into the mesh over 0.030 raw units, and a vertex that hits is looking across the slit at the lip opposite. The albedo fallback Dinocephalosaurus needed was not used, because this generation models a real mouth.",
@@ -2356,8 +2356,8 @@
   "envelope": {
     "maximumEnvelopeDifference": 0.22690588235855103,
     "maximumEnvelopeDifferenceFractionOfBodyLength": 0.03781764705975851,
-    "surfaceDistanceMax": 0.1810218244791031,
-    "surfaceDistanceP95": 0.03052835799753664,
+    "surfaceDistanceMax": 0.2353728860616684,
+    "surfaceDistanceP95": 0.03026274871081113,
     "envelopeTolerance": 0.24
   },
   "anchors": {

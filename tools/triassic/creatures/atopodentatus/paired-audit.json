@@ -3,22 +3,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 2088372,
-      "sha256": "3d28dcaebd5f8bcea9cc2dd399ebde8d2c64e7539116ffc92ea1253fea17f722",
+      "bytes": 2088344,
+      "sha256": "4896523ffb2d9eb1af18738ea00d49595112b264540709ddb50c7709778f323f",
       "triangles": 22886,
       "vertices": 14865
     },
     {
       "suffix": ".puppet",
-      "bytes": 873964,
-      "sha256": "007d3d1e515a5e1bc7a8b5c6e9987415e5c0c2cc1ce2bfffce3aae2e6ffd8022",
+      "bytes": 873940,
+      "sha256": "c0ddd50acdd98133178b4ff3b0805f7b59436fdae8e709a8c2dee88639b09e7e",
       "triangles": 7868,
       "vertices": 4142
     },
     {
       "suffix": ".lod1",
-      "bytes": 873964,
-      "sha256": "007d3d1e515a5e1bc7a8b5c6e9987415e5c0c2cc1ce2bfffce3aae2e6ffd8022",
+      "bytes": 873940,
+      "sha256": "c0ddd50acdd98133178b4ff3b0805f7b59436fdae8e709a8c2dee88639b09e7e",
       "triangles": 7868,
       "vertices": 4142
     }
@@ -197,7 +197,7 @@
           "clip": "Ability",
           "duration": 2.5,
           "samples": 61,
-          "maxVertexTravel": 0.6829904192975287
+          "maxVertexTravel": 0.6848065084599
         },
         {
           "clip": "Attack",
@@ -257,7 +257,7 @@
           "clip": "Graze",
           "duration": 2.5,
           "samples": 61,
-          "maxVertexTravel": 0.6817237675180735
+          "maxVertexTravel": 0.6835370249238502
         },
         {
           "clip": "Growth",
@@ -340,7 +340,7 @@
           "clip": "Ability",
           "duration": 2.5,
           "samples": 61,
-          "maxVertexTravel": 0.6829904192975287
+          "maxVertexTravel": 0.6848065084599
         },
         {
           "clip": "Attack",
@@ -400,7 +400,7 @@
           "clip": "Graze",
           "duration": 2.5,
           "samples": 61,
-          "maxVertexTravel": 0.6817237675180735
+          "maxVertexTravel": 0.6835370249238502
         },
         {
           "clip": "Growth",

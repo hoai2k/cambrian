@@ -2247,7 +2247,7 @@
       ]
     },
     "liningFittedPerVertex": true,
-    "liningWorstSectionHullClearance": 0.002508067729893492,
+    "liningWorstSectionHullClearance": 0.0025055615133307584,
     "liningVerticesOutsideTheSectionHull": 0,
     "toothPatches": [
       {
@@ -2327,7 +2327,7 @@
       {
         "part": "Oral cavity lining",
         "clearanceInsideSectionX": 0.0021507030682803158,
-        "clearanceInsideSectionZ": 0.0022748814960437055,
+        "clearanceInsideSectionZ": 0.0026158997789025307,
         "signedDepthProbeMin": -0.009672318585216999
       },
       {

@@ -434,6 +434,22 @@ for o in [auth, puppet]:
     K.bisect_mouth(o, seam, HINGE_X, X_SNOUT + .02, HINGE_X - .02)
     K.split(o, 'lower jaw', is_jaw, parts)
 
+# **Close the cross-section the cut leaves through the head.** A plane cut leaves the head open
+# across its whole section, and where the mandible is taken away that opening is the back wall of
+# the mouth -- except that there is no wall. A line of sight into the crease between the swung
+# mandible and the cheek runs in through it and out of the far side of the animal: casting a ray
+# through the last failing pixels of this body's gape proof found **one** surface on the whole line,
+# backfacing, and no oral geometry anywhere near it. A hinge envelope is an ellipsoid and fills the
+# middle of a section while leaving its corners; this fills the section itself, out of vertices the
+# cut already made. See `K.cap_cut`, which was written for this and had never been wired to a body.
+CAP = {}
+for _o, _out in ((auth, Vector((1, 0, 0))), (puppet, Vector((1, 0, 0))),
+                 (parts['lower jaw'][auth.name], Vector((-1, 0, 0))),
+                 (parts['lower jaw'][puppet.name], Vector((-1, 0, 0)))):
+    CAP[_o.name] = K.cap_cut(_o, (lambda c: c.x < HINGE_X + .004), _out)
+print('CAP', json.dumps(CAP))
+assert all(v > 2 for v in CAP.values()), ('the cut left no section to cap', CAP)
+
 mouthmat = K.flat_material('Coelophysis mouth interior', (.32, .13, .12, 1), .62, cull=True)
 toothmat = K.flat_material('Coelophysis teeth', (.86, .83, .74, 1), .26)
 oralparts = []
