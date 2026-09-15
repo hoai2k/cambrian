@@ -59,15 +59,6 @@ export async function auditPair({ id, base, here, local, joints, sockets: socket
   const CLIPS = meta.clips; const LOOPS = meta.looping;
   const report = { id, models: [], clips: CLIPS.length, joints, sockets: socketCount };
 
-  if (process.argv.includes('--decode')) {
-    fs.mkdirSync(local, { recursive: true });
-    for (const suffix of ['', '.puppet']) {
-      const d = await io.read(`${base}${suffix}.glb`);
-      for (const e of d.getRoot().listExtensionsUsed()) if (e.extensionName === 'EXT_meshopt_compression') e.dispose();
-      fs.writeFileSync(`${local}/${id}${suffix}.unpacked.glb`, await io.writeBinary(d));
-    }
-  }
-
   for (const suffix of ['', '.puppet', '.lod1']) {
     const file = `${base}${suffix}.glb`;
     let d = await io.read(file);
@@ -136,6 +127,21 @@ export async function auditPair({ id, base, here, local, joints, sockets: socket
     }
     report.models.push({ suffix, bytes: fs.statSync(file).size, sha256: hash(fs.readFileSync(file)), triangles: tris, vertices: verts });
   }
+  // Decode **after** packaging, never before. The review renders read these copies, a decode taken
+  // before the repack is a copy of the previous build, and a stale copy renders silently: one pass
+  // of these sheets showed Cartorhynchus' paddles coming apart into spikes at the extremes of its
+  // stroke, off a decode written before its skin weights were relaxed, while the body that shipped
+  // was clean. `creature_render.py` now refuses a decode older than the file it came from, which
+  // only works if this writes the newer one.
+  if (process.argv.includes('--decode')) {
+    fs.mkdirSync(local, { recursive: true });
+    for (const suffix of ['', '.puppet']) {
+      const d = await io.read(`${base}${suffix}.glb`);
+      for (const e of d.getRoot().listExtensionsUsed()) if (e.extensionName === 'EXT_meshopt_compression') e.dispose();
+      fs.writeFileSync(`${local}/${id}${suffix}.unpacked.glb`, await io.writeBinary(d));
+    }
+  }
+
   report.twinTriangleFraction = report.models[1].triangles / report.models[0].triangles;
   assert(report.twinTriangleFraction < 0.40, 'the twin must be under 40 % of the authored triangles');
   assert.equal(report.models[1].sha256, report.models[2].sha256, 'lod1 must be the twin, byte for byte');

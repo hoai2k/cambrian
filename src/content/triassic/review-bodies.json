@@ -4,8 +4,8 @@
     "model": "assets/triassic/creatures/cartorhynchus.glb",
     "puppet": "assets/triassic/creatures/cartorhynchus.puppet.glb",
     "lod": "assets/triassic/creatures/cartorhynchus.lod1.glb",
-    "bytes": 1755212,
-    "sha256": "70eb9ffd57b805dfad9055f530b30699731d7c9122951978aa4fb9e67c1e6584",
+    "bytes": 1834964,
+    "sha256": "ee9e361488008dc9d920e2d7b732d529d2fb6fd9f94028ed1601d69a0cad1668",
     "clips": [
       "Ability",
       "Attack",
@@ -76,8 +76,8 @@
     "model": "assets/triassic/creatures/cymbospondylus.glb",
     "puppet": "assets/triassic/creatures/cymbospondylus.puppet.glb",
     "lod": "assets/triassic/creatures/cymbospondylus.lod1.glb",
-    "bytes": 1920096,
-    "sha256": "8c206df8e1f4296b4d0c671192115d446875e385639b7fb5dbf4b3b576c792c9",
+    "bytes": 1966244,
+    "sha256": "ddf1a1b32d0b9db02583169aec75b7b9bf8e21d6be9aa22d23b6758a77ced8fe",
     "clips": [
       "Ability",
       "Attack",
@@ -174,8 +174,8 @@
     "model": "assets/triassic/creatures/hupehsuchus.glb",
     "puppet": "assets/triassic/creatures/hupehsuchus.puppet.glb",
     "lod": "assets/triassic/creatures/hupehsuchus.lod1.glb",
-    "bytes": 1865824,
-    "sha256": "910a7c72e90034771dee862ea7c7f51011a7dafbc1d38e0248a4994cc70f05ee",
+    "bytes": 1911472,
+    "sha256": "395a93b1ee73e105d2bd7b4fcf0b906b942d8539330863c147ae8669ecfd9675",
     "clips": [
       "Ability",
       "Attack",
@@ -243,8 +243,8 @@
     "model": "assets/triassic/creatures/mixosaurus.glb",
     "puppet": "assets/triassic/creatures/mixosaurus.puppet.glb",
     "lod": "assets/triassic/creatures/mixosaurus.lod1.glb",
-    "bytes": 1810252,
-    "sha256": "5b1ba4c6301ec232af558969380c02e57c2c87bc7b05b465dd155b413644522a",
+    "bytes": 1859340,
+    "sha256": "75fefe166b9dada21d63637b4c173c30f071f0ddf43ffd57f0a6c04dc981c532",
     "clips": [
       "Ability",
       "Attack",

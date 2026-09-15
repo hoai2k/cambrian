@@ -3,22 +3,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1865824,
-      "sha256": "910a7c72e90034771dee862ea7c7f51011a7dafbc1d38e0248a4994cc70f05ee",
+      "bytes": 1911472,
+      "sha256": "395a93b1ee73e105d2bd7b4fcf0b906b942d8539330863c147ae8669ecfd9675",
       "triangles": 20924,
       "vertices": 11918
     },
     {
       "suffix": ".puppet",
-      "bytes": 759584,
-      "sha256": "29f2f4f39ecb5c089c599b1193ca56284d468172ded802ee7939892a1c1803b4",
+      "bytes": 775468,
+      "sha256": "da48df005dd528898da2e4cc9f5cade01093ba2309b1a6147661060cc4ad3e4e",
       "triangles": 7660,
       "vertices": 3941
     },
     {
       "suffix": ".lod1",
-      "bytes": 759584,
-      "sha256": "29f2f4f39ecb5c089c599b1193ca56284d468172ded802ee7939892a1c1803b4",
+      "bytes": 775468,
+      "sha256": "da48df005dd528898da2e4cc9f5cade01093ba2309b1a6147661060cc4ad3e4e",
       "triangles": 7660,
       "vertices": 3941
     }
@@ -97,95 +97,95 @@
   "clipSignatures": [
     {
       "name": "Ability",
-      "sha256": "d363c3deae2dbf7c05033b18f1838c1d31e453889b218ff477f059b43fd3ac7c"
+      "sha256": "db38e6307f3b5eadfb1d937da2a8a4cfe0c23bdd104039bbea95f6e918ffb296"
     },
     {
       "name": "Attack",
-      "sha256": "7361dbe35d96471f82780b2ef8d3f77b0723b928d0968bca53ff7a474e034509"
+      "sha256": "265238114257a3192223e63ea13b48ddf3a9f5f0a65f70dbe87aadfb4507c306"
     },
     {
       "name": "Bite",
-      "sha256": "4ec470e74de6bf763d5b04cd22d2a11efe3842ba5174a72431fff9dfd070d253"
+      "sha256": "0e9d8bf29e4d799c794946cb7afbdf1c71e56c7f3188421e4e1ea482bca4a45c"
     },
     {
       "name": "Breath",
-      "sha256": "6143cd194ae4cb5000807ab8512fa2dc41834bd85d2078d065c2cac8d047832e"
+      "sha256": "55440e3162eb2d745c5d7ef911495793a18f5d2fbfdd028844b58d672c8a65f1"
     },
     {
       "name": "Breathe",
-      "sha256": "1980bccf6bc5155d9ea103eee513d72aa56ec70dfe01f6dc21f6e6a10cd79aec"
+      "sha256": "c42ed0675c2147ac375baf034e1086d071a2188348530168d7e6e924e040d6a3"
     },
     {
       "name": "Death",
-      "sha256": "7107a9353d8da73186f784adef2d448c1e2be8ad82d6a8bfdbdedcde51ea37a1"
+      "sha256": "5ba265b89003ba1e84e21610aa892d2b5372a2c5663c649e29e018d64921dc34"
     },
     {
       "name": "Dive",
-      "sha256": "d74fc9219e6f7c337c16f8370edf0d2fa045bb5e8095719d2e18106a9ad1d141"
+      "sha256": "024db90063d3d7a02d7a077c1af664c3891edc31ca2c06baf10db3af15748aed"
     },
     {
       "name": "Dodge",
-      "sha256": "3515ee944d68e400dc973bd14e6feaf2f5d5b2bdb394002e068f8958c7c82e9c"
+      "sha256": "00aa632fe8fcedff095d4bd9f6c8ea3bcd342e7cfb6a21bed2e21dd97b54f664"
     },
     {
       "name": "Eat",
-      "sha256": "565f2247b68258b00fdefb9937f87d899deeea51a1aaaef3c1e3c44ef4e1b219"
+      "sha256": "35accaa7c80dd53b1da9cd5ab31b47e7e51ccc4bfdb5fc0b6f4710be0c5c5053"
     },
     {
       "name": "Grab",
-      "sha256": "870a7a3a01411f580761b75db7b9a4694da63c3e027a159fd1772d0564a58bde"
+      "sha256": "b295c3d444e3f283780477eb5abb33d01bd4695f5fae41b20779c828e3a21d90"
     },
     {
       "name": "Growth",
-      "sha256": "2fc9c987d6dbeeeed2dd92f47cc4129c4a749a31cfe2e77c60519216367b8005"
+      "sha256": "24ee418fb87dde282a2afdb91a66310e960da303a89eb5af83710d16353e26a8"
     },
     {
       "name": "Guard",
-      "sha256": "8ac022cb6124627a00ddf48bd511ba1520313e62bf798b4b832f143dc49c3555"
+      "sha256": "aa070c1d44aab2dcbdeb6e16fc87c5a3db36f22ced066955835cf1ac9416192b"
     },
     {
       "name": "Gulp",
-      "sha256": "69cd819afd9f234c748be480a0326a64f310b0fbb493c67d86ffc17df4934d9c"
+      "sha256": "465d2ddaec0ffc32dba55f743055a69a4434eb57b876591bfe199d610e700235"
     },
     {
       "name": "Heavy",
-      "sha256": "dc981dbd7a6a576c158668a8d75a02a2efdac546e1f91bda1327f8108a38b8ad"
+      "sha256": "b35b8ab95f9910e158dbe9b9a806399b09c59ecc338990ed084a81a7dc2835c1"
     },
     {
       "name": "Hit",
-      "sha256": "db528acbed43fd599a0dc0900868c9c18075eed5549801a335d2be42866b6634"
+      "sha256": "c4201163f8e89dd002bc58e7af9378fa6127db734932f235b2875a1584fd45ca"
     },
     {
       "name": "Idle",
-      "sha256": "f36db443251ec0ba16cd9aa047050a9352071f5f13776f341e670aa183249161"
+      "sha256": "8f9ccebb8ac415ac1a18f816ff71b69de49dd7edde6843d902beef8477ea5444"
     },
     {
       "name": "Parry",
-      "sha256": "1577e4a0b6420b13d6a2f2db88d0663eec15b8cab85e0ee859fbe82718ea4c4a"
+      "sha256": "98d9acdd25f505729a18463c1f042a5f5cd5edc1ab826d0363ab8416611e27c6"
     },
     {
       "name": "Rise",
-      "sha256": "4e25687a3aef4c545eaa6b0c57b49ae79a9d736abb969372be6d9ccb24059cf7"
+      "sha256": "1e71eb801533f4d03c0014b248316c1dfece385425a8e1a64ba7b362a82103b3"
     },
     {
       "name": "Sprint",
-      "sha256": "0baaed3a781c41e3972730119af7e80a7b42842ab165d947cc955cbf48b76b07"
+      "sha256": "dc384a103111c757d945f94597547b66760a44c628c4eb73a5c08b753a610e2a"
     },
     {
       "name": "Stagger",
-      "sha256": "626318abfba0cc5f2c0543a277e38080eb67f993f79dcaebada8fd485c5ce8c8"
+      "sha256": "8edfd5a7431735bd4c0192a2fbce742e95096b9a353f168b5ad3bdf7678fd03c"
     },
     {
       "name": "Swim",
-      "sha256": "aae7002d7590246901cfeca90e7ad5a4827c1566b233efd56a7978804e216ff3"
+      "sha256": "13016287d20cd3b93e39721cb8db4af8d717cf6b51cb79c8b6443e39f5b59876"
     },
     {
       "name": "TurnLeft",
-      "sha256": "652ad584ff66c74b7acc62701c01eda01fab94ded7f87cd0aaca3e21ac2e3aff"
+      "sha256": "fc80af3a34f0e508a06e962c2982abaab63e6c7f95cc02c297915ab32c6042ee"
     },
     {
       "name": "TurnRight",
-      "sha256": "394285a9036ee67d56186499f48452ad91db1d50a961a79cac4ed12d16b17957"
+      "sha256": "a25d0c670a38077405c548f4327daa3bf45309fdb69e6207bbc6bf8e2947fb8a"
     }
   ],
   "twinTriangleFraction": 0.36608679028866375,
@@ -227,7 +227,7 @@
           "clip": "Death",
           "duration": 1.7999999523162842,
           "samples": 61,
-          "maxVertexTravel": 1.6373415450925068
+          "maxVertexTravel": 1.5541526129831438
         },
         {
           "clip": "Dive",
@@ -340,139 +340,139 @@
           "clip": "Ability",
           "duration": 2.4000000953674316,
           "samples": 61,
-          "maxVertexTravel": 1.0044593681745433
+          "maxVertexTravel": 1.0042924786707992
         },
         {
           "clip": "Attack",
           "duration": 1,
           "samples": 61,
-          "maxVertexTravel": 1.418051347521848
+          "maxVertexTravel": 1.4177633743400113
         },
         {
           "clip": "Bite",
           "duration": 0.5,
           "samples": 61,
-          "maxVertexTravel": 0.9215894244473548
+          "maxVertexTravel": 0.921372935397418
         },
         {
           "clip": "Breath",
           "duration": 2.4000000953674316,
           "samples": 61,
-          "maxVertexTravel": 0.5905999557076437
+          "maxVertexTravel": 0.5904856683119447
         },
         {
           "clip": "Breathe",
           "duration": 3,
           "samples": 61,
-          "maxVertexTravel": 0.5042249489622738
+          "maxVertexTravel": 0.5041200221684742
         },
         {
           "clip": "Death",
           "duration": 1.7999999523162842,
           "samples": 61,
-          "maxVertexTravel": 1.6345025626744494
+          "maxVertexTravel": 1.6344938446844293
         },
         {
           "clip": "Dive",
           "duration": 1.399999976158142,
           "samples": 61,
-          "maxVertexTravel": 0.5162503442080731
+          "maxVertexTravel": 0.5161415970120871
         },
         {
           "clip": "Dodge",
           "duration": 0.5,
           "samples": 61,
-          "maxVertexTravel": 0.8563555068697559
+          "maxVertexTravel": 0.8561680541202107
         },
         {
           "clip": "Eat",
           "duration": 1.600000023841858,
           "samples": 61,
-          "maxVertexTravel": 0.5708818143136465
+          "maxVertexTravel": 0.5707637069423186
         },
         {
           "clip": "Grab",
           "duration": 1.100000023841858,
           "samples": 61,
-          "maxVertexTravel": 0.7115892390177361
+          "maxVertexTravel": 0.711404720331517
         },
         {
           "clip": "Growth",
           "duration": 1.399999976158142,
           "samples": 61,
-          "maxVertexTravel": 0.5559057360303934
+          "maxVertexTravel": 0.5558222599210735
         },
         {
           "clip": "Guard",
           "duration": 1.2000000476837158,
           "samples": 61,
-          "maxVertexTravel": 0.38987011947526656
+          "maxVertexTravel": 0.3898103409431018
         },
         {
           "clip": "Gulp",
           "duration": 1.399999976158142,
           "samples": 61,
-          "maxVertexTravel": 2.6115650761452867
+          "maxVertexTravel": 2.6113059864232997
         },
         {
           "clip": "Heavy",
           "duration": 1.2000000476837158,
           "samples": 61,
-          "maxVertexTravel": 1.4198713440825992
+          "maxVertexTravel": 1.4195828581545151
         },
         {
           "clip": "Hit",
           "duration": 0.6000000238418579,
           "samples": 61,
-          "maxVertexTravel": 0.5986228751070938
+          "maxVertexTravel": 0.5985383625672629
         },
         {
           "clip": "Idle",
           "duration": 2.5999999046325684,
           "samples": 61,
-          "maxVertexTravel": 0.43829311055394055
+          "maxVertexTravel": 0.43820173180248445
         },
         {
           "clip": "Parry",
           "duration": 0.4000000059604645,
           "samples": 61,
-          "maxVertexTravel": 1.0211813973132344
+          "maxVertexTravel": 1.0210797043453603
         },
         {
           "clip": "Rise",
           "duration": 1.399999976158142,
           "samples": 61,
-          "maxVertexTravel": 0.519260592745735
+          "maxVertexTravel": 0.5191469941606072
         },
         {
           "clip": "Sprint",
           "duration": 1.100000023841858,
           "samples": 61,
-          "maxVertexTravel": 2.1081132211299547
+          "maxVertexTravel": 2.107814581821192
         },
         {
           "clip": "Stagger",
           "duration": 1.2000000476837158,
           "samples": 61,
-          "maxVertexTravel": 0.8137550928356897
+          "maxVertexTravel": 0.8136738351792826
         },
         {
           "clip": "Swim",
           "duration": 1.600000023841858,
           "samples": 61,
-          "maxVertexTravel": 1.5759563377440793
+          "maxVertexTravel": 1.575675451454614
         },
         {
           "clip": "TurnLeft",
           "duration": 1.5,
           "samples": 61,
-          "maxVertexTravel": 0.7401211925619499
+          "maxVertexTravel": 0.7401359735368288
         },
         {
           "clip": "TurnRight",
           "duration": 1.5,
           "samples": 61,
-          "maxVertexTravel": 1.6265632986883587
+          "maxVertexTravel": 1.6264050966395256
         }
       ]
     }

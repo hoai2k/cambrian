@@ -9,7 +9,7 @@ shading point is made transparent. Without that, a review shot shows the near wa
 lining that the runtime throws away, and cannot be used to judge either fault.
 """
 import bpy, os, sys
-from mathutils import Vector
+from mathutils import Vector, Quaternion
 from pathlib import Path
 
 
@@ -106,9 +106,18 @@ def poser(scene, rig):
 
 
 def renderer(scene, cam):
-    def render(file, w=700, h=525, loc=(7, -5, 4.2), target=(0, 0, 0), scale=6.4):
+    def render(file, w=700, h=525, loc=(7, -5, 4.2), target=(0, 0, 0), scale=6.4, roll=0.):
         cam.location = loc
-        cam.rotation_euler = (Vector(target) - cam.location).to_track_quat('-Z', 'Y').to_euler()
+        q = (Vector(target) - cam.location).to_track_quat('-Z', 'Y')
+        # `roll` turns the camera about its own view axis. The top view needs it: an orthographic
+        # camera's `ortho_scale` is the *wider* image dimension, these bodies run along world Y, and
+        # world Y maps to image up under the default track -- so a 4:3 top view of a body framed to
+        # its own length showed three quarters of it and cut the tail off. That is what made
+        # Cymbospondylus' travelling wave look like no wave at all on the first contact sheet: the
+        # part of the animal doing the moving was outside the frame.
+        if roll:
+            q = q @ Quaternion((0., 0., 1.), roll)
+        cam.rotation_euler = q.to_euler()
         cam.data.ortho_scale = scale
         scene.render.resolution_x = w
         scene.render.resolution_y = h

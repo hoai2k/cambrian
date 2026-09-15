@@ -141,7 +141,68 @@ dentition**, and that is a limitation of the generation, recorded rather than pa
 
 ### Gape see-through
 
-<!--SEE-THROUGH-->
+The metric is a **flood fill from the border**, not a column scan. A column scan
+counts every transparent pixel between the top and bottom of the head, which on a three-quarter
+view of an open mouth includes the background visible *past* the animal between the jaw and the
+shoulder: it read 7-11 % on bodies with no hole in them at all, and the number it was reporting was
+the framing. Filling the transparency in from the edge of the image and counting only what the fill
+cannot reach leaves exactly the pixels that are enclosed by the animal — a hole straight through it
+and nothing else.
+
+Each clip is photographed at the phase **its own gape is widest**, from three views, framed on the
+midpoint of skull and `anchor_mouth` in the skull's own frame, with the backface cull emulated
+(CYCLES ignores `use_backface_culling`, and without the emulation a review shot shows the near wall
+of the lining that the runtime throws away, which hides the fault instead of showing it).
+
+| Clip | gape | worst enclosed hole |
+| --- | ---: | ---: |
+| Idle | 0.04 rad (2.3°) | 1 px of 279405 = 0.0004 % |
+| Bite | 0.54 rad (31.2°) | 1 px of 205481 = 0.0005 % |
+| Attack | 0.48 rad (27.5°) | 5 px of 304081 = 0.0016 % |
+| Heavy | 0.60 rad (34.2°) | 2 px of 284475 = 0.0007 % |
+| Eat | 0.44 rad (25.1°) | 2 px of 215608 = 0.0009 % |
+| Ability | 0.46 rad (26.4°) | 1 px of 223599 = 0.0004 % |
+
+**The backdrop proof.** Widest gape of each clip is then rendered against a saturated backdrop
+twice — once with the cull shim and once without — and the two images differed by
+**0.0004 % of pixels** at worst (largest single-channel difference 9/255, which is CYCLES' own sampling
+noise at 10 samples). Comparing against the plain background instead would have measured the
+backdrop and passed whatever the mesh did; comparing the two renders of the same frame is what
+actually says the lining closes the mouth.
+
+**The generation arrived mouth-closed.** Nothing here is a gaping pose brought shut: the jaw sits
+closed in the neutral pose because that is how the intake surface was modelled, the cut is taken
+along the measured seam of a closed mouth, and every clip that opens it opens it from there.
+
+### Skinning tears
+
+`node tools/triassic/skin-tears.mjs` sweeps every edge of every skinned mesh over 17 phases of all
+23 clips and reports the ones stretched furthest past their rest length, with an absolute floor of
+1.5 % of body length so a thousandth of oral geometry cannot outrank a torn flank.
+`_pipeline/record-tears.mjs` runs the same sweep and writes it into `validation.json`, split in two,
+because one number for both halves hides the half that matters:
+
+| | worst ratio | on | in | grew |
+| --- | ---: | --- | --- | --- |
+| **skin** | **3.62x** | `hind_mid_R` | Dart | 0.020 → 0.071 |
+| oral lining | 29.16x | `skull` | Heavy | 0.006 → 0.179 |
+
+The **skin** figure is the one to read, and the one to compare against the shore batch
+(Nothosaurus 2.98x, Tanystropheus 6.1x, Placodus 12.4x, Macrocnemus 23.3x, Coelophysis 25.3x). The
+lining is a single skinned tube whose roof rides the skull and whose floor rides the jaw: the wall
+between them is *built* to stretch, its rest length at a shut mouth is nearly nothing, and its ratio
+at full gape says the mouth opened rather than that anything tore.
+
+The first build of this body measured far worse, and the fix is in the weights rather than in the
+gates. Every gate a builder writes — a shell-thickness threshold that tells a blade from a flank, a
+radius round a limb's polyline — is a per-vertex decision, and two vertices a hundredth of a body
+apart can fall on opposite sides of one. `T.relax_weights` diffuses the weight field over the mesh's
+own edge graph before it is written, **coupled by inverse edge length** so the sliver triangles a
+Tripo surface carries (one thirteenth of the median edge, on this batch) pull their two ends
+together hardest, welding runs joined by edges under a quarter of the median into one weight set,
+and **trimming to four influences on every pass rather than once at the end** — a long tail of tiny
+influences makes a single top-four cut pick a different four on neighbouring vertices, which is a
+worse discontinuity than the gate it was sent to fix.
 
 ## Rig and motion
 
@@ -211,6 +272,26 @@ what there is, is a launch.
 Dart carries the animal twice as far as Attack does in less time, and puts half of that travel
 inside a quarter of the clip. That is the difference between a fast-start and a bite.
 
+### What the limbs do, in degrees
+
+The standing rule is that a limbed swimmer's dash has to paddle, and this animal is the exception
+the rule has to survive: an ichthyosaur's forefin is a **hydrofoil**, not an oar. Nothing in the
+anatomy rows — the humerus is short, the blade is stiff, the propulsion is entirely axial — so a
+`Sprint` that swung the fins back and forth would be a worse animal, not a more compliant one.
+`limbSweepDegrees` in `validation.json` is what it does instead, measured at the limb root over a
+whole cycle:
+
+| Clip | fore | hind |
+| --- | ---: | ---: |
+| Swim | 10° along the body, 10° out from the flank | 6° / 6° |
+| Sprint | 14° / 14° | 8° / 8° |
+
+That is the fin *setting its angle against the beat*, and the figure is deliberately not small: the
+first build ran it at 0.030 rad, which measured about five degrees over a cycle and read on the
+sheets as a fin welded to the flank. Where the fins genuinely work is the manoeuvres — they set
+pitch in `Dive` and `Rise`, bank the turns, brace in `Guard` and `Parry`, and cock and drive with
+the strike — and those are much larger angles than either row above.
+
 ## Measurements
 
 `mixosaurus-profile.json` records **21 exact plane-intersection envelopes** of both actual meshes.
@@ -249,8 +330,17 @@ assertions: the wave travels in order, the body carries **between 0.30 and 0.56*
 here), the dorsal fin keels rather than flaps, the beat grows backwards, the head holds the line,
 the lobes lag, Dart keeps its mouth shut and is explosive, and the gape peaks on the drive.
 
-Sheets, rendered from the **decoded packaged** files through identical cameras and lights for both
-models:
+Sheets, rendered from the **decoded packaged** file — the authored body alone. The twin's own pose
+set is not rendered: the pairing is verified by the audit, which checks *parity* and cannot see
+deformation at all, and every real defect this batch turned up was on the authored body and
+invisible on a twin that has no fin rays and no toes. The twin keeps its byte-identical LOD1, its
+envelope and surface measurements, the parity checks and its delivered portrait; only the
+side-by-side picture is gone.
+
+`creature_render.py` refuses a decoded copy older than the packaged file it came from. A stale
+decode renders silently and looks fresh — one pass of these sheets showed Cartorhynchus' paddles
+coming apart into spikes at the extremes of its stroke, off a decode written two builds earlier,
+while the body that shipped was clean.
 
 - [Side, top and front](paired-volume-sheet.jpg)
 - [Deformation: Idle, Swim, the turns, Dive, Rise, Attack, Bite](paired-deformation-sheet.jpg)
@@ -268,7 +358,7 @@ No independent human review is invented by this automated QA record.
 /opt/blender/blender --background --factory-startup --python tools/triassic/creatures/mixosaurus/build.py
 node tools/triassic/creatures/mixosaurus/audit.mjs --package --decode
 /opt/blender/blender -b --factory-startup --python tools/triassic/creatures/mixosaurus/render.py -- --decoded
-/opt/blender/blender -b --factory-startup --python tools/triassic/creatures/mixosaurus/render.py -- --decoded --twin
+/opt/blender/blender -b --factory-startup --python tools/triassic/creatures/mixosaurus/render.py -- --portraits --twin
 /opt/blender/blender -b --factory-startup --python tools/triassic/creatures/mixosaurus/mouth-views.py
 python3 tools/triassic/creatures/mixosaurus/contact-sheets.py
 node tools/triassic/review-bodies.mjs
@@ -293,7 +383,9 @@ three ichthyosauromorphs in this batch is `tools/triassic/creatures/_pipeline/`.
   It is registered in `src/content/triassic/review-bodies.json`, the viewer-only register for a
   built body waiting on a human.
 - **There are no eye globes**, as on every Triassic body delivered so far.
-- **No portraits are written.** `render.py -- --portraits` produces them into `portraits/`; the
-  roster's placeholder cards stay where they are until a human decides this body ships.
+- **Only the twin's portrait is written** (`public/assets/triassic/creatures/mixosaurus.puppet.png`),
+  beside the other delivered bodies that carry one. The authored body's roster cards are not:
+  `render.py -- --portraits` produces them into `portraits/`, and the placeholder cards cut from the
+  canonical pose stay where they are until a human decides this body ships.
 - Living colours, soft tissues and movements are artistic reconstruction. World travel, grip and
   capture rules remain engine-owned.

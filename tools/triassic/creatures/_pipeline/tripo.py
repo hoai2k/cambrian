@@ -18,13 +18,28 @@ units where **the head is at -Y, up is +Z, and the body is 1.0 long along Y**. `
 builder multiplies by the engine scale, and glTF's `export_yup` then puts the head at +Z, where
 every shipped body in this repository keeps it.
 """
-import bpy, bmesh, math, json, struct, hashlib
+import bpy, bmesh, math, json, struct, hashlib, sys, os
 import numpy as np
 from mathutils import Vector, Matrix, Quaternion
 from mathutils.bvhtree import BVHTree
 from mathutils.geometry import barycentric_transform
 
 TAU = 2 * math.pi
+
+
+# **Blender exits 0 when a builder raises.** The traceback is printed, the process tears down
+# cleanly, and the shell sees success -- so a build that stopped on its own assertion reports "BUILD
+# OK" and leaves last run's artefacts sitting there looking fresh. Every one of the four builders
+# imports this module before it does anything, so installing the hook here covers all of them.
+def _die(exc_type, exc, tb):
+    import traceback
+    traceback.print_exception(exc_type, exc, tb)
+    sys.stdout.flush()
+    sys.stderr.flush()
+    os._exit(1)
+
+
+sys.excepthook = _die
 
 
 def smooth(t):
@@ -792,6 +807,107 @@ def limb_chain(names, cum, s, blend=.022):
         take = remaining * (edges[i] if i < len(edges) else 0.)
         out[n] = remaining - take
         remaining = take
+    return out
+
+
+def relax_weights(o, per_vertex, passes=3, keep=4, hold=.45):
+    """Smooth the skin weights over the mesh's own edge graph, then trim back to four influences.
+
+    **This is what stops a fin tearing.** Every gate a builder writes -- a thickness threshold that
+    separates a blade from a flank, a radius round a limb's polyline, a height off the axis -- is a
+    decision taken per vertex, and two vertices a hundredth of a body apart can fall on opposite
+    sides of one. Cymbospondylus' first build had vertices out on the right forefin weighted 1.00 to
+    `fore_tip_R` sitting against neighbours weighted 0.95 to `chest`, because the neighbour measured
+    a hundredth thicker than the blade threshold; `tools/triassic/skin-tears.mjs` read that as an
+    edge going from 0.018 to 0.409, a 23x stretch, and at gameplay scale it is a spike of skin
+    pulled off the flipper. No amount of tuning the gate fixes the class of fault -- a gate always
+    has an edge -- but a diffusion over the surface does, because a weight field that is smooth on
+    the mesh cannot tear it.
+
+    `hold` is how much of its own weight a vertex keeps each pass; the rest is the neighbourhood
+    mean. Three passes at 0.45 spread an influence about two rings, which is enough to turn any
+    step into a ramp and not enough to pull a limb's weights out onto the trunk.
+
+    The neighbourhood is weighted by **1/length**, and that is the half that matters on a Tripo
+    surface. A generation is not a clean quad grid: it carries sliver triangles whose shortest edge
+    is a tenth of the median, and linear-blend skinning turns a weight *difference* into a distance
+    whatever the edge under it is. Cartorhynchus had two vertices 0.0011 apart -- a thirteenth of
+    its own median edge -- differing by 0.076 on `hind_mid_L`, and on a rowing forelimb that is
+    0.045 units of separation, a 40x stretch and a visible pinhole in the paddle. A plain mean
+    could not close it: both vertices sit in rings far enough apart that six more passes moved the
+    figure by nothing. Coupling by inverse length makes a sliver edge the dominant term for both of
+    its ends, so the pair converges in a pass or two while a normal edge diffuses exactly as before.
+    """
+    adj = [[] for _ in range(len(o.data.vertices))]
+    co = [v.co for v in o.data.vertices]
+    for e in o.data.edges:
+        a, b = e.vertices
+        c = 1. / max((co[a] - co[b]).length, 1e-6)
+        adj[a].append((b, c))
+        adj[b].append((a, c))
+    def trim(w):
+        items = sorted(((n, v) for n, v in w.items() if v > 1e-6), key=lambda kv: -kv[1])[:keep]
+        total = sum(v for _, v in items) or 1.
+        return {n: v / total for n, v in items}
+
+    cur = [dict(w) for w in per_vertex]
+    for _ in range(passes):
+        nxt = []
+        for i, w in enumerate(cur):
+            acc = {n: v * hold for n, v in w.items()}
+            nb = adj[i]
+            if nb:
+                total = sum(c for _, c in nb)
+                for j, c in nb:
+                    share = (1. - hold) * c / total
+                    for n, v in cur[j].items():
+                        acc[n] = acc.get(n, 0.) + v * share
+            # **Trim to four inside the loop, not only at the end.** Diffusion grows a long tail of
+            # tiny influences -- after thirty passes a vertex on a paddle carried eight bones at a
+            # thousandth each -- and a top-four cut taken once at the end then picks a *different*
+            # four on neighbouring vertices, which is a worse discontinuity than the gate it was
+            # sent to fix. Cartorhynchus' paddles came apart into radiating spikes at the extreme
+            # of the stroke from exactly this, on both the authored body and its twin, while the
+            # tear sweep read 6x and passed it. Trimming every pass keeps the field a four-influence
+            # field the whole way, so the neighbours a vertex is averaging with carry the bones it
+            # carries.
+            nxt.append(trim(acc))
+        cur = nxt
+    # Diffusion narrows a sliver pair; it does not close one, and a pair that survives is still a
+    # pinhole. So the last step is exact: any run of vertices joined by edges shorter than a quarter
+    # of the median is one *cluster* and is given one weight set, the cluster mean. Two vertices
+    # that close together are the same point on the animal as far as the skin is concerned -- the
+    # generation drew them apart by a rounding error, not by anatomy -- and giving them one answer
+    # makes the stretch between them exactly zero however hard the bone under them swings.
+    lengths = sorted((co[e.vertices[0]] - co[e.vertices[1]]).length for e in o.data.edges)
+    weld = (lengths[len(lengths) // 2] if lengths else 0.) * .25
+    parent = list(range(len(cur)))
+
+    def find(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    for e in o.data.edges:
+        a, b = e.vertices
+        if (co[a] - co[b]).length < weld:
+            ra, rb = find(a), find(b)
+            if ra != rb:
+                parent[ra] = rb
+    clusters = {}
+    for i in range(len(cur)):
+        clusters.setdefault(find(i), []).append(i)
+    for members in clusters.values():
+        if len(members) < 2:
+            continue
+        acc = {}
+        for i in members:
+            for n, v in cur[i].items():
+                acc[n] = acc.get(n, 0.) + v / len(members)
+        for i in members:
+            cur[i] = dict(acc)
+    out = [trim(w) for w in cur]
     return out
 
 

@@ -228,9 +228,11 @@ for key, c in LIMBS.items():
 
 
 def limb_weights(q, thin):
-    blade = T.smooth((THIN + THIN_BAND - thin) / THIN_BAND)
-    if blade <= 0:
-        return None
+    # **Geometry, not thickness.** A paddle is what lies within its own measured radius of its own
+    # measured axis, past the seat; a shell-thickness threshold says the same thing most of the
+    # time and then disagrees on the leading edge, where a blade is thick. The relaxation below
+    # would cover a gate that is only slightly wrong, but a gate that is wrong by a whole limb is
+    # not something to smooth over.
     best, chosen = 0., None
     for key, (P, cum, names, rootw) in LIMB_FIT.items():
         dist, s = T.project(P, cum, q)
@@ -238,10 +240,10 @@ def limb_weights(q, thin):
         if dist >= rout:
             continue
         alpha = (1. if dist <= rin else T.smooth(1 - (dist - rin) / (rout - rin)))
-        alpha *= T.smooth(s / max(cum[1] * .75, 1e-6)) * blade
+        alpha *= T.smooth(s / max(cum[-1] * .42, 1e-6))
         if alpha > best:
             best = alpha
-            chosen = (T.limb_chain(names, cum, s), rootw, min(1., s / cum[-1]))
+            chosen = (T.limb_chain(names, cum, s, blend=.055), rootw, min(1., s / cum[-1]))
     return (best, *chosen) if chosen else None
 
 
@@ -250,12 +252,9 @@ def caudal_weights(q, thin):
     a plate bolted to the last joint. The lobe is taken by height off the measured axis."""
     if q.y < caudal_cluster['yRange'][0] - .01:
         return None
-    blade = T.smooth((THIN + THIN_BAND - thin) / THIN_BAND)
-    if blade <= 0:
-        return None
     d = q.z - cz(q.y)
     lobe = 'caudal_upper' if d > 0 else 'caudal_lower'
-    g = blade * T.smooth((abs(d) - .012) / .030) * T.smooth((q.y - caudal_cluster['yRange'][0]) / .03)
+    g = T.smooth((abs(d) - .012) / .030) * T.smooth((q.y - caudal_cluster['yRange'][0]) / .03)
     return ({lobe: 1.}, g) if g > 0 else None
 
 
@@ -351,9 +350,17 @@ for o, thin in ((auth, thickness), (puppet, puppet_thickness)):
         lookup[i] = float(thin[i]) if i < len(thin) else THIN * 2
     for n in B:
         o.vertex_groups.new(name=n)
+    # Every gate in `weights()` -- the blade threshold, the limb radius, the height off the axis --
+    # is a per-vertex decision, and two vertices a hundredth of a body apart can fall either side of
+    # one. The first build of this body did exactly that out on the right forefin and
+    # `skin-tears.mjs` read a 23x edge stretch off it. So the field is **relaxed over the mesh's own
+    # edge graph** before it is written: a weight field that is smooth on the surface cannot tear
+    # it, whatever the gates decided.
+    raw_weights = [weights(v.co, lookup[v.index]) for v in o.data.vertices]
+    relaxed = T.relax_weights(o, raw_weights, passes=34, hold=.45)
     counts, owners = [], {}
     for v in o.data.vertices:
-        w = weights(v.co, lookup[v.index])
+        w = relaxed[v.index]
         counts.append(len(w))
         for n, value in w.items():
             o.vertex_groups[n].add([v.index], value, 'REPLACE')

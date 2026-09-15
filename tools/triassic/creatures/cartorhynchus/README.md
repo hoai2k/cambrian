@@ -88,7 +88,68 @@ and authoring a row would have contradicted both.
 
 ### Gape see-through
 
-<!--SEE-THROUGH-->
+The metric is a **flood fill from the border**, not a column scan. A column scan
+counts every transparent pixel between the top and bottom of the head, which on a three-quarter
+view of an open mouth includes the background visible *past* the animal between the jaw and the
+shoulder: it read 7-11 % on bodies with no hole in them at all, and the number it was reporting was
+the framing. Filling the transparency in from the edge of the image and counting only what the fill
+cannot reach leaves exactly the pixels that are enclosed by the animal — a hole straight through it
+and nothing else.
+
+Each clip is photographed at the phase **its own gape is widest**, from three views, framed on the
+midpoint of skull and `anchor_mouth` in the skull's own frame, with the backface cull emulated
+(CYCLES ignores `use_backface_culling`, and without the emulation a review shot shows the near wall
+of the lining that the runtime throws away, which hides the fault instead of showing it).
+
+| Clip | gape | worst enclosed hole |
+| --- | ---: | ---: |
+| Idle | 0.04 rad (2.3°) | 0 px of 490000 = 0.0000 % |
+| Bite | 0.55 rad (31.3°) | 0 px of 490000 = 0.0000 % |
+| Attack | 0.48 rad (27.4°) | 1 px of 490000 = 0.0002 % |
+| Heavy | 0.60 rad (34.4°) | 2 px of 490000 = 0.0004 % |
+| Ability | 0.62 rad (35.5°) | 3 px of 490000 = 0.0006 % |
+| Eat | 0.44 rad (25.1°) | 1 px of 490000 = 0.0002 % |
+
+**The backdrop proof.** Widest gape of each clip is then rendered against a saturated backdrop
+twice — once with the cull shim and once without — and the two images differed by
+**0.000 % of pixels** at worst (largest single-channel difference 4/255, which is CYCLES' own sampling
+noise at 10 samples). Comparing against the plain background instead would have measured the
+backdrop and passed whatever the mesh did; comparing the two renders of the same frame is what
+actually says the lining closes the mouth.
+
+**The generation arrived mouth-closed.** Nothing here is a gaping pose brought shut: the jaw sits
+closed in the neutral pose because that is how the intake surface was modelled, the cut is taken
+along the measured seam of a closed mouth, and every clip that opens it opens it from there.
+
+### Skinning tears
+
+`node tools/triassic/skin-tears.mjs` sweeps every edge of every skinned mesh over 17 phases of all
+23 clips and reports the ones stretched furthest past their rest length, with an absolute floor of
+1.5 % of body length so a thousandth of oral geometry cannot outrank a torn flank.
+`_pipeline/record-tears.mjs` runs the same sweep and writes it into `validation.json`, split in two,
+because one number for both halves hides the half that matters:
+
+| | worst ratio | on | in | grew |
+| --- | ---: | --- | --- | --- |
+| **skin** | **5.17x** | `chest` | Sprint | 0.011 → 0.057 |
+| oral lining | 1.54x | `skull` | Ability | 0.034 → 0.051 |
+
+The **skin** figure is the one to read, and the one to compare against the shore batch
+(Nothosaurus 2.98x, Tanystropheus 6.1x, Placodus 12.4x, Macrocnemus 23.3x, Coelophysis 25.3x). The
+lining is a single skinned tube whose roof rides the skull and whose floor rides the jaw: the wall
+between them is *built* to stretch, its rest length at a shut mouth is nearly nothing, and its ratio
+at full gape says the mouth opened rather than that anything tore.
+
+The first build of this body measured far worse, and the fix is in the weights rather than in the
+gates. Every gate a builder writes — a shell-thickness threshold that tells a blade from a flank, a
+radius round a limb's polyline — is a per-vertex decision, and two vertices a hundredth of a body
+apart can fall on opposite sides of one. `T.relax_weights` diffuses the weight field over the mesh's
+own edge graph before it is written, **coupled by inverse edge length** so the sliver triangles a
+Tripo surface carries (one thirteenth of the median edge, on this batch) pull their two ends
+together hardest, welding runs joined by edges under a quarter of the median into one weight set,
+and **trimming to four influences on every pass rather than once at the end** — a long tail of tiny
+influences makes a single top-four cut pick a different four on neighbouring vertices, which is a
+worse discontinuity than the gate it was sent to fix.
 
 ## Rig and motion
 
@@ -157,6 +218,20 @@ lunges is a biter.
 | Bite (0.4 s) | 0.171 | 35 % |
 | Ability (0.7 s) | 0.071 | — (exempt; it has its own test) |
 
+### What the limbs do, in degrees
+
+This is the one animal in the batch that answers the paddling rule head on. `limbSweepDegrees` in
+`validation.json`, measured at each limb root over a whole cycle:
+
+| Clip | fore | hind |
+| --- | ---: | ---: |
+| Swim | 104° along the body, 32° out from the flank | 65° / 20° |
+| Sprint | 132° / 32° | 82° / 20° |
+
+The forelimb stroke runs from stretched forward to flush with the flank and back, the wrist leads
+the elbow, and the two sides are half a cycle apart. The forelimbs out-travel the tail tip — the
+only body here that does — which is what `audit.mjs` asserts rather than leaves to the eye.
+
 ## Measurements
 
 `cartorhynchus-profile.json` records **21 exact plane-intersection envelopes** of both actual meshes.
@@ -184,8 +259,17 @@ plays 61 phases of every clip on both models through Three.js and runs this anim
 the lobes lag, `Ability` opens faster than it shuts, and `Haul` plants its two pairs out of phase
 and carries the body forward.
 
-Sheets, rendered from the **decoded packaged** files through identical cameras and lights for both
-models:
+Sheets, rendered from the **decoded packaged** file — the authored body alone. The twin's own pose
+set is not rendered: the pairing is verified by the audit, which checks *parity* and cannot see
+deformation at all, and every real defect this batch turned up was on the authored body and
+invisible on a twin that has no fin rays and no toes. The twin keeps its byte-identical LOD1, its
+envelope and surface measurements, the parity checks and its delivered portrait; only the
+side-by-side picture is gone.
+
+`creature_render.py` refuses a decoded copy older than the packaged file it came from. A stale
+decode renders silently and looks fresh — one pass of these sheets showed Cartorhynchus' paddles
+coming apart into spikes at the extremes of its stroke, off a decode written two builds earlier,
+while the body that shipped was clean.
 
 - [Side, top and front](paired-volume-sheet.jpg)
 - [Deformation: Idle, Swim, the turns, Dive, Rise, Attack, Bite](paired-deformation-sheet.jpg)
@@ -203,7 +287,7 @@ No independent human review is invented by this automated QA record.
 /opt/blender/blender --background --factory-startup --python tools/triassic/creatures/cartorhynchus/build.py
 node tools/triassic/creatures/cartorhynchus/audit.mjs --package --decode
 /opt/blender/blender -b --factory-startup --python tools/triassic/creatures/cartorhynchus/render.py -- --decoded
-/opt/blender/blender -b --factory-startup --python tools/triassic/creatures/cartorhynchus/render.py -- --decoded --twin
+/opt/blender/blender -b --factory-startup --python tools/triassic/creatures/cartorhynchus/render.py -- --portraits --twin
 /opt/blender/blender -b --factory-startup --python tools/triassic/creatures/cartorhynchus/mouth-views.py
 python3 tools/triassic/creatures/cartorhynchus/contact-sheets.py
 node tools/triassic/review-bodies.mjs
@@ -227,6 +311,9 @@ node tools/update-asset-sizes.mjs
 - Cartorhynchus is **not** in `tools/triassic/shipped.json` and its preview badge is **not**
   cleared. It is registered in `src/content/triassic/review-bodies.json`.
 - **There are no eye globes**, as on every Triassic body delivered so far.
-- **No portraits are written**; the roster's placeholder cards stay where they are.
+- **Only the twin's portrait is written** (`public/assets/triassic/creatures/cartorhynchus.puppet.png`),
+  beside the other delivered bodies that carry one. The authored body's roster cards are not:
+  until a human decides this animal ships, the placeholder cards cut from the canonical pose
+  stay where they are.
 - Living colours, soft tissues and movements are artistic reconstruction. World travel, grip and
   capture rules remain engine-owned.

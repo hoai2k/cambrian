@@ -238,9 +238,11 @@ for key, c in LIMBS.items():
 
 
 def limb_weights(q, thin):
-    blade = T.smooth((THIN + THIN_BAND - thin) / THIN_BAND)
-    if blade <= 0:
-        return None
+    # **Geometry, not thickness.** A paddle is what lies within its own measured radius of its own
+    # measured axis, past the seat; a shell-thickness threshold says the same thing most of the
+    # time and then disagrees on the leading edge, where a blade is thick. The relaxation below
+    # would cover a gate that is only slightly wrong, but a gate that is wrong by a whole limb is
+    # not something to smooth over.
     best, chosen = 0., None
     for key, (P, cum, names, rootw) in LIMB_FIT.items():
         dist, s = T.project(P, cum, q)
@@ -248,7 +250,7 @@ def limb_weights(q, thin):
         if dist >= rout:
             continue
         alpha = (1. if dist <= rin else T.smooth(1 - (dist - rin) / (rout - rin)))
-        alpha *= T.smooth(s / max(cum[1] * .75, 1e-6)) * blade
+        alpha *= T.smooth(s / max(cum[1] * .75, 1e-6))
         if alpha > best:
             best = alpha
             chosen = (T.limb_chain(names, cum, s), rootw, min(1., s / cum[-1]))
@@ -261,11 +263,10 @@ def dorsal_weights(q, thin):
     lo, hi = dorsal_cluster['yRange']
     if not lo - .02 < q.y < hi + .02:
         return None
-    blade = T.smooth((THIN + THIN_BAND - thin) / THIN_BAND)
     d = q.z - cz(q.y)
-    if blade <= 0 or d <= 0:
+    if d <= 0:
         return None
-    g = blade * T.smooth((d - half_depth(q.y) * .75) / .030)
+    g = T.smooth((d - half_depth(q.y) * .75) / .030)
     return ({'dorsal': 1.}, g) if g > 0 else None
 
 
@@ -274,12 +275,9 @@ def caudal_weights(q, thin):
     a plate bolted to the last joint. The lobe is taken by height off the measured axis."""
     if q.y < caudal_cluster['yRange'][0] - .01:
         return None
-    blade = T.smooth((THIN + THIN_BAND - thin) / THIN_BAND)
-    if blade <= 0:
-        return None
     d = q.z - cz(q.y)
     lobe = 'caudal_upper' if d > 0 else 'caudal_lower'
-    g = blade * T.smooth((abs(d) - .012) / .030) * T.smooth((q.y - caudal_cluster['yRange'][0]) / .03)
+    g = T.smooth((abs(d) - .012) / .030) * T.smooth((q.y - caudal_cluster['yRange'][0]) / .03)
     return ({lobe: 1.}, g) if g > 0 else None
 
 
@@ -381,9 +379,17 @@ for o, thin in ((auth, thickness), (puppet, puppet_thickness)):
         lookup[i] = float(thin[i]) if i < len(thin) else THIN * 2
     for n in B:
         o.vertex_groups.new(name=n)
+    # Every gate in `weights()` -- the blade threshold, the limb radius, the height off the axis --
+    # is a per-vertex decision, and two vertices a hundredth of a body apart can fall either side of
+    # one. The first build of this body did exactly that out on the right forefin and
+    # `skin-tears.mjs` read a 23x edge stretch off it. So the field is **relaxed over the mesh's own
+    # edge graph** before it is written: a weight field that is smooth on the surface cannot tear
+    # it, whatever the gates decided.
+    raw_weights = [weights(v.co, lookup[v.index]) for v in o.data.vertices]
+    relaxed = T.relax_weights(o, raw_weights, passes=3, hold=.45)
     counts, owners = [], {}
     for v in o.data.vertices:
-        w = weights(v.co, lookup[v.index])
+        w = relaxed[v.index]
         counts.append(len(w))
         for n, value in w.items():
             o.vertex_groups[n].add([v.index], value, 'REPLACE')
@@ -852,9 +858,14 @@ for clip, duration in CLIPS.items():
             s = SIDE[key]
             fore = key.startswith('pec')
             up = pb[names[0]]
-            base = .030 * amp * wave(3 if fore else 6, beat)
+            # Amplitude is the fin's *pitch against the beat*, not a stroke: 0.085 rad on
+            # the fore and 0.050 on the hind, about twenty and twelve degrees over a cycle.
+            # It shipped at 0.030 for both, which measured five degrees and read on the
+            # sheets as a fin welded to the flank -- invisible is not the same as correct.
+            fin_amp = .085 if fore else .050
+            base = fin_amp * amp * wave(3 if fore else 6, beat)
             up.rotation_euler.x = base
-            up.rotation_euler.z = s * .030 * amp * wave(4 if fore else 7, beat)
+            up.rotation_euler.z = s * fin_amp * amp * wave(4 if fore else 7, beat)
             if clip in ('Dive', 'Rise'):
                 up.rotation_euler.x += (1 if clip == 'Dive' else -1) * (.38 if fore else .16) * e
             if clip in ('TurnLeft', 'TurnRight'):
@@ -898,8 +909,8 @@ for clip, duration in CLIPS.items():
                 sw[2] = min(sw[2], up.rotation_euler.z)
                 sw[3] = max(sw[3], up.rotation_euler.z)
             pb[names[1]].rotation_euler.x = .5 * up.rotation_euler.x + .026 * amp * wave(5, beat)
-            pb[names[2]].rotation_euler.x = .3 * up.rotation_euler.x + .030 * amp * wave(6, beat)
-            pb[names[2]].rotation_euler.z = s * .030 * amp * wave(7, beat)
+            pb[names[2]].rotation_euler.x = .3 * up.rotation_euler.x + .060 * amp * wave(6, beat)
+            pb[names[2]].rotation_euler.z = s * .060 * amp * wave(7, beat)
 
         state = np.array([tuple(q.rotation_euler) + tuple(q.location) for q in pb])
         if f == 0:
