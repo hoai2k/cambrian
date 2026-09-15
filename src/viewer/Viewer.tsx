@@ -90,7 +90,7 @@ export function Viewer() {
    * in play — so the raw generation stands in at the head of the list, which is what the roster's
    * preview badge already says about it.
    */
-  type Stage = { id: string; label: string; model: string; kind: 'full' | 'reduced' | 'twin' | 'generated' | 'borrowed' };
+  type Stage = { id: string; label: string; model: string; kind: 'full' | 'reduced' | 'twin' | 'generated' | 'borrowed' | 'origpose' };
   const stages = (c: ViewerSpecimen): Stage[] => {
     const own = !c.generated || !!c.inReview;
     const out: Stage[] = [];
@@ -99,6 +99,10 @@ export function Viewer() {
     if (c.puppet) out.push({ id: 'twin', label: 'Procedural twin · reduced', model: c.puppet, kind: 'twin' });
     else if (c.lod && own) out.push({ id: 'reduced', label: 'Reduced model', model: c.lod, kind: 'reduced' });
     if (c.generated) out.push({ id: 'generated', label: 'Generated mesh (no rig)', model: c.generated, kind: 'generated' });
+    // Where a builder moved the mesh before binding, the shipped body rests in a shape the
+    // generation never held. Both are offered: the full model IS the base pose every clip is
+    // authored from, and this is what Tripo made.
+    if (c.origPose) out.push({ id: 'origpose', label: 'Original pose (no rig)', model: c.origPose, kind: 'origpose' });
     // An off-roster subject is in no sea, so there is no body it borrows to offer.
     if (!own && !c.offRoster) out.push({ id: 'borrowed', label: 'Borrowed body (in play)', model: c.model, kind: 'borrowed' });
     return out;
@@ -135,6 +139,14 @@ export function Viewer() {
     return p.defaults[c.id] ?? p.schemes[0].id;
   };
   const [clips, setClips] = useState<string[]>([]);
+  /**
+   * Whether to draw the authored mouth geometry — the palate and floor that close each jaw, the
+   * hinge tissue, a cephalopod's beak. Off shows the mouth the generation actually arrived with,
+   * which is the only way to judge whether what was added belongs there. It survives a change of
+   * specimen on purpose: comparing mouths means comparing across animals.
+   */
+  const [oralGeometry, setOralGeometry] = useState(true);
+  const [hasOral, setHasOral] = useState(false);
   const [active, setActive] = useState('');
   const [loop, setLoop] = useState(false);
   const [speed, setSpeed] = useState(1);
@@ -209,7 +221,7 @@ export function Viewer() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true); setLoadedId(''); setError(''); setClips([]); setSlots([]);
+    setLoading(true); setLoadedId(''); setError(''); setClips([]); setSlots([]); setHasOral(false);
     // The specimen on stage leaves before the next one is fetched: watching the last creature
     // repaint into the new one's colours, then pop out of frame, read as a glitch.
     if (requestedId.current !== id) sceneRef.current?.clear();
@@ -228,6 +240,7 @@ export function Viewer() {
         const stretch = showGenerated ? getStretch(id) : undefined;
         if (stretch && stretch.model === modelPath && !stretchIsIdentity(stretch)) sceneRef.current?.applySculpt(stretchWarp(stretch), true);
         setClips(names); setSlots(sceneRef.current?.activeSlots() ?? []); setLoading(false); setLoadedId(id);
+        setHasOral(sceneRef.current?.hasOralGeometry() ?? false);
       })
       .catch((e: Error) => { if (!cancelled) { setError(e.message); setLoading(false); } });
     return () => { cancelled = true; };
@@ -235,6 +248,7 @@ export function Viewer() {
 
   useEffect(() => { sceneRef.current?.setSpeed(speed); }, [speed]);
   useEffect(() => { sceneRef.current?.setScheme(schemeId); }, [schemeId]);
+  useEffect(() => { sceneRef.current?.setOralGeometry(oralGeometry); }, [oralGeometry, loadedId]);
   useEffect(() => {
     try { sessionStorage.setItem(STORE_KEY, JSON.stringify(picks)); } catch { /* private mode: picks stay in memory */ }
   }, [picks]);
@@ -336,6 +350,16 @@ export function Viewer() {
           </select>
         </label>}
         {choices.length > 1 && <p className="hint">Swapping holds the view and the animation time, so a difference between two of these reads as movement. Missing clips return to rest.</p>}
+        {hasOral && <><label className="toggle">
+          <input type="checkbox" checked={oralGeometry} onChange={(e) => setOralGeometry(e.target.checked)} />
+          <span>Mouth geometry</span>
+        </label>
+        <p className="hint">
+          The palate and floor that close each jaw, the tissue at the hinge, and a beak where there
+          is one, are <em>authored</em> rather than generated. Turn them off to see the mouth the
+          generation actually arrived with — which is the only way to judge whether what was added
+          belongs there. The setting follows you from one animal to the next.
+        </p></>}
         {def.inReview && <p className="hint">
           <strong>Awaiting review:</strong> this animal's own body, twin and clips are built, but it
           is not in <code>shipped.json</code> yet — so the game still draws the body it borrows and
@@ -351,6 +375,13 @@ export function Viewer() {
           are redone properly when the body is cleaned and rigged, and every bit of this preview is
           thrown away the day the real one lands. Until then the animal still borrows another era's
           body in play.
+        </p>}
+        {def.origPose && <p className="hint">
+          <strong>Two poses.</strong> This generation arrived too strongly posed to rig, so its
+          builder moved the mesh before binding: {def.origPoseChanged?.join('; ')}. <em>Full
+          model</em> is the <strong>base pose</strong> — the rig at rest, and what every clip is
+          authored from. <em>Original pose</em> is the untouched generation, with no rig, so it sits
+          still. Swapping holds the view, so the difference between them reads as movement.
         </p>}
         {def.puppet && <p className="hint">
           The twin is rebuilt to this body's own volume on the same skeleton, and is where the clips
