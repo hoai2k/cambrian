@@ -85,20 +85,23 @@ const other: EraId[] = ERA_IDS.filter((e) => e !== playing);
   check('a corrupt record is simply no visitors from there', Array.isArray(earnedVisitors(playing, read)));
 }
 
-// ---- the standing guests: admitted to every game, earned in none ----
+// ---- the standing guests: admitted to their own game, earned in none ----
 {
   // Archelon and Mosasaurus are Late Cretaceous and on no roster at all (see
   // src/content/triassic/expansion.json). There is no game to take them to the top of, so they are
-  // admitted unconditionally; the one thing they are gated on is the body existing.
+  // admitted without being earned; the two things they are gated on are the body existing and the
+  // game being the one whose folder holds them. A Cretaceous marine reptile on the Cambrian's pick
+  // screen is not a reward — only an *earned* visitor crosses between games.
   const standing = standingVisitors(playing);
-  const shippedGuests = TRIASSIC_GUESTS.filter((g) => TRIASSIC_BYTES[g.id]);
-  check('every shipped guest is a standing visitor here', standing.length === shippedGuests.length,
-    `${standing.map((v) => v.id).join(', ') || 'none'} of ${TRIASSIC_GUESTS.length} guests`);
+  const here = playing === 'triassic';
+  const shippedGuests = here ? TRIASSIC_GUESTS.filter((g) => TRIASSIC_BYTES[g.id]) : [];
+  check('every shipped guest is a standing visitor in its own game', standing.length === shippedGuests.length,
+    `${standing.map((v) => v.id).join(', ') || 'none'} of ${here ? TRIASSIC_GUESTS.length : 0} guests in the ${playing}`);
   check('...and none of them is on this game\'s roster',
     standing.every((v) => !PLAYABLE_IDS.includes(v.id as never) && !CREATURE_IDS.includes(v.id as never)));
   // The gate, stated the other way round: a guest with no shipped model must not appear.
   check('...a guest with no shipped body is not offered at all',
-    TRIASSIC_GUESTS.every((g) => !!TRIASSIC_BYTES[g.id] === standing.some((v) => v.id === g.id)),
+    TRIASSIC_GUESTS.every((g) => (here && !!TRIASSIC_BYTES[g.id]) === standing.some((v) => v.id === g.id)),
     TRIASSIC_GUESTS.map((g) => `${g.id}:${TRIASSIC_BYTES[g.id] ? 'shipped' : 'not built'}`).join(', '));
   // `era` is where the files are; `origin` is where the animal is from. Saying 'Triassic' on a
   // Cretaceous animal's crew card is the lie this split exists to prevent.

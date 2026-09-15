@@ -780,9 +780,12 @@ unless the user explicitly asks for a PR. Steps:
   There is a **second kind**, and the first two arrived with the Cretaceous bodies: a **standing
   guest**. Archelon and Mosasaurus belong to no game's roster at all, so `earnedVisitors` cannot
   reach them — there is nothing to take them to the top of — and `standingVisitors` admits them
-  **unconditionally**, gated only on the body actually being shipped (an id with no entry in that
-  era's `asset-sizes.json` never becomes pickable, because a tile with nothing to draw is worse than
-  no tile). Everything else about them is a visitor: `admitVisitors`, never in `CREATURES` or
+  without their being earned, gated on two things: the body is actually shipped (an id with no entry
+  in that era's `asset-sizes.json` never becomes pickable, because a tile with nothing to draw is
+  worse than no tile), **and the game is the one whose folder holds them** — a guest visits its own
+  game and no other. A Cretaceous marine reptile on the Cambrian's pick screen is not a reward
+  anybody earned, it is an animal two hundred and fifty million years early; crossing between games
+  is what an *earned* visitor is for. Everything else about them is a visitor: `admitVisitors`, never in `CREATURES` or
   `PLAYABLE`, full grown at the ladder's top scale. `Visitor.era` stays the era whose **folder** holds
   their files, because that is what `'<era>/<id>'` resolves against; where the animal is actually
   *from* is `Visitor.origin`, a display string ("Late Cretaceous"), and anything that says where a
