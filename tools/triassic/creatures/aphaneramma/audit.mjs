@@ -53,8 +53,16 @@ for (const clip of ['Swim', 'Sprint']) {
   // joints in front of the pivot swing in antiphase with the ones behind it.
   const amp = Object.fromEntries(AXIS.filter((n) => !n.includes(':')).map((n) => [n, lateral(rows, `${n}:yaw`)]));
   const order = ['chest', 'body', 'tail_00', 'tail_02', 'tail_05', 'tail_07'];
-  let monotone = true;
-  for (let i = 1; i < order.length; i++) if (amp[order[i]] < amp[order[i - 1]] * 0.98) monotone = false;
+  // **Growing tailward is a property of where the body goes, not of the numbers on the joints.**
+  // It used to be read off the joint angles, and that is a different question with a different
+  // answer: a caudal chain realising an even wave needs its first joint to turn hardest, because
+  // that joint alone carries the tail off the trunk's own heading, so the angles dip at the second
+  // joint while the tail's actual sweep goes on growing all the way back. The dip failed a check
+  // about amplitude with a fact about levers. Measured where it is seen -- the world lateral sweep
+  // of each caudal station -- the wave grows at every step.
+  const carried = ['tail_00', 'tail_02', 'tail_05', 'tail_07'];
+  let monotone = travel.tail_00 > 0.01;
+  for (let i = 1; i < carried.length; i++) if (travel[carried[i]] < travel[carried[i - 1]] * 1.05) monotone = false;
   const phases = order.map((n) => swingPhase(rows, `${n}:yaw`));
   // **The channel is signed by side; the stroke is not.** A left limb and a right limb sweeping
   // backwards together carry *opposite* rotations about the body's long axis, because they point
@@ -135,6 +143,21 @@ for (const g of report.wave) {
   need(g.amplitudeGrowsTailward, `${g.clip}: the wave must grow towards the tail`);
   need(g.tailTipOverChest > 3.0,
     `${g.clip}: the tail must do the work (${g.tailTipOverChest.toFixed(2)}x the shoulder)`);
+  // **And it must travel, not stand.** Every station's yaw has to lag the one in front of it, and
+  // by enough to see: the shipped clip carried its lateral extreme only 0.19 of a cycle from the
+  // first caudal joint to the last, which is a tail flapping about a hinge rather than a wave
+  // running down a body, and is most of why that swim read as a waddle with the limbs doing the
+  // work. Phases come back in radians, decreasing tailward.
+  let walked = 0;
+  for (let i = 1; i < g.phaseOrder.length; i++) {
+    let d = g.phaseOrder[i - 1] - g.phaseOrder[i];
+    while (d < 0) d += 2 * Math.PI;
+    while (d > 2 * Math.PI) d -= 2 * Math.PI;
+    need(d < Math.PI, `${g.clip}: the wave runs backwards at station ${i} (${(d / (2 * Math.PI)).toFixed(3)} of a cycle)`);
+    walked += d;
+  }
+  need(walked / (2 * Math.PI) > 0.40,
+    `${g.clip}: the wave barely travels (${(walked / (2 * Math.PI)).toFixed(3)} of a cycle from shoulder to tail tip)`);
   // **And the limbs must row.** A limbed swimmer's dash that only waggles the feet while the body
   // does the work reads as a fish with legs attached; the swept angle is measured in build.py from
   // each limb's own direction and this is the same finding in world travel.
@@ -183,7 +206,7 @@ for (const name of ['Attack', 'Heavy', 'Ability', 'Bite']) {
 assert.equal(problems.join(' | '), '', 'measured performance checks');
 console.log(JSON.stringify({
   models: report.models, clips: report.clips, twinTriangleFraction: report.twinTriangleFraction,
-  wave: report.wave.map((w) => ({ clip: w.clip, amplitudeGrowsTailward: w.amplitudeGrowsTailward,
+  wave: report.wave.map((w) => ({ clip: w.clip, amplitudeGrowsTailward: w.amplitudeGrowsTailward, phaseOrder: w.phaseOrder,
     tailTipOverChest: w.tailTipOverChest, limbTipTravel: w.limbTipTravel, lag: w.lag })),
   strike: report.strike,
   jaw: report.jaw.filter((j) => ['Bite', 'Attack', 'Heavy', 'Ability', 'Crawl', 'Idle'].includes(j.clip)),

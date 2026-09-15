@@ -97,7 +97,7 @@ VIEW_DIR = {'side': Vector((1, 0, .02)), 'top': Vector((0, 0, 1)), 'front': Vect
 
 # Frames go to the gitignored workbench whatever the sheet's own destination is: a sheet
 # belongs beside the builder that it reviews, and a hundred loose PNGs do not.
-tmp = ROOT / 'local/triassic-authoring/_motion-sheets' / OUT.stem
+tmp = ROOT / 'local/triassic-authoring/_motion-sheets' / (GLB.stem + '-' + OUT.stem)
 tmp.mkdir(parents=True, exist_ok=True)
 tiles = []
 for view in VIEWS:
