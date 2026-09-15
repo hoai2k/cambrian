@@ -26,6 +26,27 @@ import { triActor } from './state';
  * has no such clip simply keeps the shared state machine's Idle, so this depends on nothing: the
  * borrowed Devonian bodies are exactly as they were.
  */
+/**
+ * Whether shore animals are placed at all.
+ *
+ * **Off**, and deliberately: the behaviour they are meant to have is designed
+ * (`docs/triassic/06-shore-visitors.md` — the stillness trigger, the runners' excursions, the posts
+ * that come and go) and not built, and what stands on the bank today is only the telegraph-and-snap
+ * cycle below. An animal that is going to be a hazard a player learns should arrive finished rather
+ * than as a partial version that teaches the wrong lesson, so the beach is empty until it is.
+ *
+ * Everything under it is left intact and tested: this is one line to flip when the plan lands.
+ */
+let SHORE_ANIMALS = false;
+/**
+ * Turn the bank on, for the tests that hold the cycle itself.
+ *
+ * The cycle is kept working and kept checked while it waits for the rest of the behaviour, so the
+ * suite runs it deliberately rather than the flag quietly deleting a hundred assertions. A game
+ * never calls this: `shoreAnimalsOn()` is false in every match.
+ */
+export function setShoreAnimals(on: boolean) { SHORE_ANIMALS = on; }
+export const shoreAnimalsOn = () => SHORE_ANIMALS;
 const POST_SPACING = 170, POST_REACH = 260;
 const TELEGRAPH = 1.5, COOLDOWN = 6, SURFACE_BAND = 4;
 /** How long the recovery off a strike reads for; the rest of the cooldown is the watch again. */
@@ -92,6 +113,7 @@ function pin(a: Actor, pos: Vec3) {
 }
 
 function ensurePosts(g: Game) {
+  if (!SHORE_ANIMALS) return;
   const s = stateFor(g), seed = worldSeed(g);
   for (const an of g.anchors()) {
     const k0 = Math.round((an.x - POST_REACH) / POST_SPACING), k1 = Math.round((an.x + POST_REACH) / POST_SPACING);

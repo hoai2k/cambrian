@@ -11,6 +11,17 @@ export const CREATURE_IDS = CREATURES.map((c) => c.id);
  * has no portrait of its own, so those creatures stay off the selection screen until their own
  * model lands. Ecology, bots and the simulation still use the whole roster.
  */
+/**
+ * The animals the *sea* is populated with: the roster minus the shore animals.
+ *
+ * A `shore: true` creature stands on the beach and strikes into the water (`src/sim/triassic/
+ * shore.ts` places them, one per post, pinned and brainless). It is not a swimmer, so it has no
+ * business in the ambient draw — and it was in it, because that draw took the whole roster: the
+ * Triassic was spawning hatchling Tanystropheus out in open water with ordinary brains, walking
+ * animals swimming around biting people. Ecology and bots take this rather than `CREATURES`.
+ */
+export const WILD = CREATURES.filter((c) => !c.shore);
+export const WILD_IDS = WILD.map((c) => c.id);
 export const PLAYABLE = CREATURES.filter((c) => !c.shore && (ACTIVE_ERA.assets.standInsPlayable || !ACTIVE_ERA.assets.standIns?.[c.id]));
 export const PLAYABLE_IDS = PLAYABLE.map((c) => c.id);
 /**

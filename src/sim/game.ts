@@ -8,7 +8,7 @@ import { tierForScale, tierScale } from './tiers';
 import { makeBrain, peaceful, think, type AiWorld } from './ai';
 import { huntingPressure, phaseAt, untilNextPhase, type Phase } from './daynight';
 import { applyHit, endRide, GRIP_BREAK, GRIP_MEAL, GRIP_STRAIN, GRIP_STRIKE, kill, rideHold, startSwallow, takeHold, takeRide, type HitContext } from './combat';
-import { creature, CREATURE_IDS, isVisitor, PLAYABLE_IDS, type CreatureId, type MoveDef } from './creatures';
+import { creature, isVisitor, PLAYABLE_IDS, WILD_IDS, type CreatureId, type MoveDef } from './creatures';
 import { resolveFlora, stepFlora, type FloraContact } from './flora';
 import { SpatialHash } from './spatial';
 import { clampMark, fillOf, ladderFill, ladderMark, ladderRung, ladderScale, LADDER_TOP, MARK_NEAR_TOP } from './ladder';
@@ -676,10 +676,10 @@ export class Game implements AiWorld {
   private spawnPreyFor(p: Actor) {
     const L = lengthOf(p);
     const def = creature(p.creature);
-    const crawlers = CREATURE_IDS.filter((id) => creature(id).ground);
+    const crawlers = WILD_IDS.filter((id) => creature(id).ground);
     const pool = def.ground
-      ? (this.rng() < 0.8 && crawlers.length ? crawlers : CREATURE_IDS.slice())
-      : CREATURE_IDS.filter((id) => !creature(id).ground);
+      ? (this.rng() < 0.8 && crawlers.length ? crawlers : WILD_IDS.slice())
+      : WILD_IDS.filter((id) => !creature(id).ground);
     const c = pool[Math.floor(this.rng() * pool.length)];
     const cd = creature(c);
     const ratio = 0.28 + this.rng() * 0.32;            // snack to small prey relative to the player
@@ -733,7 +733,7 @@ export class Game implements AiWorld {
   }
 
   private spawnAmbient(initial = false, near?: Vec3) {
-    const c = CREATURE_IDS[Math.floor(this.rng() * CREATURE_IDS.length)];
+    const c = WILD_IDS[Math.floor(this.rng() * WILD_IDS.length)];
     const def = creature(c);
     const anchor = near ?? this.randomAnchor();
     // One spawn in five is simply something big going past, up in the water and regardless of what
