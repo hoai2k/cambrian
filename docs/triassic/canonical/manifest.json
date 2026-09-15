@@ -6,9 +6,14 @@
   "subjects": {
     "cymbospondylus": {
       "turnaround": "not-started",
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "decidedAt": "2026-09-13T13:52:17.045Z",
-      "promotedFrom": "candidate02"
+      "promotedFrom": "candidate02",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T13:52:17.045Z",
+      "deliveredAt": "2026-09-15"
     },
     "shonisaurus": {
       "canonical": "delivered",
@@ -29,21 +34,36 @@
       "bodyApprovedNote": "Reviewer: playable, with no outstanding reconstruction request against it, which is the bar for dropping the caution sign. Later work on it is an update, not an outstanding ask."
     },
     "dinocephalosaurus": {
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "turnaround": "not-started",
-      "decidedAt": "2026-09-13T01:01:15.101Z"
+      "decidedAt": "2026-09-13T01:01:15.101Z",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T01:01:15.101Z",
+      "deliveredAt": "2026-09-15"
     },
     "helicoprion": {
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "turnaround": "not-started",
       "requiredFeature": "single lower-jaw tooth whorl",
-      "decidedAt": "2026-09-13T01:01:22.623Z"
+      "decidedAt": "2026-09-13T01:01:22.623Z",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T01:01:22.623Z",
+      "deliveredAt": "2026-09-15"
     },
     "rhaeticosaurus": {
       "turnaround": "not-started",
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "decidedAt": "2026-09-13T15:03:39.359Z",
-      "promotedFrom": "candidate03"
+      "promotedFrom": "candidate03",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T15:03:39.359Z",
+      "deliveredAt": "2026-09-15"
     },
     "atopodentatus": {
       "canonical": "greenlit",
@@ -56,19 +76,34 @@
       "decidedAt": "2026-09-13T01:02:52.596Z"
     },
     "placodus": {
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "turnaround": "not-started",
-      "decidedAt": "2026-09-13T01:03:01.825Z"
+      "decidedAt": "2026-09-13T01:03:01.825Z",
+      "greenlitAt": "2026-09-13T01:03:01.825Z",
+      "deliveredAt": "2026-09-15",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo"
     },
     "hybodus": {
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "turnaround": "not-started",
-      "decidedAt": "2026-09-13T01:03:09.333Z"
+      "decidedAt": "2026-09-13T01:03:09.333Z",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T01:03:09.333Z",
+      "deliveredAt": "2026-09-15"
     },
     "birgeria": {
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "turnaround": "not-started",
-      "decidedAt": "2026-09-13T01:03:25.643Z"
+      "decidedAt": "2026-09-13T01:03:25.643Z",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T01:03:25.643Z",
+      "deliveredAt": "2026-09-15"
     },
     "aphaneramma": {
       "turnaround": "not-started",
@@ -77,14 +112,24 @@
       "promotedFrom": "candidate03"
     },
     "mixosaurus": {
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "turnaround": "not-started",
-      "decidedAt": "2026-09-13T01:04:33.564Z"
+      "decidedAt": "2026-09-13T01:04:33.564Z",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T01:04:33.564Z",
+      "deliveredAt": "2026-09-15"
     },
     "henodus": {
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "turnaround": "not-started",
-      "decidedAt": "2026-09-13T01:04:55.343Z"
+      "decidedAt": "2026-09-13T01:04:55.343Z",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T01:04:55.343Z",
+      "deliveredAt": "2026-09-15"
     },
     "saurichthys": {
       "canonical": "greenlit",
@@ -92,9 +137,14 @@
       "decidedAt": "2026-09-13T01:05:07.724Z"
     },
     "hupehsuchus": {
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "turnaround": "not-started",
-      "decidedAt": "2026-09-13T01:05:32.675Z"
+      "decidedAt": "2026-09-13T01:05:32.675Z",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T01:05:32.675Z",
+      "deliveredAt": "2026-09-15"
     },
     "keichousaurus-male": {
       "canonical": "approved",
@@ -105,9 +155,14 @@
       "turnaround": "not-started"
     },
     "cartorhynchus": {
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "turnaround": "not-started",
-      "decidedAt": "2026-09-13T01:06:03.044Z"
+      "decidedAt": "2026-09-13T01:06:03.044Z",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T01:06:03.044Z",
+      "deliveredAt": "2026-09-15"
     },
     "odontochelys": {
       "turnaround": "not-started",
@@ -116,22 +171,37 @@
       "promotedFrom": "candidate02"
     },
     "ceratites": {
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "turnaround": "not-started",
       "requiredFeature": "long, large articulated tentacles",
-      "decidedAt": "2026-09-13T01:06:29.964Z"
+      "decidedAt": "2026-09-13T01:06:29.964Z",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T01:06:29.964Z",
+      "deliveredAt": "2026-09-15"
     },
     "phragmoteuthis": {
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "turnaround": "not-started",
-      "decidedAt": "2026-09-13T01:06:43.197Z"
+      "decidedAt": "2026-09-13T01:06:43.197Z",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T01:06:43.197Z",
+      "deliveredAt": "2026-09-15"
     },
     "tanystropheus": {
       "turnaround": "not-started",
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "decidedAt": "2026-09-13T19:15:00.000Z",
       "note": "Human-approved after the neck-proportion redraw; the canonical, single-model input and turnaround all preserve the complete extraordinarily long neck.",
-      "promotedFrom": "candidate05"
+      "promotedFrom": "candidate05",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T19:15:00.000Z",
+      "deliveredAt": "2026-09-15"
     },
     "mystriosuchus": {
       "turnaround": "not-started",
@@ -150,11 +220,16 @@
       "decidedAt": "2026-09-13T01:07:28.068Z"
     },
     "keichousaurus": {
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "turnaround": "not-started",
       "decidedAt": "2026-09-13T01:05:52.838Z",
       "greenlitImage": "male",
-      "reviewedCandidate": "male"
+      "reviewedCandidate": "male",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T01:05:52.838Z",
+      "deliveredAt": "2026-09-15"
     },
     "encrinus": {
       "canonical": "approved",
@@ -169,7 +244,7 @@
         "kind": "canonical",
         "label": "canonical pose"
       },
-      "reworkNote": "These are instanced props: one mesh, no rig, a few hundred triangles, vertex colours, pivot at the base centre where the prop meets the ground, scattered by the thousand and bent and swayed in the shader. The canonical pose is what the model is built from, so it has to show the organism AS IT SITS ON THE GROUND, not as a museum specimen. This is specified as a ground DECAL-MESH 0.6 wide \u2014 a flat scatter lying on the seabed where the moulted and the dead lie. The image draws a deep rounded HEAP of about a hundred columnals, several layers thick, with a domed profile. Built from this it becomes a mound of rubble, which is not what the pavement and the garden need and reads as a cairn among flat ground cover. Redraw as a single-layer scatter seen from a high three-quarter angle: ten to twenty loose columnals and two or three short stem lengths lying flat and separate on the sediment, the widest piece no more than a fifth of the patch, plenty of bare ground showing between them, and the whole thing essentially flat \u2014 height no more than one part in eight of its width. No pile, no mound, no container edge.",
+      "reworkNote": "These are instanced props: one mesh, no rig, a few hundred triangles, vertex colours, pivot at the base centre where the prop meets the ground, scattered by the thousand and bent and swayed in the shader. The canonical pose is what the model is built from, so it has to show the organism AS IT SITS ON THE GROUND, not as a museum specimen. This is specified as a ground DECAL-MESH 0.6 wide — a flat scatter lying on the seabed where the moulted and the dead lie. The image draws a deep rounded HEAP of about a hundred columnals, several layers thick, with a domed profile. Built from this it becomes a mound of rubble, which is not what the pavement and the garden need and reads as a cairn among flat ground cover. Redraw as a single-layer scatter seen from a high three-quarter angle: ten to twenty loose columnals and two or three short stem lengths lying flat and separate on the sediment, the widest piece no more than a fifth of the patch, plenty of bare ground showing between them, and the whole thing essentially flat — height no more than one part in eight of its width. No pile, no mound, no container edge.",
       "decidedAt": "2026-09-13T19:28:44.522739Z"
     },
     "diplopora": {
@@ -200,7 +275,7 @@
         "kind": "canonical",
         "label": "canonical pose"
       },
-      "reworkNote": "These are instanced props: one mesh, no rig, a few hundred triangles, vertex colours, pivot at the base centre where the prop meets the ground, scattered by the thousand and bent and swayed in the shader. The canonical pose is what the model is built from, so it has to show the organism AS IT SITS ON THE GROUND, not as a museum specimen. This is the pavement biome's floor, 1.2 wide, instanced fourteen to the area \u2014 the thing the player swims over. The image draws a QUARRIED FOSSIL SLAB: shells compressed into dark grey-black shale, with a thick raised rim like a cut block. Built from this, the pavement becomes black stone plaques dropped on a pale carbonate floor, and the rim models as a plinth standing proud of the sand. Redraw as a living shell bed on the sea floor: flat Daonella valves, thin and near-circular with fine radial ribs, lying loose and overlapping at shallow angles directly on pale carbonate sediment, some half-buried, a few tilted. Pale buff and cream shells on light sediment, no dark shale, no matrix block, no cut edge or rim \u2014 the patch should fade into the sand at its margin rather than stopping at a wall. High three-quarter view. Three orientations are wanted, so keep the outline roughly circular rather than a rectangle.",
+      "reworkNote": "These are instanced props: one mesh, no rig, a few hundred triangles, vertex colours, pivot at the base centre where the prop meets the ground, scattered by the thousand and bent and swayed in the shader. The canonical pose is what the model is built from, so it has to show the organism AS IT SITS ON THE GROUND, not as a museum specimen. This is the pavement biome's floor, 1.2 wide, instanced fourteen to the area — the thing the player swims over. The image draws a QUARRIED FOSSIL SLAB: shells compressed into dark grey-black shale, with a thick raised rim like a cut block. Built from this, the pavement becomes black stone plaques dropped on a pale carbonate floor, and the rim models as a plinth standing proud of the sand. Redraw as a living shell bed on the sea floor: flat Daonella valves, thin and near-circular with fine radial ribs, lying loose and overlapping at shallow angles directly on pale carbonate sediment, some half-buried, a few tilted. Pale buff and cream shells on light sediment, no dark shale, no matrix block, no cut edge or rim — the patch should fade into the sand at its margin rather than stopping at a wall. High three-quarter view. Three orientations are wanted, so keep the outline roughly circular rather than a rectangle.",
       "decidedAt": "2026-09-13T19:28:44.522739Z"
     },
     "brachiopod-cluster": {
@@ -222,7 +297,7 @@
         "kind": "canonical",
         "label": "canonical pose"
       },
-      "reworkNote": "These are instanced props: one mesh, no rig, a few hundred triangles, vertex colours, pivot at the base centre where the prop meets the ground, scattered by the thousand and bent and swayed in the shader. The canonical pose is what the model is built from, so it has to show the organism AS IT SITS ON THE GROUND, not as a museum specimen. The urchin itself reads well \u2014 a cidaroid test with stout club-shaped primary spines is right. The fault is that it FLOATS: it is drawn as a specimen suspended in space with spines radiating equally in every direction including straight down, and there is no ground plane anywhere in the image. This prop is 0.3 units sitting on the reef floor, so built from this its lower spines drive through the sand. Redraw it resting on the substrate: oral surface down on the sediment, the test sitting just clear of the floor on the short ventral spines, the long club spines directed upward and outward, and the sediment surface visible under it so the contact is unambiguous.",
+      "reworkNote": "These are instanced props: one mesh, no rig, a few hundred triangles, vertex colours, pivot at the base centre where the prop meets the ground, scattered by the thousand and bent and swayed in the shader. The canonical pose is what the model is built from, so it has to show the organism AS IT SITS ON THE GROUND, not as a museum specimen. The urchin itself reads well — a cidaroid test with stout club-shaped primary spines is right. The fault is that it FLOATS: it is drawn as a specimen suspended in space with spines radiating equally in every direction including straight down, and there is no ground plane anywhere in the image. This prop is 0.3 units sitting on the reef floor, so built from this its lower spines drive through the sand. Redraw it resting on the substrate: oral surface down on the sediment, the test sitting just clear of the floor on the short ventral spines, the long club spines directed upward and outward, and the sediment surface visible under it so the contact is unambiguous.",
       "decidedAt": "2026-09-13T19:28:44.522739Z"
     },
     "reef-block": {
@@ -238,7 +313,7 @@
         "kind": "canonical",
         "label": "canonical pose"
       },
-      "reworkNote": "These are instanced props: one mesh, no rig, a few hundred triangles, vertex colours, pivot at the base centre where the prop meets the ground, scattered by the thousand and bent and swayed in the shader. The canonical pose is what the model is built from, so it has to show the organism AS IT SITS ON THE GROUND, not as a museum specimen. The plant is right \u2014 a jointed horsetail clump with whorled leaves is exactly the read. The fault is that it is drawn as an UPROOTED SPECIMEN: the rhizome and a full mass of fine roots hang below in open air, and that root ball is a third of the silhouette. The pose is the contract, so a modeller either builds those roots, and the game then draws a horsetail hovering above the sand with its roots in the air, or omits them and the body no longer matches the pose. Redraw with the plant standing in the ground: cut the image at the ground line, show the stems emerging from the substrate with at most a little basal swelling and some scattered litter where they enter it, and no visible roots. Keep the clump, the joints, the whorls and the 3-unit proportion.",
+      "reworkNote": "These are instanced props: one mesh, no rig, a few hundred triangles, vertex colours, pivot at the base centre where the prop meets the ground, scattered by the thousand and bent and swayed in the shader. The canonical pose is what the model is built from, so it has to show the organism AS IT SITS ON THE GROUND, not as a museum specimen. The plant is right — a jointed horsetail clump with whorled leaves is exactly the read. The fault is that it is drawn as an UPROOTED SPECIMEN: the rhizome and a full mass of fine roots hang below in open air, and that root ball is a third of the silhouette. The pose is the contract, so a modeller either builds those roots, and the game then draws a horsetail hovering above the sand with its roots in the air, or omits them and the body no longer matches the pose. Redraw with the plant standing in the ground: cut the image at the ground line, show the stems emerging from the substrate with at most a little basal swelling and some scattered litter where they enter it, and no visible roots. Keep the clump, the joints, the whorls and the 3-unit proportion.",
       "decidedAt": "2026-09-13T19:28:44.522739Z"
     },
     "pleuromeia": {
@@ -249,7 +324,7 @@
         "kind": "canonical",
         "label": "canonical pose"
       },
-      "reworkNote": "These are instanced props: one mesh, no rig, a few hundred triangles, vertex colours, pivot at the base centre where the prop meets the ground, scattered by the thousand and bent and swayed in the shader. The canonical pose is what the model is built from, so it has to show the organism AS IT SITS ON THE GROUND, not as a museum specimen. The plant is right \u2014 unbranched trunk, rhomboid leaf scars, a crown of strap leaves and a terminal cone is exactly Pleuromeia, and it is a good distinctive silhouette. The fault is the same as the other two shore plants: it is drawn as an UPROOTED SPECIMEN, with the bulbous rhizomorph and a spreading mass of roots fully exposed below, making up nearly half the height. Redraw with the plant standing in the ground: cut at the ground line so the rhizomorph base is only just emerging, or buried entirely, and show no free roots. Keep the trunk, the scars, the strap-leaf crown and the cone, and keep the 2-unit proportion.",
+      "reworkNote": "These are instanced props: one mesh, no rig, a few hundred triangles, vertex colours, pivot at the base centre where the prop meets the ground, scattered by the thousand and bent and swayed in the shader. The canonical pose is what the model is built from, so it has to show the organism AS IT SITS ON THE GROUND, not as a museum specimen. The plant is right — unbranched trunk, rhomboid leaf scars, a crown of strap leaves and a terminal cone is exactly Pleuromeia, and it is a good distinctive silhouette. The fault is the same as the other two shore plants: it is drawn as an UPROOTED SPECIMEN, with the bulbous rhizomorph and a spreading mass of roots fully exposed below, making up nearly half the height. Redraw with the plant standing in the ground: cut at the ground line so the rhizomorph base is only just emerging, or buried entirely, and show no free roots. Keep the trunk, the scars, the strap-leaf crown and the cone, and keep the 2-unit proportion.",
       "decidedAt": "2026-09-13T19:28:44.522739Z"
     },
     "bjuvia": {
@@ -260,7 +335,7 @@
         "kind": "canonical",
         "label": "canonical pose"
       },
-      "reworkNote": "These are instanced props: one mesh, no rig, a few hundred triangles, vertex colours, pivot at the base centre where the prop meets the ground, scattered by the thousand and bent and swayed in the shader. The canonical pose is what the model is built from, so it has to show the organism AS IT SITS ON THE GROUND, not as a museum specimen. Two faults. First, the same as the other shore plants: it is drawn as an UPROOTED SPECIMEN with a wide spreading root mass fully exposed below the trunk, which would model as roots hovering over the beach. Cut at the ground line and show no free roots. Second, the leaves are wrong for the genus: this draws a normal pinnate cycad with divided, feather-like fronds, but Bjuvia is the cycad with SIMPLE, ENTIRE leaves \u2014 broad undivided strap- or tongue-shaped blades with a single midrib, not split into leaflets. That undivided leaf is the whole reason the plant is recognisable and the reason the genus is named for its simplicity. Redraw as a squat trunk in the ground carrying a rosette of broad, entire, strap-shaped leaves, 1.5 units overall.",
+      "reworkNote": "These are instanced props: one mesh, no rig, a few hundred triangles, vertex colours, pivot at the base centre where the prop meets the ground, scattered by the thousand and bent and swayed in the shader. The canonical pose is what the model is built from, so it has to show the organism AS IT SITS ON THE GROUND, not as a museum specimen. Two faults. First, the same as the other shore plants: it is drawn as an UPROOTED SPECIMEN with a wide spreading root mass fully exposed below the trunk, which would model as roots hovering over the beach. Cut at the ground line and show no free roots. Second, the leaves are wrong for the genus: this draws a normal pinnate cycad with divided, feather-like fronds, but Bjuvia is the cycad with SIMPLE, ENTIRE leaves — broad undivided strap- or tongue-shaped blades with a single midrib, not split into leaflets. That undivided leaf is the whole reason the plant is recognisable and the reason the genus is named for its simplicity. Redraw as a squat trunk in the ground carrying a rosette of broad, entire, strap-shaped leaves, 1.5 units overall.",
       "decidedAt": "2026-09-13T19:28:44.522739Z"
     },
     "shore-boulder": {
