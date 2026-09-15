@@ -439,10 +439,12 @@ unless the user explicitly asks for a PR. Steps:
   head. Two builders split it locally before it was split centrally; the tool now reports both and
   ranks on skin, matching those builders' own figures exactly. True era-wide skin picture:
   Shonisaurus 1.44x, Keichousaurus 2.34x, Mosasaurus 2.54x, Cymbospondylus 2.48x, Rhaeticosaurus 2.81x, Macrocnemus
-  2.94x, Nothosaurus 2.98x, Birgeria 3.46x, Saurichthys 3.61x, Archelon 3.86x, Mixosaurus 3.62x, Coelophysis 4.46x,
-  Henodus 4.81x, Cartorhynchus 5.17x, Hupehsuchus 5.79x, Hybodus 5.93x, Dinocephalosaurus 7.00x,
+  2.94x, Nothosaurus 2.98x, Tanystropheus 3.00x, Birgeria 3.46x, Saurichthys 3.61x, Cartorhynchus 3.72x,
+  Archelon 3.86x, Mixosaurus 3.62x, Aphaneramma 4.45x, Coelophysis 4.46x, Mystriosuchus 4.48x,
+  Henodus 4.81x, Hupehsuchus 5.79x, Hybodus 5.93x, Dinocephalosaurus 7.00x,
   Helicoprion 11.68x, Placodus 12.36x. Placodus and Helicoprion are the outstanding repair work:
-  Coelophysis came down from 25.25x and Macrocnemus from 23.31x.
+  Coelophysis came down from 25.25x, Macrocnemus from 23.31x, Tanystropheus from 6.09x and
+  Cartorhynchus from 5.17x.
 - **A skin weighting is three things, and the era has now paid for each of them separately.** The
   *relaxation* — diffusion over the mesh's own edge graph, coupled by inverse edge length, trimmed
   to four influences every pass, sliver runs welded into one weight set — is the one that stops a
@@ -509,6 +511,33 @@ unless the user explicitly asks for a PR. Steps:
   carapace is half a body length wide, so 84% of a forelimb's weight landed in the top of the shell.
   Bounding the limb radially against its own bone chain, keeping the along-limb ramp, gave 4.81x.
   So a copied rig is a starting point to be re-measured on the new animal, never a transplant.
+- **A part cut onto another bone's shell is out of reach of every weighting, and reads as a limb
+  left behind.** The jaw cut on the shore kit was a band in `y` below the mouth line with no bound
+  in `x`, and both Aphaneramma's and Mystriosuchus' generations stand with the right forelimb tucked
+  forward under the snout — so the arm was cut into the lower-jaw shell, which is rigid on `jaw` at
+  weight 1. 411 of the 637 vertices round Aphaneramma's `fore_foot_R` were in that shell, 64.5 % of
+  the neighbourhood read as `jaw` against 0.2 % of trunk weight on the other side, and the foot's
+  skin travelled 0.45 of the distance its own joint did where every other foot was 1.04 to 1.11.
+  Nothing in `weights()` could reach it: the repair is that **the cut asks the question the skinning
+  already asks** — a vertex is a limb's where it is nearer that limb's own polyline than the body's
+  axial one — so the two cannot disagree about which vertices are an arm. A width bound is not
+  enough on a long-snouted animal, whose snout is narrow and whose hand is broad. The tell is the
+  cut shell's own bounding box: a mandible is not a body-length deep. `local`-side proof is a lag
+  measurement — skin travel round a joint over that joint's own travel — because neither
+  `skin-tears.mjs` nor `idle-bones.mjs` can see this at all.
+- **A containment test written on `np.interp` cannot fail outside its own table**, because
+  `np.interp` clamps rather than refusing. Hybodus' and Saurichthys' hinge plugs were "fitted" by
+  asking whether each vertex was inside `head_half_width(y)` and between `head_z(y)` — both
+  interpolations over the head's measured stations — so a vertex a quarter of a body length ahead of
+  the snout was measured against the section at the snout tip and passed. They reported a clearance
+  of +0.004 while standing 1.29 units clear of the nose with 126 of 207 vertices outside the animal,
+  and that plug is the pale spike and bloated white shoulder those two shipped with. A head is also
+  not a box: `|x| < halfWidth` and `bot < z < top` are both satisfied up in the open water at the
+  corner. What answers exactly is **ray parity against the closed intake surface** — a point inside
+  a closed surface crosses it an odd number of times on the way out, which uses no normals and no
+  table — with a second parity test against the lining sac, because a modelled open mouth is an
+  invagination and a point in the lumen is outside the solid by construction.
+
 - **A limbed swimmer's dash has to paddle.** The Triassic's reptiles and amphibians did not scull
   along on a tail beat, and a Sprint clip that waggles the limbs while the body does the work reads
   as a fish with legs attached. The stroke runs from the limb stretched forward to flush with the

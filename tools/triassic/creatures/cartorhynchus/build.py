@@ -220,11 +220,42 @@ for key, pts in LIMB_PTS.items():
 # How far off a limb's own polyline the blade reaches, measured from the cluster itself rather
 # than guessed: a paddle is wide as well as long, and a radius that is too small leaves its
 # trailing edge on the flank bones and tears when the fin strokes.
+#
+# **The percentile is the 92nd, not the 55th, because these paddles are the engine.** The marine
+# kit's figure leaves nearly half a blade on a partial alpha, which nobody notices on a fin that
+# steers. This animal's forelimbs take a real stroke -- the audit measures them at 1.29 times the
+# tail tip's travel -- and at the 55th the right one came apart: `skin-tears.mjs` read 5.17x in
+# `Sprint` with `fore_mid_R`, `chest`, `fore_tip_R` and `fore_mid_L` heading the torn-edge list,
+# and the blade's own internal edges ran from 3.95x stretched to 0.026 of their rest length in the
+# same clip. A blade that stretches fourfold in one place and collapses to a fortieth in another is
+# the paddle "mushing together" rather than moving as a whole. Rhaeticosaurus' flippers, sweeping
+# 130 degrees, needed the same correction and went from 7.9x to 2.81x on it. The shore kit
+# takes the 99th once its flood has said what the limb is, and that is the figure this animal
+# wants too: 5.17x at the 55th, 4.63x at the 92nd, 3.72x here.
 LIMB_RADIUS = {}
+LIMB_BLEND = {}
 for key, c in LIMBS.items():
     P, cum, _n, _r = LIMB_FIT[key]
     d = [T.project(P, cum, Vector(raw_co[i]))[0] for i in c['indices']]
-    LIMB_RADIUS[key] = (float(np.quantile(d, .55)), float(np.quantile(d, .995)) + .012)
+    LIMB_RADIUS[key] = (float(np.quantile(d, .99)), float(np.quantile(d, .995)) + .012)
+    # **The blend at a joint is a fraction of the segments that joint joins, never a number.** The
+    # constant here was 0.055 on a limb whose three segments are 0.48, 0.36 and 0.16 of its own
+    # length -- so the band was *wider than the whole tip segment*, `limb_chain` handed every
+    # vertex on the paddle all four joints at nearly one weight, that busts the four-influence
+    # budget once the root station is added, and `relax_weights` trims a different four on
+    # neighbouring vertices. That is a discontinuity no amount of relaxation can smooth, because
+    # the relaxation is what makes it.
+    seg = [cum[i + 1] - cum[i] for i in range(len(cum) - 1)]
+    LIMB_BLEND[key] = [max(min(seg[k - 1], seg[k]) * .35, 1e-4) for k in range(1, len(seg))]
+
+
+def limb_chain(names, cum, s, blends):
+    """Which bone of a three-joint limb owns arc length `s`, blended over **each joint's own**
+    width. `T.limb_chain` takes one number for every joint, and on a paddle whose segments run
+    0.48, 0.36 and 0.16 of its length one number cannot be right at both ends."""
+    tl = T.smooth((s - (cum[1] - blends[0])) / (2 * blends[0]))
+    tp = T.smooth((s - (cum[2] - blends[1])) / (2 * blends[1]))
+    return {names[0]: 1 - tl, names[1]: tl * (1 - tp), names[2]: tl * tp}
 
 
 def limb_weights(q, thin):
@@ -240,10 +271,16 @@ def limb_weights(q, thin):
         if dist >= rout:
             continue
         alpha = (1. if dist <= rin else T.smooth(1 - (dist - rin) / (rout - rin)))
-        alpha *= T.smooth(s / max(cum[-1] * .42, 1e-6))
+        # The seat: how far along the limb its own bones take over from the trunk. At 0.42 of the
+        # chain this ramp covered the whole humerus segment, so the proximal half of the paddle was
+        # a blend of trunk and limb at every vertex -- `fore_upper_L` was dominant on 161 of the
+        # 1,679 vertices it touched. The kit's seat on a flipper that reaches 0.30 from the axis is
+        # 0.045; 0.18 of this chain is the same figure on this animal.
+        alpha *= T.smooth(s / max(cum[-1] * .18, 1e-6))
         if alpha > best:
             best = alpha
-            chosen = (T.limb_chain(names, cum, s, blend=.055), rootw, min(1., s / cum[-1]))
+            chosen = (limb_chain(names, cum, s, LIMB_BLEND[key]), rootw,
+                      min(1., s / cum[-1]))
     return (best, *chosen) if chosen else None
 
 
