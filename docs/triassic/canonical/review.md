@@ -17,12 +17,13 @@ sends the subject back to the undecided pile, where the viewer shows the candida
 
 | Delivered | Greenlit | Redo | Not yet reviewed |
 | --- | --- | --- | --- |
-| 17 | 8 | 7 | 63 |
+| 19 | 6 | 7 | 65 |
 
 ## Delivered — the model exists
 
 | Subject | Slot | Built from | Landed |
 | --- | --- | --- | --- |
+| **Aphaneramma rostratum** `aphaneramma` | T12 · Rung II · the sensor (marine amphibian) | the greenlit pose | 2026-09-15 |
 | **Birgeria stensioei** `birgeria` | T11 · Rung II · the tuna | the greenlit pose | 2026-09-15 |
 | **Cartorhynchus lenticarpus** `cartorhynchus` | T18 · Rung I · the shallow-water sucker | the greenlit pose | 2026-09-15 |
 | **Ceratites nodosus** `ceratites` | T20 · Rung I · the shell | the greenlit pose | 2026-09-15 |
@@ -34,6 +35,7 @@ sends the subject back to the undecided pile, where the viewer shows the candida
 | **Hybodus** `hybodus` | T10 · Rung II · the spined shark | the greenlit pose | 2026-09-15 |
 | **Keichousaurus hui** `keichousaurus` | T17 · Rung I · the crowd | `male` | 2026-09-15 |
 | **Mixosaurus cornalianus** `mixosaurus` | T13 · Rung II · the small fin | the greenlit pose | 2026-09-15 |
+| **Mystriosuchus** `mystriosuchus` | S02 · the surface lurker (marine phytosaur) | the greenlit pose | 2026-09-15 |
 | **Nothosaurus giganteus** `nothosaurus` | T03 · Rung III · two-gear ambusher | the greenlit pose | 2026-09-13 |
 | **Phragmoteuthis bisinuata** `phragmoteuthis` | T21 · Rung I · the hooks | the greenlit pose | 2026-09-15 |
 | **Placodus gigas** `placodus` | T09 · Rung II · the shell-cruncher | the greenlit pose | 2026-09-15 |
@@ -48,12 +50,10 @@ shipped with the body, the specimen viewer switches between the two in place.
 
 | Subject | Slot | Canon image | Note |
 | --- | --- | --- | --- |
-| **Aphaneramma rostratum** `aphaneramma` | T12 · Rung II · the sensor (marine amphibian) | the pose | — |
 | **Askeptosaurus italicus** `askeptosaurus` | T08 · Rung II · the turner | the pose | — |
 | **Atopodentatus unicus** `atopodentatus` | T07 · Rung III · the grazer (hammerhead) | the pose | — |
 | **Coelophysis** `coelophysis` | S04 · optional · the dinosaur at the water | the pose | — |
 | **Macrocnemus bassanii** `macrocnemus` | S03 · the runner (ambient) | the pose | — |
-| **Mystriosuchus** `mystriosuchus` | S02 · the surface lurker (marine phytosaur) | the pose | — |
 | **Odontochelys semitestacea** `odontochelys` | T19 · Rung I · the half-shell | the pose | — |
 | **Saurichthys** `saurichthys` | T15 · Rung II · the needle | the pose | — |
 
@@ -117,4 +117,4 @@ wrong: there the note is the entire brief.
 
 ## Not yet reviewed
 
-`acrodus` · `anshunsaurus` · `antrimpos` · `birgeria` · `calcisponge` · `cartorhynchus` · `ceratites` · `chaohusaurus` · `choristoceras` · `coral-head` · `cyamodus` · `cymbospondylus` · `cymbospondylus-buchseri` · `dachstein-reef` · `daonella` · `dinocephalosaurus` · `diplopora` · `encrinus` · `eusaurosphargis` · `fadenia` · `germanonautilus` · `gipskeuper` · `guizhouichthyosaurus` · `helicoprion` · `helveticosaurus` · `henodus` · `hupehsuchus` · `hybodus` · `ichthyotitan` · `keichousaurus` · `log-raft` · `mixosaurus` · `monte-san-giorgio` · `muschelkalk` · `nanchangosaurus` · `neusticosaurus` · `nothosaurus` · `phragmoteuthis` · `pistosaurus` · `placochelys` · `placodus` · `placunopsis` · `placunopsis-mound` · `psephoderma` · `rebellatrix` · `reef-block` · `retiophyllia` · `rhaeticosaurus` · `saurosphargis` · `shastasaurus` · `shonisaurus` · `shore-boulder` · `sponge-mound` · `stromatolite` · `tanystropheus` · `thecosmilia` · `thylacocephala` · `traumatocrinus` · `tropites` · `utatsusaurus` · `voltzia` · `xinpusaurus` · `yunnanolimulus`
+`acrodus` · `anshunsaurus` · `antrimpos` · `aphaneramma` · `birgeria` · `calcisponge` · `cartorhynchus` · `ceratites` · `chaohusaurus` · `choristoceras` · `coral-head` · `cyamodus` · `cymbospondylus` · `cymbospondylus-buchseri` · `dachstein-reef` · `daonella` · `dinocephalosaurus` · `diplopora` · `encrinus` · `eusaurosphargis` · `fadenia` · `germanonautilus` · `gipskeuper` · `guizhouichthyosaurus` · `helicoprion` · `helveticosaurus` · `henodus` · `hupehsuchus` · `hybodus` · `ichthyotitan` · `keichousaurus` · `log-raft` · `mixosaurus` · `monte-san-giorgio` · `muschelkalk` · `mystriosuchus` · `nanchangosaurus` · `neusticosaurus` · `nothosaurus` · `phragmoteuthis` · `pistosaurus` · `placochelys` · `placodus` · `placunopsis` · `placunopsis-mound` · `psephoderma` · `rebellatrix` · `reef-block` · `retiophyllia` · `rhaeticosaurus` · `saurosphargis` · `shastasaurus` · `shonisaurus` · `shore-boulder` · `sponge-mound` · `stromatolite` · `tanystropheus` · `thecosmilia` · `thylacocephala` · `traumatocrinus` · `tropites` · `utatsusaurus` · `voltzia` · `xinpusaurus` · `yunnanolimulus`
