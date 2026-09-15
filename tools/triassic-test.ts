@@ -20,7 +20,7 @@ const { devActor, stageScale, ADULT_STAGE, PRIME_STAGE, STAGE_AT } = await impor
 const { AIR_LOW, AIR_MAX, triActor } = await import('../src/sim/triassic/state');
 /** Mirrors AIR_BOT_SEEK in the rules: the breath at which a bot starts up. Kept here so the test says what it is testing. */
 const AIR_BOT_SEEK_T = 80;
-const { shoreClip, shorePosts } = await import('../src/sim/triassic/shore');
+const { setShoreAnimals, shoreAnimalsOn, shoreClip, shorePosts } = await import('../src/sim/triassic/shore');
 const { brokeSurface, isAlive, lengthOf, bandOf, swimCeiling } = await import('../src/sim/actors');
 const { PLAYABLE, creature, CREATURES } = await import('../src/sim/creatures');
 const { emptyInput } = await import('../src/sim/types');
@@ -310,18 +310,21 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
   g.skipHatch();
 }
 {
-  const g = new Game('rise', [{ creature: 'mixosaurus', device: 'keyboard', ready: true }]);
-  g.skipHatch();
-  const calf = g.players[0];
-  run(g, 1);
-  const t = triActor(g, calf);
-  const mother = t.mother >= 0 ? g.byId(t.mother) : undefined;
-  ok(!!mother && mother.creature === 'mixosaurus' && lengthOf(mother) > lengthOf(calf) * 2, 'an adult of its kind is beside a live-bearer');
-  ok(t.calfT > 50 && t.calfT < 60, 'and it stays a minute');
-  const e = new Game('rise', [{ creature: 'placodus', device: 'keyboard', ready: true }]);
-  e.skipHatch();
-  run(e, 1);
-  ok(triActor(e, e.players[0]).mother < 0, 'an egg-layer gets no escort');
+  // A live-bearer hatches exactly like an egg-layer: no parent, no escort. `birth: 'live'` is a
+  // fact on the animal's card and nothing the sea does to you — a grown adult of your own kind
+  // arriving and swimming off spent the one beat the series opens with.
+  for (const kind of ['mixosaurus', 'placodus'] as const) {
+    const g = new Game('rise', [{ creature: kind, device: 'keyboard', ready: true }]);
+    g.skipHatch();
+    const you = g.players[0];
+    run(g, 1);
+    // The escort was spawned two body lengths behind on the first step, so what is checked is the
+    // absence of anything *stationed on you*: the sea's own grown animals pass by from the first
+    // minute (`population.ts`) and one of them happening to be your species is ordinary.
+    const close = g.actors.filter((o) => o.id !== you.id && o.creature === kind
+      && lengthOf(o) > lengthOf(you) * 2 && Math.hypot(o.pos.x - you.pos.x, o.pos.y - you.pos.y, o.pos.z - you.pos.z) < lengthOf(you) * 6);
+    ok(close.length === 0, `${kind} hatches with no grown escort of its own kind alongside (${close.length} within six lengths)`);
+  }
 }
 // The shell an animal comes out of says what it is: a reptile's is leathery, and the sharks, fish,
 // amphibian and cephalopods on the roster lay nothing of the kind.
@@ -360,13 +363,23 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
 }
 // Holding the climb is asking for something, so it must not be treated as coasting.
 {
-  const g = new Game('rise', [{ creature: 'nothosaurus', device: 'keyboard', ready: true }], 99);
-  g.skipHatch();
-  const p = g.players[0]; p.spawnProtect = 0;
-  const y0 = p.pos.y;
-  const m = new Map([[0, { ...emptyInput(), rise: true } as InputFrame]]);
-  for (let i = 0; i < 60; i++) { g.step(1 / 60, m); g.events.length = 0; }
-  ok(p.pos.y - y0 > 1, `one second of the climb button is worth more than a metre (${(p.pos.y - y0).toFixed(2)} units)`);
+  // Over several seeds, and against the same body asking for nothing rather than against an
+  // absolute number: what this is really about is that holding the climb is an *ask* and not
+  // coasting, and one lucky seed measuring 1.04 against a 1-unit bar was how it came to be
+  // checked. (A hatchling climbs about 0.99 units a second here; still is about 0.00.)
+  const oneSecond = (seed: number, rise: boolean) => {
+    const g = new Game('rise', [{ creature: 'nothosaurus', device: 'keyboard', ready: true }], seed);
+    g.skipHatch();
+    const p = g.players[0]; p.spawnProtect = 0;
+    const y0 = p.pos.y;
+    const m = new Map([[0, { ...emptyInput(), rise } as InputFrame]]);
+    for (let i = 0; i < 60; i++) { g.step(1 / 60, m); g.events.length = 0; }
+    return p.pos.y - y0;
+  };
+  const seeds = [99, 5, 21, 7, 41];
+  const climbs = seeds.map((s) => oneSecond(s, true)), stills = seeds.map((s) => oneSecond(s, false));
+  ok(climbs.every((d) => d > 0.9), `one second of the climb button is worth about a metre at every seed (${climbs.map((d) => d.toFixed(2)).join(', ')})`);
+  ok(climbs.every((d, i) => d > stills[i] + 0.8), `...and holding it is nothing like coasting (still: ${stills.map((d) => d.toFixed(2)).join(', ')})`);
 }
 // The winded heartbeat is a heartbeat. It used to fire every second for as long as a player stayed
 // down — a hundred and forty times in three minutes — each one a loud cue and a puff of bubbles.
@@ -408,6 +421,15 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
 
 // ---- the shore that reaches in ----
 {
+  // Off in every match (`SHORE_ANIMALS` in shore.ts): the behaviour these animals are meant to
+  // have is designed and not built, so the beach is empty until it is. The cycle that *is* built
+  // stays checked, which is what the switch is for — so this block turns it on deliberately.
+  const off = new Game('reef', [{ creature: 'keichousaurus', device: 'keyboard', ready: true }]);
+  off.skipHatch(); run(off, 0.5);
+  ok(!shoreAnimalsOn(), 'shore animals are off by default');
+  ok(shorePosts(off, off.players[0].pos, 3000).length === 0, '...so no bank near a player holds one');
+  ok(off.actors.every((a) => !creature(a.creature).shore), '...and none is spawned into the sea either');
+  setShoreAnimals(true);
   const g = new Game('reef', [{ creature: 'keichousaurus', device: 'keyboard', ready: true }]);
   g.skipHatch();
   run(g, 0.5);
@@ -590,7 +612,7 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
     run(g, 8, inputs);
     return JSON.stringify(g.actors.map((a) => [a.creature, a.pos.x.toFixed(4), a.pos.y.toFixed(4), a.pos.z.toFixed(4), a.hp.toFixed(3), a.stamina.toFixed(3), a.state]));
   };
-  ok(play() === play(), 'the same seed and inputs replay the same match, shore animals and mothers included');
+  ok(play() === play(), 'the same seed and inputs replay the same match, whatever is on the banks');
 }
 
 // ---- the raw generated bodies the viewer offers ----

@@ -36,7 +36,6 @@ export interface TriActor {
   /** Pod-mates' actor ids (Shonisaurus). */
   pod: number[];
   /** The mother that stays beside a live-born calf for its first minute, and how long is left. */
-  mother: number; calfT: number;
   /** Seconds of power-stroke shove left (Rhaeticosaurus). */
   strokeT: number;
   /** 0..1 while a shore animal is winding up on this player; for the HUD. */
@@ -60,7 +59,7 @@ export function triActor(g: Game, a: Actor): TriActor {
   const s = triState(g);
   let t = s.actors.get(a.id);
   if (!t) {
-    t = { atSurface: false, air: AIR_MAX, drownT: 0, windT: 0, heldT: 0, podShield: 0, pod: [], mother: -1, calfT: 0, strokeT: 0, shoreWarn: 0, sawT: 0 };
+    t = { atSurface: false, air: AIR_MAX, drownT: 0, windT: 0, heldT: 0, podShield: 0, pod: [], strokeT: 0, shoreWarn: 0, sawT: 0 };
     s.actors.set(a.id, t);
   }
   return t;

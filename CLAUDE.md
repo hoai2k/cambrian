@@ -158,7 +158,16 @@ unless the user explicitly asks for a PR. Steps:
   `src/sim/triassic/state.ts`), armour has a facing (`armourFacing`), the sea floor sinks
   by biome (`environment.floorDepth` → `depthProfile` in `src/sim/world.ts`; the other eras leave
   it out and keep their flat floor), and shore animals (`shore: true`, never pickable) are brainless actors pinned on
-  the beach by `src/sim/triassic/shore.ts` that telegraph and strike into the water. No playable
+  the beach by `src/sim/triassic/shore.ts` that telegraph and strike into the water. **They are off
+  (`SHORE_ANIMALS` in that file) and the beach is empty**: the behaviour they are meant to have is
+  designed and not built (`docs/triassic/06-shore-visitors.md`), and a hazard a player is supposed
+  to learn should arrive finished rather than as a partial version that teaches the wrong lesson.
+  The cycle that *is* built stays intact and checked — `setShoreAnimals(true)` is how the suite runs
+  it — so turning them on is one line. A `shore: true` creature is also never an ambient swimmer:
+  the sea is populated from `WILD`/`WILD_IDS` (the roster minus the shore animals) rather than from
+  `CREATURES`, because the ambient draw took the whole roster and the Triassic was spawning
+  hatchling Tanystropheus in open water with ordinary brains — walking animals swimming about
+  biting people. No playable
   Triassic animal ever leaves the water; `shoreReach` is deliberately unused there.
   `npm run triassic` guards all of it.
 - A lungful is a gauge, and running it out is what the old flat rule now means. `AIR_MAX` seconds
@@ -213,9 +222,12 @@ unless the user explicitly asks for a PR. Steps:
 - Every Triassic animal hatches from an egg on the sea floor, as in the other two eras. The
   live-bearers were briefly born at the surface instead — which is what the fossils say, and
   Keichousaurus and Dinocephalosaurus preserve the embryos — but it cost the series its one opening
-  beat, and a player dropped into open midwater never sees the shell crack. `birth: 'live'` now only
-  puts a grown adult of the animal's own kind beside it for the first minute, which is the parental
-  care viviparity implies. A reptile's egg is *leathery* (`eggShell: 'leathery'`): opaque, matte,
+  beat, and a player dropped into open midwater never sees the shell crack. `birth: 'live'` is now a fact on the animal's
+  card and nothing the sea does to you. It briefly put a grown adult of the same kind beside the
+  hatchling for its first minute — the parental care viviparity implies — and what that read as in
+  the water was a giant of your own species turning up at the one moment the series gives you, the
+  shell cracking on the sea floor, and swimming away. The Triassic hatches exactly as the other two
+  games do. A reptile's egg is *leathery* (`eggShell: 'leathery'`): opaque, matte,
   dimpled, longer and narrower than the Cambrian's calcareous capsule, and set on the animal rather
   than the era, because the roster also has two sharks, two fish, an amphibian and two cephalopods
   that lay nothing of the kind (`src/render/eggs.ts`). The hatch has to be *seen*: `spawnInCover`

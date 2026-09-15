@@ -27,7 +27,7 @@ import { AIR_LOW, AIR_MAX, triActor, triState } from './state';
  *   with a blow. No meter, no drowning; nothing on the roster leaves the water.
  * - **Depth.** The floor sinks by biome (`floorDepth`), so the climb for air is what a biome costs.
  * - **The shore that reaches in.** Shore animals stand on the beach and strike (./shore.ts).
- * - **Armour with a facing**, the pod, live birth beside a mother, heat on the flats and cold in
+ * - **Armour with a facing**, the pod, heat on the flats and cold in
  *   the deep, a held animal's lost air, and the specials in ./specials.ts.
  */
 const RUNG_NAMES_TRI = ['', 'Floor', 'Shelf', 'Hunters', 'Giants'] as const;
@@ -39,7 +39,7 @@ const WINDED_EVERY = 3.4;
 const HEAT_DRAIN = 1.5;
 /** Cold in the deep: the share of recovery an ectotherm keeps there. */
 const COLD_REGEN = 0.5;
-const MOTHER_T = 60, POD_SIZE = 2;
+const POD_SIZE = 2;
 /**
  * The least of its full-grown climb an air-breather keeps, however small it is. At 0.7 a hatchling
  * crosses the shelf's twelve units in about eight seconds instead of nineteen, and the deepest
@@ -203,24 +203,17 @@ function clearTheView(g: Game, at: Vec3, id: CreatureId, scale: number): Vec3 {
   return best;
 }
 
-// ---- birth: the mother beside the calf ----
-function updateMother(g: Game, a: Actor, dt: number) {
-  const t = triActor(g, a), def = creature(a.creature);
-  if (t.calfT <= 0) { if (t.mother >= 0) { const m = g.byId(t.mother); if (m?.brain) m.brain.home = { ...m.pos }; t.mother = -1; } return; }
-  t.calfT -= dt;
-  let m = t.mother >= 0 ? g.byId(t.mother) : undefined;
-  if (!m || !isAlive(m)) {
-    if (t.mother >= 0) { t.mother = -1; return; }              // the mother died: no second one
-    const h = heading(a.yaw);
-    m = g.spawn(a.creature, 'ambient', { x: a.pos.x - h.x * lengthOf(a) * 2, y: a.pos.y, z: a.pos.z - h.z * lengthOf(a) * 2 }, stageScale(def.adultLength, ADULT_STAGE));
-    m.brain = makeBrain('needs', a.pos, g.rng, { aggression: 0.9, courage: 2, temper: 0.6 });
-    m.spawnProtect = 3;
-    t.mother = m.id;
-  }
-  if (m.brain) { m.brain.home = { ...a.pos }; if (m.brain.goal === 'wander' && distXZ(m.pos, a.pos) > 10) m.brain.wanderTo = { ...a.pos }; }
-  // the mother answers what comes for the calf
-  if (a.hunterId >= 0 && m.brain && m.brain.goal !== 'fight' && m.brain.goal !== 'hunt') { m.brain.goal = 'fight'; m.brain.target = a.hunterId; m.brain.goalT = 0; }
-}
+// ---- birth ----
+/**
+ * There is no parent beside a live-bearer, and there was.
+ *
+ * `birth: 'live'` is true of nine of these animals and stays on their cards, but it used to also
+ * put a grown adult of the same kind beside the hatchling for its first minute. What that actually
+ * read as, in the water, was a giant of your own species turning up at the one moment the series
+ * gives you — the shell cracking on the sea floor — and swimming away. The Triassic hatches the way
+ * the other two games do, and viviparity is something the animal's card says rather than something
+ * the sea does to you in your first minute. (`docs/triassic/01-triassic-design.md`.)
+ */
 
 // ---- the pod ----
 function updatePod(g: Game, a: Actor, dt: number) {
@@ -290,7 +283,6 @@ export const TRIASSIC_RULES: EraRules = {
       d.stage = stageForScale(creature(a.creature).adultLength, a.scale);
       d.standing = g.mode === 'reef' ? STAGE_AT[ADULT_STAGE] + 5 : STAGE_AT[d.stage];
       const t = triActor(g, a);
-      if (creature(a.creature).birth === 'live' && d.stage === 0) t.calfT = MOTHER_T;
     }
   },
 
@@ -304,7 +296,6 @@ export const TRIASSIC_RULES: EraRules = {
       t.shoreWarn = 0;                                        // the shore module raises it again this step if it is still winding up
       updateAir(g, a, dt);
       updateClimate(g, a, dt);
-      updateMother(g, a, dt);
       updatePod(g, a, dt);
       updateStroke(g, a, dt);
       updateSaw(g, a, dt);
@@ -473,7 +464,6 @@ export const TRIASSIC_RULES: EraRules = {
     // with would start the next life already out of air, and drown again the moment its bar went.
     t.atSurface = false; t.air = AIR_MAX; t.drownT = 0;
     t.windT = 0; t.heldT = 0; t.podShield = 0; t.strokeT = 0; t.shoreWarn = 0; t.sawT = 0;
-    if (creature(a.creature).birth === 'live' && devActor(g, a).stage === 0) { t.calfT = MOTHER_T; t.mother = -1; }
   },
 
   updateModes: DEVONIAN_RULES.updateModes,
@@ -509,11 +499,11 @@ export const TRIASSIC_RULES: EraRules = {
     // the gauge: effort costs stamina, which comes back normally on a full chest, so "air is what
     // effort costs" and "every fight ends at the surface" both stopped being true. The gauge itself
     // teaches the mechanic where it belongs, on the bar, and flashes for its last minute.
-    if (g.time < 12) return def.birth === 'live' ? 'Out of the shell, and a parent of your own kind is with you for a minute. Feed, dive, grow.' : rung === 1 ? 'Feed, hide, moult. Everything out there is bigger than you are today.' : rung === 2 ? 'Feed and grow. The deep is busier than the shallows, and everything in it is bigger.' : rung === 3 ? 'Hunt the shelf. Five stages between you and Prime.' : 'Stay fed. The deep is yours; the flats are closed to you.';
+    if (g.time < 12) return rung === 1 ? 'Feed, hide, moult. Everything out there is bigger than you are today.' : rung === 2 ? 'Feed and grow. The deep is busier than the shallows, and everything in it is bigger.' : rung === 3 ? 'Hunt the shelf. Five stages between you and Prime.' : 'Stay fed. The deep is yours; the flats are closed to you.';
     if (def.shell && g.time < 40) return 'Your funnel makes rise and sink free, and no direction is slow. Block withdraws into the shell.';
     if (def.sink && g.time < 40) return 'You settle when you stop. The floor is where you feed.';
     return undefined;
   },
 };
 
-export { WINDED_BELOW, HEAT_DRAIN, COLD_REGEN, MOTHER_T, POD_SIZE };
+export { WINDED_BELOW, HEAT_DRAIN, COLD_REGEN, POD_SIZE };
