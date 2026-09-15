@@ -250,7 +250,11 @@ def bone(n, p, parent):
 # Temnospondyls have effectively no neck: one short joint carries the skull off the shoulder girdle.
 NECK_Y = -.268
 CHEST_Y, BODY_Y = -.190, .005
-TAIL_Y = [.125, .180, .235, .290, .345, .400, .450]
+# **The biggest gap in an axial chain is where it tears.** With the first tail joint at 0.125 the
+# step from `body` was 0.12 of a body against 0.055 between the tail's own joints -- and that gap is
+# exactly where the pelvis is and where four limb bones stop owning skin. `skin-tears.mjs` read
+# 4.54x there with 364 of the torn edges on `tail_00`. An eighth joint halves the gap.
+TAIL_Y = [.070, .125, .180, .235, .290, .345, .400, .450]
 bone('root', (0, 0, 0), None)
 bone('body', on_axis(BODY_Y), 'root')
 bone('chest', on_axis(CHEST_Y), 'body')
@@ -302,7 +306,7 @@ for key, pts in LIMB_PTS.items():
 # body either side of the tie, and faded out over the first `LIMB_ROOT_FADE` of the chain so the
 # shoulder itself stays on the trunk. The measurement that says this is right is `skin-tears.mjs`,
 # reported in the README.
-LIMB_MARGIN = .026
+LIMB_MARGIN = .034
 LIMB_ROOT_FADE = .34
 LIMB_RADIUS = {}
 for key, c in LIMBS.items():
@@ -325,7 +329,7 @@ def limb_weights(q):
             # A wide blend between the joints: a leg that swings through 90 degrees puts the whole
             # difference between two joints across whatever band sits between them, and a narrow
             # band is where the skin comes apart.
-            chosen = (T.limb_chain(names, cum, s, blend=.038), rootw, min(1., s / cum[-1]))
+            chosen = (T.limb_chain(names, cum, s, blend=.048), rootw, min(1., s / cum[-1]))
     return (best, *chosen) if chosen else None
 
 
@@ -429,7 +433,7 @@ for o in (auth, puppet):
     for n in B:
         o.vertex_groups.new(name=n)
     raw_weights = [weights(v.co) for v in o.data.vertices]
-    relaxed = T.relax_weights(o, raw_weights, passes=4, hold=.45)
+    relaxed = T.relax_weights(o, raw_weights, passes=6, hold=.45)
     counts, owners = [], {}
     for v in o.data.vertices:
         w = relaxed[v.index]
@@ -635,8 +639,12 @@ def reset():
 # real rearward stroke in Swim and a harder one in Sprint, and the swept angle at each root is
 # measured from the limb's own direction below rather than read off an Euler channel.
 AXIAL_CHAIN = ['neck_00', 'chest', 'body'] + ['tail_%02d' % i for i in range(len(TAIL_Y))]
-GAIN = [.18, .10, .16, .34, .52, .70, .86, 1.00, 1.10, 1.16]
-LAG = [0., .30, .75, 1.25, 1.75, 2.20, 2.60, 3.00, 3.35, 3.65]
+# **The ramp at the pelvis is where the skin tears, not the tail tip.** A first pass ran the gain
+# 0.16 at the trunk and 0.34 at the first tail joint -- a doubling across one joint, right where the
+# hind limbs hang off it -- and `skin-tears.mjs` read 5.45x with 397 of the torn edges on `tail_00`.
+# A wave that grows smoothly grows just as far and tears a third less.
+GAIN = [.18, .11, .15, .20, .29, .42, .57, .74, .92, 1.06, 1.16]
+LAG = [0., .30, .75, 1.05, 1.40, 1.75, 2.10, 2.45, 2.80, 3.15, 3.50]
 SIDE = {k: (1. if k.endswith('R') else -1.) for k in LIMB_NAMES}
 # A diagonal-couplet row: each limb is half a cycle out of phase with the one beside it and a
 # quarter out with the one in front, which is what a sprawling tetrapod does in water and on land.
@@ -669,7 +677,7 @@ for clip, duration in CLIPS.items():
         env = 1. if loop else e
         pb = rig.pose.bones
 
-        amp = {'Idle': .16, 'Swim': 1.0, 'Sprint': 1.45, 'Eat': .26, 'Guard': .16, 'Grab': .24,
+        amp = {'Idle': .16, 'Swim': 1.0, 'Sprint': 1.32, 'Eat': .26, 'Guard': .16, 'Grab': .24,
                'Breath': .28, 'Breathe': .22, 'Growth': .20, 'Dodge': 1.20, 'Crawl': .34,
                'Ability': .60}.get(clip, .24)
         beat = {'Swim': 2., 'Sprint': 2., 'Idle': 1., 'Breathe': 1., 'Crawl': 1.}.get(clip, 1.)
@@ -787,7 +795,13 @@ for clip, duration in CLIPS.items():
                 q.rotation_euler.x = -.20 * (e if clip == 'Breath' else .5 + .5 * sin(p))
         if clip in ('Attack', 'Heavy', 'Ability'):
             pb['skull'].rotation_euler.x += (-.14 * cock + .20 * drive) * strike
-            pb['skull'].rotation_euler.z += (-.30 * cock + .62 * drive) * sway
+            # **The swipe is the neck's as much as the head's.** A first pass put 0.84 rad of yaw
+            # on `skull` alone in Ability and `skin-tears.mjs` read 4.92x across the head/neck
+            # junction (129 torn edges on `neck_00`). One joint cannot carry a sweep this wide on a
+            # skull a quarter of the body long; spread over the three joints behind it the snout
+            # goes just as far across and the skin holds.
+            pb['skull'].rotation_euler.z += (-.18 * cock + .34 * drive) * sway
+            pb['neck_00'].rotation_euler.z += (-.12 * cock + .22 * drive) * sway
             pb['neck_00'].rotation_euler.x += (-.08 * cock + .12 * drive) * strike
         if clip == 'Eat':
             pb['skull'].rotation_euler.z += .12 * sin(p * 2)
