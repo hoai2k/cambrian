@@ -29,18 +29,11 @@ const CLIP_ORDER = [
 ];
 
 /** A clip kept for comparison after being re-authored: `replaced/<Name>` (tools/creatures/motion). */
-/**
- * The geometry a builder adds *inside* a mouth: the palate and floor that close each jaw, the
- * tissue seated at the hinge, and a cephalopod's beak. It is authored rather than generated, so a
- * reviewer needs to be able to take it away and look at the mouth the generation actually came
- * with — which is what `setOralGeometry(false)` does. Matched on the mesh's name and its material's,
- * both of which every builder in the era spells the same way (`Oral_cavity_lining`, `Mouth_lining`,
- * `Seated_jaw_hinge_tissue`, and the `... mouth interior` / `... mouth lining` materials).
- */
-export const ORAL_GEOMETRY = /lining|mouth[ _]interior|hinge[ _]tissue|beak|palate/i;
+import { isOralGeometryNamed } from '../shared/oral-geometry';
+
+/** Whether a loaded mesh is authored mouth geometry (see `src/shared/oral-geometry.ts`). */
 export const isOralGeometry = (o: THREE.Mesh) =>
-  ORAL_GEOMETRY.test(o.name) ||
-  (Array.isArray(o.material) ? o.material : [o.material]).some((m) => m && ORAL_GEOMETRY.test(m.name ?? ''));
+  isOralGeometryNamed(o.name, (Array.isArray(o.material) ? o.material : [o.material]).map((m) => m?.name));
 
 export const REPLACED_PREFIX = 'replaced/';
 export const isReplaced = (name: string) => name.startsWith(REPLACED_PREFIX);
@@ -300,7 +293,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
 
   let model: THREE.Object3D | undefined;
   /** Survives a change of specimen, because a reviewer comparing mouths is comparing across them. */
-  let oralGeometry = true;
+  let oralGeometry = false;
   let source: GLTF | undefined;
   let mixer: THREE.AnimationMixer | undefined;
   let actions = new Map<string, THREE.AnimationAction>();
