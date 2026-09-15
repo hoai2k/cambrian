@@ -1,0 +1,68 @@
+{
+  "id": "mystriosuchus",
+  "name": "Mystriosuchus",
+  "species": "Mystriosuchus steinbergeri",
+  "provenance": "Late Triassic \u00b7 Dachstein lagoon, Austria",
+  "description": "A marine phytosaur: crocodile-shaped but not a crocodile, with a long narrow rostrum, a double row of dorsal osteoderms and a flattened sculling tail. Authored Tripo body and measured procedural volume twin share one armature, one set of inverse binds, one set of sockets and one set of actions.",
+  "modelLength": 5.0,
+  "lengthMeters": 4.0,
+  "locomotion": "Crawl",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth",
+    "Breathe",
+    "Crawl",
+    "Lower",
+    "SnapLeft",
+    "SnapRight",
+    "Retract"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "Breathe",
+    "Crawl"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "puppet": "mystriosuchus.puppet.glb",
+  "sources": [
+    "docs/triassic/canonical/mystriosuchus.png",
+    "tools/triassic/creatures/mystriosuchus/tripo-raw/mystriosuchus.raw.glb"
+  ],
+  "notes": [
+    "A SHORE ANIMAL (shore: true), which is the era's stated exception to \"a playable Triassic animal swims\": it is never playable, it stands at a post above the waterline and strikes into the water, and the land motion is its primary. locomotion is therefore Crawl, as it is for Tanystropheus, Macrocnemus and Coelophysis.",
+    "Lower, SnapLeft, SnapRight and Retract are timed to the simulation's own clock rather than beside it: TELEGRAPH (1.5 s), the 0.6 s strike window and RECOVER (0.9 s) in src/sim/triassic/shore.ts. SnapLeft swings the head to the animal's left, which is the side sideOf() names.",
+    "The swim set is authored and correct, but a crocodile-shaped ambusher sculls with its tail and holds its limbs back along its flanks \u2014 so the swept angle bar is met in Crawl, where this animal's limbs actually do the work, and the swim clips are measured rather than made to row.",
+    "The mouth is painted, not modelled: the geometric method returns 87 hits spread over the whole depth of the head, which is the gular folds and the scute relief, not a slit. The painted line is read as a continuous curve under a raised jump penalty and the read stops short of the hinge, because at the jaw corner the fit climbs off the lip onto the gold/dark boundary above it. The seam is extrapolated from there on its own slope.",
+    "The roll correction is 14.6 degrees, read off the countershading. On a body this symmetric no bounding box could have found it.",
+    "The twin resurfaces a voxel occupancy field of the authored body, relaxes it and reduces the new topology. It reuses no source vertex or face.",
+    "Living colours, soft tissues and movements are artistic reconstruction. World travel remains engine-owned."
+  ]
+}

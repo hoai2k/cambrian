@@ -107,9 +107,14 @@
     },
     "aphaneramma": {
       "turnaround": "not-started",
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "decidedAt": "2026-09-13T15:03:56.373Z",
-      "promotedFrom": "candidate03"
+      "promotedFrom": "candidate03",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T15:03:56.373Z",
+      "deliveredAt": "2026-09-15"
     },
     "mixosaurus": {
       "canonical": "delivered",
@@ -205,9 +210,14 @@
     },
     "mystriosuchus": {
       "turnaround": "not-started",
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "decidedAt": "2026-09-13T15:04:15.933Z",
-      "promotedFrom": "candidate03"
+      "promotedFrom": "candidate03",
+      "bodyApproved": true,
+      "bodyApprovedAt": "2026-09-15",
+      "bodyApprovedBy": "completion pass authorised by the project owner, 15 September 2026: build every animal out, clear the badges, and name afterwards any that should go back into redo",
+      "greenlitAt": "2026-09-13T15:04:15.933Z",
+      "deliveredAt": "2026-09-15"
     },
     "macrocnemus": {
       "canonical": "greenlit",

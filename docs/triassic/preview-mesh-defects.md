@@ -187,3 +187,44 @@ attempt — is `docs/viewer-mark.md`. Two things it deliberately does not do: it
 folder reads to `review-bodies.mjs` as a delivered body), and it does not decide anything. Whether a
 cut mesh replaces the preview it came from is a human call, and Helicoprion's row is still a redraw
 either way, because its pelvic and anal fins are in the greenlit pose.
+
+### What the two builds then measured on those generations (15 September 2026)
+
+Both are now built (`tools/triassic/creatures/{aphaneramma,mystriosuchus}/`), and three things the
+intake measured are worth keeping here rather than only in each README.
+
+- **The estimated yaw of 180 was never used, and would not have been enough.** Neither build reads
+  `preview-orientation.json`. Aphaneramma's own principal axis lies **18.5 degrees** off the file's
+  Y, and Mystriosuchus carries a **14.6 degree roll** that only the countershading finds — a body
+  this symmetric has no geometric cue for roll at all, and left uncorrected it swims with its flank
+  to the sky.
+- **Neither generation models a mouth.** Placodus' geometric method returns 34 scattered vertices on
+  Aphaneramma and 87 on Mystriosuchus, spread over the *whole depth of the head* in both cases,
+  which is the gular folds and the scute relief finding each other across a crease. Both mouths are
+  read off the painted line.
+- **Both tails carry a real rest curve**, and the ratio that decides rig-versus-mesh straightening
+  does not see it. `meanCurvatureRadiusOverSection` says how *tight* a bend is against the body's
+  own thickness — Aphaneramma's tail is 13.3 mean and 3.97 tightest, comfortably the gentle case —
+  and says nothing about how far the run turns altogether: that same tail turns **62 degrees** from
+  its first segment to its last, and Mystriosuchus' **44.6**. Both builders now record the turning
+  angle beside the ratio (`restTurning` in `validation.json`), because the `Neutral` pose pass needs
+  the second number to know there is anything to do. Nothing has been unbent in the mesh.
+
+And one of them **is** a defect, found by rendering the raw generation rather than by any
+measurement. **Aphaneramma's tail is hooked right round**: it sweeps out to 0.22 from the axis at
+0.38 of a body and comes back to 0.09 at the tip, so a slab across the body at the last few stations
+cuts the tail *twice* and the y-parameterised centreline every builder in this era measures folds
+the hook flat — which is why `restTurning` reports a mild-sounding 62 degrees and the picture shows
+a closed ring. It is present in `tripo-raw/aphaneramma.raw.glb` before any rig, so nothing
+downstream caused it, and the built body carries it into every clip: the animal swims with its tail
+curled over its own back.
+
+It is left in, because taking it out is either a Neutral-pose **mesh** unbend or a regeneration, and
+both are decisions for the pass that owns them rather than for a build. It is recorded here with
+Rhaeticosaurus' spare tails because it is the same kind of thing — a generation that drew the
+animal in a pose nothing downstream can undo on the rig — and because the metric that was supposed
+to catch it is structurally blind to it. Mystriosuchus' 44.6 degrees is a real sweep and reads
+correctly; only Aphaneramma's folds back.
+
+A *posed* tail as such is not a defect: it is what the canonical pose draws and what Tripo was asked
+for. A tail that crosses its own station is.
