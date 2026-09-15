@@ -8,6 +8,19 @@ export type TriassicCreatureId =
   | 'tanystropheus' | 'mystriosuchus' | 'macrocnemus' | 'coelophysis';
 
 /**
+ * The **standing guests**: animals whose bodies are built here and whose era is not this one.
+ *
+ * Archelon and Mosasaurus are Late Cretaceous, and where they belong is the open question in
+ * `docs/triassic/05-mesozoic-expansion.md`. Being in `TriassicCreatureId` is not itself what puts
+ * an animal in the sea -- `TRIASSIC_CREATURES` is -- but it is load-bearing all the same, because
+ * `BORROWED` and the palette tables are *total* records over that union and would quietly start
+ * demanding entries for a sea these two are not in. So they get their own union, joined to
+ * `CreatureId` alongside it: they resolve through `creature()` as visitors and appear in none of
+ * the era's own tables.
+ */
+export type TriassicGuestId = 'archelon' | 'mosasaurus';
+
+/**
  * Triassic signature identities. The ones implemented as routines live in src/sim/triassic/
  * specials.ts; the rest ride the shared machinery (the Devonian's specials and the Cambrian's
  * `snatch`, `bristleFlare` and `ambushSurge` are reused by id where a kit asked for exactly them).

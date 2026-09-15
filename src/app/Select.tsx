@@ -35,8 +35,12 @@ interface Props {
   onExtra: (i: number, id: ExtraId) => void;
   /** How many animals this device has earned from the other games. */
   visitorCount: number;
-  /** Which game a visitor is from, for the crew card. */
-  visitorEra?: (id: CreatureId) => EraId | undefined;
+  /**
+   * Where a visitor is from, in words, for the crew card. Not the era it is *filed* under: a
+   * standing guest's files live in the Triassic's folder and it is Late Cretaceous, so the card
+   * reads the visitor's own `origin` rather than looking its era's name up.
+   */
+  visitorOrigin?: (id: CreatureId) => string | undefined;
 }
 
 /**
@@ -185,7 +189,10 @@ const ASSETS = appBase();
 /** What each of the grid's buttons says. Short, because the tile is smaller than a card. */
 const EXTRA_LABEL: Record<ExtraId, { name: string; glyph: string; title: string }> = {
   random: { name: 'Random', glyph: '?', title: 'Random · pick a creature for me' },
-  visitors: { name: 'Visitors', glyph: '★', title: 'Visitors · animals you have taken to the top in the other games' },
+  // **Not "animals you have earned".** Two of the animals behind this button were never earned by
+  // anyone: Archelon and Mosasaurus are Late Cretaceous, belong to no game's roster, and stand here
+  // for every player from the day their bodies ship. The label has to be true of both kinds.
+  visitors: { name: 'Visitors', glyph: '★', title: 'Visitors · animals from outside this sea — standing guests, and any you have taken to the top elsewhere' },
 };
 
 export function SelectScreen(p: Props) {
@@ -294,7 +301,7 @@ export function SelectScreen(p: Props) {
                       the growth badge has nothing to say about it. What it says instead is where the
                       animal is from and how to look through the others you have earned. */}
                   {pl.visitorScale
-                    ? <p className="visitor-note"><b>VISITOR</b> · {ERA_NAME[(p.visitorEra?.(pl.creature) ?? 'devonian')]} · left / right for the others</p>
+                    ? <p className="visitor-note"><b>VISITOR</b> · {p.visitorOrigin?.(pl.creature) ?? ERA_NAME.devonian} · left / right for the others</p>
                     : <BestRun mark={p.best[def.id]} carrying={!!p.carry[i]} rise={p.mode === 'rise'} scheme={s} onToggle={() => p.onCarry(i)} />}
                   {!compact && (
                     <>

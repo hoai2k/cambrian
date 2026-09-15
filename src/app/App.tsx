@@ -19,7 +19,7 @@ import { atMain, cycle, groupsFor, stops, type Focus, type FocusGroup } from './
 import { rectsOf, step as spatialStep, type Dir } from './spatial-nav';
 import { gridColumns, SelectScreen } from './Select';
 import { gridStep, rosterGrid, sameSlot, type ExtraId, type Slot } from './roster-grid';
-import { earnedVisitorsHere, type EraId, type Visitor } from '../content/visitors';
+import { visitorsInBrowser, type EraId, type Visitor } from '../content/visitors';
 import { registerVisitorAssets } from '../content/asset-paths';
 import { admitVisitors } from '../sim/creatures';
 import { TitleScreen } from './Title';
@@ -164,10 +164,11 @@ export function App() {
    * cursor walks has to be the grid that is drawn.
    */
   /**
-   * Animals earned in the other games, read off this device's other records. Empty until something
-   * has been taken to the top somewhere else, which is when the Visitors button appears at all.
+   * Animals from outside this game's roster: the standing guests, which are always here once their
+   * bodies have shipped, and whatever this device has taken to the top somewhere else. Between them
+   * they are what the Visitors button holds, and the button appears only when there is one.
    */
-  const visitors = useMemo(() => earnedVisitorsHere(ACTIVE_ERA.id as EraId), []);
+  const visitors = useMemo(() => visitorsInBrowser(ACTIVE_ERA.id as EraId), []);
   useEffect(() => {
     if (!visitors.length) return;
     admitVisitors(visitors.map((v) => v.def));
@@ -919,7 +920,7 @@ export function App() {
           scheme={scheme}
           best={best} carry={carry} modeFocus={focus.group === 'modes' ? focus.index : -1}
           extras={extras} onExtra={pressExtra}
-          visitorCount={visitors.length} visitorEra={(id) => visitors.find((v) => v.id === id)?.era}
+          visitorCount={visitors.length} visitorOrigin={(id) => visitors.find((v) => v.id === id)?.origin}
           onPick={setCreature} onReady={toggleReady} onRemove={removePlayer}
           onMode={changeMode} onStart={startMatch} onBack={backToTitle} onCarry={toggleCarry}
         />
