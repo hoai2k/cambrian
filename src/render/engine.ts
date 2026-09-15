@@ -106,7 +106,7 @@ export interface EngineCallbacks {
 
 export const PLAYER_COLORS = ['#61f2d5', '#ffb457', '#c7a3ff', '#ff86a4'];
 
-interface CamState { showBoard: boolean; hatchShot: number; breathT: number; rideBlend: number; yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
+interface CamState { showBoard: boolean; hatchShot: number; breathT: number; rideBlend: number; yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; climbHold: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
 /** Per-player teleport menu state: opened with D-pad down, steered with the D-pad or stick, A confirms, B closes. */
 /**
  * The D-pad-down menu. A list of places to go, plus one entry that opens a second page: the roster,
@@ -220,6 +220,39 @@ export function swimPitch(pitch: number): number {
   if (mag <= flat) return 0;
   const limit = up ? -PITCH_UP : PITCH_DOWN;
   return Math.sign(pitch) * limit * Math.min(1, (mag - flat) / (limit - flat));
+}
+
+/**
+ * How long a climbing aim outlives the dash it fired, past the dash's own cooldown.
+ *
+ * Reaction time and nothing more: the hold below already lasts as long as the simulation's
+ * cooldown does, so this is only the gap between the button coming back and a player noticing
+ * that it has.
+ */
+export const DASH_AIM_GRACE = 0.25;
+
+/**
+ * A dash aimed up holds its aim until the next dash is ready.
+ *
+ * The pad's pitch drifts back to level whenever the stick is let go, which is what makes it feel
+ * like it is swimming for you — and it is also what made a *series* of upward dashes unusable. A
+ * dash lasts 0.42 s and its cooldown 0.55 s, and the drift ran through both, so by the time the
+ * button came back the aim had flattened and the second dash went along the surface rather than
+ * through it. Climbing out of the water is what a chain of dashes is for, so the aim has to
+ * outlast the wait: while a dash fired above the horizon is still on cooldown the drift is
+ * suspended, and for `DASH_AIM_GRACE` past that. Only the drift is held — the stick is untouched,
+ * so a player who wants to level off still does it the moment they ask.
+ *
+ * Upward only. Aiming down and drifting back to level is the drift doing its job: the flat slice
+ * on the downward side (`FLAT_DOWN`) is there precisely so a resting view is not a dive into the
+ * seabed, and a held dive would be the camera swimming a body into the sand.
+ *
+ * `dashCd` is the simulation's own countdown, so this follows whatever that cooldown is (a tail
+ * flip's is longer) rather than naming a number `src/sim` owns.
+ */
+export function climbAimHold(hold: number, pitch: number, dashCd: number, dt: number): number {
+  const armed = dashCd > 0 && pitch < -FLAT_UP ? dashCd + DASH_AIM_GRACE : 0;
+  return Math.max(0, Math.max(hold, armed) - dt);
 }
 
 export function layoutRects(n: number, w: number, h: number): Rect[] {
@@ -391,7 +424,7 @@ export class Engine {
     this.cams = setups.map((_, i) => {
       const p = this.game!.players[i];
       const cam = new THREE.PerspectiveCamera(60, 1, 0.08, 420);
-      const cs: CamState = { showBoard: false, hatchShot: -1, breathT: 0, rideBlend: 0, yaw: p.yaw, pitch: 0.2, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4(), tele: freshTele() };
+      const cs: CamState = { showBoard: false, hatchShot: -1, breathT: 0, rideBlend: 0, yaw: p.yaw, pitch: 0.2, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, climbHold: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4(), tele: freshTele() };
       cam.position.copy(cs.pos); cam.lookAt(cs.look);
       return cs;
     });
@@ -476,6 +509,9 @@ export class Engine {
         if (running && !menuOpen) {
           const cs = this.cams[i];
           this.updateAim(cs, game.players[i], c.aim, dt);
+          // A dash aimed up keeps its aim until the dash is ready again (`climbAimHold`), so a
+          // chain of them climbs instead of flattening out between presses.
+          cs.climbHold = climbAimHold(cs.climbHold, cs.pitch, p?.dashCd ?? 0, dt);
           if (c.rsClick) {
             // Right stick pressed in: up/down zooms instead of pitching.
             cs.zoom = clamp(cs.zoom * Math.exp(c.lookY * dt * 1.6), 0.55, 2.2);
@@ -487,7 +523,7 @@ export class Engine {
             // Pitch drifts back to level when a stick is let go, which is what makes a pad feel
             // like it is swimming for you. A mouse holds where it was put: the same drift there
             // would fight the hand every frame.
-            if (!this.mouseLook && Math.abs(c.lookY) < 0.05) cs.pitch = damp(cs.pitch, 0.2, 0.6, dt);
+            if (!this.mouseLook && Math.abs(c.lookY) < 0.05 && cs.climbHold === 0) cs.pitch = damp(cs.pitch, 0.2, 0.6, dt);
           }
           if (c.zoomDelta) cs.zoom = clamp(cs.zoom * Math.exp(c.zoomDelta), 0.55, 2.2);
         }

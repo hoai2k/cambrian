@@ -185,6 +185,22 @@ unless the user explicitly asks for a PR. Steps:
   animal is at the top the view was still the water. A blow raises that ceiling for `BREATH_PEEK`,
   eased in and out, and the player sees the spray and their own back in it. `npm run swim` holds the
   camera half and `npm run triassic` the rule.
+- **A dash aimed up keeps its aim until the next dash is ready.** The pad's pitch drifts back to
+  level whenever the right stick is let go, which is what makes it feel like it is swimming for
+  you — and it is also what made a *series* of upward dashes unusable: a dash is 0.42 s and its
+  cooldown 0.55 s, the drift ran through both on a 1.7-second time constant, and by the time the
+  button came back the aim had flattened, so the second dash went along the surface rather than
+  through it. Breaking the surface is what a chain of dashes is for. `climbAimHold` in
+  `src/render/engine.ts` suspends the drift while a dash fired above the horizon is still on
+  cooldown and for `DASH_AIM_GRACE` (reaction time) past it, reading the simulation's own
+  `dashCd` rather than naming a number `src/sim` owns — so a tail flip's longer cooldown is
+  followed for free. Only the *drift* is held, never the stick, so a player who wants to level off
+  still does it the moment they ask; and only upward, because the drift on the downward side is
+  doing its job — `FLAT_DOWN` exists so a resting view is not a dive into the seabed, and a held
+  dive would be the camera swimming a body into the sand. It arms one frame late by construction
+  (the renderer cannot know a dash fired until that step has run) and gives up that one frame of
+  drift and no more. `npm run swim` closes the loop end to end — camera drift into the stick into
+  the real cooldown — and measures the second dash's own rise against the first's.
 - The climb for air is the era's central act and must stay usable at every size. The shared rise
   rate is scaled by the body, but the water is not — the surface is the same twelve units above the
   shelf whether you hatched this minute or own the sea — so an air-breather's climb has a floor
