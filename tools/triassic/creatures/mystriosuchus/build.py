@@ -414,6 +414,7 @@ for key, pts in LIMB_PTS.items():
     LIMB_FIT[key] = (P, cum, LIMB_NAMES[key],
                      T.station_weights(ASTATION, T.project(AP, ACUM, P[0])[1]))
 
+RELAX_PASSES = 14   # Coelophysis' and Macrocnemus' figure; 10 left the hind limbs at 5.51x
 LIMB_MARGIN = .055
 LIMB_ROOT_FADE = .34
 LIMB_RADIUS = {}
@@ -452,21 +453,28 @@ THROAT_SPAN = .058
 THROAT_DROP = .16
 
 
+# **A throat has a width.** This gate was a band in `y` below a height in `z` and nothing at all in
+# `x`, so it claimed everything in that slab of the animal -- and this generation, like
+# Aphaneramma's, carries its **right forelimb tucked forward under the snout**, inside the slab.
+# The bound is the trunk's own measured half width at that station, which `trunk_centreline`
+# computes with the limb vertices dropped, so it is the neck's width and not the arm's.
+THROAT_WIDTH = 1.15
+
+
 def throat_jaw_share(q):
     a = T.smooth((q.y - (HINGE_Y - .016)) / .016)
     b = T.smooth(((HINGE_Y + THROAT_SPAN) - q.y) / THROAT_SPAN)
     c = T.smooth((seam(HINGE_Y) - q.z) / (THROAT_DROP * head_half_depth(HINGE_Y)) + 1.)
-    return a * b * c
+    hw = max(half_width(q.y), 1e-6)
+    d = T.smooth((THROAT_WIDTH * hw - abs(q.x - cx(q.y))) / (.30 * hw))
+    return a * b * c * d
 
 
 def weights(p):
     q = Vector(p)
     w = dict(T.station_weights(ASTATION, T.project(AP, ACUM, q)[1]))
-    throat = throat_jaw_share(q)
-    if throat > 0:
-        w = {n: v * (1 - throat) for n, v in w.items()}
-        w['jaw'] = w.get('jaw', 0.) + throat
     limb = limb_weights(q)
+    alpha = 0.
     if limb:
         alpha, chain, rootw, t = limb
         base = {}
@@ -477,6 +485,14 @@ def weights(p):
         w = {n: v * (1 - alpha) for n, v in base.items()}
         for n, v in chain.items():
             w[n] = w.get(n, 0.) + v * alpha
+    # **The limb is settled first and the throat takes only what is left of it.** Run the other way
+    # round -- which is how this builder had it -- the throat hands a vertex to `jaw`, the limb then
+    # blends *that* mixture back down by `1 - alpha`, and a tucked limb whose alpha is only about a
+    # third keeps two thirds of its flesh on the mandible. A limb is never throat.
+    throat = throat_jaw_share(q) * (1. - alpha)
+    if throat > 0:
+        w = {n: v * (1 - throat) for n, v in w.items()}
+        w['jaw'] = w.get('jaw', 0.) + throat
     w = {n: v for n, v in w.items() if v > 1e-8}
     items = sorted(w.items(), key=lambda kv: -kv[1])[:4]
     total = sum(v for _, v in items)
@@ -537,8 +553,33 @@ puppet, puppet_thickness, twin_report, bvh_src = T.build_twin(
 
 
 # --------------------------------------------------------------------- cut the jaw ----
+# **A mandible has a width, and this generation keeps its right forelimb tucked forward under the
+# snout.** The test was a band in `y` below the mouth line with nothing at all in `x`, so the cut
+# took the arm onto the mandible: 317 of the 693 vertices round `fore_foot_R` ended up in the
+# lower-jaw shell, which is rigid on `jaw` at weight 1 and out of reach of anything `weights()`
+# does -- 45.7 % of that neighbourhood read as `jaw`. Measured against the joint it belongs to, the
+# right forefoot's skin travelled 0.58 of the distance its own joint did in `Swim` (0.71 measured
+# close in), where every other foot on this animal is 0.99 to 1.06. Aphaneramma had the same fault
+# from the same line, and this is the same repair.
+#
+# The rule is the one the *skinning* already uses -- a vertex is a limb's where it is nearer that
+# limb's own polyline than the body's axial one -- so the cut and the weighting cannot disagree
+# about which vertices are an arm. A width bound alone is not enough: on Aphaneramma, at 1.35 of
+# the trunk's measured half width, the cut still took 235 of 637, because a long-snouted
+# archosauromorph's snout is narrow and its hand is broad.
+def on_a_limb(c):
+    da, _sa = T.project(AP, ACUM, c)
+    for _key, (P, cum, _n, _r) in LIMB_FIT.items():
+        dist, s = T.project(P, cum, c)
+        if dist < da and s > cum[-1] * .25:
+            return True
+    return False
+
+
 def is_jaw(c):
-    return JAW_FRONT_Y - .004 < c.y < HINGE_Y and c.z < seam(c.y) - 1e-7
+    if not (JAW_FRONT_Y - .004 < c.y < HINGE_Y and c.z < seam(c.y) - 1e-7):
+        return False
+    return not on_a_limb(c)
 
 
 parts = {}
@@ -575,7 +616,7 @@ for o in (auth, puppet):
     for n in B:
         o.vertex_groups.new(name=n)
     raw_weights = [weights(v.co) for v in o.data.vertices]
-    relaxed = T.relax_weights(o, raw_weights, passes=10, hold=.48)
+    relaxed = T.relax_weights(o, raw_weights, passes=RELAX_PASSES, hold=.48)
     counts, owners = [], {}
     for v in o.data.vertices:
         w = relaxed[v.index]

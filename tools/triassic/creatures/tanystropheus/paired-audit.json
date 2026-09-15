@@ -2,22 +2,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 2404712,
-      "sha256": "3e58a0fd77999c380b995a953f78ab46c4abdeb3c11dfdfcafe324277e81f13f",
+      "bytes": 2458224,
+      "sha256": "07d17cb80e3e59f07fd69e23249954ae79dedc6dfdf22a889c68e205c90dcaf3",
       "triangles": 20734,
       "vertices": 12919
     },
     {
       "suffix": ".puppet",
-      "bytes": 1943032,
-      "sha256": "d9042e7730d81176fe76ad5d66117beb2c8aaa7a691658342271dd7df2721048",
+      "bytes": 1958856,
+      "sha256": "efa6a088ca995c904dc1ca1c356213380aea7413fac927101426e0d35aeb4875",
       "triangles": 8078,
       "vertices": 4168
     },
     {
       "suffix": ".lod1",
-      "bytes": 1943032,
-      "sha256": "d9042e7730d81176fe76ad5d66117beb2c8aaa7a691658342271dd7df2721048",
+      "bytes": 1958856,
+      "sha256": "efa6a088ca995c904dc1ca1c356213380aea7413fac927101426e0d35aeb4875",
       "triangles": 8078,
       "vertices": 4168
     }
@@ -237,7 +237,7 @@
           "clip": "Crawl",
           "duration": 2.200000047683716,
           "samples": 61,
-          "maxVertexTravel": 0.32455999116476114
+          "maxVertexTravel": 0.34893333324040987
         },
         {
           "clip": "Death",
@@ -303,7 +303,7 @@
           "clip": "Idle",
           "duration": 3.200000047683716,
           "samples": 61,
-          "maxVertexTravel": 0.21166419678908907
+          "maxVertexTravel": 0.2116692164514434
         },
         {
           "clip": "Lower",
@@ -351,7 +351,7 @@
           "clip": "Sprint",
           "duration": 1.399999976158142,
           "samples": 61,
-          "maxVertexTravel": 1.0318188526233059
+          "maxVertexTravel": 1.0318614048575605
         },
         {
           "clip": "Stagger",
@@ -363,7 +363,7 @@
           "clip": "Swim",
           "duration": 2.200000047683716,
           "samples": 61,
-          "maxVertexTravel": 0.7692511514654725
+          "maxVertexTravel": 0.7692889187599894
         },
         {
           "clip": "TurnLeft",
@@ -410,7 +410,7 @@
           "clip": "Crawl",
           "duration": 2.200000047683716,
           "samples": 61,
-          "maxVertexTravel": 0.3290168704566165
+          "maxVertexTravel": 0.3619831549291591
         },
         {
           "clip": "Death",
@@ -476,7 +476,7 @@
           "clip": "Idle",
           "duration": 3.200000047683716,
           "samples": 61,
-          "maxVertexTravel": 0.21858856397929563
+          "maxVertexTravel": 0.21862005293577766
         },
         {
           "clip": "Lower",
@@ -524,7 +524,7 @@
           "clip": "Sprint",
           "duration": 1.399999976158142,
           "samples": 61,
-          "maxVertexTravel": 1.060988690662973
+          "maxVertexTravel": 1.0612470514649328
         },
         {
           "clip": "Stagger",
@@ -536,7 +536,7 @@
           "clip": "Swim",
           "duration": 2.200000047683716,
           "samples": 61,
-          "maxVertexTravel": 0.7912907430299599
+          "maxVertexTravel": 0.7915200851371025
         },
         {
           "clip": "TurnLeft",
@@ -558,7 +558,7 @@
     "Lower->SnapRight": 1.221573419242067e-8,
     "SnapLeft->Retract": 1.7273526226728612e-8,
     "SnapRight->Retract": 1.7273526226728612e-8,
-    "Retract->Idle": 0.05098099964029366,
+    "Retract->Idle": 0.05098112439802882,
     "telegraphTravel": 0.8716597334113663
   },
   "boom": [

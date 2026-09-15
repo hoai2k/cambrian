@@ -1340,7 +1340,10 @@
   "rigidCarapace": {
     "bone": "shell",
     "parent": "body",
-    "verticesOwned": 2244,
+    "verticesOwned": 2272,
+    "verticesWhollyTheShells": 1938,
+    "solidThreshold": 0.985,
+    "rule": "inside the footprint the weight is {shell: 1} exactly -- set before the limbs are consulted and restored after the relaxation, which is a diffusion and does not know the shell is a box. The rim keeps its ramp and does the blending. `shell` is parented to `body` and never keyed, so a hard boundary inside the footprint costs nothing.",
     "channelsStrippedFromPackagedFile": {
       "authored": 44,
       ".puppet": 44
@@ -1567,7 +1570,7 @@
       [
         2.460196018218994,
         2.7048964500427246,
-        0.7728455066680908
+        0.7728456258773804
       ]
     ],
     "TurnRight": [
@@ -1579,7 +1582,7 @@
       [
         2.4152235984802246,
         2.7054896354675293,
-        0.7414624094963074
+        0.7414625883102417
       ]
     ],
     "Dive": [
@@ -1699,7 +1702,7 @@
       [
         2.4099678993225098,
         2.7048964500427246,
-        0.8119217753410339
+        0.8119296431541443
       ]
     ],
     "Eat": [
@@ -1792,56 +1795,56 @@
       "maxInfluences": 4,
       "vertices": 9606,
       "verticesPerBone": {
-        "hind_tip_R": 333,
-        "hind_mid_R": 845,
-        "body": 6307,
-        "tail_00": 3374,
-        "chest": 4461,
-        "shell": 3488,
-        "neck_00": 1189,
-        "fore_upper_R": 1395,
-        "neck_01": 614,
-        "neck_02": 611,
-        "fore_upper_L": 1335,
-        "fore_mid_L": 917,
+        "hind_tip_R": 337,
+        "hind_mid_R": 862,
+        "body": 5485,
+        "tail_00": 2960,
+        "chest": 3999,
+        "shell": 3292,
+        "fore_upper_R": 1318,
+        "neck_00": 1119,
+        "neck_01": 598,
+        "neck_02": 617,
+        "fore_upper_L": 1271,
+        "fore_mid_L": 924,
         "fore_outer_R": 408,
-        "fore_mid_R": 840,
+        "fore_mid_R": 851,
         "fore_tip_R": 268,
-        "hind_upper_L": 905,
-        "hind_mid_L": 811,
-        "hind_upper_R": 1014,
+        "hind_upper_L": 824,
+        "hind_mid_L": 825,
+        "hind_upper_R": 924,
         "jaw": 393,
         "fore_outer_L": 449,
         "skull": 507,
         "fore_tip_L": 299,
-        "tail_01": 152,
-        "hind_tip_L": 364
+        "tail_01": 158,
+        "hind_tip_L": 366
       }
     },
     "Archelon procedural volume twin": {
       "maxInfluences": 4,
       "vertices": 2854,
       "verticesPerBone": {
-        "tail_01": 105,
-        "tail_00": 1139,
-        "hind_upper_R": 367,
-        "shell": 989,
-        "hind_mid_R": 318,
-        "hind_tip_R": 141,
-        "hind_upper_L": 366,
-        "body": 1866,
-        "chest": 1531,
-        "fore_upper_R": 506,
-        "fore_mid_R": 326,
-        "hind_tip_L": 142,
-        "hind_mid_L": 316,
-        "fore_upper_L": 496,
-        "fore_mid_L": 354,
+        "tail_01": 110,
+        "tail_00": 1001,
+        "hind_upper_R": 334,
+        "body": 1550,
+        "shell": 945,
+        "hind_mid_R": 315,
+        "hind_tip_R": 142,
+        "hind_upper_L": 330,
+        "chest": 1299,
+        "fore_upper_R": 449,
+        "fore_mid_R": 329,
+        "hind_tip_L": 144,
+        "hind_mid_L": 313,
+        "fore_upper_L": 451,
+        "fore_mid_L": 363,
         "fore_tip_R": 108,
         "fore_outer_R": 161,
-        "neck_00": 470,
-        "neck_01": 271,
-        "neck_02": 218,
+        "neck_00": 407,
+        "neck_01": 246,
+        "neck_02": 220,
         "jaw": 160,
         "skull": 173,
         "fore_tip_L": 107,
@@ -1850,7 +1853,7 @@
     }
   },
   "maxInfluences": 4,
-  "meanInfluences": 3.376083467094703,
+  "meanInfluences": 3.119422150882825,
   "mouth": {
     "method": "geometric: every head vertex casts its own outward normal back into the mesh (Placodus' method), restricted to the head rather than to the kit's front third",
     "note": "the kit's front-third default returns 156 vertices on this body, of which the great majority sit behind y -0.25 -- the gap between a forelimb and the plastron, not a mouth. Restricted to the head the cast returns 25, spread over 0.043 of a body length, which is the beak's own slit.",

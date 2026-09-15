@@ -516,8 +516,34 @@ AXIAL_PTS = ([tuple(TAIL_PTS[-1])] + [tuple(p) for p in reversed(TAIL_PTS)]
 AXIAL_NAMES = (['tail_%02d' % i for i in range(CAUDALS - 1, -1, -1)] + ['body', 'chest']
                + ['neck_%02d' % i for i in range(CERVICALS)] + ['skull'])
 AXIAL = K.AxialChain(AXIAL_PTS, AXIAL_NAMES)
+# The authored radii these limbs were first bound with, kept for the record: `fore` and `hind` as
+# `r0 + r1·t²`. The `hind` row is Coelophysis' own, copied — and it left this animal's feet exactly
+# where it left that one's. **This is the third shore animal, and the only one the measured radius
+# never reached**: Coelophysis came down from 25.25x and Macrocnemus from 23.31x when the relaxation
+# and `K.measure_radii` landed, and Tanystropheus stayed at 6.09x with `hind_foot_R`, `fore_foot_R`,
+# `hind_lower_R` and `hind_foot_L` heading the torn-edge list in `Sprint`. What that looks like is
+# what Coelophysis looked like: the toes draw out into needles as the foot swings, because their
+# tips sit outside the authored radius and carry trunk weight.
 RADII = {'fore': (.012, .016, .036, .030), 'hind': (.014, .018, .040, .034)}
-LIMB_FITS = [K.Limb(pts, names, RADII[key[:4]], .050, AXIAL) for key, (pts, names) in LIMBS.items()]
+# **And the relaxation, which this body was also never given.** `K.bind` defaults to four passes;
+# Coelophysis and Macrocnemus were both taken to fourteen when their feet were repaired, and this
+# builder kept the default. The relaxation is the load-bearing half -- a gate always has an edge,
+# and diffusion over the mesh's own edge graph is what stops the skin between two vertices on
+# opposite sides of one being asked to span the difference between two bones.
+RELAX_PASSES = 14
+# `t_floor` is past the knee and past the elbow; `span` refuses a flood that has walked out of the
+# limb, and on a body this long with legs this short a leg is a small fraction of it.
+LIMB_FITS, LIMB_RADII = [], {}
+for key, (pts, names) in LIMBS.items():
+    # No `blend` here: each joint takes a fraction of the segments it joins. See `K.Limb`.
+    limb = K.Limb(pts, names, RADII[key[:4]], .050, AXIAL)
+    limb.measured, fill = K.measure_radii(auth, limb, t_floor=.62, margin=.010, span=.25)
+    LIMB_RADII[key] = {'rows': [[round(x, 5) for x in r] for r in limb.measured],
+                       'jointBlend': [round(b, 5) for b in limb.blend],
+                       'segments': [round(limb.cum[i + 1] - limb.cum[i], 5)
+                                    for i in range(len(limb.cum) - 1)], **fill}
+    LIMB_FITS.append(limb)
+print('LIMB_RADII', json.dumps(LIMB_RADII))
 
 
 def trunk_pullback(v, w):
@@ -545,7 +571,7 @@ def weights(p):
 rig = K.build_armature(B, tx, 'Tanystropheus shared skeleton', 'Tanystropheus_Rig')
 influences = []
 for o in [auth, puppet]:
-    K.bind(o, rig, B, weights, tx, influences)
+    K.bind(o, rig, B, weights, tx, influences, passes=RELAX_PASSES)
 for o in parts['lower jaw'].values():
     K.bind_rigid(o, rig, 'jaw', tx)
 bone_count_check = len(B)
@@ -1329,6 +1355,8 @@ report = {
               'fangs': sum(K.triangles(o) for o, _ in FANGS)},
     'beamShape': BEAM.tolist(), 'strike': strike_report, 'shoreChainHandover': handover,
     'limbSweep': limb_sweep, 'mouthCut': mouth_cut,
+    'limbRadii': LIMB_RADII, 'authoredLimbRadii': RADII,
+    'weightRelaxationPasses': RELAX_PASSES,
     'normalizedWeights': True, 'rootStable': True, 'noScaleChannels': True}
 open(os.path.join(HERE, 'validation.json'), 'w').write(json.dumps(report, indent=2))
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(LOCAL, ID + '-paired.blend'))
