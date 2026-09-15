@@ -18,6 +18,7 @@ import { exportRecording, recordingPhase, resetRecording, startRecording, stopRe
 import { atMain, cycle, groupsFor, stops, type Focus, type FocusGroup } from './focus-ring';
 import { rectsOf, step as spatialStep, type Dir } from './spatial-nav';
 import { gridColumns, SelectScreen } from './Select';
+import { gridStep, rosterGrid, sameSlot, type ExtraId, type Slot } from './roster-grid';
 import { TitleScreen } from './Title';
 import { Toolbar } from './Toolbar';
 import { toolbarPlace } from './toolbar-place';
@@ -153,6 +154,15 @@ export function App() {
    */
   const [carry, setCarry] = useState<boolean[]>([]);
   const carryRef = useRef<boolean[]>([]);
+  /**
+   * The buttons in the pick grid beside the creatures. Random is always there; Visitors only where
+   * this device has taken something to the top in another game. Held in a ref as well as state
+   * because the cursor maths runs from callbacks that must see the current grid, and the grid the
+   * cursor walks has to be the grid that is drawn.
+   */
+  const extras = useMemo<ExtraId[]>(() => ['random'], []);
+  const extrasRef = useRef<ExtraId[]>(extras);
+  extrasRef.current = extras;
   /**
    * What this match has added to the record, so the results screen can mark it new.
    *
@@ -444,25 +454,25 @@ export function App() {
    * that row every horizontal press landed back on the creature you were already on. The default
    * pick sat there, which made the first thing a Devonian player ever pressed do nothing.
    *
-   * So left and right walk the roster itself and always move, wrapping at the ends; up and down
-   * move by a row and clamp into a short one. Both are what a grid of tiles is expected to do,
-   * and neither can be a no-op.
+   * So left and right walk the grid itself and always move, wrapping at the ends; up and down move
+   * by a row and land on the nearest column that is occupied. Both are what a grid of tiles is
+   * expected to do, and neither can be a no-op.
+   *
+   * The grid also holds buttons now — Random, and Visitors where the player has earned one — so
+   * this walks a *model* of the layout (src/app/roster-grid.ts) rather than indexing the roster.
+   * A button has a position and no index in the creature list, and arithmetic over the roster
+   * would put the cursor on one tile while another lit up.
    */
   const moveCursor = useCallback((index: number, dx: number, dy: number) => {
     const ps = [...playersRef.current];
     const p = ps[index]; if (!p || p.ready) return;
-    const n = CREATURES.length, cols = gridColumns(n), rows = Math.ceil(n / cols);
-    const i = CREATURE_IDS.indexOf(p.creature);
-    if (i < 0 || n === 0) return;
-    let j = i;
-    if (dx) j = (i + dx + n) % n;
-    if (dy) {
-      const r = (Math.floor(j / cols) + dy + rows) % rows;
-      const rowLength = Math.min(cols, n - r * cols);
-      j = r * cols + Math.min(j % cols, rowLength - 1);
-    }
-    if (j === i || j < 0 || j >= n) return;
-    ps[index] = { ...p, creature: CREATURE_IDS[j] };
+    const model = rosterGrid(CREATURE_IDS, extrasRef.current);
+    const from: Slot = p.cursor ? { kind: 'extra', id: p.cursor } : { kind: 'creature', id: p.creature };
+    const to = gridStep(model, from, dx, dy);
+    if (sameSlot(to, from)) return;
+    ps[index] = to.kind === 'extra'
+      ? { ...p, cursor: to.id }
+      : { ...p, cursor: undefined, creature: to.id as CreatureId };
     updatePlayers(ps); audio.play('ui-move');
   }, [updatePlayers]);
   const cycleCreature = useCallback((index: number, dir: number) => moveCursor(index, dir, 0), [moveCursor]);
@@ -474,6 +484,35 @@ export function App() {
     const ps = [...playersRef.current]; if (!ps[index]) return;
     ps[index] = { ...ps[index], ready: !ps[index].ready }; updatePlayers(ps); audio.play(ps[index].ready ? 'ui-confirm' : 'ui-back');
   }, [updatePlayers]);
+  /**
+   * Take whatever the cursor is on. On a creature that is locking in, which is what confirm has
+   * always meant here; on one of the grid's buttons it is pressing the button.
+   *
+   * Random hands you a creature and leaves the cursor on it rather than locking in as well: it is
+   * an answer to "I don't mind", not a commitment, and a player who dislikes the roll should be
+   * able to press it again or walk away from it.
+   */
+  const activate = useCallback((index: number) => {
+    const ps = [...playersRef.current];
+    const p = ps[index]; if (!p) return;
+    if (p.cursor === 'random' && !p.ready) {
+      const pool = CREATURE_IDS.filter((id) => id !== p.creature);
+      const pick = (pool.length ? pool : CREATURE_IDS)[Math.floor(Math.random() * (pool.length || CREATURE_IDS.length))];
+      ps[index] = { ...p, cursor: undefined, creature: pick };
+      updatePlayers(ps); audio.play('ui-confirm');
+      return;
+    }
+    if (p.ready) startMatch(); else toggleReady(index);
+  }, [startMatch, toggleReady, updatePlayers]);
+  /** A pointer press on one of the grid's buttons: put that seat's cursor on it, then take it. */
+  const pressExtra = useCallback((index: number, id: ExtraId) => {
+    const ps = [...playersRef.current];
+    const p = ps[index]; if (!p || p.ready) return;
+    ps[index] = { ...p, cursor: id };
+    playersRef.current = ps;
+    updatePlayers(ps);
+    activate(index);
+  }, [activate, updatePlayers]);
   /**
    * Start as a hatchling, or carry on from the furthest this creature has been taken in Rise.
    *
@@ -584,7 +623,7 @@ export function App() {
             const lastRep = repeat.get(gp.index) ?? 0;
             if (dx || dy) { moveCursor(idx, dx, dy); repeat.set(gp.index, now); }
             else if ((stickX || stickY) && now - lastRep > 240) { moveCursor(idx, stickX, stickY); repeat.set(gp.index, now); }
-            if (just('confirm')) { if (ps[idx].ready) startMatch(); else toggleReady(idx); }
+            if (just('confirm')) activate(idx);
             if (just('back')) { if (ps[idx].ready) toggleReady(idx); else removePlayer(idx); }
             if (just('menu')) startMatch();
             // Hatch, or carry on from your record. On `light` — X — because it is the one attack
@@ -641,7 +680,7 @@ export function App() {
     // padIndices is deliberately not a dependency: it is written from inside this loop, and
     // listing it would tear the loop down and rebuild it every time a pad connects, losing the
     // button edges held in `prev`.
-  }, [addPlayer, changeMode, menuInput, moveCursor, openDialog, removePlayer, setPausedBoth, startFromTitle, startMatch, toggleCarry, toggleReady]);
+  }, [activate, addPlayer, changeMode, menuInput, moveCursor, openDialog, removePlayer, setPausedBoth, startFromTitle, startMatch, toggleCarry, toggleReady]);
 
   // ---- Keyboard menu navigation ----
   useEffect(() => {
@@ -658,7 +697,7 @@ export function App() {
           if (e.code === 'ArrowLeft' || e.code === 'KeyA') moveCursor(idx, -1, 0);
           if (e.code === 'ArrowDown' || e.code === 'KeyS') moveCursor(idx, 0, 1);
           if (e.code === 'ArrowUp' || e.code === 'KeyW') moveCursor(idx, 0, -1);
-          if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); if (ps[idx].ready) startMatch(); else toggleReady(idx); }
+          if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); activate(idx); }
           if (e.code === 'Escape') { if (ps[idx].ready) toggleReady(idx); else backToTitle(); }
           // The keyboard's own way to the same choice the pad makes with Y.
           if (e.code === 'KeyC') toggleCarry(idx);
@@ -692,7 +731,7 @@ export function App() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [addKeyboard, backToTitle, changeMode, menuInput, moveCursor, openDialog, setPausedBoth, startFromTitle, startMatch, toggleCarry, toggleReady]);
+  }, [activate, addKeyboard, backToTitle, changeMode, menuInput, moveCursor, openDialog, setPausedBoth, startFromTitle, startMatch, toggleCarry, toggleReady]);
 
   // Idle-time preloading: tell the loader what is most likely to be needed next.
   useEffect(() => {
@@ -833,6 +872,7 @@ export function App() {
           players={players} mode={mode} modes={MODES} modeInfo={modeInfo} allReady={allReady} padIndices={padIndices}
           scheme={scheme}
           best={best} carry={carry} modeFocus={focus.group === 'modes' ? focus.index : -1}
+          extras={extras} onExtra={pressExtra}
           onPick={setCreature} onReady={toggleReady} onRemove={removePlayer}
           onMode={changeMode} onStart={startMatch} onBack={backToTitle} onCarry={toggleCarry}
         />

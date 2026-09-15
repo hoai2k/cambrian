@@ -12,6 +12,7 @@ import { CheckIcon, ChevronDown, Emblem, KeyboardIcon, PadIcon } from './icons';
 import { appBase } from '../shared/base';
 import { btn, fillControls, key, type Scheme } from '../shared/controls';
 import { fillOf, ladderName, rungOf } from '../sim/ladder';
+import { gridColumns, rosterGrid, sameSlot, type ExtraId, type Slot } from './roster-grid';
 
 interface Props {
   players: PlayerSetup[]; mode: Mode; modes: Mode[]; modeInfo: Record<Mode, { name: string; blurb: string; players: string }>;
@@ -27,6 +28,10 @@ interface Props {
   onPick: (i: number, c: CreatureId) => void; onReady: (i: number) => void; onRemove: (i: number) => void;
   onMode: (m: Mode) => void; onStart: () => void; onBack: () => void;
   onCarry: (i: number) => void;
+  /** The buttons in the grid beside the creatures, in the order they stand. */
+  extras: ExtraId[];
+  /** Press one of them, for the seat that is on it. */
+  onExtra: (i: number, id: ExtraId) => void;
 }
 
 /**
@@ -169,14 +174,19 @@ function FitName({ name }: { name: string }) {
 }
 
 const stat = (v: number, max: number) => Math.round((v / max) * 5);
+export { gridColumns };
 const ASSETS = appBase();
 
-/** Grid columns: three rows at most, so 21 creatures sit in 7 x 3 and 8 sit in 4 x 2. */
-export const gridColumns = (n: number) => Math.max(4, Math.ceil(n / 3));
+/** What each of the grid's buttons says. Short, because the tile is smaller than a card. */
+const EXTRA_LABEL: Record<ExtraId, { name: string; glyph: string; title: string }> = {
+  random: { name: 'Random', glyph: '?', title: 'Random · pick a creature for me' },
+  visitors: { name: 'Visitors', glyph: '★', title: 'Visitors · animals you have taken to the top in the other games' },
+};
 
 export function SelectScreen(p: Props) {
   const s = p.scheme;
-  const cols = gridColumns(CREATURES.length);
+  const grid = rosterGrid(CREATURES.map((c) => c.id), p.extras);
+  const cols = grid.cols;
   const compact = p.players.length >= 3;
   // Controllers the game can see that have not joined yet, and joined players whose controller
   // has since gone away (an Xbox pad that went to sleep looks exactly like an unplugged one).
@@ -203,7 +213,7 @@ export function SelectScreen(p: Props) {
         {/* ---- roster grid ---- */}
         <div className={`roster-grid ${cols >= 6 ? 'dense' : ''}`} role="listbox" aria-label="Creatures" style={{ ['--cols' as string]: cols }}>
           {CREATURES.map((c) => {
-            const hovering = p.players.map((pl, i) => ({ pl, i })).filter(({ pl }) => pl.creature === c.id);
+            const hovering = p.players.map((pl, i) => ({ pl, i })).filter(({ pl }) => !pl.cursor && pl.creature === c.id);
             const lockedBy = hovering.filter(({ pl }) => pl.ready);
             const cls = ['cell', hovering.length ? 'hover' : '', lockedBy.length ? 'locked' : ''].join(' ');
             return (
@@ -218,6 +228,28 @@ export function SelectScreen(p: Props) {
                   {hovering.map(({ i, pl }) => <i key={i} style={{ ['--c' as string]: PLAYER_COLORS[i], ['--k' as string]: i }} className={pl.ready ? 'ring locked' : 'ring'} />)}
                 </span>
                 {lockedBy.map(({ i }) => <span key={'b' + i} className="lock-badge" style={{ background: PLAYER_COLORS[i] }}>P{i + 1}</span>)}
+              </button>
+            );
+          })}
+          {/* The grid's buttons. Placed from the same model the cursor walks, at the column that
+              model puts them in — right-aligned under the last card column, on the final row where
+              it has room and on a row of their own where it has not, so the roster's own alignment
+              never moves. Smaller than a card, because they are not animals. */}
+          {grid.cells.filter((c) => c.slot.kind === 'extra').map(({ slot, row, col }) => {
+            const id = slot.id as ExtraId;
+            const on = p.players.map((pl, i) => ({ pl, i })).filter(({ pl }) => pl.cursor === id);
+            const label = EXTRA_LABEL[id];
+            return (
+              <button key={id} role="option" aria-selected={on.length > 0}
+                className={`cell extra extra-${id} ${on.length ? 'hover' : ''}`}
+                style={{ gridColumn: col + 1, gridRow: `span 3`, ['--c' as string]: on.length ? PLAYER_COLORS[on[0].i] : 'var(--foam)', ['--extra-row' as string]: row }}
+                onClick={() => { const i = p.players.findIndex((pl) => !pl.ready && typeof pl.device === 'string'); p.onExtra(i >= 0 ? i : 0, id); }}
+                title={label.title} aria-label={label.title}>
+                <span className="extra-glyph" aria-hidden="true">{label.glyph}</span>
+                <span className="extra-name">{label.name}</span>
+                <span className="cell-rings">
+                  {on.map(({ i }) => <i key={i} style={{ ['--c' as string]: PLAYER_COLORS[i], ['--k' as string]: i }} className="ring" />)}
+                </span>
               </button>
             );
           })}

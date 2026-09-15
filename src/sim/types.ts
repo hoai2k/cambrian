@@ -265,6 +265,12 @@ export interface PlayerSetup {
    * never reads it, so it cannot change how a match plays or replays (see src/shared/seat-schemes.ts).
    */
   scheme?: string;
+  /**
+   * Pick-screen only: the cursor is on one of the grid's buttons (Random, Visitors) rather than on
+   * a creature. `creature` still holds the last animal this seat was on, so the crew card and the
+   * match have something real to use. Never read by `src/sim`.
+   */
+  cursor?: 'random' | 'visitors';
 }
 
 /** The three modes, shared by both eras: an era changes the sea and the animals, not the match. */
