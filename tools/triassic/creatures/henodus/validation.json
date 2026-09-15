@@ -9,33 +9,33 @@
     "sliverWeld": 0.0005,
     "openEdgesAfter": 0
   },
-  "intakeTriangles": 17750,
-  "remeshTriangles": 96376,
+  "intakeTriangles": 18758,
+  "remeshTriangles": 97216,
   "puppetBudget": 6400,
-  "fullTriangles": 19272,
+  "fullTriangles": 20280,
   "puppetTriangles": 7584,
   "parts": {
-    "authoredBody": 17770,
+    "authoredBody": 18778,
     "authoredJaw": 622,
-    "puppetBody": 6439,
-    "puppetJaw": 265,
+    "puppetBody": 6441,
+    "puppetJaw": 263,
     "sharedOral": 880
   },
   "bones": 25,
   "clips": {
     "Idle": 2.4,
-    "Swim": 2.0,
+    "Swim": 2,
     "Sprint": 1.3,
     "TurnLeft": 1.6,
     "TurnRight": 1.6,
     "Dive": 1.4,
     "Rise": 1.4,
-    "Attack": 1.0,
+    "Attack": 1,
     "Bite": 0.5,
     "Heavy": 1.1,
     "Hit": 0.6,
     "Death": 1.6,
-    "Guard": 1.0,
+    "Guard": 1,
     "Parry": 0.4,
     "Dodge": 0.5,
     "Eat": 1.6,
@@ -44,9 +44,9 @@
     "Grab": 1.2,
     "Breath": 2.4,
     "Growth": 1.5,
-    "Crawl": 2.0,
+    "Crawl": 2,
     "Graze": 2.4,
-    "Breathe": 3.0
+    "Breathe": 3
   },
   "looping": [
     "Idle",
@@ -61,14 +61,14 @@
   "loopSeams": {
     "Idle": 1.4988011428009654e-17,
     "Swim": 8.327598465230243e-17,
-    "Sprint": 1.1242258027322502e-16,
+    "Sprint": 9.993118025927394e-17,
     "TurnLeft": 4.1993275700118934e-33,
     "TurnRight": 4.1993275700118934e-33,
     "Dive": 3.8993755744866164e-33,
     "Rise": 3.8993755744866164e-33,
-    "Attack": 0.0,
+    "Attack": 0,
     "Bite": 5.09918318924574e-33,
-    "Heavy": 0.0,
+    "Heavy": 0,
     "Hit": 2.6995675923855084e-33,
     "Death": 1.149999976158142,
     "Guard": 6.99440516763505e-18,
@@ -101,24 +101,24 @@
       [
         -1.864770770072937,
         -2.5026581287384033,
-        -0.7079004645347595
+        -0.7394158840179443
       ],
       [
         1.8742492198944092,
         2.4947285652160645,
-        0.653823971748352
+        0.642722487449646
       ]
     ],
     "Sprint": [
       [
-        -1.8644964694976807,
-        -2.502837657928467,
-        -0.7738369703292847
+        -1.8659050464630127,
+        -2.5027413368225098,
+        -0.7630540728569031
       ],
       [
-        1.8754535913467407,
-        2.484896183013916,
-        0.7133742570877075
+        1.8762930631637573,
+        2.4896082878112793,
+        0.6499086618423462
       ]
     ],
     "TurnLeft": [
@@ -173,7 +173,7 @@
       [
         -1.7721734046936035,
         -2.801298141479492,
-        -0.7597777247428894
+        -0.784742534160614
       ],
       [
         1.7697927951812744,
@@ -197,7 +197,7 @@
       [
         -1.7988975048065186,
         -2.74385666847229,
-        -0.843259871006012
+        -0.8630592226982117
       ],
       [
         1.8618651628494263,
@@ -262,7 +262,7 @@
       [
         2.0146965980529785,
         2.5035042762756348,
-        0.9586505889892578
+        0.932014524936676
       ]
     ],
     "Eat": [
@@ -293,7 +293,7 @@
       [
         -1.7802910804748535,
         -2.636284351348877,
-        -0.6962060332298279
+        -0.7259471416473389
       ],
       [
         1.7768614292144775,
@@ -305,7 +305,7 @@
       [
         -1.8086236715316772,
         -2.5010488033294678,
-        -0.7393985986709595
+        -0.7663273215293884
       ],
       [
         1.7969330549240112,
@@ -317,7 +317,7 @@
       [
         -1.8527415990829468,
         -2.5022826194763184,
-        -0.7971762418746948
+        -0.8002969026565552
       ],
       [
         1.8371449708938599,
@@ -329,7 +329,7 @@
       [
         -1.8590095043182373,
         -2.5030605792999268,
-        -0.6135430335998535
+        -0.6190005540847778
       ],
       [
         1.8408352136611938,
@@ -374,15 +374,15 @@
       ]
     ]
   },
-  "modelLength": 5.0,
+  "modelLength": 5,
   "maximumEnvelopeDifference": 0.09619796276092529,
   "envelopeTolerance": 0.2,
-  "envelopeTolerancePercent": 4.0,
+  "envelopeTolerancePercent": 4,
   "surfaceDistanceMax": 0.07497167587280273,
-  "surfaceDistanceP95": 0.013916293159127235,
-  "surfaceDistanceP99": 0.028026519343256957,
+  "surfaceDistanceP95": 0.01366384038701653,
+  "surfaceDistanceP99": 0.02760897522792219,
   "surfaceOutliersOver0p15": 0,
-  "surfaceVertices": 9416,
+  "surfaceVertices": 9920,
   "seatingDepthRaw": {
     "fore_upper_L": 0.04167346656322479,
     "fore_upper_R": 0.03702265024185181,
@@ -390,9 +390,9 @@
     "hind_upper_R": 0.05421963706612587,
     "carapace": 0.052003126591444016
   },
-  "maxInfluences": 3,
-  "meanInfluences": 1.9752955564614758,
-  "carapaceVertices": 1756,
+  "maxInfluences": 4,
+  "meanInfluences": 2.205246671887236,
+  "carapaceVertices": 2647,
   "carapaceBoneUnanimated": true,
   "limbSweepDegreesPerCycle": {
     "Idle": {
@@ -408,15 +408,15 @@
       "hindR": 39.6
     },
     "Sprint": {
-      "foreL": 53.4,
-      "foreR": 53.4,
-      "hindL": 53.4,
-      "hindR": 53.4
+      "foreL": 47.5,
+      "foreR": 47.5,
+      "hindL": 47.4,
+      "hindR": 47.4
     },
     "TurnLeft": {
       "foreL": 20.2,
       "foreR": 11.5,
-      "hindL": 16.0,
+      "hindL": 16,
       "hindR": 9.1
     },
     "TurnRight": {
@@ -433,7 +433,7 @@
     },
     "Rise": {
       "foreL": 19.7,
-      "foreR": 20.0,
+      "foreR": 20,
       "hindL": 3.3,
       "hindR": 3.4
     },
@@ -451,7 +451,7 @@
     },
     "Heavy": {
       "foreL": 21.4,
-      "foreR": 21.0,
+      "foreR": 21,
       "hindL": 22.1,
       "hindR": 22.5
     },
@@ -499,7 +499,7 @@
     },
     "Ability": {
       "foreL": 3.8,
-      "foreR": 4.0,
+      "foreR": 4,
       "hindL": 3.9,
       "hindR": 4.1
     },
@@ -512,7 +512,7 @@
     "Breath": {
       "foreL": 15.6,
       "foreR": 16.7,
-      "hindL": 19.0,
+      "hindL": 19,
       "hindR": 18.3
     },
     "Growth": {
@@ -543,8 +543,8 @@
   "curvature": {
     "tail": {
       "meanCurvatureRadius": 1.1285,
-      "meanHalfSection": 0.0965,
-      "meanCurvatureRadiusOverSection": 11.69
+      "meanHalfSection": 0.1107,
+      "meanCurvatureRadiusOverSection": 10.2
     },
     "spine": {
       "meanCurvatureRadius": 2.4645,
@@ -582,7 +582,7 @@
         0.3473,
         0.3473
       ],
-      "surfaceReachDifference": 0.0
+      "surfaceReachDifference": 0
     }
   },
   "mouth": {
@@ -690,17 +690,13 @@
         0.48,
         0.95,
         0.95
-      ],
-      [
-        0.485,
-        0.95,
-        0.95
       ]
     ],
     "liningRings": 20,
     "liningRing": 14,
-    "liningBackX": 0.421,
-    "liningFrontX": 0.49400000000000005,
+    "liningBackX": 0.389,
+    "liningFrontX": 0.49200000000000005,
+    "liningNearestSurfaceDepthRaw": -0.00483,
     "skinDoubleSided": true,
     "liningCullsBackfaces": true,
     "oneClosedLining": true
@@ -996,14 +992,46 @@
     ],
     "apex": [
       -0.5,
-      0.0,
+      0,
       -0.11637
     ],
     "restoredLengthOverRadius": 1.745,
+    "capRings": 4,
+    "capTaperExponent": 0.62,
     "openEdgesAfterCap": 0,
     "tailTipXAfter": -0.5
   },
   "normalizedWeights": true,
   "rootStable": true,
-  "noScaleChannels": true
+  "noScaleChannels": true,
+  "postBuildQA": {
+    "skinTears": {
+      "tool": "node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/henodus.glb",
+      "worstEdgeStretch": 4.81,
+      "worstClip": "Dodge",
+      "worstBone": "fore_paddle_L",
+      "worstEdgeFromTo": [
+        0.045,
+        0.215
+      ],
+      "clipsOverTwoTimes": 20,
+      "reference": "Nothosaurus 2.98x clean, Tanystropheus 6.1x, Placodus 12.4x, Coelophysis 25.3x",
+      "note": "The first build weighted 84 % of a forelimb into the top of the carapace, because a lateral |y| criterion cannot separate limb from shell on a body half a body length wide, and tore to 64.9x in every locomotion clip. Bounding the limb radially against its own bone chain took it to 4.81x. What is left is the splayed five-toed manus, whose spread in x is wider than any tube around the paddle bone can claim."
+    },
+    "gapeSolid": {
+      "tool": "/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- henodus Bite@0.25 Heavy@0.1 Eat@0.4 Graze@0.6 Ability@0.5",
+      "verdict": "PASS",
+      "maxSeenThroughTheBody": 9,
+      "ofPixels": 378000,
+      "tolerance": 12,
+      "perShot": {
+        "Bite@0.25": 0,
+        "Heavy@0.1": 4,
+        "Eat@0.4": 5,
+        "Graze@0.6": 9,
+        "Ability@0.5": 1
+      },
+      "note": "The leak that remains is a handful of pixels at the rear commissure of a beak 0.13 of a body length wide, where a midline hinge envelope cannot reach. It was closed to this by carrying the one oral lining 0.048 behind the hinge at 85 % of the mouth's own measured width rather than pinching it to 16 % there."
+    }
+  }
 }

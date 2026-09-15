@@ -175,14 +175,27 @@ if FORK_CUT:
     for e in edges:
         f = e.link_faces[0]
         border[frozenset(e.verts)] = {lp.vert: lp[uvl].uv.copy() for lp in f.loops if lp.vert in set(e.verts)}
+    # Four rings rather than one fan, and the section shrinks as (1-u)^CAP_TAPER rather than
+    # linearly, so the cap is a tapering tail tip and not a cone: a straight cone off a ring this
+    # wide reads as a flat wedge, which is a different wrong shape from the one being repaired.
+    CAP_RINGS, CAP_TAPER = 4, .62
+    rings = [loop]
+    for k in range(1, CAP_RINGS):
+        u = k / CAP_RINGS; shrink = (1 - u) ** CAP_TAPER
+        rings.append([bm.verts.new(C + (apex_co - C) * u + (v.co - C) * shrink) for v in loop])
     apex = bm.verts.new(apex_co)
     bm.verts.index_update()
-    for i in range(len(loop)):
-        a, b = loop[i], loop[(i + 1) % len(loop)]
-        src = border[frozenset((a, b))]
-        f = bm.faces.new((a, b, apex))
-        for lp in f.loops:
-            lp[uvl].uv = (src[a] + src[b]) / 2 if lp.vert is apex else src[lp.vert]
+    fork['capRings'] = CAP_RINGS; fork['capTaperExponent'] = CAP_TAPER
+    for k in range(CAP_RINGS):
+        cur = rings[k]; nxt = rings[k + 1] if k + 1 < CAP_RINGS else None
+        for i in range(len(loop)):
+            a, b = loop[i], loop[(i + 1) % len(loop)]
+            src = border[frozenset((a, b))]
+            f = bm.faces.new((cur[i], cur[(i + 1) % len(loop)], nxt[(i + 1) % len(loop)], nxt[i])) if nxt \
+                else bm.faces.new((cur[i], cur[(i + 1) % len(loop)], apex))
+            for j, lp in enumerate(f.loops):
+                lp[uvl].uv = src[a] if j in (0, 3) else (src[b] if j == 1 else
+                                                         (src[b] if nxt else (src[a] + src[b]) / 2))
     # The bisect leaves n-gons where it crossed triangles; everything downstream (the twin's
     # per-triangle pigment transfer, the section envelopes) reads triangles.
     bmesh.ops.triangulate(bm, faces=[f for f in bm.faces if len(f.verts) > 3])
@@ -293,11 +306,15 @@ for key, pts in LIMB_PTS.items():
 # ---- weights -----------------------------------------------------------------------------------
 # Nothosaurus' scheme, because it is the era's cleanest body by skin-tear measurement (2.98x
 # against Placodus' 12.4x on the same audit): the trunk blends longitudinally between axial
-# stations, and a limb blends *radially outwards in its own lateral coordinate* into its own root
-# station rather than by distance to a polyline. The difference that matters is where the blend
-# ends -- the limb's influence reaches full strength only once the skin is genuinely on the limb,
-# and every vertex inboard of that stays a pure axial blend, so the shoulder does not carry a ring
-# of half-limb half-trunk vertices that tear apart the moment the limb swings.
+# stations, and a limb's influence is bounded BOTH radially, by how near the skin actually is to
+# that limb's own bone chain, and along it, by how far out along the chain the skin sits. On a body
+# this wide the radial bound is the one that matters: Nothosaurus can take "outboard of |y| 0.09"
+# to mean "on the limb" because its trunk is narrow, and the first Henodus build did exactly that
+# and put 84 % of a forelimb into the top of the carapace, which tore an edge past 45x in every
+# locomotion clip. The along-limb ramp is still Nothosaurus', starting inside the flank so the
+# shoulder never carries a ring of half-limb half-trunk vertices, and the base under a partly
+# weighted limb vertex is the axial station at the limb's own ROOT rather than at that vertex's own
+# x, so a foot swung forward cannot drag a station two segments away with it.
 AXIAL = [('tail_05', -.435), ('tail_04', -.372), ('tail_03', -.318), ('tail_02', -.258), ('tail_01', -.196),
          ('tail_00', -.130), ('body', -.020), ('chest', .180), ('neck', .345), ('skull', .420)]
 assert all(AXIAL[i][1] < AXIAL[i + 1][1] for i in range(len(AXIAL) - 1)), AXIAL
@@ -311,9 +328,37 @@ def axial(x):
     t = (x - xs[i]) / (xs[i + 1] - xs[i]); return {AXIAL[i][0]: 1 - t, AXIAL[i + 1][0]: t}
 
 
-LIMB_WINDOW = {'fore': (.175, .420), 'hind': (-.215, .060)}
-ROOT_IN, ROOT_OUT = .088, .172        # where a limb's influence starts and reaches full strength
-SEG = (.178, .248, .248, .302)        # upper->lower over the first pair, lower->paddle over the second
+def poly(pts):
+    P = [Vector(p) for p in pts]; cum = [0.]
+    for i in range(1, len(P)): cum.append(cum[-1] + (P[i] - P[i - 1]).length)
+    return P, cum
+
+
+def project(P, cum, q):
+    best = (1e9, 0.)
+    for i in range(len(P) - 1):
+        a = P[i]; d = P[i + 1] - a; L2 = d.length_squared
+        t = 0. if L2 < 1e-12 else max(0., min(1., (q - a).dot(d) / L2))
+        c = a + d * t; dist = (q - c).length
+        if dist < best[0]: best = (dist, cum[i] + t * d.length)
+    return best
+
+
+LIMBFIT = {}
+for key, (pts, names) in LIMBS.items():
+    P, cum = poly(pts); LIMBFIT[key] = (P, cum, names, axial(pts[0][0]))
+# The tube each limb claims, at its root and at its foot: measured off the limb sections -- the
+# upper limb is about 0.055 through and the splayed five-toed foot about 0.105 across.
+RADII = {'fore': (.026, .040, .080, .062), 'hind': (.026, .042, .082, .064)}   # r_in0, r_in1, r_out0, r_out1
+SEAT = .082                            # arc length over which the root fades in, inside the flank
+
+
+def limbchain(names, s, cum):
+    b = .034
+    tl = smooth((s - (cum[1] - b)) / (2 * b)); tp = smooth((s - (cum[2] - b)) / (2 * b))
+    return {names[0]: 1 - tl, names[1]: tl * (1 - tp), names[2]: tl * tp}
+
+
 # The carapace footprint: a flat-sided superellipse in plan, measured off the plated dome in the
 # source albedo and the section table (x -0.20 to 0.32, half width 0.25), capped below the flank so
 # the rigid region never reaches the belly.
@@ -322,35 +367,30 @@ CC, CX, CY, CZ = .060, .260, .250, -.020
 
 def carapace_share(c):
     u = (c.x - CC) / CX; v = c.y / CY
-    return smooth((1. - (u ** 4 + v * v)) / .30) * smooth((c.z - CZ) / .040)
+    return smooth((1. - (u ** 4 + v * v)) / .55) * smooth((c.z - CZ) / .065)
 
 
 def weights(p):
-    x, y, z = p
-    w = axial(x)
-    for key, (pts, names) in LIMBS.items():
-        s = 1 if key.endswith('L') else -1
-        lo, hi = LIMB_WINDOW[key[:4]]
-        if s * y < ROOT_IN or not lo < x < hi: continue
-        d = s * y
-        blend = smooth((d - ROOT_IN) / (ROOT_OUT - ROOT_IN))
-        if blend <= 0: continue
-        if d < SEG[0]:
-            limb = {names[0]: 1.}
-        elif d < SEG[1]:
-            t = (d - SEG[0]) / (SEG[1] - SEG[0]); limb = {names[0]: 1 - t, names[1]: t}
-        else:
-            t = max(0., min(1., (d - SEG[2]) / (SEG[3] - SEG[2]))); limb = {names[1]: 1 - t, names[2]: t}
-        w = {n: val * (1 - blend) for n, val in w.items()}
-        for n, val in limb.items(): w[n] = w.get(n, 0) + val * blend
-        break
-    else:
-        # Only skin that is not on a limb may join the shell; a shoulder that went rigid would
-        # tear the moment the limb swung.
-        g = carapace_share(Vector(p))
-        if g > 0:
-            w = {n: val * (1 - g) for n, val in w.items()}
-            w['carapace'] = w.get('carapace', 0) + g
+    q = Vector(p); w = dict(axial(q.x)); best = 0.; chosen = None
+    for key, (P, cum, names, rootw) in LIMBFIT.items():
+        dist, s = project(P, cum, q); t = s / cum[-1]; r = RADII[key[:4]]
+        rin = r[0] + r[1] * t * t; rout = r[2] + r[3] * t * t
+        if dist >= rout: continue
+        alpha = (1. if dist <= rin else smooth(1 - (dist - rin) / (rout - rin))) * smooth(s / SEAT)
+        if alpha > best: best = alpha; chosen = (limbchain(names, s, cum), rootw, t)
+    # Only skin that is not on a limb may join the shell; a shoulder that went rigid would tear the
+    # moment the limb swung.
+    g = carapace_share(q) * (1 - best)
+    if chosen:
+        limb, rootw, t = chosen
+        base = {}
+        for n, v in w.items(): base[n] = base.get(n, 0) + v * (1 - t)
+        for n, v in rootw.items(): base[n] = base.get(n, 0) + v * t
+        w = {n: v * (1 - best) for n, v in base.items()}
+        for n, v in limb.items(): w[n] = w.get(n, 0) + v * best
+    if g > 0:
+        w = {n: v * (1 - g) for n, v in w.items()}
+        w['carapace'] = w.get('carapace', 0) + g
     w = {n: v for n, v in w.items() if v > 1e-8}
     items = sorted(w.items(), key=lambda kv: -kv[1])[:4]; total = sum(v for _, v in items)
     return {n: v / total for n, v in items}
@@ -514,15 +554,15 @@ MOUTH_COLOUR = (.24, .105, .095, 1)
 mbs.inputs['Base Color'].default_value = MOUTH_COLOUR; mbs.inputs['Roughness'].default_value = .62
 mouthmat.diffuse_color = MOUTH_COLOUR
 oralparts = []
-MOUTH_BACK = HINGE_X - .016
-MOUTH_FRONT = float(MX[-1]) + .004
+MOUTH_BACK = HINGE_X - .048
+MOUTH_FRONT = float(MX[-1]) + .002
 LINING_INSET = .95
 
 
 def mouth_section(x):
-    e = smooth((x - MOUTH_BACK) / .014) * smooth((MOUTH_FRONT - x) / .006)
-    w = float(np.interp(x, MX, WIDE)) * LINING_INSET * (.16 + .84 * e)
-    h = max(float(np.interp(x, MX, TALL)) * LINING_INSET, .0022) * (.30 + .70 * e)
+    e = smooth((x - MOUTH_BACK) / .026) * smooth((MOUTH_FRONT - x) / .010)
+    w = float(np.interp(x, MX, WIDE)) * LINING_INSET * (.85 + .15 * e)
+    h = max(float(np.interp(x, MX, TALL)) * LINING_INSET, .0026) * (.72 + .28 * e)
     return w, h
 
 
@@ -546,14 +586,20 @@ for n in ['skull', 'jaw']: lining.vertex_groups.new(name=n)
 for idx, p in enumerate(lin_raw):
     w, h = mouth_section(p.x)
     t = smooth(.5 + .5 * (seam(p.x) - p.z) / max(h, 1e-6))
-    g = t * smooth((p.x - HINGE_X) / .012) * smooth((MOUTH_FRONT - p.x) / .006)
+    g = t * smooth((p.x - HINGE_X) / .012) * smooth((MOUTH_FRONT - p.x) / .010)
     lining.vertex_groups['jaw'].add([idx], g, 'REPLACE'); lining.vertex_groups['skull'].add([idx], 1 - g, 'REPLACE')
 for p in lining.data.polygons: p.use_smooth = True
 mo = lining.modifiers.new('Oral membrane', 'ARMATURE'); mo.object = rig; lining.parent = rig
 oralparts.append(lining)
+# Recorded, not asserted, and Placodus says why: a point in the lumen is OUTSIDE the closed shell,
+# because the shell folds in through the modelled slit, so a nearest-surface depth on a lining
+# vertex is as often measuring the mouth's own inner wall as the skin. What the lining being inside
+# the mouth actually rests on is the measurement below -- the section it is drawn from is the
+# cavity's own 92nd-percentile half width and 94th-to-6th-percentile height, inset by LINING_INSET.
+lining_depth = min(depth(p) for p in lin_raw)
 mouth_cover = []
 for k, x in enumerate(MX):
-    if not MOUTH_BACK + .014 < x < MOUTH_FRONT - .006: continue
+    if not MOUTH_BACK + .026 < x < MOUTH_FRONT - .010: continue
     w, h = mouth_section(float(x))
     mouth_cover.append([round(float(x), 4), round(w / float(WIDE[k]), 3), round(h / max(float(TALL[k]), 1e-6), 3)])
     assert w >= float(WIDE[k]) * .90, ('the oral lining is narrower than the mouth', x, w, WIDE[k])
@@ -562,8 +608,8 @@ for k, x in enumerate(MX):
 # A closed cheek envelope around the actual hinge, covering the square face the cut leaves at
 # x = HINGE_X from the seam down to the chin, which swings into view the moment the mouth opens.
 HINGE_Z = (seam(HINGE_X) + _lo) / 2
-bpy.ops.mesh.primitive_uv_sphere_add(segments=18, ring_count=10, location=tx((HINGE_X - .004, 0, HINGE_Z)))
-o = bpy.context.object; o.name = 'Seated jaw hinge tissue'; o.scale = (.115, .085, .062)
+bpy.ops.mesh.primitive_uv_sphere_add(segments=18, ring_count=10, location=tx((HINGE_X + .002, 0, HINGE_Z)))
+o = bpy.context.object; o.name = 'Seated jaw hinge tissue'; o.scale = (.136, .090, .072)
 bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 for v in o.data.vertices: v.co = o.matrix_world @ v.co
 o.location = (0, 0, 0)
@@ -658,7 +704,7 @@ for kind in ('fore', 'hind'):
     asymmetry[kind] = {'jointOffsetOverBodyLength': [round(float(max(abs(a[0] - b[0]), abs(abs(a[1]) - abs(b[1])), abs(a[2] - b[2]))), 4)
                                                      for a, b in zip(L, R)]}
     m = P_ALL[:, 0]
-    lo, hi = LIMB_WINDOW[kind]
+    lo, hi = (min(p[0] for p in L + R) - .09, max(p[0] for p in L + R) + .09)
     selL = (m > lo) & (m < hi) & (P_ALL[:, 1] > .17); selR = (m > lo) & (m < hi) & (P_ALL[:, 1] < -.17)
     asymmetry[kind]['surfaceReachOverBodyLength'] = [round(float(P_ALL[selL][:, 1].max()), 4),
                                                      round(float(-P_ALL[selR][:, 1].min()), 4)]
@@ -674,7 +720,7 @@ def reset():
     for q in rig.pose.bones: q.rotation_euler = (0, 0, 0); q.location = (0, 0, 0); q.scale = (1, 1, 1)
 
 
-AMP = {'Idle': .30, 'Swim': 1., 'Sprint': 1.35, 'Crawl': 1., 'Graze': .4, 'Eat': .25, 'Guard': .14,
+AMP = {'Idle': .30, 'Swim': 1., 'Sprint': 1.20, 'Crawl': 1., 'Graze': .4, 'Eat': .25, 'Guard': .14,
        'Breathe': .35, 'Breath': .6, 'Dodge': 1.1, 'Ability': .3, 'Grab': .3, 'Growth': .4}
 # The row: a limbed swimmer's dash has to paddle, so the stroke is written as a reach forward and a
 # sweep back at the shoulder rather than a waggle at the wrist, and the swept angle at each limb
@@ -965,10 +1011,16 @@ report = {'sourceSha256': hashlib.sha256(open(RAW, 'rb').read()).hexdigest(),
                     'cavityHalfHeight': [[round(float(a), 5), round(float(b), 5)] for a, b in zip(MX, TALL)],
                     'mandibleDepthOverHeadDepthAtHinge': round(float(jaw_depth), 3),
                     'liningInset': LINING_INSET, 'liningCoverage': mouth_cover, 'liningRings': LINING_RINGS,
-                    'liningRing': LINING_RING, 'liningBackX': MOUTH_BACK, 'liningFrontX': MOUTH_FRONT,
+                    'liningRing': LINING_RING, 'liningBackX': MOUTH_BACK, 'liningFrontX': MOUTH_FRONT, 'liningNearestSurfaceDepthRaw': round(float(lining_depth), 5),
                     'skinDoubleSided': True, 'liningCullsBackfaces': True, 'oneClosedLining': True},
           'forkedTail': fork,
           'normalizedWeights': True, 'rootStable': True, 'noScaleChannels': True}
+# The two checks that cannot run inside the build -- the edge-stretch sweep over every clip of the
+# packaged GLB, and the culled/unculled gape pair -- run after packaging and their results are kept
+# in qa.json beside this file, so a rebuild carries them into the validation record rather than
+# dropping them on the floor.
+_qa = os.path.join(HERE, 'qa.json')
+report['postBuildQA'] = json.load(open(_qa)) if os.path.exists(_qa) else None
 open(os.path.join(HERE, 'validation.json'), 'w').write(json.dumps(report, indent=2))
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(LOCAL, 'henodus-paired.blend'))
 print('HENODUS_REPORT', json.dumps({k: v for k, v in report.items() if k != 'boundsAt13Phases'}))

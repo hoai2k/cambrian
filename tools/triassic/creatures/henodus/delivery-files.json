@@ -1,0 +1,58 @@
+{
+  "henodus.card.png": {
+    "bytes": 304667,
+    "sha256": "227733dd0f41222bab17acde098e8c40bb8ea203b53d7c3c7bbc026903a46266",
+    "dimensions": [
+      800,
+      600
+    ]
+  },
+  "henodus.glb": {
+    "bytes": 2106980,
+    "sha256": "4025fb20207022ec588ae82cf305ad918ca33169a5c3f9e0fcf78ff3f70a4236"
+  },
+  "henodus.json": {
+    "bytes": 2610,
+    "sha256": "969ad7a4984be0d8414ad5da7bc695047d64339dc90b666a5631719dc8b277d8"
+  },
+  "henodus.lod1.glb": {
+    "bytes": 729232,
+    "sha256": "7ae8e7e627e4caf063d1cc1fccd83b86d42c42e56e15ab854d356fbab3219b7a"
+  },
+  "henodus.png": {
+    "bytes": 650708,
+    "sha256": "86712660d45ca2a01ee436c7c70ffe8fa83349f52a476ce9ec5a35f4e0120212",
+    "dimensions": [
+      1200,
+      900
+    ]
+  },
+  "henodus.puppet.glb": {
+    "bytes": 729232,
+    "sha256": "7ae8e7e627e4caf063d1cc1fccd83b86d42c42e56e15ab854d356fbab3219b7a"
+  },
+  "henodus.puppet.png": {
+    "bytes": 540746,
+    "sha256": "bbc59107a692882c9e9e7b3cc9d5182f9c9edc7b6364d02260df8ad6d26452fb",
+    "dimensions": [
+      1200,
+      900
+    ]
+  },
+  "henodus.select.png": {
+    "bytes": 1120437,
+    "sha256": "649dfecd59166036df47ae9399a5123f76b6c6deb0de1ff6bc2ce93e442cff02",
+    "dimensions": [
+      1600,
+      1200
+    ]
+  },
+  "henodus.thumb.png": {
+    "bytes": 38085,
+    "sha256": "7679cae971d6c859894bcdfeca03dbb5eec6e70e855a6b8a6a8bb5a43af2e409",
+    "dimensions": [
+      256,
+      192
+    ]
+  }
+}
