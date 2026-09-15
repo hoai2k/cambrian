@@ -60,7 +60,20 @@ function sample(clip, t) {
   return out;
 }
 
-// edge list once, with the dominant bone of each edge's first vertex
+/**
+ * The oral lining is not skin and must not be ranked as if it were. It is one skinned sac whose
+ * roof rides the skull and whose floor rides the jaw, so its rest length at a shut mouth is nearly
+ * nothing and its ratio at full gape says only that the mouth opened — 50x on Hupehsuchus is the
+ * lining working, not a torn head. Because this tool names the *bone* an edge belongs to, and the
+ * lining is weighted to `skull` and `jaw` like the face around it, the two were indistinguishable:
+ * Cymbospondylus read 9.98x on `skull` while its skin was 2.48x. Two builders independently split
+ * it locally before it was split here.
+ *
+ * Every body names the lining the same way, as its own mesh with its own material.
+ */
+const LINING = /lining|mouth[ _]interior|hinge[ _]tissue/i;
+
+// edge list once, with the dominant bone of each edge's first vertex, and whether it is lining
 const edges = [];
 {
   let base = 0;
@@ -79,7 +92,7 @@ const edges = [];
         const key = u < v ? u * 1e7 + v : v * 1e7 + u;
         if (seen.has(key)) continue;
         seen.add(key);
-        edges.push([base + u, base + v, dom(u)]);
+        edges.push([base + u, base + v, dom(u), LINING.test(m.name) || LINING.test(m.material?.name ?? '')]);
       }
     }
     base += m.geometry.attributes.position.count;
@@ -99,6 +112,7 @@ const restLen = edges.map(([u, v]) => len(rest, u, v));
 const rows = [];
 for (const clip of gltf.animations) {
   let worst = 1, worstBone = '', torn = 0, grew = [0, 0];
+  let skinWorst = 1, skinBone = '', skinGrew = [0, 0];
   const bones = new Map();
   for (let p = 0; p < PHASES; p++) {
     const P = sample(clip, clip.duration * (p / (PHASES - 1)));
@@ -113,18 +127,23 @@ for (const clip of gltf.animations) {
       if (posed < L * 0.015) continue;
       if (ratio > THRESH) { torn++; bones.set(edges[e][2], (bones.get(edges[e][2]) || 0) + 1); }
       if (ratio > worst) { worst = ratio; worstBone = edges[e][2]; grew = [r, posed]; }
+      if (!edges[e][3] && ratio > skinWorst) { skinWorst = ratio; skinBone = edges[e][2]; skinGrew = [r, posed]; }
     }
   }
   const top = [...bones.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4)
     .map(([n, c]) => `${n}:${c}`).join(' ');
-  rows.push({ clip: clip.name, worst, worstBone, torn, top, grew });
+  rows.push({ clip: clip.name, worst, worstBone, torn, top, grew, skinWorst, skinBone, skinGrew });
 }
-rows.sort((a, b) => b.worst - a.worst);
+rows.sort((a, b) => b.skinWorst - a.skinWorst);
 console.log(`\n${file}   ${edges.length} edges x ${PHASES} phases x ${gltf.animations.length} clips`);
-console.log(`${'clip'.padEnd(12)} ${'worst'.padStart(7)}  ${'on bone'.padEnd(15)} ${('>' + THRESH + 'x').padStart(7)}  worst bones`);
+console.log(`${'clip'.padEnd(12)} ${'skin'.padStart(7)}  ${'on bone'.padEnd(15)} ${'all'.padStart(7)}  ${('>' + THRESH + 'x').padStart(6)}  worst bones`);
 for (const r of rows) {
-  if (r.worst < 1.6 && !r.torn) continue;
-  console.log(`${r.clip.padEnd(12)} ${r.worst.toFixed(2).padStart(6)}x  ${r.worstBone.padEnd(15)} ${String(r.torn).padStart(7)}  ${r.grew[0].toFixed(3)}->${r.grew[1].toFixed(3)}  ${r.top}`);
+  if (r.skinWorst < 1.6 && !r.torn) continue;
+  console.log(`${r.clip.padEnd(12)} ${r.skinWorst.toFixed(2).padStart(6)}x  ${r.skinBone.padEnd(15)} ${r.worst.toFixed(2).padStart(6)}x  ${String(r.torn).padStart(6)}  ${r.skinGrew[0].toFixed(3)}->${r.skinGrew[1].toFixed(3)}  ${r.top}`);
 }
 const any = rows.filter((r) => r.torn).length;
+const skinMax = Math.max(...rows.map((r) => r.skinWorst));
+const allMax = Math.max(...rows.map((r) => r.worst));
 console.log(`${any} of ${rows.length} clips tear an edge past ${THRESH}x`);
+console.log(`worst SKIN ${skinMax.toFixed(2)}x · worst including the oral lining ${allMax.toFixed(2)}x` +
+  (allMax > skinMax * 1.5 ? ' (the lining is a sac built to stretch; the skin figure is the one to judge)' : ''));

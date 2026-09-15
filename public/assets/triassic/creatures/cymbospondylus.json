@@ -1,0 +1,63 @@
+{
+  "id": "cymbospondylus",
+  "name": "Cymbospondylus",
+  "species": "Cymbospondylus youngorum",
+  "provenance": "Middle Triassic \u00b7 Fossil Hill Member, Augusta Mountains, Nevada",
+  "description": "Eel-bodied basal ichthyosaur with a long toothed rostrum, four paddles, no dorsal fin and a low caudal fin. Authored Tripo body and measured procedural volume twin share one armature, one set of inverse binds, one set of sockets and one set of actions.",
+  "modelLength": 6.0,
+  "lengthMeters": 17.65,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth",
+    "Lunge",
+    "Breathe"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "Breathe"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "puppet": "cymbospondylus.puppet.glb",
+  "sources": [
+    "docs/triassic/canonical/cymbospondylus.png",
+    "tools/triassic/creatures/cymbospondylus/tripo-raw/cymbospondylus.raw.glb"
+  ],
+  "notes": [
+    "Anguilliform, not thunniform: the travelling wave carries real amplitude by mid-body and takes a whole body length to run down the chain, which is what \"basal, primitive body plan (eel-like proportions)\" means in the research.",
+    "The paddles are control surfaces. They set pitch and roll, they brake and they brace; nothing here rows.",
+    "The body was measured into its own frame before anything was rigged: this generation lies 18.3 degrees across the file axes, and its roll was read off the countershading rather than transported, as Dinocephalosaurus requires.",
+    "The mouth line is the measured mid height of the modelled oral cavity, found by casting every head vertex normal back into the mesh. One skinned lining closes the gape; the skin under it is double-sided as the backstop.",
+    "The twin resurfaces a 0.0052-unit voxel occupancy field of the authored body, relaxes it and reduces the new topology. It reuses no source vertex or face.",
+    "The generation gives this animal a skull about 0.15 of its length against the 0.11 the research documents, and its two pectorals sit at different stations. Both are the pose and the generation, not this build; see the README.",
+    "Living colours, soft tissues and movements are artistic reconstruction. World travel remains engine-owned."
+  ]
+}

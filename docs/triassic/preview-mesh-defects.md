@@ -122,6 +122,26 @@ first).
 |---|---|---|
 | **Mixosaurus** | a deeply forked lunate fluke it should not have | welded |
 | **Helicoprion** | pelvic and anal fins, against *Fadenia*'s "no pelvic fins" | welded, **and in the greenlit pose** — needs a redraw, not just a regeneration |
+| **Phragmoteuthis** | **twelve appendages where a decabrachian has ten** | welded, and **not** in the greenlit pose — needs a regeneration |
+
+**Phragmoteuthis has two arms too many**, found while building its body (14 September 2026) and
+measured rather than eyeballed: a cut-sphere sweep about the crown settles on **12** separable
+appendages over three radii at two centres, and the count is stable enough that it is the
+generation's answer and not the instrument's. The greenlit pose draws **eight arms and two clubbed
+tentacles**, which is what a phragmoteuthid is, so this is a generation defect and not a pose
+defect — a regeneration fixes it and no redraw is needed.
+
+It is deliberately **not** smoothed away in the meantime. Smoothing collapses an appendage into the
+body it grows from, which is right for a spare tail standing on its own and wrong for two arms in
+the middle of a ring of twelve identical ones: there is no "extra pair" to point at, because which
+two are extra is not a question the geometry can answer. Choosing two would be sculpting the animal
+rather than repairing the generation. The shipped-for-review body rigs all twelve, the two longest
+as the tentacles, and records the discrepancy in its own `validation.json` and README.
+
+**Ceratites carries thirteen arms**, measured the same way, and that is *not* on this list: ammonoid
+soft parts are not preserved for the genus, the arm count is artistic reconstruction in the pose as
+much as in the generation, and the pose draws about as many. It is recorded in that body's README as
+a property of the reconstruction rather than as a defect.
 
 **Rhaeticosaurus has two separate problems, not one.** A first pass here guessed that the "two
 extra tails" were its over-long flippers read from above. That guess was wrong, and a top-down

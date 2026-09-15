@@ -150,6 +150,48 @@ Two rules that follow from the steps:
   existing model. Do not stop solely to manufacture a new approval gate, and do not call a fix
   approved until the evidence actually supports it.
 
+## What the twin is actually for, and what it is not
+
+Measured against six paired bodies rather than argued from the step list.
+
+**It does three jobs, and does them well.** It *is* the LOD1 — byte-identical, verified on
+Placodus, Helicoprion, Dinocephalosaurus, Tanystropheus, Henodus and Keichousaurus — so it is not
+extra work, it is the reduced model with a second use. It verifies the *measurement*: the 4 % / 2 %
+envelope and surface tolerances are twin-against-authored, which is what says the profile table
+describes the animal (Keichousaurus' one out-of-tolerance station came from exactly there). And it
+proves the shared rig: `exactRigParity`, `exactAnimationParity`, `exactAnchorParity` and
+`normalizedWeights` in each `paired-audit.json` are what let one authored performance drive both
+bodies rather than being retargeted.
+
+**It is not a rigging or animation instrument, and step 9 oversells it.** The rig is authored
+against bone names and rest transforms, and the twin is generated *on* that armature, so it cannot
+inform where a bone goes. Clips are authored once in code — `for clip, duration in CLIPS.items()` —
+and the identical sample arrays are written to both bodies; there is no separate pass in which a
+clip is iterated on the twin and then transferred.
+
+**And it can mislead, which is the part worth remembering.** A twin has no toes, no fin rays and no
+lip corners, so a clip that reads perfectly on it can be tearing the authored body to ribbons. The
+paired audit does not catch this and structurally cannot: it checks *parity*, not deformation
+quality. It passed on Coelophysis at 25.3x with its hind feet trailing off in ribbons, and would
+have passed on Henodus at 64.9x. That is why `tools/triassic/skin-tears.mjs` exists, and why
+**"the twin deforms cleanly" is never evidence that the authored body does.** Judge every clip on
+the body that ships.
+
+**So the review sheets are rendered from the authored body alone.** Every `contact-sheets.py`
+assembles one column, not two, and a builder no longer renders the twin's *review pose set* —
+dozens of poses per body through CYCLES on CPU, which was the expensive half of a build and bought
+a comparison that has almost never been the thing that mattered.
+
+Two things this does **not** cut, and cutting them would break delivery:
+
+- the twin's **portrait** (`<id>.puppet.png`, rendered by `render.py --puppet` without
+  `--review-only`) is a delivered asset the specimen viewer draws; it stays.
+- the twin itself, its byte-identical LOD1, the envelope and surface measurements and the four
+  parity checks all stay. What goes is only the side-by-side *picture*.
+
+The paired sheets already committed are left where they are: they are the record of what was
+actually reviewed for those bodies, and deleting them saves nothing ongoing.
+
 ## Which steps need a judgement and which are mechanical
 
 A body is twelve steps, and they are not the same kind of work. The distinction matters when the
@@ -307,6 +349,68 @@ animal. Three findings from that pass belong in this document because they gener
   builder that is only ever exercised when somebody rebuilds is not reproducible, it is merely
   untested. `tools/triassic/shorekit-check.mjs` now resolves every `K.<name>` a builder reaches for
   against the kit, statically and in a second, and runs in `npm run triassic`.
+
+## What a fish and a flyer taught (Birgeria and Rhaeticosaurus)
+
+Four findings from the pair, each of them a thing the pipeline believed and got wrong rather than a
+detail of either animal.
+
+- **The kit's fin radius is written for a paddle, and a hydrofoil is not one.** `limb_weights` takes
+  the **55th percentile** of a blade's own distances to its polyline as the radius inside which a
+  vertex is wholly the limb's, and blends from there out to the 99.5th. That is right for a fin that
+  steers: it is nearly half the blade on a partial alpha, and on a fin that barely moves nobody
+  notices. On Rhaeticosaurus' flippers, which sweep 130 degrees, the weight relaxation then spread
+  *trunk* weight right out along the blade — vertices 1.35 units off the midline carrying 0.26 of
+  `chest` and 0.23 of `body` — and `skin-tears.mjs` read **7.9x** across those edges. More joints in
+  the blade, a wider chain blend and a gentler bend each moved it by under a tenth. The **92nd
+  percentile** took it to **2.81x**, the cleanest skin in the era. This is the concrete form of "a
+  copied rig is a starting point to be re-measured, never a transplant": what has to be re-measured
+  is not only where the bones go but how wide the thing on them is.
+
+- **A lining is fitted per vertex, not per ring, and a mouth's section is not an ellipse.** Shrinking
+  the whole ring by one factor until it is inside the skin couples its two axes: a floor set deep
+  enough to sit inside the mandible rather than stipple against it took Rhaeticosaurus' lining
+  *width* down to 0.68 of the mouth's own, the far wall stopped short of the mandible's rim, and the
+  gape showed background down the jaw line. `tripo.lining` now takes a superellipse `power` and an
+  optional per-vertex `fit`; both default to what the earlier bodies were measured with.
+
+- **Which measurement sizes the lining depends on whether the mouth is modelled.** `cavity_profile`'s
+  `wide` is the spread of the measured cavity points, and those sit on both *lips*, so on a deep
+  round head it is the span of the lip **line** — wider than the head is at the seam and wider still
+  than the lumen behind it. Birgeria's first lining came out through both cheeks at 0.05 of a body
+  from it. Binning the flank over a band about the seam only moves the mistake: too tall a band
+  reads the head above the mouth line and the lining bulges, too tight a band reads the head at its
+  narrowest and the lining sits inside the skin's own cut edge, leaving an annular strip that the
+  jaw's rotation opens and nothing bridges (113 magenta pixels one way, a visible pink bulge the
+  other). **Cast the section from the mouth's own axis** instead. Width can always be cast — a
+  lateral ray crosses the lumen and hits the cheek — but **height cannot be cast on a modelled
+  mouth**: the mouth is shut in the bind pose, so a ray up from the seam measures the *closed slit*,
+  three thousandths of a body. Where a cavity is modelled the depth probe also reads backwards
+  (a point in the lumen is outside the closed shell), so such a body is sized and never fitted.
+
+- **`gape-solid.py` was measuring its own backdrop loosely enough to catch the animal.** The test for
+  "is this pixel the magenta backdrop" was `r > .5, g < .3, b > .5` — a half-space rather than the
+  backdrop. A magenta *world* also lights the scene, and the era's standard oral lining
+  (0.30, 0.13, 0.115) renders under it at (0.73, 0.29, 0.51): inside that window by a hair on green.
+  394 of the 508 pixels that failed Rhaeticosaurus at full gape were its own mouth, correctly drawn
+  and correctly front-facing, and three successive changes to the geometry moved the count by not one
+  pixel — which is the tell, and is worth watching for in any check whose number will not move. The
+  discriminator is **blue**: the backdrop renders at 0.93 and above, a lit red lining at about half
+  that. The test is now `r > .75, g < .45, b > .75`; tightening can only reduce a count, and Birgeria
+  went 1 → 0, Mixosaurus 3 → 0 and Ceratites 6 → 6 on unchanged files.
+
+  What was left was not the mouth either: through the gap between an open jaw and the throat you can
+  see the **inside of the mandible's lower rear corner**, backfacing, and no lining covers that
+  because it is outside the mouth. That puts a **ceiling on the gape a given generation will carry** —
+  on Rhaeticosaurus, cut along the line it paints, the corner opens somewhere between 0.47 and 0.50
+  radians of jaw. A clip that wants more has to get it from reach instead.
+
+Two smaller things worth not relearning. **Which end of a fish is the head cannot come from the
+principal component's sign**, because a rostrum and a caudal lobe are both thin: it comes from the
+caudal blade, which is the deepest thin cluster at one end, and the builder asserts it. And a
+**swept angle read off an Euler channel is a measurement of the rig, not of the animal** — a rotation
+written on one axis is a stroke on one body and a twist on another, depending on how the bone rests.
+Rhaeticosaurus measures it from the limb's own direction, root joint to tip joint in world space.
 
 Each creature's
 builder produces the cleaned authored body, the shared skeleton, the measured twin and the sampled

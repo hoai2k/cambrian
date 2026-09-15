@@ -1,0 +1,63 @@
+{
+  "id": "hupehsuchus",
+  "name": "Hupehsuchus",
+  "species": "Hupehsuchus nanchangensis",
+  "provenance": "Early Triassic \u00b7 Jialingjiang Formation, Hubei",
+  "description": "Armoured ichthyosauromorph with rows of dorsal osteoderms over a stiff trunk, a long toothless snout, short paddles and a tapering tail. Authored Tripo body and measured procedural volume twin share one armature, one set of inverse binds, one set of sockets and one set of actions.",
+  "modelLength": 4.0,
+  "lengthMeters": 1.0,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth",
+    "Gulp",
+    "Breathe"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "Breathe"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "puppet": "hupehsuchus.puppet.glb",
+  "sources": [
+    "docs/triassic/canonical/hupehsuchus.png",
+    "tools/triassic/creatures/hupehsuchus/tripo-raw/hupehsuchus.raw.glb"
+  ],
+  "notes": [
+    "The armoured trunk does not undulate. The gain curve is zero through the osteoderm rows and everything is behind them, which is the research's \"stiff armoured trunk, undulation of the tail\" and is why this animal reads slow beside Mixosaurus.",
+    "The osteoderm rows are the generation's own plates. They are found by measurement, they get no bone of their own, and they ride the trunk -- which is what a stiff armoured back is. No plate was modelled, moved or added.",
+    "The feeding reading is Motani, Pyenson & Jiang 2025, not Fang et al. 2023: a pelican, not a bowhead. So the mouth is a pouch that fills and empties, the clips are lunges rather than a cruise with the mouth held open, and there is no baleen and no sieve.",
+    "The pouch is animation, not geometry: one joint under the throat carries the generation's own skin and is swung and translated. Nothing was modelled for it.",
+    "This generation has **no modelled mouth**: Placodus' geometric method finds nothing on the rostrum, so the mouth line was read off the albedo as Dinocephalosaurus' was. The animal is toothless in life and the generation carries no dentition, which agree.",
+    "The twin resurfaces a voxel occupancy field of the authored body, relaxes it and reduces the new topology. It reuses no source vertex or face.",
+    "Living colours, soft tissues and movements are artistic reconstruction. World travel remains engine-owned."
+  ]
+}

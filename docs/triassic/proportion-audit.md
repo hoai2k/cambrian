@@ -186,6 +186,12 @@ of body length. **Back to the canonical pose.** Target for a brief: **fore- and 
 about 0.25 L, total span about 0.75 L**, with the hind pair slightly the larger, and the barrel
 trunk kept.
 
+*As built (September 2026).* The body was built from the greenlit pose rather than corrected, as the
+pipeline requires. The published preview carries a **neck stretch**, which lengthens the animal
+without touching the limbs, so the same fault measures a little smaller on the delivery: fore tips at
+x −0.416 and +0.414 give a span of **0.83 L**, each flipper standing about **0.31 L** clear of the
+flank against the ~0.25 L the reference asks for. The redraw brief above stands unchanged.
+
 ### 4. Birgeria — two dorsal fins, and the big one amidships
 
 Preview, length 1.000 along glTF −x, nose at frac 0, body 0.631 L deep (fins included).
@@ -202,6 +208,11 @@ Measured, there are two, and the principal one is at mid-body.
 mid-body dorsal with smaller finlets behind it, a tuna template rather than the fish. **Back to the
 canonical pose.** Target: **one dorsal fin, its leading edge no further forward than 0.65 of body
 length, no finlets**; keep the naked skin, the big head and the deep fork.
+
+*As built (September 2026).* The second dorsal is collapsed into the back in the published preview
+(`smooth-region.py`, 0.9 % of its protrusion left) and the delivery carries the remaining 129-vertex
+patch on axial weights, so the silhouette has one dorsal. Its **placement is untouched**: measured on
+the delivery it runs frac 0.40–0.57 with its own seated joint. The redraw brief above stands.
 
 ### 5. Mixosaurus — a Jurassic fluke on a Triassic tail
 

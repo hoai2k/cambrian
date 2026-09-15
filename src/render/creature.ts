@@ -109,6 +109,16 @@ export class CreatureView {
   readonly heightUnits: number;
   /** Arms that lie along what they are on, where the creature asks for it. */
   private armConform?: ArmConform;
+  /**
+   * The palette this body is drawn in, when it is not the creature's authored one — how a second
+   * player on the same animal is told from the first (src/shared/seat-schemes.ts). Settable rather
+   * than fixed at construction because camouflage re-derives the base every frame, so a per-seat
+   * scheme has to live somewhere the blend can find it rather than being applied once and stomped.
+   */
+  seatScheme?: string;
+  private baseScheme(): string { return this.seatScheme ?? schemeForCreature(this.creatureId); }
+  /** Re-apply the palette after `seatScheme` changes. Uniform writes only; nothing recompiles. */
+  refreshScheme() { this.recolor.setScheme(this.baseScheme()); }
   /** The Eat clip is a progress-driven performance rather than a loop. */
   readonly feedingPerformance: boolean;
   readonly authoredFeeding?: AuthoredFeeding;
@@ -149,7 +159,7 @@ export class CreatureView {
     // the materials cloned just above rather than a second set of models. Both LODs share the
     // material names the slots are read from, so a distant creature keeps its colours.
     if (this.def.conformArms) { const c = new ArmConform(this.model); if (c.active) this.armConform = c; }
-    this.recolor = makeRecolor(this.model); this.recolor.setScheme(schemeForCreature(creatureId));
+    this.recolor = makeRecolor(this.model); this.recolor.setScheme(this.baseScheme());
     // Distance haze, chained after the palette hook (which owns onBeforeCompile). Mixing the
     // finished pixel toward the water it is seen through is the only correct way to fade a body
     // into the background: tinting the albedo would darken it instead, since a creature's colour
@@ -447,7 +457,7 @@ export class CreatureView {
       }
     }
 
-    this.recolor.blend(schemeForCreature(this.creatureId), a.camoColors, a.camoStrength);
+    this.recolor.blend(this.baseScheme(), a.camoColors, a.camoStrength);
     // Transform
     const t = a.prevT;
     const jump = Math.hypot(a.pos.x - t.x, a.pos.y - t.y, a.pos.z - t.z) > Math.max(2, L * 3);

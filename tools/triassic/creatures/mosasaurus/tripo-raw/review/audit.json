@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "/home/user/cambrian/local/triassic-authoring/mosasaurus/tripo/mosasaurus.raw.glb",
+    "bytes": 1178192,
+    "sha256": "4774080c6369c924ef552a3bc0e4ac317587aba03ba84b0b3234733d990777e2"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 11538,
+    "faces": 19872,
+    "triangles": 19872,
+    "connected_components": 56,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.5,
+      -0.254061,
+      -0.2155
+    ],
+    "max_xyz": [
+      0.5,
+      0.254061,
+      0.2155
+    ],
+    "center_xyz": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "size_xyz": [
+      1.0,
+      0.508122,
+      0.431
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_27a0a871-835d-43b7-ac9b-8a70683a69e1",
+      "mesh": "tripo_mesh_27a0a871-835d-43b7-ac9b-8a70683a69e1",
+      "vertices": 11538,
+      "edges": 31354,
+      "faces": 19872,
+      "triangles": 19872,
+      "connected_components": 56,
+      "material_slots": [
+        "tripo_material_27a0a871-835d-43b7-ac9b-8a70683a69e1"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_27a0a871-835d-43b7-ac9b-8a70683a69e1",
+      "image_textures": [
+        "Color_27a0a871-835d-43b7-ac9b-8a70683a69e1",
+        "NormalGL_27a0a871-835d-43b7-ac9b-8a70683a69e1",
+        "ORM_27a0a871-835d-43b7-ac9b-8a70683a69e1"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_27a0a871-835d-43b7-ac9b-8a70683a69e1",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_27a0a871-835d-43b7-ac9b-8a70683a69e1",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_27a0a871-835d-43b7-ac9b-8a70683a69e1",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {},
+  "renderNote": "renders skipped: no EGL in this container; see the CYCLES sheet beside this file",
+  "preview": {
+    "path": "/home/user/cambrian/tools/triassic/creatures/mosasaurus/mosasaurus.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19872,
+    "triangles_after": 19872,
+    "bytes": 1058724,
+    "sha256": "ac7cd1a4dd508db597bc7c455624d0ecc99b1388161df1b1c91848170a23ffdb"
+  }
+}

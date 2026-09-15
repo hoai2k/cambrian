@@ -1,0 +1,57 @@
+{
+  "id": "ceratites",
+  "name": "Ceratites",
+  "species": "Ceratites nodosus",
+  "description": "Canonical Tripo body and procedural volume twin on one 72-joint rig: a rigid coiled shell that is never animated, a 13-arm crown on five joints each, a hyponome that vectors the jet, and an authored beak inside a closed oral lining.",
+  "modelLength": 5.0,
+  "lengthMeters": 1.41,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "Breath"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary",
+    "anchor_grasp"
+  ],
+  "puppet": "ceratites.puppet.glb",
+  "notes": [
+    "The coiled ribbed and tuberculate shell, the arm crown and the mantle are retained from the accepted Tripo volume; nothing of the generation is edited after intake.",
+    "The frame is measured off the animal rather than off its bounding box or its countershading, both of which fail on a coiled shell: the bulk of the body is the coil, its smallest principal axis is the coil axis (the file x to within a degree), the thin mass is the arms and they lie forward of it, and the coil stands above them.",
+    "The shell is one rigid bone with no animation channel in any clip, parented to the body so the whole animal still rolls. A bone that never moves relative to its parent cannot tear the skin it shares with it, which is what makes a coil this large safe.",
+    "The generation models no mouth, and casting head normals back into the mesh finds neighbouring arms across the crown gaps rather than a lip opposite, so the peristome is authored on the crown axis with one closed skinned lining behind it and two mandibles. The skin is double-sided as the backstop.",
+    "This animal jets (`shell: true`) but is not a `swimStyle: pulse` swimmer, so nothing scrubs its Swim clip to a simulation phase; the clip is an honest repeating funnel pump rather than a one-PULSE_CYCLE squeeze, which would drift against the thrust.",
+    "Original albedo retained with white COLOR_0; normal relief limited to 0.15 and the skin explicitly nonmetallic. The twin samples pigment through triangle-local UVs.",
+    "Living colours, soft tissues, the arm count and every movement are artistic reconstruction: ammonoid soft parts are not preserved for this genus. Locomotor translation remains engine-owned."
+  ]
+}

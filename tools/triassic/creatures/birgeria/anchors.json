@@ -1,0 +1,34 @@
+{
+  "birgeria": [
+    {
+      "name": "anchor_mouth",
+      "bone": "jaw",
+      "point": [
+        -0.04705510661005974,
+        -1.8939841985702515,
+        0.15684814751148224
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "skull",
+      "point": [
+        -0.03381737694144249,
+        -1.6839841604232788,
+        0.06866143643856049
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "skull",
+      "point": [
+        -0.04705510661005974,
+        -1.9139841794967651,
+        0.21684813499450684
+      ],
+      "role": "attack"
+    }
+  ]
+}

@@ -47,6 +47,14 @@ These defaults are **not** a universal species classifier. Before auditing a new
 
 Alternatively use `headMaterialSuffix` and `eyeMaterialSuffix`. Components are sorted by triangle count. Select closed globe solids, not separate irises, highlights or lids. Select continuous anatomical head tissue, not an orbital rim constructed to hide a protruding eye. A changed mesh with an unreviewed selector has no approved measurement.
 
+A creature whose selector lives beside its builder as `tools/devonian/creatures/<id>/audit-selectors.json` can be audited by passing that file. Prefer `eyeMeshes`/`headMesh` over the material suffixes if the same file is to serve the reduced model too: decimation renames a material (`onychodus eyes` becomes `onychodus eyes.001`), so a suffix selector silently matches nothing there and the run stops with *no eye globes selected*. Mesh names survive it.
+
+An animal whose head is not the trunk needs a selector even when nothing looks wrong. Onychodus has a separate `head` mesh, so the default body-material envelope is the trunk behind it, and both globes measure **0% inside** — a definite, plausible-looking number for the wrong envelope. Read `headMesh` in the report before believing a result.
+
+## Unresolved rays
+
+A parity ray that leaves a surface within `epsilon` of tangent can re-enter the face it just left and step along it until the walk's 64-hit budget is gone. That is the walk failing on one ray, not the mesh failing to be a solid, and it happens perhaps once in some tens of thousands of samples on a perfectly closed envelope. Such a sample is dropped and counted in `unresolvedRays`; it is never assumed inside, so the reported fraction stays conservative. Until 15 September 2026 it raised instead, and a single ray out of 61,075 aborted the whole audit of a model that was otherwise fine. A mesh that genuinely is unsuitable for parity shows up as a large `unresolvedRays`, alongside non-manifold edges and capped boundary loops in `headTopology`.
+
 ## Method and limitations
 
 - Weld coincident glTF seam vertices to 1e-6 model units; discard zero-area triangles. Split connected components. Report nonmanifold topology; fail on an unsuitable envelope or open globe.

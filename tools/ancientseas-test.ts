@@ -15,6 +15,8 @@ import { TRIASSIC } from '../src/content/triassic';
 import { padDir, step } from '../src/ancientseas/picker';
 import { emptyControls } from '../src/input/input';
 import { ANIMAL_ERA, ART_DIR, BIG_ANIMAL, COMING_SOON, DEFAULT_VERSION, GAMES, OPEN_GAMES, REQUESTED, SLOTS, STAGE, TRILOGY_LOGO, isDelivered, parseVersion, sourceFor } from '../src/ancientseas/page';
+import { DEBUG_GAMES, DEBUG_PAGES, DEBUG_PARAMS, DEBUG_SELF, everyHref, modeHref, paramHref } from '../src/ancientseas/debug-index';
+import { debugIndex } from '../src/shared/debug';
 
 let passes = 0;
 const ok = (cond: unknown, msg: string) => { assert.ok(cond, msg); passes++; };
@@ -304,5 +306,86 @@ ok(/press-start \$\{loaded \? '' : 'waiting'\}/.test(title), 'it says waiting in
 ok(/\.press-start\.waiting/.test(readFileSync('src/app/styles.css', 'utf8')), 'and the stylesheet agrees');
 // Three games means two era links on every title screen; they are a column, not two corners.
 ok(/className="era-switches"/.test(title), 'the other eras stack rather than sitting on each other');
+
+/**
+ * ---- the debug index (`?debug`) ----
+ *
+ * An index of tools is only worth having if every row on it works, and the ways it can rot are all
+ * checkable here: a page that has moved, a parameter the code stopped reading, two rows claiming
+ * one URL, or a blurb so thin it says nothing the name did not.
+ */
+ok(debugIndex('?debug'), 'a bare ?debug opens the index');
+ok(!debugIndex(''), 'and the page itself is what an ordinary visit gets');
+
+// Every standalone page has to actually be there. This is the check that would have caught the
+// Triassic asking for props that were never in its folder, applied to links instead of meshes.
+for (const page of DEBUG_PAGES) {
+  ok(existsSync(page.entry), `the debug index's ${page.name} page exists (${page.entry})`);
+  ok(page.path.endsWith('/'), `${page.name} links to a directory`);
+  ok(!page.path.startsWith('/'), `${page.name} is relative to the app root, so it survives a nested base`);
+}
+// Each mode is a query on its own page, not a path of its own.
+for (const page of DEBUG_PAGES) for (const mode of page.modes ?? []) {
+  ok(!mode.query.startsWith('?'), `${page.name} / ${mode.name} stores its query without the leading '?'`);
+  ok(modeHref(page, mode.query).startsWith(page.path), `${page.name} / ${mode.name} opens on its own page`);
+}
+// A viewer mode that names a specimen must name one that exists, or the link opens on the wrong animal.
+const viewerModes = DEBUG_PAGES.find((p) => p.id === 'viewer')?.modes ?? [];
+ok(viewerModes.length === 3, 'the viewer offers its three editors');
+// Checked against the era rosters rather than the viewer's own catalogue: that module imports
+// assetPaths, which reads ACTIVE_ERA at module top, and this page must never pull an era in.
+const ROSTERS: Record<string, readonly { id: string }[]> = { cambrian: CAMBRIAN.creatures, devonian: DEVONIAN.creatures, triassic: TRIASSIC.creatures };
+for (const mode of viewerModes) {
+  const key = new URLSearchParams(mode.query).get('specimen') ?? '';
+  const [era, id] = key.split(':');
+  ok(ROSTERS[era]?.some((c) => c.id === id), `${mode.name} opens on an animal that exists (${key})`);
+}
+// Sculpt is offered only where a builder authors a profile table by hand, so it must not be
+// pointed at a Triassic animal, where the mode refuses and opens the plain view instead.
+const sculpt = viewerModes.find((m) => m.query.includes('mode=sculpt'));
+ok(sculpt && !sculpt.query.includes('specimen=triassic:'), 'the sculpt link opens on an animal that can be sculpted');
+
+// A game parameter has to be one the code still reads: the module named in `reads` must mention it.
+for (const param of DEBUG_PARAMS) {
+  const [name, value] = param.query.split('=');
+  const source = readFileSync(param.reads, 'utf8');
+  ok(source.includes(`'${name}'`), `${param.name} names the parameter ${param.reads} reads`);
+  ok(source.includes(`'${value}'`), `...and the value it checks for (${value})`);
+}
+// Every game gets every parameter, the not-yet-open one included: /triassic/ opens by address.
+eq(DEBUG_GAMES.map((g) => g.id), GAMES.map((g) => g.id), 'the index offers every game, coming-soon or not');
+ok(DEBUG_GAMES.some((g) => g.comingSoon), 'including the one the plate does not link to');
+for (const game of DEBUG_GAMES) {
+  ok(existsSync(`${game.path}index.html`), `${game.title} has an entry page for the parameters to open`);
+  for (const param of DEBUG_PARAMS) ok(paramHref(game, param) === `${game.path}?${param.query}`, `${game.title} ?${param.query}`);
+}
+// Only the state editor replaces the game; the others change it and would be a lie if they said so.
+eq(DEBUG_PARAMS.filter((p) => p.replacesGame).map((p) => p.id), ['local'], 'one parameter replaces the game');
+
+// This page's own parameter is the draft switch, and listing it here is the one place that is
+// allowed to: the index is not a draft, and a visitor is never sent to it.
+eq(DEBUG_SELF.map((p) => p.id), ['version'], 'this page offers its draft parameter');
+eq(parseVersion(`?${DEBUG_SELF[0].query}`), 1, 'and the parameter it prints really reaches the first draft');
+
+// No two rows may claim one URL, or the index is quietly listing a tool twice under two names.
+const hrefs = everyHref();
+eq(hrefs.length, new Set(hrefs).size, 'every row in the debug index has its own URL');
+// Every row says what the tool is for. The index exists because knowing the parameter meant knowing
+// the tool; a name with no sentence behind it would leave that exactly where it was.
+for (const entry of [...DEBUG_PAGES, ...DEBUG_PARAMS, ...DEBUG_SELF]) {
+  ok(entry.blurb.length > 60, `${entry.name} is described, not just named`);
+  ok(entry.name.length > 0 && !entry.name.endsWith('.'), `${entry.name} is a name rather than a sentence`);
+}
+for (const page of DEBUG_PAGES) for (const mode of page.modes ?? []) ok(mode.blurb.length > 60, `${page.name} / ${mode.name} is described`);
+
+// A developer opening the index is not a visit to the trilogy page. The workbench is not counted
+// either, and for the same reason; the counter is for who plays, not for who is working on it.
+const entry = readFileSync('src/ancientseas/main.tsx', 'utf8');
+ok(/if \(!index\) installStats\(\)/.test(entry), 'the debug index is not counted as a visit');
+ok(/installStats/.test(entry), 'and an ordinary visit still is');
+
+// The index is a contents list, not a second composition: it must not pull in the plate's art.
+const indexSource = readFileSync('src/ancientseas/DebugIndex.tsx', 'utf8');
+ok(!/<img|ART_DIR|sourceFor|SLOTS/.test(indexSource), 'the debug index draws no pictures');
 
 console.log(`ancientseas: ${passes} checks passed`);

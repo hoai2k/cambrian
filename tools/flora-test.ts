@@ -191,6 +191,11 @@ for (const kind of ['stromatolite', 'saltCrust', 'mudRipple'] as const) {
   for (let i = 0; i < N; i++) { g.step(1 / 60, m); g.events.length = 0; maxActive = Math.max(maxActive, g.world.activeFlora.length); }
   const ms = (performance.now() - t0) / N;
   console.log(`full world: ${g.actors.length} actors, ${g.world.flora.length} plants, step ${ms.toFixed(2)} ms, up to ${maxActive} plants bent at once`);
+  // 8 ms is a ceiling with room under it, not a target, and the room is the point: this is wall
+  // clock, and the same commit has measured 6.6 ms on one quiet 4-core machine and 8.9 ms on
+  // another. A threshold set near whatever the fastest machine to hand reports is a coin flip
+  // everywhere else, and a guard that fails half the time is one nobody reads. At the time of
+  // writing a full world's step is about 5.5 ms on the slower of those two.
   check('step stays cheap', ms < 8, `${ms.toFixed(2)} ms/step`);
 }
 console.log(failed ? `${failed} FAILED` : 'all passed');
