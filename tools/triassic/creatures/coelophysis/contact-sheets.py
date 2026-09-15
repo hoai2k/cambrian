@@ -33,16 +33,16 @@ sets['paired-gait-sheet'] = ([f'{c}-{t}-cside' for c, t in run_frames]
 for sheet, names in sets.items():
     w, h = 360, 280
     cols = 2 if len(names) < 4 else 4
-    rows = (len(names) * 2 + cols - 1) // cols
+    rows = (len(names) + cols - 1) // cols
     img = Image.new('RGB', (w * cols, h * rows), (28, 34, 40))
     d = ImageDraw.Draw(img)
     for i, n in enumerate(names):
-        for j, kind in enumerate(['authored', 'puppet']):
+        for j, kind in enumerate(['authored']):
             p = base / (kind + '-review') / (n + '.png')
             assert p.exists(), p
             src = Image.open(p).convert('RGBA')
             src.thumbnail((w, h - 26))
-            index = i * 2 + j
+            index = i
             x = (index % cols) * w
             y = (index // cols) * h
             img.paste(src, (x + (w - src.width) // 2, y + 24), src)
