@@ -202,6 +202,10 @@ LIMB_MASK = limb_vertex_mask(auth, blades, cx0, cz0)
 cx, cz, half_width, half_depth, centreline = trunk_centreline(auth, thin_mask | LIMB_MASK)
 blades, other = find_blades(cx, cz)
 assert len(blades) == 4, ('four flippers did not measure on the corrected axis', len(blades))
+# Kept now: the report is written after the jaw cut has added vertices to the mesh, and a cluster
+# pass run then indexes a thickness array that no longer matches it.
+ALL_CLUSTERS = [{k: v for k, v in c.items() if k != 'indices'}
+                for c in T.thin_clusters(auth, thin_mask, cx, cz)]
 # What the correction was worth, as a number rather than an assurance.
 CENTRELINE_SHIFT = {
     'maxShiftXOverBodyLength': float(max(abs(r['cx'] - cx(r['y'])) for r in rough_centreline)),
@@ -238,9 +242,11 @@ for key, c in LIMBS.items():
     _dorsal.append({'limb': key, 'centroidZOverAxis': float(c['centroid'][2] - cz(mid))})
 assert all(r['centroidZOverAxis'] < 0 for r in _dorsal), ('a flipper is above the axis -- the '
                                                           'frame may be rolled', _dorsal)
-_shell_band = (raw_co[:, 1] > -.20) & (raw_co[:, 1] < .28)
-_above = float((raw_co[_shell_band][:, 2] - np.array([cz(float(y)) for y in raw_co[_shell_band][:, 1]])).max())
-_below = float((raw_co[_shell_band][:, 2] - np.array([cz(float(y)) for y in raw_co[_shell_band][:, 1]])).min())
+# Measured over the trunk itself, with the flippers dropped: they hang below the axis (which is
+# the reading above) and would otherwise answer this question as well as that one.
+_shell_band = (raw_co[:, 1] > -.20) & (raw_co[:, 1] < .28) & ~LIMB_MASK & ~thin_mask
+_rel = raw_co[_shell_band][:, 2] - np.array([cz(float(y)) for y in raw_co[_shell_band][:, 1]])
+_above, _below = float(_rel.max()), float(_rel.min())
 DORSAL_EVIDENCE = {'flippers': _dorsal, 'trunkRiseAboveAxis': _above, 'trunkDropBelowAxis': _below,
                    'note': 'the carapace dome stands further above the axis than the plastron '
                            'falls below it, and all four flippers hang below: dorsal is +Z'}
@@ -284,7 +290,10 @@ RAMP_DEVIATION_OVER_RADIUS = float(np.max(
     np.abs(_resid) / np.array([max(half_depth(float(y)), 1e-4) for y in _sy])))
 
 # What relief the generated beak carries, recorded rather than added to.
-SNOUT_CO, PROUD, PATCHES = T.protrusions(auth, y_front=HEAD_BACK, floor=.0020)
+# **A turtle has no teeth**, so the floor here is set where a real crown would be rather than
+# where the beak's own ridging and the head's scutes are: at 0.0020 the pass returns two patches
+# a tenth of a body long, which are the head's relief and not dentition.
+SNOUT_CO, PROUD, PATCHES = T.protrusions(auth, y_front=HEAD_BACK, floor=.0055)
 
 # The centreline table is 61 stations over a whole body and far too coarse for a head this small,
 # so the head gets its own fine profile and the mouth's own section is ray cast from the seam.
@@ -349,7 +358,7 @@ def bone(n, p, parent):
     B[n] = (Vector(p), parent)
 
 
-NECK_Y = [-.315, -.360]                  # a sea turtle's neck is short and barely retractile
+NECK_Y = [-.300, -.336, -.368]           # short, and three joints so the bend is a curve
 CHEST_Y, BODY_Y = -.235, .030
 TAIL_Y = [.400, .462]
 bone('root', (0, 0, 0), None)
@@ -384,7 +393,11 @@ for key, c in LIMBS.items():
     LIMB_NAMES[key] = names
     LIMB_PTS[key] = pts
     LIMB_SEATING[names[0]] = depth(root)
-    parent = 'chest' if kind == 'fore' else 'body'
+    # **Both pairs hang off `body`, not off `chest`.** A turtle's shoulder girdle is *inside* the
+    # shell and does not move relative to it, so a forelimb rooted on a bone that carries the
+    # neck's wave drags the front of the carapace with every stroke: rooted on `chest` the skin
+    # tore 5.37x, and `chest` alone dominated four fifths of the torn edges in Sprint.
+    parent = 'body'
     for i, n in enumerate(names):
         bone(n, pts[i], parent if i == 0 else names[i - 1])
 for n, d in LIMB_SEATING.items():
@@ -411,13 +424,16 @@ for key, pts in LIMB_PTS.items():
 # 55th, which leaves half a hydrofoil on a partial alpha and lets the relaxation spread trunk
 # weight out along it; Rhaeticosaurus needed the 92nd, and this forelimb is longer still relative
 # to its trunk. Measured here at 0.94.
-LIMB_PERCENTILE = .94
+# Measured on this body: at the 92nd percentile the blade's outer sixth sits on a partial alpha
+# and the skin tore 5.11x across the shoulder; at the 99th the whole blade is the limb's and the
+# blend band lies on the trunk instead, where the along-limb ramp already holds it down.
+LIMB_PERCENTILE = .99
 LIMB_RADIUS = {}
 for key, c in LIMBS.items():
     P, cum, _n, _r = LIMB_FIT[key]
     d = [T.project(P, cum, Vector(raw_co[i]))[0] for i in c['indices']]
-    LIMB_RADIUS[key] = (float(np.quantile(d, LIMB_PERCENTILE)),
-                        float(np.quantile(d, .995)) + .025)
+    rin = float(np.quantile(d, LIMB_PERCENTILE))
+    LIMB_RADIUS[key] = (rin, rin + .055)
 # **The inter-joint blend is a fraction of the limb's own length, never a constant.** Copied onto
 # a shorter chain as a number it overruns the four-influence budget and the relaxation then trims a
 # different four on neighbouring vertices, which is where radiating spikes come from. Each limb's
@@ -433,7 +449,7 @@ def limb_weights(q):
         if dist >= rout:
             continue
         alpha = (1. if dist <= rin else T.smooth(1 - (dist - rin) / (rout - rin)))
-        alpha *= T.smooth(s / max(cum[1] * .75, 1e-6))
+        alpha *= T.smooth(s / max(cum[1] * 1.15, 1e-6))
         if alpha > best:
             best = alpha
             chosen = (T.limb_chain(names, cum, s, blend=LIMB_BLEND[key]), rootw,
@@ -559,7 +575,7 @@ for o in (auth, puppet):
     for n in B:
         o.vertex_groups.new(name=n)
     raw_weights = [weights(v.co) for v in o.data.vertices]
-    relaxed = T.relax_weights(o, raw_weights, passes=4, hold=.45)
+    relaxed = T.relax_weights(o, raw_weights, passes=5, hold=.45)
     counts, owners = [], {}
     for v in o.data.vertices:
         w = relaxed[v.index]
@@ -653,19 +669,38 @@ for idx, p in enumerate(lining_raw):
 # the mandible's rear rim, the throat and the lining all meet and the wedge between them is what
 # opens at full gape.
 hinge_mat = T.vertex_colour_material(NAME + ' jaw hinge body', roughness=.62)
-HINGE_CENTRE = (cx(HINGE_Y), HINGE_Y + .003, cz(HINGE_Y))
-HINGE_R = (half_width(HINGE_Y) * .92, .034, half_depth(HINGE_Y) * .98)
-HINGE_FIT = 0.
+# **Sized off the head's own fine profile, not the trunk table.** The 61-station centreline runs
+# over a whole body and is smoothed across five of them, so at the beak it reports a section half
+# again as deep as the head really is.
+#
+# **And `depth()` cannot *seat* anything beside a modelled mouth, which is the trap here because it
+# looks as if it can.** Rhaeticosaurus shrinks this envelope until every probe point reads a
+# positive depth, and that works because its generation paints its mouth on a closed head. This one
+# models the slit: the lumen's own walls fold into the skull within a couple of hundredths of the
+# hinge, so `find_nearest` returns one of them and the inside/outside sign it reports is the sign
+# of that wall's normal rather than of the skull's. Measured here the search called the envelope
+# *outside* the body at every size from 0.17 to 1.00 of its nominal radius and inside below that --
+# a discontinuity that is the slit being found, not the head being small. Placodus and Henodus both
+# record this rather than asserting on it, for the same reason. So the probe is recorded and what
+# actually proves the corner of the mouth is closed is `tools/triassic/gape-solid.py`, which is
+# what the era's rule asks for in the first place.
+HINGE_CENTRE = (cx(HINGE_Y), HINGE_Y + .002, cz(HINGE_Y))
+HINGE_R = (head_half_width(HINGE_Y) * .88, .016, head_half_depth(HINGE_Y) * .88)
+HINGE_FIT = .55
+HINGE_TRACE = []
 for step in range(24):
     k = 1. - step / 24
     probe = [Vector((HINGE_CENTRE[0] + HINGE_R[0] * k * math.sin(b) * math.cos(a),
                      HINGE_CENTRE[1] + HINGE_R[1] * k * math.sin(b) * math.sin(a),
                      HINGE_CENTRE[2] + HINGE_R[2] * k * math.cos(b)))
              for a in np.linspace(0, 2 * pi, 20) for b in np.linspace(0, pi, 11)]
-    if min(depth(q) for q in probe) > .0025:
-        HINGE_FIT = k
-        break
-assert HINGE_FIT > .25, ('the hinge envelope could not be seated', HINGE_FIT)
+    HINGE_TRACE.append([round(k, 3), round(min(depth(q) for q in probe), 5)])
+HINGE_PROBE = {'centre': list(HINGE_CENTRE), 'nominalRadiusRaw': list(HINGE_R),
+               'centreDepthRaw': float(depth(Vector(HINGE_CENTRE))), 'fractionUsed': HINGE_FIT,
+               'minimumProbeDepthAtEachSize': HINGE_TRACE,
+               'note': 'recorded, not asserted: a point beside a modelled slit is measured against '
+                       'the slit\'s own wall, whose normal faces into the lumen, so the '
+                       'inside/outside sign is not the skull\'s. The gape proof is the real check.'}
 bpy.ops.mesh.primitive_uv_sphere_add(segments=18, ring_count=10, location=tx(HINGE_CENTRE))
 hinge = bpy.context.object
 hinge.name = 'Seated jaw hinge tissue'
@@ -690,11 +725,24 @@ mo.object = rig
 hinge.parent = rig
 oralparts.append(hinge)
 
+# **Recorded against `depth()`, asserted against the head's own section.** Same reason as the hinge
+# probe: beside a modelled slit the nearest-surface sign is the slit wall's rather than the skull's,
+# so `depth` is evidence and not a test here. What *is* a test, and uses no normals at all, is
+# whether every oral vertex lies inside the head's measured section at its own station -- the 48-
+# station fine profile of the front of the body, taken from the vertex cloud by percentile.
 oral_seating = []
 for o in oralparts:
     worst = min(depth(Vector(v.co[:]) / SCALE) for v in o.data.vertices)
-    oral_seating.append({'part': o.name, 'worstDepthRaw': float(worst)})
-    assert worst > -.012, ('mouth geometry breaks the skin', o.name, worst)
+    out_w, out_d = 0., 0.
+    for v in o.data.vertices:
+        q = Vector(v.co[:]) / SCALE
+        out_w = max(out_w, abs(q.x - cx(q.y)) - head_half_width(q.y))
+        out_d = max(out_d, abs(q.z - cz(q.y)) - head_half_depth(q.y))
+    oral_seating.append({'part': o.name, 'worstDepthRaw': float(worst),
+                         'outsideHeadHalfWidthRaw': float(out_w),
+                         'outsideHeadHalfDepthRaw': float(out_d)})
+    assert out_w < .006 and out_d < .006, ('mouth geometry stands outside the head\'s own section',
+                                           o.name, out_w, out_d)
 
 # ------------------------------------------------------- measured paired profile ----
 AUTH_GROUP = [auth, parts['lower jaw'][auth.name]]
@@ -762,8 +810,11 @@ def reset():
 # below is measured from the limb's own direction.
 AXIAL_CHAIN = ['neck_01', 'neck_00', 'chest', 'body'] \
     + ['tail_%02d' % i for i in range(len(TAIL_Y))]
-GAIN = [.34, .24, .05, .00, .18, .34]
-LAG = [0., .35, .8, 1.1, 1.45, 1.8]
+# **`chest` is given exactly nothing.** The shoulder girdle of a turtle is fused inside the
+# carapace; a bone there that carries any part of the neck's wave, or any part of a turn, moves
+# relative to the rigid shell beside it and tears the seam between them.
+GAIN = [.40, .30, .18, .00, .00, .20, .36]
+LAG = [0., .28, .55, .9, 1.15, 1.5, 1.85]
 SIDE = {k: (1. if k.endswith('R') else -1.) for k in LIMB_NAMES}
 # The hind pair trails the fore by a fifth of a cycle: it steers in the forelimbs' wake rather
 # than adding thrust, which is what a sea turtle's hind flippers do.
@@ -805,13 +856,20 @@ for clip, duration in CLIPS.items():
             return (sin(p * f_ - LAG[i]) - (0. if loop else sin(-LAG[i]))) * env
 
         cock = spike(u, .00, .40, 1.4) if clip in ('Attack', 'Heavy') else 0.
-        drive = ramp(u, .30, .46, 2.2) * (1 - ramp(u, .62, 1., 1.)) if clip in ('Attack', 'Heavy') else 0.
+        # **Attack lets go; Heavy does not.** The two clips share their cock and their drive, and
+        # the only thing that separates a crush from a snatch is how long the beak stays on the
+        # target: Attack's drive falls away from 0.62 of the clip, Heavy's holds to 0.80. Built with
+        # one release for both, the measured dwell at full reach came out 0.347 against 0.327 --
+        # two names for one clip.
+        _release = (.80, 1.) if clip == 'Heavy' else (.62, 1.)
+        drive = (ramp(u, .30, .46, 2.2) * (1 - ramp(u, _release[0], _release[1], 1.))
+                 if clip in ('Attack', 'Heavy') else 0.)
         snap = spike(u, .34, .58, 2.6) if clip in ('Attack', 'Heavy') else 0.
         # **Heavy is the crush, and it is longer rather than further.** Archelon is not a snatcher:
         # its heavy attack holds an ammonite in the beak and bears down, so the clip stays on the
         # target and the drive is held. It still has to be measurably a different clip from Attack,
         # which here means a longer hold and a wider bite rather than more reach.
-        hold = ramp(u, .40, .52, 1.6) * (1 - ramp(u, .72, .96, 1.)) if clip == 'Heavy' else 0.
+        hold = ramp(u, .44, .56, 1.6) * (1 - ramp(u, .84, 1., 1.)) if clip == 'Heavy' else 0.
         # `Ability` is the power stroke: both forelimbs at once, one enormous synchronised downbeat
         # and a long glide out of it.
         load = ramp(u, .02, .22, 1.6) * (1 - ramp(u, .24, .34, 2.0)) if clip == 'Ability' else 0.
@@ -895,7 +953,7 @@ for clip, duration in CLIPS.items():
         for i, n in enumerate(AXIAL_CHAIN):
             q = pb[n]
             z = .10 * GAIN[i] * amp * wave(i, beat)
-            z += turn * (.028 + .004 * i)
+            z += 0. if n == 'chest' else turn * (.028 + .004 * i)
             z += .050 * dead * sin(i * .8)
             if clip in ('Attack', 'Heavy'):
                 if n.startswith('neck') or n == 'skull':
@@ -914,12 +972,12 @@ for clip, duration in CLIPS.items():
             # The head is put on the prey by the neck straightening: short, so the reach is modest
             # and the strike is the beak closing rather than the neck flying out.
             pb['skull'].rotation_euler.x += -.18 * cock + .28 * drive + .10 * hold
-            for n in ('neck_00', 'neck_01'):
+            for n in ('neck_00', 'neck_01', 'neck_02'):
                 pb[n].rotation_euler.x += -.14 * cock + .20 * drive + .08 * hold
                 pb[n].rotation_euler.y += .10 * hold
         if clip == 'Eat':
             pb['skull'].rotation_euler.z += .10 * sin(p * 2)
-            pb['neck_01'].rotation_euler.x += -.10 * sin(p * 2)
+            pb['neck_02'].rotation_euler.x += -.10 * sin(p * 2)
         if clip == 'Grab':
             pb['skull'].rotation_euler.z += .08 * haul
 
@@ -931,14 +989,17 @@ for clip, duration in CLIPS.items():
             ph = p * beat - STROKE_LAG[kind]
             stroke = sin(ph)
             fore_aft = cos(ph)
-            reach = {'Sprint': .95, 'Swim': .72, 'Idle': .24,
+            # The stroke's reach is the animal's, not the clip's energy: a flipper sweeps the same
+            # arc and beats harder. Measured, Sprint at 0.95 swept 126 degrees at the root and the
+            # shoulder skin tore 5.1x; 0.80 is still a 100-degree stroke.
+            reach = {'Sprint': .80, 'Swim': .64, 'Idle': .24,
                      'Breathe': .26, 'Eat': .22, 'Guard': .20, 'Grab': .22}.get(clip, .26)
             gainf = 1.0 if kind == 'fore' else .58
             up.rotation_euler.y = s * reach * stroke * gainf
             up.rotation_euler.z = s * .30 * reach * fore_aft * gainf
             up.rotation_euler.x = -.34 * reach * fore_aft * gainf
             if clip == 'Ability':
-                up.rotation_euler.y = s * (.55 * load - 1.15 * power) * gainf
+                up.rotation_euler.y = s * (.50 * load - 1.00 * power) * gainf
                 up.rotation_euler.z = s * (.22 * load + .10 * power) * gainf
                 up.rotation_euler.x = -.30 * load + .20 * power
             if clip in ('Dive', 'Rise'):
@@ -955,7 +1016,7 @@ for clip, duration in CLIPS.items():
             if clip == 'Parry':
                 up.rotation_euler.z += s * .36 * e
             if clip == 'Dodge':
-                up.rotation_euler.y += s * .60 * e
+                up.rotation_euler.y += s * .42 * e
             if clip in ('Hit', 'Stagger'):
                 up.rotation_euler.y += s * .32 * e * sin(p)
             if clip in ('Breath', 'Breathe'):
@@ -1157,8 +1218,7 @@ report = {
     'dorsalEvidence': DORSAL_EVIDENCE,
     'centreline': centreline, 'roughCentreline': rough_centreline,
     'centrelineCorrection': CENTRELINE_SHIFT,
-    'measuredClusters': [{k: v for k, v in c.items() if k != 'indices'}
-                         for c in T.thin_clusters(auth, thin_mask, cx, cz)],
+    'measuredClusters': ALL_CLUSTERS,
     'limbs': {k: {'seat': list(LIMB_PTS[k][0]), 'reach': list(LIMB_PTS[k][-1]),
                   'joints': len(LIMB_NAMES[k]),
                   'radiusInner': LIMB_RADIUS[k][0], 'radiusOuter': LIMB_RADIUS[k][1],
@@ -1198,7 +1258,7 @@ report = {
         'liningJawShare': lining_jaw,
         'toothPatches': tooth_report, 'toothPatchesStraddlingTheCut': straddling,
         'authoredToothRows': [],
-        'oralPartSeating': oral_seating,
+        'oralPartSeating': oral_seating, 'hingeEnvelopeProbe': HINGE_PROBE,
     },
     'envelope': {k: profile_report[k] for k in
                  ('maximumEnvelopeDifference', 'maximumEnvelopeDifferenceFractionOfBodyLength',

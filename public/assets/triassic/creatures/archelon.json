@@ -1,0 +1,63 @@
+{
+  "id": "archelon",
+  "name": "Archelon",
+  "species": "Archelon ischyros",
+  "provenance": "Late Cretaceous \u00b7 Pierre Shale, Western Interior Seaway",
+  "offRoster": true,
+  "description": "The largest turtle known: a strut framework of ribs under a leathery back, a hooked beak for ammonites and two hydrofoil forelimbs it flies on. Authored Tripo body and measured procedural volume twin share one armature, one set of inverse binds, one set of sockets and one set of actions.",
+  "modelLength": 5.0,
+  "lengthMeters": 4.6,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth",
+    "Breathe"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "Breathe"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "puppet": "archelon.puppet.glb",
+  "sources": [
+    "tools/triassic/creatures/archelon/tripo-raw/archelon.raw.glb",
+    "tools/triassic/creatures/archelon/tripo-raw/input.png"
+  ],
+  "notes": [
+    "Off the roster on purpose: Archelon is Late Cretaceous, not Triassic, and is registered in src/content/triassic/expansion.json rather than in TRIASSIC_CREATURES. It reaches the game as a standing visitor and is in no sea and no population table.",
+    "Underwater flight, and the clip set is built around it: the shell is a box that pitches and rolls but never undulates, and the two hydrofoil forelimbs carry the animal with the hind pair steering a fifth of a cycle behind them.",
+    "The carapace is a rigid part on its own bone, as Placodus' gastral basket and Henodus' carapace are. It is never keyed, and the constant channels forced sampling writes for it are stripped from the packaged file, so the shell carries no animation at all.",
+    "The centreline is measured twice: the kit's median-of-thick-vertices pass to find the flipper clusters, then the mid-range of the 4th and 96th percentiles over everything neither thin nor nearer a flipper than the rough axis. On a body 0.94 wide against 1.00 long the kit's median is dragged off the animal.",
+    "The mouth is modelled and the cut is geometric -- Placodus' method, asked about the head rather than about the kit's front third, which on this body reaches the middle of the shell and collects forelimb-against-plastron gaps instead of a mouth.",
+    "The twin resurfaces a voxel occupancy field of the authored body, relaxes it and reduces the new topology. It reuses no source vertex or face.",
+    "Living colours, soft tissues and movements are artistic reconstruction. World travel remains engine-owned."
+  ]
+}
