@@ -656,8 +656,17 @@ unless the user explicitly asks for a PR. Steps:
   real one. `npm run visitors` covers all three eras; the apex scales and asset folders are written
   out in `src/content` (which may not reach up into `src/sim`) and checked against the real
   constants there, so they cannot drift. Apex is *how* one is earned, so the results screen says so
-  — a star on each apex card, the same mark the Visitors button carries, and a line naming the two
-  games it is now playable in. `npm run results` renders that panel on its own and reads the
+  — a star on each apex card, the same mark the Visitors button carries, and one line under the
+  strip. That line never **names** a game: which games there are, and how many, is a thing that
+  changes — the trilogy has already gained one and one of them is not released yet — so it says
+  *where* ("the other Ancient Seas games") rather than *which*, and stays true through all of it.
+  The trilogy's own name is fine and so is the game's; a *sibling game's title* is the thing to
+  keep out of a game. A visitor's crew card still says "Devonian", which is the period the animal
+  is from and is already on every creature card as provenance, not a pointer at another game. **Nothing says so before it is earned.** Visitors are found, not
+  promised: a player with an empty apex strip is told nothing, the other games are not named, and
+  the word does not appear — the same secret the pick grid keeps by leaving the Visitors button out
+  until there is something behind it. A line advertising the reward to somebody who has none spends
+  the surprise for nothing, and `npm run results` checks the silence as carefully as the message. `npm run results` renders that panel on its own and reads the
   markup, because a results screen only exists after a match ends and a headless browser gets too
   few frames under the software renderer to finish one; its last check walks the promise end to
   end, from the record the screen draws to the visitor list the other games build out of it.
