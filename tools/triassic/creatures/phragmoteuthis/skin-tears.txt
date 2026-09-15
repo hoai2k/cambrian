@@ -1,5 +1,5 @@
 
-public/assets/triassic/creatures/phragmoteuthis.glb   32630 edges x 17 phases x 21 clips
+public/assets/triassic/creatures/phragmoteuthis.glb   32898 edges x 17 phases x 21 clips
 clip            skin  on bone             all     >2x  worst bones
 Guard          6.73x  arm_09_04         6.73x    4367  0.019->0.130  arm_05_02:1478 mantle_R:651 arm_05_01:532 body:286
 TurnRight      6.65x  fin_L_01          6.65x      69  0.012->0.077  body:33 fin_L_01:33 fin_L_00:3

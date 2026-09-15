@@ -377,6 +377,8 @@ mouth_cut = {}
 for o, key in ((auth, 'authored'), (puppet, 'twin')):
     n, pts = cut_peristome(o)
     mouth_cut[key] = {'facesRemoved': int(n), 'rimVertices': int(len(pts))}
+    if key == 'authored':
+        PERISTOME = pts
     assert n >= (7 if key == 'authored' else 3), ('the peristome cut found no faces on the ' + key, n)
     assert len(pts) >= (9 if key == 'authored' else 5), ('the peristome left no rim on the ' + key, len(pts))
 mouth_cut.update({'centre': MOUTH_P.round(5).tolist(), 'normal': M_N.round(4).tolist(),
@@ -671,86 +673,17 @@ def mouth_point(a, dn, ds):
     return Vector((MOUTH_P + M_N * a + M_DN * dn + M_DS * ds).tolist())
 
 
-def build_lining():
-    verts, raw, faces = [], [], []
-    for i in range(LINING_RINGS):
-        u = i / (LINING_RINGS - 1)
-        a = -LINING_DEPTH * u + MOUTH_R * .18
-        r = MOUTH_R * (1.02 - .78 * smooth(max(0., (u - .35) / .65)))
-        for j in range(LINING_RING):
-            th = j * 2 * pi / LINING_RING
-            p = mouth_point(a, r * math.sin(th), r * math.cos(th))
-            raw.append(np.array(p[:]))
-            verts.append(tx(p))
-    for i in range(LINING_RINGS - 1):
-        for j in range(LINING_RING):
-            x = i * LINING_RING + j
-            y = i * LINING_RING + (j + 1) % LINING_RING
-            faces.append((x, y, y + LINING_RING, x + LINING_RING))
-    faces.append(tuple(reversed(range(LINING_RING))))
-    faces.append(tuple(range((LINING_RINGS - 1) * LINING_RING, LINING_RINGS * LINING_RING)))
-    me = bpy.data.meshes.new(NAME + ' oral lining')
-    me.from_pydata(verts, [], faces)
-    me.update()
-    o = bpy.data.objects.new(NAME + ' oral lining', me)
-    bpy.context.collection.objects.link(o)
-    o.data.materials.append(mouth_material)
-    for n in ('skull', 'jaw'):
-        o.vertex_groups.new(name=n)
-    for idx, p in enumerate(raw):
-        _a, dn, _ds = mouth_local(p)
-        u = idx // LINING_RING / (LINING_RINGS - 1)
-        g = max(0., min(1., .5 + .5 * dn / max(MOUTH_R, 1e-9))) * (1 - smooth(max(0., (u - .45) / .55)))
-        o.vertex_groups['jaw'].add([idx], g, 'REPLACE')
-        o.vertex_groups['skull'].add([idx], 1 - g, 'REPLACE')
-    for p in o.data.polygons:
-        p.use_smooth = True
-    mod = o.modifiers.new('Oral membrane', 'ARMATURE')
-    mod.object = rig
-    o.parent = rig
-    return o
+_lining, _lining_raw = T.crown_lining(
+    NAME + ' oral lining', rig, tx, PERISTOME, MOUTH_P, M_N, M_DN, M_DS,
+    into_head=LINING_DEPTH, skin_weights=lambda q: weights(q, 0.), material=mouth_material,
+    rings=LINING_RINGS, ring=LINING_RING)
+oralparts.append(_lining)
 
 
-oralparts.append(build_lining())
-
-
-def build_mandible(name, bone_name, sign):
-    SECT = 7
-    verts, faces = [], []
-    for i in range(SECT):
-        u = i / (SECT - 1)
-        a = -MOUTH_R * .55 + MOUTH_R * .75 * u
-        dn = sign * MOUTH_R * (.26 - .30 * u ** 2)
-        w = MOUTH_R * (.62 - .52 * u) * (1 - .25 * u)
-        h = MOUTH_R * (.30 - .26 * u)
-        base = len(verts)
-        for sx, sz in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
-            verts.append(tx(mouth_point(a, dn - sz * h * sign, sx * w)))
-        if i:
-            for j in range(4):
-                k = (j + 1) % 4
-                faces.append((base - 4 + j, base - 4 + k, base + k, base + j))
-    faces.append((0, 1, 2, 3))
-    faces.append((len(verts) - 1, len(verts) - 2, len(verts) - 3, len(verts) - 4))
-    me = bpy.data.meshes.new(name)
-    me.from_pydata(verts, [], faces)
-    me.update()
-    o = bpy.data.objects.new(name, me)
-    bpy.context.collection.objects.link(o)
-    o.data.materials.append(beak_material)
-    g = o.vertex_groups.new(name=bone_name)
-    g.add(list(range(len(o.data.vertices))), 1., 'REPLACE')
-    for p in o.data.polygons:
-        p.use_smooth = False
-    mod = o.modifiers.new('Rigid mandible', 'ARMATURE')
-    mod.object = rig
-    o.parent = rig
-    return o
-
-
-oralparts.append(build_mandible(NAME + ' upper mandible', 'skull', -1))
-oralparts.append(build_mandible(NAME + ' lower mandible', 'jaw', 1))
-lining_back = mouth_point(-LINING_DEPTH + MOUTH_R * .18, 0, 0)
+for _label, _bone, _sign in ((' upper mandible', 'skull', -1), (' lower mandible', 'jaw', 1)):
+    oralparts.append(T.crown_beak(NAME + _label, rig, _bone, tx, MOUTH_P, M_N, M_DN, M_DS,
+                                  MOUTH_R, _sign, beak_material))
+lining_back = Vector(np.asarray(_lining_raw)[-LINING_RING:].mean(0).tolist())
 lining_depth_raw = depth(lining_back)
 assert lining_depth_raw > .003, ('the lining reaches outside the head', round(float(lining_depth_raw), 5))
 

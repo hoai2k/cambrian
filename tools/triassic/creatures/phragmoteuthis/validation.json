@@ -176,12 +176,12 @@
     "bladeDilation": 0.0022
   },
   "puppetTriangleTarget": 7200,
-  "fullTriangles": 20139,
-  "puppetTriangles": 7613,
+  "fullTriangles": 20387,
+  "puppetTriangles": 7861,
   "parts": {
     "authoredBody": 19591,
     "twinBody": 7065,
-    "sharedOral": 548
+    "sharedOral": 796
   },
   "bones": 77,
   "clips": {
@@ -1179,7 +1179,7 @@
     "liningRings": 16,
     "liningRing": 14,
     "liningDepth": 0.05498738440782972,
-    "liningNearestSurfaceDepthRaw": 0.01314,
+    "liningNearestSurfaceDepthRaw": 0.03351,
     "skinDoubleSided": true,
     "liningCullsBackfaces": true,
     "oneClosedLining": true,
