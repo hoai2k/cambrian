@@ -58,6 +58,22 @@ so the roll correction is 4.5°. Countershading strength 0.47 over 24 stations.
 | Gape solid | **9 px** of 378,000 (tolerance 12) |
 | Idle bones | every joint owns skin |
 
+## The axis, checked rather than assumed
+
+`measured_centreline` is the median of the **thick** vertices, and on a sprawling quadruped that is
+wrong: a leg is thick, so the median is dragged into the armpit and the axis can leave the skin
+altogether — which is what happens on Odontochelys, and what Mystriosuchus failed a build on. This
+animal's four paddles are blades and the thin mask takes them out, so the kit's axis is right here.
+That is a *measurement*, not an assumption, and the build checks it along the animal's whole length:
+the worst station reads **0.0086 inside the skin**, at the thin end of the tail.
+
+The reading has to be **parity**, not the signed depth probe. This generation models its mouth, so
+the axis runs down the lumen over the front sixth of the animal, where the nearest surface to it is
+the lumen wall and the probe's sign is backwards — taken that way the axis reads 0.0054 *outside*
+the animal at the rostrum, which is the mouth and not a fault. The three stations in front of
+y −0.27 are recorded and excluded for that reason, and the tail's last stations for the plainer one
+that the animal becomes a thread.
+
 ## The paddles
 
 Four broad blades, found by connectivity on the measured shell thickness. **The rostrum is thin
@@ -73,6 +89,13 @@ them. The radius inside which a vertex is wholly the limb's is the **92nd percen
 blade's own distances to its polyline — the figure Rhaeticosaurus had to move the kit's 55th
 percentile to, re-measured here rather than inherited.
 
+The blend between the joints of a chain is a **fraction of that chain's own length** (0.16, giving
+0.034–0.042 on these blades) rather than a number copied from another animal. Rhaeticosaurus' 0.050
+is 0.16 of a flipper reaching 0.30 from the axis; as a *number* on a shorter chain it is more than a
+whole segment wide, every vertex then carries all four joints at nearly equal weight, that busts the
+four-influence budget, and the relaxation trims a different four on neighbouring vertices — which is
+Cartorhynchus' radiating spikes. Mean influences here: 3.10 of a maximum of 4.
+
 ## The mouth
 
 **Modelled**, which makes this the easy case of the three the pipeline records. Placodus' geometric
@@ -83,6 +106,13 @@ cut would have deviated 0.0075 raw, 0.177 of the local radius; the curve used de
 the measured line. The albedo read (`painted_line`) is taken as a second opinion and recorded in
 `validation.json`; it agrees to 0.177 of the local radius, which is a corroboration rather than a
 measurement.
+
+**The head's own section must read only the head**, and the build asserts it both ways: no head
+station may read more than three times the head's median half depth (worst 0.046 against a median
+0.029 — nothing reaches this head, the nearest paddle starting 0.08 behind the last head station),
+and the seam itself must stay inside the animal (worst clearance **0.0211**). On a pose where a limb
+does reach under the jaw, an ungated read takes the measured half depth up by a factor of four in
+one station and the mouth line then climbs out through the top of the skull.
 
 The cavity's last few stations climb steeply (seam 0.024 → 0.041 over 0.03 of the body) while its
 half width collapses to 0.016: that is the detector following the narrowing groove at the corner of

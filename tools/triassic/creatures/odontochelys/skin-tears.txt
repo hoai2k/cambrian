@@ -1,0 +1,28 @@
+
+public/assets/triassic/creatures/odontochelys.glb   34889 edges x 17 phases x 23 clips
+clip            skin  on bone             all     >2x  worst bones
+Sprint         5.13x  tail_00           5.13x    3599  0.025->0.128  tail_00:1813 chest:526 hind_outer_L:462 hind_outer_R:308
+Crawl          4.45x  tail_00           4.45x    2288  0.025->0.111  tail_00:1266 hind_outer_L:324 chest:254 hind_outer_R:188
+Swim           4.26x  tail_00           4.26x    1942  0.025->0.106  tail_00:1128 hind_outer_L:264 chest:204 hind_outer_R:158
+Dodge          4.13x  tail_00           4.13x    1527  0.025->0.103  tail_00:1136 hind_outer_L:264 hind_outer_R:71 hind_mid_L:41
+Death          3.74x  tail_00           3.74x    1048  0.048->0.178  tail_00:683 hind_outer_R:286 hind_mid_R:38 hind_outer_L:37
+TurnRight      3.63x  tail_00           3.63x     978  0.044->0.158  tail_00:761 hind_outer_L:162 hind_outer_R:23 hind_mid_L:16
+Dive           3.58x  tail_00           3.58x     660  0.025->0.089  tail_00:540 hind_outer_L:72 hind_outer_R:40 hind_mid_L:6
+Ability        3.37x  tail_00           3.37x     623  0.044->0.147  tail_00:492 hind_outer_L:103 fore_mid_L:10 hind_outer_R:8
+Heavy          3.15x  tail_00          14.83x     403  0.044->0.138  tail_00:220 chest:65 fore_mid_R:48 hind_outer_L:32
+Attack         3.14x  tail_00          13.66x     395  0.044->0.137  tail_00:217 chest:65 fore_mid_R:48 hind_outer_L:31
+Stagger        3.09x  tail_00           8.52x     259  0.025->0.077  tail_00:212 hind_outer_L:30 skull:9 jaw:3
+Hit            3.06x  tail_00           8.52x     245  0.025->0.076  tail_00:203 hind_outer_L:28 skull:9 chest:2
+TurnLeft       3.03x  chest             3.03x     179  0.035->0.104  chest:96 fore_mid_R:74 fore_mid_L:5 fore_outer_R:3
+Breathe        2.96x  tail_00           2.96x     310  0.044->0.129  tail_00:269 hind_outer_L:39 hind_mid_L:2
+Breath         2.82x  tail_00           2.82x     215  0.032->0.090  tail_00:186 hind_outer_L:24 hind_outer_R:5
+Parry          2.37x  tail_00           2.37x      24  0.044->0.104  tail_00:20 fore_mid_L:4
+Rise           2.31x  chest             2.31x      26  0.035->0.080  chest:14 fore_mid_R:7 fore_mid_L:4 fore_upper_L:1
+Growth         2.24x  tail_00           2.24x       8  0.044->0.098  tail_00:8
+Grab           2.14x  tail_00           2.14x       6  0.044->0.093  tail_00:6
+Bite           2.11x  tail_00          15.18x      43  0.044->0.092  jaw:22 skull:15 tail_00:6
+Guard          1.99x  tail_00           1.99x       0  0.044->0.087  
+Eat            1.93x  tail_00          13.68x      56  0.044->0.084  skull:30 jaw:26
+Idle           1.84x  tail_00           1.84x       0  0.044->0.080  
+21 of 23 clips tear an edge past 2x
+worst SKIN 5.13x · worst including the oral lining 15.18x (the lining is a sac built to stretch; the skin figure is the one to judge)

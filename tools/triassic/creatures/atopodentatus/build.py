@@ -138,6 +138,46 @@ assert sorted(LIMBS) == ['foreL', 'foreR', 'hindL', 'hindR'], sorted(LIMBS)
 
 depth, bvh_auth = T.depth_probe(auth)
 
+# **The kit's centreline is the median of the *thick* vertices, and on a sprawling quadruped that
+# is wrong**: a leg is thick, so the median is dragged into the armpit and the axis can leave the
+# skin altogether. Odontochelys is that case and carries a measured interior axis instead. This
+# animal is not -- its four paddles are blades and the thin mask takes them out -- but "not that
+# case" is a measurement rather than an assumption, so the axis is checked along its whole length.
+# The reading has to be **parity**, not the signed depth probe: this generation models its mouth,
+# and the axis runs straight down the lumen over the front sixth of the animal, where the nearest
+# surface to it is the lumen wall and the probe's sign is therefore backwards. Taken that way the
+# axis reads 0.0054 *outside* the animal at the rostrum -- which is the mouth, not a fault.
+def _parity_inside(p, tries=((1., 0., 0.), (0., 0., 1.), (.577, .577, .577))):
+    votes = 0
+    for d in tries:
+        crossings, cursor = 0, Vector(p)
+        dv = Vector(d).normalized()
+        for _ in range(48):
+            hit = bvh_auth.ray_cast(cursor, dv, 3.)
+            if hit[0] is None:
+                break
+            crossings += 1
+            cursor = Vector(hit[0]) + dv * 1e-5
+        votes += crossings % 2
+    return votes >= 2
+
+
+AXIS_DEPTH = []
+for _y in np.linspace(Y0 + .02, Y1 - .02, 60):
+    _p = Vector((cx(float(_y)), float(_y), cz(float(_y))))
+    AXIS_DEPTH.append([round(float(_y), 4),
+                       round(float(bvh_auth.find_nearest(_p)[3]) * (1 if _parity_inside(_p) else -1),
+                             5)])
+# Judged **behind the mouth and in front of the tail tip**. The three stations in front of y -0.27
+# read -0.0054, -0.0047 and -0.0028, and all three are inside the measured lumen: on a body whose
+# mouth is modelled the axis runs down the mouth over the front sixth, and a pocket in a closed
+# shell is exterior space to a parity test. At the other end the animal simply becomes a thread.
+AXIS_JUDGED = [v for y, v in AXIS_DEPTH if -.194 < y < .602]
+AXIS_DEPTH_MIN = float(min(AXIS_JUDGED))
+print('ATOPO_AXIS', json.dumps({'worstBehindTheMouth': AXIS_DEPTH_MIN, 'perStation': AXIS_DEPTH}))
+assert AXIS_DEPTH_MIN > .008, ('the measured centreline leaves the animal', AXIS_DEPTH_MIN,
+                               AXIS_DEPTH)
+
 # --------------------------------------------------------------------- measure the mouth ----
 # **Placodus' geometric method reaches this animal**, which makes it the easy case of the three the
 # pipeline records: a modelled slit with an interior, 634 vertices at a 0.020 gap. The seam is the
@@ -233,6 +273,23 @@ def head_outer_width(y):
 
 def head_z_range(y):
     return float(np.interp(y, _HY, _HZLO)), float(np.interp(y, _HY, _HZHI))
+
+
+# **The head's own section must exclude anything that is not the head.** `head_half_depth` is what
+# the lining is sized in units of and what the seam is judged against, so one station that reads a
+# limb reaching under the jaw puts the mouth line out through the top of the skull. Nothing reaches
+# this head -- the nearest paddle starts 0.08 behind the last head station -- and the check says so
+# rather than the build assuming it.
+assert _HD.max() < 3. * float(np.median(_HD)), \
+    ('the head section is reading something that is not the head',
+     float(_HD.max()), float(np.median(_HD)))
+# And the seam itself must stay inside the animal.
+SEAM_MARGIN = []
+for _y in _sy:
+    _zl, _zh = head_z_range(float(_y))
+    SEAM_MARGIN.append(min(seam(float(_y)) - _zl, _zh - seam(float(_y))))
+SEAM_MARGIN_MIN = float(min(SEAM_MARGIN))
+assert SEAM_MARGIN_MIN > .002, ('the mouth line leaves the head', SEAM_MARGIN_MIN)
 
 
 def mouth_half_width(y):
@@ -390,11 +447,19 @@ for key, pts in LIMB_PTS.items():
 # which a vertex is wholly the limb's is taken from the paddle's own distance distribution, at the
 # 92nd percentile Rhaeticosaurus had to move it to: a broad blade left on the kit's 55th percentile
 # carries trunk weight right out to its rim, and the rim is what tears when it strokes.
+# **A limb's inter-joint blend is a fraction of that limb's own length, not a number.**
+# Rhaeticosaurus' 0.050 is 0.16 of a flipper that reaches 0.30 from the axis; copied as a *number*
+# onto a shorter chain it is more than a whole segment wide, every vertex then carries all four
+# joints at nearly equal weight, that busts the four-influence budget, and the relaxation trims a
+# different four on neighbouring vertices -- which is Cartorhynchus' radiating spikes.
+BLEND_FRACTION = .16
+LIMB_BLEND = {}
 LIMB_RADIUS = {}
 for key, c in LIMBS.items():
     P, cum, _n, _r = LIMB_FIT[key]
     d = [T.project(P, cum, Vector(raw_co[i]))[0] for i in c['indices']]
     LIMB_RADIUS[key] = (float(np.quantile(d, .92)), float(np.quantile(d, .995)) + .025)
+    LIMB_BLEND[key] = BLEND_FRACTION * cum[-1]
 
 
 def limb_weights(q):
@@ -408,7 +473,8 @@ def limb_weights(q):
         alpha *= T.smooth(s / max(cum[1] * .75, 1e-6))
         if alpha > best:
             best = alpha
-            chosen = (T.limb_chain(names, cum, s, blend=.046), rootw, min(1., s / cum[-1]))
+            chosen = (T.limb_chain(names, cum, s, blend=LIMB_BLEND[key]), rootw,
+                      min(1., s / cum[-1]))
     return (best, *chosen) if chosen else None
 
 
@@ -1216,6 +1282,10 @@ report = {
     'twinTriangleFraction': puppet_tris / authored_tris,
     **twin_report,
     'bones': len(B), 'boneNames': list(B),
+    'measuredCentrelineWorstDepthInsideTheSkinBehindTheMouth': AXIS_DEPTH_MIN,
+    'measuredCentrelineDepthPerStation': AXIS_DEPTH,
+    'limbChainBlendFractionOfLimbLength': BLEND_FRACTION,
+    'limbChainBlend': {k: round(v, 5) for k, v in LIMB_BLEND.items()},
     'poseDeviation': POSE_DEVIATION, 'limbAsymmetry': LIMB_ASYMMETRY,
     'limbSweepDegrees': limb_sweep,
     'limbSweepMethod': 'the largest angle between any two directions the limb points over the '
@@ -1242,6 +1312,9 @@ report = {
                           for a, b, c, d in zip(CAV_Y, CAV_MID, CAV_WIDE, CAV_TALL)],
         'cavityProfileColumns': ['y', 'seamZ', 'halfWidth', 'halfHeight'],
         'measuredLineRoughnessOverRadius': CAVITY_ROUGHNESS,
+        'seamClearanceInsideTheHeadMin': SEAM_MARGIN_MIN,
+        'headSectionWorstHalfDepth': float(_HD.max()),
+        'headSectionMedianHalfDepth': float(np.median(_HD)),
         'paintedLineAgreementOverRadius': PAINTED_AGREEMENT,
         'paintedLine': [[round(r['y'], 4), round(r['z'], 5), round(r['u'], 3)] for r in PAINTED],
         'liningCoverage': mouth_cover, 'liningSection': LINING_FIT,

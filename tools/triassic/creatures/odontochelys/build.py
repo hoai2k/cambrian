@@ -304,6 +304,28 @@ for _i, _y in enumerate(_HY):
     _HZHI.append(float(_q[:, 2].max()))
 _HW, _HD = np.array(_HW), np.array(_HD)
 _HOUT, _HZLO, _HZHI = np.array(_HOUT), np.array(_HZLO), np.array(_HZHI)
+# What the gate is worth, measured: the same stations read with a plain y band and no radius.
+_HD_UNGATED = []
+for _y in _HY:
+    _yv = float(_y)
+    _m = np.abs(raw_co[:, 1] - _yv) < .006
+    _HD_UNGATED.append(float(np.quantile(np.abs(raw_co[_m, 2] - cz(_yv)), .90)) if _m.sum() >= 6
+                       else 0.)
+HEAD_SECTION_EVIDENCE = {
+    'headRadiusGate': HEAD_RADIUS,
+    'halfDepthGated': [round(float(v), 4) for v in _HD],
+    'halfDepthWithAPlainBand': [round(float(v), 4) for v in _HD_UNGATED],
+    'worstGatedHalfDepth': float(_HD.max()),
+    'worstUngatedHalfDepth': float(max(_HD_UNGATED)),
+}
+# **The head's own section must exclude the limbs**, and on this pose it must: a forelimb reaches
+# forward under the jaw, so a plain band at the back of the head reads the *shoulder* and not the
+# head. `head_half_depth` is what the lining is sized in units of and what the seam is judged
+# against, so an ungated read puts the mouth line out through the top of the skull and the lining
+# outside the skin. The check is that the gated section stays a head-sized thing: no station may
+# read more than three times the head's own median.
+assert _HD.max() < 3. * float(np.median(_HD)), \
+    ('the head section is reading something that is not the head', HEAD_SECTION_EVIDENCE)
 
 
 def head_half_width(y):
@@ -320,6 +342,20 @@ def head_outer_width(y):
 
 def head_z_range(y):
     return float(np.interp(y, _HY, _HZLO)), float(np.interp(y, _HY, _HZHI))
+
+
+# **The seam must stay inside the animal**, and that is asserted rather than assumed. The mouth
+# line is the one measurement that decides where the jaw is cut and how big the lining is, so a
+# seam that has climbed out through the top of the skull -- which is what an ungated head section
+# does on a pose with a forelimb under the jaw -- fails the build instead of shipping a mouth
+# somewhere else.
+SEAM_MARGIN = []
+for _y in _sy:
+    _zl, _zh = head_z_range(float(_y))
+    SEAM_MARGIN.append(min(seam(float(_y)) - _zl, _zh - seam(float(_y))))
+SEAM_MARGIN_MIN = float(min(SEAM_MARGIN))
+assert SEAM_MARGIN_MIN > .002, ('the mouth line leaves the head', SEAM_MARGIN_MIN,
+                                [round(float(v), 4) for v in SEAM_MARGIN])
 
 
 def mouth_half_width(y):
@@ -503,25 +539,60 @@ LIMB_FIT = {}
 for key, pts in LIMB_PTS.items():
     P, cum = T.polyline(pts)
     LIMB_FIT[key] = (P, cum, LIMB_NAMES[key], T.station_weights(ASTATION, T.project(AP, ACUM, P[0])[1]))
+# **A limb's inter-joint blend is a fraction of that limb's own length, not a number.**
+# Rhaeticosaurus' 0.050 is 0.16 of a flipper that reaches 0.30 from the axis; copied as a *number*
+# onto a shorter chain it is more than a whole segment wide, every vertex then carries all four
+# joints at nearly equal weight, that busts the four-influence budget, and the relaxation trims a
+# different four on neighbouring vertices -- which is Cartorhynchus' radiating spikes. These limbs
+# run 0.27 to 0.28, so the same fraction is 0.044 and the 0.060 this build started with was half a
+# segment too wide.
+BLEND_FRACTION = .16
+LIMB_BLEND = {}
 LIMB_RADIUS = {}
 for key, c in LIMBS.items():
     P, cum, _n, _r = LIMB_FIT[key]
     d = [T.project(P, cum, Vector(raw_co[i]))[0] for i in c['indices']]
-    LIMB_RADIUS[key] = (float(np.quantile(d, .92)), float(np.quantile(d, .995)) + .022)
+    LIMB_RADIUS[key] = (float(np.quantile(d, .84)), float(np.quantile(d, .995)) + .045)
+    LIMB_BLEND[key] = BLEND_FRACTION * cum[-1]
 
-
+# **The radius has to open out towards the foot, and that is what this animal's tear was.**
+#
+# The kit takes one inner and one outer radius per limb from the distances of the limb's own
+# vertices to its polyline, and beyond the outer one a vertex gets no limb weight at all. On a
+# hydrofoil or a paddle that is safe, because a blade is a blade all the way out. On a clawed leg
+# the toes splay past the end of the chain, so the half per cent of cluster vertices outside the
+# 99.5th percentile are the *toe tips* -- and they came out weighted to `tail_00`, the trunk bone
+# behind the hip, sitting against neighbours weighted to `hind_tip_R`. `local/tearloc.mjs` put the
+# worst edges in the era at exactly those positions: 3.84x between `hind_tip_R` and `tail_00` on
+# the right hind foot, and 163 more within `tail_00` around it.
+#
+# So both radii grow with arc length along the limb, as Henodus' do: `r + r'·t²`, tight at the
+# shoulder where the trunk is next door and open at the foot where nothing else is.
+# Measured, not guessed: 0.60/1.20 read 5.13x, and opening them further to 2.40/3.00 with a
+# 90th-percentile base went back up to 6.46x -- a radius wide enough to cover a splayed foot
+# is also wide enough to reach the hip from the knee.
+RADIUS_GROWTH = (.60, 1.20)
 def limb_weights(q):
     best, chosen = 0., None
     for key, (P, cum, names, rootw) in LIMB_FIT.items():
         dist, s = T.project(P, cum, q)
+        t = min(1., s / cum[-1])
         rin, rout = LIMB_RADIUS[key]
+        rin *= 1. + RADIUS_GROWTH[0] * t * t
+        rout *= 1. + RADIUS_GROWTH[1] * t * t
         if dist >= rout:
             continue
         alpha = (1. if dist <= rin else T.smooth(1 - (dist - rin) / (rout - rin)))
-        alpha *= T.smooth(s / max(cum[1] * .75, 1e-6))
+        # **A long root fade.** The kit's default completes the limb's takeover within three
+        # quarters of the first bone, which is right for a fin growing off a flank and wrong for
+        # a leg tucked against one: these limbs' inner radius is 0.042 to 0.060 against a trunk
+        # half width of 0.15, so trunk skin near the shoulder sits well inside the limb's field
+        # and takes a partial alpha next to limb skin taking a full one. `skin-tears.mjs` read
+        # 11.0x across exactly that band, on `chest` and `tail_00`.
+        alpha *= T.smooth(s / max(cum[1] * 1.40, 1e-6))
         if alpha > best:
             best = alpha
-            chosen = (T.limb_chain(names, cum, s, blend=.040), rootw, min(1., s / cum[-1]))
+            chosen = (T.limb_chain(names, cum, s, blend=LIMB_BLEND[key]), rootw, t)
     return (best, *chosen) if chosen else None
 
 
@@ -627,7 +698,7 @@ for o in (auth, puppet):
     for n in B:
         o.vertex_groups.new(name=n)
     raw_weights = [weights(v.co) for v in o.data.vertices]
-    relaxed = T.relax_weights(o, raw_weights, passes=4, hold=.45)
+    relaxed = T.relax_weights(o, raw_weights, passes=9, hold=.45)
     counts, owners = [], {}
     for v in o.data.vertices:
         w = relaxed[v.index]
@@ -839,7 +910,10 @@ def reset():
 # about the body's vertical, which is the bone's own Z.
 AXIAL_CHAIN = ['neck_01', 'neck_00', 'chest', 'body'] \
     + ['tail_%02d' % i for i in range(len(TAIL_Y))]
-GAIN = [.12, .08, .02, .02, .14, .26, .40, .56, .74]
+# **Almost nothing at the tail's own base.** `tail_00` carries the hind limbs as well as the tail,
+# so every degree it takes swings a whole leg past the hip skin beside it, and `skin-tears.mjs`
+# read 7.0x with `tail_00` the dominant bone. The wave starts behind the pelvis.
+GAIN = [.12, .08, .02, .02, .05, .20, .38, .56, .76]
 LAG = [0., .20, .44, .74, 1.05, 1.36, 1.68, 2.00, 2.32]
 SIDE = {k: (1. if k.endswith('R') else -1.) for k in LIMB_NAMES}
 # Diagonal couplets: the fore pair alternates, the hind pair alternates, and the hind is half a beat
@@ -1018,7 +1092,7 @@ for clip, duration in CLIPS.items():
             ph = p * beat - STROKE_LAG[kind] - (0. if s > 0 else pi)
             stroke = sin(ph)
             lift = cos(ph)
-            reach = {'Sprint': 1.00, 'Swim': .76, 'Idle': .20, 'Crawl': .82, 'Ability': .18,
+            reach = {'Sprint': .88, 'Swim': .68, 'Idle': .18, 'Crawl': .72, 'Ability': .16,
                      'Breathe': .22, 'Eat': .20, 'Guard': .16, 'Grab': .18}.get(clip, .24)
             gainf = 1.0 if kind == 'fore' else .95
             up.rotation_euler.z = s * reach * stroke * gainf
@@ -1122,7 +1196,35 @@ scene.frame_set(0)
 sockets = T.make_sockets(rig, anchors)
 open(os.path.join(HERE, 'anchors.json'), 'w').write(json.dumps({ID: anchors}, indent=2) + '\n')
 
+def drop_plastron_channels(path):
+    """Strip every animation channel on the rigid plate.
+
+    **The exporter samples every pose bone whether or not it was keyed**, so a bone that the
+    performance never touched still leaves the builder with a full set of constant channels -- 92 of
+    them here -- and "rigid" then rests on the values being identical rather than on the channels
+    being absent. Henodus does the same thing for its carapace inside its own patch; the shared
+    `patch_glb` only knows about `root` and scale, so this is a second pass over the same file.
+    """
+    import struct as _struct
+    raw = open(path, 'rb').read()
+    n = _struct.unpack_from('<I', raw, 12)[0]
+    g = json.loads(raw[20:20 + n])
+    binary = raw[20 + n:]
+    dropped = 0
+    for a in g['animations']:
+        keep = [c for c in a['channels']
+                if g['nodes'][c['target']['node']].get('name') != 'plastron']
+        dropped += len(a['channels']) - len(keep)
+        a['channels'] = keep
+    js = json.dumps(g, separators=(',', ':')).encode()
+    js += b' ' * ((-len(js)) % 4)
+    open(path, 'wb').write(_struct.pack('<III', 0x46546c67, 2, 20 + len(js) + len(binary))
+                           + _struct.pack('<II', len(js), 0x4e4f534a) + js + binary)
+    return dropped
+
+
 tri = lambda o: sum(len(p.vertices) - 2 for p in o.data.polygons)
+PLASTRON_CHANNELS_DROPPED = {}
 for group, suffix in ((AUTH_GROUP, ''), (PUP_GROUP, '.puppet')):
     bpy.ops.object.select_all(action='DESELECT')
     for o in group + [rig] + sockets + oralparts:
@@ -1131,6 +1233,7 @@ for group, suffix in ((AUTH_GROUP, ''), (PUP_GROUP, '.puppet')):
     path = os.path.join(OUT, ID + suffix + '.glb')
     bpy.ops.export_scene.gltf(filepath=path, **T.EXPORT_KWARGS)
     T.patch_glb(path, anchors)
+    PLASTRON_CHANNELS_DROPPED[suffix or 'authored'] = drop_plastron_channels(path)
 shutil.copyfile(os.path.join(OUT, ID + '.puppet.glb'), os.path.join(OUT, ID + '.lod1.glb'))
 
 authored_tris = sum(tri(o) for o in AUTH_GROUP) + sum(tri(o) for o in oralparts)
@@ -1210,8 +1313,14 @@ report = {
     'limbs': {k: {'seat': list(LIMB_PTS[k][0]), 'reach': list(LIMB_PTS[k][-1]),
                   'radiusInner': LIMB_RADIUS[k][0], 'radiusOuter': LIMB_RADIUS[k][1]}
               for k in LIMB_NAMES},
+    'limbRadiusPercentiles': [.84, .995], 'limbRootFadeOverFirstBone': 1.40,
+    'limbRadiusGrowthWithArcLength': list(RADIUS_GROWTH),
+    'limbChainBlendFractionOfLimbLength': BLEND_FRACTION,
+    'limbChainBlend': {k: round(v, 5) for k, v in LIMB_BLEND.items()},
+    'relaxPasses': 9,
     'plastron': {**PLASTRON_MEASURED, 'verticesMostlyOnThePlate': plastron_vertices,
-                 'boneUnanimated': True, 'thereIsNoCarapaceBone': True},
+                 'boneUnanimated': True, 'thereIsNoCarapaceBone': True,
+                 'constantChannelsStrippedFromTheExport': PLASTRON_CHANNELS_DROPPED},
     'authoredTriangles': authored_tris, 'twinTriangles': puppet_tris,
     'twinTriangleFraction': puppet_tris / authored_tris,
     **twin_report,
@@ -1243,6 +1352,8 @@ report = {
                           for a, b, c, d in zip(CAV_Y, CAV_MID, CAV_WIDE, CAV_TALL)],
         'cavityProfileColumns': ['y', 'seamZ', 'halfWidth', 'halfHeight'],
         'measuredLineRoughnessOverRadius': CAVITY_ROUGHNESS,
+        'seamClearanceInsideTheHeadMin': SEAM_MARGIN_MIN,
+        'headSection': HEAD_SECTION_EVIDENCE,
         'paintedLineAgreementOverRadius': PAINTED_AGREEMENT,
         'paintedLine': [[round(r['y'], 4), round(r['z'], 5), round(r['u'], 3)] for r in PAINTED],
         'liningCoverage': mouth_cover, 'liningSection': LINING_FIT,
