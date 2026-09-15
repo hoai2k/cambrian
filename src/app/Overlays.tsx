@@ -98,12 +98,15 @@ export function Results({ snapshot, players, record, fresh, items, sel, shown, o
  * so the page is a map of what is left rather than a list of what happened. Anything this match
  * added is called out as new.
  */
-function Discoveries({ codex, fresh }: { codex: Codex; fresh: Codex }) {
+export function Discoveries({ codex, fresh }: { codex: Codex; fresh: Codex }) {
   const base = appBase();
   const seenBiome = new Set(codex.biomes), newBiome = new Set(fresh.biomes);
   const seenMark = new Set(codex.landmarks), newMark = new Set(fresh.landmarks);
   const newApex = new Set(fresh.apex);
   const roster = ACTIVE_ERA.creatures;
+  // The other two games, by name, so "unlocked elsewhere" points somewhere the player can go.
+  const others = [ACTIVE_ERA.copy.sibling, ...(ACTIVE_ERA.copy.siblings ?? [])].filter((g) => !!g).map((g) => g.title);
+  const elsewhere = others.length > 1 ? `${others.slice(0, -1).join(', ')} and ${others[others.length - 1]}` : others[0] ?? 'the other games';
   return (
     <div className="discoveries">
       <div className="discovery-head">
@@ -141,14 +144,28 @@ function Discoveries({ codex, fresh }: { codex: Codex; fresh: Codex }) {
         {roster.map((c) => {
           const seen = codex.apex.includes(c.id);
           return (
-            <li key={c.id} className={`apex-card ${seen ? 'found' : 'unfound'} ${newApex.has(c.id) ? 'fresh' : ''}`} title={seen ? `${c.name} · reached Apex` : `${c.name} · not yet at Apex`}>
+            <li key={c.id} className={`apex-card ${seen ? 'found' : 'unfound'} ${newApex.has(c.id) ? 'fresh' : ''}`}
+                title={seen ? `${c.name} · reached Apex · unlocked as a visitor in ${elsewhere}` : `${c.name} · not yet at Apex`}>
               <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={base} alt={c.name} loading="lazy" />
               <span>{c.name}</span>
+              {/* Reaching the top here is what admits an animal to the *other* games, so the card
+                  that records it says so. The star is the same mark the Visitors button carries on
+                  their pick screens, which is where this ends up mattering. Top left, because NEW
+                  already owns the other corner and these cards are 54 pixels wide. */}
+              {seen && <span className="visitor-tag" aria-hidden="true">★</span>}
               {newApex.has(c.id) && <span className="new-tag">NEW</span>}
             </li>
           );
         })}
       </ul>
+      {/* What Apex is *for*, which was never said anywhere: it is the only way to earn a visitor,
+          and a player who has just got one has no reason to know that yet. Reads as a reward once
+          there is something to report and as a goal while there is not. */}
+      <p className="apex-note">
+        {codex.apex.length
+          ? <>★ <b>Unlocked as visitors</b> in {elsewhere} — pick them there from the <b>Visitors</b> button.</>
+          : <>Take a creature to Apex to unlock it as a <b>visitor</b> in {elsewhere}.</>}
+      </p>
     </div>
   );
 }

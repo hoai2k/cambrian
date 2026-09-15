@@ -619,7 +619,12 @@ unless the user explicitly asks for a PR. Steps:
   the preloader — `prioritize` tolerates ids it has never heard of, and `addVisitor` gives them a
   real one. `npm run visitors` covers all three eras; the apex scales and asset folders are written
   out in `src/content` (which may not reach up into `src/sim`) and checked against the real
-  constants there, so they cannot drift.
+  constants there, so they cannot drift. Apex is *how* one is earned, so the results screen says so
+  — a star on each apex card, the same mark the Visitors button carries, and a line naming the two
+  games it is now playable in. `npm run results` renders that panel on its own and reads the
+  markup, because a results screen only exists after a match ends and a headless browser gets too
+  few frames under the software renderer to finish one; its last check walks the promise end to
+  end, from the record the screen draws to the visitor list the other games build out of it.
 - Menu cursors move by where the buttons are, not by list order: `src/app/spatial-nav.ts` resolves a
   direction against the buttons' own rectangles, so the pause and results rows answer left and
   right, a column answers up and down, and the unused axis falls back to list order so no press is
