@@ -474,6 +474,26 @@ def shell_share(q):
     return plan * dome
 
 
+# **A carapace is not flesh, and inside its footprint the answer is one bone.** `shell` is parented
+# to `body` and carries no animation channel in any clip, so a hard boundary there costs nothing --
+# shell and body move identically, and what a mixed weight inside the carapace actually buys is a
+# share of `chest` and `tail_00`, which *are* keyed, and of the limbs. Measured on the delivered
+# body: 456 of the 2,665 shell-dominant vertices (17.1 %) carried forelimb or hindlimb weight, and
+# across the whole shell band 48.6 % of the vertices carried limb, neck, tail or chest weight --
+# 254 units of it, `chest` 112 and `tail_00` 88. That is a box asked to bend with the legs and with
+# the pitch of the trunk.
+#
+# Two thresholds, because the *boundary* still has to be a ramp even though the inside is not. The
+# gate is hard before the relaxation, so nothing but shell is bid inside the footprint; the
+# relaxation then does what it always does and turns the step into a two-ring ramp both ways; and
+# afterwards the plateau -- and only the plateau -- is restored to `{shell: 1}` exactly, so the rim
+# keeps its ramp and the carapace does not. Restoring the whole footprint instead defeats the
+# relaxation exactly where it is needed and makes `shell` the worst tear on the animal (4.94x
+# against 3.86x).
+SHELL_GATE = .50
+SHELL_SOLID = .985
+
+
 THROAT_SPAN = .030
 THROAT_DROP = .14
 
@@ -487,6 +507,8 @@ def throat_jaw_share(q):
 
 def weights(p):
     q = Vector(p)
+    if shell_share(q) >= SHELL_GATE:
+        return {'shell': 1.}
     w = dict(T.station_weights(ASTATION, T.project(AP, ACUM, q)[1]))
     throat = throat_jaw_share(q)
     if throat > 0:
@@ -504,10 +526,6 @@ def weights(p):
         w = {n: v * (1 - alpha) for n, v in base.items()}
         for n, v in chain.items():
             w[n] = w.get(n, 0.) + v * alpha
-    g = shell_share(q) * (1 - alpha)
-    if g > 0:
-        w = {n: v * (1 - g) for n, v in w.items()}
-        w['shell'] = w.get('shell', 0.) + g
     w = {n: v for n, v in w.items() if v > 1e-8}
     items = sorted(w.items(), key=lambda kv: -kv[1])[:4]
     total = sum(v for _, v in items)
@@ -571,11 +589,23 @@ bpy.ops.object.mode_set(mode='OBJECT')
 
 weight_report, influences = {}, []
 shell_vertices = 0
+shell_solid_vertices = 0
 for o in (auth, puppet):
     for n in B:
         o.vertex_groups.new(name=n)
     raw_weights = [weights(v.co) for v in o.data.vertices]
     relaxed = T.relax_weights(o, raw_weights, passes=5, hold=.45)
+    # The relaxation is a diffusion and does not know the shell is a box: five passes carry a
+    # forelimb's weight several rings in over the rim. Inside the footprint the answer is restored
+    # exactly afterwards, which is the whole of "the skinning should consider the shell not to be
+    # flexible". Outside it nothing is touched, so the rim still ramps and still cannot tear.
+    solid = 0
+    for v in o.data.vertices:
+        if shell_share(v.co) >= SHELL_SOLID:
+            relaxed[v.index] = {'shell': 1.}
+            solid += 1
+    if o is auth:
+        shell_solid_vertices = solid
     counts, owners = [], {}
     for v in o.data.vertices:
         w = relaxed[v.index]
@@ -1231,6 +1261,13 @@ report = {
     **twin_report,
     'bones': len(B), 'boneNames': list(B),
     'rigidCarapace': {'bone': 'shell', 'parent': 'body', 'verticesOwned': shell_vertices,
+                      'verticesWhollyTheShells': shell_solid_vertices,
+                      'solidThreshold': SHELL_SOLID,
+                      'rule': 'inside the footprint the weight is {shell: 1} exactly -- set before '
+                              'the limbs are consulted and restored after the relaxation, which is '
+                              'a diffusion and does not know the shell is a box. The rim keeps its '
+                              'ramp and does the blending. `shell` is parented to `body` and never '
+                              'keyed, so a hard boundary inside the footprint costs nothing.',
                       'channelsStrippedFromPackagedFile': rigid_dropped,
                       'yExtent': list(SHELL_Y)},
     'poseDeviation': POSE_DEVIATION, 'limbAsymmetry': LIMB_ASYMMETRY,
