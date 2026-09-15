@@ -2,22 +2,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1501544,
-      "sha256": "420d588887c6d77c21e37e30a709b3f44f55d0f4065fc05589ed76f322f2ca55",
+      "bytes": 1501400,
+      "sha256": "d5336abaed5537f5b8963fadbb5fc7ac0dcb6d43cf521ec527697e6e21dfd292",
       "triangles": 19253,
       "vertices": 11619
     },
     {
       "suffix": ".puppet",
-      "bytes": 589028,
-      "sha256": "c37db2ae3ff7eaa986e1163336ca40c5d2af4cabe97e10f16e0e866ac610258e",
+      "bytes": 588884,
+      "sha256": "80caa2af4fbc377f2b40452d14433c6d691f20410b6313ab7eafe85b8c158579",
       "triangles": 7100,
       "vertices": 3548
     },
     {
       "suffix": ".lod1",
-      "bytes": 589028,
-      "sha256": "c37db2ae3ff7eaa986e1163336ca40c5d2af4cabe97e10f16e0e866ac610258e",
+      "bytes": 588884,
+      "sha256": "80caa2af4fbc377f2b40452d14433c6d691f20410b6313ab7eafe85b8c158579",
       "triangles": 7100,
       "vertices": 3548
     }
@@ -123,7 +123,7 @@
     },
     {
       "name": "Eat",
-      "sha256": "7bffabfda2abaa0d9ca5ff821fe89d9a7903f2fac5aef2e246d33c1b8e4103ab"
+      "sha256": "8c2e7da9fb07add4329c11c2a90a7a46206469fe7dbf73b6854f06b5d507e2fb"
     },
     {
       "name": "Grab",
@@ -135,7 +135,7 @@
     },
     {
       "name": "Guard",
-      "sha256": "59f159ec2236367447da6edef5d906b149690e025483aa562665eb65864ba6df"
+      "sha256": "25e12b8a48f801b0cf44becf04bf2780444e43e266a0fdf990f82bae8716872f"
     },
     {
       "name": "Heavy",
@@ -147,7 +147,7 @@
     },
     {
       "name": "Idle",
-      "sha256": "7a19d5bd62c4db22c883061fbc46145e5532b247c84db2b895dfe496fc0f3127"
+      "sha256": "df5fa49029a7ac4bc453090f73ab207b40afa2d485e0f00ac21e55a6d7686e52"
     },
     {
       "name": "Parry",
@@ -229,7 +229,7 @@
           "clip": "Eat",
           "duration": 1.600000023841858,
           "samples": 61,
-          "maxVertexTravel": 0.34288907075268243
+          "maxVertexTravel": 0.3464090567603363
         },
         {
           "clip": "Grab",
@@ -360,7 +360,7 @@
           "clip": "Eat",
           "duration": 1.600000023841858,
           "samples": 61,
-          "maxVertexTravel": 0.3659008257263051
+          "maxVertexTravel": 0.3858730298811934
         },
         {
           "clip": "Grab",
@@ -480,128 +480,149 @@
   "jaw": [
     {
       "clip": "Idle",
-      "maxOpenRadians": 0.02400000631319985,
-      "minRadians": -3.587324068671532e-43,
-      "mouthSocketTravelInSkullFrame": 0.009170177998851916
+      "maxOpenRadians": -0.3022500670801352,
+      "minRadians": -0.3222500196512662,
+      "peakPhase": 0.5,
+      "mouthSocketTravelInSkullFrame": 0.007641850907927891
     },
     {
       "clip": "Swim",
       "maxOpenRadians": 0.02400000631319985,
       "minRadians": 0,
+      "peakPhase": 0.5,
       "mouthSocketTravelInSkullFrame": 0.009170177998851916
     },
     {
       "clip": "Sprint",
       "maxOpenRadians": 0.02400000631319985,
       "minRadians": 0,
+      "peakPhase": 0.5,
       "mouthSocketTravelInSkullFrame": 0.009170177998851916
     },
     {
       "clip": "TurnLeft",
       "maxOpenRadians": 0,
       "minRadians": 0,
+      "peakPhase": 0,
       "mouthSocketTravelInSkullFrame": 8.886119947416683e-16
     },
     {
       "clip": "TurnRight",
       "maxOpenRadians": 0,
       "minRadians": 0,
+      "peakPhase": 0,
       "mouthSocketTravelInSkullFrame": 6.810021516914953e-16
     },
     {
       "clip": "Dive",
       "maxOpenRadians": 0,
       "minRadians": 0,
+      "peakPhase": 0,
       "mouthSocketTravelInSkullFrame": 6.753223014464258e-16
     },
     {
       "clip": "Rise",
       "maxOpenRadians": 0,
       "minRadians": 0,
+      "peakPhase": 0,
       "mouthSocketTravelInSkullFrame": 6.661343794634861e-16
     },
     {
       "clip": "Attack",
       "maxOpenRadians": 0.4048504277247238,
       "minRadians": -3.5527107141876503e-13,
+      "peakPhase": 0.14583333333333334,
       "mouthSocketTravelInSkullFrame": 0.15363898671819015
     },
     {
       "clip": "Bite",
       "maxOpenRadians": 0.4945369834850429,
       "minRadians": 0,
+      "peakPhase": 0.4791666666666667,
       "mouthSocketTravelInSkullFrame": 0.18704278881167238
     },
     {
       "clip": "Heavy",
       "maxOpenRadians": 0.5282840936592823,
       "minRadians": 0,
+      "peakPhase": 0.14583333333333334,
       "mouthSocketTravelInSkullFrame": 0.19951813424089435
     },
     {
       "clip": "Hit",
       "maxOpenRadians": 0,
       "minRadians": 0,
+      "peakPhase": 0,
       "mouthSocketTravelInSkullFrame": 6.66786416333167e-16
     },
     {
       "clip": "Death",
       "maxOpenRadians": 0.16000001550592483,
       "minRadians": 0,
+      "peakPhase": 1,
       "mouthSocketTravelInSkullFrame": 0.06107072862965637
     },
     {
       "clip": "Guard",
-      "maxOpenRadians": 0.02400000631319985,
-      "minRadians": 0,
-      "mouthSocketTravelInSkullFrame": 0.009170177998851916
+      "maxOpenRadians": -0.3022500670801352,
+      "minRadians": -0.3222500196512662,
+      "peakPhase": 0.5,
+      "mouthSocketTravelInSkullFrame": 0.007641850907927937
     },
     {
       "clip": "Parry",
       "maxOpenRadians": 0,
       "minRadians": 0,
+      "peakPhase": 0,
       "mouthSocketTravelInSkullFrame": 6.690187733356916e-16
     },
     {
       "clip": "Dodge",
       "maxOpenRadians": 0,
       "minRadians": 0,
+      "peakPhase": 0,
       "mouthSocketTravelInSkullFrame": 6.714612423521196e-16
     },
     {
       "clip": "Eat",
-      "maxOpenRadians": 0.3999999600370711,
-      "minRadians": -6.866245319043687e-27,
-      "mouthSocketTravelInSkullFrame": 0.15182301601884704
+      "maxOpenRadians": 0.6165652812313333,
+      "minRadians": -0.3222500490675714,
+      "peakPhase": 0.25,
+      "mouthSocketTravelInSkullFrame": 0.34569188617485425
     },
     {
       "clip": "Stagger",
       "maxOpenRadians": 0,
       "minRadians": 0,
+      "peakPhase": 0,
       "mouthSocketTravelInSkullFrame": 6.667208323029411e-16
     },
     {
       "clip": "Ability",
       "maxOpenRadians": 0.3433290311471953,
       "minRadians": 0,
+      "peakPhase": 0.125,
       "mouthSocketTravelInSkullFrame": 0.13054259619715017
     },
     {
       "clip": "Grab",
       "maxOpenRadians": 0.2670834038229853,
       "minRadians": 0.2200000185412186,
+      "peakPhase": 0.75,
       "mouthSocketTravelInSkullFrame": 0.017988875049427564
     },
     {
       "clip": "Breath",
       "maxOpenRadians": 0.11999999735386131,
       "minRadians": 0,
+      "peakPhase": 0.5,
       "mouthSocketTravelInSkullFrame": 0.04582447112861856
     },
     {
       "clip": "Growth",
       "maxOpenRadians": 0,
       "minRadians": 0,
+      "peakPhase": 0,
       "mouthSocketTravelInSkullFrame": 6.684478423521909e-16
     }
   ],

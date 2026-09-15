@@ -89,6 +89,11 @@ for o in s.objects:
         lo = Vector((min(lo[i], w[i]) for i in range(3))); hi = Vector((max(hi[i], w[i]) for i in range(3)))
 centre = (lo + hi) / 2
 span = max(hi[i] - lo[i] for i in range(3))
+# `--centre` aims the cameras somewhere other than the middle of the body, which is what a mouth or
+# a hand needs; it is in the Blender frame the glTF import lands in (+X the creature's left, +Y
+# behind it, +Z up), so a bone position read out of the same file can be pasted straight in.
+if opt('--centre'):
+    centre = Vector([float(v) for v in opt('--centre').split(',')])
 SCALE = float(opt('--scale', str(span * 1.25)))
 R = span * 3
 

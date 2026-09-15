@@ -662,6 +662,110 @@ for name, (b, p, role) in ANCHOR_POINTS.items():
                            'fractionOfBodyLength': float(hit[3] * SCALE / BODY_LENGTH)}
     assert hit[3] * SCALE < ANCHOR_TOLERANCE, (name, hit[3])
 
+# ------------------------------------------------- how far open it arrived ----
+# **This generation was authored gaping, and the bind pose carries that gape.** The clips were built
+# on the rule that the jaw only ever opens from the bind pose, which is right for a body that
+# arrived shut and wrong for this one: it left the animal holding its mouth open in every clip it
+# has, Idle included, which is what a review of the shipped body picked up. So the closing rotation
+# is measured here and `JAW_SHUT` is a real pose the resting clips can sit in.
+#
+# The gape is read off the **crossings of a vertical line**, and *which* void on that line is the
+# gape is the thing this head gets to correct. The era's standing rule is to take the largest empty
+# interval, because the first one from below is usually the sliver between a mandible and a modelled
+# tongue. Here the tooth whorl stands up through the middle of the lumen and divides it in two, and
+# the larger half is as often the space *under* the whorl as the space above it: measured that way
+# the "roof" came back as the whorl's own underside at four stations out of thirteen, 0.03 low, and
+# the closing rotation it implied was nonsense. What is wanted is the void whose roof is the palate,
+# which is the **topmost** one -- crossings of a closed shell alternate in and out, so the voids are
+# the intervals starting on an odd crossing and the last of those is the one under the palate. Its
+# floor is then whatever is highest in the lower jaw at that station, whorl crown or mandible, which
+# is exactly the thing that has to come up to meet the palate.
+MOUTH_HINGE_Y, MOUTH_HINGE_Z = -.352, -.030
+GAPE_STATIONS = [y for y in np.linspace(-.470, -.362, 19)]
+
+
+def _crossings(y, x=0.):
+    """Every surface crossing on the vertical line through (x, y), bottom to top."""
+    out, z = [], centre(y) - .28
+    for _ in range(24):
+        hit = _bvh_auth.ray_cast(Vector((x, y, z)), Vector((0, 0, 1)), .56)
+        if hit[0] is None:
+            break
+        z = hit[0][2] + 2e-5
+        out.append(float(hit[0][2]))
+    return out
+
+
+def _lumen(y):
+    """(floor, roof) of the topmost void inside the head on the line at y, or None."""
+    c = _crossings(y)
+    if len(c) < 4 or len(c) % 2:
+        return None
+    return (c[-3], c[-2])
+
+
+_gape = []
+for _y in GAPE_STATIONS:
+    _l = _lumen(_y)
+    if _l is None or _l[1] - _l[0] < 1e-4:
+        continue
+    _gape.append({'y': round(float(_y), 4), 'floor': round(_l[0], 5), 'roof': round(_l[1], 5),
+                  'gap': round(_l[1] - _l[0], 5),
+                  'closingRadians': round((_l[1] - _l[0]) / abs(_y - MOUTH_HINGE_Y), 4)})
+assert len(_gape) >= 8, ('no modelled gape found along the head', len(_gape))
+# One rigid rotation cannot close a gape that is not proportional to the distance from the hinge, so
+# the median is taken and the spread is recorded rather than smoothed away. Only the stations with a
+# real lever under them count: within 0.04 of the hinge the gap is divided by almost nothing and the
+# rotation it asks for runs to several radians, which is a measurement about the hinge and not about
+# the mouth. The front of the mouth is also what a viewer reads as shut or not shut.
+_front = [r for r in _gape if abs(r['y'] - MOUTH_HINGE_Y) > .040]
+assert len(_front) >= 6, ('the gape did not measure forward of the hinge', len(_front))
+JAW_CLOSE = float(np.median([r['closingRadians'] for r in _front]))
+JAW_SHUT = -JAW_CLOSE                     # the jaw channel's own units: positive opens
+
+
+def _roof_at(y):
+    ys = [r['y'] for r in _gape]
+    return float(np.interp(y, ys, [r['roof'] for r in _gape]))
+
+
+# **Does the whorl fit inside when the mouth shuts?** The whorl rides the jaw, so closing carries it
+# up into the mouth; the question is whether it then pushes through the palate. Measured against the
+# palate's own ventral surface -- the roof of the lumen above -- with no normals anywhere in it.
+_wh = raw_co[(np.abs(raw_co[:, 0]) < WHORL_HALF_WIDTH)
+             & (raw_co[:, 1] > WHORL_BAND[0]) & (raw_co[:, 1] < WHORL_BAND[1])]
+_wh = np.array([p for p in _wh if jaw_weight(tuple(p)) > .5])
+assert len(_wh) >= 40, ('the whorl did not measure', len(_wh))
+_ca, _sa = cos(JAW_SHUT), sin(JAW_SHUT)
+_wy = MOUTH_HINGE_Y + (_wh[:, 1] - MOUTH_HINGE_Y) * _ca - (_wh[:, 2] - MOUTH_HINGE_Z) * _sa
+_wz = MOUTH_HINGE_Z + (_wh[:, 1] - MOUTH_HINGE_Y) * _sa + (_wh[:, 2] - MOUTH_HINGE_Z) * _ca
+_above = np.array([_wz[i] - _roof_at(float(_wy[i])) for i in range(len(_wh))])
+_inside = float((_above <= 0).mean())
+WHORL_FIT = {
+    'method': 'every whorl vertex carried through the closing rotation about the jaw hinge and '
+              'measured against the palate\'s own ventral surface, which is the roof of the '
+              'topmost void on the vertical line at that station',
+    'whorlVerticesMeasured': int(len(_wh)),
+    'fractionUnderThePalate': round(_inside, 4),
+    'worstProtrusionRaw': round(float(_above.max()), 5),
+    'worstProtrusionOverBodyLength': round(float(_above.max()) * SCALE / BODY_LENGTH, 5),
+    'meanProtrusionOfTheVerticesThatDo': round(float(_above[_above > 0].mean()) if (_above > 0).any() else 0., 5),
+}
+RESTING_GAPE = {
+    'closingRotationDegrees': round(math.degrees(JAW_CLOSE), 2),
+    'closingRotationRadians': round(JAW_CLOSE, 4),
+    'stations': len(_gape),
+    'gapPerStation': _gape,
+    'stationsWithALeverUnderThem': len(_front),
+    'closingRadiansSpread': [round(min(r['closingRadians'] for r in _front), 4),
+                             round(max(r['closingRadians'] for r in _front), 4)],
+    'verdict': 'the generation arrived GAPING: the bind pose carries that gape, so Idle sits at '
+               'JAW_SHUT and Eat closes through it to swallow. Swim keeps the open mouth, which is '
+               'what a ram-feeding eugeneodont is doing anyway.',
+    'whorl': WHORL_FIT,
+}
+print('HELICOPRION_GAPE', json.dumps(RESTING_GAPE))
+
 # ---------------------------------------------------------- performance ----
 scene = bpy.context.scene
 scene.render.fps = 30
@@ -709,14 +813,23 @@ for clip, duration in CLIPS.items():
         wind = sin(pi * u / .28) ** 2 if u < .28 else 0.
         dead = u * u * (3 - 2 * u) if clip == 'Death' else 0.
         saw = max(0., sin(p * 3)) ** 2 if clip in ('Ability', 'Grab') else 0.
+        # The gulp, a beat behind the jaw shutting: Eat is one bite taken and put away.
+        swallow = (sin(pi * (u - .46) / .44) ** 2 if .46 < u < .90 else 0.) if clip == 'Eat' else 0.
         if clip == 'Death':
             amp *= 1 - dead
 
-        # --- the whorl. The jaw only ever opens: the tooth spiral all but touches the palate in
-        # the bind pose, which is where a eugeneodont's occlusion actually is.
+        # --- the whorl and the jaw it rides. **The bind pose is a gape, not an occlusion**, so
+        # `JAW_SHUT` (measured above) is where the mouth is actually closed and the clips that are
+        # not about swimming sit there. A eugeneodont cruising with its mouth open is what a ram
+        # feeder does and is left alone; a eugeneodont holding station with its mouth open is the
+        # animal forgetting to shut it, which is what a review of the shipped body picked up.
         opening = .012 * (1 - cos(p)) if loop else 0.
+        if clip in ('Idle', 'Guard'):
+            opening = JAW_SHUT + .010 * (1 - cos(p))
         if clip == 'Eat':
-            opening = .20 * (1 - cos(p * 2))
+            # Open off the shut pose, take the mouthful, and shut through the bind pose and past it
+            # -- that closing *is* the swallow, and the throat follows it back a beat later.
+            opening = JAW_SHUT + (.62 - JAW_SHUT) * (sin(pi * u / .52) ** 2 if u < .52 else 0.)
         if clip == 'Bite':
             opening = .50 * sin(pi * u) ** 2
         if clip == 'Attack':
@@ -792,7 +905,12 @@ for clip, duration in CLIPS.items():
         if clip in ('Attack', 'Heavy'):
             pb['skull'].rotation_euler.x += -.05 * wind + .10 * peak
         if clip == 'Eat':
-            pb['skull'].rotation_euler.z += .10 * sin(p * 2)
+            # The mouthful worked to the back of the mouth while it is open, and then the swallow:
+            # the shut jaw, a lift of the head and a wave that runs back down the throat behind it.
+            pb['skull'].rotation_euler.z += .07 * sin(p * 2) * (1 - swallow)
+            pb['skull'].rotation_euler.x += -.09 * swallow
+            pb['chest'].rotation_euler.x += .05 * swallow
+            body.rotation_euler.x += -.04 * swallow
         if clip in ('Ability', 'Grab'):
             pb['skull'].rotation_euler.z += .06 * saw * (1 if clip == 'Ability' else .6)
 
@@ -979,6 +1097,15 @@ meta = {
         'skin at roughness 0.62. Twin pigment samples triangle-local UVs to avoid seam bleed.',
         'Breath is gill ventilation held in place, not a surface breath: this animal has gills and '
         'never goes up.',
+        'This generation was authored gaping, so the bind pose is a gape and not an occlusion. '
+        '`restingGape` measures the rotation that brings the mandible onto the palate -- 18.5 '
+        'degrees, from the topmost void on a vertical line through the head at thirteen stations '
+        '-- and Idle and Guard sit at it, Eat opens off it and shuts through the bind pose to '
+        'swallow, and Swim and Sprint keep the open mouth, which is what a ram-feeding eugeneodont '
+        'is doing anyway. At the shut pose 98.7 % of the whorl is under the palate and the worst '
+        'that is not stands 0.42 % of a body length through it, so the coil does fit in the closed '
+        'mouth; the arc that stays visible below the chin is the front arc the canonical pose '
+        'draws, not the jaw failing to shut.',
         'The whorl is the generated surface, measured and kept rather than re-modelled: 97.9 % of '
         'it is seated inside the lower jaw with only its front arc exposed, as the canonical pose '
         'draws it. Its own narrow gaps are shut here by moving its own walls together; no coil is '
@@ -1022,6 +1149,7 @@ report = {
     'twinVerticesHeldBackFromRelaxation': relax_masked,
     'bladeDilation': BLADE_DILATION,
     'whorl': whorl_report,
+    'restingGape': RESTING_GAPE,
     'bones': len(B), 'boneNames': list(B),
     'clips': CLIPS, 'looping': LOOPS, 'loopSeams': seams, 'boundsAt13Phases': bounds,
     'weights': weight_report,

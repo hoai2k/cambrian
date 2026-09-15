@@ -45,6 +45,118 @@
       "raysOverOnePercentOfBodyLength": 24
     }
   },
+  "restingGape": {
+    "closingRotationDegrees": 18.46,
+    "closingRotationRadians": 0.3223,
+    "stations": 13,
+    "gapPerStation": [
+      {
+        "y": -0.434,
+        "floor": -0.03786,
+        "roof": -0.00535,
+        "gap": 0.03251,
+        "closingRadians": 0.3965
+      },
+      {
+        "y": -0.428,
+        "floor": -0.02753,
+        "roof": -0.00255,
+        "gap": 0.02497,
+        "closingRadians": 0.3286
+      },
+      {
+        "y": -0.422,
+        "floor": -0.02117,
+        "roof": -0.00082,
+        "gap": 0.02035,
+        "closingRadians": 0.2908
+      },
+      {
+        "y": -0.416,
+        "floor": -0.01768,
+        "roof": 0.00064,
+        "gap": 0.01831,
+        "closingRadians": 0.2861
+      },
+      {
+        "y": -0.41,
+        "floor": -0.01122,
+        "roof": 0.00209,
+        "gap": 0.01331,
+        "closingRadians": 0.2295
+      },
+      {
+        "y": -0.404,
+        "floor": -0.01403,
+        "roof": 0.00291,
+        "gap": 0.01695,
+        "closingRadians": 0.3259
+      },
+      {
+        "y": -0.398,
+        "floor": -0.01168,
+        "roof": 0.00298,
+        "gap": 0.01466,
+        "closingRadians": 0.3186
+      },
+      {
+        "y": -0.392,
+        "floor": -0.01188,
+        "roof": 0.00303,
+        "gap": 0.01491,
+        "closingRadians": 0.3727
+      },
+      {
+        "y": -0.386,
+        "floor": -0.01958,
+        "roof": 0.00301,
+        "gap": 0.02259,
+        "closingRadians": 0.6644
+      },
+      {
+        "y": -0.38,
+        "floor": -0.02212,
+        "roof": 0.00278,
+        "gap": 0.0249,
+        "closingRadians": 0.8894
+      },
+      {
+        "y": -0.374,
+        "floor": -0.05636,
+        "roof": 0.00211,
+        "gap": 0.05847,
+        "closingRadians": 2.6575
+      },
+      {
+        "y": -0.368,
+        "floor": -0.05329,
+        "roof": 0.00057,
+        "gap": 0.05386,
+        "closingRadians": 3.3663
+      },
+      {
+        "y": -0.362,
+        "floor": -0.04714,
+        "roof": -0.00237,
+        "gap": 0.04477,
+        "closingRadians": 4.4775
+      }
+    ],
+    "stationsWithALeverUnderThem": 8,
+    "closingRadiansSpread": [
+      0.2295,
+      0.3965
+    ],
+    "verdict": "the generation arrived GAPING: the bind pose carries that gape, so Idle sits at JAW_SHUT and Eat closes through it to swallow. Swim keeps the open mouth, which is what a ram-feeding eugeneodont is doing anyway.",
+    "whorl": {
+      "method": "every whorl vertex carried through the closing rotation about the jaw hinge and measured against the palate's own ventral surface, which is the roof of the topmost void on the vertical line at that station",
+      "whorlVerticesMeasured": 709,
+      "fractionUnderThePalate": 0.9873,
+      "worstProtrusionRaw": 0.00417,
+      "worstProtrusionOverBodyLength": 0.00417,
+      "meanProtrusionOfTheVerticesThatDo": 0.00236
+    }
+  },
   "bones": 23,
   "boneNames": [
     "root",
@@ -118,7 +230,7 @@
     "Guard": 1.0746958820138e-17,
     "Parry": 5.09918318924574e-33,
     "Dodge": 8.248678958590156e-33,
-    "Eat": 4.977944471331049e-17,
+    "Eat": 3.508368115879949e-17,
     "Stagger": 3.8993755744866164e-33,
     "Ability": 3.8993755744866164e-33,
     "Grab": 7.347881115511007e-17,
@@ -129,7 +241,7 @@
     "Idle": [
       [
         -1.2486679553985596,
-        -2.5147926807403564,
+        -2.516855001449585,
         -1.1058669090270996
       ],
       [
@@ -273,7 +385,7 @@
     "Guard": [
       [
         -1.2541264295578003,
-        -2.5280191898345947,
+        -2.528475522994995,
         -1.2824130058288574
       ],
       [
@@ -309,12 +421,12 @@
     "Eat": [
       [
         -1.2486679553985596,
-        -2.5147926807403564,
+        -2.516855001449585,
         -1.1058669090270996
       ],
       [
         1.2512441873550415,
-        2.5604496002197266,
+        2.5952115058898926,
         1.1046679019927979
       ]
     ],
