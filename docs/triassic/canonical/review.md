@@ -17,7 +17,7 @@ sends the subject back to the undecided pile, where the viewer shows the candida
 
 | Delivered | Greenlit | Redo | Not yet reviewed |
 | --- | --- | --- | --- |
-| 21 | 4 | 7 | 67 |
+| 24 | 1 | 7 | 70 |
 
 ## Delivered — the model exists
 
@@ -28,6 +28,7 @@ sends the subject back to the undecided pile, where the viewer shows the candida
 | **Birgeria stensioei** `birgeria` | T11 · Rung II · the tuna | the greenlit pose | 2026-09-15 |
 | **Cartorhynchus lenticarpus** `cartorhynchus` | T18 · Rung I · the shallow-water sucker | the greenlit pose | 2026-09-15 |
 | **Ceratites nodosus** `ceratites` | T20 · Rung I · the shell | the greenlit pose | 2026-09-15 |
+| **Coelophysis** `coelophysis` | S04 · optional · the dinosaur at the water | the greenlit pose | 2026-09-15 |
 | **Cymbospondylus youngorum** `cymbospondylus` | T01 · Rung IV giant · the first giant | the greenlit pose | 2026-09-15 |
 | **Dinocephalosaurus orientalis** `dinocephalosaurus` | T04 · Rung III · the reach (32-joint neck) | the greenlit pose | 2026-09-15 |
 | **Helicoprion** `helicoprion` | T05 · Rung III · the whorl (Permian relict; see Fadenia) | the greenlit pose | 2026-09-15 |
@@ -35,6 +36,7 @@ sends the subject back to the undecided pile, where the viewer shows the candida
 | **Hupehsuchus nanchangensis** `hupehsuchus` | T16 · Rung II · the armoured gulper | the greenlit pose | 2026-09-15 |
 | **Hybodus** `hybodus` | T10 · Rung II · the spined shark | the greenlit pose | 2026-09-15 |
 | **Keichousaurus hui** `keichousaurus` | T17 · Rung I · the crowd | `male` | 2026-09-15 |
+| **Macrocnemus bassanii** `macrocnemus` | S03 · the runner (ambient) | the greenlit pose | 2026-09-15 |
 | **Mixosaurus cornalianus** `mixosaurus` | T13 · Rung II · the small fin | the greenlit pose | 2026-09-15 |
 | **Mystriosuchus** `mystriosuchus` | S02 · the surface lurker (marine phytosaur) | the greenlit pose | 2026-09-15 |
 | **Nothosaurus giganteus** `nothosaurus` | T03 · Rung III · two-gear ambusher | the greenlit pose | 2026-09-13 |
@@ -42,6 +44,7 @@ sends the subject back to the undecided pile, where the viewer shows the candida
 | **Phragmoteuthis bisinuata** `phragmoteuthis` | T21 · Rung I · the hooks | the greenlit pose | 2026-09-15 |
 | **Placodus gigas** `placodus` | T09 · Rung II · the shell-cruncher | the greenlit pose | 2026-09-15 |
 | **Rhaeticosaurus mertensi** `rhaeticosaurus` | T06 · Rung III · the flyer (first plesiosaur) | the greenlit pose | 2026-09-15 |
+| **Saurichthys** `saurichthys` | T15 · Rung II · the needle | the greenlit pose | 2026-09-15 |
 | **Shonisaurus popularis** `shonisaurus` | T02 · Rung IV giant · the pod | the greenlit pose | 2026-09-13 |
 | **Tanystropheus hydroides** `tanystropheus` | S01 · the boom (13-joint stiff neck) | the greenlit pose | 2026-09-15 |
 
@@ -53,9 +56,6 @@ shipped with the body, the specimen viewer switches between the two in place.
 | Subject | Slot | Canon image | Note |
 | --- | --- | --- | --- |
 | **Askeptosaurus italicus** `askeptosaurus` | T08 · Rung II · the turner | the pose | — |
-| **Coelophysis** `coelophysis` | S04 · optional · the dinosaur at the water | the pose | — |
-| **Macrocnemus bassanii** `macrocnemus` | S03 · the runner (ambient) | the pose | — |
-| **Saurichthys** `saurichthys` | T15 · Rung II · the needle | the pose | — |
 
 ## Redo — regenerate the canonical pose
 
@@ -117,4 +117,4 @@ wrong: there the note is the entire brief.
 
 ## Not yet reviewed
 
-`acrodus` · `anshunsaurus` · `antrimpos` · `aphaneramma` · `atopodentatus` · `birgeria` · `calcisponge` · `cartorhynchus` · `ceratites` · `chaohusaurus` · `choristoceras` · `coral-head` · `cyamodus` · `cymbospondylus` · `cymbospondylus-buchseri` · `dachstein-reef` · `daonella` · `dinocephalosaurus` · `diplopora` · `encrinus` · `eusaurosphargis` · `fadenia` · `germanonautilus` · `gipskeuper` · `guizhouichthyosaurus` · `helicoprion` · `helveticosaurus` · `henodus` · `hupehsuchus` · `hybodus` · `ichthyotitan` · `keichousaurus` · `log-raft` · `mixosaurus` · `monte-san-giorgio` · `muschelkalk` · `mystriosuchus` · `nanchangosaurus` · `neusticosaurus` · `nothosaurus` · `odontochelys` · `phragmoteuthis` · `pistosaurus` · `placochelys` · `placodus` · `placunopsis` · `placunopsis-mound` · `psephoderma` · `rebellatrix` · `reef-block` · `retiophyllia` · `rhaeticosaurus` · `saurosphargis` · `shastasaurus` · `shonisaurus` · `shore-boulder` · `sponge-mound` · `stromatolite` · `tanystropheus` · `thecosmilia` · `thylacocephala` · `traumatocrinus` · `tropites` · `utatsusaurus` · `voltzia` · `xinpusaurus` · `yunnanolimulus`
+`acrodus` · `anshunsaurus` · `antrimpos` · `aphaneramma` · `atopodentatus` · `birgeria` · `calcisponge` · `cartorhynchus` · `ceratites` · `chaohusaurus` · `choristoceras` · `coelophysis` · `coral-head` · `cyamodus` · `cymbospondylus` · `cymbospondylus-buchseri` · `dachstein-reef` · `daonella` · `dinocephalosaurus` · `diplopora` · `encrinus` · `eusaurosphargis` · `fadenia` · `germanonautilus` · `gipskeuper` · `guizhouichthyosaurus` · `helicoprion` · `helveticosaurus` · `henodus` · `hupehsuchus` · `hybodus` · `ichthyotitan` · `keichousaurus` · `log-raft` · `macrocnemus` · `mixosaurus` · `monte-san-giorgio` · `muschelkalk` · `mystriosuchus` · `nanchangosaurus` · `neusticosaurus` · `nothosaurus` · `odontochelys` · `phragmoteuthis` · `pistosaurus` · `placochelys` · `placodus` · `placunopsis` · `placunopsis-mound` · `psephoderma` · `rebellatrix` · `reef-block` · `retiophyllia` · `rhaeticosaurus` · `saurichthys` · `saurosphargis` · `shastasaurus` · `shonisaurus` · `shore-boulder` · `sponge-mound` · `stromatolite` · `tanystropheus` · `thecosmilia` · `thylacocephala` · `traumatocrinus` · `tropites` · `utatsusaurus` · `voltzia` · `xinpusaurus` · `yunnanolimulus`
