@@ -1,5 +1,5 @@
 import { ACTIVE_ERA } from '../content';
-import type { CreatureId } from '../content/creature-types';
+import type { CreatureDef, CreatureId } from '../content/creature-types';
 export type { CreatureId, AbilityId, CreatureDef, MoveDef } from '../content/creature-types';
 
 // Shared systems consume only the selected build's roster.
@@ -65,7 +65,21 @@ export function setEquivalentSizing(on: boolean) { byId = on ? flat : natural; }
  * from the resized numbers would report the size a second time and tell the player Marrella was
  * slow, when what it is is small.
  */
-export const authoredCreature = (id: CreatureId) => flat.get(id)!;
+export const authoredCreature = (id: CreatureId) => (guests.get(id as string) as typeof CREATURES[number] | undefined) ?? flat.get(id)!;
 /** The animal's own length in centimetres, where the era knows it. */
 export const realCm = (id: CreatureId) => ACTIVE_ERA.naturalSizes?.[id]?.realCm;
-export const creature = (id: CreatureId) => byId.get(id)!;
+/**
+ * Animals from the other games, admitted as visitors (src/content/visitors.ts).
+ *
+ * They are kept in their own map rather than folded into the roster on purpose: the roster is what
+ * the pick grid draws, what bots are drawn from and what the sea is populated with, and a visitor
+ * belongs to none of that — it is one body a player brought with them. So `creature()` finds it and
+ * nothing that walks `CREATURES` ever does.
+ */
+const guests = new Map<string, CreatureDef>();
+export function admitVisitors(defs: readonly CreatureDef[]) {
+  for (const d of defs) guests.set(d.id, d);
+}
+/** Is this id a visitor rather than one of this game's own? */
+export const isVisitor = (id: string) => guests.has(id);
+export const creature = (id: CreatureId) => byId.get(id) ?? (guests.get(id as string) as typeof CREATURES[number]);

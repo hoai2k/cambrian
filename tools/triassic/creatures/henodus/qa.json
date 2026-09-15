@@ -1,0 +1,21 @@
+{
+  "skinTears": {
+    "tool": "node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/henodus.glb",
+    "worstEdgeStretch": 4.81,
+    "worstClip": "Dodge",
+    "worstBone": "fore_paddle_L",
+    "worstEdgeFromTo": [0.045, 0.215],
+    "clipsOverTwoTimes": 20,
+    "reference": "Nothosaurus 2.98x clean, Tanystropheus 6.1x, Placodus 12.4x, Coelophysis 25.3x",
+    "note": "The first build weighted 84 % of a forelimb into the top of the carapace, because a lateral |y| criterion cannot separate limb from shell on a body half a body length wide, and tore to 64.9x in every locomotion clip. Bounding the limb radially against its own bone chain took it to 4.81x. What is left is the splayed five-toed manus, whose spread in x is wider than any tube around the paddle bone can claim."
+  },
+  "gapeSolid": {
+    "tool": "/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- henodus Bite@0.25 Heavy@0.1 Eat@0.4 Graze@0.6 Ability@0.5",
+    "verdict": "PASS",
+    "maxSeenThroughTheBody": 9,
+    "ofPixels": 378000,
+    "tolerance": 12,
+    "perShot": { "Bite@0.25": 0, "Heavy@0.1": 4, "Eat@0.4": 5, "Graze@0.6": 9, "Ability@0.5": 1 },
+    "note": "The leak that remains is a handful of pixels at the rear commissure of a beak 0.13 of a body length wide, where a midline hinge envelope cannot reach. It was closed to this by carrying the one oral lining 0.048 behind the hinge at 85 % of the mouth's own measured width rather than pinching it to 16 % there."
+  }
+}

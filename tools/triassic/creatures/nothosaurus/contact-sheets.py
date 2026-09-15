@@ -16,3 +16,17 @@ for sheet,names in sets.items():
    src=Image.open(p).convert('RGBA');src.thumbnail((w,h-26));index=i*2+j;x=(index%cols)*w;y=(index//cols)*h
    img.paste(src,(x+(w-src.width)//2,y+24),src);d.text((x+8,y+7),kind+' / '+n,fill='white')
  img.save(dest/(sheet+'.jpg'),quality=92)
+
+# The webbing is judged against a saturated ground, where a gap between two toes is unmistakable
+# rather than a dark patch. Authored body only: the twin has no digits to web, it resurfaces the
+# paddle the webbing made. Only built while `--feet-only` has been run.
+feet=[('%s-%s'%(n,v)) for n in ['foreL','foreR','hindL','hindR'] for v in ['top','under','out']]
+if all((base/'authored-review'/('feet-'+n+'.png')).exists() for n in feet):
+ w,h=400,400;cols=6;rows=(len(feet)+cols-1)//cols
+ img=Image.new('RGB',(w*cols,h*rows),(28,34,40));d=ImageDraw.Draw(img)
+ for i,n in enumerate(feet):
+  src=Image.open(base/'authored-review'/('feet-'+n+'.png')).convert('RGB');src.thumbnail((w,h-26))
+  x=(i%cols)*w;y=(i//cols)*h
+  img.paste(src,(x+(w-src.width)//2,y+24));d.text((x+8,y+7),n,fill='white')
+ img.save(dest/'webbed-feet-sheet.jpg',quality=90)
+ print('wrote webbed-feet-sheet.jpg',img.size)
