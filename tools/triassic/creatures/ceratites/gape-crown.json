@@ -18,8 +18,8 @@
       "clip": "Bite",
       "t": 0.25,
       "openedWhereTheMouthIsDrawn": 0,
-      "openedAnywhere": 6,
-      "mouthPixels": 16169,
+      "openedAnywhere": 3,
+      "mouthPixels": 16170,
       "solid": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/ceratites/gape-crown/Bite-0.25-solid.png",
       "culled": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/ceratites/gape-crown/Bite-0.25-culled.png",
       "marker": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/ceratites/gape-crown/Bite-0.25-marker.png"
@@ -28,8 +28,8 @@
       "clip": "Attack",
       "t": 0.44,
       "openedWhereTheMouthIsDrawn": 4,
-      "openedAnywhere": 17,
-      "mouthPixels": 15442,
+      "openedAnywhere": 16,
+      "mouthPixels": 15450,
       "solid": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/ceratites/gape-crown/Attack-0.44-solid.png",
       "culled": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/ceratites/gape-crown/Attack-0.44-culled.png",
       "marker": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/ceratites/gape-crown/Attack-0.44-marker.png"
@@ -38,8 +38,8 @@
       "clip": "Eat",
       "t": 0.4,
       "openedWhereTheMouthIsDrawn": 2,
-      "openedAnywhere": 16,
-      "mouthPixels": 15466,
+      "openedAnywhere": 15,
+      "mouthPixels": 15458,
       "solid": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/ceratites/gape-crown/Eat-0.4-solid.png",
       "culled": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/ceratites/gape-crown/Eat-0.4-culled.png",
       "marker": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/ceratites/gape-crown/Eat-0.4-marker.png"

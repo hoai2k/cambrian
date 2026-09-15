@@ -86,11 +86,15 @@ const pose = (v, out) => {
     if (w > 0.999) nearPure++;
     if (w >= 1 - 1e-6 && pure.length < 400) pure.push(v);
   }
-  assert(pure.length > 100, `the mantle must own a solid block of skin outright (${pure.length})`);
+  // Fewer outright-owned vertices than Ceratites' shell has, and that is the design rather than a
+  // weakness: the squeeze's feather deliberately spreads most of the flank across three bones, so
+  // what the mantle owns alone is the dorsal and ventral strips between them. The rigid-body test
+  // is exact, so a few dozen points and the hundreds of pairs between them settle it.
+  assert(pure.length > 30, `the mantle must own a block of skin outright (${pure.length})`);
   const p = new THREE.Vector3();
   const snap = () => pure.map((v) => pose(v, p).clone());
   const pairs = [];
-  for (let i = 0; i < pure.length; i += 7) for (let j = i + 13; j < pure.length; j += 53) pairs.push([i, j]);
+  for (let i = 0; i < pure.length; i += 2) for (let j = i + 3; j < pure.length; j += 7) pairs.push([i, j]);
   mixer.stopAllAction();
   gltf.scene.updateMatrixWorld(true);
   for (const m of meshes) m.skeleton.update();

@@ -288,8 +288,16 @@ def arm_centrelines():
         pts, rad = [], []
         for k in range(ARM_SEG):
             lo = dmax * k / ARM_SEG
-            hi = dmax * (k + 1.15) / ARM_SEG
-            band = [v for v in part if lo <= dist.get(v, 1e9) <= hi]
+            # **A station is never skipped.** The band was a fixed window and an appendage the
+            # generation meshed thinly could leave one empty, so that arm came out with three joints
+            # where its neighbours had five -- and its one distal bone then had to carry the whole
+            # of a long arm, which `skin-tears.mjs` read as the worst edge on the body. The window
+            # grows until it has something in it instead.
+            band, grow = [], 1.15
+            while len(band) < 3 and grow < 4.:
+                hi = dmax * (k + grow) / ARM_SEG
+                band = [v for v in part if lo <= dist.get(v, 1e9) <= hi]
+                grow += .35
             if len(band) < 3:
                 continue
             q = np.array([v.co[:] for v in band])
@@ -650,7 +658,7 @@ influences, weight_tally = [], {}
 AUTH_GROUP, PUP_GROUP = [auth], [puppet]
 for o in (auth, puppet):
     per_vertex = [weights(v.co) for v in o.data.vertices]
-    per_vertex = T.relax_weights(o, per_vertex, passes=3, keep=4, hold=.45)
+    per_vertex = T.relax_weights(o, per_vertex, passes=4, keep=4, hold=.45)
     for n in ORDER:
         o.vertex_groups.new(name=n)
     for v in o.data.vertices:
@@ -921,11 +929,11 @@ for clip, duration in CLIPS.items():
                 sweep = .55 + .18 * sin(p * 2 - phase)
                 curl = .45 + .18 * sin(p * 2 - phase)
             if clip == 'Heavy':
-                sweep = 1.30 * e                                   # folded back over the aperture
-                curl = .85 * e
+                sweep = 1.05 * e                                   # folded back over the aperture
+                curl = .70 * e
             if clip == 'Guard':
-                sweep = 1.30 + .07 * sin(p - phase)
-                curl = .85 + .05 * sin(p - phase)
+                sweep = 1.05 + .07 * sin(p - phase)
+                curl = .70 + .05 * sin(p - phase)
             if clip in ('Hit', 'Stagger', 'Parry'):
                 sweep = .60 * e
                 curl = .40 * e

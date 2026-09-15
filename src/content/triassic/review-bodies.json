@@ -37,8 +37,8 @@
     "model": "assets/triassic/creatures/ceratites.glb",
     "puppet": "assets/triassic/creatures/ceratites.puppet.glb",
     "lod": "assets/triassic/creatures/ceratites.lod1.glb",
-    "bytes": 3015076,
-    "sha256": "1ee2779ecd20fb53cf4feaf0dd9eb49dd0f7e0fc154116d8f1a5f8494eab07fa",
+    "bytes": 3018716,
+    "sha256": "254d45e38de854a761aa86941051d01c94e7972bed7a123ce8d2c164fadd4f83",
     "clips": [
       "Ability",
       "Attack",
@@ -407,8 +407,8 @@
     "model": "assets/triassic/creatures/phragmoteuthis.glb",
     "puppet": "assets/triassic/creatures/phragmoteuthis.puppet.glb",
     "lod": "assets/triassic/creatures/phragmoteuthis.lod1.glb",
-    "bytes": 2982640,
-    "sha256": "ef84c57f0d02db19adafd7132ea351ab51b54e22b0a44d1ca4220639f6ff60cc",
+    "bytes": 2984924,
+    "sha256": "8ebb6b82fb38435a5aad2b47931454d0c2134427be416fc9e68a9163c2e9533e",
     "clips": [
       "Ability",
       "Attack",

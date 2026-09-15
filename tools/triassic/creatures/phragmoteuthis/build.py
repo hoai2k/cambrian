@@ -223,8 +223,16 @@ def arm_centrelines(nseg_for):
         pts, rad = [], []
         for k in range(nseg):
             lo = dmax * k / nseg
-            hi = dmax * (k + 1.15) / nseg
-            band = [v for v in part if lo <= dist.get(v, 1e9) <= hi]
+            # **A station is never skipped.** The band was a fixed window and an appendage the
+            # generation meshed thinly could leave one empty, so that arm came out with three joints
+            # where its neighbours had five -- and its one distal bone then had to carry the whole
+            # of a long arm, which `skin-tears.mjs` read as the worst edge on the body. The window
+            # grows until it has something in it instead.
+            band, grow = [], 1.15
+            while len(band) < 3 and grow < 4.:
+                hi = dmax * (k + grow) / nseg
+                band = [v for v in part if lo <= dist.get(v, 1e9) <= hi]
+                grow += .35
             if len(band) < 3:
                 continue
             q = np.array([v.co[:] for v in band])
@@ -562,7 +570,11 @@ def squeeze_share(q):
         return 0., None
     hw = max(float(half_width(y)), 1e-4)
     lateral = (float(q.x) - float(cx(y))) / hw
-    band = smooth((abs(lateral) - .35) / .45) \
+    # A wide feather across the section. The squeeze moves flank skin sideways while the skin
+    # above and below it stays put, so however gentle the travel the boundary between them is where
+    # this body tears; the answer is to spread the boundary over most of the flank rather than to
+    # make the jet smaller.
+    band = smooth((abs(lateral) - .20) / .62) \
         * smooth((float(q.y) - (MANTLE_FRONT - .02)) / .06) \
         * smooth(((FIN_Y0 + .04) - float(q.y)) / .08)
     if band <= 0:
@@ -635,7 +647,7 @@ for o in (auth, puppet):
     th = thickness if o is auth else pup_thickness
     blades = [smooth((THIN - float(th[i])) / THIN_BAND) for i in range(len(o.data.vertices))]
     per_vertex = [weights(v.co, blades[v.index]) for v in o.data.vertices]
-    per_vertex = T.relax_weights(o, per_vertex, passes=3, keep=4, hold=.45)
+    per_vertex = T.relax_weights(o, per_vertex, passes=4, keep=4, hold=.45)
     for n in ORDER:
         o.vertex_groups.new(name=n)
     for v in o.data.vertices:
@@ -924,8 +936,8 @@ for clip, duration in CLIPS.items():
                 sweep = .55 + .18 * sin(p * 2 - phase)
                 curl = .45 + .18 * sin(p * 2 - phase)
             if clip == 'Guard':
-                sweep = 1.15 + .07 * sin(p - phase)
-                curl = .80 + .05 * sin(p - phase)
+                sweep = .98 + .07 * sin(p - phase)
+                curl = .68 + .05 * sin(p - phase)
             if clip in ('Hit', 'Stagger', 'Parry'):
                 sweep = .60 * e
                 curl = .40 * e

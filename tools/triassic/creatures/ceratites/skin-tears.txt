@@ -1,19 +1,17 @@
 
 public/assets/triassic/creatures/ceratites.glb   34123 edges x 17 phases x 21 clips
 clip            skin  on bone             all     >2x  worst bones
-Guard          4.34x  head              4.34x     632  0.036->0.157  arm_00_04:250 arm_10_04:136 head:110 arm_12_04:68
-Heavy          4.17x  head              4.17x     204  0.036->0.151  arm_00_04:60 arm_10_04:58 head:34 arm_12_04:28
-Grab           3.35x  head              3.35x     116  0.036->0.121  arm_10_04:41 arm_12_04:22 head:19 arm_00_04:19
-Attack         3.00x  head              3.00x      33  0.036->0.109  arm_10_04:10 arm_12_04:8 head:8 arm_00_03:4
-Eat            2.80x  arm_00_03         2.80x      74  0.046->0.130  head:26 arm_12_04:18 arm_00_03:13 arm_10_04:10
-Stagger        2.42x  arm_00_03         2.42x      14  0.046->0.112  head:6 arm_00_03:5 arm_10_04:3
-Hit            2.41x  arm_00_03         2.41x      13  0.046->0.112  arm_00_03:5 head:5 arm_10_04:3
-Parry          2.40x  arm_00_03         2.40x      11  0.046->0.111  arm_00_03:5 arm_10_04:3 head:3
-Bite           2.17x  arm_00_03         2.17x       3  0.046->0.100  arm_00_03:3
-Swim           2.12x  head              2.12x       4  0.041->0.088  head:2 arm_00_04:2
-Sprint         2.11x  head              2.11x       4  0.041->0.087  head:2 arm_00_04:2
-Dodge          2.00x  head              2.00x       0  0.041->0.083  
-TurnLeft       1.72x  arm_00_03         1.72x       0  0.046->0.080  
-Rise           1.65x  body              1.65x       0  0.046->0.075  
-11 of 21 clips tear an edge past 2x
-worst SKIN 4.34x · worst including the oral lining 4.34x
+Guard          3.23x  head              3.23x     123  0.036->0.117  head:51 arm_00_03:34 arm_00_04:21 arm_10_04:17
+Heavy          3.09x  head              3.09x      41  0.036->0.112  head:19 arm_00_03:12 arm_10_04:5 arm_00_04:5
+Grab           2.95x  head              2.95x      35  0.036->0.107  head:17 arm_00_03:8 arm_10_04:5 arm_00_04:5
+Attack         2.66x  head              2.66x      10  0.036->0.096  head:5 arm_00_03:3 arm_10_04:1 arm_00_04:1
+Eat            2.48x  arm_00_03         2.48x      28  0.046->0.115  head:14 arm_00_03:11 arm_10_04:3
+Stagger        2.17x  arm_00_03         2.17x       4  0.046->0.100  arm_00_03:3 head:1
+Hit            2.17x  arm_00_03         2.17x       4  0.046->0.100  arm_00_03:3 head:1
+Parry          2.15x  arm_00_03         2.15x       3  0.046->0.100  arm_00_03:3
+Bite           1.96x  arm_00_03         1.96x       0  0.046->0.091  
+Swim           1.93x  head              1.93x       0  0.041->0.080  
+Sprint         1.92x  head              1.92x       0  0.041->0.080  
+Dodge          1.83x  head              1.83x       0  0.041->0.076  
+8 of 21 clips tear an edge past 2x
+worst SKIN 3.23x · worst including the oral lining 3.23x
