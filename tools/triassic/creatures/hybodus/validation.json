@@ -65,9 +65,9 @@
     "meanJointGapRaw": 0.0,
     "meanJointGapOverBodyLength": 0.0,
     "maxJointGapOverBodyLength": 0.0,
-    "finVerticesMeasured": 2933,
-    "meanMirroredSurfaceGapOverBodyLength": 0.0103,
-    "p95MirroredSurfaceGapOverBodyLength": 0.04203
+    "finVerticesMeasured": 2860,
+    "meanMirroredSurfaceGapOverBodyLength": 0.01043,
+    "p95MirroredSurfaceGapOverBodyLength": 0.04238
   },
   "mouth": {
     "method": "geometric: every head vertex casts its own outward normal back into the mesh",
@@ -155,13 +155,24 @@
     "skullSideVertices": 9117,
     "note": "a height test on the vertex itself splits interlocking teeth down the middle and a graded one stretches each half between two bones -- which is how this fish's upper tooth row first came out as a comb of needles two head-depths long. Taking the height of the smoothed surface instead, which is the tooth's own base, puts every tooth whole on the jaw it grows from. Flood-filling labels from the skin was tried first and is worse on a needle rostrum: the seeds are sparse on a tube that thin and the label boundary wanders through it, which tore the snout into ribbons."
   },
-  "liningClearanceInsideSkinRaw": 0.00629,
+  "hingePlug": {
+    "inwardPullStepsToFitInsideTheSilhouette": 1606,
+    "plugVertices": 164,
+    "nominalRadiiUnits": [
+      0.7948,
+      1.9733,
+      0.8099
+    ],
+    "clearanceInsideSilhouetteRaw": 0.00402,
+    "note": "rigid on the skull, shaped like the head section at the pivot rather than like a ball, and fitted so it cannot come out through the cheek."
+  },
+  "liningClearanceInsideSkinRaw": 0.0042,
   "scale": 4.22013,
   "bodyLength": 5.0,
-  "authoredTriangles": 22267,
-  "twinTriangles": 8866,
+  "authoredTriangles": 22335,
+  "twinTriangles": 8194,
   "twinRemeshTriangles": 63140,
-  "twinDecimateRatio": 0.1140323057770729,
+  "twinDecimateRatio": 0.10294583439826965,
   "twinVerticesHeldBackFromRelaxation": 11372,
   "bladeDilation": 0.006,
   "voxel": 0.006,
@@ -254,277 +265,277 @@
   "boundsAt13Phases": {
     "Idle": [
       [
-        -1.3635361194610596,
-        -2.6475486755371094,
-        -0.958815336227417
+        -1.363551139831543,
+        -3.785191535949707,
+        -0.9596453905105591
       ],
       [
-        1.3014568090438843,
-        2.515737771987915,
+        1.297282338142395,
+        2.5152664184570312,
         1.045843243598938
       ]
     ],
     "Swim": [
       [
-        -1.383048176765442,
-        -2.6475486755371094,
-        -1.0025221109390259
+        -1.3831545114517212,
+        -3.785191535949707,
+        -0.9969311952590942
       ],
       [
-        1.3244487047195435,
-        2.515737771987915,
+        1.313684105873108,
+        2.5152664184570312,
         1.0505831241607666
       ]
     ],
     "Sprint": [
       [
-        -1.388853907585144,
-        -2.647519826889038,
-        -1.0651397705078125
+        -1.3890748023986816,
+        -3.785191535949707,
+        -1.0268348455429077
       ],
       [
-        1.3454935550689697,
-        2.515737771987915,
+        1.3264713287353516,
+        2.5152664184570312,
         1.0535202026367188
       ]
     ],
     "TurnLeft": [
       [
         -1.3512964248657227,
-        -2.647348403930664,
-        -1.2928729057312012
+        -3.785191535949707,
+        -1.295689344406128
       ],
       [
-        1.295518159866333,
-        2.515737771987915,
+        1.3033463954925537,
+        2.5152664184570312,
         1.0460145473480225
       ]
     ],
     "TurnRight": [
       [
-        -1.3852226734161377,
-        -2.647348403930664,
-        -1.4037091732025146
+        -1.3852930068969727,
+        -3.785191535949707,
+        -1.368780255317688
       ],
       [
         1.2908520698547363,
-        2.515737771987915,
+        2.5152664184570312,
         1.0436943769454956
       ]
     ],
     "Dive": [
       [
-        -1.3574925661087036,
-        -2.6490073204040527,
-        -1.193415641784668
+        -1.3575379848480225,
+        -3.7918355464935303,
+        -1.1902780532836914
       ],
       [
-        1.2964600324630737,
-        2.515737771987915,
+        1.2946195602416992,
+        2.5152664184570312,
         1.0436943769454956
       ]
     ],
     "Rise": [
       [
-        -1.362591028213501,
-        -2.647348403930664,
-        -1.3306260108947754
+        -1.3625727891921997,
+        -3.785191535949707,
+        -1.330580234527588
       ],
       [
-        1.3018463850021362,
-        2.515995740890503,
+        1.293092966079712,
+        2.515584945678711,
         1.1012121438980103
       ]
     ],
     "Attack": [
       [
-        -1.390180230140686,
-        -2.9820749759674072,
-        -1.0319551229476929
+        -1.3901662826538086,
+        -4.112918376922607,
+        -1.0319724082946777
       ],
       [
-        1.3283443450927734,
-        2.537261486053467,
+        1.3211524486541748,
+        2.5382211208343506,
         1.0599169731140137
       ]
     ],
     "Bite": [
       [
-        -1.3668564558029175,
-        -2.760080337524414,
-        -0.95405513048172
+        -1.36684250831604,
+        -3.8793158531188965,
+        -0.9540560245513916
       ],
       [
-        1.2978515625,
-        2.515737771987915,
+        1.2939140796661377,
+        2.5152664184570312,
         1.0453497171401978
       ]
     ],
     "Heavy": [
       [
-        -1.4556517601013184,
-        -3.182044267654419,
-        -1.086737871170044
+        -1.4556549787521362,
+        -4.307912826538086,
+        -1.0899887084960938
       ],
       [
-        1.3801087141036987,
-        2.5572597980499268,
+        1.3718035221099854,
+        2.5592081546783447,
         1.0481345653533936
       ]
     ],
     "Hit": [
       [
-        -1.620499610900879,
-        -2.647348403930664,
-        -1.1961853504180908
+        -1.6204930543899536,
+        -3.785191535949707,
+        -1.1751490831375122
       ],
       [
-        1.300080418586731,
-        2.6105785369873047,
+        1.2991951704025269,
+        2.6125540733337402,
         1.0436943769454956
       ]
     ],
     "Death": [
       [
-        -1.6131922006607056,
-        -2.6498117446899414,
-        -1.6954234838485718
+        -1.6060290336608887,
+        -3.7922182083129883,
+        -1.6809359788894653
       ],
       [
         1.2908520698547363,
-        2.515737771987915,
-        1.2744005918502808
+        2.5152664184570312,
+        1.27655827999115
       ]
     ],
     "Guard": [
       [
-        -1.3814804553985596,
-        -2.6495025157928467,
-        -1.0740077495574951
+        -1.3815058469772339,
+        -3.791731119155884,
+        -1.0739277601242065
       ],
       [
-        1.3475948572158813,
-        2.515737771987915,
+        1.3263835906982422,
+        2.5152664184570312,
         1.0436943769454956
       ]
     ],
     "Parry": [
       [
         -1.3512964248657227,
-        -2.647348403930664,
-        -1.2970092296600342
+        -3.785191535949707,
+        -1.2978887557983398
       ],
       [
-        1.6834068298339844,
-        2.515737771987915,
+        1.6773293018341064,
+        2.5152664184570312,
         1.0460093021392822
       ]
     ],
     "Dodge": [
       [
-        -1.6560618877410889,
-        -2.647348403930664,
-        -1.4545483589172363
+        -1.6556757688522339,
+        -3.785191535949707,
+        -1.4239375591278076
       ],
       [
         1.2908520698547363,
-        2.515737771987915,
+        2.5152664184570312,
         1.0436943769454956
       ]
     ],
     "Eat": [
       [
-        -1.3643133640289307,
-        -2.6600489616394043,
-        -0.959797739982605
+        -1.3642178773880005,
+        -3.783607006072998,
+        -0.9608973860740662
       ],
       [
-        1.3022013902664185,
-        2.515737771987915,
+        1.3052054643630981,
+        2.5152664184570312,
         1.0460021495819092
       ]
     ],
     "Stagger": [
       [
-        -1.6099218130111694,
-        -2.647348403930664,
-        -1.1961853504180908
+        -1.6102657318115234,
+        -3.785191535949707,
+        -1.1751490831375122
       ],
       [
-        1.2958909273147583,
-        2.6077139377593994,
+        1.291979432106018,
+        2.607111692428589,
         1.0436943769454956
       ]
     ],
     "Ability": [
       [
         -1.3512964248657227,
-        -2.6526899337768555,
-        -1.0663667917251587
+        -3.785191535949707,
+        -1.0663607120513916
       ],
       [
-        1.295279860496521,
-        2.5159153938293457,
+        1.2926791906356812,
+        2.51556134223938,
         1.1134276390075684
       ]
     ],
     "Grab": [
       [
-        -1.4617033004760742,
-        -2.8287253379821777,
-        -1.1425395011901855
+        -1.4618123769760132,
+        -3.941411018371582,
+        -1.1428862810134888
       ],
       [
-        1.411233901977539,
-        2.3757376670837402,
+        1.403503656387329,
+        2.3752663135528564,
         1.0472521781921387
       ]
     ],
     "Breath": [
       [
-        -1.3588892221450806,
-        -2.647348403930664,
-        -1.0258134603500366
+        -1.35891592502594,
+        -3.785191535949707,
+        -1.0258007049560547
       ],
       [
-        1.2976504564285278,
-        2.515897274017334,
+        1.2941257953643799,
+        2.5154669284820557,
         1.1179367303848267
       ]
     ],
     "Growth": [
       [
         -1.3512964248657227,
-        -2.647348403930664,
-        -1.029160737991333
+        -3.785191535949707,
+        -1.0291568040847778
       ],
       [
-        1.3445640802383423,
-        2.515782594680786,
+        1.3496891260147095,
+        2.5153963565826416,
         1.0608258247375488
       ]
     ],
     "Shake": [
       [
-        -1.5799686908721924,
-        -2.782125949859619,
-        -1.5614068508148193
+        -1.5803512334823608,
+        -3.8784756660461426,
+        -1.5609536170959473
       ],
       [
-        1.5394214391708374,
-        2.515737771987915,
+        1.5361145734786987,
+        2.5152664184570312,
         1.0475062131881714
       ]
     ],
     "SpineBrace": [
       [
-        -1.3678096532821655,
-        -2.6420958042144775,
-        -1.1729762554168701
+        -1.3677442073822021,
+        -3.7656161785125732,
+        -1.1729650497436523
       ],
       [
-        1.3416101932525635,
-        2.5130960941314697,
+        1.2979018688201904,
+        2.5129616260528564,
         1.0683256387710571
       ]
     ]
@@ -534,63 +545,217 @@
       "maxInfluences": 4,
       "vertices": 9955,
       "verticesPerBone": {
-        "dorsal_1": 533,
-        "chest": 3492,
-        "body": 2441,
-        "tail_00": 1445,
-        "skull": 3120,
-        "dorsal_2": 335,
-        "tail_01": 910,
-        "tail_02": 669,
-        "pec_mid_R": 611,
-        "pec_upper_R": 378,
-        "tail_03": 792,
-        "tail_04": 672,
-        "pelvic_L": 241,
-        "tail_05": 426,
-        "tail_06": 370,
-        "pec_tip_R": 475,
-        "pec_mid_L": 346,
-        "pec_upper_L": 274,
-        "pec_tip_L": 244,
-        "pelvic_R": 249,
-        "caudal_lower": 32
+        "dorsal_1": 994,
+        "body": 4163,
+        "chest": 5624,
+        "tail_00": 2664,
+        "skull": 4605,
+        "pec_mid_L": 711,
+        "pec_upper_L": 706,
+        "dorsal_2": 530,
+        "tail_01": 1949,
+        "tail_02": 1359,
+        "pec_mid_R": 916,
+        "pec_upper_R": 803,
+        "tail_03": 1295,
+        "tail_04": 1176,
+        "pelvic_R": 485,
+        "tail_05": 908,
+        "pelvic_L": 546,
+        "tail_06": 619,
+        "caudal_upper": 241,
+        "caudal_lower": 284,
+        "pec_tip_R": 538,
+        "pec_tip_L": 393
       }
     },
     "Hybodus procedural volume twin": {
       "maxInfluences": 4,
-      "vertices": 3824,
+      "vertices": 3468,
       "verticesPerBone": {
-        "tail_05": 143,
-        "tail_06": 186,
-        "caudal_lower": 30,
-        "caudal_upper": 2,
-        "tail_03": 309,
-        "tail_02": 269,
-        "tail_04": 233,
-        "tail_00": 589,
-        "body": 774,
-        "tail_01": 418,
-        "dorsal_2": 203,
-        "pelvic_R": 118,
-        "pelvic_L": 117,
-        "chest": 1163,
-        "dorsal_1": 239,
-        "skull": 1069,
-        "pec_upper_L": 136,
-        "pec_mid_L": 179,
-        "pec_tip_L": 131,
-        "pec_upper_R": 168,
-        "pec_mid_R": 253,
-        "pec_tip_R": 218
+        "tail_05": 356,
+        "tail_06": 240,
+        "tail_04": 431,
+        "tail_03": 449,
+        "caudal_lower": 123,
+        "caudal_upper": 97,
+        "tail_02": 494,
+        "tail_01": 878,
+        "tail_00": 1130,
+        "body": 1566,
+        "dorsal_2": 235,
+        "chest": 2031,
+        "pelvic_L": 253,
+        "pelvic_R": 230,
+        "dorsal_1": 414,
+        "skull": 1653,
+        "pec_upper_R": 453,
+        "pec_upper_L": 372,
+        "pec_mid_L": 389,
+        "pec_tip_L": 210,
+        "pec_mid_R": 412,
+        "pec_tip_R": 227
       }
     }
+  },
+  "finBladeSpansMeasuredOffTheGeneration": {
+    "caudal": [
+      0.00266,
+      0.01508
+    ]
+  },
+  "bladeVerticesByStation": [
+    {
+      "fromBodyFraction": 0.0,
+      "above": 14,
+      "below": 134,
+      "maxOutAbove": 0.0173,
+      "maxOutBelow": 0.0301
+    },
+    {
+      "fromBodyFraction": 0.05,
+      "above": 61,
+      "below": 92,
+      "maxOutAbove": 0.0259,
+      "maxOutBelow": 0.03
+    },
+    {
+      "fromBodyFraction": 0.1,
+      "above": 0,
+      "below": 15,
+      "maxOutAbove": 0.0,
+      "maxOutBelow": 0.0252
+    },
+    {
+      "fromBodyFraction": 0.15,
+      "above": 25,
+      "below": 521,
+      "maxOutAbove": 0.0162,
+      "maxOutBelow": 0.18
+    },
+    {
+      "fromBodyFraction": 0.2,
+      "above": 0,
+      "below": 739,
+      "maxOutAbove": 0.0,
+      "maxOutBelow": 0.1845
+    },
+    {
+      "fromBodyFraction": 0.25,
+      "above": 18,
+      "below": 408,
+      "maxOutAbove": 0.1068,
+      "maxOutBelow": 0.1851
+    },
+    {
+      "fromBodyFraction": 0.3,
+      "above": 226,
+      "below": 53,
+      "maxOutAbove": 0.1796,
+      "maxOutBelow": 0.1153
+    },
+    {
+      "fromBodyFraction": 0.35,
+      "above": 268,
+      "below": 0,
+      "maxOutAbove": 0.2213,
+      "maxOutBelow": 0.0
+    },
+    {
+      "fromBodyFraction": 0.4,
+      "above": 21,
+      "below": 0,
+      "maxOutAbove": 0.097,
+      "maxOutBelow": 0.0
+    },
+    {
+      "fromBodyFraction": 0.45,
+      "above": 14,
+      "below": 62,
+      "maxOutAbove": 0.0833,
+      "maxOutBelow": 0.0835
+    },
+    {
+      "fromBodyFraction": 0.5,
+      "above": 120,
+      "below": 356,
+      "maxOutAbove": 0.1238,
+      "maxOutBelow": 0.1357
+    },
+    {
+      "fromBodyFraction": 0.55,
+      "above": 189,
+      "below": 228,
+      "maxOutAbove": 0.1542,
+      "maxOutBelow": 0.1473
+    },
+    {
+      "fromBodyFraction": 0.6,
+      "above": 18,
+      "below": 74,
+      "maxOutAbove": 0.1624,
+      "maxOutBelow": 0.0796
+    },
+    {
+      "fromBodyFraction": 0.65,
+      "above": 0,
+      "below": 82,
+      "maxOutAbove": 0.0,
+      "maxOutBelow": 0.0819
+    },
+    {
+      "fromBodyFraction": 0.7,
+      "above": 0,
+      "below": 85,
+      "maxOutAbove": 0.0,
+      "maxOutBelow": 0.1099
+    },
+    {
+      "fromBodyFraction": 0.75,
+      "above": 0,
+      "below": 295,
+      "maxOutAbove": 0.0,
+      "maxOutBelow": 0.1765
+    },
+    {
+      "fromBodyFraction": 0.8,
+      "above": 0,
+      "below": 125,
+      "maxOutAbove": 0.0,
+      "maxOutBelow": 0.0723
+    },
+    {
+      "fromBodyFraction": 0.85,
+      "above": 46,
+      "below": 138,
+      "maxOutAbove": 0.0172,
+      "maxOutBelow": 0.0571
+    },
+    {
+      "fromBodyFraction": 0.9,
+      "above": 52,
+      "below": 115,
+      "maxOutAbove": 0.0177,
+      "maxOutBelow": 0.0515
+    },
+    {
+      "fromBodyFraction": 0.95,
+      "above": 39,
+      "below": 83,
+      "maxOutAbove": 0.016,
+      "maxOutBelow": 0.0367
+    }
+  ],
+  "weightRelaxation": {
+    "passes": 10,
+    "keptPerPass": 0.45,
+    "note": "each pass replaces a vertex's weights with this much of its own and the rest shared equally among its neighbours on the mesh graph"
   },
   "envelope": {
     "maximumEnvelopeDifference": 0.060456812381744385,
     "maximumEnvelopeDifferenceFractionOfBodyLength": 0.012091362476348877,
-    "surfaceDistanceMax": 0.07446051388978958,
-    "surfaceDistanceP95": 0.02640808178111911,
+    "surfaceDistanceMax": 0.07419749349355698,
+    "surfaceDistanceP95": 0.026287045795470476,
     "envelopeTolerance": 0.2
   },
   "anchors": {
@@ -631,7 +796,7 @@
   },
   "authoredVerticesFarthestFromTheTwin": [
     [
-      0.0745,
+      0.0742,
       [
         0.042,
         -0.642,
@@ -639,7 +804,7 @@
       ]
     ],
     [
-      0.0703,
+      0.0712,
       [
         0.022,
         -0.665,
@@ -655,23 +820,15 @@
       ]
     ],
     [
-      0.0609,
+      0.0644,
       [
-        0.075,
-        -0.671,
-        0.371
+        -0.214,
+        -2.121,
+        0.073
       ]
     ],
     [
-      0.0605,
-      [
-        0.017,
-        -0.651,
-        0.364
-      ]
-    ],
-    [
-      0.0592,
+      0.0634,
       [
         -0.17,
         -2.166,
@@ -679,19 +836,27 @@
       ]
     ],
     [
-      0.0586,
+      0.0616,
       [
-        0.071,
-        -0.63,
-        0.373
+        -0.026,
+        -2.138,
+        0.074
       ]
     ],
     [
-      0.0585,
+      0.0615,
       [
-        -0.174,
-        -2.19,
-        0.085
+        0.017,
+        -0.651,
+        0.364
+      ]
+    ],
+    [
+      0.0609,
+      [
+        0.075,
+        -0.671,
+        0.371
       ]
     ]
   ],
@@ -708,277 +873,179 @@
   "normalizedWeights": true,
   "rootStable": true,
   "noScaleChannels": true,
-  "skinTears": {
-    "tool": "node tools/triassic/skin-tears.mjs",
-    "worstRatio": 56.03,
-    "worstClip": "Shake",
-    "worstEdgeUnits": [
-      0.011,
-      0.641
-    ],
-    "clipsTearingAnEdgePast2x": 21,
-    "perClip": [
-      {
-        "clip": "Shake",
-        "worstRatio": 56.03,
-        "onBone": "skull",
-        "edgesOver2x": 1368,
-        "worstEdgeUnits": [
-          0.011,
-          0.641
-        ],
-        "bonesWithMostTornEdges": "skull:674 pec_tip_L:329 pec_mid_L:115 pec_mid_R:90"
-      },
-      {
-        "clip": "Death",
-        "worstRatio": 48.78,
-        "onBone": "skull",
-        "edgesOver2x": 1864,
-        "worstEdgeUnits": [
-          0.011,
-          0.558
-        ],
-        "bonesWithMostTornEdges": "skull:769 pec_tip_L:315 pelvic_L:177 pec_mid_L:143"
-      },
-      {
-        "clip": "Ability",
-        "worstRatio": 37.93,
-        "onBone": "skull",
-        "edgesOver2x": 1240,
-        "worstEdgeUnits": [
-          0.011,
-          0.434
-        ],
-        "bonesWithMostTornEdges": "skull:642 pec_tip_L:316 pec_mid_L:122 pec_mid_R:99"
-      },
-      {
-        "clip": "Dodge",
-        "worstRatio": 37.25,
-        "onBone": "skull",
-        "edgesOver2x": 1006,
-        "worstEdgeUnits": [
-          0.011,
-          0.426
-        ],
-        "bonesWithMostTornEdges": "skull:528 pec_tip_L:309 pec_mid_L:124 pec_upper_L:45"
-      },
-      {
-        "clip": "Grab",
-        "worstRatio": 34.85,
-        "onBone": "skull",
-        "edgesOver2x": 1359,
-        "worstEdgeUnits": [
-          0.011,
-          0.399
-        ],
-        "bonesWithMostTornEdges": "skull:694 pec_tip_L:332 pec_mid_R:133 pec_mid_L:129"
-      },
-      {
-        "clip": "Dive",
-        "worstRatio": 32.29,
-        "onBone": "skull",
-        "edgesOver2x": 1035,
-        "worstEdgeUnits": [
-          0.011,
-          0.369
-        ],
-        "bonesWithMostTornEdges": "skull:536 pec_tip_L:282 pec_mid_L:96 pec_mid_R:92"
-      },
-      {
-        "clip": "Parry",
-        "worstRatio": 29.95,
-        "onBone": "skull",
-        "edgesOver2x": 1337,
-        "worstEdgeUnits": [
-          0.011,
-          0.343
-        ],
-        "bonesWithMostTornEdges": "skull:678 pec_tip_L:284 pec_mid_L:131 pec_mid_R:98"
-      },
-      {
-        "clip": "TurnRight",
-        "worstRatio": 28.95,
-        "onBone": "skull",
-        "edgesOver2x": 954,
-        "worstEdgeUnits": [
-          0.011,
-          0.331
-        ],
-        "bonesWithMostTornEdges": "skull:490 pec_tip_L:277 pec_mid_L:85 pec_mid_R:62"
-      },
-      {
-        "clip": "Sprint",
-        "worstRatio": 23.72,
-        "onBone": "skull",
-        "edgesOver2x": 987,
-        "worstEdgeUnits": [
-          0.011,
-          0.271
-        ],
-        "bonesWithMostTornEdges": "skull:388 pec_tip_L:255 pelvic_L:114 tail_00:82"
-      },
-      {
-        "clip": "Growth",
-        "worstRatio": 22.75,
-        "onBone": "skull",
-        "edgesOver2x": 1101,
-        "worstEdgeUnits": [
-          0.011,
-          0.26
-        ],
-        "bonesWithMostTornEdges": "skull:557 pec_tip_L:261 pec_mid_L:109 pec_mid_R:88"
-      },
-      {
-        "clip": "Heavy",
-        "worstRatio": 22.1,
-        "onBone": "skull",
-        "edgesOver2x": 380,
-        "worstEdgeUnits": [
-          0.011,
-          0.253
-        ],
-        "bonesWithMostTornEdges": "skull:187 pec_tip_L:100 pec_mid_R:39 pec_mid_L:30"
-      },
-      {
-        "clip": "Rise",
-        "worstRatio": 21.86,
-        "onBone": "skull",
-        "edgesOver2x": 662,
-        "worstEdgeUnits": [
-          0.011,
-          0.25
-        ],
-        "bonesWithMostTornEdges": "skull:336 pec_tip_L:211 pec_mid_R:53 pec_mid_L:51"
-      },
-      {
-        "clip": "Attack",
-        "worstRatio": 21.36,
-        "onBone": "skull",
-        "edgesOver2x": 371,
-        "worstEdgeUnits": [
-          0.011,
-          0.244
-        ],
-        "bonesWithMostTornEdges": "skull:184 pec_tip_L:100 pec_mid_R:39 pec_mid_L:29"
-      },
-      {
-        "clip": "TurnLeft",
-        "worstRatio": 20.53,
-        "onBone": "skull",
-        "edgesOver2x": 893,
-        "worstEdgeUnits": [
-          0.011,
-          0.235
-        ],
-        "bonesWithMostTornEdges": "skull:429 pec_tip_L:201 pec_mid_R:93 pec_mid_L:74"
-      },
-      {
-        "clip": "Bite",
-        "worstRatio": 20.33,
-        "onBone": "skull",
-        "edgesOver2x": 450,
-        "worstEdgeUnits": [
-          0.011,
-          0.232
-        ],
-        "bonesWithMostTornEdges": "skull:211 pec_tip_L:120 pec_mid_L:43 jaw:40"
-      },
-      {
-        "clip": "Stagger",
-        "worstRatio": 16.39,
-        "onBone": "skull",
-        "edgesOver2x": 686,
-        "worstEdgeUnits": [
-          0.011,
-          0.187
-        ],
-        "bonesWithMostTornEdges": "skull:327 pec_tip_L:192 pec_mid_R:70 pec_mid_L:59"
-      },
-      {
-        "clip": "Breath",
-        "worstRatio": 16.12,
-        "onBone": "skull",
-        "edgesOver2x": 499,
-        "worstEdgeUnits": [
-          0.011,
-          0.184
-        ],
-        "bonesWithMostTornEdges": "skull:235 pec_tip_L:194 pec_mid_R:40 pec_mid_L:30"
-      },
-      {
-        "clip": "SpineBrace",
-        "worstRatio": 15.92,
-        "onBone": "skull",
-        "edgesOver2x": 1139,
-        "worstEdgeUnits": [
-          0.011,
-          0.182
-        ],
-        "bonesWithMostTornEdges": "skull:446 pec_tip_L:193 chest:104 pec_mid_L:90"
-      },
-      {
-        "clip": "Swim",
-        "worstRatio": 14.47,
-        "onBone": "skull",
-        "edgesOver2x": 466,
-        "worstEdgeUnits": [
-          0.011,
-          0.166
-        ],
-        "bonesWithMostTornEdges": "skull:208 pec_tip_L:207 pec_mid_R:23 pelvic_L:14"
-      },
-      {
-        "clip": "Eat",
-        "worstRatio": 12.31,
-        "onBone": "skull",
-        "edgesOver2x": 414,
-        "worstEdgeUnits": [
-          0.011,
-          0.141
-        ],
-        "bonesWithMostTornEdges": "skull:200 pec_tip_L:138 pec_mid_L:43 pec_mid_R:20"
-      },
-      {
-        "clip": "Guard",
-        "worstRatio": 10.72,
-        "onBone": "skull",
-        "edgesOver2x": 524,
-        "worstEdgeUnits": [
-          0.011,
-          0.123
-        ],
-        "bonesWithMostTornEdges": "skull:246 pec_tip_L:131 pec_mid_L:61 pec_mid_R:39"
-      }
-    ],
-    "reference": "Nothosaurus 2.98x is the era reference; Placodus 12.4x and Coelophysis 25.3x are the ones the sweep called broken."
-  },
   "gapeSolid": {
     "tool": "blender -b --python tools/triassic/gape-solid.py -- hybodus",
     "pixelsPerFrame": 378000,
-    "maxSeenThroughTheBody": 6,
+    "maxSeenThroughTheBody": 1,
     "tolerance": 12,
+    "largestConnectedRunOfSeeThrough": 1,
+    "note": "the tool counts pixels over the whole frame; the run length says whether they are a hole or the silhouette meeting a surface one polygon thick. The shipped body material is double-sided, so none of them arise at runtime at all -- the cull is the worst case a single-sided renderer would draw.",
     "shots": [
       {
         "clip": "Heavy",
         "t": 0.5,
-        "differingPixels": 172,
-        "holesOpenedByCulling": 6,
-        "seenThroughTheBody": 6
+        "differingPixels": 114,
+        "holesOpenedByCulling": 0,
+        "seenThroughTheBody": 0,
+        "seenThroughTheBodyRecount": 0,
+        "largestConnectedRun": 0,
+        "runs": []
       },
       {
         "clip": "Attack",
         "t": 0.43,
-        "differingPixels": 157,
-        "holesOpenedByCulling": 3,
-        "seenThroughTheBody": 2
+        "differingPixels": 99,
+        "holesOpenedByCulling": 0,
+        "seenThroughTheBody": 0,
+        "seenThroughTheBodyRecount": 0,
+        "largestConnectedRun": 0,
+        "runs": []
       },
       {
         "clip": "Bite",
         "t": 0.17,
-        "differingPixels": 570,
-        "holesOpenedByCulling": 3,
-        "seenThroughTheBody": 3
+        "differingPixels": 25153,
+        "holesOpenedByCulling": 35,
+        "seenThroughTheBody": 1,
+        "seenThroughTheBodyRecount": 1,
+        "largestConnectedRun": 1,
+        "runs": [
+          1
+        ]
       }
     ]
+  },
+  "skinTears": {
+    "tool": "node tools/triassic/skin-tears.mjs",
+    "worstRatio": 5.93,
+    "worstClip": "Shake",
+    "worstEdgeUnits": [
+      0.017,
+      0.099
+    ],
+    "clipsTearingAnEdgePast2x": 8,
+    "perClip": [
+      {
+        "clip": "Shake",
+        "worstRatio": 5.93,
+        "onBone": "skull",
+        "edgesOver2x": 157,
+        "worstEdgeUnits": [
+          0.017,
+          0.099
+        ],
+        "bonesWithMostTornEdges": "skull:66 pec_tip_L:37 pec_tip_R:28 pec_mid_L:16"
+      },
+      {
+        "clip": "Heavy",
+        "worstRatio": 5.19,
+        "onBone": "skull",
+        "edgesOver2x": 17,
+        "worstEdgeUnits": [
+          0.023,
+          0.118
+        ],
+        "bonesWithMostTornEdges": "jaw:13 skull:4"
+      },
+      {
+        "clip": "Bite",
+        "worstRatio": 5.01,
+        "onBone": "skull",
+        "edgesOver2x": 24,
+        "worstEdgeUnits": [
+          0.023,
+          0.114
+        ],
+        "bonesWithMostTornEdges": "jaw:16 skull:8"
+      },
+      {
+        "clip": "Attack",
+        "worstRatio": 4.62,
+        "onBone": "skull",
+        "edgesOver2x": 7,
+        "worstEdgeUnits": [
+          0.023,
+          0.105
+        ],
+        "bonesWithMostTornEdges": "jaw:4 skull:3"
+      },
+      {
+        "clip": "Death",
+        "worstRatio": 3.62,
+        "onBone": "skull",
+        "edgesOver2x": 154,
+        "worstEdgeUnits": [
+          0.028,
+          0.103
+        ],
+        "bonesWithMostTornEdges": "skull:55 pec_tip_L:50 pec_tip_R:38 pec_mid_R:7"
+      },
+      {
+        "clip": "Grab",
+        "worstRatio": 2.66,
+        "onBone": "pec_tip_R",
+        "edgesOver2x": 17,
+        "worstEdgeUnits": [
+          0.043,
+          0.115
+        ],
+        "bonesWithMostTornEdges": "pec_tip_R:9 skull:6 pec_mid_R:1 pec_tip_L:1"
+      },
+      {
+        "clip": "Ability",
+        "worstRatio": 2.4,
+        "onBone": "pec_tip_R",
+        "edgesOver2x": 5,
+        "worstEdgeUnits": [
+          0.043,
+          0.103
+        ],
+        "bonesWithMostTornEdges": "skull:2 pec_tip_R:2 pec_tip_L:1"
+      },
+      {
+        "clip": "Parry",
+        "worstRatio": 2.06,
+        "onBone": "pec_tip_L",
+        "edgesOver2x": 3,
+        "worstEdgeUnits": [
+          0.046,
+          0.096
+        ],
+        "bonesWithMostTornEdges": "skull:2 pec_tip_L:1"
+      }
+    ],
+    "reference": "Nothosaurus 2.98x is the era reference; Placodus 12.4x and Coelophysis 25.3x are the ones the sweep called broken.",
+    "perSurface": {
+      "Hybodus_authored_body": {
+        "worstRatio": 5.929951473149112,
+        "clip": "Shake",
+        "grewFrom": 0.016669982290208534,
+        "grewTo": 0.0988521860391917,
+        "edgesOver2x": 336
+      },
+      "Mouth_lining": {
+        "worstRatio": 5.193711302641129,
+        "clip": "Heavy",
+        "grewFrom": 0.02278018254859177,
+        "grewTo": 0.11831369157884926,
+        "edgesOver2x": 48
+      },
+      "Seated_jaw_hinge_tissue": {
+        "worstRatio": 1.0000000941252272,
+        "clip": "Death",
+        "grewFrom": 0.25374188486410537,
+        "grewTo": 0.25374190874761793,
+        "edgesOver2x": 0
+      },
+      "Hybodus_authored_body_lower_jaw": {
+        "worstRatio": 1.0000000718917703,
+        "clip": "Death",
+        "grewFrom": 0.16966633682256144,
+        "grewTo": 0.16966634902017474,
+        "edgesOver2x": 0
+      }
+    },
+    "worstSkinEdgeStretch": 5.929951473149112,
+    "perSurfaceNote": "the shared tool names the bone an edge follows, not the surface it is in, and the worst edge on this body is in the oral lining -- a sac built to stretch from a shut mouth to a full gape. audit.mjs splits the same measurement by surface and asserts the skin's own worst is under 8x."
   }
 }

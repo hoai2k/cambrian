@@ -1,25 +1,16 @@
 
-public/assets/triassic/creatures/hybodus.glb   35427 edges x 17 phases x 23 clips
+public/assets/triassic/creatures/hybodus.glb   35534 edges x 17 phases x 23 clips
 clip           worst  on bone             >2x  worst bones
-Shake         56.03x  skull              1368  0.011->0.641  skull:674 pec_tip_L:329 pec_mid_L:115 pec_mid_R:90
-Death         48.78x  skull              1864  0.011->0.558  skull:769 pec_tip_L:315 pelvic_L:177 pec_mid_L:143
-Ability       37.93x  skull              1240  0.011->0.434  skull:642 pec_tip_L:316 pec_mid_L:122 pec_mid_R:99
-Dodge         37.25x  skull              1006  0.011->0.426  skull:528 pec_tip_L:309 pec_mid_L:124 pec_upper_L:45
-Grab          34.85x  skull              1359  0.011->0.399  skull:694 pec_tip_L:332 pec_mid_R:133 pec_mid_L:129
-Dive          32.29x  skull              1035  0.011->0.369  skull:536 pec_tip_L:282 pec_mid_L:96 pec_mid_R:92
-Parry         29.95x  skull              1337  0.011->0.343  skull:678 pec_tip_L:284 pec_mid_L:131 pec_mid_R:98
-TurnRight     28.95x  skull               954  0.011->0.331  skull:490 pec_tip_L:277 pec_mid_L:85 pec_mid_R:62
-Sprint        23.72x  skull               987  0.011->0.271  skull:388 pec_tip_L:255 pelvic_L:114 tail_00:82
-Growth        22.75x  skull              1101  0.011->0.260  skull:557 pec_tip_L:261 pec_mid_L:109 pec_mid_R:88
-Heavy         22.10x  skull               380  0.011->0.253  skull:187 pec_tip_L:100 pec_mid_R:39 pec_mid_L:30
-Rise          21.86x  skull               662  0.011->0.250  skull:336 pec_tip_L:211 pec_mid_R:53 pec_mid_L:51
-Attack        21.36x  skull               371  0.011->0.244  skull:184 pec_tip_L:100 pec_mid_R:39 pec_mid_L:29
-TurnLeft      20.53x  skull               893  0.011->0.235  skull:429 pec_tip_L:201 pec_mid_R:93 pec_mid_L:74
-Bite          20.33x  skull               450  0.011->0.232  skull:211 pec_tip_L:120 pec_mid_L:43 jaw:40
-Stagger       16.39x  skull               686  0.011->0.187  skull:327 pec_tip_L:192 pec_mid_R:70 pec_mid_L:59
-Breath        16.12x  skull               499  0.011->0.184  skull:235 pec_tip_L:194 pec_mid_R:40 pec_mid_L:30
-SpineBrace    15.92x  skull              1139  0.011->0.182  skull:446 pec_tip_L:193 chest:104 pec_mid_L:90
-Swim          14.47x  skull               466  0.011->0.166  skull:208 pec_tip_L:207 pec_mid_R:23 pelvic_L:14
-Eat           12.31x  skull               414  0.011->0.141  skull:200 pec_tip_L:138 pec_mid_L:43 pec_mid_R:20
-Guard         10.72x  skull               524  0.011->0.123  skull:246 pec_tip_L:131 pec_mid_L:61 pec_mid_R:39
-21 of 23 clips tear an edge past 2x
+Shake          5.93x  skull               157  0.017->0.099  skull:66 pec_tip_L:37 pec_tip_R:28 pec_mid_L:16
+Heavy          5.19x  skull                17  0.023->0.118  jaw:13 skull:4
+Bite           5.01x  skull                24  0.023->0.114  jaw:16 skull:8
+Attack         4.62x  skull                 7  0.023->0.105  jaw:4 skull:3
+Death          3.62x  skull               154  0.028->0.103  skull:55 pec_tip_L:50 pec_tip_R:38 pec_mid_R:7
+Grab           2.66x  pec_tip_R            17  0.043->0.115  pec_tip_R:9 skull:6 pec_mid_R:1 pec_tip_L:1
+Ability        2.40x  pec_tip_R             5  0.043->0.103  skull:2 pec_tip_R:2 pec_tip_L:1
+Parry          2.06x  pec_tip_L             3  0.046->0.096  skull:2 pec_tip_L:1
+Dive           1.88x  skull                 0  0.054->0.101  
+Dodge          1.82x  pec_tip_L             0  0.061->0.111  
+TurnLeft       1.78x  skull                 0  0.054->0.095  
+Growth         1.70x  pec_tip_L             0  0.061->0.104  
+8 of 23 clips tear an edge past 2x

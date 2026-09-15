@@ -51,7 +51,7 @@ HEAD_ARC = .13                 # fraction of the centreline arc carried rigidly 
 BANDS = 80
 VOXEL = .0060
 BLADE_DILATION = .0060
-PUPPET_TRIANGLE_TARGET = 7200
+PUPPET_TRIANGLE_TARGET = 6500
 ENVELOPE_TOLERANCE_FRACTION = .04
 ANCHOR_TOLERANCE_FRACTION = .02
 
@@ -1091,8 +1091,18 @@ for i in range(LIN_RINGS):
     # mouth opened onto the backdrop at full gape.
     e = smooth(u / .035) * smooth((1. - u) / .08)
     _wy, _wz = lumen(y)
-    wy = _wy * (.18 + .82 * e)
-    wz = _wz * (.20 + .80 * e)
+    # Behind the pivot the sac becomes a throat and fills the head's own section. The wedge the cut
+    # leaves between the mandible and the skull opens there, and closing it with a separate blunt
+    # ellipsoid -- Placodus' hinge envelope -- needs one nearly as big as the head: fitted inside
+    # the silhouette it is too small to cover the wedge, and big enough to cover it, it stands out
+    # of the snout as a pale ball in every three-quarter render. The lining is already skinned
+    # across the joint and already inside the head, so it does the job without adding a shape.
+    _bot, _top = head_z(y)
+    _throat = 1. - smooth(u / .22)
+    _ty = .80 * head_half_width(y)
+    _tz = .38 * (_top - _bot)
+    wy = max(_wy, _ty * _throat) * (.18 + .82 * e)
+    wz = max(_wz, _tz * _throat) * (.20 + .80 * e)
     for j in range(LIN_RING):
         th = j * 2 * pi / LIN_RING
         # The roof sits *on* the cut rather than above it. An ellipse centred on the mouth
@@ -1149,19 +1159,24 @@ for p in lining.data.polygons:
     p.use_smooth = True
 oralparts = [lining]
 
-# The hinge envelope. The cut leaves a square face at the back of the mandible and a matching edge
-# on the skull, and as the jaw swings a wedge opens between them behind the lumen the lining fills.
-# Placodus had the same thing and closed it the same way: one blunt ellipsoid seated inside the head
-# at the pivot, skinned half to each bone so it rolls with the joint instead of tearing. It is
-# invisible from outside -- it never leaves the head -- and it is the simplest shape there is.
+# The hinge plug. The cut runs right across the cheek, and when the jaw swings the two *outer*
+# surfaces separate: what shows between them is the inside of the head, and under a single-sided
+# draw the inside of the head is not there. A lining cannot close that, because the gap is outside
+# the mouth. What closes it is filling the head's own section behind the cut -- Placodus' hinge
+# envelope, but shaped like the head rather than like a ball. Wide and deep as the section at the
+# pivot, short along the body, rigid on the skull so it cannot shear, and fitted to the silhouette
+# so it can never come out through the cheek.
 _hb, _ht = head_z(HINGE_Y)
-_hr = max(.018 * RAW_LENGTH, 1.02 * head_half_width(HINGE_Y))
 _hz = min(max(seam_z(HINGE_Y), _hb + .3 * (_ht - _hb)), _ht - .3 * (_ht - _hb))
-bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=9,
+# A floor in body-length terms as well as a fraction of the head: on a needle-snouted
+# fish the section at the pivot is small and a plug scaled to it has no reach at all.
+# Whatever sticks out is pulled back in below, so a generous nominal size costs nothing.
+_hplug_w = max(head_half_width(HINGE_Y), .055 * RAW_LENGTH)
+bpy.ops.mesh.primitive_uv_sphere_add(segments=18, ring_count=10,
                                      location=tx((0., HINGE_Y, _hz)))
 hinge = bpy.context.object
 hinge.name = 'Seated jaw hinge tissue'
-hinge.scale = (_hr * SCALE, _hr * 1.35 * SCALE, (_ht - _hb) * .78 * SCALE)
+hinge.scale = (1.45 * _hplug_w * SCALE, 3.60 * _hplug_w * SCALE, 1.15 * (_ht - _hb) * SCALE)
 bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 for v in hinge.data.vertices:
     v.co = hinge.matrix_world @ v.co
@@ -1180,17 +1195,51 @@ for item in _hcol.data:
     item.color = (1, 1, 1, 1)
 for n in ['skull', 'jaw']:
     hinge.vertex_groups.new(name=n)
-# Rigid on the skull, not shared with the jaw. Split half and half it shears with every degree
-# the joint turns, and `tools/triassic/skin-tears.mjs` reads that as the worst tear on the animal --
-# 48.9x, on an envelope nobody ever sees. Rigid it cannot tear at all, and it still does its job:
-# the mandible's own cut face is capped, so what this has to cover is the hole the jaw swings away
-# from, which belongs to the skull.
 for v in hinge.data.vertices:
     hinge.vertex_groups['skull'].add([v.index], 1., 'REPLACE')
     hinge.vertex_groups['jaw'].add([v.index], 0., 'REPLACE')
 for poly in hinge.data.polygons:
     poly.use_smooth = True
+_hcentre = tx((0., HINGE_Y, _hz))
+
+
+def _hinge_clear(f):
+    """Containment against the animal's own silhouette, not against the closed surface: a point in
+    the mouth's lumen is outside the *solid* by construction and reads as a failure, which is how
+    the first fit collapsed to a tenth of the size it could have been."""
+    worst = 1e9
+    for v in hinge.data.vertices:
+        x, y, z = ((_hcentre + (Vector(v.co[:]) - _hcentre) * f) / SCALE)
+        bot, top = head_z(y)
+        worst = min(worst, head_half_width(y) - abs(x), z - bot, top - z)
+    return worst
+
+
+# Fitted vertex by vertex rather than scaled as a whole. Scaled down until the worst vertex is
+# inside, the plug shrinks to a third of the head and stops covering the wedge; pulled in only
+# where it actually sticks out, it fills the head everywhere it can and cannot show anywhere.
+_pulled = 0
+for v in hinge.data.vertices:
+    for _ in range(40):
+        x, y, z = Vector(v.co[:]) / SCALE
+        bot, top = head_z(y)
+        if min(head_half_width(y) - abs(x), z - bot, top - z) > .004:
+            break
+        v.co = _hcentre + (Vector(v.co[:]) - _hcentre) * .94
+        _pulled += 1
+_hfit = 1.
+hinge_report = {'inwardPullStepsToFitInsideTheSilhouette': _pulled,
+                'plugVertices': len(hinge.data.vertices),
+                'nominalRadiiUnits': [round(1.45 * _hplug_w * SCALE, 4),
+                                      round(3.60 * _hplug_w * SCALE, 4),
+                                      round(1.15 * (_ht - _hb) * SCALE, 4)],
+                'clearanceInsideSilhouetteRaw': round(_hinge_clear(1.), 5),
+                'note': 'rigid on the skull, shaped like the head section at the pivot rather than '
+                        'like a ball, and fitted so it cannot come out through the cheek.'}
 oralparts.append(hinge)
+
+
+
 
 # -------------------------------------------------------------- weights ----
 AXIAL = [('skull', .145), ('chest', .27), ('body', .46)] + \
@@ -1208,47 +1257,125 @@ def axial(y):
     return {AXIAL[i][0]: 1 - t, AXIAL[i + 1][0]: t}
 
 
+# How hard the weights are relaxed over the mesh graph afterwards: each pass replaces a vertex's
+# weights with WEIGHT_KEEP of its own and the rest shared equally among its neighbours.
+WEIGHT_RELAX, WEIGHT_KEEP = 10, .45
 THIN = .030
 THIN_BAND = .012
 F = lambda f: YLO + f * RAW_LENGTH        # noqa: E731 -- body fraction to station
 
 
+# Where a fin's blade actually lies, measured off this generation rather than named as a constant.
+_FCO = np.array([v.co[:] for v in auth.data.vertices])
+_FBLADE = np.asarray(thickness, dtype=float) < THIN + THIN_BAND
+_FC = np.interp(_FCO[:, 1], _cy, _cz)
+
+
+def fin_span(ylo, yhi, up, both=False, lo_q=.25, hi_q=.80, fallback=(.0, 1.)):
+    """The two ends of a fin's radial ramp, read off the mesh.
+
+    A constant that suits a shark's dorsal is wrong for a fish's pelvic, and when it is wrong the
+    fin owns *no* vertices: the bone still swings, the geometry stays on the body, and the swept
+    angle recorded for the joint is about nothing. Here the ramp runs from the quartile of how far
+    out that stretch's thin vertices actually lie to the 80th percentile, so most of a blade is at
+    full weight and its root is feathered, whatever size the blade is.
+    """
+    m = _FBLADE & (_FCO[:, 1] > ylo) & (_FCO[:, 1] < yhi)
+    if not both:
+        m &= (_FCO[:, 2] > _FC) if up else (_FCO[:, 2] < _FC)
+    if m.sum() < 40:
+        return fallback
+    d = np.abs(_FCO[m][:, 2] - _FC[m]) / RAW_LENGTH
+    lo, hi = float(np.quantile(d, lo_q)), float(np.quantile(d, hi_q))
+    return round(lo, 5), round(max(hi - lo, 1e-4), 5)
+
+CAUDAL_SPAN = fin_span(F(.93), YHI + 1., True, both=True)
+fin_span_report = {'caudal': CAUDAL_SPAN}
+
+
+# Where the generation's thin blades are, station by station: the count of blade vertices above and
+# below the measured axis in each twentieth of the body. A fin mask can only find a fin the
+# generation modelled, and when a fin bone comes out owning no vertices this is what says which of
+# the two happened.
+blade_scan = []
+for _i in range(20):
+    _a = YLO + (_i / 20.) * RAW_LENGTH
+    _b = YLO + ((_i + 1) / 20.) * RAW_LENGTH
+    _m = _FBLADE & (_FCO[:, 1] >= _a) & (_FCO[:, 1] < _b)
+    blade_scan.append({'fromBodyFraction': round(_i / 20., 2),
+                       'above': int((_m & (_FCO[:, 2] > _FC)).sum()),
+                       'below': int((_m & (_FCO[:, 2] <= _FC)).sum()),
+                       'maxOutAbove': round(float(np.max((_FCO[_m & (_FCO[:, 2] > _FC)][:, 2]
+                                                          - _FC[_m & (_FCO[:, 2] > _FC)])
+                                                         / RAW_LENGTH)), 4)
+                       if (_m & (_FCO[:, 2] > _FC)).sum() else 0.,
+                       'maxOutBelow': round(float(np.max((_FC[_m & (_FCO[:, 2] <= _FC)]
+                                                          - _FCO[_m & (_FCO[:, 2] <= _FC)][:, 2])
+                                                         / RAW_LENGTH)), 4)
+                       if (_m & (_FCO[:, 2] <= _FC)).sum() else 0.})
+print('BLADESCAN', json.dumps(blade_scan))
+
+
+def window(v, lo, hi, feather):
+    """A region boundary that fades instead of stepping.
+
+    Every gate in `fin_weights` used to be a hard `lo < v < hi`. A blade runs past the end of its
+    window, so at a fin's distal edge that put `pec_tip: 1.000` on one vertex and pure axial weight
+    on the vertex next to it, and `tools/triassic/skin-tears.mjs` read the edge between the two as
+    the worst stretch on the body. It is the same window; it has a slope on it now.
+    """
+    return smooth((v - lo) / feather) * smooth((hi - v) / feather)
+
+
 def fin_weights(p, thin):
     """Which fin a point belongs to and how strongly it owns it. A fin's root blend is radial and
-    runs from inside the trunk outward, so a seated root follows the flank when the body bends."""
+    runs from inside the trunk outward, so a seated root follows the flank when the body bends.
+
+    Every fin here bids for the point and the strongest bid wins, and every bid is a product of
+    slopes rather than of tests: the thinness of the shell, how far out along the blade the point
+    is, and how far into the fin's own stretch of the body. Written as `if` gates -- which is how
+    it was -- the windows in y cut a blade off square at 1.000, and the vertex on the other side of
+    that line kept pure axial weight.
+    """
     x, y, z = p
     c = centre(y)
     blade = smooth((THIN + THIN_BAND - thin) / THIN_BAND)
-    if blade <= 0:
+    s = 'L' if x > 0 else 'R'
+    d = abs(x) / RAW_LENGTH
+    _side, _pts, names = PECTORAL[s]
+    if d < .115:
+        pec = {names[0]: 1.}
+    elif d < .165:
+        t = (d - .115) / .050
+        pec = {names[0]: 1 - t, names[1]: t}
+    else:
+        t = min(1., (d - .165) / .050)
+        pec = {names[1]: 1 - t, names[2]: t}
+    lobe = 'caudal_upper' if z > c else 'caudal_lower'
+    # A wide, gentle root blend: narrow, adjacent vertices at the root end up on different
+    # bones and the edge between them is torn through the whole stroke.
+    bids = [
+        (pec, blade * window(y, F(.19), F(.34), .035 * RAW_LENGTH)
+         * smooth((d - .040) / .100)
+         * smooth(((c - z) / RAW_LENGTH - .002) / .026)),
+        ({'pelvic_' + s: 1.}, blade * window(y, F(.46), F(.56), .025 * RAW_LENGTH)
+         * smooth(((c - z) / RAW_LENGTH - .050) / .030)
+         * smooth((d - .004) / .012)),
+        ({'dorsal_1': 1.}, blade * window(y, F(.28), F(.46), .030 * RAW_LENGTH)
+         * smooth(((z - c) / RAW_LENGTH - .050) / .030)),
+        ({'dorsal_2': 1.}, blade * window(y, F(.48), F(.65), .030 * RAW_LENGTH)
+         * smooth(((z - c) / RAW_LENGTH - .050) / .030)),
+        # Past the peduncle the thinness rule is the wrong question. A heterocercal tail's long
+        # lobe carries the end of the vertebral column and measures as trunk, and gating the lobes
+        # on blade thickness left one of the two owning no vertices at all -- so the lobe lag the
+        # clips animate drew nothing. Everything behind the peduncle is caudal fin.
+        ({lobe: 1.}, smooth((abs(z - c) / RAW_LENGTH - CAUDAL_SPAN[0]) / CAUDAL_SPAN[1])
+         * smooth((y - F(.930)) / (.030 * RAW_LENGTH))),
+    ]
+    chain, bid = max(bids, key=lambda kv: kv[1])
+    if bid <= 0:
         return None
-    if F(.19) < y < F(.34) and abs(x) > .045 * RAW_LENGTH and z < c - .010 * RAW_LENGTH:
-        s = 'L' if x > 0 else 'R'
-        _side, _pts, names = PECTORAL[s]
-        d = abs(x) / RAW_LENGTH
-        # A wide, gentle root blend: narrow, adjacent vertices at the root end up on different
-        # bones and the edge between them is torn through the whole stroke.
-        span = smooth((d - .040) / .100)
-        if d < .115:
-            chain = {names[0]: 1.}
-        elif d < .165:
-            t = (d - .115) / .050
-            chain = {names[0]: 1 - t, names[1]: t}
-        else:
-            t = min(1., (d - .165) / .050)
-            chain = {names[1]: 1 - t, names[2]: t}
-        return chain, blade * span
-    if F(.46) < y < F(.56) and z < c - .030 * RAW_LENGTH and abs(x) > .004 * RAW_LENGTH:
-        s = 'L' if x > 0 else 'R'
-        return {'pelvic_' + s: 1.}, blade * smooth(((c - z) / RAW_LENGTH - .050) / .030)
-    if F(.28) < y < F(.46) and z > c + .030 * RAW_LENGTH:
-        return {'dorsal_1': 1.}, blade * smooth(((z - c) / RAW_LENGTH - .050) / .030)
-    if F(.48) < y < F(.65) and z > c + .030 * RAW_LENGTH:
-        return {'dorsal_2': 1.}, blade * smooth(((z - c) / RAW_LENGTH - .050) / .030)
-    if y > F(.925):
-        lobe = 'caudal_upper' if z > c else 'caudal_lower'
-        return {lobe: 1.}, blade * smooth((abs(z - c) / RAW_LENGTH - .022) / .040) \
-            * smooth((y - F(.930)) / (.030 * RAW_LENGTH))
-    return None
+    return chain, bid
 
 
 def jaw_weight_labelled(p):
@@ -1310,9 +1437,35 @@ weight_report = {}
 for o, thin in [(auth, thickness), (puppet, puppet_thickness)]:
     for n in B:
         o.vertex_groups.new(name=n)
+    # Weights are assigned from a formula and then *relaxed over the mesh's own graph*. The formula
+    # reads a measured shell thickness, and that measurement is noisy at a fin's base: two vertices
+    # a hundredth of a unit apart can land either side of the blade mask and then follow different
+    # bones for the length of a clip. Averaging each vertex's weights with its neighbours' cannot
+    # invent an influence that was not already next to it -- it removes the step instead of moving
+    # it -- and it is what takes the worst edge stretch on this body from tens of times rest length
+    # down to a few. Run after the feathering, not instead of it: feathering fixes the windows the
+    # formula draws and this fixes what the measurement does inside them.
+    raw = [weights(v.co, float(thin[v.index]), o is auth) for v in o.data.vertices]
+    nbr = [[] for _ in o.data.vertices]
+    for e in o.data.edges:
+        a, b = e.vertices
+        nbr[a].append(b)
+        nbr[b].append(a)
+    for _ in range(WEIGHT_RELAX):
+        nxt = []
+        for i, w in enumerate(raw):
+            acc = {n: v * WEIGHT_KEEP for n, v in w.items()}
+            share = (1. - WEIGHT_KEEP) / max(1, len(nbr[i]))
+            for j in nbr[i]:
+                for n, v in raw[j].items():
+                    acc[n] = acc.get(n, 0.) + v * share
+            nxt.append(acc)
+        raw = nxt
     influences, owners = [], {}
     for v in o.data.vertices:
-        w = weights(v.co, float(thin[v.index]), o is auth)
+        w = {n: x for n, x in sorted(raw[v.index].items(), key=lambda kv: -kv[1])[:4] if x > 1e-5}
+        total = sum(w.values())
+        w = {n: x / total for n, x in w.items()}
         influences.append(len(w))
         for n, value in w.items():
             o.vertex_groups[n].add([v.index], value, 'REPLACE')
@@ -1916,6 +2069,7 @@ validation = {
     'pairedFinAsymmetry': PAIRED_FIN_ASYMMETRY,
     'mouth': mouth_report,
     'mouthSideLabelling': label_report,
+    'hingePlug': hinge_report,
     'liningClearanceInsideSkinRaw': round(lining_clearance, 5),
     'scale': round(SCALE, 5), 'bodyLength': BODY_LENGTH,
     'authoredTriangles': authored_tris, 'twinTriangles': puppet_tris,
@@ -1925,6 +2079,12 @@ validation = {
     'bones': len(B), 'boneNames': list(B),
     'clips': CLIPS, 'looping': LOOPS, 'loopSeams': seams, 'boundsAt13Phases': bounds,
     'weights': weight_report,
+    'finBladeSpansMeasuredOffTheGeneration': fin_span_report,
+    'bladeVerticesByStation': blade_scan,
+    'weightRelaxation': {'passes': WEIGHT_RELAX, 'keptPerPass': WEIGHT_KEEP,
+                         'note': 'each pass replaces a vertex\'s weights with this much of '
+                                 'its own and the rest shared equally among its neighbours '
+                                 'on the mesh graph'},
     'envelope': {k: profile_report[k] for k in
                  ('maximumEnvelopeDifference', 'maximumEnvelopeDifferenceFractionOfBodyLength',
                   'surfaceDistanceMax', 'surfaceDistanceP95', 'envelopeTolerance')},

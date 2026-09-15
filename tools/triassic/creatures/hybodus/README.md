@@ -13,11 +13,11 @@ also the runtime LOD.
 
 | Delivery | Triangles | Vertices | Packaged bytes |
 | --- | ---: | ---: | ---: |
-| `hybodus.glb` — worked Tripo body | 22,267 | 13,268 | 1,760,612 |
-| `hybodus.puppet.glb` — procedural twin | 8,866 | 4,518 | 1,315,224 |
-| `hybodus.lod1.glb` — byte-identical twin alias | 8,866 | 4,518 | 1,315,224 |
+| `hybodus.glb` — worked Tripo body | 22,335 | 13,307 | 1,843,828 |
+| `hybodus.puppet.glb` — procedural twin | 8,194 | 4,186 | 1,323,784 |
+| `hybodus.lod1.glb` — byte-identical twin alias | 8,194 | 4,186 | 1,323,784 |
 
-The reduced model is **39.8 %** of the authored triangles, inside the contract's 40 %. The model is
+The reduced model is **36.7 %** of the authored triangles, inside the contract's 40 %. The model is
 5.000 engine authoring units long, faces +Z in glTF and uses +Y up; the research registry
 (`docs/research/triassic-swimming.json`) gives the animal 2 m.
 
@@ -160,9 +160,17 @@ Getting it right took five measured corrections, each found by the number rather
   from anyone looking into the gape, so under a single-sided draw the open mouth showed straight out
   through the bottom of the jaw. Filling the cut's own boundary loop closed it: no new shape, no new
   vertices, the ring's own UVs.
-- **The wedge at the pivot** is closed by one blunt ellipsoid seated inside the head at the hinge,
-  rigid on the skull. Split half and half with the jaw it sheared with every degree the joint
-  turned and read as the worst tear on the animal at 48.9×; rigid it cannot tear at all.
+- **The wedge at the pivot** is closed by one blunt plug seated inside the head at the hinge, rigid
+  on the skull. Split half and half with the jaw it sheared with every degree the joint turned and
+  read as the worst tear on the animal at 48.9×; rigid it cannot tear at all. It is also *fitted*
+  rather than sized: shaped like the head's own section at the pivot rather than like a ball, and
+  then pulled in vertex by vertex until every one of them is inside the head's silhouette, which
+  took 1,606 inward steps and leaves 0.0040 raw of clearance. Sized only to close the wedge it
+  came out nearly as big as the head and stood out of the snout as a pale ball in every
+  three-quarter review render, on the twin as well as the authored body, and invisible in the tight
+  mouth cameras that were being used to judge it. Scaled down *as a whole* until it fitted, it
+  shrank to a third of the head and stopped covering the wedge; pulled in only where it actually
+  breaks the surface, it fills the head everywhere it can and can show nowhere.
 
 The proof is the shared tool, not one of my own:
 
@@ -171,16 +179,20 @@ blender -b --python tools/triassic/gape-solid.py -- hybodus Heavy@0.50 Attack@0.
 ```
 
 It renders at full gape against a saturated magenta backdrop twice, once with every backface culled
-and once without, and counts backdrop pixels enclosed by the silhouette. **6 pixels of 378,000**
+and once without, and counts backdrop pixels enclosed by the silhouette. **1 pixel of 378,000**
 at the worst of the three shots (tolerance 12) — `PASS`. The trap it exists to avoid is comparing a
 gape render against the plain background, which measures the backdrop and passes whatever the mesh
 does; the comparison here is between the two passes.
 
 | shot | differing pixels | opened by culling | seen through the body |
 | --- | ---: | ---: | ---: |
-| `Heavy` @ 0.50 | 172 | 6 | **6** |
-| `Attack` @ 0.43 | 157 | 3 | 2 |
-| `Bite` @ 0.17 | 570 | 3 | 3 |
+| `Heavy` @ 0.50 | 114 | 0 | **0** |
+| `Attack` @ 0.43 | 99 | 0 | 0 |
+| `Bite` @ 0.17 | 25,153 | 35 | 1 |
+
+`Bite` differs from the other two because it is the widest gape of the three and the culled pass
+throws away the whole near wall of the lining, which is 25,000 pixels of difference and none of it a
+hole: the 35 pixels the cull *opens* are along the lip, and one of them is enclosed by the body.
 
 ---
 
@@ -197,6 +209,31 @@ on a blade's rim has a normal lying almost in the plane of the blade, so its own
 of the fin instead of across it, and uncorrected that weights the rim to the body and tears a fan of
 spikes out of the fin on the first roll. Every vertex on both bodies has normalised non-zero weights
 and at most **four** influences.
+
+**Three corrections took the worst edge stretch on this body from 56.0× to 5.9×**, and each of them
+was found by a number rather than by eye:
+
+1. **Every fin's region gate is feathered.** They were hard tests — `F(.19) < y < F(.34)` and the
+   like — and a blade runs past the end of its window: at the distal edge of the pectoral that put
+   `pec_tip_L: 1.000` on one vertex and pure skull-and-chest on the vertex a hundredth of a unit
+   away from it, and `skin-tears.mjs` read the edge between the two as 56× through the shake. Each
+   fin now *bids* for a point as a product of slopes and the strongest bid wins, so no vertex is
+   ever a step away from its neighbour.
+2. **The weights are relaxed over the mesh's own graph** afterwards — ten passes, each keeping 45 %
+   of a vertex's own weights and sharing the rest equally among its edge-neighbours. The formula
+   reads a *measured* shell thickness and that measurement is noisy at a fin's base, so two vertices
+   a hundredth of a unit apart could still land either side of the blade mask. Averaging cannot
+   invent an influence that was not already next to a vertex; it removes the step instead of moving
+   it.
+3. **A fin's radial ramp is measured, not named.** The caudal lobes were gated on the same thinness
+   rule as the paired fins, and a heterocercal tail's long lobe carries the end of the vertebral
+   column and measures as trunk: `caudal_upper` came out owning **no vertices at all**, so the lobe
+   lag the clips animate was moving a bone that drove nothing. The ramp now runs from the quartile
+   of how far out that stretch's thin vertices actually lie to the 80th percentile — 0.0027 to
+   0.0177 of the body here — and both lobes own their own blade (241 and 284 vertices). All 22 of
+   the joints the body is skinned by now own geometry, `jaw` carries the mandible and the lining,
+   and only `root` is unskinned, which is what `validation.json`'s `verticesPerBone` says;
+   `bladeVerticesByStation` beside it is the measurement that settled it.
 
 Every fin root is seated inside the trunk's own cross-section, which the builder asserts:
 
@@ -295,7 +332,8 @@ under them and holds.
 **The paired fins work the dash rather than hanging off it.** They are control surfaces and take no
 propulsive stroke, but they sweep with the beat and trim the body through it; the swept angle at
 each root over the whole Sprint clip, which holds two beats, is
-**0.95 rad** at each pectoral and **1.27 rad** at each pelvic.
+**0.95 rad** at each pectoral and **1.27 rad** at each pelvic. Every one of the 21 skinned joints
+owns geometry, so each of those numbers is about a fin rather than about a bone.
 
 ## Verification
 
@@ -320,7 +358,9 @@ which happened once here, to a one-line name collision.
 animation sample and no mesh attribute, and then asserts exact paired joint names, hierarchy, local
 rest transforms, inverse-bind arrays, socket transforms and metadata, per-clip SHA-256 of every
 sample array, normalised weights, no duplicate clips, no root or scale channel, loop seams under
-1e-4 on all seven looping clips, and the twin under 40 % of the authored triangles. It then plays
+1e-4 on all seven looping clips, and the twin under 40 % of the authored triangles. It also sweeps
+every edge of every clip and **asserts the skin's own worst stretch is under 8×**, split by surface
+so the oral lining — which is built to stretch — cannot mask a weight fault in the skin. It then plays
 **61 phases of every clip on both models** through the real `GLTFLoader`/`AnimationMixer`, evaluating
 actual skinned vertices, and runs the gait, lunge, shake, spine-brace and jaw assertions above over
 121 phases. Measurements are written to `paired-audit.json` *before* they are judged, so a failure
@@ -342,7 +382,12 @@ models:
   which is where a travelling wave either reads or does not.
 - [This animal's own clips](paired-era-clips-sheet.jpg) — Shake at three phases, SpineBrace.
 - [The mouth](paired-mouth-sheet.jpg) — closed, and at Bite, Attack and Heavy's widest, from the
-  side and the front.
+  side and the front. These are the hardest frames on this animal to read: the generation's mouth is
+  a small ventral crescent under a rostrum a third of the body long, so a camera close enough to see
+  it is inside the snout. The cameras were re-aimed for this pass (they had been pointing half a
+  body behind the mouth, at a height where the snout hides it) and it is still a poor view. The
+  evidence that the gape is a gape is the `gape-solid` pass above, where the open mouth renders as a
+  solid black cavity against a magenta backdrop with every backface culled.
 
 ## What I actually looked at, and what is weak
 
@@ -356,16 +401,30 @@ nothing tears out of it.
 
 Honest limitations, worst first:
 
-1. **Skinning tears.** `node tools/triassic/skin-tears.mjs` reports a worst edge stretch of
-   **56.0×** (Shake; an edge 0.011 units long at rest reaching 0.641), with 21 of 23 clips tearing
-   something past 2×. Nothosaurus' 2.98× is the era reference and Placodus' 12.4× is already called
-   broken, so this is the single worst thing about the body. The dominant bones are `skull` and the
-   pectoral chain: most of the worst edges are the **oral lining's own wall**, which is interior
-   geometry that is *designed* to stretch from a shut mouth to a 50° gape, but the pectoral tips
-   contribute 329 torn edges in Shake and that part is a real weight fault. The next fix is the fin
-   root and blade masks, which are currently a smoothstep on measured thickness and behave as a step
-   where the thickness changes abruptly at a fin's base. I did not fix it; the number is recorded
-   rather than hidden. Full per-clip table in [`skin-tears.txt`](skin-tears.txt).
+1. **Skinning tears — fixed, and here is what is left.** `node tools/triassic/skin-tears.mjs` now
+   reports a worst edge stretch of **5.93×** (Shake; an edge 0.017 units long at rest reaching
+   0.099) with **8** of 23 clips tearing something past 2×, against **56.03×** and 21 of 23 before
+   the three corrections in the Rig section. Nothosaurus' 2.98× is the era reference and Placodus'
+   12.4× is the figure the sweep called broken, so this now sits between the two and nearer the good
+   end — but it is not as clean as Nothosaurus and that is the honest state.
+
+   The shared tool names the **bone** an edge follows, not the surface it is in, which on both fish
+   in this batch reads the wrong way round: the second, third and fourth worst clips in the table
+   are all the **oral lining**, a sac whose whole job is to stretch from a shut mouth to a full
+   gape. `audit.mjs` splits the same measurement by surface so the two cannot be confused, records
+   it as `skinTearsPerSurface`, and **asserts the skin's own worst is under 8×** so the fix cannot
+   quietly rot:
+
+   | surface | worst | clip | grew from → to | edges over 2× |
+   | --- | ---: | --- | ---: | ---: |
+   | `Hybodus_authored_body` (the skin) | **5.93×** | Shake | 0.017 → 0.099 | 336 |
+   | `Mouth_lining` (built to stretch) | 5.19× | Heavy | 0.023 → 0.118 | 48 |
+   | `Seated_jaw_hinge_tissue` | 1.00× | — | — | 0 |
+   | `Hybodus_authored_body_lower_jaw` | 1.00× | — | — | 0 |
+
+   What is left is `skull` against `pec_tip` at the pectoral root under Shake's roll, where the two
+   bones genuinely go opposite ways and a tenth of a unit of weight difference across a 0.017 edge
+   is enough. Full per-clip table in [`skin-tears.txt`](skin-tears.txt).
 2. **The generation's jaws were modelled apart** and closing them costs 638 of 849 mandible vertices
    inside the skull surface, to 4.7 % of body length. Interior and not visible in any sheet, but it
    is the reason this animal **wants a mouth-closed regeneration**.

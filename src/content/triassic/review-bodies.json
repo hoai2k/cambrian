@@ -108,8 +108,8 @@
     "model": "assets/triassic/creatures/hybodus.glb",
     "puppet": "assets/triassic/creatures/hybodus.puppet.glb",
     "lod": "assets/triassic/creatures/hybodus.lod1.glb",
-    "bytes": 1760612,
-    "sha256": "a7e2757628eea3c39cd3b475529624caff6cbc55a8dfb2c93167c1ef9b790cb7",
+    "bytes": 1843828,
+    "sha256": "b724a8ec8c3e852c4ec05d57d80b15b9d1a5ec5eb38eb3bef42e251fb2115588",
     "clips": [
       "Ability",
       "Attack",
@@ -212,8 +212,8 @@
     "model": "assets/triassic/creatures/saurichthys.glb",
     "puppet": "assets/triassic/creatures/saurichthys.puppet.glb",
     "lod": "assets/triassic/creatures/saurichthys.lod1.glb",
-    "bytes": 1736836,
-    "sha256": "5fae573d3344603e88e4162ca2e028823f2649ffeaf19332728d4e6e3461b0ff",
+    "bytes": 1802240,
+    "sha256": "a4a4c88e6c66be2baf132ae932eb9d5a70b0dfd6c79e11a3c3a8d62ed0a07c09",
     "clips": [
       "Ability",
       "Attack",

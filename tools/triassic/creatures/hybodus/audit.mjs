@@ -287,6 +287,83 @@ for (const suffix of ['', '.puppet']) {
     }
   }
 }
+// ---------------------------------------------------------------- skinning tears, per surface ---
+// The same measurement `tools/triassic/skin-tears.mjs` makes -- every edge's posed length against
+// its rest length over every clip, with that tool's own 1.5 %-of-body absolute floor so a
+// thousandth-of-a-body edge in the dentition cannot dominate -- split by the surface the edge is
+// in. That split matters here: the shared tool names the bone an edge follows, and the worst edge
+// on both of these bodies is in the oral lining, which is a sac built to stretch from a shut mouth
+// to a full gape. The skin's own worst is the number a weight change has to move, so it is the one
+// asserted.
+{
+  const bytes = fs.readFileSync(base + '.glb');
+  const g = await loader.parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
+  const skinned = [];
+  g.scene.traverse(o => { if (o.isSkinnedMesh) skinned.push(o); });
+  const mx = new THREE.AnimationMixer(g.scene), vv = new THREE.Vector3();
+  const pose = (clip, t) => {
+    mx.stopAllAction();
+    if (clip) { mx.clipAction(clip).play(); mx.setTime(0); mx.setTime(t); } else mx.setTime(0);
+    g.scene.updateMatrixWorld(true);
+    const out = [];
+    for (const m of skinned) {
+      m.skeleton.update();
+      for (let i = 0; i < m.geometry.attributes.position.count; i++) {
+        m.getVertexPosition(i, vv);
+        vv.applyMatrix4(m.matrixWorld);
+        out.push(vv.x, vv.y, vv.z);
+      }
+    }
+    return out;
+  };
+  const edges = [];
+  let off = 0;
+  for (const m of skinned) {
+    const ix = m.geometry.index, seen = new Set();
+    for (let t = 0; t < ix.count; t += 3) {
+      const a = ix.getX(t), b = ix.getX(t + 1), c = ix.getX(t + 2);
+      for (const [u, w] of [[a, b], [b, c], [c, a]]) {
+        const key = u < w ? u * 1e7 + w : w * 1e7 + u;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        edges.push([off + u, off + w, m.name]);
+      }
+    }
+    off += m.geometry.attributes.position.count;
+  }
+  const rest = pose(null, 0);
+  let span = 0;
+  for (let k = 0; k < 3; k++) {
+    let lo = 1e9, hi = -1e9;
+    for (let i = k; i < rest.length; i += 3) { if (rest[i] < lo) lo = rest[i]; if (rest[i] > hi) hi = rest[i]; }
+    span = Math.max(span, hi - lo);
+  }
+  const elen = (P, e) => Math.hypot(P[e[1] * 3] - P[e[0] * 3], P[e[1] * 3 + 1] - P[e[0] * 3 + 1], P[e[1] * 3 + 2] - P[e[0] * 3 + 2]);
+  const restLen = edges.map(e => elen(rest, e));
+  const per = new Map();
+  for (const clip of g.animations) {
+    for (let p = 0; p < 17; p++) {
+      const P = pose(clip, clip.duration * (p / 16));
+      for (let i = 0; i < edges.length; i++) {
+        const r = restLen[i];
+        if (r < 1e-6) continue;
+        const posed = elen(P, edges[i]);
+        if (posed < span * 0.015) continue;
+        const ratio = posed / r;
+        const cur = per.get(edges[i][2]) || { worstRatio: 1, clip: '', grewFrom: 0, grewTo: 0, edgesOver2x: 0 };
+        if (ratio > 2) cur.edgesOver2x++;
+        if (ratio > cur.worstRatio) { cur.worstRatio = ratio; cur.clip = clip.name; cur.grewFrom = r; cur.grewTo = posed; }
+        per.set(edges[i][2], cur);
+      }
+    }
+  }
+  report.skinTearsPerSurface = Object.fromEntries([...per.entries()]
+    .sort((a, b) => b[1].worstRatio - a[1].worstRatio));
+  const skin = [...per.entries()].filter(([n]) => !/lining/i.test(n))
+    .reduce((w, [, r]) => Math.max(w, r.worstRatio), 1);
+  report.worstSkinEdgeStretch = skin;
+}
+
 report.exactRigParity = true;
 report.exactAnimationParity = true;
 report.exactAnchorParity = true;
@@ -345,10 +422,13 @@ for (const name of ['Attack', 'Heavy', 'Eat', 'Grab', 'Shake']) {
 }
 const grab = report.playback[0].results.find(r => r.clip === 'Grab');
 need(grab.duration >= 0.9 && grab.duration <= 1.2, `Grab must be a 0.9-1.2 s held loop (${grab.duration})`);
+need(report.worstSkinEdgeStretch < 8,
+  `the skin must not tear: worst edge stretch ${report.worstSkinEdgeStretch.toFixed(2)}x, against Nothosaurus' 2.98x reference and the 12.4x the sweep called broken`);
 assert.equal(problems.join(' | '), '', 'measured performance checks');
 console.log(JSON.stringify({
   models: report.models, clips: report.clips, twinTriangleFraction: report.twinTriangleFraction,
   gait: report.gait, lunge: report.lunge, shake: report.shake,
   jaw: report.jaw.filter(j => ['Bite', 'Attack', 'Heavy', 'Idle'].includes(j.clip)),
+  skinTearsPerSurface: report.skinTearsPerSurface,
   exactRigParity: true, exactAnimationParity: true, playbackSamples: 61,
 }, null, 2));

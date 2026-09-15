@@ -30,8 +30,8 @@
   "appendageRootSeating": {
     "pec_upper_R": 0.0165,
     "pec_upper_L": 0.0179,
-    "pelvic_R": 0.0185,
-    "pelvic_L": 0.0182,
+    "pelvic_R": 0.0173,
+    "pelvic_L": 0.0251,
     "jaw": 0.0129,
     "skull": 0.0382,
     "chest": 0.0521,

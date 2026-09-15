@@ -1,13 +1,13 @@
-"""Assemble the paired review sheets from the renders of the exported Hybodus GLBs.
+"""Assemble the paired review sheets from the renders of the exported Saurichthys GLBs.
 
 Run after render.py has produced both `authored-review/` and `twin-review/`:
 
-  python3 tools/triassic/creatures/hybodus/contact-sheets.py
+  python3 tools/triassic/creatures/saurichthys/contact-sheets.py
 """
 from PIL import Image, ImageDraw
 from pathlib import Path
 
-ID = 'hybodus'
+ID = 'saurichthys'
 ROOT = Path(__file__).resolve().parents[4]
 base = ROOT / 'local/triassic-authoring' / ID
 dest = Path(__file__).resolve().parent
@@ -24,7 +24,7 @@ SETS = {
                              'Death-1.8', 'Ability-0.5', 'Grab-0.55', 'Breath-1.2', 'Growth-0.75'],
     'paired-beat-sheet': ['Swim-0-top', 'Swim-0.45-top', 'Swim-0.9-top', 'Swim-1.35-top',
                           'Sprint-0-top', 'Sprint-0.27-top', 'Sprint-0.55-top', 'Sprint-0.82-top'],
-    'paired-era-clips-sheet': ['Shake-0.2', 'Shake-0.5', 'Shake-0.8', 'SpineBrace-0.6'],
+    'paired-era-clips-sheet': ['FastStart-0.12', 'FastStart-0.3', 'FastStart-0.6', 'Hover-0.8'],
     'paired-mouth-sheet': ['mouth-Idle-0', 'mouth-front-Idle-0', 'mouth-Bite-0.25',
                            'mouth-front-Bite-0.25', 'mouth-Attack-0.43', 'mouth-front-Attack-0.43',
                            'mouth-Heavy-0.5', 'mouth-front-Heavy-0.5'],

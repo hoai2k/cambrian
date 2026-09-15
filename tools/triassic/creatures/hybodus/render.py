@@ -14,6 +14,7 @@ away, and cannot be used to judge either the lining or the gape.
 """
 import bpy, os, sys
 from mathutils import Vector
+from math import pi
 from pathlib import Path
 
 ID = 'hybodus'
@@ -87,9 +88,11 @@ def pose(clip, t):
     s.frame_set(round(t * 30))
 
 
-def render(file, w=760, h=560, loc=(7, -5, 4.2), target=(0, 0, 0), scale=6.6):
+def render(file, w=760, h=560, loc=(7, -5, 4.2), target=(0, 0, 0), scale=6.6, rot=None):
     cam.location = loc
-    cam.rotation_euler = (Vector(target) - cam.location).to_track_quat('-Z', 'Y').to_euler()
+    # A camera tracked with +Y up stands the animal on end, and at this scale the frame then cuts
+    # the head and the tail off. The plan views pass their own rotation so the body lies across it.
+    cam.rotation_euler = rot if rot else (Vector(target) - cam.location).to_track_quat('-Z', 'Y').to_euler()
     cam.data.ortho_scale = scale
     s.render.resolution_x = w
     s.render.resolution_y = h
@@ -98,9 +101,14 @@ def render(file, w=760, h=560, loc=(7, -5, 4.2), target=(0, 0, 0), scale=6.6):
 
 
 # The head sits at Blender -Y once the glTF +Z-forward body is imported.
-MOUTH = dict(loc=(3.0, -3.4, .1), target=(0, -2.25, -.02), scale=1.7)
-BELOW = dict(loc=(.2, -2.6, -3.0), target=(0, -2.25, -.02), scale=1.7)
-FRONT = dict(loc=(0, -5.2, .1), target=(0, -2.25, -.02), scale=1.7)
+# Aimed at the mouth, which on a shark is *under* the snout and a long way in front of where these
+# cameras first pointed: at a target 2.25 units out and a camera level with the rostrum, the sheet
+# was a tight crop of the top of the snout with the gape hidden beneath it. The mouth line sits
+# around 2.75 units forward on this 6.28-unit body, so the side camera drops below the jaw and all
+# three pull back enough to hold the whole head.
+MOUTH = dict(loc=(2.6, -3.9, -1.3), target=(0, -2.75, -.20), scale=2.3)
+BELOW = dict(loc=(.3, -3.1, -3.2), target=(0, -2.75, -.20), scale=2.3)
+FRONT = dict(loc=(0, -5.6, -.7), target=(0, -2.75, -.20), scale=2.3)
 
 if '--mouth-only' in sys.argv:
     for clip, t in [('Idle', 0), ('Bite', .25), ('Attack', .43), ('Heavy', .50)]:
@@ -111,7 +119,7 @@ if '--mouth-only' in sys.argv:
     sys.exit(0)
 
 pose('Idle', 0)
-if '--portraits-only' in sys.argv or '--review-only' not in sys.argv:
+if '--tops-only' not in sys.argv and ('--portraits-only' in sys.argv or '--review-only' not in sys.argv):
     if TWIN:
         render(HERE / ('portraits/%s.puppet.png' % ID), 1200, 900)
     else:
@@ -121,6 +129,11 @@ if '--portraits-only' in sys.argv or '--review-only' not in sys.argv:
     if '--portraits-only' in sys.argv:
         sys.exit(0)
 
+if '--tops-only' in sys.argv:
+    TOPS_ONLY = True
+else:
+    TOPS_ONLY = False
+
 PHASES = [('Idle', 0), ('Swim', 0), ('Swim', .45), ('Swim', .9), ('Swim', 1.35), ('Sprint', 0),
           ('Sprint', .27), ('Sprint', .55), ('Sprint', .82), ('TurnLeft', .8), ('TurnRight', .8),
           ('Dive', .7), ('Rise', .7), ('Attack', .12), ('Attack', .43), ('Attack', .72),
@@ -128,18 +141,20 @@ PHASES = [('Idle', 0), ('Swim', 0), ('Swim', .45), ('Swim', .9), ('Swim', 1.35),
           ('Guard', .6), ('Parry', .2), ('Dodge', .25), ('Eat', .4), ('Stagger', .6),
           ('Ability', .5), ('Grab', .55), ('Breath', 1.2), ('Growth', .75),
           ('Shake', .2), ('Shake', .5), ('Shake', .8), ('SpineBrace', .6)]
-for clip, t in PHASES:
+for clip, t in ([] if TOPS_ONLY else PHASES):
     pose(clip, t)
     render(REVIEW / (clip + '-' + str(t) + '.png'))
+TOP = dict(w=1000, h=520, loc=(0, 0, 8), scale=6.9, rot=(0, 0, -pi / 2))
 for clip, t in [('Swim', 0), ('Swim', .45), ('Swim', .9), ('Swim', 1.35),
                 ('Sprint', 0), ('Sprint', .27), ('Sprint', .55), ('Sprint', .82),
                 ('Attack', .12), ('Attack', .43), ('Attack', .72)]:
     pose(clip, t)
-    render(REVIEW / (clip + '-' + str(t) + '-top.png'), 900, 620, (0, 0, 8))
-for name, loc in [('side', (7, 0, .1)), ('top', (0, 0, 8)), ('front', (0, -8, .1))]:
-    pose('Idle', 0)
-    render(REVIEW / (name + '.png'), 900, 620, loc)
-for clip, t in [('Idle', 0), ('Bite', .25), ('Attack', .43), ('Heavy', .5)]:
+    render(REVIEW / (clip + '-' + str(t) + '-top.png'), **TOP)
+pose('Idle', 0)
+render(REVIEW / 'side.png', 1000, 520, (7, 0, .1), scale=6.9, rot=(pi / 2, 0, pi / 2))
+render(REVIEW / 'top.png', **TOP)
+render(REVIEW / 'front.png', 620, 620, (0, -8, .1), scale=2.6)
+for clip, t in ([] if TOPS_ONLY else [('Idle', 0), ('Bite', .25), ('Attack', .43), ('Heavy', .5)]):
     pose(clip, t)
     render(REVIEW / ('mouth-%s-%s.png' % (clip, t)), 900, 700, **MOUTH)
     render(REVIEW / ('mouth-front-%s-%s.png' % (clip, t)), 900, 700, **FRONT)
