@@ -258,6 +258,13 @@ export interface PlayerSetup {
    * and ignore it. See src/sim/ladder.ts.
    */
   startRung?: number;
+  /**
+   * Which palette this seat's body is drawn in, when it is not the creature's authored one. Set
+   * only where two seats have picked the same animal and one of them has to be told apart; the
+   * first seat on a creature never carries it. Presentation only — `src/sim` passes it through and
+   * never reads it, so it cannot change how a match plays or replays (see src/shared/seat-schemes.ts).
+   */
+  scheme?: string;
 }
 
 /** The three modes, shared by both eras: an era changes the sea and the animals, not the match. */

@@ -22,6 +22,7 @@ import { TitleScreen } from './Title';
 import { Toolbar } from './Toolbar';
 import { toolbarPlace } from './toolbar-place';
 import { menuScheme } from '../shared/controls';
+import { assignSeatSchemes } from '../shared/seat-schemes';
 import { freshCursor, menuPress, MENU_LOCKOUT, type MenuCursor, type MenuEvent } from './menu-cursor';
 
 export type Screen = 'title' | 'select' | 'playing' | 'results';
@@ -165,7 +166,15 @@ export function App() {
   const clearFresh = useCallback(() => { freshRef.current = emptyCodex(); setFresh(freshRef.current); }, []);
   const setCarryBoth = useCallback((c: boolean[]) => { carryRef.current = c; setCarry(c); }, []);
 
-  const updatePlayers = useCallback((p: PlayerSetup[]) => { playersRef.current = p; setPlayers(p); }, []);
+  /**
+   * Every change to the lineup goes through here, which is why the seats' colours are settled here
+   * too: two players on the same animal have to be told apart, and the one place that knows the
+   * whole lineup is the one place that can say which of them is the duplicate.
+   */
+  const updatePlayers = useCallback((p: PlayerSetup[]) => {
+    const settled = assignSeatSchemes(p, Math.random);
+    playersRef.current = settled; setPlayers(settled);
+  }, []);
   /**
    * Fold what a match finds into the record as it finds it — biomes swum through, landmarks come
    * across, species taken to the top, growth marks moved.

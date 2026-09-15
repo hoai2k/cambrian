@@ -241,7 +241,11 @@ export function SelectScreen(p: Props) {
                   <button className="remove" aria-label={`Remove player ${i + 1}`} onClick={() => p.onRemove(i)}>×</button>
                 </div>
                 <div className="hero">
-                  <CreaturePortrait key={def.id} creatureId={def.id} kind="select" assetBase={ASSETS} alt={`${def.name} reconstruction`} draggable={false} />
+                  {/* A seat drawn in another palette because it is the second on this creature shows
+                      that palette here, so a player knows which animal in the water is theirs before
+                      the match starts. Falls back to the authored render where no portrait has been
+                      baked for the scheme, which is most of them. */}
+                  <CreaturePortrait key={`${def.id}:${pl.scheme ?? ''}`} creatureId={def.id} kind="select" schemeId={pl.scheme} assetBase={ASSETS} alt={`${def.name} reconstruction`} draggable={false} />
                 </div>
                 <CopyBox>
                   <span className="role">{def.ground ? 'SEAFLOOR' : 'SWIMMER'} · {def.role}</span>
