@@ -1,0 +1,21 @@
+
+public/assets/triassic/creatures/phragmoteuthis.glb   32898 edges x 17 phases x 21 clips
+clip            skin  on bone             all     >2x  worst bones
+Guard          5.37x  funnel            5.37x    2799  0.029->0.154  arm_05_02:1207 arm_05_01:417 funnel:253 mantle_R:197
+TurnRight      5.06x  body              5.06x      19  0.020->0.102  body:14 fin_L_01:5
+Grab           4.46x  arm_09_04         4.46x     468  0.019->0.086  arm_05_02:147 arm_05_01:74 arm_11_04:67 arm_06_04:58
+Dive           4.19x  body              4.19x       7  0.020->0.084  body:5 fin_L_01:2
+Attack         3.95x  arm_09_04         3.95x     110  0.019->0.076  arm_05_02:29 arm_11_04:21 arm_06_04:19 arm_05_01:15
+Heavy          3.89x  funnel            3.89x     123  0.029->0.111  arm_05_02:54 funnel:19 arm_05_01:16 arm_11_04:13
+Eat            3.51x  arm_11_04         3.51x     306  0.023->0.082  arm_11_04:77 arm_06_04:71 arm_05_02:63 arm_09_04:45
+Parry          3.20x  funnel            3.20x     127  0.029->0.092  arm_05_02:39 arm_06_04:29 arm_11_04:28 arm_09_04:13
+Hit            3.17x  funnel            3.17x     130  0.029->0.091  arm_05_02:39 arm_06_04:30 arm_11_04:28 arm_09_04:13
+Stagger        3.16x  funnel            3.16x     130  0.029->0.090  arm_05_02:39 arm_06_04:30 arm_11_04:29 arm_09_04:13
+Sprint         2.37x  mantle_R          2.37x      16  0.036->0.085  mantle_R:16
+Bite           2.30x  arm_11_04         2.30x      28  0.047->0.107  arm_11_04:14 arm_06_04:10 arm_09_04:2 arm_05_02:2
+Ability        2.04x  arm_05_02         2.04x       3  0.037->0.076  arm_05_02:1 funnel:1 body:1
+Rise           1.97x  arm_05_02         1.97x       0  0.040->0.078  
+Dodge          1.81x  mantle_R          1.81x       0  0.045->0.081  
+TurnLeft       1.71x  arm_11_04         1.71x       0  0.047->0.080  
+13 of 21 clips tear an edge past 2x
+worst SKIN 5.37x · worst including the oral lining 5.37x

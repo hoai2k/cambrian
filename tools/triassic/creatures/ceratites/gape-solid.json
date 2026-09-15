@@ -1,0 +1,47 @@
+{
+  "id": "ceratites",
+  "backdrop": [
+    1.0,
+    0.0,
+    1.0,
+    1.0
+  ],
+  "shots": [
+    {
+      "clip": "Bite",
+      "t": 0.25,
+      "pixels": 378000,
+      "differingPixels": 1118,
+      "holesOpenedByCulling": 6,
+      "seenThroughTheBody": 6,
+      "backdropInBothPasses": 11630,
+      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/ceratites/gape-solid/Bite-0.25-opened.png",
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/ceratites/gape-solid/Bite-0.25-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/ceratites/gape-solid/Bite-0.25-culled.png"
+    },
+    {
+      "clip": "Attack",
+      "t": 0.44,
+      "pixels": 378000,
+      "differingPixels": 1175,
+      "holesOpenedByCulling": 7,
+      "seenThroughTheBody": 7,
+      "backdropInBothPasses": 9387,
+      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/ceratites/gape-solid/Attack-0.44-opened.png",
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/ceratites/gape-solid/Attack-0.44-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/ceratites/gape-solid/Attack-0.44-culled.png"
+    },
+    {
+      "clip": "Eat",
+      "t": 0.4,
+      "pixels": 378000,
+      "differingPixels": 1148,
+      "holesOpenedByCulling": 5,
+      "seenThroughTheBody": 5,
+      "backdropInBothPasses": 8507,
+      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/ceratites/gape-solid/Eat-0.4-opened.png",
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/ceratites/gape-solid/Eat-0.4-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/ceratites/gape-solid/Eat-0.4-culled.png"
+    }
+  ]
+}

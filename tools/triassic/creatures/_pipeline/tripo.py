@@ -656,6 +656,183 @@ def lining(name, rig, tx, seam, section, y_back, y_front, jaw_blend, material,
     return o, raw
 
 
+def crown_lining(name, rig, tx, rim, centre, axis, dn_axis, ds_axis, into_head,
+                 skin_weights, material, rings=16, ring=14, seam_margin=.30, sew_rings=3):
+    """One closed skinned lining for a **beak inside an arm crown**, sewn to the skin's own cut rim.
+
+    `lining()` above is the jawed-head case: a tube on a measured seam that runs along the body's
+    long axis, with its roof on the skull and its floor on the jaw. A cephalopod's mouth is not that
+    shape and, more importantly, is not held by those bones. Two things go wrong if it is built like
+    one, and both were measured on Ceratites before this existed:
+
+    - **The opening is a curve on a dome, not a circle in a plane.** A flat front ring at a fixed
+      distance along the mouth axis stands proud of the rim where the dome falls away and behind it
+      where the dome bulges, so there is an annular gap round part of it from the first frame.
+    - **The rim of the skin is not weighted to the jaw.** Round a peristome the skin belongs to the
+      lips, the head and the arms standing over it, so a lining whose front ring rides the jaw
+      swings away from a rim that stays put the moment the beak opens. `gape-solid.py` saw the
+      backdrop through that gap at 168 px against a 12 px tolerance.
+
+    So the front ring is placed **on the measured rim itself**, azimuth by azimuth, pulled inside
+    along the axis by `seam_margin` of the local radius so it sits behind the skin rather than
+    meeting it edge to edge; and its first `sew_rings` take the skin's own weights at that point
+    (`skin_weights` is the builder's `weights()`, which is a pure function of position), fading into
+    the jaw/skull blend deeper in. The lining then follows whatever the skin round the mouth
+    follows, and only its throat rides the beak.
+
+    `rim` is the cut rim's vertices in raw coordinates; `centre`, `axis`, `dn_axis`, `ds_axis` the
+    mouth frame; `into_head` how far back the sac reaches. Returns the object and its raw points.
+    """
+    rim = np.asarray(rim, dtype=float)
+    d = rim - np.asarray(centre, dtype=float)
+    ra = d @ np.asarray(axis, dtype=float)
+    rdn = d @ np.asarray(dn_axis, dtype=float)
+    rds = d @ np.asarray(ds_axis, dtype=float)
+    rrad = np.hypot(rdn, rds)
+    rth = np.arctan2(rdn, rds)
+
+    def rim_at(theta):
+        """The rim's own distance out and distance along, at one azimuth: a weighted mean of the
+        rim vertices near it, so a rim the cut left unevenly sampled still reads smoothly."""
+        dth = np.abs((rth - theta + math.pi) % (2 * math.pi) - math.pi)
+        w = np.exp(-(dth / .45) ** 2)
+        if w.sum() < 1e-9:
+            k = int(np.argmin(dth))
+            return float(rrad[k]), float(ra[k])
+        return float((rrad * w).sum() / w.sum()), float((ra * w).sum() / w.sum())
+
+    thetas = [j * TAU / ring for j in range(ring)]
+    edge = [rim_at(t) for t in thetas]
+    mean_r = float(np.mean([r for r, _a in edge]))
+
+    # The first two rings are a **flange wider than the hole**, set back behind the skin. A lining
+    # that merely meets the rim is edge-on to a camera looking into the mouth, and the quads at that
+    # seam are the ones a backface cull takes away: Ceratites leaked 40 px of backdrop in a scatter
+    # right across the width of its own mouth, every one of them at the rim under an arm. A flange
+    # puts squarely-facing geometry behind the seam, so a sliver opened at the rim looks onto the
+    # lining instead of into the head.
+    verts, raw, faces = [], [], []
+    for i in range(rings):
+        u = i / (rings - 1)
+        flange = 1.16 if i == 0 else 1.10 if i == 1 else 1.0
+        shrink = flange * (1.02 - .80 * smooth(max(0., (u - .30) / .70)))
+        for j, th in enumerate(thetas):
+            r0, a0 = edge[j]
+            r = r0 * shrink
+            a = a0 - seam_margin * mean_r - into_head * u
+            p = Vector((np.asarray(centre, dtype=float)
+                        + np.asarray(axis, dtype=float) * a
+                        + np.asarray(dn_axis, dtype=float) * (r * math.sin(th))
+                        + np.asarray(ds_axis, dtype=float) * (r * math.cos(th))).tolist())
+            raw.append(np.array(p[:]))
+            verts.append(tx(p))
+    for i in range(rings - 1):
+        for j in range(ring):
+            x = i * ring + j
+            y = i * ring + (j + 1) % ring
+            faces.append((x, y, y + ring, x + ring))
+    faces.append(tuple(reversed(range(ring))))
+    faces.append(tuple(range((rings - 1) * ring, rings * ring)))
+    me = bpy.data.meshes.new(name)
+    me.from_pydata(verts, [], faces)
+    me.update()
+    o = bpy.data.objects.new(name, me)
+    bpy.context.collection.objects.link(o)
+    o.data.materials.append(material)
+
+    groups = {}
+    per_vertex = []
+    for idx, p in enumerate(raw):
+        u = (idx // ring) / (rings - 1)
+        dn = float((p - np.asarray(centre, dtype=float)) @ np.asarray(dn_axis, dtype=float))
+        g = max(0., min(1., .5 + .5 * dn / max(mean_r, 1e-9)))
+        oral = {'jaw': g, 'skull': 1 - g}
+        # The sew: the first rings carry the skin's own weights, so the opening moves with the face
+        # round it; the throat carries the beak.
+        t = smooth(max(0., (u - (sew_rings - 1) / (rings - 1)) / max(1e-6, .45)))
+        skin = skin_weights(p) if t < 1 else {}
+        w = {}
+        for n, v in skin.items():
+            w[n] = w.get(n, 0.) + v * (1 - t)
+        for n, v in oral.items():
+            w[n] = w.get(n, 0.) + v * t
+        total = sum(w.values()) or 1.
+        w = {n: v / total for n, v in sorted(w.items(), key=lambda kv: -kv[1])[:4]}
+        per_vertex.append(w)
+        for n in w:
+            groups.setdefault(n, o.vertex_groups.new(name=n))
+    for idx, w in enumerate(per_vertex):
+        total = sum(w.values()) or 1.
+        for n, v in w.items():
+            groups[n].add([idx], v / total, 'REPLACE')
+    for q in o.data.polygons:
+        q.use_smooth = True
+    mod = o.modifiers.new('Oral membrane', 'ARMATURE')
+    mod.object = rig
+    o.parent = rig
+    return o, raw
+
+
+def crown_beak(name, rig, bone_name, tx, centre, axis, dn_axis, ds_axis, radius, sign,
+               material, sections=9, ring=10, hook=.55):
+    """One mandible of a cephalopod beak: a curved, keeled wedge rigid on one bone.
+
+    This is the one piece of geometry either cephalopod builder invents, and the era's rule is that
+    what may be authored is decided by how *simple* the shape is. A beak is two curved wedges, which
+    is far below the tooth-whorl bar that rule sets — but simple is not the same as crude. The first
+    version was a four-sided box with flat shading and it read, looking straight into the crown, as
+    a pair of grey lumps rather than as a beak. This is the same amount of invented shape, described
+    properly: an elliptical section that flattens to a keel along the occlusal edge, a rostrum that
+    curves in towards the axis over the last third, and smooth shading.
+
+    `sign` is +1 for the lower mandible and -1 for the upper; the two are otherwise identical, as
+    they nearly are in life. It carries the oral apparatus' own material rather than the skin's,
+    exactly as every other Triassic mouth lining and tooth does: a beak is chitin, and painting it
+    with the mantle's pigment would be the error that rule is about rather than the fix for it.
+    """
+    centre = np.asarray(centre, dtype=float)
+    axis = np.asarray(axis, dtype=float)
+    dn_axis = np.asarray(dn_axis, dtype=float)
+    ds_axis = np.asarray(ds_axis, dtype=float)
+    verts, faces = [], []
+    for i in range(sections):
+        u = i / (sections - 1)
+        a = -radius * .58 + radius * .84 * u
+        # The rostrum: straight for the first half, curving in towards the mouth axis over the rest.
+        lift = sign * radius * (.30 - .34 * smooth(max(0., (u - .35) / .65)) - hook * .22 * u ** 3)
+        w = radius * (.60 - .50 * u ** 1.3)
+        h = radius * (.30 - .27 * u ** 1.1)
+        for j in range(ring):
+            th = j * TAU / ring
+            # A keel: the occlusal side (towards the other mandible) is flattened, the outer side
+            # is round, which is what makes a wedge read as a cutting edge rather than as a tube.
+            keel = 1. if math.sin(th) * sign < 0 else .45
+            p = (centre + axis * a + dn_axis * (lift + sign * h * math.sin(th) * keel)
+                 + ds_axis * (w * math.cos(th)))
+            verts.append(tx(Vector(p.tolist())))
+        if i:
+            base = i * ring
+            for j in range(ring):
+                k = (j + 1) % ring
+                faces.append((base - ring + j, base - ring + k, base + k, base + j))
+    faces.append(tuple(reversed(range(ring))))
+    faces.append(tuple(range((sections - 1) * ring, sections * ring)))
+    me = bpy.data.meshes.new(name)
+    me.from_pydata(verts, [], faces)
+    me.update()
+    o = bpy.data.objects.new(name, me)
+    bpy.context.collection.objects.link(o)
+    o.data.materials.append(material)
+    g = o.vertex_groups.new(name=bone_name)
+    g.add(list(range(len(o.data.vertices))), 1., 'REPLACE')
+    for q in o.data.polygons:
+        q.use_smooth = True
+    mod = o.modifiers.new('Rigid mandible', 'ARMATURE')
+    mod.object = rig
+    o.parent = rig
+    return o
+
+
 def inward_material(name, colour, roughness=.62):
     m = bpy.data.materials.new(name)
     m.use_nodes = True
