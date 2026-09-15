@@ -104,9 +104,6 @@ export function Discoveries({ codex, fresh }: { codex: Codex; fresh: Codex }) {
   const seenMark = new Set(codex.landmarks), newMark = new Set(fresh.landmarks);
   const newApex = new Set(fresh.apex);
   const roster = ACTIVE_ERA.creatures;
-  // The other two games, by name, so "unlocked elsewhere" points somewhere the player can go.
-  const others = [ACTIVE_ERA.copy.sibling, ...(ACTIVE_ERA.copy.siblings ?? [])].filter((g) => !!g).map((g) => g.title);
-  const elsewhere = others.length > 1 ? `${others.slice(0, -1).join(', ')} and ${others[others.length - 1]}` : others[0] ?? 'the other games';
   return (
     <div className="discoveries">
       <div className="discovery-head">
@@ -145,7 +142,7 @@ export function Discoveries({ codex, fresh }: { codex: Codex; fresh: Codex }) {
           const seen = codex.apex.includes(c.id);
           return (
             <li key={c.id} className={`apex-card ${seen ? 'found' : 'unfound'} ${newApex.has(c.id) ? 'fresh' : ''}`}
-                title={seen ? `${c.name} · reached Apex · unlocked as a visitor in ${elsewhere}` : `${c.name} · not yet at Apex`}>
+                title={seen ? `${c.name} · reached Apex · unlocked in the other Ancient Seas games` : `${c.name} · not yet at Apex`}>
               <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={base} alt={c.name} loading="lazy" />
               <span>{c.name}</span>
               {/* Reaching the top here is what admits an animal to the *other* games, so the card
@@ -158,14 +155,24 @@ export function Discoveries({ codex, fresh }: { codex: Codex; fresh: Codex }) {
           );
         })}
       </ul>
-      {/* What Apex is *for*, which was never said anywhere: it is the only way to earn a visitor,
-          and a player who has just got one has no reason to know that yet. Reads as a reward once
-          there is something to report and as a goal while there is not. */}
-      <p className="apex-note">
-        {codex.apex.length
-          ? <>★ <b>Unlocked as visitors</b> in {elsewhere} — pick them there from the <b>Visitors</b> button.</>
-          : <>Take a creature to Apex to unlock it as a <b>visitor</b> in {elsewhere}.</>}
-      </p>
+      {/* What Apex is *for*, which a player who has just earned one has no reason to know yet.
+          Only ever shown to somebody who has one: visitors are a thing you find out you have, not
+          a goal the game sets you in advance, and a line promising them to a player with an empty
+          strip would give the surprise away for nothing. Same reason the Visitors button is absent
+          from the pick grid until there is something behind it.
+
+          The other games are deliberately not named. Which they are, and how many, is a thing that
+          changes — the trilogy has already gained one and may gain more, and one of them is not
+          released yet — so the line says where rather than which, and stays true through all of it.
+          The trilogy's own name is fine; a sibling game's title is what it avoids. A visitor's crew
+          card still says "Devonian", which is the *period* the animal is from and is already on
+          every creature card as provenance ("Late Devonian · Cleveland Shale"), not a pointer at
+          another game. */}
+      {codex.apex.length > 0 && (
+        <p className="apex-note">
+          ★ <b>Unlocked</b> — playable in the other Ancient Seas games, from the <b>Visitors</b> button.
+        </p>
+      )}
     </div>
   );
 }

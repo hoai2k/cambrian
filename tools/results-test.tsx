@@ -32,12 +32,18 @@ const draw = (apex: string[], fresh: string[] = []) =>
 const stars = (html: string) => (html.match(/visitor-tag/g) ?? []).length;
 const others = [era.copy.sibling, ...(era.copy.siblings ?? [])].filter((g) => !!g).map((g) => g!.title);
 
-// --- nothing earned yet: the panel says what Apex is for, as a goal ---
+// --- nothing earned yet: the panel gives nothing away ---
+//
+// Visitors are meant to be found, not promised. A player with an empty strip must not be told that
+// animals unlock elsewhere — that is the surprise, and advertising it in advance spends it for
+// nothing. The Visitors button keeps the same secret by being absent from the pick grid until
+// there is something behind it.
 {
   const html = draw([]);
   check('with nothing at Apex there are no visitor marks', stars(html) === 0);
-  check('...and the note reads as a goal', html.includes('Take a creature to Apex'), 'unlock prompt shown');
-  for (const name of others) check(`...naming ${name}`, html.includes(name));
+  check('...and nothing about unlocking is said at all', !/unlock/i.test(html) && !html.includes('apex-note'), 'no note rendered');
+  check('...and the other games are not named', others.every((name) => !html.includes(name)), others.join(', '));
+  check('...and the word visitor does not appear', !/visitor/i.test(html));
 }
 
 // --- one earned: the card is marked and the note reads as a reward ---
@@ -45,9 +51,14 @@ const others = [era.copy.sibling, ...(era.copy.siblings ?? [])].filter((g) => !!
   const one = PLAYABLE[0].id;
   const html = draw([one], [one]);
   check('an animal at Apex carries the visitor mark', stars(html) === 1, `${one}`);
-  check('...and the note reads as a reward', html.includes('Unlocked as visitors'), 'unlock reported');
+  check('...and only now is the unlock mentioned', html.includes('Unlocked'), 'unlock reported');
+  check('...pointing at the Visitors button', html.includes('Visitors'));
+  // Which games, and how many, is a thing that changes: the trilogy has already gained one and one
+  // of them is not released yet. The line says *where* rather than *which*, so it stays true.
+  check('...without naming a single game', others.every((name) => !html.includes(name)), others.join(', '));
+  check('...saying only "the other Ancient Seas games"', html.includes('other Ancient Seas games'));
   check('...and it still says NEW for the one just earned', html.includes('NEW'));
-  check('...and its title says where it is unlocked', html.includes('unlocked as a visitor in'));
+  check('...and its title says so too, equally vaguely', html.includes('unlocked in the other Ancient Seas games'));
 }
 
 // --- the mark counts exactly the animals at Apex, and nothing else ---
