@@ -2,24 +2,24 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 2004572,
-      "sha256": "4980648fe4bded9fc143a79c7faf617807bb66ee63a9997eeebe037aa3868071",
-      "triangles": 21720,
-      "vertices": 13058
+      "bytes": 2005548,
+      "sha256": "a1bf024b22a47f0b57a9d42ed668662b6804102b1f858b872fa448ef714a7b26",
+      "triangles": 21828,
+      "vertices": 13114
     },
     {
       "suffix": ".puppet",
-      "bytes": 1497648,
-      "sha256": "6bd1871024707bbed0f7be5c9e8a3f128476ef05d197e8f5373b18ccf8cfc95f",
-      "triangles": 8466,
-      "vertices": 4380
+      "bytes": 1498620,
+      "sha256": "22ab222cf8d0801bde5ed2680b2f694fd4157570b2320e7e292e2016f9f449e9",
+      "triangles": 8574,
+      "vertices": 4436
     },
     {
       "suffix": ".lod1",
-      "bytes": 1497648,
-      "sha256": "6bd1871024707bbed0f7be5c9e8a3f128476ef05d197e8f5373b18ccf8cfc95f",
-      "triangles": 8466,
-      "vertices": 4380
+      "bytes": 1498620,
+      "sha256": "22ab222cf8d0801bde5ed2680b2f694fd4157570b2320e7e292e2016f9f449e9",
+      "triangles": 8574,
+      "vertices": 4436
     }
   ],
   "sockets": [
@@ -196,7 +196,7 @@
       "sha256": "1f6d9c2e83c4bc8a2febc6f5ba4b95cec4c4c6dfb3ca290d549f5b267c255049"
     }
   ],
-  "lodTriangleFraction": 0.3897790055248619,
+  "lodTriangleFraction": 0.39279824079164377,
   "playback": [
     {
       "suffix": "",
@@ -223,7 +223,7 @@
           "clip": "Breath",
           "duration": 2,
           "samples": 61,
-          "maxVertexTravel": 0.5164630480411211
+          "maxVertexTravel": 0.5209692128357025
         },
         {
           "clip": "Charge",
@@ -289,7 +289,7 @@
           "clip": "Hit",
           "duration": 0.5,
           "samples": 61,
-          "maxVertexTravel": 0.4837036013690861
+          "maxVertexTravel": 0.48486907307683635
         },
         {
           "clip": "Idle",
@@ -301,7 +301,7 @@
           "clip": "Parry",
           "duration": 0.30000001192092896,
           "samples": 61,
-          "maxVertexTravel": 0.4737885214479583
+          "maxVertexTravel": 0.4813678482338855
         },
         {
           "clip": "Retreat",

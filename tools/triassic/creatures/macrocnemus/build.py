@@ -590,6 +590,21 @@ def mouth_room(_x):
 
 lining, lin_raw = K.oral_lining('Oral cavity lining', (MOUTH_BACK, MOUTH_FRONT), mouth_section,
                                 seam, tx, rings=16, ring=14, centre=mouth_centre,
+                                # **The palate runs behind the hinge on this animal.** With a
+                                # real mandible cut off there is a wedge between the two cut
+                                # halves, and a ray down the middle of the gape goes past a
+                                # palate that stops at the mouth's own back and hits the
+                                # inside of the far cheek -- 1,447 px of it, on a body that
+                                # reads zero with the palate carried back. This builder's
+                                # room is read off its own measured head profile, which runs
+                                # the length of the animal, so behind the mouth it is still a
+                                # measurement rather than an extrapolation.
+                                behind=.30,
+                                # And its palate fills the skull's interior outright
+                                # rather than being held short of it: on this head a ray
+                                # into the gape passes *over* a palate held at the kit's
+                                # default and out through the temporal roof.
+                                buried=1.,
                                 # A squircle, not an ellipse: see `K.oral_lining`.
                                 power=LINING_POWER, room=mouth_room)
 lining.data.materials.append(mouthmat)

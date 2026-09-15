@@ -701,7 +701,13 @@ def oral_shells(seam, section, u_back, u_front, rings=24, ring=14, centre=None, 
             q = lo + (1. - lo) * (i / (rings - 1))
             u = u_back + (u_front - u_back) * q
             w, hu, hd = half_heights(u)
-            back = smooth((throat - q) / (throat - lo)) if throat - lo > 1e-9 else 0.
+            # **The throat blend is measured from the mouth's own back, not from wherever the
+            # palate starts.** Dividing by the extended range dilutes it: with the palate carried
+            # 0.30 of the mouth's length behind, the rear cap reached its full section 0.30 back and
+            # was only a third of the way down to the head's floor *at the hinge*, which is where
+            # the wedge between the two cut halves opens. `smooth` clamps, so this reads 1 behind
+            # the mouth and tapers over `throat` in front of it.
+            back = smooth((throat - q) / throat) if throat > 1e-9 else 0.
             # **Each shell fills its own jaw, not the lumen.** The measured cavity of a shut mouth
             # is much narrower than the head that holds it -- Placodus' is 0.042 half-wide in a head
             # more than twice that -- and two shells drawn to the lumen alone leave a gap either
