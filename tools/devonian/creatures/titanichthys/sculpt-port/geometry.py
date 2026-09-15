@@ -1,8 +1,25 @@
 """Titanichthys body/eye/fin geometry, ported from rework-v3/build_clay04.py (the geometry stage
 every later candidate treats as immutable rest geometry, per its own geo_hash checks). Reused
-verbatim except for one addition: an optional nose warp (`nose_edit=True`) that reshapes the snout
-per titanichthys-sculpt.json, hooked into `head_surface()`/`oral_surface()` only, so eye windows,
-the oral lining and the mouth rim -- all derived from those two functions -- stay seamless.
+verbatim except for one addition: an optional nose loft (`nose_edit=True`) that re-authors the
+snout's own profile rows per titanichthys-sculpt.json.
+
+The head is not a swept profile table like the post-neck body: it is a cage of six control rows
+per angle -- mouth rim, lip back, preoral, crown, occipital, neck -- that `cage_spline()` lofts
+through. Those control rows ARE the snout's profile table, and the sculpt is applied to them and
+to rows read off the same cage in between (`head_controls()`, `HEAD_KNOTS_LOFT`, and the same
+lofted mouth rim inside `oral_surface()`), never to the finished vertices. A lateral scale applied
+per vertex to a blunt rounded snout squeezes rows that wrapped round a wide nose into a narrow one
+and folds them into pleats wherever the scale changes faster than the rows are spaced -- which is
+what the first port of this sculpt did (adjacent face normals up to 170 degrees apart over the
+snout, against 90 on the shipped file), and its one knot at station 15 creased the neck into a
+hard ring as well (an 8% waist with a slope reversal at axis 1.22). Lofting the rows instead keeps
+the surface as smooth as the shipped one by construction, and it is measured: the rebuilt snout's
+99th-percentile face-normal angle is 39.7 degrees against the unedited rebuild's 40.4, and the
+neck's 33.4 against 32.4 (`solve_nose.py`).
+
+The snout's width taper was re-authored again on 14 September (see `_NOSE_WIDTH`): smooth by that
+measure it was, but it ended on a floor rather than closing, and the tab that left standing off
+the prow is what the user asked to have smoothed out.
 
 Call `build(nose_edit)` inside a fresh Blender scene. Returns the constructed objects.
 """
@@ -13,49 +30,77 @@ from math import sin, cos, pi, exp
 from mathutils import Vector
 from mathutils.kdtree import KDTree
 
-# ---- nose warp: piecewise-linear envelope scale + axial shift, keyed on the model's own
-# unwarped GLB-z (= -Blender y). Control values are the base/edit numbers from
-# titanichthys-sculpt.json stations 15-19 (station 14 and earlier are untouched by the sculpt;
-# the first control point below is NECK_Y itself -- exact identity there keeps the neck seam
-# closed against the unwarped post-neck body loft, which this warp never touches).
-# A sixth knot (Z18 + 0.05) is added past station 18 purely to shape the WIDTH curve: the
-# measured "width" at a station is a windowed max over a neighbourhood (+-half a station
-# spacing), and the actual widest points near the tip come off the preoral/crown cage bulge
-# (well before the literal tip vertex), not off the mouth rim. A linear drop straight from
-# station 18's ratio to station 19's leaves that bulge too wide inside the tip's measurement
-# window; dropping fast right after station 18 (then easing into station 19's own value) keeps
-# every point that window can see close to the target. Dorsal/ventral/shift stay on the plain
-# linear interpolant through the sculpt's own knots at that same extra point -- only width bends.
-_NOSE_Z = [1.08, 1.2173644994434554, 1.5969388108504443, 1.9765131222574333, 2.356087433664422, 2.406087433664422, 2.735661745071411]
-_NOSE_SHIFT = [0.0, 8.303852482411846e-05, -0.0053975041135677, 0.004466170811251936, 0.14099994432348095, 0.15224029, 0.2263011004905877]
-_NOSE_DORSAL = [1.0, 1.0, 1.0, 0.9954563866953571, 0.9676686007568404, 0.95372074, 0.8618296519878388]
-_NOSE_VENTRAL = [1.0, 1.0, 1.0, 1.0, 1.0112977058192054, 1.00981349, 1.0]
-_NOSE_WIDTH = [1.0, 0.8732700604142044, 0.933317207366273, 1.0, 0.9561676272053804, 0.30, 0.22329431926991455]
+# ---- nose loft: the snout's re-authored profile table, keyed on the model's own unlofted GLB-z
+# (= -Blender y). Each curve is (axis, value) knots read as a shape-preserving monotone cubic
+# (`_hermite` below), with zero slope at both ends so the curve leaves the neck exactly as flat as
+# the untouched body behind it -- the first knot is the neck itself (NECK_AXIS = -NECK_Y), where
+# every curve is identity, which keeps the neck seam closed against the post-neck loft this never
+# touches, with no step and no change of slope across it.
+#
+# The numbers are what `npm run sculpt:measure` asks for, not the sculpt's station percentages
+# read literally: the port is 0.226 longer, so its 20-station grid no longer lands where the
+# sculpt's did, and each station is a windowed extreme rather than a point on the curve. These
+# were solved against the measured stations (see sculpt-port/solve_nose.py) so stations 15-19 of
+# the rebuilt model land on the sculpt's edited curves, and stations 0-14 stay exactly as shipped.
+NECK_AXIS = 1.08
+_NOSE_SHIFT = [(NECK_AXIS, 0.), (1.55, .0066), (1.9765, .0111), (2.3561, .1516), (2.7357, .2293)]
+# The width curve behind axis 2.15 is the first port's, untouched. Ahead of it the taper is
+# re-authored so the snout *closes*: the first port fell to a .221 floor at 2.55 and held it to
+# the frontmost row, and the rostral shelf that overhangs the mouth (the preoral cage row reaches
+# 0.14 further forward than the mouth rim does) was left wrapping a nose that no longer had the
+# width to carry it. What that squeezed out was a parallel-sided tab standing off the prow, a
+# hand's breadth wide and pinched either side of its root, with the shield falling away into a
+# hollow behind each shoulder -- read head-on, a nose with two nostrils. Ending the taper at the
+# frontmost row instead lets the prow converge to a rounded point, and spreading the same
+# narrowing over .49 of axis rather than .30 takes the hollows out with it.
+_NOSE_WIDTH = [(NECK_AXIS, 1.), (1.15, .9836), (1.25, .9537), (1.4, .896), (1.55, .887),
+               (1.7, .9636), (1.8, 1.0104), (1.95, 1.0051), (2.05, .988), (2.15, .964),
+               (2.25, .90), (2.35, .795), (2.45, .66), (2.55, .50), (2.62, .385),
+               (2.68, .255), (2.7357, .10)]
+# The tab-ended curve the model on disk was built with. A position transplant matches the
+# candidate against a base that reproduces the *shipped* vertices, so the base for this rework is
+# this curve, not the unedited body: `build_base_full.py --previous-nose`.
+_NOSE_WIDTH_PREVIOUS = [(NECK_AXIS, 1.), (1.15, .9836), (1.25, .9537), (1.4, .896), (1.55, .887),
+                        (1.7, .9636), (1.8, 1.0104), (1.95, 1.0051), (2.05, .988), (2.15, .964),
+                        (2.25, .9), (2.35, .6658), (2.45, .3976), (2.55, .221), (2.65, .221),
+                        (2.7357, .221)]
+_NOSE_DORSAL = [(NECK_AXIS, 1.), (1.6, 1.), (1.85, .982), (2.05, .9682), (2.25, .962),
+                (2.45, .929), (2.62, .862), (2.7357, .86)]
+_NOSE_VENTRAL = [(NECK_AXIS, 1.), (1.6, .9607), (1.85, 1.075), (2.05, 1.085), (2.25, 1.1),
+                 (2.45, 1.08), (2.62, 1.), (2.7357, 1.)]
 
 
-def _interp(z, ys):
-    zs = _NOSE_Z
-    if z <= zs[0]:
-        return ys[0]
-    if z >= zs[-1]:
-        return ys[-1]
-    for i in range(len(zs) - 1):
-        if zs[i] <= z <= zs[i + 1]:
-            t = (z - zs[i]) / (zs[i + 1] - zs[i])
-            return ys[i] + (ys[i + 1] - ys[i]) * t
-    return ys[-1]
+def _hermite(knots, z):
+    """Fritsch-Carlson monotone cubic through (axis, value) knots, flat outside them. C1, and it
+    cannot overshoot a knot -- an envelope curve that bulged between two rows would loft a fold."""
+    n = len(knots)
+    if z <= knots[0][0]:
+        return knots[0][1]
+    if z >= knots[-1][0]:
+        return knots[-1][1]
+    h = [knots[i + 1][0] - knots[i][0] for i in range(n - 1)]
+    d = [(knots[i + 1][1] - knots[i][1]) / h[i] for i in range(n - 1)]
+    m = [0.] * n
+    for i in range(1, n - 1):
+        if d[i - 1] * d[i] > 0:
+            w1, w2 = 2 * h[i] + h[i - 1], h[i] + 2 * h[i - 1]
+            m[i] = (w1 + w2) / (w1 / d[i - 1] + w2 / d[i])
+    k = next(i for i in range(n - 1) if knots[i][0] <= z <= knots[i + 1][0])
+    t = (z - knots[k][0]) / h[k]
+    t2, t3 = t * t, t * t * t
+    return ((2 * t3 - 3 * t2 + 1) * knots[k][1] + (t3 - 2 * t2 + t) * h[k] * m[k]
+            + (-2 * t3 + 3 * t2) * knots[k + 1][1] + (t3 - t2) * h[k] * m[k + 1])
 
 
-def nose_warp(p):
-    """p is a Blender-frame point (x, y, z); y<0 is forward (nose), z is up."""
+def nose_loft(p):
+    """Place one snout control row (or an anchor riding with it). p is a Blender-frame point
+    (x, y, z); y<0 is forward (nose), z is up."""
     zc = -p.y
-    if zc <= _NOSE_Z[0]:
-        return p
-    shift = _interp(zc, _NOSE_SHIFT)
-    rd, rv, rw = _interp(zc, _NOSE_DORSAL), _interp(zc, _NOSE_VENTRAL), _interp(zc, _NOSE_WIDTH)
-    new_x = p.x * rw
-    new_z = p.z * rd if p.z >= 0 else p.z * rv
-    return Vector((new_x, -(zc + shift), new_z))
+    if zc <= NECK_AXIS:
+        return Vector(p)
+    rw = _hermite(_NOSE_WIDTH, zc)
+    rd, rv = _hermite(_NOSE_DORSAL, zc), _hermite(_NOSE_VENTRAL, zc)
+    return Vector((p.x * rw, -(zc + _hermite(_NOSE_SHIFT, zc)), p.z * (rd if p.z >= 0 else rv)))
 
 
 def build(nose_edit=False):
@@ -216,6 +261,14 @@ def build(nose_edit=False):
         return p
 
     HEAD_KNOTS = [0., .06, .22, .46, .73, 1.]
+    # The sculpted snout is lofted through a DENSER profile table: the shipped cage's own six
+    # rows, plus rows read off that same cage in between. Six rows cannot carry this edit -- the
+    # span from the crown to the preoral row is most of the snout, and once the nose is drawn out
+    # and pulled in to a point the spline between those two rows runs wide of the taper (40% over
+    # the sculpt's width at the nose station, measured) and wobbles in and out between them, which
+    # reads as creases running the length of the snout. Every row here is a point on the shipped
+    # cage, so with the loft identity this table rebuilds the shipped head.
+    HEAD_KNOTS_LOFT = [0., .06, .10, .16, .22, .28, .34, .40, .46, .55, .64, .73, .86, 1.]
     NECK_Y = -1.08
 
     def mouth_rim(a):
@@ -241,24 +294,31 @@ def build(nose_edit=False):
         occipital = Vector(((1.39 - .08 * smooth(down / .75)) * cx,
                             -1.30 - .31 * smooth(up) - .23 * smooth(down),
                             .045 + .98 * up ** .74 - .84 * down ** .85))
-        return [m, lip_back, preoral, crown, occipital, surface(NECK_Y, a)]
+        rows = [m, lip_back, preoral, crown, occipital, surface(NECK_Y, a)]
+        if not nose_edit:
+            return rows
+        # The sculpt is applied here, to the profile rows themselves, so everything lofted
+        # through them (surface, oral lining, eye windows, the mouth rim seam) follows one
+        # smooth set of rows. The neck row is identity by construction: its axis is NECK_AXIS
+        # exactly, where every envelope curve is 1.
+        return [nose_loft(cage_spline(rows, t)) for t in HEAD_KNOTS_LOFT]
 
-    def cage_spline(points, t):
+    def cage_spline(points, t, knots=HEAD_KNOTS):
         if t <= 0:
             return points[0].copy()
         if t >= 1:
             return points[-1].copy()
-        k = next(i for i in range(len(HEAD_KNOTS) - 1) if HEAD_KNOTS[i] <= t <= HEAD_KNOTS[i + 1])
-        lo, hi = HEAD_KNOTS[k], HEAD_KNOTS[k + 1]
+        k = next(i for i in range(len(knots) - 1) if knots[i] <= t <= knots[i + 1])
+        lo, hi = knots[k], knots[k + 1]
         q = (t - lo) / (hi - lo)
         before, after = max(0, k - 1), min(len(points) - 1, k + 2)
-        d0 = (points[k + 1] - points[before]) / (HEAD_KNOTS[k + 1] - HEAD_KNOTS[before]) * (hi - lo)
-        d1 = (points[after] - points[k]) / (HEAD_KNOTS[after] - HEAD_KNOTS[k]) * (hi - lo)
+        d0 = (points[k + 1] - points[before]) / (knots[k + 1] - knots[before]) * (hi - lo)
+        d1 = (points[after] - points[k]) / (knots[after] - knots[k]) * (hi - lo)
         return ((2 * q ** 3 - 3 * q * q + 1) * points[k] + (q ** 3 - 2 * q * q + q) * d0
                 + (-2 * q ** 3 + 3 * q * q) * points[k + 1] + (q ** 3 - q * q) * d1)
 
     def head_base(t, a):
-        return cage_spline(head_controls(a), t)
+        return cage_spline(head_controls(a), t, HEAD_KNOTS_LOFT if nose_edit else HEAD_KNOTS)
 
     HEAD_SUTURES = [
         [(.22, 1.57), (.26, 1.22), (.37, .91), (.51, .65), (.60, .30)],
@@ -283,8 +343,6 @@ def build(nose_edit=False):
             normal = tangent.cross(around).normalized()
             distance = head_seams.find(p)[2]
             p -= normal * (.0065 * exp(-(distance / .029) ** 2))
-        if nose_edit:
-            p = nose_warp(p)
         return p
 
     def head_weights(t, a):
@@ -342,9 +400,9 @@ def build(nose_edit=False):
         quad((last[j], tail_end, last[(j + 1) % N]))
 
     def oral_surface(t, a):
-        # Duplicates head_surface's pre-warp computation (not a call to head_surface itself):
-        # the nose warp below must see the ORIGINAL point, exactly as head_surface does, so the
-        # two functions warp consistently and the shared mouth-rim seam stays closed.
+        # Duplicates head_surface's own computation (not a call to head_surface itself): the
+        # lofted cage row and the lofted mouth rim here must be exactly the ones head_surface
+        # lofted, so the mouth-rim seam the two share stays closed.
         q = head_base(t, a)
         if .08 < t < .99:
             tangent = head_base(min(1, t + .0001), a) - head_base(max(0, t - .0001), a)
@@ -360,10 +418,14 @@ def build(nose_edit=False):
                          m.y * (1 - t) + NECK_Y * t + .018,
                          -.080 + .064 * ss - .020 * max(0, ss) ** 3
                          + .42 * sin(pi * t / 2) * ss - .070 * t))
+        if nose_edit:
+            # The rim and the palate are built in the unlofted frame and lofted as the cage rows
+            # they belong to -- the palate's own axis carries it, so the roof of the mouth travels
+            # and narrows with the snout above it and never comes through the skin. At t=1 it is
+            # at the neck, where the loft is identity, so the throat behind is untouched.
+            m, palate = nose_loft(m), nose_loft(palate)
         inner = inner.lerp(palate, smooth(ss / .45))
         out = m.lerp(inner, smooth(t / .065)) if t < .065 else inner
-        if nose_edit:
-            out = nose_warp(out)
         return out
 
     last = head_rows[0]
@@ -618,4 +680,8 @@ def build(nose_edit=False):
         'Long pectoral L', 'Long pectoral R', 'Pelvic L', 'Pelvic R',
         'Modest swept dorsal', 'Strong heterocercal caudal')]
     assert len(meshes) == 9, meshes
-    return {'body': body, 'eye_L': eye_L, 'eye_R': eye_R, 'fins': fin_objects, 'meshes': meshes, 'eyes': eyes}
+    # head_rows carries each cage row's vertex indices into the finished body mesh, so a
+    # diagnostic (solve_nose.py) can say which profile row a measured extreme came off.
+    return {'body': body, 'eye_L': eye_L, 'eye_R': eye_R, 'fins': fin_objects, 'meshes': meshes,
+            'eyes': eyes, 'head_rows': [[remap.get(i) for i in row] for row in head_rows],
+            'head_shape': (HEAD_ROWS, N)}

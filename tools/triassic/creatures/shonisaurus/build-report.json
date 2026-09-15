@@ -1,0 +1,211 @@
+{
+  "rawSHA256": "576114e5d8e4b3eabfd97148a515cc8f9f4567788478791a4441eb85606b6330",
+  "closedRestJawAngleRadians": -0.155,
+  "puppetLipContactFit": {
+    "vertices": 66,
+    "maximumModelDisplacement": 0.07871732556819916
+  },
+  "chinSurgery": {
+    "adjustedVertices": 23,
+    "maximumRawLengthDisplacement": 0.0011560130119323726
+  },
+  "closedSurfaceWinding": {
+    "Puppet measured trunk": {
+      "signedVolumeBefore": -2.928754114746648,
+      "signedVolumeAfter": 2.928615457845187,
+      "outward": true
+    },
+    "Puppet measured crescent caudal": {
+      "signedVolumeBefore": 0.0470415485224488,
+      "signedVolumeAfter": 0.0470415485224488,
+      "outward": true
+    },
+    "Puppet upper rostrum": {
+      "signedVolumeBefore": -0.10512265864862451,
+      "signedVolumeAfter": 0.1051226586486244,
+      "outward": true
+    },
+    "Puppet lower rostrum": {
+      "signedVolumeBefore": -0.0433952441213341,
+      "signedVolumeAfter": 0.043396381176651115,
+      "outward": true
+    },
+    "Puppet pectoral L": {
+      "signedVolumeBefore": -0.03949105483381993,
+      "signedVolumeAfter": 0.039491054833819914,
+      "outward": true
+    },
+    "Puppet pectoral R": {
+      "signedVolumeBefore": 0.039335131456851566,
+      "signedVolumeAfter": 0.039335131456851566,
+      "outward": true
+    },
+    "Puppet pelvic L": {
+      "signedVolumeBefore": -0.019299217217905184,
+      "signedVolumeAfter": 0.019299217217905187,
+      "outward": true
+    },
+    "Puppet pelvic R": {
+      "signedVolumeBefore": 0.019419103293470113,
+      "signedVolumeAfter": 0.019419103293470113,
+      "outward": true
+    },
+    "Upper teeth": {
+      "signedVolumeBefore": -2.1665154433771954e-05,
+      "signedVolumeAfter": 2.1665154433772672e-05,
+      "outward": true
+    },
+    "Lower teeth": {
+      "signedVolumeBefore": 2.1567704413195727e-05,
+      "signedVolumeAfter": 2.1567704413195727e-05,
+      "outward": true
+    }
+  },
+  "rawVertices": 9494,
+  "rawTriangles": 18984,
+  "meshes": {
+    "Shonisaurus authored skin": {
+      "vertices": 54939,
+      "triangles": 109712,
+      "maxInfluences": 3
+    },
+    "Shonisaurus authored jaw": {
+      "vertices": 2179,
+      "triangles": 4192,
+      "maxInfluences": 2
+    },
+    "Puppet measured trunk": {
+      "vertices": 2016,
+      "triangles": 4028,
+      "maxInfluences": 3
+    },
+    "Puppet measured crescent caudal": {
+      "vertices": 372,
+      "triangles": 740,
+      "maxInfluences": 2
+    },
+    "Puppet upper rostrum": {
+      "vertices": 288,
+      "triangles": 572,
+      "maxInfluences": 1
+    },
+    "Puppet lower rostrum": {
+      "vertices": 288,
+      "triangles": 572,
+      "maxInfluences": 2
+    },
+    "Puppet pectoral L": {
+      "vertices": 180,
+      "triangles": 356,
+      "maxInfluences": 3
+    },
+    "Puppet pectoral R": {
+      "vertices": 180,
+      "triangles": 356,
+      "maxInfluences": 3
+    },
+    "Puppet pelvic L": {
+      "vertices": 180,
+      "triangles": 356,
+      "maxInfluences": 3
+    },
+    "Puppet pelvic R": {
+      "vertices": 180,
+      "triangles": 356,
+      "maxInfluences": 3
+    },
+    "Oral palate": {
+      "vertices": 162,
+      "triangles": 272,
+      "maxInfluences": 1
+    },
+    "Oral floor": {
+      "vertices": 162,
+      "triangles": 272,
+      "maxInfluences": 1
+    },
+    "Oral throat and cheeks": {
+      "vertices": 84,
+      "triangles": 154,
+      "maxInfluences": 2
+    },
+    "Eye globe L": {
+      "vertices": 182,
+      "triangles": 360,
+      "maxInfluences": 1
+    },
+    "Eye iris L": {
+      "vertices": 182,
+      "triangles": 360,
+      "maxInfluences": 1
+    },
+    "Eye pupil L": {
+      "vertices": 182,
+      "triangles": 360,
+      "maxInfluences": 1
+    },
+    "Eye globe R": {
+      "vertices": 182,
+      "triangles": 360,
+      "maxInfluences": 1
+    },
+    "Eye iris R": {
+      "vertices": 182,
+      "triangles": 360,
+      "maxInfluences": 1
+    },
+    "Eye pupil R": {
+      "vertices": 182,
+      "triangles": 360,
+      "maxInfluences": 1
+    },
+    "Upper teeth": {
+      "vertices": 238,
+      "triangles": 340,
+      "maxInfluences": 1
+    },
+    "Lower teeth": {
+      "vertices": 238,
+      "triangles": 340,
+      "maxInfluences": 1
+    }
+  },
+  "bones": 21,
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Growth"
+  ],
+  "profileSections": 190,
+  "materialCorrection": {
+    "authoredAlbedo": "original UV texture; white COLOR_0",
+    "normalStrength": 0.15,
+    "roughness": 0.7,
+    "puppetMaterialUnchanged": true
+  },
+  "authoredMandibleSeparation": {
+    "frontOwner": "jaw",
+    "upperLipOwner": "skull",
+    "rearHingeRawY": [
+      0.326,
+      0.36
+    ],
+    "trianglesPreserved": true
+  }
+}

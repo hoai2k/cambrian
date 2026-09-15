@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { ViewerSpecimen } from '../catalogue';
-import type { OrthoView, Rect, SculptMesh, ViewerScene } from '../scene';
+import { rootFramePositions, type OrthoView, type Rect, type ViewerScene } from '../scene';
 import { History } from './history';
 import {
   CURVES, autoSlope, contourAt, evaluate, exportDoc, eyesChanged, gapeToward, isIdentity, makeProbe, measure, mouthChanged, mouthCorner,
@@ -179,7 +179,7 @@ export function SculptEditor({ scene, specimen, onExit }: Props) {
   // Hand the scene its viewports whenever anything about them changes.
   useEffect(() => {
     if (!rects) return;
-    scene.setLayout('sculpt', rects.main);
+    scene.setLayout('split', rects.main);
     if (doc && cams) for (const view of ['side', 'top'] as const) {
       const v: OrthoView = { rect: rects[view], centre: cams[view].centre, unitsPerPixel: cams[view].upp, axis: doc.frame.axis };
       scene.setOrthoView(view, v);
@@ -675,18 +675,6 @@ function Drawing(p: DrawingProps) {
 // ---------------------------------------------------------------------------------------------
 
 const CURVE_LABEL: Record<CurveName, string> = { dorsal: 'Dorsal (top line)', ventral: 'Ventral (bottom line)', width: 'Width (half, from the midline)' };
-
-function rootFramePositions(base: Float32Array, toRoot: SculptMesh['toRoot']): Float32Array {
-  const e = toRoot.elements;
-  const out = new Float32Array(base.length);
-  for (let i = 0; i < base.length; i += 3) {
-    const x = base[i], y = base[i + 1], z = base[i + 2];
-    out[i] = e[0] * x + e[4] * y + e[8] * z + e[12];
-    out[i + 1] = e[1] * x + e[5] * y + e[9] * z + e[13];
-    out[i + 2] = e[2] * x + e[6] * y + e[10] * z + e[14];
-  }
-  return out;
-}
 
 /** The lateral midline as the top view draws it (the scene's top camera has +x up for a z body, −z up for an x body). */
 const latSign = (doc: SculptDoc) => (doc.frame.axis === 'z' ? 1 : -1);

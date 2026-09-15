@@ -1,0 +1,62 @@
+{
+  "id": "placodus",
+  "name": "Placodus",
+  "species": "Placodus gigas",
+  "description": "Canonical Tripo body and procedural volume twin on one 26-joint rig: articulated jaw with a crushing palate, a rigid ventral gastral basket, four splayed limbs and a tail-driven swim.",
+  "modelLength": 5.577,
+  "lengthMeters": 2.5,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth",
+    "Crawl",
+    "Pry",
+    "CrushBite",
+    "Breathe"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Crawl",
+    "Pry",
+    "Breathe"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "puppet": "placodus.puppet.glb",
+  "notes": [
+    "The splayed five-toed manus and pes, the barrel trunk, the procumbent chisels and the asymmetric stance are retained from the accepted Tripo volume.",
+    "The generated tail was hooked 0.262 of a body length out of the midline, which the greenlit pose is not. Intake unbends it by carrying each caudal cross-section rigidly from its own measured centreline frame onto a straightened axis of the same segment lengths; the tip now sits 0.001 off the midline and no section is stretched or sheared. STRAIGHTEN=False in build.py rebuilds the hooked tail.",
+    "The twin resurfaces a 0.0055-unit voxel occupancy field, relaxes it and reduces the new topology. It reuses no source vertex or face.",
+    "The ventral gastral basket is a separate rigid part on its own unanimated bone, as the design asks; the skin it is cut from is put on the trunk bone at the seam so the cut cannot open.",
+    "Same rest rig, inverse binds, sockets and all 25 action sample arrays for authored body and puppet. The LOD keeps every clip.",
+    "Original albedo retained with white COLOR_0; normal relief limited to 0.15 and skin explicitly nonmetallic at roughness 0.7. Puppet pigment samples triangle-local UVs to avoid seam bleed.",
+    "Swim and Sprint are tail-driven: a travelling wave down the trunk and tail with the limbs folded back and only steering. Crawl is the bottom-walk punt - a short shove from both pairs, a long float, then the reach for the next contact.",
+    "Living colours, soft tissues and movements are artistic reconstruction. Ability is the roster crush bite at its 0.9 s duration; CrushBite is the longer feeding version, Pry the incisors levering a shell, Breathe the settled surface loop. Locomotor translation remains engine-owned."
+  ]
+}

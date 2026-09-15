@@ -1,0 +1,206 @@
+[
+ {
+  "id": "nothosaurus",
+  "name": "Nothosaurus procedural twin",
+  "species": "Nothosaurus giganteus",
+  "category": "creature",
+  "modelStatus": "preview",
+  "provenance": "Middle Triassic; approved canonical image, Tripo image-to-model body, and independently rebuilt procedural volume twin",
+  "description": "A procedural comparison body built to the delivered Tripo volume and animated on the same 30-joint rig as the textured runtime model.",
+  "model": "assets/triassic/creatures/nothosaurus.puppet.glb",
+  "lod": "assets/triassic/creatures/nothosaurus.puppet.glb",
+  "image": "assets/triassic/creatures/nothosaurus.thumb.png",
+  "lengthMeters": 6,
+  "looping": [
+   "Idle",
+   "Swim",
+   "Sprint",
+   "Guard",
+   "Eat"
+  ],
+  "sources": [
+   "docs/triassic/canonical/model-inputs/nothosaurus/input.png",
+   "docs/triassic/04-tripo-pipeline.md",
+   "tools/triassic/creatures/nothosaurus/tripo-raw/metadata.json"
+  ],
+  "notes": [
+   "The procedural twin preserves the accepted generated volume but does not reuse the raw Tripo mesh's vertices or faces.",
+   "It shares the runtime body's rest rig, inverse binds, sockets, and 21 named animation clips.",
+   "This paired model remains a preview until a human approves the generated body and procedural twin together."
+  ]
+ },
+ {
+  "id": "shonisaurus",
+  "name": "Shonisaurus procedural twin",
+  "species": "Shonisaurus popularis",
+  "category": "creature",
+  "modelStatus": "preview",
+  "provenance": "Late Triassic, Nevada; approved canonical image, Tripo image-to-model body, and independently rebuilt procedural volume twin",
+  "description": "A procedural comparison body built to the delivered Tripo volume and animated on the same 21-bone rig as the textured runtime model.",
+  "model": "assets/triassic/creatures/shonisaurus.puppet.glb",
+  "lod": "assets/triassic/creatures/shonisaurus.puppet.glb",
+  "image": "assets/triassic/creatures/shonisaurus.thumb.png",
+  "lengthMeters": 14,
+  "looping": [
+   "Idle",
+   "Swim",
+   "Sprint",
+   "Guard",
+   "Eat"
+  ],
+  "sources": [
+   "docs/triassic/canonical/model-inputs/shonisaurus/input.png",
+   "docs/triassic/04-tripo-pipeline.md",
+   "tools/triassic/creatures/shonisaurus/tripo-raw/metadata.json"
+  ],
+  "notes": [
+   "The procedural twin preserves the accepted generated volume but does not reuse the raw Tripo mesh's vertices or faces.",
+   "It shares the runtime body's rest rig, inverse binds, sockets, and 19 named animation clips.",
+   "This paired model remains a preview until a human approves the generated body and procedural twin together."
+  ]
+ },
+ {
+  "id": "triassic-stromatolite-1",
+  "name": "Stromatolite, tall dome",
+  "species": "Microbial dome",
+  "category": "prop",
+  "modelStatus": "preview",
+  "modelNote": "A static preview model. The shape and its pigment are an authored first pass and no canonical pose has been greenlit for this family yet, so the silhouette may still change.",
+  "provenance": "Authored library model; the gypsum flats and the conifer shore",
+  "description": "A layered microbial dome, the flats' only structure. Post-extinction stromatolites grew where almost nothing else would, so this carpets the hypersaline pan where reef formers cannot live. The laminae are geometry rather than texture, with muted layer pigment carried in the vertex colours. The taller, steeper profile of the pair.",
+  "model": "assets/triassic/props-instanced/triassic-stromatolite-1.glb",
+  "image": "assets/triassic/props-instanced/triassic-stromatolite-1.png",
+  "lengthMeters": 0.726,
+  "looping": [],
+  "sources": [
+   "tools/triassic/props/README.md",
+   "docs/triassic/02-biomes-and-depth.md"
+  ],
+  "notes": [
+   "Static mesh: no rig, no skin and no animation clips. Instanced scenery is drawn thousands of times and is swayed or bent by the renderer's shader rather than by bones, so a prop carries no skeleton by design.",
+   "640 triangles, one mesh, one material, vertex colours and no texture fetch.",
+   "Pivot at the base centre where the prop meets the ground; authored at the design's scale-1 size, which the game then scales per instance.",
+   "Built by tools/triassic/props/build.py from triassic-stromatolite-1.blend."
+  ]
+ },
+ {
+  "id": "triassic-stromatolite-2",
+  "name": "Stromatolite, low dome",
+  "species": "Microbial dome",
+  "category": "prop",
+  "modelStatus": "preview",
+  "modelNote": "A static preview model. The shape and its pigment are an authored first pass and no canonical pose has been greenlit for this family yet, so the silhouette may still change.",
+  "provenance": "Authored library model; the gypsum flats and the conifer shore",
+  "description": "A layered microbial dome, the flats' only structure. Post-extinction stromatolites grew where almost nothing else would, so this carpets the hypersaline pan where reef formers cannot live. The laminae are geometry rather than texture, with muted layer pigment carried in the vertex colours. The lower, broader profile of the pair.",
+  "model": "assets/triassic/props-instanced/triassic-stromatolite-2.glb",
+  "image": "assets/triassic/props-instanced/triassic-stromatolite-2.png",
+  "lengthMeters": 0.737,
+  "looping": [],
+  "sources": [
+   "tools/triassic/props/README.md",
+   "docs/triassic/02-biomes-and-depth.md"
+  ],
+  "notes": [
+   "Static mesh: no rig, no skin and no animation clips. Instanced scenery is drawn thousands of times and is swayed or bent by the renderer's shader rather than by bones, so a prop carries no skeleton by design.",
+   "640 triangles, one mesh, one material, vertex colours and no texture fetch.",
+   "Pivot at the base centre where the prop meets the ground; authored at the design's scale-1 size, which the game then scales per instance.",
+   "Built by tools/triassic/props/build.py from triassic-stromatolite-2.blend."
+  ]
+ },
+ {
+  "id": "triassic-salt-crust-1",
+  "name": "Salt crust, plate I",
+  "species": "Gypsum crust plate",
+  "category": "prop",
+  "modelStatus": "preview",
+  "modelNote": "A static preview model. The shape and its pigment are an authored first pass and no canonical pose has been greenlit for this family yet, so the silhouette may still change.",
+  "provenance": "Authored library model; the gypsum flats",
+  "description": "A thin gypsum plate lying on the pan, scalloped at the rim and curled unevenly at one edge as an evaporite crust dries and lifts. Flat ground cover rather than growth: it is scattered across the flats and never bends. One rim and curl pattern.",
+  "model": "assets/triassic/props-instanced/triassic-salt-crust-1.glb",
+  "image": "assets/triassic/props-instanced/triassic-salt-crust-1.png",
+  "lengthMeters": 1.021,
+  "looping": [],
+  "sources": [
+   "tools/triassic/props/README.md",
+   "docs/triassic/02-biomes-and-depth.md"
+  ],
+  "notes": [
+   "Static mesh: no rig, no skin and no animation clips. Instanced scenery is drawn thousands of times and is swayed or bent by the renderer's shader rather than by bones, so a prop carries no skeleton by design.",
+   "240 triangles, one mesh, one material, vertex colours and no texture fetch.",
+   "Pivot at the base centre where the prop meets the ground; authored at the design's scale-1 size, which the game then scales per instance.",
+   "Built by tools/triassic/props/build.py from triassic-salt-crust-1.blend."
+  ]
+ },
+ {
+  "id": "triassic-salt-crust-2",
+  "name": "Salt crust, plate II",
+  "species": "Gypsum crust plate",
+  "category": "prop",
+  "modelStatus": "preview",
+  "modelNote": "A static preview model. The shape and its pigment are an authored first pass and no canonical pose has been greenlit for this family yet, so the silhouette may still change.",
+  "provenance": "Authored library model; the gypsum flats",
+  "description": "A thin gypsum plate lying on the pan, scalloped at the rim and curled unevenly at one edge as an evaporite crust dries and lifts. Flat ground cover rather than growth: it is scattered across the flats and never bends. The other rim and curl pattern.",
+  "model": "assets/triassic/props-instanced/triassic-salt-crust-2.glb",
+  "image": "assets/triassic/props-instanced/triassic-salt-crust-2.png",
+  "lengthMeters": 1.01,
+  "looping": [],
+  "sources": [
+   "tools/triassic/props/README.md",
+   "docs/triassic/02-biomes-and-depth.md"
+  ],
+  "notes": [
+   "Static mesh: no rig, no skin and no animation clips. Instanced scenery is drawn thousands of times and is swayed or bent by the renderer's shader rather than by bones, so a prop carries no skeleton by design.",
+   "240 triangles, one mesh, one material, vertex colours and no texture fetch.",
+   "Pivot at the base centre where the prop meets the ground; authored at the design's scale-1 size, which the game then scales per instance.",
+   "Built by tools/triassic/props/build.py from triassic-salt-crust-2.blend."
+  ]
+ },
+ {
+  "id": "triassic-mud-ripple-1",
+  "name": "Mud ripple, slab I",
+  "species": "Laminated black-mud floor",
+  "category": "prop",
+  "modelStatus": "preview",
+  "modelNote": "A static preview model. The shape and its pigment are an authored first pass and no canonical pose has been greenlit for this family yet, so the silhouette may still change.",
+  "provenance": "Authored library model; the black basin",
+  "description": "A laminated mud slab with directional ripple relief and a thin pale ash horizon at its edge, the volcanic beds the basin is named for. The basin's only floor prop, flat underneath so it sits true on the bottom. One ripple phase.",
+  "model": "assets/triassic/props-instanced/triassic-mud-ripple-1.glb",
+  "image": "assets/triassic/props-instanced/triassic-mud-ripple-1.png",
+  "lengthMeters": 2.0,
+  "looping": [],
+  "sources": [
+   "tools/triassic/props/README.md",
+   "docs/triassic/02-biomes-and-depth.md"
+  ],
+  "notes": [
+   "Static mesh: no rig, no skin and no animation clips. Instanced scenery is drawn thousands of times and is swayed or bent by the renderer's shader rather than by bones, so a prop carries no skeleton by design.",
+   "712 triangles, one mesh, one material, vertex colours and no texture fetch.",
+   "Pivot at the base centre where the prop meets the ground; authored at the design's scale-1 size, which the game then scales per instance.",
+   "Built by tools/triassic/props/build.py from triassic-mud-ripple-1.blend."
+  ]
+ },
+ {
+  "id": "triassic-mud-ripple-2",
+  "name": "Mud ripple, slab II",
+  "species": "Laminated black-mud floor",
+  "category": "prop",
+  "modelStatus": "preview",
+  "modelNote": "A static preview model. The shape and its pigment are an authored first pass and no canonical pose has been greenlit for this family yet, so the silhouette may still change.",
+  "provenance": "Authored library model; the black basin",
+  "description": "A laminated mud slab with directional ripple relief and a thin pale ash horizon at its edge, the volcanic beds the basin is named for. The basin's only floor prop, flat underneath so it sits true on the bottom. The opposing ripple phase.",
+  "model": "assets/triassic/props-instanced/triassic-mud-ripple-2.glb",
+  "image": "assets/triassic/props-instanced/triassic-mud-ripple-2.png",
+  "lengthMeters": 2.0,
+  "looping": [],
+  "sources": [
+   "tools/triassic/props/README.md",
+   "docs/triassic/02-biomes-and-depth.md"
+  ],
+  "notes": [
+   "Static mesh: no rig, no skin and no animation clips. Instanced scenery is drawn thousands of times and is swayed or bent by the renderer's shader rather than by bones, so a prop carries no skeleton by design.",
+   "712 triangles, one mesh, one material, vertex colours and no texture fetch.",
+   "Pivot at the base centre where the prop meets the ground; authored at the design's scale-1 size, which the game then scales per instance.",
+   "Built by tools/triassic/props/build.py from triassic-mud-ripple-2.blend."
+  ]
+ }
+]

@@ -5,6 +5,7 @@ import type { Actor, InputFrame, Mode, WorldEvent } from './types';
 import type { CreatureId } from './creatures';
 import type { ExpansionContext } from './expansion-abilities';
 import { DEVONIAN_RULES } from './devonian/rules';
+import { TRIASSIC_RULES } from './triassic/rules';
 
 /**
  * The seams where an era changes how the shared simulation behaves. Every hook is optional in
@@ -24,6 +25,23 @@ export interface EraHud {
   rung: number; rungName: string; stage: string;
   /** This body breathes both ways: lungs as well as gills, so dead water cannot touch it. */
   bimodal: boolean;
+  /** This body breathes air and nothing else: stamina comes back only at the surface. */
+  air?: boolean;
+  /** Air-breathers: whether the last step found the body at the surface, breathing. */
+  atSurface?: boolean;
+  /**
+   * Air-breathers: the breath being held, 1 at the surface down to 0. It is a clock on a dive, not
+   * a health bar — running it out stops stamina coming back, and nothing else by itself.
+   */
+  airLeft?: number;
+  /** The last minute of that breath, where the gauge flashes. */
+  airLow?: boolean;
+  /** Out of air *and* out of stamina: the body is going under, and hp is going with it. */
+  drowning?: boolean;
+  /** 0..1 while a shore animal is winding up to strike at this player; 0 otherwise. */
+  shoreWarn?: number;
+  /** Held under by something that will not let it up: its bar is going and cannot come back. */
+  heldUnder?: boolean;
   beached: boolean;
   /** Dead zones as world offsets from the player and radii, for the radar. */
   deadZones: { dx: number; dz: number; r: number }[];
@@ -73,6 +91,12 @@ export interface EraRules {
   botNursery(index: number): Vec3 | undefined;
   /** Seconds of protection a body gets when it hatches or comes back. */
   spawnProtect(a: Actor): number;
+  /**
+   * Optional: this body is born alive rather than hatched from an egg on the sand. The hatch is
+   * then the short swell where the era's `spawnPoint` put it (the Triassic: at the surface,
+   * beside a mother) and no egg is laid or drawn.
+   */
+  liveBirth?(a: Actor): boolean;
   /**
    * True when `hunter` (an AI body) must leave `target` alone unless provoked: the era's nursery
    * sanctuary. The caller has already established the hunter is not provoked.
@@ -155,7 +179,19 @@ export interface EraRules {
    * shared tier name and nutrition ring are used.
    */
   scoreLine?(g: Game, a: Actor): { rank: string; progress: number } | undefined;
+  /**
+   * Presentation only: an animation this era wants played on a body that the shared state machine
+   * has nothing to say about. The Triassic's shore animals are the case it exists for — they are
+   * brainless, pinned, and never enter `attack` or `ability`, so the renderer would keep them on
+   * Idle through a telegraph and a strike that the simulation is really performing.
+   *
+   * It returns the clip the body should be *in* right now, and the renderer fires it as a one-shot
+   * when the name changes. Returning undefined leaves the shared state machine alone, which is
+   * what every other body gets. Nothing here may touch simulation state: it is read off state that
+   * has already been decided, so a replay is unaffected by whether anyone was watching.
+   */
+  clip?(a: Actor): { name: string; dur: number } | undefined;
 }
 
-export const RULES: EraRules | undefined = ACTIVE_ERA.id === 'devonian' ? DEVONIAN_RULES : undefined;
+export const RULES: EraRules | undefined = ACTIVE_ERA.id === 'devonian' ? DEVONIAN_RULES : ACTIVE_ERA.id === 'triassic' ? TRIASSIC_RULES : undefined;
 RULES?.install();

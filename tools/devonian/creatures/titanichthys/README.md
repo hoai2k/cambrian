@@ -70,3 +70,49 @@ The three v1 compatible sockets are `anchor_mouth` on jaw, `anchor_mouth_inside`
 The full export contains all 18 clips. The decimated LOD retains exactly Idle, Swim and Death. `validation.json` records geometry reduction, weights, finite deformation bounds at five phases of every clip, loop/recovery seams, stable root and absent scale channels. Exporter-generated constant root/scale tracks are verified against bind transforms and removed; authored motion remains intact. The root's fixed glTF axis-conversion rotation is retained.
 
 Review images cover Idle and Swim laterally, Eat and Ability frontally, Bite and Dodge laterally, and Heavy, Guard and Death in three-quarter view. See `review.md` for the visual inspection result and any amendments made after inspection.
+
+## Sculpt port shipped — 12 September 2026
+
+The user's viewer sculpt (`docs/viewer-sculpt.md`) asked for a longer, narrower, pointed snout:
+the nose +0.23 along the axis and +0.14 behind it, half-width −78% at the nose and −10%/−4% at
+stations 15/16, the underside raised 8%/25% at 17/18, dorsal −14% at the nose; nothing from
+station 14 back. `sculpt-port/` carries it (`build_base_full.py` the base with the edit off,
+`build_candidate.py` with it on, `geometry.py` the loft).
+
+A first port applied the numbers as a per-vertex lateral scale of the finished snout and pleated
+it: rows that wrapped a wide blunt nose folded when squeezed into a narrow one (adjacent face
+normals up to 170° apart over the snout, against 90° shipped), and a knot at station 15 put an 8%
+waist behind the neck that read as a hard ring. The port that shipped edits the head cage's own
+control rows instead — the snout's profile table, `head_controls` and the same lofted mouth rim in
+`oral_surface` — lofting through a denser table (`HEAD_KNOTS_LOFT`, fourteen rows read off the
+shipped cage) with monotone shape-preserving Hermite envelope curves (`_hermite`) that leave the
+neck flat, so the surface is smooth by construction. `solve_nose.py` measures a build the way
+`sculpt:measure` does, names the profile row each extreme comes off, and reports the face-normal
+bands; its `--knots` mode is how the tables were solved.
+
+The rebuild is a deformation source: `tools/devonian/transplant-positions.mjs` keeps the shipped
+GLB whole (materials, UVs, skin, clips, sockets) and takes only the rebuild's vertex positions,
+matched through the base, both LODs. Measured: changed stations 15–19 within 1.3% of the sculpt's
+curves on every curve; `--against` the previous shipped GLB, stations 0–14 read 0.0% on every
+curve. Neck-band face-normal angles identical to shipped. `modelLength` 7.212 → 7.438. Portraits
+by `sculpt-port/portraits.py --out`. Grab re-applied by `tools/creatures/motion/apply.mjs`.
+
+## Nose rework — 14 September 2026
+
+The snout the sculpt port shipped ended on a tab. `_NOSE_WIDTH` fell to a .221 floor at axis 2.55
+and held it to the frontmost row, while the rostral shelf that overhangs the mouth — the preoral
+cage row reaches 0.14 further forward than the mouth rim does — went on wrapping a nose that no
+longer had the width to carry it. What came out was a parallel-sided tongue of surface standing off
+the prow, 0.13 half-wide and 0.14 long with a pinched shoulder either side of its root, and, read
+head-on, a bulge with a hollow beside it that the user fairly called a weird nose. The taper now
+runs on to the frontmost row instead of stopping on a floor (.221 → .10 over 2.55–2.7357) and the
+narrowing ahead of 2.25 is spread over .49 of axis rather than .30, which closes the prow to a
+rounded point and takes the hollows with it. Measured: snout face-normal 99th percentile 39.7° →
+38.1°, 99.9th 97.9° → 92.4°; every station within 1.3% of the sculpt's curves as before except
+station 19's width, which is the tab's own measurement and is now 0.404 against the sculpt's 0.188.
+
+Finished the same way: `build_base_full.py --previous-nose` rebuilds the snout the file on disk
+carries (that is what a position transplant matches against — `_NOSE_WIDTH_PREVIOUS`),
+`--nose-edit` the candidate, and `transplant-positions.mjs` takes only the positions. Stage 3
+matched 100% exactly on both LODs. Portraits by `sculpt-port/portraits.py --out`; length, clips,
+anchors, materials and skin unchanged.

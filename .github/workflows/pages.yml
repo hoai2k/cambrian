@@ -27,8 +27,14 @@ jobs:
       - run: npm run typecheck
       - run: npm run check
       - run: npm run devonian:check
+      - run: npm run triassic
       - run: npm run eras
       - run: npm run sculpt
+      # The rig tests: creature anchors and the attachment pass, read off the shipped GLBs.
+      # They need no browser and no network, only the creature assets already in the repo,
+      # and take about eight seconds together — cheap enough that a rig regression can no
+      # longer sit unnoticed behind a doc that says to run them by hand.
+      - run: npm run rigs
       - run: npm run portraits
       # The feedback button exists only in a build that was given somewhere to send to. Unset —
       # a fork, or a repository variable that got lost — publishes the site without the button

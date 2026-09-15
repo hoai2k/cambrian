@@ -27,11 +27,52 @@ carry-through the oral cavity needed to stay consistent with the narrower snout 
    samples, min -0.0063, all at t~0.033 and the wide-angle corners). Reads SEC[0][1] instead, so
    it stays the actual tip half-width whichever table is loaded; check-oral-clearance.py itself is
    unchanged. oralWeight() never referenced .63 and needed no change.
+
+14 September: the user's viewer sculpt (docs/viewer-sculpt.md) ported into the same four places —
+SEC, the pectoral fin, its bone chain, and the eyes. It asks for a deeper, narrower animal: the
+head and neck much deeper top and bottom (stations 15-18, dorsal +26/+56/+28/+25%, ventral
++42/+76/+83/+50%), the tail deeper (stations 1-5), the trunk a little narrower (stations 9-11,
+-1.4 to -5.8%), the fore body's outline pulled in over the pectoral fin (stations 12-15, -7.7 to
+-18.7%), and the eyes .077 in towards the midline.
+
+SEC's h and z columns carry the dorsal and ventral asks. They are not independent of each other:
+in the trunk the section runs z-h..z+h, over the head it runs -.015-.44h..z+h, and the two blend
+over -1.10..-.45, so each row solves h and z together from the pair of percentages its own station
+asks for. A station is a windowed extreme over a grid that is not the builder's, and the flank's
+longitudinal sweep puts a row's widest points a long way behind its own station, so the table was
+solved rather than typed: port, build, `npm run sculpt:measure`, divide each row by the deviation
+it came back with, repeat. Three rounds; every station lands within ~3% of the sculpt's curves
+except four, all of which are the metric rather than the shape:
+ - station 17's dorsal reads +9.9%. The station's extreme there is the eye globe, not the roof:
+   the roof under it measures 0.3778 against a target of 0.377, and the pair stand .034 proud of
+   it, which is what a dorsal eye does and what the shipped model did too (its own station 17 was
+   the eye's top as well).
+ - station 19's dorsal reads +6.0% — .009 of a unit at the very tip of the snout, where the row
+   itself is pinned to what shipped.
+ - station 14's ventral +6.3% and station 2's ventral -5.7%: the deepest point of the belly and of
+   the tail fall between rows, and pulling either further to chase the window put a kink in the
+   profile on the round before.
+ - station 16's width is left 6.1% under its target, which is the one place the port does not
+   follow the sculpt. That station's width is the snout's flank, swept back by surf()'s own
+   longitudinal map, and the same SEC rows feed stations 17-19 at every other angle, where the
+   sculpt asks for no change at all: +9.7% at 16 cannot be had without +9.7% at 17-19 too.
 """
 import math,numpy as np
 from math import sin,cos,pi,exp
 from mathutils import Vector
-SEC=[(-2.80,.52,.040,-.010),(-2.63,.60,.135,.015),(-2.35,.67,.170,.020),(-1.9,.725,.200,.025),(-1.45,.75,.225,.035),(-1.05,.73,.300,.018),(-.68,.71,.365,0),(-.2,.70,.420,0),(.45,.68,.405,0),(1.1,.62,.365,0),(1.65,.54,.310,0),(2.25,.32,.240,0),(2.85,.14,.27,0),(3.4,.055,.34,0),(3.85,.025,.30,0),(4.23,.009,.145,0),(4.43,.0004,.003,0)]
+SEC=[(-2.8,.52,.04,-.01),(-2.63,.6,.12686,.02186),(-2.35,.67,.21392,.03755),(-1.9,.725,.35345,-.10518),(-1.45,.75,.44578,-.04345),(-1.05,.73,.56309,-.08261),(-.68,.71,.47499,-.06441),(-.2,.7,.40522,-.00502),(.45,.64451,.40899,.00048),(1.1,.61662,.36461,-.00044),(1.65,.5172,.31099,.00029),(2.25,.32,.23953,-.00047),(2.85,.1394,.29113,.00628),(3.4,.0557,.41114,.00198),(3.85,.02568,.32429,-.02934),(4.23,.00894,.14198,.00165),(4.43,.0004,.003,0)]
+# The sculpt's top view pulled the fore body's outline in over the pectoral fin (stations 12-15,
+# -7.7% to -18.7%). Out there that outline *is* the fin, so the port narrows the fin rather than
+# the trunk under it: one lateral scale per control row, solved against the sculpt's own stations,
+# applied to the row's centre and to its .84w spread but not to the .54w sweep, which is
+# fore-and-aft and nothing the sculpt touched. PEC_BONE is the same scale at each pectoral joint,
+# so the chain stays inside the fin it bends.
+PEC_X=[.71587,.83195,.88171,.89615,.93714]
+PEC_BONE={'pectoral':.74534,'elbow':.84082,'distal':.88171,'web':.89542}
+# The globes moved .077 in towards the midline, and the roof over them rose with the deeper head;
+# seating them at a fixed z would have buried them in it. EYE_DEPTH is where the shipped pair sat
+# below the surface at its own station, measured the same way, so the seat follows the new roof.
+EYE=(.20777,-1.58368);EYE_DEPTH=.06825
 def smooth(t):
  if np.isscalar(t):
   t=max(0,min(1,t));return t*t*(3-2*t)
@@ -47,7 +88,7 @@ def surf(y,a):
  w,h,z=section(y);s=np.sin(a);c=np.cos(a)
  # Monotonic longitudinal map: no reversed cheek folds or circular mouth termini.
  yy=y+1.30*np.abs(c)**2.6*(1-smooth((y+2.8)/2.5));x=w*c;head=1-smooth((y+1.10)/.65);power=1.28;bodyZ=z+h*np.sign(s)*np.abs(s)**1.0;headZ=-.015+(h+z+.015)*np.maximum(0,s)**power-.44*h*np.maximum(0,-s)**power;zz=bodyZ*(1-head)+headZ*head
- zz+=.048*np.exp(-((y+1.64)/.24)**2)*(np.exp(-((x-.23)/.12)**2)+np.exp(-((x+.23)/.12)**2))*np.maximum(0,s)**2
+ zz+=.048*np.exp(-((y+1.64)/.24)**2)*(np.exp(-((x-.153)/.12)**2)+np.exp(-((x+.153)/.12)**2))*np.maximum(0,s)**2
  zz-=.015*np.exp(-((y+1.8)/.75)**2)*np.maximum(0,s)**3*np.exp(-(x/.16)**2)
  # Small marginal nares and expanded spiracular skin notches, sculpted into skin.
  nare=np.exp(-((yy+2.35)/.045)**2)*np.exp(-((np.abs(x)-.27)/.055)**2)*np.maximum(0,s)**2
@@ -90,16 +131,18 @@ def make(g):
      a=-pi/2+side*abs(a);t=.10;p=oralPoint(t,a);w=oralWeight(t,a);tip=p+Vector((-side*.013,.008,.050-.01*k));tube([p,p.lerp(tip,.35),p.lerp(tip,.75),tip],[.010,.008,.004,.0004],(.5,.43,.28),w,2,10)
  # Dorsal eyes are actual globes seated deeply inside the original continuous roof.
  for side in [-1,1]:
-  c=Vector((side*.285,-1.59,.185));scale=Vector((.112,.146,.113))
+  ea=math.acos(min(1.,EYE[0]/float(section(EYE[1])[0])));c=Vector((side*EYE[0],EYE[1],float(surf(EYE[1],ea)[2])-EYE_DEPTH));scale=Vector((.112,.146,.113))
   grid(37,64,lambda i,j:vertex(c+Vector((scale.x*sin(pi*i/36)*cos(2*pi*j/64),scale.y*sin(pi*i/36)*sin(2*pi*j/64),scale.z*cos(pi*i/36))),(1,1,1),'skull',(j/64,i/36),False),3,True)
  def fin(side,pelvic=False):
   suffix='L'if side>0 else'R'
   if pelvic:centers=[(.23,1.44,-.12),(.56,1.68,-.22),(.77,2.00,-.26),(.91,2.35,-.26),(.94,2.65,-.24)];widths=[.21,.26,.33,.28,.0008];depths=[.10,.095,.055,.018,.0005];names=['pelvic','pelvicDistal','pelvicWeb'];points=[0,.38,.76]
   else:centers=[(.33,-.78,-.10),(.74,-.48,-.20),(1.04,-.10,-.28),(1.23,.32,-.29),(1.25,.68,-.25)];widths=[.27,.32,.40,.33,.0008];depths=[.18,.15,.08,.024,.0005];names=['pectoral','elbow','distal','web'];points=[0,.27,.53,.78]
+  spread=[1.]*5 if pelvic else PEC_X
   def param(t,a):
    q=t*4;k=min(3,int(q));u=q-k;p0=Vector(centers[max(0,k-1)]);p1=Vector(centers[k]);p2=Vector(centers[k+1]);p3=Vector(centers[min(4,k+2)]);c=.5*((2*p1)+(-p0+p2)*u+(2*p0-5*p1+4*p2-p3)*u*u+(-p0+3*p1-3*p2+p3)*u**3)
    w=(1-u)*widths[k]+u*widths[k+1];h=(1-u)*depths[k]+u*depths[k+1];w*=1+.035*sin(pi*t)
-   c+=Vector((.84,-.54,0))*w*cos(a);c.z+=h*sin(a);c.z+=.008*sin(9*a+2*t)*sin(pi*t)**2*smooth((t-.4)/.4)*abs(sin(a));c.x*=side
+   sx=(1-u)*spread[k]+u*spread[k+1];c.x*=sx
+   c+=Vector((.84*sx,-.54,0))*w*cos(a);c.z+=h*sin(a);c.z+=.008*sin(9*a+2*t)*sin(pi*t)**2*smooth((t-.4)/.4)*abs(sin(a));c.x*=side
    if pelvic:c.y+=1.10
    return c
   def weight(t,a):
@@ -111,7 +154,8 @@ def make(g):
  # Place the deformation skeleton in the same reviewed elongated trunk coordinates.
  for name,(h,t,parent)in list(g['B'].items()):
   if name.startswith('pelvic'):h.y+=1.10;t.y+=1.10
-  elif name.startswith(('pectoral','elbow','distal','web')):continue
+  elif name.startswith(('pectoral','elbow','distal','web')):
+   sx=PEC_BONE[name[:-1]];h.x*=sx;t.x*=sx;g['B'][name]=(h,t,parent);continue
   elif name not in ['root','body']:
    h.y=float(physical_y(h.y));t.y=float(physical_y(t.y))
   g['B'][name]=(h,t,parent)

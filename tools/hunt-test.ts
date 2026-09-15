@@ -1,6 +1,6 @@
 import { Game } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
-import { bandOf, isAlive, lengthOf } from '../src/sim/actors';
+import { applyScaleStats, bandOf, isAlive, lengthOf } from '../src/sim/actors';
 import { dist } from '../src/shared/math';
 import { sampleHeight } from '../src/sim/world';
 /** A spot on the open shelf, well clear of the seabed whatever the terrain there does. */
@@ -67,4 +67,95 @@ for (const [creatureId, mode, scale] of [['waptia', 'rise', 0.25], ['anomalocari
   let small = 0; for (const o of g.actors) if (o.id !== p.id && isAlive(o) && dist(o.pos, p.pos) < 45 + L * 4) { const b = bandOf(p, o); if (b === 'snack' || b === 'prey') small++; }
   check(`${creatureId} at scale ${scale} has prey nearby`, small >= 14, `${small} snack/prey within ${(45 + L * 4).toFixed(0)}u (L=${L.toFixed(1)})`);
 }
+// --- a giant hunts when it is hungry, and only then: a fed one lets you swim right up to it ---
+{
+  const { makeBrain } = await import('../src/sim/ai');
+  /** A player hanging in plain sight of one giant, close enough to be seen and swimming at it. */
+  const seen = (hunger: number, seconds = 12) => {
+    const g = new Game('reef', [{ creature: 'opabinia', device: 'keyboard', ready: true }], 6);
+    // Grown, because that is the player who goes looking for a giant to ride — and because a body
+    // this size is one a giant can hardly miss: its detection saturates in a second or two, which
+    // is what made "seen" a hunt on its own before.
+    const p = g.players[0]; p.scale = 2.6; applyScaleStats(p, false);
+    p.pos = { ...OPEN }; p.spawnProtect = 1e9; p.yaw = 0; p.hp = p.hpMax;
+    for (const o of [...g.actors]) if (o.controller !== 'player') g.remove(o);
+    const L = lengthOf(p);
+    const giant = g.spawn('anomalocaris', 'giant', { x: OPEN.x, y: OPEN.y + 3, z: OPEN.z + L * 5 }, 3.2);
+    const lair = { ...giant.pos };
+    giant.brain = makeBrain('giant', lair, g.rng, {});
+    giant.brain.hunger = hunger;
+    // One waypoint it can never reach, and the body held on station: a giant that finishes its
+    // route dozes for twenty-five seconds and a dozing giant is not looking at anything, which
+    // would prove nothing either way. This one is awake, in place, and facing the player.
+    giant.brain.patrol = [{ x: lair.x, y: lair.y, z: lair.z + 400 }];
+    const goals = new Set<string>();
+    for (let i = 0; i < 60 * seconds; i++) {
+      giant.pos = { ...lair }; giant.yaw = Math.PI;     // facing back down its route, at the player
+      // swimming straight at it, in the open, at full tilt: the loudest a body can be
+      g.step(1 / 60, new Map([[0, { ...emptyInput(), my: 1, burst: 1, camYaw: 0 }]])); g.events.length = 0;
+      p.spawnProtect = 1e9; goals.add(giant.brain!.goal);
+    }
+    return { goals, hunted: p.hunted, giant };
+  };
+  const fed = seen(0);
+  check('a fed giant never hunts what swims up to it', !fed.goals.has('hunt'), `goals ${[...fed.goals].join(',')}`);
+  check('...though it does look at it', fed.goals.has('notice'), `goals ${[...fed.goals].join(',')}`);
+  check('...so nothing tells the player they are hunted', fed.hunted < 0.5, `hunted ${fed.hunted.toFixed(2)}`);
+  const hungry = seen(600);
+  check('a hungry one comes down for it', hungry.goals.has('hunt'), `goals ${[...hungry.goals].join(',')}`);
+}
+
+// --- a mouthful is taken in the mouth, not made to vanish ---
+{
+  const g = new Game('reef', [{ creature: 'opabinia', device: 'keyboard', ready: true }], 4);
+  const p = g.players[0]; p.pos = { ...OPEN }; p.yaw = 0; p.spawnProtect = 1e9;
+  for (const o of [...g.actors]) if (o.controller !== 'player') g.remove(o);
+  const L = lengthOf(p);
+  // right under the mouth, small enough to go down whole
+  const snack = g.spawn('waptia', 'ambient', { x: OPEN.x, y: OPEN.y, z: OPEN.z + L * 0.35 }, 0.1);
+  snack.spawnProtect = 0; snack.brain = undefined;
+  const there = g.actors.includes(snack);
+  run(g, { ...emptyInput(), my: 1, camYaw: 0 }, 30);
+  check('swimming into an animal does not make it disappear', there && g.actors.includes(snack) && isAlive(snack),
+    `alive=${isAlive(snack)} inWorld=${g.actors.includes(snack)} gap=${dist(p.pos, snack.pos).toFixed(2)}`);
+  // now take it: the bite that lands carries it into the mouth and eats it there
+  snack.pos = { x: p.pos.x, y: p.pos.y, z: p.pos.z + lengthOf(p) * 0.35 };
+  run(g, { ...emptyInput(), light: true, camYaw: 0 }, 6);
+  check('a bite that lands puts it in the mouth', snack.state === 'swallowed' && snack.swallowedBy === p.id,
+    `state=${snack.state} by=${snack.swallowedBy}`);
+  const eats = p.eats;
+  run(g, emptyInput(), 150);
+  check('...and it is eaten there, a moment later', p.eats > eats && !g.actors.includes(snack),
+    `eats ${eats}->${p.eats}`);
+}
+
+// --- the warning is about intent, not about size ---
+{
+  const { comingFor, applyScaleStats: scaleStats } = await import('../src/sim/actors');
+  const { makeBrain } = await import('../src/sim/ai');
+  const g = new Game('reef', [{ creature: 'opabinia', device: 'keyboard', ready: true }], 5);
+  const p = g.players[0]; p.scale = 1; scaleStats(p, false); p.pos = { ...OPEN }; p.spawnProtect = 1e9;
+  for (const o of [...g.actors]) if (o.controller !== 'player') g.remove(o);
+  const big = g.spawn('anomalocaris', 'giant', { x: OPEN.x, y: OPEN.y + 2, z: OPEN.z + 14 }, 3.2);
+  big.brain = makeBrain('giant', { ...big.pos }, g.rng, {});
+  run(g, emptyInput(), 2);
+  big.brain.goal = 'patrol'; big.brain.target = -1;
+  check('a giant going about its business is not a warning', !comingFor(big, p) && bandOf(p, big) === 'giant',
+    `band ${bandOf(p, big)} goal ${big.brain.goal}`);
+  const quiet = g.radarFor(0, 400).find((b) => b.id === big.id);
+  check('...and its radar contact is not marked hunting', !!quiet && !quiet.hunting, `blip ${quiet ? quiet.kind : 'none'}`);
+  // Set and read without stepping: a giant's own brain would think again in between, and what is
+  // under test is what the marks make of the state, not how the state was arrived at.
+  big.brain.goal = 'hunt'; big.brain.target = p.id;
+  check('one that has picked you out is', comingFor(big, p), `goal ${big.brain.goal} target ${big.brain.target}`);
+  const hot = g.radarFor(0, 400).find((b) => b.id === big.id);
+  check('...and so is its contact', !!hot && hot.hunting, `hunting=${hot?.hunting}`);
+  // Something its own size that has squared up to it counts too: aggression is not about being big.
+  const rival = g.spawn('opabinia', 'ambient', { x: OPEN.x + 4, y: OPEN.y, z: OPEN.z + 4 }, 1);
+  rival.brain = makeBrain('needs', { ...rival.pos }, g.rng, {});
+  rival.brain.goal = 'fight'; rival.brain.target = p.id;
+  check('a neighbour picking a fight is a warning at any size', comingFor(rival, p) && bandOf(p, rival) === 'rival',
+    `band ${bandOf(p, rival)}`);
+}
+
 console.log(failed ? `\n${failed} FAILED` : '\nall hunt tests passed'); process.exit(failed ? 1 : 0);

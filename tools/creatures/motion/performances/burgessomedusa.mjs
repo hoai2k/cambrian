@@ -215,4 +215,15 @@ export const clips = [
       arms(P, { work: .85 + .15 * Math.sin(2 * Math.PI * u * 2), sway: .5, swayT: 2 * Math.PI * u });
     },
   },
+  {
+    name: 'Grab', duration: 1.15, loop: true,
+    // The hold: the fringe drawn in fully under the bell around whatever it caught, and left
+    // there. The bell keeps its refill beat at a third size — it has to, or the animal sinks —
+    // and the oral arms work steadily at the catch rather than snatching at it.
+    pose(u, P) {
+      bell(P, { ...beat(u, .5, { loop: true }), ripple: .04, rippleT: 2 * Math.PI * u });
+      gather(P, .95, .08 * Math.sin(2 * Math.PI * u));
+      arms(P, { work: .85 + .1 * Math.sin(2 * Math.PI * u), sway: .4, swayT: 2 * Math.PI * u });
+    },
+  },
 ];

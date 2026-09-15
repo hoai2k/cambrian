@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/creatures/keichousaurus/tripo-raw/keichousaurus.raw.glb",
+    "bytes": 1285856,
+    "sha256": "7396ab100b2a45c4a44ab897b252aefb5fbdf51db7825aecac91a761931dc21b"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 10946,
+    "faces": 19020,
+    "triangles": 19020,
+    "connected_components": 42,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.280664,
+      -0.5,
+      -0.222271
+    ],
+    "max_xyz": [
+      0.280664,
+      0.5,
+      0.222271
+    ],
+    "center_xyz": [
+      0,
+      0,
+      0
+    ],
+    "size_xyz": [
+      0.561329,
+      1,
+      0.444541
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_b42d4163-e0ce-4540-aaf0-43dddedef799",
+      "mesh": "tripo_mesh_b42d4163-e0ce-4540-aaf0-43dddedef799",
+      "vertices": 10946,
+      "edges": 29924,
+      "faces": 19020,
+      "triangles": 19020,
+      "connected_components": 42,
+      "material_slots": [
+        "tripo_material_b42d4163-e0ce-4540-aaf0-43dddedef799"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_b42d4163-e0ce-4540-aaf0-43dddedef799",
+      "image_textures": [
+        "Color_b42d4163-e0ce-4540-aaf0-43dddedef799",
+        "NormalGL_b42d4163-e0ce-4540-aaf0-43dddedef799",
+        "ORM_b42d4163-e0ce-4540-aaf0-43dddedef799"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_b42d4163-e0ce-4540-aaf0-43dddedef799",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_b42d4163-e0ce-4540-aaf0-43dddedef799",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_b42d4163-e0ce-4540-aaf0-43dddedef799",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/creatures/keichousaurus/tripo-raw/review/side.png",
+    "top": "tools/triassic/creatures/keichousaurus/tripo-raw/review/top.png",
+    "three-quarter": "tools/triassic/creatures/keichousaurus/tripo-raw/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "tools/triassic/creatures/keichousaurus/keichousaurus.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 19020,
+    "triangles_after": 19020,
+    "bytes": 1171500,
+    "sha256": "91ce3cc47a5b5658baf707f82c0273bc28d6cef5002622516e58ff739193022a"
+  }
+}

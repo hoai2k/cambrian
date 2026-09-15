@@ -191,9 +191,13 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
  * left (side above, top below) and the orbit preview on the right. The cells are only layout and
  * pointer surfaces — the scene renders all three into the one canvas underneath, and each drawing
  * carries an SVG for its spline controls. The info card gives way to the sculpt panel.
+ *
+ * Stretch mode is the same layout with a different drawing on it (`src/viewer/stretch/`), so it
+ * reuses these cells and this panel and adds only its own marks below.
  */
-.viewer.sculpting .stage { grid-row: 1 / 3; }
-.viewer.sculpting .clips, .viewer.sculpting .info { display: none; }
+.viewer.sculpting .stage, .viewer.stretching .stage { grid-row: 1 / 3; }
+.viewer.sculpting .clips, .viewer.sculpting .info,
+.viewer.stretching .clips, .viewer.stretching .info { display: none; }
 .sculpt-stage { grid-column: 2; grid-row: 1 / 3; position: relative; z-index: 5; min-width: 0; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; pointer-events: none; }
 .sculpt-cell { position: relative; min-width: 0; min-height: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
 .sculpt-side { grid-column: 1; grid-row: 1; pointer-events: auto; }
@@ -241,9 +245,64 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .ghost.primary { border-color: var(--lagoon); background: rgba(97, 242, 213, .14); }
 .sculpt-error { color: var(--coral); font-size: 12px; }
 .info-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+/**
+ * Stretch mode's own marks: two cut lines across the body with a handle at each end, the region
+ * between them, and where the far cut is going. The lines are drawn thin and grabbed through a
+ * fat transparent twin, because a 1.6px line is not a pointer target.
+ */
+.stretch-region { fill: rgba(97, 242, 213, .07); stroke: none; pointer-events: none; }
+.stretch-grab { stroke: transparent; stroke-width: 16; cursor: ew-resize; }
+.stretch-line { stroke: var(--lagoon); stroke-width: 1.8; pointer-events: none; }
+.stretch-cut.from .stretch-line { stroke: #8fd3ff; }
+.stretch-cut.active .stretch-line { stroke-width: 2.6; }
+.stretch-handle { fill: rgba(6, 22, 28, .9); stroke: var(--lagoon); stroke-width: 1.8; cursor: crosshair; }
+.stretch-cut.from .stretch-handle { stroke: #8fd3ff; }
+.stretch-handle:hover { fill: var(--ember); stroke: var(--ember); }
+.stretch-cut-label { fill: var(--dim); font: 600 10px var(--font-body); letter-spacing: .12em; pointer-events: none; text-transform: uppercase; }
+.stretch-cut.active .stretch-cut-label { fill: var(--foam); }
+.stretch-moved { fill: none; stroke: var(--ember); stroke-width: 1.6; stroke-dasharray: 5 4; pointer-events: none; }
+.stretch-arrow { stroke: var(--ember); stroke-width: 2; pointer-events: none; }
+.stretch-arrow-head { fill: var(--ember); }
+.stretch-readout { font: 600 15px var(--font-body); font-variant-numeric: tabular-nums; color: var(--foam); display: flex; flex-wrap: wrap; gap: 0 6px; align-items: baseline; }
+.stretch-readout b.changed { color: var(--ember); }
+.stretch-readout small { flex-basis: 100%; color: var(--dim); font-size: 11px; font-weight: 400; }
+.stretch-slider { display: flex; align-items: center; gap: 8px; }
+.stretch-slider input { flex: 1; min-width: 0; }
+.stretch-slider output { font: 700 13px var(--font-body); font-variant-numeric: tabular-nums; color: var(--lagoon); min-width: 3.6em; text-align: right; }
+.stretch-angles { display: flex; gap: 6px; }
+.stretch-panel code { font-size: 10px; color: var(--mist); }
+
 @media (max-width: 900px) {
-  .viewer.sculpting .stage, .viewer.sculpting .sculpt-stage { grid-column: 1; grid-row: 2 / 4; }
+  .viewer.sculpting .stage, .viewer.sculpting .sculpt-stage,
+  .viewer.stretching .stage, .viewer.stretching .sculpt-stage { grid-column: 1; grid-row: 2 / 4; }
   .sculpt-panel { grid-column: 2; grid-row: 2 / 4; }
   .sculpt-stage { grid-template-columns: minmax(0, 1fr); grid-template-rows: 1fr 1fr 1.2fr; }
   .sculpt-main { grid-column: 1; grid-row: 3; }
+}
+
+/* ---------- mark mode ----------
+ * Marking happens on the orbit view itself, so unlike sculpt mode there are no extra viewports:
+ * the stage keeps the whole cell and this layer only draws the brush over it. It must never take
+ * a pointer event — the brush listens on the canvas underneath, and the orbit still owns the
+ * right button — so the overlay is inert and only the panel in the info column is interactive.
+ */
+.viewer.marking .stage { grid-row: 1 / 3; }
+.viewer.marking .clips, .viewer.marking .info { display: none; }
+.mark-stage { grid-column: 2; grid-row: 1 / 3; position: relative; z-index: 5; min-width: 0; min-height: 0; pointer-events: none; }
+.mark-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.mark-label { position: absolute; left: 10px; top: 8px; z-index: 2; font: 700 10px var(--font-display); letter-spacing: .14em; color: var(--dim); text-transform: uppercase; }
+.mark-ring { fill: rgba(255, 47, 168, .1); stroke: #ff2fa8; stroke-width: 1.6; }
+.mark-ring.erasing { fill: none; stroke: var(--foam); stroke-dasharray: 5 4; }
+/* Off the body the ring is a guide rather than a promise: nothing would be marked there. */
+.mark-ring.off { fill: none; stroke: rgba(238, 250, 246, .35); }
+.mark-panel .mark-count { margin: 0; font: 700 14px var(--font-body); color: var(--foam); font-variant-numeric: tabular-nums; }
+.mark-slider { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--mist); }
+.mark-slider small { color: var(--dim); font-size: 11px; }
+.mark-slider input { width: 100%; margin: 0; accent-color: #ff2fa8; }
+.mark-note { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--mist); }
+.mark-note textarea { width: 100%; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: rgba(6, 22, 28, .72); color: var(--foam); font: 400 12px var(--font-body); resize: vertical; }
+.mark-panel code { font-size: 11px; color: var(--lagoon); overflow-wrap: anywhere; }
+@media (max-width: 900px) {
+  .viewer.marking .stage, .mark-stage { grid-column: 1; grid-row: 2 / 4; }
+  .mark-panel { grid-column: 2; grid-row: 2 / 4; }
 }

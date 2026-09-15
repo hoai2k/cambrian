@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "name": "saurichthys",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "task_id": "fcd37f06-a374-42dc-b9eb-6aa38e6160db",
+    "created_at": "2026-09-13T15:47:06.803669Z",
+    "completed_at": "2026-09-13T15:48:18.878802Z",
+    "credits_consumed": 30,
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    }
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/saurichthys/input.png",
+    "sha256": "cef2af0863cb12cb8696db8a2e486dc285008da36f1933c08a0bf6abb54b75c9",
+    "bytes": 1275953
+  },
+  "artifact": {
+    "path": "tools/triassic/creatures/saurichthys/tripo-raw/saurichthys.raw.glb",
+    "bytes": 1368452,
+    "sha256": "cc2f1d5c08667762bb344114786814839253f709ef17d6a0ba4f5567e3daa907",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-13T15:48:29.328Z"
+}

@@ -1,0 +1,48 @@
+{
+  "sourceSha256": "5cb48becbdcbbc3863519bca8a2bb99c5129c6a0e5b1affb6252e15e01c49604",
+  "sourceAlbedoSha256": "2cc6afb93a698f947e20e060797b4b931fe66295a091035997e4dea293381bc2",
+  "models": [
+    {
+      "suffix": "",
+      "sha256": "ad518199ee3726344a6d47d2b2abc82539ffafa61d82290266f721a93dc2bceb",
+      "baseColorTexture": "Color_ea4528e3-1f9a-42f4-b0c4-2b84b879ff7c",
+      "normalScale": 0.15000000596046448,
+      "roughness": 0.699999988079071,
+      "metallic": 0,
+      "whiteColorVertices": 12163,
+      "sourceAlbedoPreservedExactly": true,
+      "boundToPairedAudit": "tools/triassic/creatures/nothosaurus/paired-audit.json"
+    },
+    {
+      "suffix": ".puppet",
+      "sha256": "524bf62d61ad6b910166f77a8c5758d3182c6efedcca1802deb22b82f5f1e478",
+      "baseColorTexture": null,
+      "normalScale": 1,
+      "roughness": 0.7400000095367432,
+      "metallic": 0,
+      "boundToPairedAudit": "tools/triassic/creatures/nothosaurus/paired-audit.json"
+    },
+    {
+      "suffix": ".lod1",
+      "sha256": "524bf62d61ad6b910166f77a8c5758d3182c6efedcca1802deb22b82f5f1e478",
+      "baseColorTexture": null,
+      "normalScale": 1,
+      "roughness": 0.7400000095367432,
+      "metallic": 0,
+      "boundToPairedAudit": "tools/triassic/creatures/nothosaurus/paired-audit.json"
+    }
+  ],
+  "neckStretch": {
+    "from": 1.3950956484794046,
+    "to": 1.8717986749838416,
+    "factor": 1.97,
+    "appliedToSourcePositionsBeforeMatching": true
+  },
+  "sourceUvComparison": {
+    "matchedOriginalSurfaceVertices": 11542,
+    "newCutOrRoundingBoundaryVertices": 621,
+    "above1eMinus5Tolerance": 1,
+    "maximumUvDifference": 0.0001920461654663086,
+    "maximumDifferenceIn2kTexels": 0.393310546875
+  }
+}

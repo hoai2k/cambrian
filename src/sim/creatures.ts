@@ -11,7 +11,7 @@ export const CREATURE_IDS = CREATURES.map((c) => c.id);
  * has no portrait of its own, so those creatures stay off the selection screen until their own
  * model lands. Ecology, bots and the simulation still use the whole roster.
  */
-export const PLAYABLE = CREATURES.filter((c) => !ACTIVE_ERA.assets.standIns?.[c.id]);
+export const PLAYABLE = CREATURES.filter((c) => !c.shore && (ACTIVE_ERA.assets.standInsPlayable || !ACTIVE_ERA.assets.standIns?.[c.id]));
 export const PLAYABLE_IDS = PLAYABLE.map((c) => c.id);
 /**
  * The roster plays at the animals' natural sizes; *Equivalent sizing* is the option that flattens

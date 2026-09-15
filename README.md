@@ -37,6 +37,9 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 | `src/render/` | Three.js: sea environment, creature views and animation layering, effects, cameras, split-screen engine. |
 | `src/app/` | React shell: title, creature select, HUD, pause/results, help and settings. |
 | `src/input/`, `src/audio/` | Gamepad/keyboard reading; the WebAudio graph, its sample library and the distance falloff for world sounds. |
+| `src/ancientseas/` | The trilogy's page, which the site root serves: one engraved plate with the three games on it as links. `?version=1` is the first draft (the three title paintings on a dark ground) kept for comparison. |
+| `src/cambrian/`, `src/devonian/`, `src/triassic/` | The three game entry pages: each selects its era and points the asset base one level up before importing the app. |
+| `stats/`, `src/shared/config-stats.ts` | Visitor stats at `/stats/`: one GoatCounter site, a chip row that filters the dashboard per game, and the setup steps until a site code is set. |
 | `src/workbench/` | Development workbenches at `/workbench/?edit=<name>`. `?edit=audio` plays every sound through the real audio module; `?edit=environment` previews biome paintings, 3D props and radar marks. |
 | `src/shared/palettes.ts` | Creature colour schemes and the material-name to slot mapping they apply through (`src/render/recolor.ts`). |
 | `public/assets/creatures/` | 21 rigged full models, reduced LODs, anatomical anchors, studio renders, hero cards, thumbnails and transparent `.select.png` portraits. |
@@ -59,6 +62,9 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 | [`docs/environment-assets.md`](docs/environment-assets.md) | The seven biome props, nine biome paintings and five radar glyphs, and how the streamed sea consumes them. |
 | [`docs/art/colour-rendering.md`](docs/art/colour-rendering.md) | Runtime creature palettes and the portrait-variant fallback policy. |
 | [`docs/image-requests.md`](docs/image-requests.md) | Open image, glyph and prop requests — **currently none**. Delivered briefs: [`docs/image-requests-history.md`](docs/image-requests-history.md). |
+| [`docs/triassic/builder-requests.md`](docs/triassic/builder-requests.md) | Blender work queued on a Triassic creature builder, measured and written up. |
+| [`docs/viewer-stretch.md`](docs/viewer-stretch.md) | The neck stretcher: lengthening a run of a raw generated body between two cuts, and baking it into the GLB. |
+| [`docs/stats.md`](docs/stats.md) | Visitor counting: what is recorded and what is not, how to switch it on, and how to read the numbers honestly. |
 | [`docs/audio-requests.md`](docs/audio-requests.md) | Sound and music requests, and what has been delivered. Extra music is optional; nothing waits on it. |
 
 ## Headless checks
@@ -77,8 +83,7 @@ run tools/modes-test.ts           # Hunter & Hunted turns and scoring, and the s
 run tools/assets-test.ts          # every path each era asks for exists, and neither reaches into the other's
 run tools/ecology-test.ts         # the day/night cycle, appetite by the hour, grumpy and territorial animals
 run tools/motion-test.ts          # smooth motion: the interpolation snapshot, no step-to-step oscillation
-node --experimental-transform-types tools/anchors-test.mjs
-node --experimental-transform-types tools/feeding-test.mjs
+npm run rigs                      # the rigs: every creature's anchors, and the attachment pass that feeds, grabs and aims
 node tools/hallucigenia-test.mjs  # the revised rig: skinning, loop seams, gait
 node tools/check-creature-assets.mjs --strict
 npm run palettes                  # every material lands in the colour slot its scheme assumes
@@ -86,7 +91,11 @@ npm run portraits                 # palette-aware portraits match their snapshot
 run tools/audio-mix-test.ts       # audio density: how much of the reef's noise is in earshot
 run tools/harness.ts all 240      # balance: hunting, growth, escapes per creature
 run tools/harness.ts duel         # rival fights between creature pairs
+npm run stretch                   # the neck stretcher: the body held still, the head rigid, the region uniform
+npm run stats                     # the visitor counter: the site code, the per-game filters, every entry counted
 npm run preview & node tools/smoke.mjs /tmp   # needs Chromium; writes screenshots
+npm run preview & node tools/stats-smoke.mjs /tmp   # /stats/ off and on in a browser; gc.zgo.at is intercepted
+npm run preview & node tools/stretch-browser.mjs /tmp   # stretch mode: two cuts, one direction, the export
 npm run preview & node tools/biome-tour.mjs /tmp   # drives through every biome band; screenshots and streaming stats
 npm run preview & node tools/workbench-smoke.mjs /tmp   # audio workbench: plays sounds, flags missing samples
 ```
@@ -114,8 +123,9 @@ reproducible generation scripts are in `tools/creatures/`.
 
 ## Era content
 
-Two eras share one engine. The Cambrian pack (`src/content/cambrian/`) is the default at `/`;
-**Devonian Domination** lives at `/devonian/` with its own pack in `src/content/devonian/`. The
+Three eras share one engine, each on its own page below the trilogy's: **Cambrian Conquest** at
+`/cambrian/` (`src/content/cambrian/`, the build's default pack), **Devonian Domination** at
+`/devonian/` and **Triassic Triumph** at `/triassic/`, with their own packs beside it. The
 entry page selects its era (`selectEra`) before the app loads, so every module-top read of
 `ACTIVE_ERA` sees the right roster, assets and modes. See [the era content plan](docs/redesign/06-era-content.md)
 for the boundary and run `npm run eras` to validate the content contract.

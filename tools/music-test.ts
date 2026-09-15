@@ -9,6 +9,7 @@ import assert from 'node:assert/strict';
 import { selectEra } from '../src/content';
 import { CAMBRIAN } from '../src/content/cambrian';
 import { DEVONIAN } from '../src/content/devonian';
+import { TRIASSIC } from '../src/content/triassic';
 import type { Biome } from '../src/sim/world';
 
 let passes = 0;
@@ -69,7 +70,7 @@ const advance = (audio: { update(dt: number): void }, seconds: number, step = 0.
   }
 };
 
-for (const era of [CAMBRIAN, DEVONIAN]) {
+for (const era of [CAMBRIAN, DEVONIAN, TRIASSIC]) {
   selectEra(era);
   const { GameAudio } = await import('../src/audio/audio');
   const { AREA_ENTER, AREA_LEAVE, themeFor } = await import('../src/audio/music');

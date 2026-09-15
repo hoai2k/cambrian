@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-13",
+  "purpose": "Review-only canonical redo candidates; no downstream build until human greenlight.",
+  "subjects": {
+    "aphaneramma": {
+      "candidate": "aphaneramma-candidate02.png",
+      "status": "reviewed-replace",
+      "tool": "builtin image_gen.imagegen",
+      "original": "aphaneramma.png",
+      "originalBackup": "backups/pre-redo-2026-09-13/aphaneramma.png",
+      "reference": {
+        "title": "Metoposaurus diagnosticus kraselovi 1DB.jpg",
+        "subject": "Metoposaurus diagnosticus",
+        "author": "Dmitry Bogdanov / DiBgd",
+        "license": "CC BY-SA 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+        "page": "https://commons.wikimedia.org/wiki/File:Metoposaurus_diagnosticus_kraselovi_1DB.jpg",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Metoposaurus_diagnosticus_kraselovi_1DB.jpg",
+        "interpretation": "Different species. Borrowed low flattened amphibian body, small newt limbs, wrinkled skin and olive/yellow-brown markings. Explicitly retained Aphaneramma's extremely long narrow snout, posterior eyes, lateral-line grooves and finned swimming tail. Did not copy Metoposaurus's short broad skull.",
+        "file": "references/aphaneramma-steer-metoposaurus-bogdanov.jpg",
+        "changes": "Source file preserved unmodified; new generated artwork uses source as directed in interpretation.",
+        "shippingPolicy": "Reference only. Do not copy the source file into runtime art.",
+        "sha256": "59e7ddb5d7dca3e21909e9923d5c2daf5f76a611297487013c9f076fec07928d"
+      },
+      "prompts": [
+        {
+          "prompt": "Use case: scientific-educational. Asset type: replacement canonical creature pose for a Triassic game, a single detailed photorealistic paleoart portrait, landscape 1536x1024. Input 1 is the old Aphaneramma rostratum pose to replace; Input 2 is morphology and color direction: Dmitry Bogdanov / DiBgd, Metoposaurus diagnosticus kraselovi, CC BY-SA 3.0. IMPORTANT input 2 depicts ANOTHER species. Preserve Aphaneramma's extremely long narrow gharial-like rostrum, low flat skull and small far-back eyes, fine marginal teeth, subtle lateral-line grooves. Borrow only the reference's long low broad flattened amphibian trunk, short stout sprawling newt limbs, wrinkled amphibian skin and earthy olive/brown with muted yellow mottling. Replace the old seal-like swelling trunk and huge fins with a convincingly low temnospondyl build: four small articulate legs with modest separated digits (four foredigits, five hinddigits), no flippers or claws, no crocodile armor. Tail long and muscular, laterally compressed with a modest continuous newt-like fin tapering to a rounded point, NO huge crescent/lunate fluke or disconnected tail blade. Full animal fully inside frame, snout facing right, a calm near-side three-quarter swim with little foreshortening and only slight lateral body curve so its long silhouette is unambiguous. Shallow blue-green water, simple subdued rocky/sandy bottom and soft natural light, no other animals or plants overlapping it. Realistic soft skin, restrained natural markings, anatomical detail sharp. Do not copy the reference's short broad Metoposaurus snout. No text, signature, watermark, border, collage or panels.",
+          "output": "/Users/hoai/.codex/generated_images/01a0986b-fad5-79d1-af54-e589e5cb5cf8/exec-f16a11af-b21d-420f-b472-1457a2878b9e.png"
+        },
+        {
+          "prompt": "Make ONLY this anatomical cleanup to the provided Aphaneramma portrait; preserve everything else exactly, including its long snout, flat skull, yellow-brown skin, body, tail, realistic underwater scene and pose. Both front feet must have exactly FOUR slender unwebbed digits (not five), hindfeet five. Show the distant rear limb as a small natural hind leg partially visible BELOW the rear trunk, and remove the small knob currently projecting upward from the spine just ahead of the tail. There must be exactly four short limbs attached in fore/hind pairs, with clean readable anatomy, no dorsal protrusion or dorsal fin. Keep the full creature unchanged otherwise. Single image.",
+          "output": "/Users/hoai/.codex/generated_images/01a0986b-fad5-79d1-af54-e589e5cb5cf8/exec-7c98e2aa-43b7-44f2-9e1d-6855e15cb8e9.png"
+        }
+      ],
+      "visualReview": "Visually reviewed at 1536×1024. Full long-snouted animal visible; four small legs, flatter amphibian trunk and rounded newt-like tail replace swollen body and enormous fluke. Dorsal limb-like knob removed and forefeet reduced to four digits. Hind digits are partially obscured/ambiguous at this pose and should be confirmed during human review; no exact hind-digit count is certified.",
+      "sha256": "e355690f19197647f7bf4858601b50c85e5d5a27bbd22e6ea0d110e1ca27c80b",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "reviewedAt": "2026-09-13T13:55:55.371Z",
+      "reviewerNote": "It should look more like an amphibian than a reptile"
+    },
+    "cymbospondylus": {
+      "candidate": "cymbospondylus-candidate02.png",
+      "status": "greenlit-and-promoted",
+      "tool": "builtin image_gen.imagegen",
+      "original": "cymbospondylus.png",
+      "originalBackup": "backups/pre-redo-2026-09-13/cymbospondylus.png",
+      "reference": {
+        "title": "Cymbospondylus youngorum reconstruction 2023.jpg",
+        "subject": "Cymbospondylus youngorum",
+        "author": "Mariolanzas",
+        "license": "CC BY-SA 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "page": "https://commons.wikimedia.org/wiki/File:Cymbospondylus_youngorum_reconstruction_2023.jpg",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/6/61/Cymbospondylus_youngorum_reconstruction_2023.jpg",
+        "interpretation": "Same species. Followed long low trunk and tail, small eyes and flippers, low asymmetrical terminal fin, absent dorsal fin and muted olive-gray mottling. Removed old canonical's large lunate tail silhouette.",
+        "file": "references/cymbospondylus-steer-mariolanzas.jpg",
+        "changes": "Source file preserved unmodified; new generated artwork uses source as directed in interpretation.",
+        "shippingPolicy": "Reference only. Do not copy the source file into runtime art.",
+        "sha256": "f9594f275dbae8c812ac0f3825e9d8933c6053ed45c29afaf7a91dcee09cf590"
+      },
+      "prompts": [
+        {
+          "prompt": "Use case: scientific-educational. Asset type: replacement canonical creature pose for a Triassic game, one detailed photorealistic paleoart portrait, landscape 1536x1024. Input 1 is the OLD Cymbospondylus youngorum pose to replace. Input 2 is the reviewer's chosen primary morphology reference, Mariolanzas, Cymbospondylus youngorum reconstruction 2023, CC BY-SA 4.0. Rebuild the old animal toward input 2: elongate low eel-proportioned ichthyosaur, continuous long trunk and very long muscular gradually tapering tail, small eyes, very long narrow toothed snout, four modest paddle flippers small in proportion to its giant body, hind flippers at the rear of the trunk. NO dorsal fin. Critically replace the old huge symmetrical crescent fluke with the reference's weakly differentiated LOW asymmetrical tail fin and long tapering tip, a low vertical fin membrane supported along the terminal tail, never a modern dolphin/shark tail. Match the reference's proportions and muted olive-gray fine mottled countershading; the head and eyes should not be oversized. Broadside-biased three-quarter view with snout facing right; entire animal with all four flippers, all snout and tail tip fully inside frame, only a shallow body curve, no perspective that shortens the long trunk. Slightly parted jaws with fine conical tooth row along the lip. Single animal cruising through clear blue water above distant subdued rocks, softly sunlit, enough background separation to read every fin root. No surrounding creatures, no human scale silhouette, no text/signature/watermark, no collage, no dorsal hump. Keep the restrained realistic rendering quality of input 1 while making its morphology decisively match input 2.",
+          "output": "/Users/hoai/.codex/generated_images/01a0986b-fad5-79d1-af54-e589e5cb5cf8/exec-111bee0a-a1a6-40c0-ace3-9ab84d2f826f.png"
+        },
+        {
+          "prompt": "Make ONLY this precise anatomical cleanup in the provided Cymbospondylus portrait, keeping all other pixels/composition as unchanged as possible. The animal currently has an EXTRA small paddle sticking out below the belly immediately LEFT of the near front flipper root, near the lower mid-body. Remove that extra little triangular fifth appendage and seamlessly restore the smooth belly there. Retain exactly FOUR flippers total: the existing TWO rear flippers at the tailward part of the trunk (image left), and the TWO front flippers at the shoulder (image right: large near-side flipper pointing downward-left and distant flipper pointing downward-right). Preserve the long low body and long tail, weak asymmetric terminal fin, snout, small eyes, color, underwater setting, lighting, pose and full framing. Do not add appendages.",
+          "output": "/Users/hoai/.codex/generated_images/01a0986b-fad5-79d1-af54-e589e5cb5cf8/exec-4c96738e-70e2-459c-a4ec-a62738d9e83a.png"
+        }
+      ],
+      "visualReview": "Visually reviewed at 1536×1024. Full low elongate silhouette, narrow toothed head, small eye, no dorsal fin, long tail with low asymmetric terminal fin and four distinct paddles. Targeted second pass removed an extra fifth paddle from first pass.",
+      "sha256": "2bde106b6eda0d9d24d940d057860a1e80865da9d7b8559932527aa65201632c",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "reviewedAt": "2026-09-13T13:52:17.045Z"
+    },
+    "odontochelys": {
+      "candidate": "odontochelys-candidate02.png",
+      "status": "greenlit-and-promoted",
+      "tool": "builtin image_gen.imagegen",
+      "original": "odontochelys.png",
+      "originalBackup": "backups/pre-redo-2026-09-13/odontochelys.png",
+      "reference": {
+        "title": "Thaichelys ruchae life restoration.png",
+        "subject": "Thaichelys ruchae",
+        "author": "Tomasz Szczygielski, Dawid Dróżdż, Phornphen Chanthasit, Sita Manitkoon, Pitaksit Ditbanjong; digital drawing by Sita Manitkoon",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+        "page": "https://commons.wikimedia.org/wiki/File:Thaichelys_ruchae_life_restoration.png",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/0/05/Thaichelys_ruchae_life_restoration.png",
+        "interpretation": "Different species. Borrowed sturdier jointed limbs with clawed feet, robust body, olive/yellow-brown mottling and fine skin texture. Explicitly rejected Thaichelys's complete upper shell and toothless beak: kept Odontochelys's bare ridged back, belly plastron only, teeth in both jaws and long tail.",
+        "file": "references/odontochelys-steer-thaichelys-manitkoon.png",
+        "changes": "Source file preserved unmodified; new generated artwork uses source as directed in interpretation.",
+        "shippingPolicy": "Reference only. Do not copy the source file into runtime art.",
+        "sha256": "6b35b99d8cd72ffe1c1675c09a38b13d16f52cb38d09d4e043883b24f6380b61"
+      },
+      "prompts": [
+        {
+          "prompt": "Use case: scientific-educational. Asset type: replacement canonical creature pose for a Triassic game, one detailed photorealistic paleoart portrait, landscape 1536x1024. Input 1 is the old Odontochelys semitestacea pose to replace. Input 2 is art/morphology direction only: Thaichelys ruchae life restoration, digital drawing by Sita Manitkoon, credited to Tomasz Szczygielski, Dawid Dróżdż, Phornphen Chanthasit, Sita Manitkoon, Pitaksit Ditbanjong, CC BY 4.0. IMPORTANT input 2 is another turtle species with a full shell: DO NOT transfer its carapace. Subject remains Odontochelys: a roughly 40cm primitive toothed turtle with a COMPLETE PALE PLASTRON ON BELLY ONLY, a soft bare back with broadened unfused ribs visible as modest transverse ridges under skin, NO upper shell, NO carapace scutes/rim/plates/spikes or lumps of armor on top. Keep its long tapering tail and moderately long narrow reptilian head; mouth slightly parted to show small teeth in both jaws, NO hooked toothless turtle beak. Borrow the selected reference's more robust natural turtle body, short sturdy jointed sprawling legs, small individual clawed digits, olive-brown and muted yellow mottling and fine skin texture. Critically replace old large webbed sea-turtle flippers with FOUR UNSPECIALIZED LEGS AND SMALL CLAWED FEET, only minimal toe webbing; not fins/paddles. Calm three-quarter SIDE view facing right, camera close to body level so both soft ribbed back and the lower edge/portion of plastron are visible. All four limbs naturally separated and visible, full head and tail inside the frame, no confusing overlaps or duplicates. Animal gently swimming just above a subdued sandy shallow-water floor with a few distant rocks, simple blue-green water and soft sun. A clean anatomically legible portrait with realistic surfaces. No other animals, text, watermark, signature, labels or collage. This is a half-shelled toothed stem turtle, not a modern fully shelled turtle.",
+          "output": "/Users/hoai/.codex/generated_images/01a0986b-fad5-79d1-af54-e589e5cb5cf8/exec-04ef94f0-7b5e-4b90-8816-72b59399b5ec.png"
+        },
+        {
+          "prompt": "Make ONLY this precise head correction in the provided Odontochelys portrait. Remove the smooth cream-colored down-hooked upper beak tip. This animal has NO horny beak: its upper and lower jaws have a low narrow smoothly tapering reptilian snout, covered by the same pebbly skin continuously to the tip, with small teeth continuing all the way toward the front of BOTH jaws. Keep mouth slightly open, tiny clear teeth along both lips, natural nasal openings, no hooked overbite or modern turtle beak. Preserve the original head size and everything else exactly: four sturdy clawed legs, long tail, olive-yellow mottling, soft ridged bare back with NO carapace, pale plastron on belly only, pose, full animal framing, environment and light. Single image.",
+          "output": "/Users/hoai/.codex/generated_images/01a0986b-fad5-79d1-af54-e589e5cb5cf8/exec-b58fb715-1d10-4f17-bbf0-fc69bc8021b0.png"
+        }
+      ],
+      "visualReview": "Visually reviewed at 1536×1024. Four stout jointed limbs with clawed feet; pale belly plastron, soft transverse-ridged back without a carapace; long tail. Targeted second pass removed the residual horny hooked beak and showed teeth extending toward both jaw tips.",
+      "sha256": "d4439c097980270384160f7ea9c5f7f1f35b9c7afeeaaca52f12265de00c8b85",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "reviewedAt": "2026-09-13T13:57:25.792Z"
+    }
+  }
+}

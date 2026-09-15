@@ -61,6 +61,14 @@ oral anatomy rather than copying the illustration's visible tooth count or assum
 retraction mechanism. Model the interior, lower jaw and tooth supports together for coherent rest,
 gape and feeding poses. Brief: `tools/devonian/creatures/onychodus/rework-v3/ANATOMY_REFERENCE_BRIEF.md`.
 
+15 September: the palatal-clearance half of this is done ahead of the rework. The tusks were on a
+crescent platform that stood their bases .07 above the mouth line, and closed, three of the four
+came out through the roof of the snout; they are now the lower jaw's own front teeth, the palate's
+receiving recesses carry them, the snout's roof rose over the rostrum, and the builder asserts the
+closed fit rather than eyeing it (`build_v2.py`, `oralClearanceClosed` in `validation.json`). The
+rest of this entry — the dermal cranial map, the cheek and gill-cover volumes, the supported eye,
+the surface relief — is untouched and still wanted.
+
 ### Rhinodipterus
 
 Reference: `../devonian-authoring/rhinodipterus/user-reference/rhinodipterus-user-reference-2026-09-08.webp`
@@ -366,8 +374,10 @@ audit path runs in one place; the staging is `docs/model-queue-plan.md`, the res
 - **Titanichthys, Gemuendina, Dunkleosteus** accepted by the user as published; badges cleared.
   Dunkleosteus' "paler LOD" was a builder regression, fixed in `build_v2.py`; the shipped asset
   was already right.
-- **Coccosteus** is blocked here: candidate07's frozen recipe needs two evidence files that exist
-  only in the Mac authoring tree (`rework-v3/RESUME-CANDIDATE07-BLOCKED.md`).
+- **Coccosteus** shipped on 13 September: the user delivered candidate07 itself to
+  `intake/coccosteus-candidate07/`, which made re-deriving the frozen recipe unnecessary. Both
+  gates the pause handoff asked for passed and the badge is cleared
+  (`tools/devonian/creatures/coccosteus/README.md`).
 - **Doryaspis** waits on the mouth-position decision recorded in `rework-v3/root-review-clay01.md`.
 - **Acanthostega V2, Jaekelopterus V2, Palaeoisopus V2, Cladoselache V3, Tiktaalik V3** shipped
   from their approved silhouette studies (groups A/B): tail fin along the tail and a flat belly;
@@ -393,5 +403,5 @@ audit path runs in one place; the staging is `docs/model-queue-plan.md`, the res
 - **Grab everywhere**: the user's rule is that every model carries a Grab clip; 26 shipped models
   lacked one and are getting it through `tools/creatures/motion/apply.mjs`.
 
-Still carrying `model: true`: Coccosteus (waiting on the user's two GLBs) and Doryaspis (in
-progress).
+Still carrying `model: true`: none of the total reworks. Coccosteus shipped from the delivered
+candidate07 on 13 September and Doryaspis V3 on 12 September.

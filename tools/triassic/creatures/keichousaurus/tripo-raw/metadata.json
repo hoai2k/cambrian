@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "name": "keichousaurus",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "task_id": "b42d4163-e0ce-4540-aaf0-43dddedef799",
+    "created_at": "2026-09-13T15:49:56.420371Z",
+    "completed_at": "2026-09-13T15:51:14.346799Z",
+    "credits_consumed": 30,
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    }
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/keichousaurus/input.png",
+    "sha256": "87aa8db7f7ffe219017010459e9952ceb8229662dc37ce30a69da3bfdbc6653a",
+    "bytes": 1460964
+  },
+  "artifact": {
+    "path": "tools/triassic/creatures/keichousaurus/tripo-raw/keichousaurus.raw.glb",
+    "bytes": 1285856,
+    "sha256": "7396ab100b2a45c4a44ab897b252aefb5fbdf51db7825aecac91a761931dc21b",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-13T15:51:19.057Z"
+}

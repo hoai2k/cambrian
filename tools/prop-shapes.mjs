@@ -32,9 +32,9 @@ export function propFiles() {
   const files = {};
   for (const f of fs.readdirSync('public/assets/props').filter((f) => f.endsWith('.glb')))
     files[f.replace(/\.glb$/, '')] = `public/assets/props/${f}`;
-  const dir = 'public/assets/devonian/props-instanced';
-  for (const f of fs.readdirSync(dir).filter((f) => f.endsWith('.glb')))
-    files[f.replace(/\.glb$/, '')] = `${dir}/${f}`;
+  for (const dir of ['public/assets/devonian/props-instanced', 'public/assets/triassic/props-instanced'])
+    for (const f of (fs.existsSync(dir) ? fs.readdirSync(dir) : []).filter((f) => f.endsWith('.glb')))
+      files[f.replace(/\.glb$/, '')] = `${dir}/${f}`;
   return files;
 }
 

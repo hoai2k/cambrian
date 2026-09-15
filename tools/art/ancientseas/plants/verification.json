@@ -1,0 +1,47 @@
+[
+  {
+    "file": "plant-crinoid.webp",
+    "width": 768,
+    "height": 1024,
+    "bytes": 225510,
+    "quality": 92,
+    "alpha": true,
+    "whiteKeyed": true
+  },
+  {
+    "file": "plant-sea-fern.webp",
+    "width": 1024,
+    "height": 768,
+    "bytes": 321198,
+    "quality": 92,
+    "alpha": true,
+    "whiteKeyed": true
+  },
+  {
+    "file": "plant-red-coral.webp",
+    "width": 768,
+    "height": 1024,
+    "bytes": 432840,
+    "quality": 92,
+    "alpha": true,
+    "whiteKeyed": false
+  },
+  {
+    "file": "plant-tube-sponge.webp",
+    "width": 768,
+    "height": 1024,
+    "bytes": 251724,
+    "quality": 92,
+    "alpha": true,
+    "whiteKeyed": true
+  },
+  {
+    "file": "plant-brain-coral.webp",
+    "width": 1024,
+    "height": 768,
+    "bytes": 295866,
+    "quality": 92,
+    "alpha": true,
+    "whiteKeyed": true
+  }
+]

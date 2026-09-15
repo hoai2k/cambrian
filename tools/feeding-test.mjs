@@ -10,9 +10,9 @@ globalThis.self = globalThis; globalThis.createImageBitmap = async () => ({ widt
 import path from 'node:path'; import { build } from 'esbuild';
 const bundleDir = path.join(process.cwd(), 'node_modules', '.cache', 'cambrian-tests'); fs.mkdirSync(bundleDir, { recursive: true });
 const entry = path.join(bundleDir, 'feeding-entry.ts'), bundle = path.join(bundleDir, 'feeding-bundle.mjs');
-fs.writeFileSync(entry, `export { CreatureAnchors } from '${process.cwd()}/src/render/anchors';\nexport { Attachments } from '${process.cwd()}/src/render/attachments';\nexport { creature, CREATURE_IDS } from '${process.cwd()}/src/sim/creatures';\nexport { lengthOf } from '${process.cwd()}/src/sim/actors';\n`);
+fs.writeFileSync(entry, `export { CreatureAnchors } from '${process.cwd()}/src/render/anchors';\nexport { Attachments } from '${process.cwd()}/src/render/attachments';\nexport { creature, CREATURE_IDS } from '${process.cwd()}/src/sim/creatures';\nexport { lengthOf } from '${process.cwd()}/src/sim/actors';\nexport { bitesFor } from '${process.cwd()}/src/sim/game';\n`);
 await build({ entryPoints: [entry], bundle: true, format: 'esm', platform: 'node', external: ['three'], outfile: bundle, logLevel: 'silent' });
-const { CreatureAnchors, Attachments, creature, CREATURE_IDS, lengthOf } = await import(bundle);
+const { CreatureAnchors, Attachments, creature, CREATURE_IDS, lengthOf, bitesFor } = await import(bundle);
 
 async function load(id) {
   const bytes = fs.readFileSync(`public/assets/creatures/${id}.glb`);
@@ -32,7 +32,7 @@ function view(gltf, scale, performance = false) {
   group.updateWorldMatrix(true, true);
   return v;
 }
-const actor = (id, cid, scale, o = {}) => ({ id, creature: cid, scale, state: 'free', stateT: 0, stateDur: 1, pos: { x: 0, y: 0, z: 0 }, yaw: 0, eaten: 0,
+const actor = (id, cid, scale, o = {}) => ({ id, creature: cid, scale, state: 'free', stateT: 0, stateDur: 1, pos: { x: 0, y: 0, z: 0 }, yaw: 0, eaten: 0, eatBites: 1,
   eatingTarget: -1, lockTarget: -1, grabbedBy: -1, swallowedBy: -1, abilityActive: false, ...o });
 const results = {};
 const originalIds = ['anomalocaris','opabinia','waptia','canadia','hallucigenia','wiwaxia','marrella','olenoides'];
@@ -41,7 +41,10 @@ for (const id of originalIds) {
   const predScale = 1, pred = actor(1, id, predScale / def.adultLength, { state: 'eating', eatingTarget: 2 });
   const L = lengthOf(pred); assert(Math.abs(L - predScale) < 1e-9);
   const pv = view(gltf, L, id === 'opabinia');
-  const foodDef = creature('marrella'), food = actor(2, 'marrella', L * .35 / foodDef.adultLength, { state: 'dead' });
+  // Only a body that goes down whole is carried to the mouth; a bigger carcass stays where it fell
+  // and is torn into (bitesFor / carcass.ts). Size the meal by the sim's own rule so it stays one.
+  const foodDef = creature('marrella'), food = actor(2, 'marrella', L * .3 / foodDef.adultLength, { state: 'dead' });
+  food.eatBites = bitesFor(pred, food); assert.equal(food.eatBites, 1, `${id} fixture meal must go down whole`);
   const foodGltf = await load('marrella'), fv = view(foodGltf, lengthOf(food));
   // Food dropped just ahead of the mouth, where the sim allows eating to start.
   const mouth = new THREE.Vector3(); assert(pv.anchors.world('anchor_mouth', mouth));
@@ -136,6 +139,9 @@ for(const id of expansionIds) for(const lod of [0,1]){
   const predatorB=actor(101,id,.65/def.adultLength,{state:'grabbing',pos:{x:-5,y:3,z:12},grabbing:103});
   const foodA=actor(102,'marrella',.2/creature('marrella').adultLength,{state:'grabbed',grabbedBy:100,pos:{x:40,y:20,z:50},stateDur:1.6});
   const foodB=actor(103,'marrella',.15/creature('marrella').adultLength,{state:'grabbed',grabbedBy:101,pos:{x:-40,y:30,z:-50},stateDur:1.6});
+  // Both meals are well under a third of their eater, so the sim swallows them whole and the pass carries them.
+  foodA.eatBites=bitesFor(predatorA,foodA);foodB.eatBites=bitesFor(predatorB,foodB);
+  assert.equal(foodA.eatBites,1,`${file}: fixture meal A must go down whole`);assert.equal(foodB.eatBites,1,`${file}: fixture meal B must go down whole`);
   const fvA={group:new THREE.Group(),visibleLength:.2,anchors:{canAim:false}},fvB={group:new THREE.Group(),visibleLength:.15,anchors:{canAim:false}};
   const actors=[predatorA,predatorB,foodA,foodB],world={actors,byId(i){return actors.find(a=>a.id===i)}};
   const views=new Map([[100,left],[101,right],[102,fvA],[103,fvB]]),attachments=new Attachments();

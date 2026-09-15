@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "name": "cymbospondylus",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "task_id": "655e68fc-e2d8-45d5-bc83-ad29b1cf40e0",
+    "created_at": "2026-09-13T15:24:22.852388Z",
+    "completed_at": "2026-09-13T15:25:27.204827Z",
+    "credits_consumed": 30,
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    }
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/cymbospondylus/input.png",
+    "sha256": "f59372a449488faf70f2119e9f2e0c03af2f847ef59a9a328996a698f1f4e8ea",
+    "bytes": 1754392
+  },
+  "artifact": {
+    "path": "tools/triassic/creatures/cymbospondylus/tripo-raw/cymbospondylus.raw.glb",
+    "bytes": 1449948,
+    "sha256": "62c5f531d6b860e1d001116975d5bf087e0d1dfbcaf61b9ab36ebfae9ba279b5",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-13T15:29:24.450Z"
+}
