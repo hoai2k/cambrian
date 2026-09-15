@@ -60,7 +60,10 @@ SCALE = 5.0
 BODY_LENGTH = 1.0 * SCALE
 ENVELOPE_TOLERANCE = .04 * BODY_LENGTH        # 4 % of body length, per the pipeline
 ANCHOR_TOLERANCE = .02 * BODY_LENGTH          # 2 % of body length
-PUPPET_TRIANGLE_TARGET = 6400
+# The oral lining is counted in both bodies, and at 34 rings of 24 it is not small: with the twin
+# at 6400 the LOD came to 38.9 % of the authored triangles, which is inside the contract's 40 % and
+# too close to it to leave alone.
+PUPPET_TRIANGLE_TARGET = 5200
 VOXEL = .0040
 THIN = .030
 

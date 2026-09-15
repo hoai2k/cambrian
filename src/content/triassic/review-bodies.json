@@ -1,5 +1,38 @@
 [
   {
+    "id": "birgeria",
+    "model": "assets/triassic/creatures/birgeria.glb",
+    "puppet": "assets/triassic/creatures/birgeria.puppet.glb",
+    "lod": "assets/triassic/creatures/birgeria.lod1.glb",
+    "bytes": 1881528,
+    "sha256": "5bc0cddb4cfc7959f7998900f4336cbd76f418ec6042caab858758744add8521",
+    "clips": [
+      "Ability",
+      "Attack",
+      "Bite",
+      "Breath",
+      "Death",
+      "Dive",
+      "Dodge",
+      "Eat",
+      "FastStart",
+      "Gape",
+      "Grab",
+      "Growth",
+      "Guard",
+      "Heavy",
+      "Hit",
+      "Idle",
+      "Parry",
+      "Rise",
+      "Sprint",
+      "Stagger",
+      "Swim",
+      "TurnLeft",
+      "TurnRight"
+    ]
+  },
+  {
     "id": "cartorhynchus",
     "model": "assets/triassic/creatures/cartorhynchus.glb",
     "puppet": "assets/triassic/creatures/cartorhynchus.puppet.glb",
