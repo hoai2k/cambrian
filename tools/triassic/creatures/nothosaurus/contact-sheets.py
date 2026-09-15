@@ -8,12 +8,12 @@ sets={
 'paired-gait-sheet':['Swim-0-top','Swim-0.612-top','Swim-1.224-top','Swim-1.512-top','Sprint-0-top','Sprint-0.408-top','Sprint-0.816-top','Sprint-1.008-top'],
 'paired-volume-sheet':['side','top','mouth-Bite']}
 for sheet,names in sets.items():
- w,h=360,280;cols=2 if len(names)<4 else 4;rows=(len(names)*2+cols-1)//cols
+ w,h=360,280;cols=2 if len(names)<4 else 4;rows=(len(names) +cols-1)//cols
  img=Image.new('RGB',(w*cols,h*rows),(28,34,40));d=ImageDraw.Draw(img)
  for i,n in enumerate(names):
-  for j,kind in enumerate(['authored','puppet']):
+  for j,kind in enumerate(['authored']):
    p=base/(kind+'-review')/(n+'.png');assert p.exists(),p
-   src=Image.open(p).convert('RGBA');src.thumbnail((w,h-26));index=i*2+j;x=(index%cols)*w;y=(index//cols)*h
+   src=Image.open(p).convert('RGBA');src.thumbnail((w,h-26));index = i;x=(index%cols)*w;y=(index//cols)*h
    img.paste(src,(x+(w-src.width)//2,y+24),src);d.text((x+8,y+7),kind+' / '+n,fill='white')
  img.save(dest/(sheet+'.jpg'),quality=92)
 

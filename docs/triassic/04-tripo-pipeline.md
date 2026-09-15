@@ -177,6 +177,21 @@ have passed on Henodus at 64.9x. That is why `tools/triassic/skin-tears.mjs` exi
 **"the twin deforms cleanly" is never evidence that the authored body does.** Judge every clip on
 the body that ships.
 
+**So the review sheets are rendered from the authored body alone.** Every `contact-sheets.py`
+assembles one column, not two, and a builder no longer renders the twin's *review pose set* —
+dozens of poses per body through CYCLES on CPU, which was the expensive half of a build and bought
+a comparison that has almost never been the thing that mattered.
+
+Two things this does **not** cut, and cutting them would break delivery:
+
+- the twin's **portrait** (`<id>.puppet.png`, rendered by `render.py --puppet` without
+  `--review-only`) is a delivered asset the specimen viewer draws; it stays.
+- the twin itself, its byte-identical LOD1, the envelope and surface measurements and the four
+  parity checks all stay. What goes is only the side-by-side *picture*.
+
+The paired sheets already committed are left where they are: they are the record of what was
+actually reviewed for those bodies, and deleting them saves nothing ongoing.
+
 ## Which steps need a judgement and which are mechanical
 
 A body is twelve steps, and they are not the same kind of work. The distinction matters when the
