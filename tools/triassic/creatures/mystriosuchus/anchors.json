@@ -1,0 +1,34 @@
+{
+  "mystriosuchus": [
+    {
+      "name": "anchor_mouth",
+      "bone": "jaw",
+      "point": [
+        0.012593238614499569,
+        -2.5780560970306396,
+        0.4132944643497467
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "skull",
+      "point": [
+        -0.04445885494351387,
+        -1.7780561447143555,
+        0.3574576675891876
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "skull",
+      "point": [
+        0.012593238614499569,
+        -2.5980560779571533,
+        0.45829445123672485
+      ],
+      "role": "attack"
+    }
+  ]
+}

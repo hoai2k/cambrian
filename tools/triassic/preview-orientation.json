@@ -12,15 +12,6 @@
     "A yaw here that turns out wrong costs a preview that faces the wrong way, never a shipped asset."
   ],
   "yaw": {
-    "aphaneramma": 180,
-    "archelon": 180,
-    "askeptosaurus": 0,
-    "atopodentatus": -90,
-    "coelophysis": 0,
-    "macrocnemus": 0,
-    "mosasaurus": 270,
-    "mystriosuchus": 180,
-    "odontochelys": 180,
-    "saurichthys": 180
+    "askeptosaurus": 0
   }
 }

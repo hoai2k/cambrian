@@ -326,7 +326,26 @@ unless the user explicitly asks for a PR. Steps:
   how Placodus came to open onto transparency. Proving it needs care: render at full gape against a
   saturated backdrop *with and without* a backface-cull shim and compare the two, because comparing
   against the plain background measures the backdrop rather than the gape and passes whatever the
-  mesh does. *The cut*: the jaw seam follows the model's own lip contour rather than running straight
+  mesh does. **And the test for "this pixel is the backdrop" has been too loose twice, the same way
+  both times**: a magenta world lights the animal too, so a half-space catches it. At
+  `r > .5, g < .3, b > .5` it caught Rhaeticosaurus' own lit lining; tightened to
+  `r > .75, g < .45, b > .75` it caught Saurichthys' pale silvery *skin*, which renders at about
+  (0.78, 0.44, 0.76) and sat inside that window by one part in two hundred on green, while the
+  backdrop itself comes back below 0.063 on green in every render this repository has made. It is
+  now `r > .90, g < .20, b > .90`, measured against the backdrop rather than set by eye; across 33
+  shots on 7 bodies nothing went up, Keichousaurus and Henodus went to 0 and Saurichthys 17 px to 3.
+  The tell was the same both times and is worth watching for in any check whose number will not
+  move: **a count that does not move under a correction is a count about something else**, and the
+  way to find out what a failing pixel *is*, is to cast a ray through it and ask every surface on
+  the line rather than keep changing geometry and re-reading renders.
+  Two shapes close a mouth that a lining alone does not. `T.rim_flange` folds the open rim of a cut
+  inwards, because a boundary edge is one polygon thick and at a grazing angle that edge *is* the
+  silhouette — 19 px on Macrocnemus that four corrections to its lining and two to its hinge plug
+  did not move; the fold has to run out before the snout, where the two rims meet round the front of
+  the mouth and folding both of them inwards parts them instead of closing them. `T.cap_cut` closes
+  the cross-section a plane cut leaves through a head, which is the back wall of the mouth and is
+  otherwise simply absent — Coelophysis' `SnapRight` sees straight through it into the neck and is
+  the era's one open gape failure. *The cut*: the jaw seam follows the model's own lip contour rather than running straight
   near it — cast head vertex normals back into the mesh and fit a curve to the hits where a slit is
   modelled (Placodus), and read the lip line off the albedo where none is (Dinocephalosaurus, where
   the first method finds zero vertices). There is a **third** case, found on Keichousaurus: the
@@ -401,10 +420,70 @@ unless the user explicitly asks for a PR. Steps:
   at full gape says only that the mouth opened — Hupehsuchus' 50x is the lining working, not a torn
   head. Two builders split it locally before it was split centrally; the tool now reports both and
   ranks on skin, matching those builders' own figures exactly. True era-wide skin picture:
-  Shonisaurus 1.44x, Keichousaurus 2.34x, Cymbospondylus 2.48x, Nothosaurus 2.98x, Saurichthys
-  3.61x, Mixosaurus 3.62x, Henodus 4.81x, Cartorhynchus 5.17x, Hupehsuchus 5.79x, Hybodus 5.93x,
-  Dinocephalosaurus 7.00x, Helicoprion 11.68x, Placodus 12.36x, Macrocnemus 23.31x, Coelophysis
-  25.25x. The last two are the outstanding repair work.
+  Shonisaurus 1.44x, Keichousaurus 2.34x, Mosasaurus 2.54x, Cymbospondylus 2.48x, Rhaeticosaurus 2.81x, Macrocnemus
+  2.94x, Nothosaurus 2.98x, Birgeria 3.46x, Saurichthys 3.61x, Archelon 3.86x, Mixosaurus 3.62x, Coelophysis 4.46x,
+  Henodus 4.81x, Cartorhynchus 5.17x, Hupehsuchus 5.79x, Hybodus 5.93x, Dinocephalosaurus 7.00x,
+  Helicoprion 11.68x, Placodus 12.36x. Placodus and Helicoprion are the outstanding repair work:
+  Coelophysis came down from 25.25x and Macrocnemus from 23.31x.
+- **A skin weighting is three things, and the era has now paid for each of them separately.** The
+  *relaxation* — diffusion over the mesh's own edge graph, coupled by inverse edge length, trimmed
+  to four influences every pass, sliver runs welded into one weight set — is the one that stops a
+  gate tearing a skin, and `shorekit` did not have it at all until Coelophysis was repaired, which
+  is the whole reason the three shore animals sat at 25.3x, 23.3x and 6.1x while every body on the
+  marine kit sat between 1.4x and 12x. It is imported into `shorekit` from `_pipeline/tripo.py`
+  rather than copied, so there is one of it. The *radius* inside which a vertex is wholly a limb's
+  is measured rather than authored (`K.measure_radii`), and how it is measured matters: the limb is
+  flooded from its tip over the mesh's own edges and never allowed below an arc position past the
+  knee, because "nearer this limb's polyline than the axial one" puts half the animal in the distal
+  bin — a polyline ends at its last joint and everything past the foot clamps to it — and the belly
+  in the thigh. And the *blend between a limb's joints* is a fraction of that limb's own segments,
+  never a number: Rhaeticosaurus' 0.050 is a sixth of a flipper reaching 0.30 from the axis, and on
+  a theropod's forelimb, whose segments are 0.087, 0.046 and 0.036, the same figure is a band wider
+  than two whole segments — it hands every vertex all four joints at one weight and then has the
+  relaxation trim a *different* four on its neighbours.
+- **Which end is the head is the frame's first decision and its sign is arbitrary.**
+  `T.measure_frame` takes the long axis from the first principal component and the *caller* supplies
+  the sign; eleven of the Triassic's twelve builders pass `head_is_positive_pca=True` and it is
+  right for all of them. It is wrong for Mosasaurus, and it is wrong **plausibly**, which is the
+  expensive part: both ends of that body are thin and deep (snout 0.021 half-width against 0.115
+  half-depth, caudal fluke 0.021 against 0.115), so every head measurement reads the tail and reports
+  it confidently — `T.mouth_cavity` returned zero vertices at every gap out to 0.16 ("this generation
+  models no mouth", which other bodies genuinely are), the fluke's fork measured as a 0.055-long
+  notch, and `painted_line` on inverted luminance fitted the tail's pale ventral keel with a
+  roughness of 0.022, *better* numbers than the read Rhaeticosaurus accepted. Four side renders of
+  "the head" are a convincing pair of gaping jaws. What settles it is the **flippers**: the pair
+  nearest the head is the larger pair on every tetrapod in these seas, so a builder asserts that
+  (`FORE_REACH > HIND_REACH * 1.25`) rather than assuming it, and a reversed frame then fails loudly.
+  Birgeria decides the same question off its caudal fin, for the same reason.
+- **`depth()` cannot seat anything beside a modelled mouth**, and it looks as if it can.
+  `T.depth_probe` returns distance to the nearest surface signed by that surface's normal, so next to
+  a modelled slit or cavity `find_nearest` answers about the *lumen's own wall* rather than the skull
+  — Archelon's hinge envelope read as outside the body at every size from 0.17 to 1.00 of its nominal
+  radius and inside below that, a discontinuity that is the slit being found and not the head being
+  small. Rhaeticosaurus' shrink-until-positive search is safe only because that generation paints its
+  mouth on a closed head. Where a mouth is modelled, record the probe and assert against the head's
+  own **measured section** instead, which uses no normals at all; Placodus and Henodus already record
+  rather than assert for the same reason, and the thing that actually proves a mouth is
+  `gape-solid.py`.
+- **Closing a generation that was authored gaping is priced in two numbers, and only one of them is
+  the answer.** Hybodus' `RESTING_GAPE` measures the rotation; the cost is then the mandible posed at
+  it, against the skull. Measured with a `find_nearest` normal-sign test beside a *modelled* oral
+  cavity that figure counts a mouth floor correctly inside the mouth as inside the skull, so it is an
+  upper bound — Mosasaurus reads 27 % of the mandible and 4.5 % of a body length that way. What the
+  question actually is, and what a reviewer should be shown, is how far the shut jaw pushes out
+  through the head's **own measured section**, which uses no normals: 13 % of the mandible and 0.72 %
+  of a body length. And the lining is where the real work is. At the snout the closing rotation is
+  *defined* as the one that carries the mandible's dorsal margin exactly onto the palate's ventral
+  one, so a lining floor riding the jaw at weight 1 arrives exactly where its own roof already is,
+  the sac is degenerate at the shut pose, and rounding decides which side of the roof each vertex
+  lands on — a pink shard through the top of the snout. Hold the floor at 0.93, build the tube a
+  fourteenth of the local gape *below* the mouth line so its floor starts inside the jaw's flesh and
+  its roof finishes inside the skull's, and size it on the **measured gape** rather than on
+  `cavity_profile` (a cast over the front quarter of a body whose forelimbs sit behind the skull
+  mostly finds the gap between a paddle and a flank: x ±0.24 where the head is 0.08 across).
+  And read the gape as the **largest** empty interval on a vertical line, not the first: six surface
+  crossings turn up wherever a modelled tongue rises into the lumen, and the first interval there is
+  the sliver between the mandible and the tongue.
 - **A weighting scheme is shaped by the body it was written for.** Nothosaurus' is the era's
   cleanest at 2.98x and the obvious one to copy, and copied unchanged onto Henodus it tore to
   **64.9x** — its "outboard of |y| 0.09 means on the limb" test assumes a narrow trunk, and Henodus'
@@ -619,7 +698,39 @@ unless the user explicitly asks for a PR. Steps:
   the preloader — `prioritize` tolerates ids it has never heard of, and `addVisitor` gives them a
   real one. `npm run visitors` covers all three eras; the apex scales and asset folders are written
   out in `src/content` (which may not reach up into `src/sim`) and checked against the real
-  constants there, so they cannot drift.
+  constants there, so they cannot drift. Apex is *how* one is earned, so the results screen says so
+  — a star on each apex card, the same mark the Visitors button carries, and one line under the
+  strip. That line never **names** a game: which games there are, and how many, is a thing that
+  changes — the trilogy has already gained one and one of them is not released yet — so it says
+  *where* ("the other Ancient Seas games") rather than *which*, and stays true through all of it.
+  The trilogy's own name is fine and so is the game's; a *sibling game's title* is the thing to
+  keep out of a game. A visitor's crew card still says "Devonian", which is the period the animal
+  is from and is already on every creature card as provenance, not a pointer at another game. **Nothing says so before it is earned.** Visitors are found, not
+  promised: a player with an empty apex strip is told nothing, the other games are not named, and
+  the word does not appear — the same secret the pick grid keeps by leaving the Visitors button out
+  until there is something behind it. A line advertising the reward to somebody who has none spends
+  the surprise for nothing, and `npm run results` checks the silence as carefully as the message. `npm run results` renders that panel on its own and reads the
+  markup, because a results screen only exists after a match ends and a headless browser gets too
+  few frames under the software renderer to finish one; its last check walks the promise end to
+  end, from the record the screen draws to the visitor list the other games build out of it.
+  There is a **second kind**, and the first two arrived with the Cretaceous bodies: a **standing
+  guest**. Archelon and Mosasaurus belong to no game's roster at all, so `earnedVisitors` cannot
+  reach them — there is nothing to take them to the top of — and `standingVisitors` admits them
+  **unconditionally**, gated only on the body actually being shipped (an id with no entry in that
+  era's `asset-sizes.json` never becomes pickable, because a tile with nothing to draw is worse than
+  no tile). Everything else about them is a visitor: `admitVisitors`, never in `CREATURES` or
+  `PLAYABLE`, full grown at the ladder's top scale. `Visitor.era` stays the era whose **folder** holds
+  their files, because that is what `'<era>/<id>'` resolves against; where the animal is actually
+  *from* is `Visitor.origin`, a display string ("Late Cretaceous"), and anything that says where a
+  visitor is from reads that rather than looking the era's name up. Nothing is rippled through
+  `ERA_IDS`, `ROSTERS`, `SETTINGS_KEY` or `APEX_SCALE` — there is no fourth era id in the build — and
+  the two kinds are joined only in `visitorsHere`, so a test that wants to know nothing has been
+  earned does not have to subtract the guests first. The pick screen's Visitors label had to change
+  with them: "animals you have taken to the top in the other games" is not true of an animal nobody
+  earned. Their gameplay definitions are `src/content/triassic/guests.ts` and their ids are a union
+  of their own (`TriassicGuestId`) joined to `CreatureId` beside `TriassicCreatureId`, because
+  `BORROWED` and the palette tables are *total* records over that union and would otherwise start
+  demanding entries for a sea these two are not in.
 - Menu cursors move by where the buttons are, not by list order: `src/app/spatial-nav.ts` resolves a
   direction against the buttons' own rectangles, so the pause and results rows answer left and
   right, a column answers up and down, and the unused axis falls back to list order so no press is

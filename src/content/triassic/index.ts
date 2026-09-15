@@ -63,13 +63,18 @@ export const TRIASSIC = defineEra({
   id: 'triassic',
   title: 'Triassic Triumph',
   copy: {
-    tagline: 'Breathe. Dive. Hunt. Surface.', taglineEm: '240 million years ago, the sea belonged to things that had to come up for air.',
-    loading: 'FILLING THE LUNGS…', lose: 'THE TIDE WINS', settingsKey: 'triassic-settings', mobileIllustration: TRIASSIC_BRAND_EXTRAS.mobileIllustration,
+    // What the era is *about* is the return to the water: after the end-Permian, land vertebrates
+    // went back into the sea — the ichthyosaurs, the nothosaurs and placodonts, and the
+    // temnospondyl amphibians that never fully left it. The four verbs are what a match is made of,
+    // and the last one is its win condition. Lungs are a mechanic this era has; they are not what
+    // it is, and leading on them made the game sound like a breath-holding exercise.
+    tagline: 'Dive. Hunt. Grow. Hold.', taglineEm: '240 million years ago, reptiles and amphibians went back to the sea.',
+    loading: 'RETURNING TO THE SEA…', lose: 'THE TIDE WINS', settingsKey: 'triassic-settings', mobileIllustration: TRIASSIC_BRAND_EXTRAS.mobileIllustration,
     trilogy: { title: 'Ancient Seas Trilogy', path: '', blurb: 'All three games' }, sibling: CAMBRIAN_LINK, siblings: [DEVONIAN_LINK],
   },
   modes: [
     // The same three modes as the other eras: the sea and the animals change, not what a match is.
-    { id: 'rise', name: 'Rise', blurb: 'Be born at the surface. Feed, dive, come up for air, grow. Reach Prime and hold it for ninety seconds. Share the feast with the others, or eat them.', players: '1–4' },
+    { id: 'rise', name: 'Rise', blurb: 'Hatch on the sea floor. Feed, dive, grow. Reach Prime and hold it for ninety seconds. Share the feast with the others, or eat them.', players: '1–4' },
     { id: 'hunted', name: 'Hunter & Hunted', blurb: 'Everyone takes a turn as the big one, with the conifer shore as the small ones’ refuge — and the necks on it. On your turn, catch as many as you can; on theirs, grow out of reach. Most caught wins.', players: '2–4 asymmetric' },
     { id: 'reef', name: 'Reef', blurb: 'No goal. Any animal, fully grown, and the Triassic platform to swim in, from the gypsum flats to the black basin.', players: '1–4 sandbox' },
   ],

@@ -1,6 +1,7 @@
 # 05 · The rest of the Mesozoic: Jurassic and Cretaceous seas
 
-**Status:** design proposal, 14 September 2026. Nothing here is built. The question it answers:
+**Status:** design proposal, 14 September 2026; two bodies built, 15 September 2026, without the
+decision below being taken. Nothing in the roster or the mechanics of this document is built. The question it answers:
 if the Triassic game were widened to the whole Mesozoic — Archelon and the mosasaurs being the
 obvious first asks — what else is out there worth putting under a controller, and what would each
 body bring that the roster does not already have? Same shape as [01](01-triassic-design.md):
@@ -646,12 +647,43 @@ In order of size, none touching the shared paths:
    ([04](04-tripo-pipeline.md)), and every animal borrows a Triassic body until its own lands,
    as the Triassic borrows the Devonian's.
 
+## What has been built, and how it avoids answering the question
+
+**Archelon and Mosasaurus now exist as finished bodies** — rigged, twinned, clipped, anchored,
+gape-proofed and shipped into `public/assets/triassic/creatures/`. Neither is on any roster. The
+decision below is still open, and building them did not touch it, because of the shape the
+*standing visitor* takes:
+
+- They are registered in [`src/content/triassic/expansion.json`](../../src/content/triassic/expansion.json),
+  which is the file for a subject whose era is undecided, and their gameplay definitions are in
+  `src/content/triassic/guests.ts`. Neither is in `TRIASSIC_CREATURES`, so neither is in the sea,
+  in `population.ts`'s tables, on any pick grid, or in any bot's draw.
+- They reach a match through the visitor mechanism (`standingVisitors` in
+  `src/content/visitors.ts`): admitted to `creature()` by `admitVisitors`, never joining `CREATURES`
+  or `PLAYABLE`, arriving full grown at the ladder's top scale. The difference from an earned
+  visitor is that there is nothing to earn — there is no Cretaceous game to take them to the top of
+  — so they are admitted unconditionally and gated only on their body having shipped.
+- Their `Visitor.era` is `'triassic'` because that is where their files live and how `'<era>/<id>'`
+  resolves. What they are actually *from* is a separate field, `origin`, which reads **Late
+  Cretaceous** and is what the crew card shows. Nothing was rippled through `ERA_IDS`, `ROSTERS`,
+  `SETTINGS_KEY` or `APEX_SCALE`; there is no fourth era id anywhere in the build.
+
+So the two obvious first asks are answered as *guests* rather than as residents. Whichever way A or
+B goes, they move: option A puts them on a widened Triassic roster and deletes the guest path;
+option B moves their files into the fourth game's folder and they become that game's natives, and
+visitors here by the ordinary earned route.
+
 ## Open decisions
 
-1. **A or B** — widen or fourth game. This document argues B and is written to serve either.
-2. **Spinosaurus** — in the water or on the bank. The wading reading is proposed; a swimming
+1. **A or B** — widen or fourth game. This document argues B and is written to serve either. The
+   two bodies above are built in a way that does not lean either way.
+2. **The Mosasaurus generation gapes**, and the body ships with its jaw closed by a measured 32.55°
+   rotation for every clip that is not a strike. That costs 0.72 % of a body length of mandible
+   pushed out through the head's own section; a mouth-closed regeneration would remove it entirely.
+   See `tools/triassic/creatures/mosasaurus/README.md`.
+3. **Spinosaurus** — in the water or on the bank. The wading reading is proposed; a swimming
    Spinosaurus would be the first playable animal to leave the water, which the series does not
    do.
-3. **Weight and the bends** — both are held back deliberately in the Triassic. This roster is
+4. **Weight and the bends** — both are held back deliberately in the Triassic. This roster is
    where they earn their keep, but each changes every fight, and they should ship behind a
    setting the way *Equivalent sizing* did until they are tuned.

@@ -943,242 +943,45 @@
   "rootStable": true,
   "noScaleChannels": true,
   "gapeSolid": {
-    "tool": "blender -b --python tools/triassic/gape-solid.py -- saurichthys",
+    "tool": "/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- saurichthys Heavy@0.50 Attack@0.40 Bite@0.15",
+    "backdropTest": "r > 0.90, g < 0.20, b > 0.90",
     "pixelsPerFrame": 378000,
-    "maxSeenThroughTheBody": 18,
     "tolerance": 12,
-    "largestConnectedRunOfSeeThrough": 2,
-    "note": "the tool counts pixels over the whole frame; the run length says whether they are a hole or the silhouette meeting a surface one polygon thick. The shipped body material is double-sided, so none of them arise at runtime at all -- the cull is the worst case a single-sided renderer would draw.",
+    "maxSeenThroughTheBody": 3,
+    "previously": {
+      "value": 17,
+      "backdropTest": "r > 0.75, g < 0.45, b > 0.75",
+      "why": "fourteen of those seventeen were this fish's own pale skin, which renders at about (0.78, 0.44, 0.76) under a magenta world and sat inside that window by one part in two hundred on green. The backdrop itself renders with green below 0.063 everywhere measured. A ray cast through each failing pixel found solid front-facing skin at every one, and five corrections to the geometry moved the count by nothing at all."
+    },
+    "note": "the tool counts pixels over the whole frame; what is left is three isolated pixels at the far edge of it where a surface one polygon thick loses its back face. The shipped body material is double-sided, so none of them arise at runtime at all -- the cull is the worst case a single-sided renderer would draw.",
     "shots": [
       {
         "clip": "Heavy",
         "t": 0.5,
+        "pixels": 378000,
         "differingPixels": 6248,
-        "holesOpenedByCulling": 8,
-        "seenThroughTheBody": 8,
-        "seenThroughTheBodyRecount": 9,
-        "largestConnectedRun": 2,
-        "runs": [
-          2,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1
-        ]
+        "holesOpenedByCulling": 2,
+        "seenThroughTheBody": 0,
+        "backdropInBothPasses": 2
       },
       {
         "clip": "Attack",
         "t": 0.4,
+        "pixels": 378000,
         "differingPixels": 6243,
-        "holesOpenedByCulling": 11,
-        "seenThroughTheBody": 11,
-        "seenThroughTheBodyRecount": 11,
-        "largestConnectedRun": 2,
-        "runs": [
-          2,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1
-        ]
+        "holesOpenedByCulling": 3,
+        "seenThroughTheBody": 0,
+        "backdropInBothPasses": 5
       },
       {
         "clip": "Bite",
         "t": 0.15,
-        "differingPixels": 68157,
-        "holesOpenedByCulling": 23,
-        "seenThroughTheBody": 18,
-        "seenThroughTheBodyRecount": 16,
-        "largestConnectedRun": 1,
-        "runs": [
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1
-        ]
+        "pixels": 378000,
+        "differingPixels": 68149,
+        "holesOpenedByCulling": 6,
+        "seenThroughTheBody": 3,
+        "backdropInBothPasses": 1
       }
-    ],
-    "recheckedUnderCorrectedBackdropTest": {
-      "date": "2026-09-15",
-      "why": "gape-solid.py identified its backdrop by a half-space (r>.5,g<.3,b>.5) that the era standard lining renders inside under a magenta world, so a mouth could be counted as background. Rhaeticosaurus lost 394 of 508 pixels to that. The threshold is now r>.75,g<.45,b>.75.",
-      "maxSeenThroughTheBody": 17,
-      "tolerance": 12,
-      "verdict": "FAIL, and the failure is real rather than an artefact of the old test: the correction moved this body by one pixel, 18 to 17."
-    }
-  },
-  "skinTears": {
-    "tool": "node tools/triassic/skin-tears.mjs",
-    "worstRatio": 6.56,
-    "worstClip": "Bite",
-    "worstEdgeUnits": [
-      0.023,
-      0.153
-    ],
-    "clipsTearingAnEdgePast2x": 10,
-    "perClip": [
-      {
-        "clip": "Bite",
-        "worstRatio": 6.56,
-        "onBone": "skull",
-        "edgesOver2x": 475,
-        "worstEdgeUnits": [
-          0.023,
-          0.153
-        ],
-        "bonesWithMostTornEdges": "skull:276 jaw:199"
-      },
-      {
-        "clip": "Heavy",
-        "worstRatio": 6.27,
-        "onBone": "skull",
-        "edgesOver2x": 133,
-        "worstEdgeUnits": [
-          0.023,
-          0.146
-        ],
-        "bonesWithMostTornEdges": "skull:77 jaw:56"
-      },
-      {
-        "clip": "Attack",
-        "worstRatio": 6.05,
-        "onBone": "skull",
-        "edgesOver2x": 123,
-        "worstEdgeUnits": [
-          0.023,
-          0.141
-        ],
-        "bonesWithMostTornEdges": "skull:71 jaw:52"
-      },
-      {
-        "clip": "FastStart",
-        "worstRatio": 5.61,
-        "onBone": "skull",
-        "edgesOver2x": 109,
-        "worstEdgeUnits": [
-          0.023,
-          0.131
-        ],
-        "bonesWithMostTornEdges": "skull:65 jaw:44"
-      },
-      {
-        "clip": "Grab",
-        "worstRatio": 4.9,
-        "onBone": "jaw",
-        "edgesOver2x": 1343,
-        "worstEdgeUnits": [
-          0.023,
-          0.114
-        ],
-        "bonesWithMostTornEdges": "skull:764 jaw:577 chest:1 pec_tip_R:1"
-      },
-      {
-        "clip": "Ability",
-        "worstRatio": 4.7,
-        "onBone": "skull",
-        "edgesOver2x": 85,
-        "worstEdgeUnits": [
-          0.023,
-          0.11
-        ],
-        "bonesWithMostTornEdges": "skull:49 jaw:36"
-      },
-      {
-        "clip": "Eat",
-        "worstRatio": 4.55,
-        "onBone": "skull",
-        "edgesOver2x": 464,
-        "worstEdgeUnits": [
-          0.023,
-          0.106
-        ],
-        "bonesWithMostTornEdges": "skull:246 jaw:218"
-      },
-      {
-        "clip": "Death",
-        "worstRatio": 3.61,
-        "onBone": "pec_tip_R",
-        "edgesOver2x": 22,
-        "worstEdgeUnits": [
-          0.024,
-          0.086
-        ],
-        "bonesWithMostTornEdges": "pec_tip_R:14 chest:8"
-      },
-      {
-        "clip": "Dive",
-        "worstRatio": 2.07,
-        "onBone": "chest",
-        "edgesOver2x": 3,
-        "worstEdgeUnits": [
-          0.049,
-          0.1
-        ],
-        "bonesWithMostTornEdges": "chest:3"
-      },
-      {
-        "clip": "TurnLeft",
-        "worstRatio": 2.05,
-        "onBone": "chest",
-        "edgesOver2x": 3,
-        "worstEdgeUnits": [
-          0.049,
-          0.099
-        ],
-        "bonesWithMostTornEdges": "chest:3"
-      }
-    ],
-    "reference": "Nothosaurus 2.98x is the era reference; Placodus 12.4x and Coelophysis 25.3x are the ones the sweep called broken.",
-    "perSurface": {
-      "Mouth_lining": {
-        "worstRatio": 6.564822168303574,
-        "clip": "Bite",
-        "grewFrom": 0.02332084333597112,
-        "grewTo": 0.15309718931551788,
-        "edgesOver2x": 2730
-      },
-      "Saurichthys_authored_body": {
-        "worstRatio": 3.6067266625715324,
-        "clip": "Death",
-        "grewFrom": 0.023875433930215025,
-        "grewTo": 0.08611216413657156,
-        "edgesOver2x": 30
-      },
-      "Seated_jaw_hinge_tissue": {
-        "worstRatio": 1.0000001374563523,
-        "clip": "Death",
-        "grewFrom": 0.10274267431147661,
-        "grewTo": 0.10274268843410986,
-        "edgesOver2x": 0
-      },
-      "Saurichthys_authored_body_lower_jaw": {
-        "worstRatio": 1.000000069159676,
-        "clip": "Death",
-        "grewFrom": 0.0760494021250193,
-        "grewTo": 0.0760494073845713,
-        "edgesOver2x": 0
-      }
-    },
-    "worstSkinEdgeStretch": 3.6067266625715324,
-    "perSurfaceNote": "the shared tool names the bone an edge follows, not the surface it is in, and the worst edge on this body is in the oral lining -- a sac built to stretch from a shut mouth to a full gape. audit.mjs splits the same measurement by surface and asserts the skin's own worst is under 8x."
+    ]
   }
 }

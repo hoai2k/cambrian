@@ -1,0 +1,65 @@
+{
+  "id": "odontochelys",
+  "name": "Odontochelys",
+  "species": "Odontochelys semitestacea",
+  "provenance": "Late Triassic \u00b7 Guanling, Guizhou",
+  "description": "The earliest turtle: a full belly shell, no shell on top, teeth in both jaws and a long tail. Authored Tripo body and measured procedural volume twin share one armature, one set of inverse binds, one set of sockets and one set of actions.",
+  "modelLength": 5.0,
+  "lengthMeters": 0.4,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth",
+    "Breathe",
+    "Crawl"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "Breathe",
+    "Crawl"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "puppet": "odontochelys.puppet.glb",
+  "sources": [
+    "docs/triassic/canonical/odontochelys.png",
+    "tools/triassic/creatures/odontochelys/tripo-raw/odontochelys.raw.glb",
+    "tools/triassic/creatures/odontochelys/odontochelys.preview.glb"
+  ],
+  "notes": [
+    "The plastron is a rigid part on its own unanimated bone, as Placodus' gastral basket and Henodus' carapace are -- and, unlike theirs, it is ventral only. There is no carapace bone, because this animal has no carapace: its back is broadened ribs under skin and it bends. The plate is measured off the generation's own pale ventral pigment and then feathered into a field, so the gate between shell and skin is a ramp and not a step.",
+    "A rower with four clawed limbs on a diagonal-couplet gait: the two sides alternate and the hind pair is half a beat behind the fore, which is a walking tetrapod's gait taken into the water rather than a sea turtle's synchronous flight. The swept angle at each limb root is measured from the limb's own direction in world space rather than read off an Euler channel, and the build refuses a limb that sweeps under 60 degrees in Sprint.",
+    "Ability is bellyTurn: a one-shot roll that puts the plate between the animal and whatever is coming, with the head drawn in over it and the limbs pulled under. Crawl is the punt along the bottom, an extra beside the swim set rather than the locomotion.",
+    "The mouth is modelled and reads cleanly over the front 0.06 of the body. Behind the hinge the detector walks off the head onto the forelimb, which stands directly beside the jaw on this pose, so the seam is fitted in front of the hinge and continued behind it.",
+    "Every head measurement is taken inside a radius of the head's own axis: a plain band at y -0.330 reads a half width of 0.204 where the head measures 0.061, and it is reading the shoulder.",
+    "The twin resurfaces a voxel occupancy field of the authored body, relaxes it and reduces the new topology. It reuses no source vertex or face.",
+    "Living colours, soft tissues and movements are artistic reconstruction. World travel remains engine-owned."
+  ]
+}

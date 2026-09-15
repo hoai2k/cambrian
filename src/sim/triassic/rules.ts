@@ -504,7 +504,12 @@ export const TRIASSIC_RULES: EraRules = {
     const p = g.players[i]; if (!p || !isAlive(p)) return undefined;
     const t = triActor(g, p), def = creature(p.creature), rung = rungOf(p);
     if (t.shoreWarn > 0) return 'Something on the shore is fishing. Get deeper.';
-    if (g.time < 12) return def.birth === 'live' ? 'Out of the shell, and a parent of your own kind is with you for a minute. Breathe, dive, feed.' : rung === 1 ? 'Feed, hide, moult. Everything out there is bigger than you are today.' : rung === 2 ? 'Feed and keep near the top. Air is what effort costs.' : rung === 3 ? 'Hunt the shelf. Five stages between you and Prime, and every fight ends at the surface.' : 'Stay fed. The deep is yours; the flats are closed to you.';
+    // These no longer mention air, for two reasons. It is not what the era is about — it went back
+    // to the sea, it does not merely breathe — and the two that did say so had been made wrong by
+    // the gauge: effort costs stamina, which comes back normally on a full chest, so "air is what
+    // effort costs" and "every fight ends at the surface" both stopped being true. The gauge itself
+    // teaches the mechanic where it belongs, on the bar, and flashes for its last minute.
+    if (g.time < 12) return def.birth === 'live' ? 'Out of the shell, and a parent of your own kind is with you for a minute. Feed, dive, grow.' : rung === 1 ? 'Feed, hide, moult. Everything out there is bigger than you are today.' : rung === 2 ? 'Feed and grow. The deep is busier than the shallows, and everything in it is bigger.' : rung === 3 ? 'Hunt the shelf. Five stages between you and Prime.' : 'Stay fed. The deep is yours; the flats are closed to you.';
     if (def.shell && g.time < 40) return 'Your funnel makes rise and sink free, and no direction is slow. Block withdraws into the shell.';
     if (def.sink && g.time < 40) return 'You settle when you stop. The floor is where you feed.';
     return undefined;

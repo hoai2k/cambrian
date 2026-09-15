@@ -35,16 +35,38 @@ OUT.mkdir(parents=True, exist_ok=True)
 # or grey hide over a dark red mouth, so any magenta pixel inside the silhouette is background seen
 # through the animal.
 #
-# **The test for it has to be the backdrop, not a half-space.** At `r > .5, g < .3, b > .5` it was
-# loose enough to catch the animal: a magenta *world* also lights the scene, and Rhaeticosaurus'
-# oral lining -- (0.30, 0.13, 0.115), the same dark red Mixosaurus ships -- renders under it at
-# (0.73, 0.29, 0.51), inside that window by a hair on green. 394 of the 508 pixels that failed this
-# body at full gape were its own mouth, correctly drawn and correctly front-facing, and no change to
-# the geometry moved the count by a single pixel because the count was never about the geometry. The
-# discriminator is **blue**: the backdrop renders at 0.93 and above, a lit red lining at about half
-# that. Tightening the test can only ever *reduce* a count, so nothing that passed before can fail
-# now, and the flood fill from the frame edge is unaffected because the surround is saturated.
+# **The test for it has to be the backdrop, not a half-space** -- and it has been too loose twice,
+# in the same way, for the same reason. A magenta *world* also lights the scene, so anything on the
+# animal that is pale or pink renders near magenta and a half-space catches it.
+#
+# The first time, at `r > .5, g < .3, b > .5`, what it caught was a mouth: Rhaeticosaurus' oral
+# lining -- (0.30, 0.13, 0.115), the same dark red Mixosaurus ships -- renders under that world at
+# (0.73, 0.29, 0.51), inside the window by a hair on green, and 394 of the 508 pixels that failed
+# the body at full gape were its own lining, correctly drawn and correctly front-facing.
+#
+# The second time, at `r > .75, g < .45, b > .75`, what it caught was **skin**. Saurichthys is a
+# pale silvery fish, and its flank and lip line render at about (0.78, 0.44, 0.76): inside that
+# window by one part in two hundred on green. Seventeen pixels of it were being counted as
+# background seen through the animal, and a ray cast through them -- measuring its own distance to
+# each part rather than reading the render -- found solid front-facing skin at every one.
+#
+# Both times the tell was the same and is worth watching for in any check whose number will not
+# move: five separate corrections to this fish's geometry, and a sixth to its cut rim, moved the
+# count by nothing at all.
+#
+# So the test is now measured against **the backdrop itself** rather than set by eye. Over every
+# render this repository has made, backdrop pixels come back with green below **0.063** and red and
+# blue at 1.00; the tail above that is antialiasing along the silhouette and lit skin. At
+# `r > .90, g < .20, b > .90` the window is still three times wider in green than any backdrop pixel
+# measured, and it excludes a lit pale hide by a factor of two. The flood fill from the frame edge
+# is unaffected because the surround is saturated.
+#
+# Tightening is *nearly* monotone but not quite, and the reason is worth knowing: a pixel is only
+# counted as opened if none of its eight neighbours was backdrop in the *solid* pass, and narrowing
+# the test can drop a neighbour out of that exclusion. In practice it moves single pixels either way
+# along a silhouette. The change was re-run across every delivered body before it landed.
 BACKDROP = (1.0, 0.0, 1.0, 1.0)
+BG = (.90, .20, .90)             # r >, g <, b > for a pixel to be the backdrop
 
 
 def scene_setup():
@@ -146,7 +168,7 @@ def enclosed_backdrop(px, w, h):
     """
     def is_bg(i):
         r, g, b = px[i * 4], px[i * 4 + 1], px[i * 4 + 2]
-        return r > .75 and g < .45 and b > .75
+        return r > BG[0] and g < BG[1] and b > BG[2]
 
     seen = bytearray(w * h)
     stack = []
@@ -186,7 +208,7 @@ for (clip, t, fa), (_, _, fb) in zip(solid, culled):
                if max(abs(pa[i * 4 + k] - pb_[i * 4 + k]) for k in range(3)) > 0.08)
     def bg(px, i):
         r, g, b = px[i * 4], px[i * 4 + 1], px[i * 4 + 2]
-        return r > .75 and g < .45 and b > .75
+        return r > BG[0] and g < BG[1] and b > BG[2]
 
     # A hole is backdrop the cull *opened*: backdrop in the culled pass, body in the solid pass, and
     # not touching backdrop in the solid pass either — that last clause is what throws away the

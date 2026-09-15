@@ -98,7 +98,7 @@ export function Results({ snapshot, players, record, fresh, items, sel, shown, o
  * so the page is a map of what is left rather than a list of what happened. Anything this match
  * added is called out as new.
  */
-function Discoveries({ codex, fresh }: { codex: Codex; fresh: Codex }) {
+export function Discoveries({ codex, fresh }: { codex: Codex; fresh: Codex }) {
   const base = appBase();
   const seenBiome = new Set(codex.biomes), newBiome = new Set(fresh.biomes);
   const seenMark = new Set(codex.landmarks), newMark = new Set(fresh.landmarks);
@@ -141,14 +141,38 @@ function Discoveries({ codex, fresh }: { codex: Codex; fresh: Codex }) {
         {roster.map((c) => {
           const seen = codex.apex.includes(c.id);
           return (
-            <li key={c.id} className={`apex-card ${seen ? 'found' : 'unfound'} ${newApex.has(c.id) ? 'fresh' : ''}`} title={seen ? `${c.name} · reached Apex` : `${c.name} · not yet at Apex`}>
+            <li key={c.id} className={`apex-card ${seen ? 'found' : 'unfound'} ${newApex.has(c.id) ? 'fresh' : ''}`}
+                title={seen ? `${c.name} · reached Apex · unlocked in the other Ancient Seas games` : `${c.name} · not yet at Apex`}>
               <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={base} alt={c.name} loading="lazy" />
               <span>{c.name}</span>
+              {/* Reaching the top here is what admits an animal to the *other* games, so the card
+                  that records it says so. The star is the same mark the Visitors button carries on
+                  their pick screens, which is where this ends up mattering. Top left, because NEW
+                  already owns the other corner and these cards are 54 pixels wide. */}
+              {seen && <span className="visitor-tag" aria-hidden="true">★</span>}
               {newApex.has(c.id) && <span className="new-tag">NEW</span>}
             </li>
           );
         })}
       </ul>
+      {/* What Apex is *for*, which a player who has just earned one has no reason to know yet.
+          Only ever shown to somebody who has one: visitors are a thing you find out you have, not
+          a goal the game sets you in advance, and a line promising them to a player with an empty
+          strip would give the surprise away for nothing. Same reason the Visitors button is absent
+          from the pick grid until there is something behind it.
+
+          The other games are deliberately not named. Which they are, and how many, is a thing that
+          changes — the trilogy has already gained one and may gain more, and one of them is not
+          released yet — so the line says where rather than which, and stays true through all of it.
+          The trilogy's own name is fine; a sibling game's title is what it avoids. A visitor's crew
+          card still says "Devonian", which is the *period* the animal is from and is already on
+          every creature card as provenance ("Late Devonian · Cleveland Shale"), not a pointer at
+          another game. */}
+      {codex.apex.length > 0 && (
+        <p className="apex-note">
+          ★ <b>Unlocked</b> — playable in the other Ancient Seas games, from the <b>Visitors</b> button.
+        </p>
+      )}
     </div>
   );
 }
