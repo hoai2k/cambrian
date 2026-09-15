@@ -20,7 +20,7 @@ the body's own albedo.
 
 Writes only this species' asset family. Touches no shared registry and performs no git operations.
 """
-import bpy, bmesh, math, json, os, struct, hashlib, shutil, heapq, sys
+import bpy, bmesh, math, json, os, sys, struct, hashlib, shutil, heapq, sys
 
 # Blender exits 0 even when a script raises, so a build that failed halfway reports success
 # and leaves yesterday's GLB on disk looking fresh. Fail the process instead.
@@ -41,6 +41,9 @@ from mathutils.geometry import barycentric_transform
 from math import sin, cos, pi
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(os.path.abspath(os.path.join(HERE, '../../../..')),
+                                'tools/triassic/creatures/_pipeline'))
+import tripo as T                                                              # noqa: E402
 ROOT = os.path.abspath(os.path.join(HERE, '../../../..'))
 LOCAL = os.path.join(ROOT, 'local/triassic-authoring/saurichthys')
 OUT = os.path.join(ROOT, 'public/assets/triassic/creatures')
@@ -1121,72 +1124,45 @@ def lumen_centre(y):
     return min(max(seam_z(y), bot + .18 * (top - bot)), top - .18 * (top - bot))
 
 
-verts, faces, lin_an = [], [], []
-for i in range(LIN_RINGS):
-    u = i / (LIN_RINGS - 1.)
-    y = LIN_BACK + (LIN_FRONT - LIN_BACK) * u
-    # Drawn in at both ends so the sac closes rather than ending in a ring standing in open flesh.
-    # Drawn in at the ends so the sac closes rather than ending in a ring standing in open
-    # flesh -- but only just at the back. Tapered over the last eighth there, the tube
-    # pinched to a fifth of its width exactly where the cut is widest, and the corner of the
-    # mouth opened onto the backdrop at full gape.
-    # Tapered over the last twelfth at the front, the sac has run out well before the cut has:
-    # on a rostrum this long that is two hundredths of the body of open lip with nothing behind
-    # it, and it showed as backdrop along the snout tip. It now closes where the cut closes.
+# **A palate and a floor, each closed on its own** -- `T.oral_shells`, shared with the era. One sac
+# whose wall stretched between the two bones stood here; the wall could not part, which is what it
+# was for, and it photographs as a mouth webbed shut. On this fish the roof already sat almost *on*
+# the cut, which is what a palate is; what the shells change is that the floor is no longer joined
+# to it. Both halves still overlap a little way into the flesh above and below, because drawn
+# exactly to the cut the lumen ends where the skin's cut edge begins and a pixel straddling that
+# boundary is part skin and part nothing at all -- the mouth line came out edged with single pixels
+# of backdrop for the whole length of the rostrum. And the throat term is kept: behind the pivot
+# the palate fills the head's own section, which is what closes the wedge the cut leaves between
+# the mandible and the skull.
+def lumen_shells(y):
+    u = (y - LIN_BACK) / (LIN_FRONT - LIN_BACK)
     e = smooth(u / .035) * smooth((1. - u) / .025)
     _wy, _wz = lumen(y)
-    # Behind the pivot the sac becomes a throat and fills the head's own section. The wedge the cut
-    # leaves between the mandible and the skull opens there, and closing it with a separate blunt
-    # ellipsoid -- Placodus' hinge envelope -- needs one nearly as big as the head: fitted inside
-    # the silhouette it is too small to cover the wedge, and big enough to cover it, it stands out
-    # of the snout as a pale ball in every three-quarter render. The lining is already skinned
-    # across the joint and already inside the head, so it does the job without adding a shape.
     _bot, _top = head_z(y)
     _throat = 1. - smooth(u / .22)
-    _ty = .80 * head_half_width(y)
-    _tz = .38 * (_top - _bot)
-    wy = max(_wy, _ty * _throat) * (.18 + .82 * e)
-    wz = max(_wz, _tz * _throat) * (.20 + .80 * e)
-    # The roof sits *on* the cut rather than above it. An ellipse centred on the mouth line
-    # leaves a crescent between its roof and the ring the cut left in the skull, and a ray
-    # into the gape goes over the sac, through that ring and out of the top of the head.
-    # Flattening the upper half onto the seam seals it; the lower half is what the jaw
-    # carries down, and the wall between the two is what stretches.
-    #
-    # Flush is not quite enough, though. Drawn exactly to the cut, the far wall of the lumen
-    # ends where the skin's cut edge begins, and a pixel straddling that boundary is part
-    # skin and part nothing at all: under an all-backfaces-culled shim the mouth line came
-    # out edged with single pixels of backdrop for the whole length of the rostrum, where the
-    # lip is one polygon thick and there are two hundred pixels of it. So roof and floor
-    # overlap a little way into the flesh above and below -- both still inside the head's own
-    # section, so nothing can show -- and there is no boundary left to straddle.
+    wy = max(_wy, .80 * head_half_width(y) * _throat) * (.18 + .82 * e)
+    wz = max(_wz, .38 * (_top - _bot) * _throat) * (.20 + .80 * e)
     _c = lumen_centre(y)
     _roof_lift = max(0., min(.40 * (_top - _c), .9 * (_top - _c) - .0008))
     _floor_drop = min(1.75 * wz, .92 * (_c - _bot))
-    for j in range(LIN_RING):
-        th = j * 2 * pi / LIN_RING
-        _s_th = sin(th)
-        _dz = (_roof_lift + .10 * wz) * _s_th if _s_th > 0 else _floor_drop * _s_th
-        verts.append(Vector((wy * cos(th), y, _c + _dz)))
-        lin_an.append((sin(th), u))
-# Wound inwards: what an open mouth shows is the far wall of the lumen, and the near wall has to be
-# got out of the way. Which way round that is was settled by measurement, not by reading the loop --
-# with the winding the other way the near wall survived the cull and the far wall did not, and the
-# gape measured 7.4 % see-through at Attack's widest against 0.3 % this way round.
-for i in range(LIN_RINGS - 1):
-    for j in range(LIN_RING):
-        p0 = i * LIN_RING + j
-        p1 = i * LIN_RING + (j + 1) % LIN_RING
-        faces.append((p0 + LIN_RING, p1 + LIN_RING, p1, p0))
-faces.append(tuple(range(LIN_RING)))
-faces.append(tuple(reversed(range((LIN_RINGS - 1) * LIN_RING, LIN_RINGS * LIN_RING))))
-_lining_raw = [Vector(v) for v in verts]
+    return wy, max(_roof_lift + .10 * wz, _throat * .9 * (_top - _c)), _floor_drop
+
+
+_lining_raw, faces, _lin_palate = T.oral_shells(
+    lumen_centre, lumen_shells, LIN_BACK, LIN_FRONT, rings=LIN_RINGS, ring=LIN_RING,
+    axis='y', swell=1.10, behind=.08)
+verts = list(_lining_raw)
 me = bpy.data.meshes.new('Mouth lining')
 me.from_pydata([tx(v) for v in verts], [], faces)
 me.update()
 lining = bpy.data.objects.new('Mouth lining', me)
 bpy.context.collection.objects.link(lining)
 lining.location = (0, 0, 0)
+# Outward, by measurement rather than by winding convention: each shell is a closed solid and a
+# closed solid shows its front faces to everything outside it, so the cull cannot open it.
+_lbm = bmesh.new(); _lbm.from_mesh(lining.data)
+bmesh.ops.recalc_face_normals(_lbm, faces=list(_lbm.faces))
+_lbm.to_mesh(lining.data); _lbm.free()
 lining.data.materials.clear()
 lining.data.materials.append(liningmat)
 _luv = lining.data.uv_layers.new(name='UVMap')
@@ -1199,17 +1175,12 @@ for poly in lining.data.polygons:
 _lcol = lining.data.color_attributes.new(name='Color', type='FLOAT_COLOR', domain='POINT')
 for item in _lcol.data:
     item.color = (1, 1, 1, 1)
+# Rigid, one bone each: the palate is the skull's and the floor is the jaw's. There is no blend to
+# tune because there is no wall left to stretch.
 for n in ['skull', 'jaw']:
     lining.vertex_groups.new(name=n)
-for v in lining.data.vertices:
-    _an, _u = lin_an[v.index]
-    t = .5 + .5 * _an                                 # 1 at the roof, 0 at the floor
-    # The front of the sac goes entirely with the mandible. Split between the two bones it is
-    # dragged open as the jaw swings and comes out past the lips as a handful of long strands --
-    # the last thing left of the fan of ribbons this mouth started with.
-    skull_w = smooth(t) * (1. - smooth((_u - .80) / .20))
-    lining.vertex_groups['skull'].add([v.index], skull_w, 'REPLACE')
-    lining.vertex_groups['jaw'].add([v.index], 1. - skull_w, 'REPLACE')
+lining.vertex_groups['skull'].add(list(range(_lin_palate)), 1., 'REPLACE')
+lining.vertex_groups['jaw'].add(list(range(_lin_palate, len(_lining_raw))), 1., 'REPLACE')
 for p in lining.data.polygons:
     p.use_smooth = True
 oralparts = [lining]

@@ -2,7 +2,7 @@
 Blender 5.2. Geometry coordinates are raw Tripo metres (X snoutward, Y left, Z up, body length 1.0)
 until the final 5x engine transform tx().
 """
-import bpy,bmesh,math,json,os,struct,hashlib,shutil
+import bpy,bmesh,math,json,os,sys,struct,hashlib,shutil
 import numpy as np
 from mathutils import Vector,Matrix,Quaternion
 from mathutils.bvhtree import BVHTree
@@ -10,6 +10,8 @@ from mathutils.geometry import barycentric_transform
 from math import sin,cos,pi,exp
 
 HERE=os.path.dirname(os.path.abspath(__file__)); ROOT=os.path.abspath(os.path.join(HERE,'../../../..'))
+sys.path.insert(0,os.path.join(ROOT,'tools/triassic/creatures/_pipeline'))
+import tripo as T                                                              # noqa: E402
 LOCAL=os.path.join(ROOT,'local/triassic-authoring/placodus'); OUT=os.path.join(ROOT,'public/assets/triassic/creatures')
 os.makedirs(LOCAL,exist_ok=True); os.makedirs(OUT,exist_ok=True)
 RAW=os.path.join(HERE,'tripo-raw/placodus.raw.glb'); ID='placodus'; SCALE=5
@@ -458,30 +460,17 @@ def mouth_section(x):
  h=max(float(np.interp(x,MX,TALL))*LINING_INSET,.0022)*(.30+.70*e)
  return w,h
 LINING_RINGS,LINING_RING=22,14
-lin_raw=[];verts=[];faces=[]
-for i in range(LINING_RINGS):
- x=MOUTH_BACK+(MOUTH_FRONT-MOUTH_BACK)*(i/(LINING_RINGS-1));w,h=mouth_section(x)
- for j in range(LINING_RING):
-  th=j*2*pi/LINING_RING;p=Vector((x,w*cos(th),seam(x)+h*sin(th)))
-  lin_raw.append(p);verts.append(tx(p))
-# Wound inwards: the lumen is what is looked into, so the near wall must cull and the far wall draw.
-for i in range(LINING_RINGS-1):
- for j in range(LINING_RING):
-  a=i*LINING_RING+j;b=i*LINING_RING+(j+1)%LINING_RING
-  faces.append((a,a+LINING_RING,b+LINING_RING,b))
-faces.append(tuple(range(LINING_RING)))
-faces.append(tuple(reversed(range((LINING_RINGS-1)*LINING_RING,LINING_RINGS*LINING_RING))))
-me=bpy.data.meshes.new('Oral cavity lining');me.from_pydata(verts,[],faces);me.update()
-lining=bpy.data.objects.new('Oral cavity lining',me);bpy.context.collection.objects.link(lining)
-lining.location=(0,0,0);lining.data.materials.append(mouthmat)
-for n in ['skull','jaw']:lining.vertex_groups.new(name=n)
-for idx,p in enumerate(lin_raw):
- w,h=mouth_section(p.x)
- t=smooth(.5+.5*(seam(p.x)-p.z)/max(h,1e-6))
- g=t*smooth((p.x-HINGE_X)/.014)*smooth((MOUTH_FRONT-p.x)/.006)
- lining.vertex_groups['jaw'].add([idx],g,'REPLACE');lining.vertex_groups['skull'].add([idx],1-g,'REPLACE')
-for p in lining.data.polygons:p.use_smooth=True
-mo=lining.modifiers.new('Oral membrane','ARMATURE');mo.object=rig;lining.parent=rig
+# A palate rigid on the skull and a floor rigid on the jaw, each closed on its own and overlapping
+# rather than joining at the corner of the mouth -- `T.oral_shells`, shared with every other body in
+# the era. What stood here was ONE sac whose wall stretched between the two bones, and this animal
+# is where that sac was written: two split tubes had parted and shown the backdrop through the head,
+# and a stretching wall could not part. It could not, and it was still wrong -- the wall photographs
+# as a mouth webbed shut, a flat sheet filling the whole gape. The closure is now each shell being
+# closed by itself, which no rotation can undo, and the overlap is at the hinge, where the jaw's
+# rotation is zero by definition.
+lin_raw,faces,n_palate=T.oral_shells(seam,mouth_section,MOUTH_BACK,MOUTH_FRONT,
+                                     rings=LINING_RINGS,ring=LINING_RING,axis='x')
+lining=T.oral_object('Oral cavity lining',tx,lin_raw,faces,n_palate,mouthmat,rig)
 oralparts.append(lining)
 # What went wrong before is a lining narrower than the mouth, so that is what is asserted: across
 # the stations the cavity was measured at, the lining carries the mouth's own section. (The shipped

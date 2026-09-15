@@ -7,8 +7,8 @@
   "maximumEnvelopeDifferenceFractionOfBodyLength": 0.03781764705975851,
   "surfaceDistanceMax": 0.1810218244791031,
   "surfaceDistanceMaxFractionOfBodyLength": 0.030170304079850514,
-  "surfaceDistanceP95": 0.03052835799753664,
-  "surfaceDistanceP95FractionOfBodyLength": 0.0050880596662561065,
+  "surfaceDistanceP95": 0.030984362401068215,
+  "surfaceDistanceP95FractionOfBodyLength": 0.0051640604001780355,
   "anchorTolerance": 0.12,
   "anchorSurfaceDistances": {
     "anchor_mouth": {
@@ -556,7 +556,7 @@
         "max": [
           0.16904358565807343,
           2.670825719833374,
-          0.44603919982910156
+          0.4569934010505676
         ]
       },
       "twin": {
@@ -571,7 +571,7 @@
           0.48106512427330017
         ]
       },
-      "maximumEnvelopeDifference": 0.03502592444419861
+      "maximumEnvelopeDifference": 0.02839323878288269
     },
     {
       "stationY": 2.9672256351470945,

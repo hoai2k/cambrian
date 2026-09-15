@@ -653,17 +653,12 @@ for _y in np.linspace(MOUTH_FRONT + .004, MOUTH_BACK - .004, 12):
         ('the oral lining is narrower than the mouth', y, w, mouth_half_width(y))
     assert h >= .0012, ('the oral lining is flat', y, h)
 
-# The lining's jaw share, applied after the fact so the weights can be measured from the built
-# rings rather than guessed from the section. **The changeover is above the lip, not at it**:
-# centred on the seam, the ring's equator takes half the jaw's rotation while the mandible's cut
-# rim takes all of it, and a wedge opens between them at full gape.
-lining_jaw = []
-for idx, p in enumerate(lining_raw):
-    _w, h = mouth_section(p.y)
-    t = T.smooth(.5 + 1.6 * ((seam(p.y) + .45 * h) - p.z) / max(h, 1e-6))
-    lining.vertex_groups['jaw'].add([idx], t, 'REPLACE')
-    lining.vertex_groups['skull'].add([idx], 1 - t, 'REPLACE')
-    lining_jaw.append(round(float(t), 3))
+# What the two shells claim, read back off the built rings rather than asserted: 0 for every
+# palate vertex (rigid on the skull) and 1 for every floor vertex (rigid on the jaw). There is no
+# blend left to record, because there is no wall left to stretch -- see `T.oral_shells`.
+_jaw_group = lining.vertex_groups['jaw'].index
+lining_jaw = [round(next((g.weight for g in v.groups if g.group == _jaw_group), 0.), 3)
+              for v in lining.data.vertices]
 
 # The jaw hinge tissue: a seated envelope straddling the cut plane, because that corner is where
 # the mandible's rear rim, the throat and the lining all meet and the wedge between them is what

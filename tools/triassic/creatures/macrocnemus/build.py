@@ -752,11 +752,10 @@ for n in ['skull', 'jaw']:
 # half the jaw's rotation while the cut rim takes all of it, so the rim ends up below the lining's
 # widest point and a wedge opens between them. Everything at and below the mouth line follows the
 # mandible, and the stretch is carried by the band above it where nothing can see it.
-for idx, p in enumerate(lin_raw):
-    w, h = mouth_section(p.x)
-    g = K.smooth(.5 + 1.6 * ((seam(p.x) + .45 * h) - p.z) / max(h, 1e-6))
-    lining.vertex_groups['jaw'].add([idx], g, 'REPLACE')
-    lining.vertex_groups['skull'].add([idx], 1 - g, 'REPLACE')
+# The mouth is a palate on the skull and a floor on the jaw, each closed on its own and each
+# rigid on one bone (`K.oral_lining`). It used to be one sac whose wall stretched between the two,
+# and that wall photographed as a mouth webbed shut; the weights that tuned the stretch went with
+# it, because there is no longer a stretch to tune.
 for p in lining.data.polygons:
     p.use_smooth = True
 mo = lining.modifiers.new('Oral membrane', 'ARMATURE')

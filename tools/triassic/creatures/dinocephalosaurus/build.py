@@ -19,7 +19,7 @@ reach a neck rather than a tail, and both are recorded in pose-study.py:
     transport disagrees with the colour by up to 124 degrees across this neck, which would spiral
     the markings down a silhouette that came out perfectly straight.
 """
-import bpy, bmesh, math, json, os, struct, hashlib, shutil, heapq
+import bpy, bmesh, math, json, os, sys, struct, hashlib, shutil, heapq
 import numpy as np
 from mathutils import Vector, Matrix, Quaternion
 from mathutils.bvhtree import BVHTree
@@ -27,6 +27,9 @@ from mathutils.geometry import barycentric_transform
 from math import sin, cos, pi
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.abspath(os.path.join(HERE, '../../../..'))
+sys.path.insert(0, os.path.join(os.path.abspath(os.path.join(HERE, '../../../..')),
+                                'tools/triassic/creatures/_pipeline'))
+import tripo as T                                                              # noqa: E402
 LOCAL = os.path.join(ROOT, 'local/triassic-authoring/dinocephalosaurus'); OUT = os.path.join(ROOT, 'public/assets/triassic/creatures')
 os.makedirs(LOCAL, exist_ok=True); os.makedirs(OUT, exist_ok=True)
 RAW = os.path.join(HERE, 'tripo-raw/dinocephalosaurus.raw.glb'); ID = 'dinocephalosaurus'
@@ -774,46 +777,29 @@ def rigid(o, bonename, material):
 def head_point(a, n, b): return HEAD_P0 + HEAD_DIR * a + HEAD_UP * n + HEAD_SIDE * b
 
 
-# One lining rather than a palate and a floor. Two separate closed tubes, one rigid on the skull and
-# one rigid on the jaw, part the moment the jaw swings and leave a wedge at the back of the mouth
-# that a single-sided skin is seen straight out through -- Placodus' fault exactly. This is one sac
-# on the head's own radius profile, *skinned*: the roof follows the skull, the floor follows the
-# jaw, and the wall between them stretches, so no opening the clips reach can open it.
+# **A palate and a floor after all, and each closed on its own.** What stood here was one sac whose
+# wall stretched between the two bones, written because two split tubes had parted at the back of
+# the mouth and a single-sided skin was seen straight out through the wedge. The wall closed that
+# and photographed as a mouth webbed shut. `T.oral_shells` is the answer to both: each shell is
+# closed by itself so no rotation can part it, and they overlap at the corner of the mouth where
+# the jaw's rotation is zero. This head's lumen follows the head's own curved frame, which is what
+# the `point` hook carries.
 LINING_RINGS, LINING_RING = 26, 14
 LIN_BACK = HINGE_A - .005
 LIN_FRONT = HEAD_LEN - .004
 
 
-def lining_section(a, u):
-    # Drawn in at both ends so the sac closes rather than ending in a ring standing in open flesh.
+def lining_section(a):
+    # Drawn in at both ends so each shell closes rather than ending in a ring standing in open flesh.
+    u = (a - LIN_BACK) / (LIN_FRONT - LIN_BACK)
     e = smooth(u / .12) * smooth((1. - u) / .07)
     return .55 * head_r(a) * (.16 + .84 * e), .30 * head_r(a) * (.20 + .80 * e)
 
 
-verts = []; faces = []; lin_an = []
-for i in range(LINING_RINGS):
-    u = i / (LINING_RINGS - 1.); a = LIN_BACK + (LIN_FRONT - LIN_BACK) * u
-    wy, wz = lining_section(a, u)
-    for j in range(LINING_RING):
-        th = j * 2 * pi / LINING_RING
-        verts.append(tx(head_point(a, seam_n(a) + wz * sin(th), wy * cos(th))))
-        lin_an.append(sin(th))
-for i in range(LINING_RINGS - 1):
-    for j in range(LINING_RING):
-        p0 = i * LINING_RING + j; p1 = i * LINING_RING + (j + 1) % LINING_RING
-        faces.append((p0, p1, p1 + LINING_RING, p0 + LINING_RING))
-faces.append(tuple(reversed(range(LINING_RING))))
-faces.append(tuple(range((LINING_RINGS - 1) * LINING_RING, LINING_RINGS * LINING_RING)))
-me = bpy.data.meshes.new('Mouth lining'); me.from_pydata(verts, [], faces); me.update()
-_lin = bpy.data.objects.new('Mouth lining', me); bpy.context.collection.objects.link(_lin)
-_lin.location = (0, 0, 0); _lin.data.materials.clear(); _lin.data.materials.append(mouthmat)
-for n in ['skull', 'jaw']: _lin.vertex_groups.new(name=n)
-for v in _lin.data.vertices:
-    t = .5 + .5 * lin_an[v.index]                      # 1 at the roof, 0 at the floor
-    _lin.vertex_groups['skull'].add([v.index], smooth(t), 'REPLACE')
-    _lin.vertex_groups['jaw'].add([v.index], 1. - smooth(t), 'REPLACE')
-_lin.parent = rig; _lin.modifiers.new('Mouth lining', 'ARMATURE').object = rig
-for p in _lin.data.polygons: p.use_smooth = True
+_lin_raw, _lin_faces, _lin_palate = T.oral_shells(
+    seam_n, lining_section, LIN_BACK, LIN_FRONT, rings=LINING_RINGS, ring=LINING_RING,
+    point=(lambda a, lat, n_: head_point(a, n_, lat)))
+_lin = T.oral_object('Mouth lining', tx, _lin_raw, _lin_faces, _lin_palate, mouthmat, rig)
 oralparts.append(_lin)
 # The fang trap: a long slender snout of interlocking conical teeth, the front pair the largest.
 for label, lift, bonename, sgnz in [('Upper fangs', .0026, 'skull', -1), ('Lower fangs', -.0024, 'jaw', 1)]:

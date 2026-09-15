@@ -13,7 +13,7 @@ against a 0.25 depth, its mouth is the front 0.04 of the body rather than a long
 one thing Placodus does not have at all is a fused dorsal shell, which is a rigid part here in the
 same sense that Placodus' gastral basket is.
 """
-import bpy, bmesh, math, json, os, struct, hashlib, shutil
+import bpy, bmesh, math, json, os, sys, struct, hashlib, shutil
 import numpy as np
 from mathutils import Vector, Matrix, Quaternion
 from mathutils.bvhtree import BVHTree
@@ -21,6 +21,8 @@ from mathutils.geometry import barycentric_transform
 from math import sin, cos, pi
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.abspath(os.path.join(HERE, '../../../..'))
+sys.path.insert(0, os.path.join(ROOT, 'tools/triassic/creatures/_pipeline'))
+import tripo as T                                                              # noqa: E402
 LOCAL = os.path.join(ROOT, 'local/triassic-authoring/henodus'); OUT = os.path.join(ROOT, 'public/assets/triassic/creatures')
 os.makedirs(LOCAL, exist_ok=True); os.makedirs(OUT, exist_ok=True)
 RAW = os.path.join(HERE, 'tripo-raw/henodus.raw.glb'); ID = 'henodus'; SCALE = 5
@@ -567,29 +569,13 @@ def mouth_section(x):
 
 
 LINING_RINGS, LINING_RING = 20, 14
-lin_raw = []; verts = []; faces = []
-for i in range(LINING_RINGS):
-    x = MOUTH_BACK + (MOUTH_FRONT - MOUTH_BACK) * (i / (LINING_RINGS - 1)); w, h = mouth_section(x)
-    for j in range(LINING_RING):
-        th = j * 2 * pi / LINING_RING; p = Vector((x, w * cos(th), seam(x) + h * sin(th)))
-        lin_raw.append(p); verts.append(tx(p))
-for i in range(LINING_RINGS - 1):
-    for j in range(LINING_RING):
-        a = i * LINING_RING + j; b = i * LINING_RING + (j + 1) % LINING_RING
-        faces.append((a, a + LINING_RING, b + LINING_RING, b))
-faces.append(tuple(range(LINING_RING)))
-faces.append(tuple(reversed(range((LINING_RINGS - 1) * LINING_RING, LINING_RINGS * LINING_RING))))
-me = bpy.data.meshes.new('Oral cavity lining'); me.from_pydata(verts, [], faces); me.update()
-lining = bpy.data.objects.new('Oral cavity lining', me); bpy.context.collection.objects.link(lining)
-lining.location = (0, 0, 0); lining.data.materials.append(mouthmat)
-for n in ['skull', 'jaw']: lining.vertex_groups.new(name=n)
-for idx, p in enumerate(lin_raw):
-    w, h = mouth_section(p.x)
-    t = smooth(.5 + .5 * (seam(p.x) - p.z) / max(h, 1e-6))
-    g = t * smooth((p.x - HINGE_X) / .012) * smooth((MOUTH_FRONT - p.x) / .010)
-    lining.vertex_groups['jaw'].add([idx], g, 'REPLACE'); lining.vertex_groups['skull'].add([idx], 1 - g, 'REPLACE')
-for p in lining.data.polygons: p.use_smooth = True
-mo = lining.modifiers.new('Oral membrane', 'ARMATURE'); mo.object = rig; lining.parent = rig
+# A palate rigid on the skull and a floor rigid on the jaw, each closed on its own, overlapping at
+# the corner of the mouth where the jaw's rotation is zero: `T.oral_shells`, shared with the era.
+# What stood here was one sac whose wall stretched between the two bones. The wall could not part,
+# which is what it was written for, and it was still wrong: it photographs as a mouth webbed shut.
+lin_raw, faces, n_palate = T.oral_shells(seam, mouth_section, MOUTH_BACK, MOUTH_FRONT,
+                                         rings=LINING_RINGS, ring=LINING_RING, axis='x')
+lining = T.oral_object('Oral cavity lining', tx, lin_raw, faces, n_palate, mouthmat, rig)
 oralparts.append(lining)
 # Recorded, not asserted, and Placodus says why: a point in the lumen is OUTSIDE the closed shell,
 # because the shell folds in through the modelled slit, so a nearest-surface depth on a lining

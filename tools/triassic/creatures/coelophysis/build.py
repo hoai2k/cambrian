@@ -561,14 +561,10 @@ for o in [auth, puppet]:
     K.bind(o, rig, B, weights, tx, influences, passes=RELAX_PASSES)
 for o in parts['lower jaw'].values():
     K.bind_rigid(o, rig, 'jaw', tx)
-for n in ['skull', 'jaw']:
-    lining.vertex_groups.new(name=n)
-for idx, p in enumerate(lin_raw):
-    w, h = mouth_section(p.x)
-    t = K.smooth(.5 + .5 * (seam(p.x) - p.z) / max(h, 1e-6))
-    g = t * K.smooth((p.x - HINGE_X) / .014) * K.smooth((MOUTH_FRONT - p.x) / .008)
-    lining.vertex_groups['jaw'].add([idx], g, 'REPLACE')
-    lining.vertex_groups['skull'].add([idx], 1 - g, 'REPLACE')
+# The mouth is a palate on the skull and a floor on the jaw, each closed on its own and each
+# rigid on one bone (`K.oral_lining`). It used to be one sac whose wall stretched between the two,
+# and that wall photographed as a mouth webbed shut; the weights that tuned the stretch went with
+# it, because there is no longer a stretch to tune.
 for p in lining.data.polygons:
     p.use_smooth = True
 mo = lining.modifiers.new('Oral membrane', 'ARMATURE')

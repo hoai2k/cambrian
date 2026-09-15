@@ -72,6 +72,7 @@ import sys
 # between 1.4x and 12x. See `tools/triassic/creatures/_pipeline/tripo.py` for the whole argument.
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '_pipeline'))
 from tripo import relax_weights, rim_flange, cap_cut                          # noqa: E402,F401
+from tripo import oral_shells, oral_object                                    # noqa: E402,F401
 
 
 # Blender exits 0 when a script raises. In `--background --python` mode the traceback goes to stdout
@@ -1089,61 +1090,28 @@ def split(obj, label, test, parts):
     return part
 
 
-def oral_lining(name, stations, section, seam, tx, rings=22, ring=14, centre=None, power=2.):
-    """One closed lining on the mouth's own measured section, wound inwards.
+def oral_lining(name, stations, section, seam, tx, rings=22, ring=14, centre=None, power=2.,
+                overlap=.16, throat=.18, swell=1.60, behind=.16):
+    """A **palate on the skull and a floor on the jaw**, each closed on its own.
 
-    What an open mouth shows is the far wall of the lumen, so the tube is wound with its normals
-    *inwards*: 187 of Tanystropheus' 216 vertices face the lumen, the other 29 being the two end
-    caps. `flat_material(cull=True)` asks for the backfaces to be dropped as well, but that does
-    not survive the glTF export — the material ships `doubleSided`, which is the safe direction of
-    the two and is why this is a note rather than a bug: a double-sided lining cannot read as a
-    hole whichever way a face happens to be wound, and the skin around it is opaque anyway. Do not
-    "fix" the export to honour the cull without checking the gape renders again. The lining is
-    *skinned* rather than split — floor on the jaw, roof on the skull, the wall between them
-    stretching — so no opening the clips reach can part it.
+    This used to be one sac whose wall stretched between the two bones, and the wall is the reason
+    it is not any more: it is a mouth webbed shut. What replaced it, and why the closure still
+    holds, is `oral_shells` in `_pipeline/tripo.py` -- imported here rather than copied, so the
+    marine kit and the shore kit have one implementation of the mouth between them.
+
+    The object comes back already weighted: the palate rigid on `skull`, the floor rigid on `jaw`.
+    A builder that re-weighted it per vertex would be reinventing the blend the wall needed.
 
     `centre` is the head's own lateral axis at each station. It is not always zero: these
     generations are drawn, not symmetrical, and Macrocnemus' skull sits a third of its own width
-    left of the body's midline. A lumen built on the body's midline would be outside that head.
-
-    `power` is the section's superellipse exponent, 2 for the plain ellipse the bodies built before
-    this option keep. **A mouth's section is not an ellipse**, and the difference is a hole: an
-    ellipse narrows towards its poles, so at the height the mandible's rim reaches at full gape the
-    lining is a fraction of the width the mouth is, and a line of sight slips over the rim, past the
-    lining and out to the inside of the far cheek. The marine kit learned this on Rhaeticosaurus;
-    Macrocnemus is where it reached this one, at 18 px that four other corrections did not move.
+    left of the body's midline. `power` is the section's superellipse exponent -- a mouth's section
+    is not an ellipse, and on a deep head the difference used to be a hole.
     """
-    lin_raw = []
-    verts = []
-    faces = []
-    for i in range(rings):
-        x = stations[0] + (stations[1] - stations[0]) * (i / (rings - 1))
-        w, h = section(x)
-        for j in range(ring):
-            th = j * 2 * pi / ring
-            c, sn = cos(th), sin(th)
-            if power != 2.:
-                e = 2. / power
-                c = math.copysign(abs(c) ** e, c)
-                sn = math.copysign(abs(sn) ** e, sn)
-            cy = centre(x) if centre else 0.
-            p = Vector((x, cy + w * c, seam(x) + h * sn))
-            lin_raw.append(p)
-            verts.append(tx(p))
-    for i in range(rings - 1):
-        for j in range(ring):
-            a = i * ring + j
-            b = i * ring + (j + 1) % ring
-            faces.append((a, a + ring, b + ring, b))
-    faces.append(tuple(range(ring)))
-    faces.append(tuple(reversed(range((rings - 1) * ring, rings * ring))))
-    me = bpy.data.meshes.new(name)
-    me.from_pydata(verts, [], faces)
-    me.update()
-    obj = bpy.data.objects.new(name, me)
-    bpy.context.collection.objects.link(obj)
-    obj.location = (0, 0, 0)
-    return obj, lin_raw
+    raw, faces, n_palate = oral_shells(seam, section, stations[0], stations[1], rings=rings,
+                                       ring=ring, centre=centre, power=power, overlap=overlap,
+                                       throat=throat, swell=swell, behind=behind, axis='x')
+    obj = oral_object(name, tx, raw, faces, n_palate, None)
+    return obj, raw
 
 
 def wear_the_skin(obj, source, albedo, material, to_raw=None):

@@ -16,7 +16,7 @@ the same reason -- the animal's own colouring is the only measurement there is.
 The generation arrives lying along +Y with the head at +Y; intake turns it a quarter turn about Z
 so the rest of this file can speak the same raw frame every other builder in the era speaks.
 """
-import bpy, bmesh, math, json, os, struct, hashlib, shutil
+import bpy, bmesh, math, json, os, sys, struct, hashlib, shutil
 import numpy as np
 from mathutils import Vector, Matrix, Quaternion
 from mathutils.bvhtree import BVHTree
@@ -24,6 +24,9 @@ from mathutils.geometry import barycentric_transform
 from math import sin, cos, pi
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.abspath(os.path.join(HERE, '../../../..'))
+sys.path.insert(0, os.path.join(os.path.abspath(os.path.join(HERE, '../../../..')),
+                                'tools/triassic/creatures/_pipeline'))
+import tripo as T                                                              # noqa: E402
 LOCAL = os.path.join(ROOT, 'local/triassic-authoring/keichousaurus'); OUT = os.path.join(ROOT, 'public/assets/triassic/creatures')
 os.makedirs(LOCAL, exist_ok=True); os.makedirs(OUT, exist_ok=True)
 RAW = os.path.join(HERE, 'tripo-raw/keichousaurus.raw.glb'); ID = 'keichousaurus'; SCALE = 5
@@ -506,44 +509,22 @@ def mouth_section(a):
 
 
 LINING_RINGS, LINING_RING = 18, 10
-lin_raw = []; verts = []; faces = []
-for i in range(LINING_RINGS):
-    a = MOUTH_BACK + (MOUTH_FRONT - MOUTH_BACK) * (i / (LINING_RINGS - 1)); w, hu, hd = mouth_section(a)
-    for j in range(LINING_RING):
-        th = j * 2 * pi / LINING_RING
-        n_ = seam_n(a) + (hu if sin(th) >= 0 else hd) * sin(th)
-        p = head_point(a, n_, w * cos(th))
-        lin_raw.append((a, n_, p)); verts.append(tx(p))
-for i in range(LINING_RINGS - 1):
-    for j in range(LINING_RING):
-        a = i * LINING_RING + j; b = i * LINING_RING + (j + 1) % LINING_RING
-        faces.append((a, a + LINING_RING, b + LINING_RING, b))
-faces.append(tuple(range(LINING_RING)))
-faces.append(tuple(reversed(range((LINING_RINGS - 1) * LINING_RING, LINING_RINGS * LINING_RING))))
-me = bpy.data.meshes.new('Oral cavity lining'); me.from_pydata(verts, [], faces); me.update()
-lining = bpy.data.objects.new('Oral cavity lining', me); bpy.context.collection.objects.link(lining)
-lining.location = (0, 0, 0); lining.data.materials.append(mouthmat)
-for n in ['skull', 'jaw']: lining.vertex_groups.new(name=n)
-for idx, (a, n_, p) in enumerate(lin_raw):
-    w, hu, hd = mouth_section(a)
-    t = smooth(.5 + .5 * (seam_n(a) - n_) / max(hd, 1e-6))
-    # No front taper on the jaw's share: the floor of the mouth at the very front IS the tip of
-    # the mandible, and pinning it to the skull leaves the tip swinging out from under the lining --
-    # which is where the gape test found the backdrop.
-    # The floor is fully on the jaw BY the hinge, not 0.014 after it. A lining that is still all
-    # skull at the hinge does not follow the mandible's rear edge at all, and the V that opens
-    # between the two cut edges is where the gape test found 30 px of backdrop. Points at the hinge
-    # barely move under the rotation, so giving them the jaw costs nothing.
-    g = t * smooth((a - (HINGE_A - .012)) / .012)
-    lining.vertex_groups['jaw'].add([idx], g, 'REPLACE'); lining.vertex_groups['skull'].add([idx], 1 - g, 'REPLACE')
-for p in lining.data.polygons: p.use_smooth = True
-mo = lining.modifiers.new('Oral membrane', 'ARMATURE'); mo.object = rig; lining.parent = rig
+# A palate rigid on the skull and a floor rigid on the jaw, each closed on its own and overlapping
+# at the corner of the mouth: `T.oral_shells`. One sac whose wall stretched between the two bones
+# stood here, and the wall photographs as a mouth webbed shut. This head's mouth is measured on the
+# **head's own curved frame** rather than on a straight axis -- a long neck carries the lumen round
+# with it -- so the shells are placed through `head_point` and their `z` is distance along the
+# head's normal, which is what the `point` hook is for.
+lin_raw, faces, n_palate = T.oral_shells(seam_n, mouth_section, MOUTH_BACK, MOUTH_FRONT,
+                                         rings=LINING_RINGS, ring=LINING_RING,
+                                         point=(lambda a, lat, n_: head_point(a, n_, lat)))
+lining = T.oral_object('Oral cavity lining', tx, lin_raw, faces, n_palate, mouthmat, rig)
 oralparts.append(lining)
 # This generation models no slit, so the shell is smooth and a nearest-surface depth on a lining
 # vertex means what it says -- unlike Placodus, where the shell folds in through a real slit and
 # the same measurement is untrustworthy. So it is asserted here: a lining that leaves the head is a
 # red nub on the snout at rest, which is what the first pass at closing the gape produced.
-_ld = sorted(((depth(p), round(a, 4), round(n_, 4), tuple(round(float(c), 4) for c in p)) for a, n_, p in lin_raw))[:5]
+_ld = sorted((depth(p), tuple(round(float(c), 4) for c in p)) for p in lin_raw)[:5]
 lining_depth = _ld[0][0]
 assert lining_depth > .0005, ('the oral lining leaves the head', _ld)
 
