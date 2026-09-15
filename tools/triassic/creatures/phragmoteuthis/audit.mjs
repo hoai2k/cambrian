@@ -296,16 +296,75 @@ for (const c of ['Attack', 'Heavy']) {
     `${c}: the tentacles must out-reach the arms (${crown(c).minTentacleTravel.toFixed(3)} vs ${crown(c).meanArmTravel.toFixed(3)})`);
   need(anchor(c).anchor_attack_primary > 2 * anchor(c).anchor_mouth,
     `${c}: the attack anchor must out-travel the mouth (${anchor(c).anchor_attack_primary.toFixed(3)} vs ${anchor(c).anchor_mouth.toFixed(3)})`);
+  // A floor under the ratio as well. Most of what the mouth socket travels in these clips is the
+  // crown's own protraction, which carries the socket and the tentacle tip alike, so the ratio on
+  // its own would be satisfied by a tentacle that merely came along for the ride.
+  need(anchor(c).anchor_attack_primary > 0.55,
+    `${c}: the attack anchor must travel (${anchor(c).anchor_attack_primary.toFixed(3)})`);
 }
 need(anchor('Grab').anchor_grasp > 0.2, `Grab: the grasp anchor must reach (${anchor('Grab').anchor_grasp.toFixed(3)})`);
-// The beak.
-for (const b of report.beak) need(b.minRadians > -0.02, `${b.clip}: the beak must not close past the bind pose`);
-for (const c of ['Swim', 'Sprint', 'TurnLeft', 'TurnRight', 'Dive', 'Rise']) {
-  need(beak(c).maxOpenRadians < 0.05, `${c}: the beak must stay shut (${beak(c).maxOpenRadians.toFixed(3)})`);
+// **The beak is not animated, in any clip, and that is the check.** It sits at the bottom of a well
+// of arms and is never on screen; what this animal reaches with, catches with and is read by is the
+// crown and its two tentacles, and `anchor_mouth` riding a still `jaw` is the whole of what the game
+// needs to know about its mouth. A gape authored down there is motion spent where nothing can see
+// it, and it stretches the oral lining for nothing.
+for (const b of report.beak) {
+  need(Math.abs(b.maxOpenRadians) < 1e-4 && Math.abs(b.minRadians) < 1e-4,
+    `${b.clip}: the beak must not be animated (${b.maxOpenRadians.toFixed(5)} / ${b.minRadians.toFixed(5)})`);
+  need(b.mouthSocketTravelInSkullFrame < 1e-4,
+    `${b.clip}: the mouth socket must hold still in the skull's own frame (${b.mouthSocketTravelInSkullFrame.toFixed(5)})`);
 }
-need(beak('Bite').maxOpenRadians > 0.45, 'Bite must open the beak');
-for (const c of ['Attack', 'Eat']) need(beak(c).maxOpenRadians > 0.25, `${c} must open the beak`);
-need(beak('Bite').mouthSocketTravelInSkullFrame > 0.02, 'the mouth socket must travel with the beak');
+
+// --- 6. a grab reaches and shuts; a hit jabs and hauls back ---------------------------------------
+// The shipped Attack shot the tentacles out on the *windup* and then spent the whole strike hauling
+// them back in: the attack anchor was furthest forward at u=0.25 and furthest back at u=0.44, 1.45
+// units of travel that is almost all retraction. That is a jab that has already missed, and it is
+// what the note this was raised on called "hits with tentacles" against the "lithe grab forward" it
+// should be. Since the heavy is a *hook latch*, the move is a grab and the grab has three parts.
+//
+// **What cannot be measured here is a forward swing**, and finding that out is most of the work.
+// These arms lie along the animal's own axis at rest with their tips at the very front of its
+// bounding box, so no rotation carries a tip further forward: swinging one "forward" about the crown
+// tangent lifts it over the head, and converging it past the axis brings it down the other side.
+// Two corrections measured exactly that (0.048 forward against 0.321 back, then 0.099 against
+// 0.120) before the geometry was read rather than argued with. So the three parts are measured as
+// what they actually are.
+report.strike = [];
+for (const c of ['Attack', 'Bite', 'Grab', 'Heavy']) {
+  const rows = track(c, ['anchor_attack_primary', 'head', 'arm_03_06', 'arm_04_06'], 48);
+  // 1. The crown protracts. `head` is the parent of all twelve appendages, so its own forward
+  //    travel is the reach, and it has to come after the gather rather than with it.
+  const hz = rows.map((r) => r.head[2]);
+  const protraction = Math.max(...hz) - hz[0];
+  const gatherBack = hz[0] - Math.min(...hz);
+  const reachPhase = rows[hz.indexOf(Math.max(...hz))].phase;
+  const gatherPhase = rows[hz.indexOf(Math.min(...hz))].phase;
+  // 2. No tentacle whips back. Measured in the head's own frame, so the protraction cannot pay for
+  //    a retraction: the tip's forward extent relative to the crown must never fall far below where
+  //    it rests. This is the number the old clip failed, and it failed it by a body's width.
+  const local = (r, n) => r[n][2] - r.head[2];
+  const whip = Math.max(...['arm_03_06', 'arm_04_06'].map((n) =>
+    local(rows[0], n) - Math.min(...rows.map((r) => local(r, n)))));
+  // 3. The grab shuts. The two tentacle tips must end up closer together than they opened.
+  const spanOf = (r) => Math.hypot(...[0, 1, 2].map((k) => r.arm_03_06[k] - r.arm_04_06[k]));
+  const spans = rows.map(spanOf);
+  const opened = Math.max(...spans);
+  const shut = Math.min(...spans.slice(Math.floor(spans.indexOf(opened))));
+  report.strike.push({ clip: c, protraction, gatherBack, reachPhase, gatherPhase,
+    tentacleWhipBackInCrownFrame: whip, tentacleSpanOpen: opened, tentacleSpanShut: shut });
+  // A twentieth of a body length. It is deliberately not larger: the head is the crown's
+  // parent and the skin between it and the mantle pays for every unit of it -- at 0.36 the
+  // head/body junction tore 5.77x against this body's standing 5.37x, and at 0.25 it is 4.28x.
+  need(protraction > 0.22, `${c}: the crown must be driven forward (${protraction.toFixed(3)})`);
+  need(protraction > 3 * gatherBack,
+    `${c}: the crown must go forward rather than back (forward ${protraction.toFixed(3)} vs back ${gatherBack.toFixed(3)})`);
+  need(reachPhase > gatherPhase,
+    `${c}: the reach must come after the gather (reach at ${reachPhase.toFixed(2)}, gather at ${gatherPhase.toFixed(2)})`);
+  // A quarter of the tentacle's own forward extent (2.02 units from the crown at rest). The
+  // shipped clips gave up 1.07, 1.03 and 0.76 of it on Attack, Heavy and Grab.
+  need(whip < 0.50, `${c}: the tentacles must not whip back into the crown (${whip.toFixed(3)})`);
+  need(opened - shut > 0.18, `${c}: the grab must shut (opened ${opened.toFixed(3)}, shut ${shut.toFixed(3)})`);
+}
 
 assert.equal(problems.join(' | '), '', 'measured performance checks');
 console.log(JSON.stringify({
@@ -317,5 +376,6 @@ console.log(JSON.stringify({
   crown: report.crown.filter((c) => ['Swim', 'Sprint', 'Attack', 'Heavy', 'Grab'].includes(c.clip)),
   anchorTravel: report.anchorTravel.filter((r) => ['Swim', 'Attack', 'Heavy', 'Grab', 'Bite'].includes(r.clip)),
   beak: report.beak.filter((b) => ['Idle', 'Swim', 'Bite', 'Attack', 'Eat', 'Heavy'].includes(b.clip)),
+  strike: report.strike,
   exactRigParity: true, exactAnimationParity: true, exactAnchorParity: true,
 }, null, 2));

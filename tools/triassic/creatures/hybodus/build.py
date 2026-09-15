@@ -1159,84 +1159,51 @@ for p in lining.data.polygons:
     p.use_smooth = True
 oralparts = [lining]
 
-# The hinge plug. The cut runs right across the cheek, and when the jaw swings the two *outer*
-# surfaces separate: what shows between them is the inside of the head, and under a single-sided
-# draw the inside of the head is not there. A lining cannot close that, because the gap is outside
-# the mouth. What closes it is filling the head's own section behind the cut -- Placodus' hinge
-# envelope, but shaped like the head rather than like a ball. Wide and deep as the section at the
-# pivot, short along the body, rigid on the skull so it cannot shear, and fitted to the silhouette
-# so it can never come out through the cheek.
-_hb, _ht = head_z(HINGE_Y)
-_hz = min(max(seam_z(HINGE_Y), _hb + .3 * (_ht - _hb)), _ht - .3 * (_ht - _hb))
-# A floor in body-length terms as well as a fraction of the head: on a needle-snouted
-# fish the section at the pivot is small and a plug scaled to it has no reach at all.
-# Whatever sticks out is pulled back in below, so a generous nominal size costs nothing.
-_hplug_w = max(head_half_width(HINGE_Y), .055 * RAW_LENGTH)
-bpy.ops.mesh.primitive_uv_sphere_add(segments=18, ring_count=10,
-                                     location=tx((0., HINGE_Y, _hz)))
-hinge = bpy.context.object
-hinge.name = 'Seated jaw hinge tissue'
-hinge.scale = (1.45 * _hplug_w * SCALE, 3.60 * _hplug_w * SCALE, 1.15 * (_ht - _hb) * SCALE)
-bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-for v in hinge.data.vertices:
-    v.co = hinge.matrix_world @ v.co
-hinge.location = (0, 0, 0)
-hinge.data.materials.clear()
-hinge.data.materials.append(liningmat)
-_huv = hinge.data.uv_layers.new(name='UVMap')
-for poly in hinge.data.polygons:
-    for li in poly.loop_indices:
-        q = Vector(hinge.data.vertices[hinge.data.loops[li].vertex_index].co[:]) / SCALE
-        hit = src_bvh.find_nearest(q)
-        sm = hit_uv(hit[0], hit[2]) if hit[0] is not None else None
-        _huv.data[li].uv = (sm.x, sm.y) if sm else (0., 0.)
-_hcol = hinge.data.color_attributes.new(name='Color', type='FLOAT_COLOR', domain='POINT')
-for item in _hcol.data:
-    item.color = (1, 1, 1, 1)
-for n in ['skull', 'jaw']:
-    hinge.vertex_groups.new(name=n)
-for v in hinge.data.vertices:
-    hinge.vertex_groups['skull'].add([v.index], 1., 'REPLACE')
-    hinge.vertex_groups['jaw'].add([v.index], 0., 'REPLACE')
-for poly in hinge.data.polygons:
-    poly.use_smooth = True
-_hcentre = tx((0., HINGE_Y, _hz))
-
-
-def _hinge_clear(f):
-    """Containment against the animal's own silhouette, not against the closed surface: a point in
-    the mouth's lumen is outside the *solid* by construction and reads as a failure, which is how
-    the first fit collapsed to a tenth of the size it could have been."""
-    worst = 1e9
-    for v in hinge.data.vertices:
-        x, y, z = ((_hcentre + (Vector(v.co[:]) - _hcentre) * f) / SCALE)
-        bot, top = head_z(y)
-        worst = min(worst, head_half_width(y) - abs(x), z - bot, top - z)
-    return worst
-
-
-# Fitted vertex by vertex rather than scaled as a whole. Scaled down until the worst vertex is
-# inside, the plug shrinks to a third of the head and stops covering the wedge; pulled in only
-# where it actually sticks out, it fills the head everywhere it can and cannot show anywhere.
-_pulled = 0
-for v in hinge.data.vertices:
-    for _ in range(40):
-        x, y, z = Vector(v.co[:]) / SCALE
-        bot, top = head_z(y)
-        if min(head_half_width(y) - abs(x), z - bot, top - z) > .004:
-            break
-        v.co = _hcentre + (Vector(v.co[:]) - _hcentre) * .94
-        _pulled += 1
-_hfit = 1.
-hinge_report = {'inwardPullStepsToFitInsideTheSilhouette': _pulled,
-                'plugVertices': len(hinge.data.vertices),
-                'nominalRadiiUnits': [round(1.45 * _hplug_w * SCALE, 4),
-                                      round(3.60 * _hplug_w * SCALE, 4),
-                                      round(1.15 * (_ht - _hb) * SCALE, 4)],
-                'clearanceInsideSilhouetteRaw': round(_hinge_clear(1.), 5),
-                'note': 'rigid on the skull, shaped like the head section at the pivot rather than '
-                        'like a ball, and fitted so it cannot come out through the cheek.'}
-oralparts.append(hinge)
+# **There is no hinge plug on this animal, and the measurements say there should not be.**
+#
+# The idea was Placodus' hinge envelope: the cut runs right across the cheek, and when the jaw
+# swings the two outer surfaces separate, so something has to stand behind the gap. What this
+# builder shipped was a uv-sphere scaled to `(1.45 * headHalfWidth, 3.60 * headHalfWidth,
+# 1.15 * headDepth)` -- the *along-body* radius given the large factor, where every plug in the kit
+# gives it the small one (`(halfWidth * .84, .030, halfDepth * .84)`) -- and "fitted" against a test
+# that could not fail: `head_half_width` and `head_z` are `np.interp`, which clamps outside its
+# table rather than refusing, so a point a quarter of a body length ahead of the snout was measured
+# against the section at the snout tip and passed. The plug reported a clearance of +0.004 while
+# standing 1.29 units clear of the nose with 126 of its 207 vertices outside the animal, and it is
+# the pale spike and the bloated white shoulder this body shipped with.
+#
+# Rebuilt honestly -- bisected back to the skin by ray parity against the closed intake surface, or
+# against the lining sac where the lumen is -- it does not earn its place. Measured at `Attack@0.43`
+# with `tools/triassic/gape-solid.py`:
+#
+#   giant plug, 126 of 207 vertices outside the animal     1 px seen through the body
+#   contained plug, 0.6x the mouth's own length          666 px
+#   no plug at all                                       667 px
+#
+# One pixel. Sized up to 1.8x the mouth's own length a contained plug does close most of it (44 px),
+# but only by filling the volume the mandible occupies in the generation's gaping bind pose -- and
+# the mandible rises through that volume in every clip, so the plug comes out along the lip and
+# under the gills as grey slabs. Weighting its lower half onto `jaw` does not save it: below the cut
+# the plug is as wide as the head and the mandible is not, so what swings out is the cheek half
+# (117 px and the slabs together). Confined above the cut it is invisible and seals 42 px of 667.
+#
+# What is actually left at full gape is the cut's own rim, which is one polygon thick and at a
+# grazing angle *is* the silhouette -- the fault `T.rim_flange` exists for, and which these two
+# self-contained builders have no equivalent of. The shipped body material is double-sided, so none
+# of it is drawn at runtime; the cull is the worst case a single-sided renderer would draw. Folding
+# those rims is the fix, and it is work on the mouth rather than on the animal's outline.
+hinge_report = {
+    'plug': 'none',
+    'why': 'the plug this builder shipped was fitted against an np.interp clearance test that '
+           'clamps rather than refusing, so it passed while standing 1.29 units clear of the '
+           'snout with 126 of its 207 vertices outside the animal; it is the spike and the white '
+           'shoulder in the delivered renders.',
+    'seenThroughTheBodyAtAttack043': {'giantPlugOutsideTheAnimal': 1, 'containedPlugAt0.6x': 666,
+                                      'containedPlugAt1.8x': 44, 'roofOnlyPlug': 625, 'noPlug': 667},
+    'whatIsLeft': 'the cut rim, one polygon thick and at a grazing angle, which a fold closes and '
+                  'a plug can only mask by standing outside the skin. The shipped body material is '
+                  'double-sided, so none of it is drawn at runtime.',
+}
 
 
 
