@@ -400,6 +400,92 @@ def albedo_mouth_line(o, luminance_at, y_lo, y_hi, centre_z, half_depth, station
     return rows
 
 
+def painted_line(o, luminance_at, centre_z, half_depth, y_lo, y_hi, u_lo=-.95, u_hi=.15,
+                 stations=32, band=.010, jump=1.2, filter_width=(.12, .35)):
+    """Read a painted mouth line as one **continuous curve** rather than station by station.
+
+    `albedo_mouth_line` walks up from the belly and takes the first row below mid luminance, and
+    that is the right reading on a cleanly countershaded animal. It is not a reading at all on a
+    *blotched* one: Rhaeticosaurus' jaw is white with black speckles on it, and the walk stops at
+    the first speckle, so the two flanks disagreed by a third of the head's radius and the line
+    wandered by 0.13 of a radius between neighbouring stations. Keichousaurus records a third case
+    in the same family -- the method finding the countershading boundary instead of the lip -- and
+    the cure there was to say which *feature* was wanted. This says the same thing geometrically.
+
+    What a generation paints is a **thin dark line with lighter skin immediately above and below
+    it**, running the length of the head, so:
+
+    * each station's flank is resampled onto a normalised height ``u = (z - cz) / halfDepth``;
+    * a matched filter scores exactly that shape -- the mean luminance of the bands
+      `filter_width` of a radius above and below, less twice the luminance at u. A broad blotch
+      scores nothing, because it darkens the comparison bands as well as the centre;
+    * and the answer is the best-scoring **path** along the head under a penalty on how far it may
+      move between neighbouring stations, so one bad station cannot take the line with it.
+
+    `u_lo`/`u_hi` bound the search, and the bound is load-bearing rather than tidy: the eye and the
+    countershading boundary both lie above the lip and both outscore it, and an unbounded read on
+    Rhaeticosaurus climbed off the jaw corner and followed the countershading back along the neck.
+
+    Returns a row per station with each flank's height, their mean, and their disagreement over the
+    local radius -- which is the number that says whether the reading can be trusted.
+    """
+    co = np.array([v.co[:] for v in o.data.vertices])
+    uvs = vertex_uvs(o)
+    lum = np.array([luminance_at(*uvs.get(i, (0., 0.))) for i in range(len(co))])
+    U = np.linspace(u_lo, u_hi, max(8, int(round((u_hi - u_lo) / .05)) + 1))
+    profiles, keep = {1: [], -1: []}, []
+    for y in np.linspace(y_lo, y_hi, stations):
+        m = np.abs(co[:, 1] - y) < band
+        if m.sum() < 14:
+            continue
+        midx = np.median(co[m, 0])
+        got = {}
+        for sgn in (1, -1):
+            f = m & (np.sign(co[:, 0] - midx) == sgn)
+            if f.sum() < 7:
+                continue
+            q, l = co[f], lum[f]
+            u = (q[:, 2] - centre_z(y)) / max(half_depth(y), 1e-6)
+            order = np.argsort(u)
+            got[sgn] = np.interp(U, u[order], l[order])
+        if len(got) == 2:
+            keep.append(float(y))
+            for s in (1, -1):
+                profiles[s].append(got[s])
+    if len(keep) < 6:
+        return []
+    du = U[1] - U[0]
+    lo, hi = max(1, int(round(filter_width[0] / du))), max(2, int(round(filter_width[1] / du)))
+    paths = {}
+    for s in (1, -1):
+        P = np.array(profiles[s])
+        score = np.zeros_like(P)
+        for k in range(P.shape[1]):
+            above = P[:, min(k + lo, P.shape[1] - 1):min(k + hi, P.shape[1] - 1) + 1]
+            below = P[:, max(k - hi, 0):max(k - lo, 0) + 1]
+            score[:, k] = above.mean(1) + below.mean(1) - 2 * P[:, k]
+        cost, back = score.copy(), np.zeros_like(score, dtype=int)
+        for i in range(1, cost.shape[0]):
+            for k in range(cost.shape[1]):
+                prev = cost[i - 1] - jump * np.abs(np.arange(cost.shape[1]) - k) * du
+                j = int(np.argmax(prev))
+                back[i, k] = j
+                cost[i, k] += prev[j]
+        k = int(np.argmax(cost[-1]))
+        idx = [k]
+        for i in range(cost.shape[0] - 1, 0, -1):
+            k = back[i, k]
+            idx.append(k)
+        paths[s] = [float(U[j]) for j in idx[::-1]]
+    rows = []
+    for i, y in enumerate(keep):
+        a, b = paths[1][i], paths[-1][i]
+        rows.append({'y': y, 'left': a, 'right': b, 'u': (a + b) / 2,
+                     'z': float(centre_z(y)) + (a + b) / 2 * float(half_depth(y)),
+                     'disagreementOverRadius': abs(a - b)})
+    return rows
+
+
 def bisect_on_curve(o, seam, y_back, y_front, margin=.03):
     """Take the mouth cut on the *curve* the mouth actually is. A curve cannot be a bisection
     plane, so the head is sheared vertically by -seam(y), which carries the curve exactly onto
