@@ -13,6 +13,7 @@ import triassicPending from '../content/triassic/pending-refinements.json';
 import previewBodies from '../content/triassic/preview-bodies.json';
 import reviewBodies from '../content/triassic/review-bodies.json';
 import expansion from '../content/triassic/expansion.json';
+import basePoses from '../content/triassic/base-poses.json';
 import { DEVONIAN_SPECIMENS } from '../content/devonian/specimens';
 import { DEVONIAN_CREATURES } from '../content/devonian/creatures';
 import devonianPending from '../content/devonian/pending-refinements.json';
@@ -86,6 +87,17 @@ export interface ViewerSpecimen {
    */
   generatedSha256?: string;
   /**
+   * The body's *original* pose — the untouched Tripo generation — where its builder unbent or
+   * straightened the mesh before binding. The shipped body then rests in a shape the generation
+   * never held, which is the right correction and is recorded in each `validation.json`, but there
+   * was no way to look at what changed: the shipped body is all that is in `public/`, and a preview
+   * is retired the day an animal ships. It carries no rig, so it sits still — a thing to compare
+   * against, not to animate.
+   */
+  origPose?: string;
+  /** What the builder moved, in words, for the hint beside the control. */
+  origPoseChanged?: readonly string[];
+  /**
    * True for a subject that is being built but is on no era's roster — see
    * `src/content/triassic/expansion.json`. It borrows no body, because it is in no sea: where it
    * ends up is the open question, so the viewer must not offer a "borrowed body in play" stage
@@ -115,6 +127,9 @@ const TRIASSIC_PUPPETS = new Map(TRIASSIC_SPECIMENS.filter(c => c.category === '
  * points at the real files, and it exists because without it a finished animal is invisible to the
  * person whose job is to approve it. An entry retires itself when the animal ships.
  */
+/** The untouched generation of each body whose builder moved the mesh before binding. */
+const TRIASSIC_ORIG_POSE = new Map((basePoses as { id: string; model: string; changed: string[] }[])
+  .map(b => [b.id, b]));
 const TRIASSIC_REVIEW = new Map((reviewBodies as { id: string; model: string; puppet: string | null; lod: string | null; clips: string[] }[])
   .map(b => [b.id, b]));
 /**
@@ -181,6 +196,8 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     previewYaw: TRIASSIC_PREVIEW.get(c.id)?.yaw,
     previewLength: TRIASSIC_PREVIEW.get(c.id)?.lengthUnits ?? undefined,
     generatedSha256: TRIASSIC_PREVIEW.get(c.id)?.sha256,
+    origPose: TRIASSIC_ORIG_POSE.get(c.id)?.model,
+    origPoseChanged: TRIASSIC_ORIG_POSE.get(c.id)?.changed,
     inReview: TRIASSIC_REVIEW.has(c.id),
     looping: ['Idle', 'Swim', 'Crawl', 'Guard', 'Eat', ...(c.abilityLoop ? ['Ability'] : [])],
   })),
