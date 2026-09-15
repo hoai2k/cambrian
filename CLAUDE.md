@@ -347,6 +347,17 @@ unless the user explicitly asks for a PR. Steps:
   interpenetrate when they are first brought together, the oral cavity Tripo modelled has to fold
   rather than be built, and closing is a large jaw rotation, so the pose the animal spends almost
   all its time in becomes the most deformed one.
+- **A joint that owns no skin is a silent defect, and it makes other measurements lie.** Hybodus'
+  `caudal_upper` and Saurichthys' `pelvic_L`, `pelvic_R` and `caudal_lower` each owned *zero*
+  vertices: their clips swung joints that moved nothing, and the per-limb swept angles those
+  builders recorded were measurements of nothing at all. Nothing caught it — the paired audits check
+  parity, `skin-tears.mjs` checks edges that exist, and a weightless joint appears in neither. The
+  causes are anatomical rather than careless, which is why reading the weight table would not have
+  found them either: a heterocercal tail's long lobe carries the vertebral column and reads as
+  trunk, and a pelvic bone at 0.63 of the body cannot claim a blade sitting at 0.50-0.60.
+  `tools/triassic/idle-bones.mjs --all` now runs inside `npm run triassic` over every delivered
+  body. The rig's `root` is excluded: it carries the body rather than skin and the clip contract
+  forbids it moving, so it owns nothing by design on every body in every era.
 - **A weighting scheme is shaped by the body it was written for.** Nothosaurus' is the era's
   cleanest at 2.98x and the obvious one to copy, and copied unchanged onto Henodus it tore to
   **64.9x** — its "outboard of |y| 0.09 means on the limb" test assumes a narrow trunk, and Henodus'
