@@ -19,6 +19,22 @@ def pose(clip,t):
  s.frame_set(round(t*30))
 def render(file,w=800,h=600,loc=(7,-5,4.2),target=(0,0,0),scale=6.8):
  cam.location=loc;cam.rotation_euler=(Vector(target)-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.ortho_scale=scale;s.render.resolution_x=w;s.render.resolution_y=h;s.render.filepath=str(file);bpy.ops.render.render(write_still=True)
+# The webbing is judged by whether any background shows between the digits, so the paddles get
+# their own cameras and a saturated ground: a hole is then unmistakable rather than a dark patch.
+# Review-space coordinates are the builder's raw frame permuted and scaled: (y, -x, z) * 5.
+FEET={'foreL':(1.214,-1.335,-.307),'foreR':(-1.384,-1.195,-.272),
+      'hindL':(1.213,.365,-.366),'hindR':(-1.198,.392,-.402)}
+if '--feet-only' in sys.argv:
+ s.render.film_transparent=False;s.view_settings.view_transform='Standard'
+ bg=s.world.node_tree.nodes['Background'];bg.inputs[0].default_value=(1,0,1,1);bg.inputs[1].default_value=1.
+ for o in [x for x in s.objects if x.type=='LIGHT']:o.data.energy*=.55
+ pose('Idle',0)
+ for name,c in FEET.items():
+  T=Vector(c)
+  for vn,d in [('top',(0,0,1)),('under',(0,0,-1)),('out',(1 if name.endswith('L')else -1,0,.35))]:
+   dv=Vector(d).normalized()
+   render(REVIEW/('feet-%s-%s.png'%(name,vn)),800,800,T+dv*3,T,1.05)
+ sys.exit(0)
 if '--gait-only' in sys.argv:
  for clip,t in [('Swim',0),('Swim',.612),('Swim',1.224),('Swim',1.512),('Sprint',0),('Sprint',.408),('Sprint',.816),('Sprint',1.008)]:
   pose(clip,t);render(REVIEW/(clip+'-'+str(t)+'-top.png'),1000,750,(0,0,8))

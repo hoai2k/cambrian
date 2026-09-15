@@ -5,6 +5,7 @@ import bpy,bmesh,math,json,os,struct,hashlib,shutil,sys
 import numpy as np
 from mathutils import Vector,Matrix,Quaternion
 from mathutils.bvhtree import BVHTree
+from mathutils.geometry import barycentric_transform
 from math import sin,cos,pi
 HERE=os.path.dirname(os.path.abspath(__file__)); ROOT=os.path.abspath(os.path.join(HERE,'../../../..'))
 LOCAL=os.path.join(ROOT,'local/triassic-authoring/nothosaurus'); OUT=os.path.join(ROOT,'public/assets/triassic/creatures'); os.makedirs(LOCAL,exist_ok=True);os.makedirs(OUT,exist_ok=True)
@@ -81,6 +82,27 @@ removed=sum(len(c)for c in components if len(c)<8)
 for c in components:
  if len(c)<8:bmesh.ops.delete(bm,geom=c,context='VERTS')
 bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces));bm.to_mesh(auth.data);bm.free()
+# Five slivers are all that is open in the welded intake: five two-edge loops of perimeter 0.0013
+# to 0.0021 raw (0.006-0.011 in engine units), on the flank and the feet, and nothing to do with
+# the gaps between the toes, which are absent geometry rather than an open boundary. Each is a
+# hairline crack whose two sides are separate vertices a few ten-thousandths apart, so naming the
+# missing triangle only moves the crack along; welding at SLIVER_WELD closes all five, and it is
+# a second pass rather than a wider first one because the 1e-6 weld above is about texture seams.
+# It merges six vertices of 9,608 and drops twelve degenerate faces: 0.0025 engine units, which
+# is under three millimetres on a six-metre animal.
+SLIVER_WELD=5e-4
+bm=bmesh.new();bm.from_mesh(auth.data)
+sliver_report={'openEdgesBefore':len([e for e in bm.edges if len(e.link_faces)<2]),
+               'perimeter':round(sum(e.calc_length()for e in bm.edges if len(e.link_faces)<2),6),
+               'verticesBefore':len(bm.verts),'weld':SLIVER_WELD}
+bmesh.ops.remove_doubles(bm,verts=list(bm.verts),dist=SLIVER_WELD)
+bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces))
+sliver_report['openEdgesAfter']=len([e for e in bm.edges if len(e.link_faces)<2])
+sliver_report['verticesAfter']=len(bm.verts)
+sliver_report['verticesMerged']=sliver_report['verticesBefore']-sliver_report['verticesAfter']
+bm.to_mesh(auth.data);bm.free()
+assert sliver_report['openEdgesAfter']==0,sliver_report
+assert sliver_report['verticesMerged']<=12,sliver_report
 source_triangles=len(auth.data.polygons)
 # Preserve the full original 2K albedo. White COLOR_0 enables runtime recoloring without
 # multiplying the texture by a second baked copy of its own pigment. The generated normal
@@ -101,6 +123,198 @@ def sample_albedo(u,v):
  rgb=(pixels[y0%h,x0%w,:3]*(1-fx)*(1-fy)+pixels[y0%h,(x0+1)%w,:3]*fx*(1-fy)+pixels[(y0+1)%h,x0%w,:3]*(1-fx)*fy+pixels[(y0+1)%h,(x0+1)%w,:3]*fx*fy)
  linear=np.where(rgb<=.04045,rgb/12.92,((rgb+.055)/1.055)**2.4)
  return (*[float(x)for x in linear],1.)
+# --- The webbing -------------------------------------------------------------------------------
+# `docs/triassic/research.md` asks for "webbed, paddle-like feet with retained digits" and the
+# generation delivered the digits without the web: rendered against a saturated ground, all four
+# paddles showed background straight through the notches between the toes, and the hind feet read
+# as clawed hands. The gaps are absent geometry, not open boundaries -- the welded intake carries
+# only the five slivers filled above -- so the fix is a membrane, authored here and seated on the
+# digits it spans.
+#
+# It is authored, but its *shape* is measured off the foot rather than invented: each paddle is
+# projected onto the horizontal plane (all four sit within 15 degrees of it), its silhouette is
+# rasterised, and the web is the morphological closing of that silhouette minus the silhouette --
+# that is, exactly the notches between the toes, filled by a disc of WEB_CLOSE rolling over the
+# outline, which is what leaves a webbed foot its scalloped free edge. The membrane's two faces
+# are the paddle's own upper and lower surfaces extrapolated off the digits and relaxed between
+# them, so the web meets each digit at the digit's own surface and curves as the foot curves, and
+# its thickness tapers to WEB_TAPER of the local flesh at the free edge. It is seated rather than
+# butted: a collar of cells over the digits themselves is carried at WEB_SEAT of their thickness,
+# so the sheet runs *inside* the toe and no seam shows where the two meet.
+#
+# It wears the animal's own skin: every web vertex takes its UV from the nearest point on the
+# original surface through that triangle's own barycentric map, and COLOR_0 is white as everywhere
+# else, so the membrane samples the same 2K Tripo albedo as the toes on either side of it. Nothing
+# here is a flat-shaded patch in a pored hide, and no UVs are lost anywhere: the original mesh is
+# not remeshed, only added to.
+WEB_CLOSE=.026      # rolling-disc radius: the widest notch between two digits it has to bridge
+WEB_CELL=.0018      # raster cell, ~60 across a paddle
+WEB_TAPER=.28       # free-edge thickness as a fraction of the flesh the web grows out of
+WEB_COLLAR=9.0      # cells of digit the membrane is seated into
+WEB_SEAT=.60        # how far inside the digit's own surface that seated collar runs
+WEB_ALONG=-.015     # no web behind this point along the limb, so the ankle is not bridged
+WEB_DECIMATE=.26
+WEB_PIN=.0016      # a web vertex this close to the original surface keeps its measured UV
+WEB_UV_RELAX=120   # passes relaxing the rest of the sheet's UVs to those pinned edges
+WEB_FOOT_R=.100
+WEB_BACK=.030
+# wrist and paddle joint of each limb, the same points the rig's limb chain is built on
+WEB_PADDLES={'foreL':((.240,.224,-.060),(.238,.280,-.061)),
+             'foreR':((.240,-.224,-.060),(.238,-.315,-.061)),
+             'hindL':((-.087,.224,-.060),(-.094,.275,-.061)),
+             'hindR':((-.087,-.224,-.060),(-.094,-.265,-.061))}
+
+
+def _disc(r):
+ n=int(math.ceil(r));return[(dx,dy)for dx in range(-n,n+1)for dy in range(-n,n+1)if dx*dx+dy*dy<=r*r]
+
+
+def _shift_or(mask,offsets):
+ H,W=mask.shape;out=np.zeros_like(mask)
+ for dx,dy in offsets:
+  xs0,xs1=max(0,dx),min(W,W+dx);ys0,ys1=max(0,dy),min(H,H+dy)
+  out[ys0:ys1,xs0:xs1]|=mask[ys0-dy:ys1-dy,xs0-dx:xs1-dx]
+ return out
+
+
+def _cell_distance(mask):
+ d=np.where(mask,0,1<<20).astype(np.int32);cur=mask.copy()
+ for k in range(1,80):
+  nxt=_shift_or(cur,[(1,0),(-1,0),(0,1),(0,-1)]);new=nxt&~cur
+  if not new.any():break
+  d[new]=k;cur=nxt
+ return d
+
+
+def _spread(fld,where,nx,ny,passes):
+ for _ in range(passes):
+  acc=np.zeros_like(fld);cnt=np.zeros(fld.shape)
+  for dx,dy in[(1,0),(-1,0),(0,1),(0,-1)]:
+   sh=np.full_like(fld,np.nan);xs0,xs1=max(0,dx),min(nx,nx+dx);ys0,ys1=max(0,dy),min(ny,ny+dy)
+   sh[ys0:ys1,xs0:xs1]=fld[ys0-dy:ys1-dy,xs0-dx:xs1-dx]
+   m=~np.isnan(sh)&where;acc[m]+=sh[m];cnt[m]+=1
+  ok=where&(cnt>0);fld[ok]=acc[ok]/cnt[ok]
+
+
+def web_paddle(name,wrist,tip,P,polys):
+ """One paddle's membrane, as a closed slab over the notches between its digits."""
+ W0,T0=np.array(wrist),np.array(tip);axis=(T0-W0)/np.linalg.norm(T0-W0)
+ inside=(np.linalg.norm(P-T0,axis=1)<WEB_FOOT_R)&((P-W0)@axis>-WEB_BACK)
+ faces=[f for f in polys if all(inside[v]for v in f)]
+ Q=P[inside];lo=Q[:,:2].min(0)-WEB_CLOSE*1.5;hi=Q[:,:2].max(0)+WEB_CLOSE*1.5
+ nx=int(np.ceil((hi[0]-lo[0])/WEB_CELL))+1;ny=int(np.ceil((hi[1]-lo[1])/WEB_CELL))+1
+ occ=np.zeros((ny,nx),dtype=bool);zmax=np.full((ny,nx),-1e9);zmin=np.full((ny,nx),1e9)
+ rng=np.random.default_rng(3)
+ for f in faces:
+  tri=P[list(f[:3])];area=np.linalg.norm(np.cross(tri[1]-tri[0],tri[2]-tri[0]))/2
+  n=int(min(600,max(8,area/(WEB_CELL*WEB_CELL)*6)));u=rng.random((n,2));flip=u.sum(1)>1;u[flip]=1-u[flip]
+  pts=tri[0]+u[:,:1]*(tri[1]-tri[0])+u[:,1:]*(tri[2]-tri[0])
+  ix=((pts[:,0]-lo[0])/WEB_CELL).astype(int);iy=((pts[:,1]-lo[1])/WEB_CELL).astype(int)
+  ok=(ix>=0)&(ix<nx)&(iy>=0)&(iy<ny);ix,iy,z=ix[ok],iy[ok],pts[ok,2]
+  occ[iy,ix]=True;np.maximum.at(zmax,(iy,ix),z);np.minimum.at(zmin,(iy,ix),z)
+ R=WEB_CLOSE/WEB_CELL
+ closed=~_shift_or(~_shift_or(occ,_disc(R)),_disc(R))
+ GX,GY=np.meshgrid(lo[0]+(np.arange(nx)+.5)*WEB_CELL,lo[1]+(np.arange(ny)+.5)*WEB_CELL)
+ closed&=((GX-W0[0])*axis[0]+(GY-W0[1])*axis[1])>WEB_ALONG
+ web=closed&~occ
+ if not web.any():return None,{'webCells':0}
+ top=np.where(occ,zmax,np.nan);bot=np.where(occ,zmin,np.nan);cur=occ.copy()
+ for _ in range(90):
+  grow=_shift_or(cur,[(1,0),(-1,0),(0,1),(0,-1)])&closed&~cur
+  if not grow.any():break
+  _spread(top,grow,nx,ny,1);_spread(bot,grow,nx,ny,1);cur=cur|grow
+ _spread(top,web,nx,ny,40);_spread(bot,web,nx,ny,40)
+ mid=(top+bot)/2;half=(top-bot)/2
+ dist=_cell_distance(occ).astype(float);dmax=max(1.,float(dist[web].max()))
+ half=half*np.clip(1.-(1.-WEB_TAPER)*dist/dmax,WEB_TAPER,1.)
+ collar=occ&_shift_or(web,_disc(WEB_COLLAR));patch=web|collar
+ half=np.where(collar,half*WEB_SEAT,half)
+ nodes={};verts=[];quads=[]
+
+ def node(ix,iy,side):
+  key=(ix,iy,side)
+  if key in nodes:return nodes[key]
+  zs=[mid[cy,cx]+side*half[cy,cx]for cx,cy in[(ix-1,iy-1),(ix,iy-1),(ix-1,iy),(ix,iy)]
+      if 0<=cx<nx and 0<=cy<ny and patch[cy,cx]and not np.isnan(mid[cy,cx])]
+  i=len(verts);verts.append((lo[0]+ix*WEB_CELL,lo[1]+iy*WEB_CELL,float(np.mean(zs))if zs else 0.))
+  nodes[key]=i;return i
+
+ live=[(int(cy),int(cx))for cy,cx in np.argwhere(patch)if not np.isnan(mid[cy,cx])]
+ for cy,cx in live:
+  quads.append((node(cx,cy,1),node(cx+1,cy,1),node(cx+1,cy+1,1),node(cx,cy+1,1)))
+  quads.append((node(cx,cy+1,-1),node(cx+1,cy+1,-1),node(cx+1,cy,-1),node(cx,cy,-1)))
+ liveset=set(live)
+ for cy,cx in live:
+  for dx,dy,e0,e1 in[(1,0,(1,0),(1,1)),(-1,0,(0,1),(0,0)),(0,1,(1,1),(0,1)),(0,-1,(0,0),(1,0))]:
+   if (cy+dy,cx+dx) in liveset:continue
+   quads.append((node(cx+e0[0],cy+e0[1],1),node(cx+e1[0],cy+e1[1],1),
+                 node(cx+e1[0],cy+e1[1],-1),node(cx+e0[0],cy+e0[1],-1)))
+ mesh=bpy.data.meshes.new('Nothosaurus web '+name)
+ mesh.from_pydata([Vector(v)for v in verts],[],quads);mesh.validate()
+ ob=bpy.data.objects.new('Nothosaurus web '+name,mesh);bpy.context.collection.objects.link(ob)
+ return ob,{'regionFaces':len(faces),'webCells':int(web.sum()),'patchCells':int(patch.sum())}
+
+
+web_report={}
+_P=np.array([v.co[:]for v in auth.data.vertices])
+_polys=[p.vertices[:]for p in auth.data.polygons]
+_bvh_web=BVHTree.FromPolygons([v.co for v in auth.data.vertices],_polys,all_triangles=False)
+_uvname=auth.data.uv_layers.active.name
+webs=[]
+for _name,(_wrist,_tip)in WEB_PADDLES.items():
+ ob,rep=web_paddle(_name,_wrist,_tip,_P,_polys)
+ if ob is None:
+  web_report[_name]=rep;continue
+ bm=bmesh.new();bm.from_mesh(ob.data)
+ bmesh.ops.remove_doubles(bm,verts=list(bm.verts),dist=1e-6)
+ bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces))
+ for _ in range(6):bmesh.ops.smooth_vert(bm,verts=list(bm.verts),factor=.5,use_axis_x=True,use_axis_y=True,use_axis_z=True)
+ bmesh.ops.triangulate(bm,faces=list(bm.faces));bm.to_mesh(ob.data);bm.free()
+ bpy.context.view_layer.objects.active=ob
+ m=ob.modifiers.new('Web topology budget','DECIMATE');m.ratio=WEB_DECIMATE
+ bpy.ops.object.modifier_apply(modifier=m.name)
+ # the animal's own skin: nearest point on the original surface, through that triangle's own UVs
+ ob.data.uv_layers.new(name=_uvname);_ul=ob.data.uv_layers.active.data
+ vuv=[];pin=[]
+ for v in ob.data.vertices:
+  hit=_bvh_web.find_nearest(v.co);poly=auth.data.polygons[hit[2]]
+  p3=[auth.data.vertices[j].co for j in poly.vertices]
+  q3=[Vector((*uv.data[j].uv,0))for j in poly.loop_indices]
+  st=barycentric_transform(hit[0],p3[0],p3[1],p3[2],q3[0],q3[1],q3[2])
+  vuv.append([st.x,st.y]);pin.append((v.co-hit[0]).length<WEB_PIN)
+ # Nearest-surface alone puts a seam wherever the nearest digit changes, and the albedo then draws
+ # contour lines across the membrane. The seated collar keeps its measured UVs and the free sheet
+ # between the digits is relaxed to them, so the skin runs continuously from one toe to the next.
+ nbr=[set()for _ in ob.data.vertices]
+ for e in ob.data.edges:
+  a,b=e.vertices;nbr[a].add(b);nbr[b].add(a)
+ for _ in range(WEB_UV_RELAX):
+  nxt=[u[:]for u in vuv]
+  for i,ns in enumerate(nbr):
+   if pin[i]or not ns:continue
+   nxt[i]=[sum(vuv[j][0]for j in ns)/len(ns),sum(vuv[j][1]for j in ns)/len(ns)]
+  vuv=nxt
+ for p in ob.data.polygons:
+  for li,vi in zip(p.loop_indices,p.vertices):_ul[li].uv=vuv[vi]
+ rep['uvPinnedToSkin']=int(sum(pin));rep['uvRelaxed']=len(pin)-int(sum(pin))
+ wl=ob.data.color_attributes.new(name='Color',type='FLOAT_COLOR',domain='POINT')
+ for item in wl.data:item.color=(1,1,1,1)
+ ob.data.materials.append(mat)
+ for p in ob.data.polygons:p.use_smooth=True
+ rep['vertices']=len(ob.data.vertices);rep['triangles']=len(ob.data.polygons)
+ web_report[_name]=rep;webs.append(ob)
+if webs:
+ bpy.ops.object.select_all(action='DESELECT')
+ for ob in webs:ob.select_set(True)
+ auth.select_set(True);bpy.context.view_layer.objects.active=auth;bpy.ops.object.join()
+ # the join replaces the mesh datablock, so every reference taken off it has to be taken again
+ uv=auth.data.uv_layers.active
+ assert min(min(c.color[:3])for c in auth.data.color_attributes['Color'].data)>.999
+web_report['total']={'triangles':len(auth.data.polygons),
+                     'trianglesAdded':len(auth.data.polygons)-source_triangles}
+print('NOTHOSAURUS_WEB',json.dumps(web_report))
+print('NOTHOSAURUS_SLIVERS',json.dumps(sliver_report))
+
 # Measure the actual input volume, then resurface its occupancy field. This is regenerated topology,
 # not the authored triangle mesh decimated into an LOD: no input vertex/face survives the remesh.
 puppet=auth.copy();puppet.data=auth.data.copy();bpy.context.collection.objects.link(puppet);puppet.name='Nothosaurus procedural volume puppet'

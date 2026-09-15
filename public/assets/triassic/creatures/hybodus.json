@@ -1,0 +1,64 @@
+{
+  "id": "hybodus",
+  "name": "Hybodus",
+  "species": "Hybodus sp.",
+  "provenance": "Middle Triassic \u00b7 Muschelkalk, Germanic Basin",
+  "description": "Hybodont shark with two spined dorsal fins and a heterocercal tail. The worked Tripo body and a measured procedural volume twin share one armature, one set of inverse binds, one set of sockets and one set of actions.",
+  "modelLength": 5.0,
+  "lengthMeters": 2,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth",
+    "Shake",
+    "SpineBrace"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "SpineBrace"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "puppet": "hybodus.puppet.glb",
+  "sources": [
+    "docs/triassic/canonical/hybodus.png",
+    "tools/triassic/creatures/hybodus/hybodus.preview.glb",
+    "tools/triassic/creatures/hybodus/tripo-raw/hybodus.raw.glb"
+  ],
+  "notes": [
+    "The generation is folded into an S with its tail a quarter of a body out of the midline. Intake measures the animal's own centreline off the surface and carries every section rigidly onto a straight axis, with the roll read off the countershading: nothing is stretched, sheared or thinned, and the head is carried by one rigid transform.",
+    "An obligate swimmer: the performance is carangiform body-caudal undulation with the paired fins as control surfaces. Nothing rows, walks, hauls out or surfaces.",
+    "The lower jaw is cut out of the generation's own skin along its own measured mouth line, which is a curve rather than a ramp. The teeth are the generation's and are not replaced.",
+    "The only authored surface is the oral lining: one skinned sac that closes the gape, taking its UVs from the skin around it and wearing the body's own albedo.",
+    "The twin resurfaces a voxel occupancy field of the authored body, relaxes it and reduces the new topology. It reuses no source vertex or face.",
+    "Breath is gill ventilation held in place, not a surface breath: this animal has gills and never goes up. SpineBrace is the roster's spine brace and Shake is the shark's roll-and-shake on a held prey.",
+    "Living colours, soft tissue and movement are artistic reconstruction. Travel and grip rules remain engine-owned."
+  ]
+}

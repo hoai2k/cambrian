@@ -106,7 +106,7 @@ export interface EngineCallbacks {
 
 export const PLAYER_COLORS = ['#61f2d5', '#ffb457', '#c7a3ff', '#ff86a4'];
 
-interface CamState { showBoard: boolean; hatchShot: number; breathT: number; yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
+interface CamState { showBoard: boolean; hatchShot: number; breathT: number; rideBlend: number; yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
 /** Per-player teleport menu state: opened with D-pad down, steered with the D-pad or stick, A confirms, B closes. */
 /**
  * The D-pad-down menu. A list of places to go, plus one entry that opens a second page: the roster,
@@ -278,7 +278,7 @@ export class Engine {
   private resize: ResizeObserver;
   private scratchBoulders: Boulder[] = [];
   private cullSphere = new THREE.Sphere();
-  private tmpV = new THREE.Vector3(); private tmpLook = new THREE.Vector3(); private tmpDesired = new THREE.Vector3(); private tmpProj = new THREE.Vector3();
+  private tmpV = new THREE.Vector3(); private tmpLook = new THREE.Vector3(); private tmpRide = new THREE.Vector3(); private tmpDesired = new THREE.Vector3(); private tmpProj = new THREE.Vector3();
   private lookSpeed = 1; private invertY = false;
   private attract = true;
   private attractT = 0;
@@ -391,7 +391,7 @@ export class Engine {
     this.cams = setups.map((_, i) => {
       const p = this.game!.players[i];
       const cam = new THREE.PerspectiveCamera(60, 1, 0.08, 420);
-      const cs: CamState = { showBoard: false, hatchShot: -1, breathT: 0, yaw: p.yaw, pitch: 0.2, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4(), tele: freshTele() };
+      const cs: CamState = { showBoard: false, hatchShot: -1, breathT: 0, rideBlend: 0, yaw: p.yaw, pitch: 0.2, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4(), tele: freshTele() };
       cam.position.copy(cs.pos); cam.lookAt(cs.look);
       return cs;
     });
@@ -803,6 +803,23 @@ export class Engine {
       ? this.renderPos(pred, this.tmpLook).setY(this.tmpLook.y + lengthOf(pred) * 0.1)
       : this.tmpLook.set(pp.x, pp.y + L * 0.15, pp.z);
     if (pred) dist = magnificationDistance(lengthOf(pred)) * cs.zoom * 0.85;
+    // Riding: the shot is the animal you are on, not the one you are.
+    //
+    // Framed on a hatchling clinging to a giant, the camera sits a body length or two off a very
+    // small animal, and the giant is a wall filling the screen with no way to tell what you are
+    // holding or where it is taking you. Framing the host puts both in shot at a distance that
+    // suits the big one — and it takes the camera off the rider, which is the body carrying the
+    // per-frame correction that seats the grip on moving geometry, so the shot stops inheriting
+    // that animation's jitter. Eased in and out, because letting go should not be a cut.
+    const host = p.rideHost >= 0 ? this.game!.byId(p.rideHost) : undefined;
+    const riding = !!host && isAlive(host) && host.riddenBy === p.id && !pred;
+    cs.rideBlend = damp(cs.rideBlend, riding ? 1 : 0, 3.5, dt);
+    if (host && cs.rideBlend > 0.001) {
+      const hl = lengthOf(host);
+      this.renderPos(host, this.tmpRide).y += hl * 0.15;
+      lookAt.lerp(this.tmpRide, cs.rideBlend);
+      dist += (magnificationDistance(hl) * cs.zoom - dist) * cs.rideBlend;
+    }
     // Fade to black just before the respawn, and in again just after. Always the real player's
     // own death, never the spectated one's: this viewport's owner is the one coming back.
     // Fade to black over the last moment before the respawn, and in again slowly on the new body:
@@ -918,6 +935,12 @@ export class Engine {
         this.views.set(a.id, v);
         v.update(a, 0, this.time, true);
       }
+      // A seat that is the second on its creature is drawn in another palette, so four players on
+      // four Anomalocaris are four different animals to look at. Read every frame rather than set
+      // once: a view is rebuilt when the body or the detail level changes, and the scheme has to
+      // survive that without the rebuild knowing about seats.
+      const seat = a.controller === 'player' && a.player >= 0 ? this.setups[a.player] : undefined;
+      if (v.seatScheme !== seat?.scheme) { v.seatScheme = seat?.scheme; v.refreshScheme(); }
       keep.add(a.id); count++;
       // Only nearby creatures cast shadows: the shadow pass has no frustum culling for these
       // meshes, so every distant swimmer was being rasterised into the shadow map for nothing.

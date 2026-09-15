@@ -1,0 +1,34 @@
+{
+  "saurichthys": [
+    {
+      "name": "anchor_mouth",
+      "bone": "jaw",
+      "point": [
+        0.0,
+        -2.3952279090881348,
+        -0.048264335840940475
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "skull",
+      "point": [
+        0.0,
+        -1.7152278423309326,
+        -0.04673588648438454
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "skull",
+      "point": [
+        0.0,
+        -2.3952279090881348,
+        -0.008264335803687572
+      ],
+      "role": "attack"
+    }
+  ]
+}

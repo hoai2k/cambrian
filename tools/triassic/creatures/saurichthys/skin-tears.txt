@@ -1,0 +1,17 @@
+
+public/assets/triassic/creatures/saurichthys.glb   35544 edges x 17 phases x 23 clips
+clip           worst  on bone             >2x  worst bones
+Bite           6.56x  skull               475  0.023->0.153  skull:276 jaw:199
+Heavy          6.27x  skull               133  0.023->0.146  skull:77 jaw:56
+Attack         6.05x  skull               123  0.023->0.141  skull:71 jaw:52
+FastStart      5.61x  skull               109  0.023->0.131  skull:65 jaw:44
+Grab           4.90x  jaw                1343  0.023->0.114  skull:764 jaw:577 chest:1 pec_tip_R:1
+Ability        4.70x  skull                85  0.023->0.110  skull:49 jaw:36
+Eat            4.55x  skull               464  0.023->0.106  skull:246 jaw:218
+Death          3.61x  pec_tip_R            22  0.024->0.086  pec_tip_R:14 chest:8
+Dive           2.07x  chest                 3  0.049->0.100  chest:3
+TurnLeft       2.05x  chest                 3  0.049->0.099  chest:3
+Parry          1.84x  chest                 0  0.049->0.089  
+Dodge          1.65x  pec_mid_L             0  0.048->0.079  
+Sprint         1.63x  chest                 0  0.049->0.079  
+10 of 23 clips tear an edge past 2x
