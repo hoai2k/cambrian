@@ -270,7 +270,7 @@
     {
       "y": -0.08186567475398376,
       "cx": -0.002620968560222537,
-      "cz": -0.000015249103307725387,
+      "cz": -1.5249103307725387e-05,
       "halfWidth": 0.16857867984799668,
       "halfDepth": 0.17699267169833185
     },
@@ -828,9 +828,9 @@
       "radiusOuter": 0.09707499781924903
     }
   },
-  "authoredTriangles": 21000,
-  "twinTriangles": 7666,
-  "twinTriangleFraction": 0.36504761904761907,
+  "authoredTriangles": 20996,
+  "twinTriangles": 7662,
+  "twinTriangleFraction": 0.3649266526957516,
   "twinRemeshTriangles": 129272,
   "twinDecimateRatio": 0.04950801283121109,
   "twinVerticesHeldBackFromRelaxation": 11910,
@@ -986,7 +986,7 @@
     "Rise": 1.2,
     "Attack": 0.8,
     "Bite": 0.4,
-    "Heavy": 1,
+    "Heavy": 1.0,
     "Hit": 0.5,
     "Death": 1.6,
     "Guard": 1.1,
@@ -995,8 +995,8 @@
     "Eat": 1.4,
     "Stagger": 1.1,
     "Ability": 0.7,
-    "Grab": 1,
-    "Breath": 2,
+    "Grab": 1.0,
+    "Breath": 2.0,
     "Growth": 1.2,
     "Haul": 1.6,
     "Breathe": 2.8
@@ -1384,7 +1384,7 @@
     "hingeY": -0.31919899964332576,
     "jawFrontY": -0.3591989996433258,
     "albedoStations": 21,
-    "flankToFlankDisagreementMax": 0,
+    "flankToFlankDisagreementMax": 0.0,
     "rampSlope": 0.15825994704470261,
     "rampIntercept": 0.12898450119855773,
     "worstResidualAsFractionOfLocalDepth": 0.09297789654924471,
@@ -1393,107 +1393,107 @@
       [
         -0.3592,
         0.07456,
-        0
+        0.0
       ],
       [
         -0.3572,
         0.07442,
-        0
+        0.0
       ],
       [
         -0.3552,
         0.07414,
-        0
+        0.0
       ],
       [
         -0.3532,
         0.0737,
-        0
+        0.0
       ],
       [
         -0.3512,
         0.07317,
-        0
+        0.0
       ],
       [
         -0.3492,
         0.07271,
-        0
+        0.0
       ],
       [
         -0.3472,
         0.07249,
-        0
+        0.0
       ],
       [
         -0.3452,
         0.07251,
-        0
+        0.0
       ],
       [
         -0.3432,
         0.07273,
-        0
+        0.0
       ],
       [
         -0.3412,
         0.07315,
-        0
+        0.0
       ],
       [
         -0.3392,
         0.07378,
-        0
+        0.0
       ],
       [
         -0.3372,
         0.07459,
-        0
+        0.0
       ],
       [
         -0.3352,
         0.07542,
-        0
+        0.0
       ],
       [
         -0.3332,
         0.07619,
-        0
+        0.0
       ],
       [
         -0.3312,
         0.07687,
-        0
+        0.0
       ],
       [
         -0.3292,
         0.07749,
-        0
+        0.0
       ],
       [
         -0.3272,
         0.07804,
-        0
+        0.0
       ],
       [
         -0.3252,
         0.0785,
-        0
+        0.0
       ],
       [
         -0.3232,
         0.07882,
-        0
+        0.0
       ],
       [
         -0.3212,
         0.07903,
-        0
+        0.0
       ],
       [
         -0.3192,
         0.07915,
-        0
+        0.0
       ]
     ],
     "restSlitMaxHalfDepthRaw": 0.006027693051181651,
@@ -1732,7 +1732,7 @@
     "oralPartSeating": [
       {
         "part": "Oral cavity lining",
-        "worstDepthRaw": -0.007750518154352903
+        "worstDepthRaw": -0.011647491715848446
       },
       {
         "part": "Seated jaw hinge tissue",
@@ -1766,29 +1766,5 @@
   },
   "normalizedWeights": true,
   "rootStable": true,
-  "noScaleChannels": true,
-  "skinTears": {
-    "tool": "tools/triassic/skin-tears.mjs",
-    "phasesPerClip": 17,
-    "clips": 23,
-    "edges": 33132,
-    "bodyLength": 3,
-    "skin": {
-      "worstRatio": 5.17,
-      "clip": "Sprint",
-      "bone": "chest",
-      "grewFrom": 0.011,
-      "grewTo": 0.0567,
-      "instancesOverTwice": 9286
-    },
-    "oralLining": {
-      "worstRatio": 1.54,
-      "clip": "Ability",
-      "bone": "skull",
-      "grewFrom": 0.0335,
-      "grewTo": 0.0514,
-      "instancesOverTwice": 0
-    },
-    "note": "The lining wall is built to stretch -- roof on the skull, floor on the jaw -- so its ratio at full gape says the mouth opened, not that anything tore. `skin` is the figure to compare against the shore batch's (Nothosaurus 2.98x, Tanystropheus 6.1x, Placodus 12.4x)."
-  }
+  "noScaleChannels": true
 }

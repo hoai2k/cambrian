@@ -5,14 +5,14 @@
   "removedFlakeVertices": 0,
   "remeshTriangles": 105412,
   "puppetBudget": 6400,
-  "fullTriangles": 21276,
-  "puppetTriangles": 8092,
+  "fullTriangles": 21272,
+  "puppetTriangles": 8088,
   "parts": {
     "authoredBody": 19869,
     "authoredJaw": 143,
     "puppetBody": 6756,
     "puppetJaw": 72,
-    "sharedOral": 1264
+    "sharedOral": 1260
   },
   "bones": 57,
   "cervicals": 32,
@@ -696,7 +696,7 @@
     "hingeAlongHead": 0.0346
   },
   "oralPartDepthInsideHead": {
-    "Mouth lining": 0.0019,
+    "Mouth lining": 0.0004,
     "Upper fangs": 0.0037,
     "Lower fangs": 0.0027,
     "Seated jaw hinge tissue": 0.0013

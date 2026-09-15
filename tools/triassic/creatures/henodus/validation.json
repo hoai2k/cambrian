@@ -12,30 +12,30 @@
   "intakeTriangles": 18758,
   "remeshTriangles": 97216,
   "puppetBudget": 6400,
-  "fullTriangles": 20280,
-  "puppetTriangles": 7584,
+  "fullTriangles": 20276,
+  "puppetTriangles": 7580,
   "parts": {
     "authoredBody": 18778,
     "authoredJaw": 622,
     "puppetBody": 6441,
     "puppetJaw": 263,
-    "sharedOral": 880
+    "sharedOral": 876
   },
   "bones": 25,
   "clips": {
     "Idle": 2.4,
-    "Swim": 2,
+    "Swim": 2.0,
     "Sprint": 1.3,
     "TurnLeft": 1.6,
     "TurnRight": 1.6,
     "Dive": 1.4,
     "Rise": 1.4,
-    "Attack": 1,
+    "Attack": 1.0,
     "Bite": 0.5,
     "Heavy": 1.1,
     "Hit": 0.6,
     "Death": 1.6,
-    "Guard": 1,
+    "Guard": 1.0,
     "Parry": 0.4,
     "Dodge": 0.5,
     "Eat": 1.6,
@@ -44,9 +44,9 @@
     "Grab": 1.2,
     "Breath": 2.4,
     "Growth": 1.5,
-    "Crawl": 2,
+    "Crawl": 2.0,
     "Graze": 2.4,
-    "Breathe": 3
+    "Breathe": 3.0
   },
   "looping": [
     "Idle",
@@ -66,9 +66,9 @@
     "TurnRight": 4.1993275700118934e-33,
     "Dive": 3.8993755744866164e-33,
     "Rise": 3.8993755744866164e-33,
-    "Attack": 0,
+    "Attack": 0.0,
     "Bite": 5.09918318924574e-33,
-    "Heavy": 0,
+    "Heavy": 0.0,
     "Hit": 2.6995675923855084e-33,
     "Death": 1.149999976158142,
     "Guard": 6.99440516763505e-18,
@@ -374,10 +374,10 @@
       ]
     ]
   },
-  "modelLength": 5,
+  "modelLength": 5.0,
   "maximumEnvelopeDifference": 0.09619796276092529,
   "envelopeTolerance": 0.2,
-  "envelopeTolerancePercent": 4,
+  "envelopeTolerancePercent": 4.0,
   "surfaceDistanceMax": 0.07497167587280273,
   "surfaceDistanceP95": 0.01366384038701653,
   "surfaceDistanceP99": 0.02760897522792219,
@@ -416,7 +416,7 @@
     "TurnLeft": {
       "foreL": 20.2,
       "foreR": 11.5,
-      "hindL": 16,
+      "hindL": 16.0,
       "hindR": 9.1
     },
     "TurnRight": {
@@ -433,7 +433,7 @@
     },
     "Rise": {
       "foreL": 19.7,
-      "foreR": 20,
+      "foreR": 20.0,
       "hindL": 3.3,
       "hindR": 3.4
     },
@@ -451,7 +451,7 @@
     },
     "Heavy": {
       "foreL": 21.4,
-      "foreR": 21,
+      "foreR": 21.0,
       "hindL": 22.1,
       "hindR": 22.5
     },
@@ -499,7 +499,7 @@
     },
     "Ability": {
       "foreL": 3.8,
-      "foreR": 4,
+      "foreR": 4.0,
       "hindL": 3.9,
       "hindR": 4.1
     },
@@ -512,7 +512,7 @@
     "Breath": {
       "foreL": 15.6,
       "foreR": 16.7,
-      "hindL": 19,
+      "hindL": 19.0,
       "hindR": 18.3
     },
     "Growth": {
@@ -582,7 +582,7 @@
         0.3473,
         0.3473
       ],
-      "surfaceReachDifference": 0
+      "surfaceReachDifference": 0.0
     }
   },
   "mouth": {
@@ -696,7 +696,7 @@
     "liningRing": 14,
     "liningBackX": 0.389,
     "liningFrontX": 0.49200000000000005,
-    "liningNearestSurfaceDepthRaw": -0.00483,
+    "liningNearestSurfaceDepthRaw": -0.00543,
     "skinDoubleSided": true,
     "liningCullsBackfaces": true,
     "oneClosedLining": true
@@ -992,7 +992,7 @@
     ],
     "apex": [
       -0.5,
-      0,
+      0.0,
       -0.11637
     ],
     "restoredLengthOverRadius": 1.745,

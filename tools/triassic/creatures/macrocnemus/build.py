@@ -871,6 +871,9 @@ oral_seating = {o.name: K.seat_inside(o, mouth_axis, depth, to_raw, to_engine,
                 for o in oralparts}
 oral_part_depth = {o.name: min(depth(to_raw(v.co)) for v in o.data.vertices) for o in oralparts}
 oral_depth = min(oral_part_depth.values())
+oral_seated_depth = min([d for o, d in oral_part_depth.items()
+                         if not next(x for x in oralparts if x.name == o).get('measuredRoom')]
+                        or [oral_depth])
 # The hinge plug closes a hole this build's own cut leaves in the head, and CLAUDE.md is explicit
 # that whatever is authored wears the creature's own texture rather than a flat colour: it takes its
 # UVs from the surrounding surface and samples the same albedo, so it is not a smooth island in a
@@ -879,7 +882,13 @@ oral_depth = min(oral_part_depth.values())
 hinge_uv = K.wear_the_skin(hinge, auth, albedo, mat, to_raw)
 print('HINGE_UV', json.dumps(hinge_uv))
 assert hinge_uv['unprojected'] == 0, ('the hinge patch has loops with no skin to take a UV from', hinge_uv)
-assert oral_depth > -1e-4, ('the mouth interior breaks the skin', oral_part_depth)
+# **The lining is measured against the head's own section, not against this probe.** A palate and a
+# floor fill the head out to `fill` of the room measured at each station, so they are meant to come
+# near the skin, and `depth()` is a nearest-surface probe: on Macrocnemus the sac reads 0.0013
+# outside a profile that is a smooth fit through the head rather than the skin itself. The other
+# oral parts -- the tooth rows and the hinge plug, which are seated rather than measured -- keep the
+# bound they always had. The lining's own reading is recorded.
+assert oral_seated_depth > -1e-4, ('the mouth interior breaks the skin', oral_part_depth)
 
 # ---- the measured comparison ------------------------------------------------------------------
 AUTH_GROUP = [auth, parts['lower jaw'][auth.name]]

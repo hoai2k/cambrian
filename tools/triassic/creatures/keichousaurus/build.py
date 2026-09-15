@@ -524,6 +524,13 @@ lin_raw, faces, n_palate = T.oral_shells(seam_n, mouth_section, MOUTH_BACK, MOUT
                                          # room at the mouth line. `mouth_extent` casts outwards
                                          # from the mouth axis, which is honest here and only here
                                          # -- this generation models no slit for a ray to stop on.
+                                         # Held further inside the head than the kit's
+                                         # default. This generation models no slit, so its
+                                         # own nearest-surface check on the lining means
+                                         # what it says, and a shell drawn to nine tenths
+                                         # of the measured room leaves it 0.00025 of clear
+                                         # flesh against the 0.0005 it asks for.
+                                         fill=.84,
                                          room=mouth_extent)
 lining = T.oral_object('Oral cavity lining', tx, lin_raw, faces, n_palate, mouthmat, rig,
                        measured_room=True)

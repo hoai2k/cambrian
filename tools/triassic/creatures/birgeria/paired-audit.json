@@ -3,23 +3,23 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1881528,
-      "sha256": "5bc0cddb4cfc7959f7998900f4336cbd76f418ec6042caab858758744add8521",
-      "triangles": 22414,
+      "bytes": 1878676,
+      "sha256": "06043b3eae99074a5c930c56d8760e3e61ef172993ce11dd529e21f38204fd15",
+      "triangles": 22410,
       "vertices": 13287
     },
     {
       "suffix": ".puppet",
-      "bytes": 624112,
-      "sha256": "96e74fb6ca38c43950367e6b9634c8a259baac0deb92349593114da241d8bc0e",
-      "triangles": 7480,
+      "bytes": 621260,
+      "sha256": "f453b2ef64a1836b096f583df2630e97098eec0c17d7b5c2b9ee5bfe8728eadc",
+      "triangles": 7476,
       "vertices": 3894
     },
     {
       "suffix": ".lod1",
-      "bytes": 624112,
-      "sha256": "96e74fb6ca38c43950367e6b9634c8a259baac0deb92349593114da241d8bc0e",
-      "triangles": 7480,
+      "bytes": 621260,
+      "sha256": "f453b2ef64a1836b096f583df2630e97098eec0c17d7b5c2b9ee5bfe8728eadc",
+      "triangles": 7476,
       "vertices": 3894
     }
   ],
@@ -188,7 +188,7 @@
       "sha256": "7c9ff01680d30c99c1ff165e70bddefcc1e11d445f47fdb6382d93a9841b0faa"
     }
   ],
-  "twinTriangleFraction": 0.3337199964308022,
+  "twinTriangleFraction": 0.33360107095046854,
   "playback": [
     {
       "suffix": "",

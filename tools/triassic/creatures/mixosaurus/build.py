@@ -509,7 +509,18 @@ def mouth_room(_y):
     if k not in _room_cache:
         _room_cache[k] = T.mouth_room(bvh_auth, Vector((cx(_y), _y, seam(_y))),
                                       Vector((1, 0, 0)), Vector((0, 0, 1)),
-                                      limit=.20, fallback=.02)
+                                      limit=.20, fallback=.02,
+                                      # Capped by this builder's own measured head section: a cast
+                                      # from outside stops on the first surface it meets, which on
+                                      # a paddled body is a flipper rather than the cheek. The two
+                                      # vertical caps are **not** the half depth: the mouth line
+                                      # sits below the head's centre, so the roof is nearer than
+                                      # half a head above it and the floor further below. Measured
+                                      # from the axis, a palate capped at the half depth still came
+                                      # out through the top of Rhaeticosaurus' skull.
+                                      cap=(head_half_width(_y),
+                                           max(.002, head_half_depth(_y) - (seam(_y) - cz(_y))),
+                                           max(.002, head_half_depth(_y) + (seam(_y) - cz(_y)))))
     return _room_cache[k]
 
 

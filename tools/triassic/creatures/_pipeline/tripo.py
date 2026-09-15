@@ -581,7 +581,7 @@ def protrusions(o, y_front, floor=.0034):
     return co, out, groups
 
 
-def mouth_room(bvh, at, side, up, limit=.25, fallback=.02):
+def mouth_room(bvh, at, side, up, limit=.25, fallback=.02, cap=None):
     """How much head there is round the mouth line at one station: half-width to the nearer side,
     height to the roof, depth to the floor, measured by ray cast from the mouth's own axis.
 
@@ -603,7 +603,13 @@ def mouth_room(bvh, at, side, up, limit=.25, fallback=.02):
     def reach(d):
         hit = bvh.ray_cast(at + d * limit, -d, limit)
         return limit - (hit[0] - (at + d * limit)).length if hit[0] is not None else fallback
-    return (min(reach(side), reach(-side)), reach(up), reach(-up))
+    out = (min(reach(side), reach(-side)), reach(up), reach(-up))
+    # **A cast from outside meets the first surface on the line, and on a body whose flippers span
+    # wider than its head that surface is a flipper.** Rhaeticosaurus' do span further than it is
+    # long, and its palate came out through the top of its skull on a room measured through a
+    # paddle; Archelon's stood 0.0066 outside the head's own section and its builder said so. So the
+    # caller passes the head's own measured section as a `cap` and the cast may only ever narrow it.
+    return out if cap is None else tuple(min(a, b) for a, b in zip(out, cap))
 
 
 def _superellipse(th, power):

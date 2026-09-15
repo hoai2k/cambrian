@@ -230,11 +230,11 @@
     "clearanceInsideSilhouetteRaw": 0.00404,
     "note": "rigid on the skull, shaped like the head section at the pivot rather than like a ball, and fitted so it cannot come out through the cheek."
   },
-  "liningClearanceInsideSkinRaw": 0.00184,
+  "liningClearanceInsideSkinRaw": 0.00189,
   "scale": 4.67977,
   "bodyLength": 5.0,
-  "authoredTriangles": 22152,
-  "twinTriangles": 8530,
+  "authoredTriangles": 22148,
+  "twinTriangles": 8526,
   "twinRemeshTriangles": 54464,
   "twinDecimateRatio": 0.11934489011764526,
   "twinVerticesHeldBackFromRelaxation": 7923,
@@ -365,7 +365,7 @@
     ],
     "TurnLeft": [
       [
-        -0.8786860704421997,
+        -0.8847002983093262,
         -2.5243797302246094,
         -0.7414862513542175
       ],
@@ -497,7 +497,7 @@
     ],
     "Dodge": [
       [
-        -0.8745238184928894,
+        -0.8995667695999146,
         -2.521284580230713,
         -0.7233179211616516
       ],
