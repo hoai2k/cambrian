@@ -90,7 +90,7 @@ export function Viewer() {
    * in play — so the raw generation stands in at the head of the list, which is what the roster's
    * preview badge already says about it.
    */
-  type Stage = { id: string; label: string; model: string; kind: 'full' | 'reduced' | 'twin' | 'generated' | 'borrowed' };
+  type Stage = { id: string; label: string; model: string; kind: 'full' | 'reduced' | 'twin' | 'generated' | 'borrowed' | 'origpose' };
   const stages = (c: ViewerSpecimen): Stage[] => {
     const own = !c.generated || !!c.inReview;
     const out: Stage[] = [];
@@ -99,6 +99,10 @@ export function Viewer() {
     if (c.puppet) out.push({ id: 'twin', label: 'Procedural twin · reduced', model: c.puppet, kind: 'twin' });
     else if (c.lod && own) out.push({ id: 'reduced', label: 'Reduced model', model: c.lod, kind: 'reduced' });
     if (c.generated) out.push({ id: 'generated', label: 'Generated mesh (no rig)', model: c.generated, kind: 'generated' });
+    // Where a builder moved the mesh before binding, the shipped body rests in a shape the
+    // generation never held. Both are offered: the full model IS the base pose every clip is
+    // authored from, and this is what Tripo made.
+    if (c.origPose) out.push({ id: 'origpose', label: 'Original pose (no rig)', model: c.origPose, kind: 'origpose' });
     // An off-roster subject is in no sea, so there is no body it borrows to offer.
     if (!own && !c.offRoster) out.push({ id: 'borrowed', label: 'Borrowed body (in play)', model: c.model, kind: 'borrowed' });
     return out;
@@ -351,6 +355,13 @@ export function Viewer() {
           are redone properly when the body is cleaned and rigged, and every bit of this preview is
           thrown away the day the real one lands. Until then the animal still borrows another era's
           body in play.
+        </p>}
+        {def.origPose && <p className="hint">
+          <strong>Two poses.</strong> This generation arrived too strongly posed to rig, so its
+          builder moved the mesh before binding: {def.origPoseChanged?.join('; ')}. <em>Full
+          model</em> is the <strong>base pose</strong> — the rig at rest, and what every clip is
+          authored from. <em>Original pose</em> is the untouched generation, with no rig, so it sits
+          still. Swapping holds the view, so the difference between them reads as movement.
         </p>}
         {def.puppet && <p className="hint">
           The twin is rebuilt to this body's own volume on the same skeleton, and is where the clips

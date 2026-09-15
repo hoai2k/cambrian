@@ -228,3 +228,32 @@ correctly; only Aphaneramma's folds back.
 
 A *posed* tail as such is not a defect: it is what the canonical pose draws and what Tripo was asked
 for. A tail that crosses its own station is.
+
+## The two off-roster Cretaceous generations
+
+Archelon and Mosasaurus were never *preview* bodies for long — both are built now — but what their
+generations carry is worth recording in the same place, because the next Cretaceous subject will
+arrive from the same generator with the same habits.
+
+**Archelon: none.** One turtle, one connected piece after welding, 19,058 triangles, a modelled beak
+slit, and no spare fins or tails. It is the cleanest generation this era has had, and the reason is
+recorded in its own README: it is the *second* one, made from a single cropped panel after the first
+— fed a six-panel contact sheet whole — came back as six turtles in one GLB.
+
+**Mosasaurus: the mouth is open, and it is open as a pose.** The jaws part over 0.176 of a body
+length and the rotation that brings the two lips together measures **32.55°**, so the bind pose is a
+gaping head and every clip that is not a strike has to close it. That is not a mesh defect — it is
+what the source sheet drew, and the CLAUDE.md rule covers it — but it is a *cost*, and the cost is
+0.72 % of a body length of mandible pushed out through the head's own measured section at the shut
+pose, on 13 % of the mandible's vertices. A mouth-closed regeneration would remove it entirely.
+
+Two smaller things about that body, neither fixable by script:
+
+- **Its teeth are painted, not modelled.** `T.protrusions` finds five patches on the whole head and
+  the largest is 27 vertices, so the closed mouth reads as a lipped seam rather than as interlocking
+  tooth rows. Every method this era has for finding a lip line off *geometry* therefore has nothing
+  to hold onto except the gape itself — which is why the builder counts surface crossings instead.
+- **Both of its ends are thin and deep**, within a thousandth of each other, which is what made the
+  shared frame's arbitrary principal-component sign put the head at the tail. That is a property of
+  the animal rather than a fault in the mesh, and the lesson it produced is in CLAUDE.md: which end
+  is the head is decided by the flippers and asserted, never read off the silhouette.
