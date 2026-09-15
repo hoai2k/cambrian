@@ -21,7 +21,9 @@ every player has to go and the one place everything can see them.
 So *Triassic Triumph* is played between two edges, the surface and the floor, in a sea that gets
 deeper the further out you go. Feeding is on the bottom or in the column; breathing is at the top;
 the deep is where the giants are and where a long fight leaves you empty a long way down.
-Live-bearers are born at the surface beside their mother; everything else hatches in the weed. No
+Everything hatches from an egg on the sea floor; a live-bearer gets a grown adult of its own kind
+beside it for its first minute instead. (Surface birth is what the fossils say and was built, then
+taken out: it cost the series its one opening beat, the shell cracking on the bottom.) No
 player ever goes ashore. But the shore comes to them: something with a three-metre neck is standing
 at the waterline, and it fishes.
 
@@ -33,9 +35,12 @@ of bodies the sea had never seen before and, in half the cases, never saw again.
 
 ## Design pillars
 
-1. **Air is what effort costs.** Everything that matters breathes, and nothing it spends down
-   there comes back until it goes up. The surface is where a body is paid, and the depth of the
-   water under it is the price of going to collect.
+1. **A lungful is a clock on a dive.** Everything that matters breathes, and a breath is worth
+   `AIR_MAX` of them; while it lasts a body works as any other does, and when it runs out nothing
+   comes back until it goes up. The surface is where a body is paid, and the depth of the water
+   under it is the price of going to collect. (This began as "air is what effort costs" — no meter,
+   nothing recovered under water at all — which made the deep somewhere you visited on the bar you
+   arrived with. See *Air and stamina* below.)
 2. **The surface is a place.** Bright, exposed, alive with logs, spray and the shadows of pods. It
    has its own presentation, its own sounds and its own dangers, and the camera reads *out* there.
 3. **The shore bites back.** No player ever leaves the water, and land is not somewhere to
