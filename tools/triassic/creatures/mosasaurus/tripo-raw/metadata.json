@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "name": "mosasaurus",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "input": {
+      "pbr": true,
+      "file": {
+        "type": "jpeg",
+        "object": {
+          "key": "tcli_2f16803761ed4cf0af45a11555b61c60/20260915/27a0a871-835d-43b7-ac9b-8a70683a69e1/image.jpeg",
+          "bucket": "tripo-data"
+        }
+      },
+      "texture": true,
+      "export_uv": true,
+      "face_limit": 20000,
+      "model_version": "v3.1-20260211",
+      "geometry_quality": "standard",
+      "enable_image_autofix": false
+    },
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    },
+    "task_id": "27a0a871-835d-43b7-ac9b-8a70683a69e1",
+    "created_at": "2026-09-15T07:54:55.941261Z",
+    "completed_at": "2026-09-15T07:56:00.975021Z",
+    "credits_consumed": 30
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "/home/user/cambrian/local/triassic-authoring/mosasaurus-input.png",
+    "sha256": "d82255ad3b7ebe5f7fbacfbada352b0d541270a7706320b4bec88ec6ca6b22cc",
+    "bytes": 254977
+  },
+  "artifact": {
+    "path": "/home/user/cambrian/local/triassic-authoring/mosasaurus/tripo/mosasaurus.raw.glb",
+    "bytes": 1178192,
+    "sha256": "4774080c6369c924ef552a3bc0e4ac317587aba03ba84b0b3234733d990777e2",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-15T07:56:05.530Z"
+}

@@ -153,6 +153,15 @@
     "lengthUnits": 4
   },
   {
+    "id": "mosasaurus",
+    "model": "assets/triassic/creatures/mosasaurus.preview.glb",
+    "bytes": 1058724,
+    "sha256": "ac7cd1a4dd508db597bc7c455624d0ecc99b1388161df1b1c91848170a23ffdb",
+    "yaw": 270,
+    "scale": 16.42,
+    "lengthUnits": 16.42
+  },
+  {
     "id": "mystriosuchus",
     "model": "assets/triassic/creatures/mystriosuchus.preview.glb",
     "bytes": 1531012,
