@@ -1,5 +1,5 @@
 
-public/assets/triassic/creatures/ceratites.glb   33697 edges x 17 phases x 21 clips
+public/assets/triassic/creatures/ceratites.glb   33855 edges x 17 phases x 21 clips
 clip            skin  on bone             all     >2x  worst bones
 Guard          4.34x  head              4.34x     632  0.036->0.157  arm_00_04:250 arm_10_04:136 head:110 arm_12_04:68
 Heavy          4.17x  head              4.17x     204  0.036->0.151  arm_00_04:60 arm_10_04:58 head:34 arm_12_04:28

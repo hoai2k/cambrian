@@ -1,0 +1,58 @@
+{
+  "id": "phragmoteuthis",
+  "name": "Phragmoteuthis",
+  "species": "Phragmoteuthis bisinuata",
+  "description": "Canonical Tripo body and procedural volume twin on one 77-joint rig: a stiff mantle that squeezes by translation rather than scale, two lateral fins carrying a travelling wave, 12 appendages of which two are tentacles, and an authored beak inside a closed oral lining.",
+  "modelLength": 5.0,
+  "lengthMeters": 2.42,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "Breath"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary",
+    "anchor_grasp"
+  ],
+  "puppet": "phragmoteuthis.puppet.glb",
+  "notes": [
+    "The mantle, the terminal fins, the hooked arms and the two clubbed tentacles are retained from the accepted Tripo volume; nothing of the generation is edited after intake.",
+    "The frame is the shared measured one -- this body has a long axis a principal component can see and real countershading at 0.348 -- and it is corroborated by the fins, which after the roll span 0.215 across the body and 0.114 through it.",
+    "The mantle is one stiff bone: a phragmoteuthid carries a rigid internal shell up its back. Its jet is a radial contraction, which the contract cannot express as scale, so it is two flank bones with translation channels and the audit measures the width.",
+    "The generation models no mouth, and casting head normals back into the mesh finds neighbouring arms across the crown gaps rather than a lip opposite, so the peristome is authored on the crown axis with one closed skinned lining and two mandibles.",
+    "This animal has `swimStyle: omnidirectional` and NOT `shell: true`, so it does not jet in the simulation and nothing scrubs its Swim clip to a phase. Its cruise is the fin wave, which is what an animal with fins this size and no fixed front actually swims on.",
+    "OPEN DEFECT: the generation carries 12 appendages. A phragmoteuthid is a decabrachian with ten, and the greenlit pose draws eight arms and two clubbed tentacles. The two longest are rigged as the tentacles; the extra pair is preserved rather than cut, because a shape change goes back to a fresh generation.",
+    "Original albedo retained with white COLOR_0; normal relief limited to 0.15 and the skin explicitly nonmetallic. The twin samples pigment through triangle-local UVs.",
+    "Living colours, soft tissues, hook placement and every movement are artistic reconstruction. Locomotor translation remains engine-owned."
+  ]
+}

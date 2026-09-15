@@ -593,12 +593,12 @@
   ],
   "maximumEnvelopeDifference": 0.14462268352508545,
   "surfaceDistanceMax": 0.187527135014534,
-  "surfaceDistanceP95": 0.03442718796432019,
+  "surfaceDistanceP95": 0.0346800273284316,
   "seatingDepthRaw": {
     "shell": 0.0731,
     "head": 0.08636,
     "funnel": 0.08766,
-    "crown": 0.05561,
+    "crown": 0.05623,
     "arm_00_00": 0.02497,
     "arm_01_00": 0.01554,
     "arm_02_00": 0.01974,
@@ -640,22 +640,22 @@
   },
   "mouth": {
     "authored": {
-      "facesRemoved": 228,
-      "rimVertices": 60
+      "facesRemoved": 143,
+      "rimVertices": 53
     },
     "twin": {
-      "facesRemoved": 57,
-      "rimVertices": 26
+      "facesRemoved": 48,
+      "rimVertices": 27
     },
     "centre": [
       0.0,
-      -0.13286,
-      -0.04404
+      -0.11311,
+      -0.0758
     ],
     "normal": [
       0.0,
-      -0.9041,
-      -0.4274
+      -0.8499,
+      -0.527
     ],
     "radius": 0.03654,
     "rootSpread": 0.20662,

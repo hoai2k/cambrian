@@ -370,23 +370,24 @@ ROOT_SPREAD = float(np.mean([np.linalg.norm(np.array(a['pts'][1]) - CROWN) for a
 MOUTH_R = ARM_BAND * 1.55
 
 
-def crown_surface():
-    """Where the crown's dome actually is on the axis, and its outward normal there."""
-    start = Vector((CROWN + CROWN_AXIS * .40).tolist())
-    hit = bvh_auth.ray_cast(start, Vector((-CROWN_AXIS).tolist()), .8)
-    assert hit[0] is not None, 'no crown surface on the axis'
-    return np.array(hit[0][:]), np.array(hit[1][:])
-
-
-MOUTH_P, MOUTH_N = crown_surface()
-if float(MOUTH_N @ CROWN_AXIS) < 0:
-    MOUTH_N = -MOUTH_N
-# The animal is symmetric about the shell's plane and its beak is on that plane, so the mouth axis
-# is the measured dome normal projected into it. Taking the raw surface normal put the mouth axis
-# 0.146 out of plane, which is the local shape of one facet of the dome rather than the animal.
-MOUTH_N[0] = 0.
+# **The mouth's axis is where the crown points, not where one facet of the dome faces.** Taking the
+# surface normal at the hit was the first try: on Phragmoteuthis it came out (0, -0.34, -0.94),
+# almost entirely ventral, because the seated crown joint sits high in the head and the ray forward
+# from it lands where the dome is nearly horizontal -- and a lining built back along that normal left
+# the head after 0.022. The crown's own direction is the mean of its arms, which is measured, is on
+# the plane of symmetry by construction, and is what a beak in an arm crown actually faces.
+CROWN_ROOTS = np.array([a['pts'][0] for a in ARMS]).mean(0)
+CROWN, CROWN_DEPTH = seat_deepest(CROWN_ROOTS, span=.05, step=.010)
+CROWN = np.array([0., float(CROWN[1]), float(CROWN[2])])
+CROWN_DIR = np.array([a['pts'][-1] for a in ARMS]).mean(0) - CROWN
+CROWN_DIR[0] = 0.
+CROWN_DIR /= np.linalg.norm(CROWN_DIR)
+_start = Vector((CROWN + CROWN_DIR * .40).tolist())
+_hit = bvh_auth.ray_cast(_start, Vector((-CROWN_DIR).tolist()), .8)
+assert _hit[0] is not None, 'no crown surface on the axis'
+MOUTH_P = np.array(_hit[0][:])
 MOUTH_P = np.array([0., float(MOUTH_P[1]), float(MOUTH_P[2])])
-M_N = MOUTH_N / np.linalg.norm(MOUTH_N)              # out of the head, down the crown axis
+M_N = CROWN_DIR                                      # out of the head, down the crown's own axis
 M_DN = np.array([0., 0., -1.]) - M_N * float(np.array([0., 0., -1.]) @ M_N)
 M_DN /= np.linalg.norm(M_DN)                         # ventral, in the mouth's plane
 M_DS = np.cross(M_N, M_DN)                           # across the mouth
@@ -675,7 +676,24 @@ mouth_material = T.inward_material(NAME + ' mouth interior', (.21, .085, .085, 1
 beak_material = T.opaque_material(NAME + ' beak', (.055, .042, .036, 1), roughness=.34)
 oralparts = []
 LINING_RINGS, LINING_RING = 16, 14
-LINING_DEPTH = MOUTH_R * 2.3
+
+
+def axial_room(margin=.006, limit=.30, step=.002):
+    """How far back the head goes on the mouth's own axis. The lining's closed end has to be inside
+    the animal, and a fraction of the mouth radius is not a measurement of that."""
+    inside, room = False, 0.
+    for t in np.arange(step, limit, step):
+        d = depth(Vector((MOUTH_P - M_N * float(t)).tolist()))
+        if d >= margin:
+            inside, room = True, float(t)
+        elif inside:
+            break
+    return room
+
+
+HEAD_ROOM = axial_room()
+LINING_DEPTH = min(MOUTH_R * 2.3, HEAD_ROOM * .80)
+assert LINING_DEPTH > MOUTH_R * .8, ('no room for a mouth behind the peristome', HEAD_ROOM)
 
 
 def mouth_point(a, dn, ds):

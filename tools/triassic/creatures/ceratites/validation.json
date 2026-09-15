@@ -158,11 +158,11 @@
     "bladeDilation": 0.0035
   },
   "puppetTriangleTarget": 7200,
-  "fullTriangles": 19666,
-  "puppetTriangles": 7687,
+  "fullTriangles": 19751,
+  "puppetTriangles": 7697,
   "parts": {
-    "authoredBody": 19118,
-    "twinBody": 7139,
+    "authoredBody": 19203,
+    "twinBody": 7149,
     "sharedOral": 548
   },
   "bones": 72,
@@ -480,15 +480,15 @@
   "envelopeTolerance": 0.2,
   "envelopeTolerancePercent": 4.0,
   "surfaceDistanceMax": 0.187527135014534,
-  "surfaceDistanceP95": 0.03442718796432019,
-  "surfaceDistanceP99": 0.0881294992566107,
+  "surfaceDistanceP95": 0.0346800273284316,
+  "surfaceDistanceP99": 0.08797441601753236,
   "surfaceOutliersOver0p12": 31,
-  "surfaceVertices": 9554,
+  "surfaceVertices": 9590,
   "seatingDepthRaw": {
     "shell": 0.0731,
     "head": 0.08636,
     "funnel": 0.08766,
-    "crown": 0.05561,
+    "crown": 0.05623,
     "arm_00_00": 0.02497,
     "arm_01_00": 0.01554,
     "arm_02_00": 0.01974,
@@ -504,7 +504,7 @@
     "arm_12_00": 0.01169
   },
   "maxInfluences": 4,
-  "meanInfluences": 2.884785257386537,
+  "meanInfluences": 2.8904826958105647,
   "jointsBelowHalfAPercentOfSkin": [],
   "armSweepDegreesPerCycle": {
     "Idle": {
@@ -1025,22 +1025,22 @@
   },
   "mouth": {
     "authored": {
-      "facesRemoved": 228,
-      "rimVertices": 60
+      "facesRemoved": 143,
+      "rimVertices": 53
     },
     "twin": {
-      "facesRemoved": 57,
-      "rimVertices": 26
+      "facesRemoved": 48,
+      "rimVertices": 27
     },
     "centre": [
       0.0,
-      -0.13286,
-      -0.04404
+      -0.11311,
+      -0.0758
     ],
     "normal": [
       0.0,
-      -0.9041,
-      -0.4274
+      -0.8499,
+      -0.527
     ],
     "radius": 0.03654,
     "rootSpread": 0.20662,
@@ -1048,8 +1048,8 @@
     "method": "authored on the crown axis: the generation models no mouth at all, and casting head normals back into the mesh finds neighbouring arms across the gaps rather than a lip opposite",
     "liningRings": 16,
     "liningRing": 14,
-    "liningDepth": 0.08403706670903291,
-    "liningNearestSurfaceDepthRaw": 0.03506,
+    "liningDepth": 0.05920000000000001,
+    "liningNearestSurfaceDepthRaw": 0.05225,
     "skinDoubleSided": true,
     "liningCullsBackfaces": true,
     "oneClosedLining": true,
