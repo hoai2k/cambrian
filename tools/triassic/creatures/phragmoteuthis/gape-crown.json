@@ -1,0 +1,49 @@
+{
+  "id": "phragmoteuthis",
+  "backdrop": [
+    1.0,
+    0.0,
+    1.0,
+    1.0
+  ],
+  "marker": [
+    0.0,
+    1.0,
+    0.0,
+    1.0
+  ],
+  "tolerance": 12,
+  "shots": [
+    {
+      "clip": "Bite",
+      "t": 0.22,
+      "openedWhereTheMouthIsDrawn": 8,
+      "openedAnywhere": 101,
+      "mouthPixels": 11029,
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/phragmoteuthis/gape-crown/Bite-0.22-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/phragmoteuthis/gape-crown/Bite-0.22-culled.png",
+      "marker": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/phragmoteuthis/gape-crown/Bite-0.22-marker.png"
+    },
+    {
+      "clip": "Attack",
+      "t": 0.4,
+      "openedWhereTheMouthIsDrawn": 2,
+      "openedAnywhere": 51,
+      "mouthPixels": 10303,
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/phragmoteuthis/gape-crown/Attack-0.4-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/phragmoteuthis/gape-crown/Attack-0.4-culled.png",
+      "marker": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/phragmoteuthis/gape-crown/Attack-0.4-marker.png"
+    },
+    {
+      "clip": "Eat",
+      "t": 0.37,
+      "openedWhereTheMouthIsDrawn": 5,
+      "openedAnywhere": 70,
+      "mouthPixels": 10542,
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/phragmoteuthis/gape-crown/Eat-0.37-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/phragmoteuthis/gape-crown/Eat-0.37-culled.png",
+      "marker": "/home/user/cambrian/.claude/worktrees/agent-a8cc9111d569755fa/local/triassic-authoring/phragmoteuthis/gape-crown/Eat-0.37-marker.png"
+    }
+  ],
+  "worstOpenedWhereTheMouthIsDrawn": 8
+}

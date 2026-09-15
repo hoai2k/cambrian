@@ -1,6 +1,21 @@
 {
   "creatures": [
+    "birgeria",
+    "cartorhynchus",
+    "ceratites",
+    "cymbospondylus",
+    "dinocephalosaurus",
+    "helicoprion",
+    "henodus",
+    "hupehsuchus",
+    "hybodus",
+    "keichousaurus",
+    "mixosaurus",
     "nothosaurus",
-    "shonisaurus"
+    "phragmoteuthis",
+    "placodus",
+    "rhaeticosaurus",
+    "shonisaurus",
+    "tanystropheus"
   ]
 }

@@ -1,11 +1,12 @@
 /**
  * Debug entry points, opened by a URL parameter and never linked to from the game.
  *
- * There are two kinds, and the difference matters. `?debug=local` opens the local state editor
+ * There are three kinds, and the differences matter. `?debug=local` opens the local state editor
  * *instead of* the game — it replaces the whole app. `?debug=game` opens nothing: it arms the
  * match recorder inside the ordinary game, which adds a button to the pause menu and otherwise
- * changes nothing about how the game plays. Both are development tools: nothing advertises them,
- * nothing links to them, and neither does anything at all unless its parameter is present.
+ * changes nothing about how the game plays. And a bare `?debug`, on the trilogy page only, opens
+ * the index of all of them. All are development tools: nothing advertises them, nothing links to
+ * them from anywhere a visitor goes, and none does anything at all unless its parameter is present.
  */
 export type DebugScreen = 'local';
 
@@ -32,4 +33,23 @@ export function debugScreen(search = typeof location === 'undefined' ? '' : loca
  */
 export function debugGame(search = typeof location === 'undefined' ? '' : location.search): boolean {
   return debugParam(search) === 'game';
+}
+
+/**
+ * Whether this URL asks for the debug index: a bare `?debug`, with no value.
+ *
+ * The index is the trilogy page's, not a game's. These tools were only ever reachable by knowing
+ * the parameter, which meant knowing they existed; the index is the one place that says what there
+ * is. It deliberately takes the *valueless* parameter, so it can never collide with a named screen:
+ * every `?debug=<something>` is a specific tool, and `?debug` on its own is the list of them.
+ *
+ * `?debug=` counts too. A parameter written with a trailing `=` and nothing after it is the same
+ * statement as one written without — both say "debug, unspecified" — and a URL that loses its empty
+ * value in a round trip through a form or a link shortener should still open the index.
+ *
+ * On a game page this is not consulted at all: `?debug` there is not a screen (`debugScreen`
+ * returns nothing) and does not arm the recorder, so a game URL carrying it is simply the game.
+ */
+export function debugIndex(search = typeof location === 'undefined' ? '' : location.search): boolean {
+  return debugParam(search) === '';
 }
