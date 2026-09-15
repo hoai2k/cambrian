@@ -1,0 +1,66 @@
+{
+  "id": "rhaeticosaurus",
+  "name": "Rhaeticosaurus",
+  "species": "Rhaeticosaurus mertensi",
+  "provenance": "Late Triassic \u00b7 Bonenburg, Westphalia",
+  "description": "The first true plesiosaur: four hydrofoil flippers beating together, a barrel trunk and a short tail. Authored Tripo body and measured procedural volume twin share one armature, one set of inverse binds, one set of sockets and one set of actions.",
+  "modelLength": 5.0,
+  "lengthMeters": 2.37,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth",
+    "Breathe",
+    "Glide"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "Breathe",
+    "Glide"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "puppet": "rhaeticosaurus.puppet.glb",
+  "sources": [
+    "docs/triassic/canonical/rhaeticosaurus.png",
+    "tools/triassic/creatures/rhaeticosaurus/tripo-raw/rhaeticosaurus.raw.glb",
+    "tools/triassic/creatures/rhaeticosaurus/rhaeticosaurus.preview.glb"
+  ],
+  "notes": [
+    "Underwater flight, and the clip set is built around it: the trunk is a stiff box that pitches and rolls but does not undulate, and all four hydrofoils beat in a figure of eight with the hind pair a fifth of a cycle behind the fore.",
+    "The swept angle at each limb root is measured from the *limb's own direction* rather than read off an Euler channel, so it cannot be an artefact of which axis a rotation was written on. The build refuses a flipper that sweeps under 60 degrees in Sprint.",
+    "Ability is the roster's power stroke: all four flippers at once with no phase offset, shoulders first, one synchronised downbeat and a long carry out of it.",
+    "The mouth is **painted, not modelled** -- Placodus' geometric method finds three vertices on the whole front third -- and the painted line is read as a continuous curve rather than station by station, because this hide is blotched and a per-station walk stops at the first speckle. The search band is bounded below the section's mid height, because the eye and the countershading boundary both outscore the lip; see the README.",
+    "Recorded pose fault, not corrected here: each flipper stands about 0.31 of a body length clear of the flank, against roughly 0.25 L for a plesiosaur forelimb. That is what the greenlit pose draws and it is a redraw question. See docs/triassic/proportion-audit.md.",
+    "The source is the published preview: two spare tail blades collapsed by smooth-region.py and a neck stretch baked on top, both recorded in docs/triassic/preview-mesh-defects.md. The raw generation is preserved unchanged.",
+    "The twin resurfaces a voxel occupancy field of the authored body, relaxes it and reduces the new topology. It reuses no source vertex or face.",
+    "Living colours, soft tissues and movements are artistic reconstruction. World travel remains engine-owned."
+  ]
+}
