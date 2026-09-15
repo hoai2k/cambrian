@@ -61,6 +61,11 @@ if not SUFFIX and '--review-only' not in sys.argv:
     for suffix, w, h in [('select.png', 1600, 1200), ('card.png', 800, 600), ('thumb.png', 256, 192), ('png', 1200, 900)]:
         render(OUT / ('henodus.' + suffix), w, h)
     if '--portrait-only' in sys.argv: sys.exit(0)
+MOUTH = [('mouth-closed', 'Idle', 0), ('mouth-Bite', 'Bite', .25), ('mouth-Graze', 'Graze', .6)]
+if '--mouth-only' in sys.argv:
+    for name, clip, t in MOUTH:
+        pose(clip, t); render(REVIEW / (name + '.png'), 1000, 750, (3.6, -3.6, .7), (0, -2.0, -.16), 1.7)
+    sys.exit(0)
 POSES = [('Idle', 0), ('Swim', 0), ('Swim', .5), ('Swim', 1.), ('Swim', 1.5), ('Sprint', 0), ('Sprint', .33), ('Sprint', .65),
          ('TurnLeft', .8), ('TurnRight', .8), ('Dive', .7), ('Rise', .7), ('Attack', .14), ('Attack', .45),
          ('Bite', .25), ('Heavy', .15), ('Heavy', .45), ('Hit', .3), ('Death', 1.6), ('Guard', .5), ('Parry', .2),
@@ -72,5 +77,5 @@ for clip, t in POSES:
 for name, loc, tgt, scale in [('side', (7, 0, .1), (0, 0, 0), 6.0), ('top', (0, 0, 8), (0, 0, 0), 6.0),
                               ('front', (0, -8, .9), (0, 0, .1), 3.6), ('belly', (0, 0, -8), (0, 0, 0), 6.0)]:
     pose('Idle', 0); render(REVIEW / (name + '.png'), 1000, 750, loc, tgt, scale)
-for name, clip, t in [('mouth-closed', 'Idle', 0), ('mouth-Bite', 'Bite', .25), ('mouth-Graze', 'Graze', .6)]:
+for name, clip, t in MOUTH:
     pose(clip, t); render(REVIEW / (name + '.png'), 1000, 750, (3.6, -3.6, .7), (0, -2.0, -.16), 1.7)
