@@ -72,6 +72,13 @@ export const FIRST_FADE = 4;
  * excursion sound like a passage rather than a mistake.
  */
 export const AREA_FADE = 7, AREA_ENTER = 3, AREA_LEAVE = 5;
+/**
+ * How long the soundtrack may be silent before it is restarted (`reviveMusic` in audio.ts).
+ *
+ * Longer than every fade the score uses, so a crossfade or an area swap in progress is never
+ * mistaken for the music having stopped; short enough that a player does not conclude it is over.
+ */
+export const DEAD_AIR = 2;
 
 /**
  * The track to play after `current`: a random pick from the rotation, with the one that has just

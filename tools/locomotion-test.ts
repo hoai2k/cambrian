@@ -42,22 +42,26 @@ function solo(id: CreatureId, seed = 11) {
 }
 const flat = (v: { x: number; z: number }) => Math.hypot(v.x, v.z);
 
-// --- the tail-flip: straight back, whatever the stick asked, and weaker as the tail runs down ---
+// --- the tail-flip: back by default, where it is asked when it is asked, weaker as the tail runs down ---
 {
-  /** Push the stick forward and hit dash: a flipper goes the other way. */
-  const flip = (id: CreatureId) => {
+  /** Dash, with the stick held where `my` says. A neutral stick is the reflex; a pushed one steers. */
+  const flip = (id: CreatureId, my: number) => {
     const { p, step } = solo(id);
     for (let i = 0; i < 20; i++) step();
     const from = { ...p.pos }, yaw0 = p.yaw;
-    step({ my: 1, dash: true });
-    for (let i = 0; i < 24; i++) step({ my: 1 });
+    step({ my, dash: true });
+    for (let i = 0; i < 24; i++) step({ my });
     const h = heading(yaw0), dx = p.pos.x - from.x, dz = p.pos.z - from.z;
     return { along: h.x * dx + h.z * dz, moved: Math.hypot(dx, dz), turn: Math.abs(wrapAngle(p.yaw - yaw0)) };
   };
-  const shrimp = flip('waptia'), fish = flip('anomalocaris');
-  check('a tail-flip throws the body backwards', shrimp.along < -2, `${shrimp.along.toFixed(1)} units along its own heading`);
-  check('...even with the stick pushed forward', shrimp.moved > 2, `${shrimp.moved.toFixed(1)} units travelled`);
-  check('...without turning to do it', shrimp.turn < 0.5, `${shrimp.turn.toFixed(2)} rad`);
+  // Asked for nothing, the caridoid reflex throws the body away from whatever touched it.
+  const reflex = flip('waptia', 0);
+  check('a tail-flip with no stick throws the body backwards', reflex.along < -2, `${reflex.along.toFixed(1)} units along its own heading`);
+  check('...without turning to do it', reflex.turn < 0.5, `${reflex.turn.toFixed(2)} rad`);
+  // But a stick direction is an instruction, and wins here as it does on every other body: it used
+  // to be overridden outright, so swimming forward and dashing sent the animal backwards.
+  const steered = flip('waptia', 1), fish = flip('anomalocaris', 1);
+  check('...and a stick pushed forward dashes forward', steered.along > 2, `${steered.along.toFixed(1)} units along its heading`);
   check('a finned body dashes where it is pointed', fish.along > 2, `${fish.along.toFixed(1)} units along its heading`);
 
   // The reflex is the whole abdomen, so it costs the tail: flip on empty and it barely clears.

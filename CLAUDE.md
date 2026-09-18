@@ -156,6 +156,15 @@ unless the user explicitly asks for a PR. Steps:
   music track that names biomes is an *area theme*: reserved for them, never shuffled into the
   rotation, crossfaded to on a dwell and back again on a longer one, resuming where it left off
   (`stepArea` in `src/audio/audio.ts`, the constants in `src/audio/music.ts`, `npm run music`).
+  **The soundtrack is never allowed to end**, and it did: everything that moves the rotation on is
+  an *event* on a media element (`ended`, `timeupdate`, `error`), so an element that never gets one
+  leaves the music stopped for the rest of the match with nothing to restart it. `reviveMusic`
+  checks it on the clock the game already runs — silent for `DEAD_AIR` while music is on means pick
+  a track and start one. The cause of the original death is worth knowing too: `endVoice` recorded a
+  resume position for *every* track, and the rotation hands over **near the end** — that is what the
+  crossfade is — so one cycle parked every roaming track a second from finishing and the score
+  became a string of one-second snippets and then nothing. Resuming belongs to an area theme, which
+  is an excursion you come back from; a rotation track starts at the top.
   Nothing synthesises a stand-in for a sound that has not loaded — it stays quiet and the file is
   fetched; anything genuinely missing goes in `docs/audio-requests.md`. Only creatures with their own delivered model are pickable
   (`PLAYABLE` in `src/sim/creatures.ts`); the rest borrow a body in the world but stay off the roster.
@@ -220,6 +229,18 @@ unless the user explicitly asks for a PR. Steps:
   (the renderer cannot know a dash fired until that step has run) and gives up that one frame of
   drift and no more. `npm run swim` closes the loop end to end — camera drift into the stick into
   the real cooldown — and measures the second dash's own rise against the first's.
+- **A breach is a leap, not a launch.** The vertical a body carried through the surface used to be
+  whatever it had, and a dash's launch speed is `L * 9.5 + 7` — so a five-unit animal that dashed
+  straight up cleared a hundred units of air and a Cymbospondylus over a thousand. `breachSpeed` in
+  `src/sim/game.ts` caps it at `BREACH_LEAP` body lengths of air, which is about what a breaching
+  animal actually does. The *horizontal* is deliberately untouched, so a fast run still carries a
+  long way forward through the air, and the splash is still sized on the speed the animal was
+  travelling at rather than on the capped climb. `npm run swim` holds it at four sizes.
+- **Aim mode is framed across the viewport, not across the world.** The over-the-shoulder shift that
+  makes room for the crosshair is measured in body lengths, which is right, but the room it needs is
+  measured across the *view* — and a split screen has half of one, so two players side by side put
+  the animal off the edge. `aimRoom` in `src/render/engine.ts` scales the shift by the view's own
+  aspect (`AIM_SHOULDER`), and `AIM_CLOSER` brings the camera in further than it did at every width.
 - The climb for air is the era's central act and must stay usable at every size. The shared rise
   rate is scaled by the body, but the water is not — the surface is the same twelve units above the
   shelf whether you hatched this minute or own the sea — so an air-breather's climb has a floor
@@ -619,6 +640,13 @@ unless the user explicitly asks for a PR. Steps:
   apex into the direction of travel while it beats (`bellTilt`), so re-timing that clip breaks the
   lock — which is what the bell cases in `npm run locomotion` are there to catch. Which animal has what, and how well each is actually
   attested, is `docs/research/locomotion-ideas.md`.
+- **A stick direction is an instruction, on every body.** The tail-flip (`tailFlip`, the caridoid
+  escape) used to go straight back along the animal's own axis *whatever the stick asked*, so
+  Odaraia swimming forward and dashing went backwards. It now defaults backwards — asked for
+  nothing, the reflex throws the body away from whatever touched it, which is the whole point of it
+  and is what a jetter does too — and a real stick direction wins, as it does everywhere else. The
+  cost, the launch and the lack of steering mid-flip are unchanged; `npm run locomotion` holds both
+  halves.
 - Nothosaurus now holds its head still in its authored `Swim` and `Sprint` clips. The earlier
   renderer-side `steadyHead` counter-rotation was removed when those clips were corrected; do not
   reintroduce a runtime pose patch for motion that belongs in the reproducible Blender builder.
