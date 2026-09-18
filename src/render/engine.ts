@@ -205,6 +205,8 @@ export const BREATH_PEEK = 1.1;
  * which is what was asked for and helps at every width.
  */
 export const AIM_CLOSER = 0.42, AIM_SHOULDER = 0.75;
+/** How much a body inside the near field outranks one the same apparent size further off. */
+const NEAR_RANK = 3;
 /** 1 at a full-width view, falling off for a narrow one; never less than a third of the shift. */
 export const aimRoom = (aspect: number) => clamp(aspect / 1.6, 0.34, 1);
 export const PITCH_UP = -0.95;   // ~54° above the horizon
@@ -944,13 +946,32 @@ export class Engine {
     const nearDist = (a: Actor) => { let best = Infinity; for (const c of cams) { const d = Math.hypot(a.pos.x - c.x, a.pos.y - c.y, a.pos.z - c.z); if (d < best) best = d; } return best; };
     // Rank by apparent size (body length over distance), not distance alone: a giant 80 units away
     // matters far more than a 0.2-unit snack at 20. Anything under ~8 screen pixels is skipped.
+    /**
+     * Inside this, a body is drawn whatever its apparent size.
+     *
+     * The apparent-size floor below is a good rule for the far field and a bad one up close,
+     * because the distance it divides by is *the viewer's own framing*: the camera sits about one
+     * and a half body lengths back, so a nineteen-unit Cymbospondylus watches from thirty units
+     * away and a prey fish swimming five units in front of its nose is thirty-five from the
+     * camera — 0.011 apparent size, right on the floor, popping in and out. The bigger the animal
+     * you are playing, the nearer the things that vanish. Hence the floor is joined by a plain
+     * near field measured in the same unit the camera is placed in, so what is *in front of you*
+     * is always drawn no matter how small it is or how large you are.
+     */
+    const nearAlways = game.players.reduce(
+      (m, p) => Math.max(m, magnificationDistance(p ? lengthOf(p) : 1) * 1.8 + 10), 22);
     const candidates: { a: Actor; d: number; size: number }[] = [];
     for (const a of game.actors) {
       const d = Math.max(0.5, nearDist(a));
       const size = lengthOf(a) / d;
-      if (a.controller === 'player' || (d < (players > 2 ? 90 : 130) && size > 0.011)) candidates.push({ a, d, size });
+      if (a.controller === 'player' || d < nearAlways || (d < (players > 2 ? 90 : 130) && size > 0.011)) candidates.push({ a, d, size });
     }
-    candidates.sort((x, y) => y.size - x.size);
+    // Ranked by apparent size, with the near field weighted up rather than let past the cap: the
+    // cap is a frame-cost limit and must stay one, but what it cuts is the *tail* of the list —
+    // which is exactly a prey swarm, every member small on screen and most of them right beside
+    // you. Weighting keeps a giant eighty units off (the thing that matters most at any moment)
+    // ahead of the chaff while lifting what is within reach above the small and far.
+    candidates.sort((x, y) => y.size * (y.d < nearAlways ? NEAR_RANK : 1) - x.size * (x.d < nearAlways ? NEAR_RANK : 1));
     const cap = Math.round((this.quality === 'high' ? 88 : 56) / (0.6 + 0.4 * players));
     // Full-detail bodies are the most expensive thing in the frame — they are skinned on the CPU
     // and drawn again into the shadow map, once per viewport — and how expensive depends entirely
