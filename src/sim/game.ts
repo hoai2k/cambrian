@@ -3,7 +3,7 @@ import { RULES } from './era-rules';
 import { BURROWERS, HEAVY_SPECIALS, DEFENSIVE_SPECIALS, CAMOUFLAGE_DRAIN, camouflageMatch, clearPursuit, stopHiding } from './concealment';
 import { abilitySpeed, beginExpansionAbility, beginHeavyStrike, heavyStrikeReach, specialHit, stepExpansionAbility, stepHeavyStrike, bloomRate, grazeRate } from './expansion-abilities';
 import { add, clamp, damp, dist, distXZ, dot, heading, len3, lerp, makeRng, norm, scale as vscale, sub, TAU, v3, wrapAngle, yawOf, type Rng, type Vec3 } from '../shared/math';
-import { applyScaleStats, bandOf, bodyGap, bodyRadius, canAct, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, speedFactor, staminaCost, surfaceGap, swimCeiling } from './actors';
+import { applyScaleStats, bandOf, bodyGap, bodyRadius, canAct, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, isAlive, isHidden, isInvulnerable, lengthOf, makeActor, massOf, mouthReach, speedFactor, staminaCost, surfaceGap, swimCeiling } from './actors';
 import { tierForScale, tierScale } from './tiers';
 import { makeBrain, peaceful, think, type AiWorld } from './ai';
 import { huntingPressure, phaseAt, untilNextPhase, type Phase } from './daynight';
@@ -2633,7 +2633,20 @@ export class Game implements AiWorld {
   private attackHits(a: Actor, m: MoveDef, L: number) {
     const h = heading(a.yaw);
     const mouth = m.sweep ? a.pos : { x: a.pos.x + h.x * L * 0.42, y: a.pos.y - Math.sin(a.pitch) * L * 0.3, z: a.pos.z + h.z * L * 0.42 };
-    const reach = m.sweep ? L * 0.85 : L * 0.4;
+    const reach = m.sweep ? L * 0.85 : mouthReach(a, L);
+    /**
+     * A bite takes **one** mouthful.
+     *
+     * This loop used to call `takeWhole` for every snack inside the mouth, so a single bite into a
+     * prey swarm made three or four animals vanish at once — and the player never saw any of them
+     * taken, because a swarm member goes down without ceremony. The nearest one is remembered here
+     * and swallowed after the loop, so it is carried in the jaws and eaten where it can be seen;
+     * anything else in the way is struck, as a bite that lands on two bodies should.
+     * Bulk feeding is untouched: a filter feeder crossing a shoal has its own path, and a reef
+     * predator that is not steered still eats the way it always did.
+     */
+    let mouthful: Actor | undefined, mouthfulD = Infinity;
+    const steered = a.controller === 'player' || a.controller === 'bot';
     for (const o of this.nearby(a.pos, L * 1.5 + 4)) {
       if (o.id === a.id || !isAlive(o) || a.hitDone.has(o.id) || isHidden(o)) continue;
       if (o.controller === 'swarm' && a.controller === 'swarm') continue;
@@ -2648,12 +2661,17 @@ export class Game implements AiWorld {
         if (a.graspHold && a.grabbing < 0 && a.rideHost < 0 && this.closeGrip(a, o)) continue;
         const closing = clamp(dot(sub(a.vel, o.vel), norm(sub(o.pos, a.pos))) / (creature(a.creature).speed * speedFactor(a.scale) * 1.8), 0, 1.5);
         const band = bandOf(a, o);
-        if (band === 'snack' && (o.controller === 'swarm' || (o.controller === 'ambient' && lengthOf(o) < lengthOf(a) * 0.3))) { this.takeWhole(a, o); continue; }
+        if (band === 'snack' && (o.controller === 'swarm' || (o.controller === 'ambient' && lengthOf(o) < lengthOf(a) * 0.3))) {
+          if (!steered) { this.takeWhole(a, o); continue; }
+          if (d < mouthfulD) { mouthfulD = d; mouthful = o; }
+          continue;
+        }
         const r = applyHit(this.hitCtx, a, o, m, closing);
         if (o.controller === 'player' && (band === 'rival')) this.flag(o, 'fought');
         void r;
       }
     }
+    if (mouthful && isAlive(mouthful)) this.takeWhole(a, mouthful);
   }
 
   private corpseInReach(a: Actor): Actor | undefined {
