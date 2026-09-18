@@ -53,6 +53,19 @@ unless the user explicitly asks for a PR. Steps:
 - `src/sim` must be reproducible: given the same seed and inputs a match replays exactly.
   Nothing there may call `Math.random` — take randomness from the game's `rng` (combat gets it
   through `HitContext.rng`). `tools/` tests rely on this; without it failures do not reproduce.
+- **What is in front of you is always drawn.** `syncViews` picks which bodies get a mesh by
+  *apparent size* — body length over distance, with a floor at about eight screen pixels — and that
+  is a good rule for the far field and a bad one up close, because the distance it divides by is the
+  viewer's **own framing**: the camera sits about one and a half body lengths back, so a 19-unit
+  Cymbospondylus watches from thirty units away and a prey fish five units off its nose is
+  thirty-five from the camera, right on the floor, popping in and out. The bigger the animal you
+  play, the nearer the things that vanish — which is why this showed up in the Triassic and not the
+  Cambrian. So the floor is joined by a near field measured in the same unit the camera is placed
+  in (`nearAlways`), and the *ranking* weights that near field up (`NEAR_RANK`) rather than letting
+  it past the view cap: the cap is a frame-cost limit and must stay one, but what it cuts is the
+  tail of the list, and a prey swarm is the tail — every member small on screen and most of them
+  beside you. Weighting keeps a giant eighty units off ahead of the chaff and lifts what is within
+  reach above the small and far.
 - The renderer interpolates between fixed simulation steps using each actor's `prevT` snapshot,
   so anything that moves an actor by more than it could swim in one step (teleport, respawn)
   must read as a jump. `tools/motion-test.ts` guards this.
