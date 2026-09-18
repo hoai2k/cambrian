@@ -696,5 +696,34 @@ function inFront(p: Actor, o: Actor) {
   check('the dash clip is queued for the models that lack it', dash > 0 || queuedDash >= 20, `${dash} delivered, ${queuedDash} queued`);
 }
 
+// --- the heavy button is never dead, and the prompt never promises what it will not do ---
+{
+  /** One player with prey straight ahead, and a press of RT. */
+  const shot = (setup: (p: Actor) => void, burst = 0) => {
+    const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 5);
+    const p = g.players[0]; g.skipHatch(); p.spawnProtect = 0;
+    const prey = g.spawn('marrella', 'ambient', { x: p.pos.x, y: p.pos.y, z: p.pos.z + lengthOf(p) * 1.5 }, 1);
+    prey.spawnProtect = 0; p.yaw = 0;
+    setup(p);
+    const promised = g.heavyMove(p).ready;
+    g.step(1 / 60, new Map([[0, { ...emptyInput(), heavy: true, burst } as InputFrame]]));
+    g.events.length = 0;
+    return { promised, did: p.state !== 'free' && p.state !== 'guard', state: p.state };
+  };
+  // A pounce that is refused still answers. The press used to fall off the end of the cascade —
+  // the plain-attack branch below it is bots only — so for a player RT did nothing at all.
+  const cooling = shot((p) => { p.pounceCd = 5; p.stamina = p.staminaMax; });
+  check('a refused pounce still swings', cooling.did, `state ${cooling.state}`);
+  const tired = shot((p) => { p.stamina = 13; });
+  check('...and so does a press on a thin bar', tired.did, `state ${tired.state}`);
+  // The prompt and the gate are one thing: a press the HUD calls ready must do the pounce, and a
+  // charge costs more, which is the window the prompt used to lie in.
+  const charged = shot((p) => { p.stamina = 14; p.prev.burst = true; }, 1);
+  check('a charge is priced in the prompt as well as the action', charged.promised === false || charged.did,
+    charged.promised ? 'promised and delivered' : 'not promised');
+  const ready = shot((p) => { p.stamina = p.staminaMax; });
+  check('...and a full bar standing still is a pounce', ready.promised && ready.did, `state ${ready.state}`);
+}
+
 console.log(failed ? `FAILED (${failed})` : 'PASS: grasp roster, held grabs, prey swallowed on release, riding, biting while ridden, shake-off, grip limits');
 process.exit(failed ? 1 : 0);
