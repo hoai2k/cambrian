@@ -19,7 +19,7 @@ selectEra(era);
 let failed = 0;
 const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(62)} ${d}`); if (!ok) failed++; };
 
-const { APEX_SCALE, ERA_IDS, earnedVisitors, standingVisitors, visitorsHere, visitorsFrom } = await import('../src/content/visitors');
+const { APEX_SCALE, ERA_IDS, earnedVisitors, recordableIds, standingVisitors, visitorFor, visitorsHere, visitorsFrom } = await import('../src/content/visitors');
 const { TRIASSIC_GUESTS } = await import('../src/content/triassic/guests');
 const TRIASSIC_BYTES = (await import('../src/content/triassic/asset-sizes.json')).default as Record<string, number>;
 type EraId = import('../src/content/visitors').EraId;
@@ -109,6 +109,17 @@ const other: EraId[] = ERA_IDS.filter((e) => e !== playing);
   check('...but saying where it is really from', standing.every((v) => v.origin === 'Late Cretaceous'),
     standing.map((v) => `${v.id}: ${v.origin}`).join(', '));
   check('...and marked as standing rather than earned', standing.every((v) => v.standing === true));
+  // A guest grows: it has earned nothing, so it hatches and climbs this game's ladder like anything
+  // on the roster — which is also what lets it *be* earned. Two halves to that: the record keeps
+  // its id, and an apex recorded against it resolves into a visitor in the other games.
+  for (const g of TRIASSIC_GUESTS) {
+    check(`...${g.id} is an id this game may record`, recordableIds('triassic').includes(g.id));
+    for (const e of ERA_IDS.filter((x) => x !== 'triassic')) {
+      const v = visitorFor('triassic', g.id);
+      check(`...and taking it to the top sends it to the ${e}`, !!v && v.origin === 'Late Cretaceous',
+        v ? `${v.id} at ${v.length.toFixed(1)} units, from ${v.origin}` : 'not resolved');
+    }
+  }
   for (const v of standing) {
     registerVisitorAssets([{ id: v.id, era: v.era }]);
     check(`...${v.id}'s model resolves into the Triassic's folder`,

@@ -1,3 +1,4 @@
+import { recordableIds, type EraId } from '../content/visitors';
 import { ACTIVE_ERA } from '../content';
 import type { CreatureId } from '../sim/creatures';
 import type { Biome, LandmarkKind } from '../sim/world';
@@ -50,7 +51,7 @@ const clean = <T extends string>(v: unknown, allowed?: readonly T[]): T[] => {
 const cleanBest = (v: unknown): Partial<Record<CreatureId, number>> => {
   const out: Partial<Record<CreatureId, number>> = {};
   if (!v || typeof v !== 'object') return out;
-  const ids = new Set<string>(ACTIVE_ERA.creatures.map((c) => c.id));
+  const ids = new Set<string>(recordableIds(ACTIVE_ERA.id as EraId));
   for (const [k, n] of Object.entries(v as Record<string, unknown>)) {
     if (!ids.has(k) || typeof n !== 'number') continue;
     const m = clampMark(n);
@@ -69,7 +70,7 @@ export function loadCodex(): Codex {
     return {
       biomes: clean<Biome>(v.biomes),
       landmarks: clean<LandmarkKind>(v.landmarks, ['arch', 'stack', 'bones']),
-      apex: clean<CreatureId>(v.apex, ACTIVE_ERA.creatures.map((c) => c.id)),
+      apex: clean<CreatureId>(v.apex, recordableIds(ACTIVE_ERA.id as EraId) as CreatureId[]),
       best: cleanBest(v.best),
     };
   } catch { return EMPTY; }

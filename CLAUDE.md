@@ -745,6 +745,16 @@ unless the user explicitly asks for a PR. Steps:
   `spawnAmbient` draws from it; `spawnPreyFor` still keeps food of your own size within reach, and
   `PASSER_BY` sends a large animal through the upper water whatever the seabed holds. Ambient brains
   wander within ~32 units of where they spawned, so a population stays in its biome.
+- **A death costs half the rung you are standing on, not the rung you had climbed.** `DEATH_COST`
+  and `deathMark`/`placeOnLadder` in `src/sim/ladder.ts`, applied centrally in `respawn` so all
+  three games price it the same way and an era hook only resets the rest of what a respawn resets.
+  A whole-rung penalty made the same mistake cost five seconds or five minutes depending on where
+  in a rung it landed — the moment after a moult was worth almost nothing and the moment before it
+  everything. Half a rung is the same price wherever it lands, and it still demotes: a quarter of
+  the way into adult puts you three quarters of the way through young, and anything past halfway
+  keeps its rung. The rung is set by giving the body the scale that rung is worth and letting the
+  era read it back (`onSwap`), because the Cambrian stores a `tier` and the other two a `stage`.
+  `npm run respawn` prices it at four places on the ladder.
 - A death costs a rung, not the swim back. `respawnAt` in `src/sim/game.ts` returns a body to the
   distance from shore it died at — the same biome, the same depth — and away from any giant;
   inshore that is still the nursery, which is the hatchery and in the shore band anyway. Every
@@ -836,7 +846,15 @@ unless the user explicitly asks for a PR. Steps:
   game and no other. A Cretaceous marine reptile on the Cambrian's pick screen is not a reward
   anybody earned, it is an animal two hundred and fifty million years early; crossing between games
   is what an *earned* visitor is for. Everything else about them is a visitor: `admitVisitors`, never in `CREATURES` or
-  `PLAYABLE`, full grown at the ladder's top scale. `Visitor.era` stays the era whose **folder** holds
+  `PLAYABLE`. But a guest **grows**: an earned visitor arrives full grown because that is the
+  reward and it has already been taken to the top of its own game, where a guest has earned nothing
+  and is admitted because it exists — so it hatches and climbs this game's ladder like anything on
+  the roster (`startScale` in `App.tsx` gives a standing pick no `visitorScale`), which is also what
+  lets it *be* earned. Two halves make that work: `recordableIds` is the roster **plus** that era's
+  guests, so `loadCodex` stops throwing their rungs and their apex away — it cleans against the
+  roster alone, and Archelon and Mosasaurus climbed the ladder and were forgotten the moment the
+  record was read back — and `defOf` resolves a guest id, so an apex recorded against one becomes a
+  visitor in the other two games with its own `origin` on it. `Visitor.era` stays the era whose **folder** holds
   their files, because that is what `'<era>/<id>'` resolves against; where the animal is actually
   *from* is `Visitor.origin`, a display string ("Late Cretaceous"), and anything that says where a
   visitor is from reads that rather than looking the era's name up. Nothing is rippled through
