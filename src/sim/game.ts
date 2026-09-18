@@ -2034,7 +2034,11 @@ export class Game implements AiWorld {
 
     // Aim range: the crosshair fills when whatever RT does for this creature would connect
     a.aimInRange = false;
-    if (a.lockTarget >= 0) { const t = this.idMap.get(a.lockTarget); if (t && isAlive(t)) a.aimInRange = dist(a.pos, t.pos) < this.heavyMove(a).reach; }
+    // Surface to surface, not centre to centre — the lesson the recorder already learned. A big
+    // body's centre is half a length from its mouth and ground prey sits a drop below a swimmer,
+    // so measuring middles put the one thing a player was aiming at out of range while the
+    // crosshair sat on it.
+    if (a.lockTarget >= 0) { const t = this.idMap.get(a.lockTarget); if (t && isAlive(t)) a.aimInRange = bodyGap(t, a) < this.heavyMove(a).reach; }
     // Lock target validity. An unaimed lock is dropped once whatever it is on has got well away —
     // except while the animal is crossing open water to take hold of it. That swim is the whole
     // move, and the distance it covers is the point of it: dropping the lock on range mid-pursuit
@@ -2169,7 +2173,10 @@ export class Game implements AiWorld {
     const def = creature(a.creature);
     // A burrowed ambusher's emergence strike takes the button ahead of everything else.
     if (a.emergenceHeavy) return { name: 'AMBUSH', reach: this.pounceRange(a), ready: true };
-    const pounce = { name: 'POUNCE', reach: this.pounceRange(a), ready: a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0 };
+    // `bursting` costs `CHARGE_STAMINA` on top, and leaving it out of `ready` is how the prompt
+    // came to promise a pounce the action would refuse — the exact window a player hunts in.
+    const need = 12 + (a.state === 'dodge' || a.prev.burst ? CHARGE_STAMINA : 0);
+    const pounce = { name: 'POUNCE', reach: this.pounceRange(a), ready: a.pounceCd === 0 && a.stamina >= need && a.exhausted === 0 };
     if (HEAVY_SPECIALS.has(def.ability)) {
       if (a.abilityCd <= 0 && a.stamina >= 18) return { name: def.abilityName.toUpperCase(), reach: heavyStrikeReach(a, def), ready: true };
       // The special is down. A player's press falls through to the pounce rather than being
@@ -2210,7 +2217,20 @@ export class Game implements AiWorld {
     // been ruled out just above (cooling down, or too little stamina): RT is never a dead button.
     // Bots keep the old split — RT is their special and nothing else — so every seeded replay that
     // depends on their behaviour is unchanged.
-    if (a.controller !== 'player' || a.pounceCd !== 0 || a.stamina < 12 + extra || a.exhausted > 0) return false;
+    if (a.controller !== 'player') return false;
+    // RT is never a dead button. A pounce that is refused — cooling down, too little in the bar,
+    // winded — used to return false here, and for a *player* nothing below this catches the press
+    // (the plain-attack branch is bots only), so the button did literally nothing. Worse, the
+    // surcharge for pressing it mid-charge is paid here but not counted in `heavyMove`'s `ready`,
+    // so the HUD said POUNCE over a press that would be swallowed. It falls through to the
+    // creature's own heavy strike instead: a smaller answer than a pounce, but an answer.
+    if (a.pounceCd !== 0 || a.stamina < 12 + extra || a.exhausted > 0) {
+      if (a.stamina < staminaCost(a, def.heavy.stamina) * 0.5 || a.exhausted > 0) return false;
+      a.state = 'attack'; a.stateT = 0; a.move = def.heavy; a.moveKind = 'heavy'; a.hitDone.clear();
+      a.stamina -= staminaCost(a, def.heavy.stamina); a.combo = 0;
+      this.aimNudge(a, L * 1.8 + 2); this.flag(a, 'heavy');
+      return true;
+    }
     a.stamina -= extra;
     // Holding the grip button turns the lunge into a way of getting hold of something: it will
     // pick a body far too big to bite and swim at it until it arrives, where an ordinary pounce
