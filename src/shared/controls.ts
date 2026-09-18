@@ -21,7 +21,7 @@ export type Scheme = 'pad' | 'kbm' | 'key1' | 'key2';
 
 export type Action =
   | 'swim' | 'look' | 'zoom'
-  | 'sprint' | 'rise' | 'sink'
+  | 'rise' | 'sink'
   | 'light' | 'heavy' | 'ability' | 'dash' | 'guard' | 'aim'
   | 'sense' | 'teleport' | 'view' | 'menu'
   | 'confirm' | 'back' | 'modePrev' | 'modeNext' | 'pick';
@@ -33,13 +33,12 @@ const LABELS: Record<Action, Label> = {
   swim:     { pad: 'Left stick', kbm: 'WASD', key1: 'WASD', key2: 'IJKL' },
   look:     { pad: 'Right stick', kbm: 'Mouse', key1: 'Arrow keys', key2: 'IJKL (no camera)' },
   zoom:     { pad: 'Right stick click + up/down', kbm: 'Mouse wheel', key1: 'PgUp / PgDn', key2: '—', short: { pad: 'RS + ▲▼', kbm: 'Wheel' } },
-  sprint:   { pad: 'LB', kbm: 'Shift', key1: 'Shift', key2: 'Right Shift', short: { key2: 'R-Shift' } },
   rise:     { pad: 'RB', kbm: 'Space', key1: 'Space', key2: 'N' },
   sink:     { pad: 'Left stick click', kbm: 'C', key1: 'C', key2: 'M', short: { pad: 'LS click' } },
   light:    { pad: 'X', kbm: 'F', key1: 'F', key2: ';' },
   heavy:    { pad: 'RT', kbm: 'Left click', key1: 'G', key2: '’', short: { kbm: 'LMB' } },
   ability:  { pad: 'Y', kbm: 'R', key1: 'R', key2: 'P' },
-  dash:     { pad: 'A', kbm: 'Right click', key1: 'V', key2: '/', short: { kbm: 'RMB' } },
+  dash:     { pad: 'A or LB', kbm: 'Right click', key1: 'V', key2: '/', short: { pad: 'A', kbm: 'RMB' } },
   guard:    { pad: 'B', kbm: 'Q', key1: 'Q', key2: 'U' },
   aim:      { pad: 'LT', kbm: 'Middle click', key1: 'Tab', key2: 'O', short: { kbm: 'MMB' } },
   sense:    { pad: 'D-pad up', kbm: 'E', key1: 'E', key2: 'Y', short: { pad: '▲' } },

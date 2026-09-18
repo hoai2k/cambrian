@@ -733,6 +733,19 @@ unless the user explicitly asks for a PR. Steps:
   ceiling with room under it rather than a target, and tightening it towards whatever the fastest
   machine to hand reports makes it fail everywhere else. Read the note beside it before touching the
   number.
+- **Sprint is gone, and the dash is as long as it is held.** A steered body has one way of putting
+  its back into a move. `toInput` sends `burst: 0` for a player and LB — which used to hold the
+  sprint — is a second dash button; the burst machinery stays because the AI drives it and a
+  creature's own free surge (`ambushSurge`, `combCruise`, `burstT`) is that same code, so what was
+  removed is a *player* holding a button to go faster, not the mechanic underneath it. The dash was
+  one length whatever the press was, so the only way to move a little was to move a lot: it now
+  pays `DASH_TAP`'s share of the cost up front and the rest per second while the button is held,
+  and a release reins the body in (`DASH_BRAKE`) and never charges the remainder. A tap covers
+  about a third of a full crossing for about a quarter of the stamina. `DASH_TAP` is a
+  *commitment* window — the dash cannot be ended inside it, which is what keeps its invulnerability
+  worth having — not a delay before braking. `a.dashCost` is what is still owed, and it is zero on
+  a dash nobody is holding (a bot's, a tail-flip's reflex), which is how those stay untouched.
+  `npm run locomotion` measures the travel and the price at three hold lengths.
 - A giant hunts when it is hungry and not otherwise (`wantsToHunt` in `src/sim/ai.ts`): being seen
   used to be reason enough, so every giant that could see a player came down on them and there was
   no approaching one to ride it. A fed giant notices — the head comes round, which is the tell — and
