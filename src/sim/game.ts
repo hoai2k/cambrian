@@ -1748,7 +1748,7 @@ export class Game implements AiWorld {
       // rather than along (see `startDash`). There is always a way back to the surface.
       else if (justDash && (a.stamina >= 10 || freeClimb) && (a.exhausted === 0 || freeClimb) && a.dashCd === 0 && !a.dashUsed) {
         a.dashUsed = true;
-        this.startDash(a, def, mag > 0.3 ? dir : vscale(heading(a.yaw), jets ? -1 : 1), L, sf, relief);
+        this.startDash(a, def, mag > 0.3 ? dir : vscale(heading(a.yaw), jets || def.tailFlip ? -1 : 1), L, sf, relief);
       }
       // Dodge (B for creatures that cannot guard, bots)
       else if (justDodge && a.controller !== 'player' && a.stamina >= 10 && a.exhausted === 0) this.startDodge(a, def, dir, mag, L, sf);
@@ -2134,7 +2134,7 @@ export class Game implements AiWorld {
 
   private startDodge(a: Actor, def: ReturnType<typeof creature>, dir: Vec3, mag: number, L: number, sf: number) {
     // An animal that escapes by flipping its tail has only that one evasion, whichever button asked.
-    if (def.tailFlip) { this.startDash(a, def, dir, L, sf); return; }
+    if (def.tailFlip) { this.startDash(a, def, mag > 0.2 ? dir : vscale(heading(a.yaw), -1), L, sf); return; }
     const retreat = a.dodgeTapT > 0;
     let d: Vec3 = mag > 0.2 ? { ...dir } : vscale(heading(a.yaw), -1);
     if (def.ground) d.y = 0;
@@ -2470,10 +2470,14 @@ export class Game implements AiWorld {
   }
 
   private startDash(a: Actor, def: ReturnType<typeof creature>, dir: Vec3, L: number, sf: number, relief = 0) {
-    // The tail-flip fires before the animal has decided anything: it goes straight back along its
-    // own axis whatever the stick was asking for, and it costs the tail rather than a fin beat.
+    // The tail-flip costs the tail rather than a fin beat, and *defaults* backwards: asked for
+    // nothing, the reflex throws the body away from whatever touched it, which is what the caridoid
+    // escape is. It used to go back along its own axis whatever the stick was asking, so Odaraia
+    // swimming forward and dashing went backwards — a stick direction is an instruction and wins
+    // here as it does on every other body. The caller resolves a neutral stick (the jetters reverse
+    // too); a direction that arrives empty anyway is answered the same way.
     const flip = !!def.tailFlip;
-    let d: Vec3 = flip ? vscale(heading(a.yaw), -1) : { ...dir };
+    let d: Vec3 = len3(dir) > 0.01 ? { ...dir } : vscale(heading(a.yaw), flip ? -1 : 1);
     // A walker dashes along what it is aimed at, up out of the sand included. It keeps the
     // vertical it was given — the dash is a shove, and where it goes afterwards is the settle's
     // business — but it never dashes *into* the floor, which is only a way to waste the stamina.

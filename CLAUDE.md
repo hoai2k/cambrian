@@ -640,6 +640,13 @@ unless the user explicitly asks for a PR. Steps:
   apex into the direction of travel while it beats (`bellTilt`), so re-timing that clip breaks the
   lock — which is what the bell cases in `npm run locomotion` are there to catch. Which animal has what, and how well each is actually
   attested, is `docs/research/locomotion-ideas.md`.
+- **A stick direction is an instruction, on every body.** The tail-flip (`tailFlip`, the caridoid
+  escape) used to go straight back along the animal's own axis *whatever the stick asked*, so
+  Odaraia swimming forward and dashing went backwards. It now defaults backwards — asked for
+  nothing, the reflex throws the body away from whatever touched it, which is the whole point of it
+  and is what a jetter does too — and a real stick direction wins, as it does everywhere else. The
+  cost, the launch and the lack of steering mid-flip are unchanged; `npm run locomotion` holds both
+  halves.
 - Nothosaurus now holds its head still in its authored `Swim` and `Sprint` clips. The earlier
   renderer-side `steadyHead` counter-rotation was removed when those clips were corrected; do not
   reintroduce a runtime pose patch for motion that belongs in the reproducible Blender builder.
