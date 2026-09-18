@@ -509,11 +509,7 @@ export class Engine {
     const fwd = this.tmpV.copy(cs.look).sub(cs.camera.position).normalize();
     f.camYaw = Math.atan2(fwd.x, fwd.z);
     f.camPitch = swimPitch(-Math.asin(clamp(fwd.y, -1, 1)));
-    // Sprint is gone. A steered body has one way of putting its back into a move — the dash — and
-    // LB, which used to hold the sprint, is now a second button for it. `burst` stays on the frame
-    // because the AI still drives it and a creature's own free surge (`ambushSurge`, `combCruise`)
-    // is that same machinery: what was removed is the *player* holding a button to go faster.
-    f.burst = 0; f.dash = c.dash || c.burst > 0.5;
+    f.burst = c.burst; f.dash = c.dash;
     f.rise = c.rise; f.sink = c.sink;
     f.light = c.light; f.heavy = c.heavy; f.ability = c.ability; f.dodge = c.dodge; f.guard = c.guard; f.lock = c.lock; f.sense = c.sense;
     f.aim = c.aim; f.aimTarget = c.aim ? cs.aimTarget : -1;

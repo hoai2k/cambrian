@@ -98,22 +98,28 @@ export class KeyboardInput {
     const k = (c: string) => this.keys.has(c);
     const c = emptyControls();
     if (layout === 1) {
-      c.mx = Number(k('KeyD')) - Number(k('KeyA')); c.my = Number(k('KeyW')) - Number(k('KeyS'));
-      c.lookX = Number(k('ArrowRight')) - Number(k('ArrowLeft')); c.lookY = Number(k('ArrowDown')) - Number(k('ArrowUp'));
-      // The mouse-and-keyboard layout is the *mouse's* layout with the keys around it: the left
-      // hand sits on WASD with everything it reaches — E up, C down, Q guard, Z camouflage, G
-      // sense — and the space bar dashes, which is the one thing that has to fire under a thumb.
-      // The attacks are on the mouse (a click bites, a hold is the heavy) and F is the bite's key
-      // for a player without one. Nothing here is on the same key as anything else.
-      c.rise = k('KeyE'); c.sink = k('KeyC');
-      c.light = k('KeyF'); c.ability = k('KeyZ'); c.dodge = k('Space'); c.dash = k('Space'); c.guard = k('KeyQ'); c.lock = k('Tab'); c.aim = k('Tab'); c.sense = k('KeyG');
+      // **A and D turn; they do not strafe.** The left hand steers the animal the way the right
+      // stick would, so the camera's yaw is what they move — which means turning composes with
+      // swimming rather than replacing it: hold W and press D and the body swims forward along a
+      // curve, because `mx`/`my` are camera-relative and the camera is what turned. The arrow keys
+      // still do it too, for a hand that wants them.
+      c.my = Number(k('KeyW')) - Number(k('KeyX'));
+      c.lookX = Number(k('KeyD')) - Number(k('KeyA')) + Number(k('ArrowRight')) - Number(k('ArrowLeft'));
+      c.lookY = Number(k('ArrowDown')) - Number(k('ArrowUp'));
+      // Up and down are a pair on each hand: E or Q lifts, S or C drops. Every attack has a key as
+      // well as a mouse button, because a hand already on the keys should not have to reach — J and
+      // F bite, G and K are the heavy.
+      c.burst = k('ShiftLeft') ? 1 : 0;
+      c.rise = k('KeyE') || k('KeyQ'); c.sink = k('KeyS') || k('KeyC');
+      c.light = k('KeyF') || k('KeyJ'); c.heavy = k('KeyG') || k('KeyK');
+      c.ability = k('KeyZ'); c.dodge = k('Space'); c.dash = k('Space'); c.guard = k('KeyR'); c.lock = k('Tab'); c.aim = k('Tab'); c.sense = k('KeyI');
       if (k('PageUp') || k('PageDown')) { c.rsClick = true; c.lookY = k('PageUp') ? -1 : 1; }
       c.teleport = k('KeyT'); c.view = k('KeyV');
       c.menu = k('Escape'); c.confirm = k('Enter') || k('Space'); c.back = k('Backspace');
       c.dleft = k('ArrowLeft'); c.dright = k('ArrowRight'); c.dup = k('ArrowUp'); c.ddown = k('ArrowDown');
     } else {
       c.mx = Number(k('KeyL')) - Number(k('KeyJ')); c.my = Number(k('KeyI')) - Number(k('KeyK'));
-      c.rise = k('KeyN'); c.sink = k('KeyM');
+      c.burst = k('ShiftRight') ? 1 : 0; c.rise = k('KeyN'); c.sink = k('KeyM');
       c.light = k('Semicolon'); c.heavy = k('Quote'); c.ability = k('KeyP'); c.dodge = k('Slash'); c.dash = k('Slash'); c.guard = k('KeyU'); c.lock = k('KeyO'); c.aim = k('KeyO'); c.sense = k('KeyY');
       c.teleport = k('KeyH'); c.view = k('Comma');
       c.confirm = k('Enter'); c.back = k('Backspace');
