@@ -20,6 +20,17 @@ export const speedFactor = (scale: number) => Math.pow(scale, 0.45);
 export const clearanceOf = (a: Actor) => lengthOf(a) * (creature(a.creature).clearance ?? (creature(a.creature).ground ? 0.13 : 0.2));
 export const bodyRadius = (a: Actor) => lengthOf(a) * (creature(a.creature).bodyRadius ?? .22);
 /**
+ * How far a bite reaches from the mouth point — the size of the mouth, not of the animal.
+ *
+ * It was two fifths of the body's *length*, which is a sphere the size of a head on a shark and
+ * the size of half a neck on a plesiosaur: a long-necked, small-headed swimmer bit things a body
+ * width away from its jaws, and a big animal bit a whole shoal at once. Girth is the better
+ * measure of a head — a body carries its jaws at roughly its own thickness — so the mouth is
+ * mostly `bodyRadius`, with a little of the length in it so that a long slender fish still has a
+ * bite with some length to it, and a floor so a hatchling can always close on something.
+ */
+export const mouthReach = (a: Actor, L = lengthOf(a)) => Math.max(0.35, bodyRadius(a) * 1.15 + L * 0.08);
+/**
  * How far a body's surface is from a point, treating the animal as a capsule down its own axis
  * rather than as a ball around its middle.
  *
