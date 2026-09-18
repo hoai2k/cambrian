@@ -735,7 +735,15 @@ unless the user explicitly asks for a PR. Steps:
   through `startSwallow`, so the body is carried in front of the jaws and eaten over the next second
   rather than vanishing on contact, and swimming into an animal no longer eats it at all — a player
   has to bite or pounce. The reef's own predators, and anything out of a school, still go down in
-  one gulp with no ceremony.
+  one gulp with no ceremony — but **one bite takes one mouthful**. `attackHits` called `takeWhole`
+  for every snack inside the mouth, so a bite into a prey swarm made three or four animals vanish
+  at once and none of them was seen taken. A steered body (player or bot) takes the *nearest* one,
+  after the loop and through the swallow, and strikes whatever else is in the way; bulk feeding is
+  untouched, because a filter feeder crossing a shoal has its own path and an unsteered reef
+  predator eats the way it always did. And the mouth is sized on the body's **girth**, not on two
+  fifths of its *length* (`mouthReach` in `actors.ts`): the old sphere was a head on a shark and
+  half a neck on a plesiosaur, so a long-necked swimmer bit things a body width from its jaws and
+  a big animal bit a whole shoal at once.
 - What lives where is the place's own business, not the player's: `src/sim/population.ts` gives every
   210-unit area a size profile and a density from a hash bent by the biome (hatcheries inshore, grown
   animals in the deep), pure in the place and the world seed so an area is the same when you return.
