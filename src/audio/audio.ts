@@ -14,7 +14,7 @@ import { assetPaths } from '../content/asset-paths';
  * oscillator.
  */
 import { AUDIBLE_FLOOR, MIN_GAP } from './mix';
-import { AREA_ENTER, AREA_FADE, AREA_LEAVE, CROSSFADE, FIRST_FADE, MISSING, openingTrack, pickNext, themeFor, type MusicTrack } from './music';
+import { AREA_ENTER, AREA_FADE, AREA_LEAVE, CROSSFADE, DEAD_AIR, FIRST_FADE, MISSING, openingTrack, pickNext, themeFor, type MusicTrack } from './music';
 import type { Biome } from '../sim/world';
 import { appBase, setAppBase } from '../shared/base';
 
@@ -80,6 +80,8 @@ export class GameAudio {
   private fadeEnds = 0;
   /** Where each track had got to when it was last faded down, so returning resumes it. */
   private resumeAt = new Map<string, number>();
+  /** Seconds the soundtrack has been silent while it was meant to be playing; see `reviveMusic`. */
+  private deadAir = 0;
   /** The track the score returns to when the player is nowhere in particular. */
   private roamingTrack?: MusicTrack;
   /** What the area rules want playing, and how long they have wanted it. */
@@ -172,7 +174,12 @@ export class GameAudio {
     // Pick the track up where it was left rather than replaying its opening: a minute in the
     // shallows and back should sound like a passage, not like the score starting over.
     const at = this.resumeAt.get(track.name);
-    if (at) el.addEventListener('loadedmetadata', () => { if (Number.isFinite(el.duration)) el.currentTime = Math.min(at, Math.max(0, el.duration - 1)); }, { once: true });
+    // Never resume into the last few seconds: a position that close is a track about to end, and
+    // picking it up there is the same as not playing it.
+    if (at) el.addEventListener('loadedmetadata', () => {
+      if (!Number.isFinite(el.duration) || at >= el.duration - CROSSFADE * 2) return;
+      el.currentTime = at;
+    }, { once: true });
     const gain = ctx.createGain(); gain.gain.value = 0;
     const node = ctx.createMediaElementSource(el);
     node.connect(gain); gain.connect(this.musicGain);
@@ -202,9 +209,20 @@ export class GameAudio {
     voice.gain.gain.linearRampToValueAtTime(to, ctx.currentTime + seconds);
   }
 
-  /** Silence `voice`, remember where it had got to, and take it apart. */
+  /**
+   * Silence `voice`, remember where it had got to, and take it apart.
+   *
+   * Only an **area theme** is remembered. The rotation's own tracks are handed over *near their
+   * end* — that is what the crossfade is — so remembering one parked it a second from finishing,
+   * and the next time it came round it played that second and ended. One cycle of the rotation
+   * left every track parked at its end and the music turned into a string of one-second snippets
+   * and then nothing. Resuming is for the excursion an area theme is: a minute in the shallows and
+   * back should sound like a passage rather than the score starting over. A rotation track has no
+   * such thread to pick up; it starts at the top.
+   */
   private endVoice(voice: MusicVoice) {
-    if (Number.isFinite(voice.el.currentTime)) this.resumeAt.set(voice.track.name, voice.el.currentTime);
+    const t = voice.el.currentTime;
+    if (voice.track.biomes?.length && Number.isFinite(t) && t > 1) this.resumeAt.set(voice.track.name, t);
     voice.el.pause(); voice.el.removeAttribute('src'); voice.el.load();
     voice.node.disconnect(); voice.gain.disconnect();
     if (this.fadingOut === voice) this.fadingOut = undefined;
@@ -238,6 +256,30 @@ export class GameAudio {
     this.ramp(voice, 1, fade);
     if (outgoing) { this.fadingOut = outgoing; this.ramp(outgoing, 0, fade); this.scheduleTeardown(fade); }
     if (!track.biomes?.length) this.roamingTrack = track;
+  }
+
+  /**
+   * The soundtrack is never allowed to end.
+   *
+   * Everything that moves it on is an *event* on a media element — `ended`, `timeupdate`, `error` —
+   * and an element that never gets one leaves the rotation stopped for the rest of the match with
+   * nothing to restart it: a `play()` the browser refused before the first gesture, a stream that
+   * stalled, a voice torn down by a crossfade that then had nowhere to hand over to. So the
+   * soundtrack is also *checked*, on the clock the game already runs: if music is meant to be on
+   * and nothing has been playing for `DEAD_AIR`, pick a track and start one. Two seconds is long
+   * enough to sit through a legitimate gap (a crossfade is `CROSSFADE`, an area swap `AREA_FADE`)
+   * and short enough that a player does not decide the music is over.
+   */
+  private reviveMusic(dt: number) {
+    const live = this.music && !this.music.el.paused && !this.music.el.ended;
+    if (!this.musicOn || live) { this.deadAir = 0; return; }
+    this.deadAir += dt;
+    if (this.deadAir < DEAD_AIR) return;
+    this.deadAir = 0;
+    const was = this.music;
+    this.music = undefined;                 // the silent voice is not something to crossfade from
+    if (was) this.endVoice(was);
+    this.playTrack(pickNext(this.lastHeard), FIRST_FADE);
   }
 
   /** Take the outgoing voice apart once the fade it is in has actually finished. */
@@ -303,7 +345,9 @@ export class GameAudio {
    * the score gives it up. See the note on those constants in music.ts for why the two differ.
    */
   private stepArea(dt: number) {
-    if (!this.ctx || !this.musicStarted || !this.music) return;
+    if (!this.ctx || !this.musicStarted) return;
+    this.reviveMusic(dt);
+    if (!this.music) return;
     const theme = themeFor(this.biome);
     const target = theme ?? this.roamingTrack;
     if (!target || target.name === this.music.track.name) { this.areaWant = undefined; this.areaWantT = 0; return; }

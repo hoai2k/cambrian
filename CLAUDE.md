@@ -156,6 +156,15 @@ unless the user explicitly asks for a PR. Steps:
   music track that names biomes is an *area theme*: reserved for them, never shuffled into the
   rotation, crossfaded to on a dwell and back again on a longer one, resuming where it left off
   (`stepArea` in `src/audio/audio.ts`, the constants in `src/audio/music.ts`, `npm run music`).
+  **The soundtrack is never allowed to end**, and it did: everything that moves the rotation on is
+  an *event* on a media element (`ended`, `timeupdate`, `error`), so an element that never gets one
+  leaves the music stopped for the rest of the match with nothing to restart it. `reviveMusic`
+  checks it on the clock the game already runs — silent for `DEAD_AIR` while music is on means pick
+  a track and start one. The cause of the original death is worth knowing too: `endVoice` recorded a
+  resume position for *every* track, and the rotation hands over **near the end** — that is what the
+  crossfade is — so one cycle parked every roaming track a second from finishing and the score
+  became a string of one-second snippets and then nothing. Resuming belongs to an area theme, which
+  is an excursion you come back from; a rotation track starts at the top.
   Nothing synthesises a stand-in for a sound that has not loaded — it stays quiet and the file is
   fetched; anything genuinely missing goes in `docs/audio-requests.md`. Only creatures with their own delivered model are pickable
   (`PLAYABLE` in `src/sim/creatures.ts`); the rest borrow a body in the world but stay off the roster.
