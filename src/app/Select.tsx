@@ -231,7 +231,16 @@ export function SelectScreen(p: Props) {
             return (
               <button key={c.id} role="option" aria-selected={hovering.length > 0} className={cls}
                 style={{ ['--c' as string]: hovering.length ? PLAYER_COLORS[hovering[0].i] : c.color }}
-                onClick={() => { const i = p.players.findIndex((pl) => !pl.ready && typeof pl.device === 'string'); p.onPick(i >= 0 ? i : 0, c.id); }}
+                onClick={() => {
+                  // A click on the animal you are already on is the second half of choosing it:
+                  // once to move here, again to lock in, again to change your mind. The seat that
+                  // answers is the one *on this tile* when there is one — otherwise a locked-in
+                  // player could never be unlocked, because the search below skips ready seats.
+                  const here = p.players.findIndex((pl) => !pl.cursor && pl.creature === c.id && typeof pl.device === 'string');
+                  if (here >= 0) { p.onReady(here); return; }
+                  const i = p.players.findIndex((pl) => !pl.ready && typeof pl.device === 'string');
+                  p.onPick(i >= 0 ? i : 0, c.id);
+                }}
                 title={`${c.name}${c.kind ? ` · ${c.kind}` : ''} · ${c.role}`} aria-label={c.kind ? `${c.name}, ${c.kind}` : c.name}>
                 <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={ASSETS} alt="" draggable={false} loading="eager" />
                 <FitName name={c.name} />

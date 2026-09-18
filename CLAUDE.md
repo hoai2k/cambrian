@@ -141,6 +141,31 @@ unless the user explicitly asks for a PR. Steps:
   `src/app/Loading.tsx`) it grows a progress bar under that line. The full boot screen is for a
   boot nobody is looking at a screen for — deep-linked to the roster — because over the title it
   would be the title's own painting a second time.
+- **The mouse plays the game without being taken.** It used to be pointer lock: the cursor gone for
+  the match, the mouse turning the camera, the middle of the screen the only thing you could point
+  at. That is a shooter's scheme and this is a game about pointing at an *animal*, so the cursor
+  stays and the camera holds itself. `MousePlay` in `src/input/input.ts` reads one button three
+  ways, the way every drawing program does: a **click** (down and up without travelling) is the
+  bite and fires on the *release*, because until the button comes up it is not yet known to be a
+  click; a **hold** past `HOLD` is the heavy — whatever that animal's heavy is, a pounce, a lunge
+  or its own special; and a **drag** past `DRAG` is the camera and cancels the attack, because
+  moving the mouse is how you look around. The right button dashes at the water under the cursor
+  (the cursor's ray becomes the camera's forward for those frames, so the dash goes there and, held,
+  keeps going), and the middle button is aim mode's framing.
+  Two things follow from there. `cursorDir` unprojects the cursor into the world, and `updateAim`
+  ranks targets along *that* rather than along the camera's centre — pointing at an animal is
+  aiming at it — so the frame carries `aim: true` with the target under the cursor while the
+  over-the-shoulder *framing* stays on the middle button: the simulation's idea of aiming is "this
+  is the body I mean", which is exactly true here, and the camera's is a different question.
+  A cursor also gets no snap, because easing the view onto a target would fight the hand holding
+  the mouse. And with no second stick and no lock, nothing is steering the view frame to frame, so
+  it steers itself: `FOLLOW_RATE` eases the camera round behind the body and back to the resting
+  pitch, and `FOLLOW_HOLD` stands it aside after a drag so looking somewhere on purpose sticks.
+  The keyboard around it is the mouse's own layout — E up, C down, Q guard, Z camouflage, G sense,
+  space to dash, F for a bite without a mouse — and `npm run mouse` drives the whole of it in a
+  real browser, where every part of it is something a headless test cannot vouch for. That harness
+  waits on the *game's own state and frames*, never on the clock: this page draws about a frame a
+  second under the software renderer, so a wait in seconds measures the renderer.
 - **A seat is a claim, and arriving at a screen claims nothing.** Reaching the roster from another
   game's picker (`deepLinkedToSelect`) used to open a keyboard seat on the era's default animal, so
   the screen showed somebody playing before anybody had pressed anything. The keyboard now takes its
