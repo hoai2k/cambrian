@@ -41,6 +41,18 @@ export type DialogKind = null | 'help' | 'settings';
 export interface Settings { quality: Quality; lookSpeed: number; invertY: boolean; volume: number; muted: boolean; music: boolean; equivalentSizing: boolean; }
 
 /** The active era's modes, in its order; the first is the default selection. */
+/**
+ * The size a visitor starts at.
+ *
+ * An **earned** visitor arrives full grown: that is the reward, and it has already been taken to
+ * the top of its own game. A **standing guest** has earned nothing — it is admitted because it
+ * exists — so it hatches and climbs this game's ladder like anything else on the roster, which is
+ * also what lets it *be* earned: its rungs are saved (`recordableIds`) and reaching the top makes
+ * it a visitor in the other two games. Handing one the apex scale for free skipped the whole game
+ * and left nothing to record.
+ */
+const startScale = (v: Visitor) => (v.standing ? undefined : v.scale);
+
 const MODES: Mode[] = ACTIVE_ERA.modes.map((m) => m.id);
 const SETTINGS_KEY = ACTIVE_ERA.copy.settingsKey;
 const defaultSettings = (): Settings => {
@@ -504,7 +516,7 @@ export function App() {
       if (!list.length || !dx) return;
       const at = Math.max(0, list.findIndex((v) => v.id === p.creature));
       const v = list[(at + dx + list.length) % list.length];
-      ps[index] = { ...p, creature: v.id as CreatureId, visitorScale: v.scale };
+      ps[index] = { ...p, creature: v.id as CreatureId, visitorScale: startScale(v) };
       updatePlayers(ps); audio.play('ui-move');
       return;
     }
@@ -564,7 +576,7 @@ export function App() {
     if (p.cursor === 'visitors' && !p.ready) {
       const v = visitorsRef.current[0];
       if (v) {
-        ps[index] = { ...p, creature: v.id as CreatureId, visitorScale: v.scale, ready: true };
+        ps[index] = { ...p, creature: v.id as CreatureId, visitorScale: startScale(v), ready: true };
         updatePlayers(ps); audio.play('ui-confirm');
         return;
       }

@@ -836,7 +836,15 @@ unless the user explicitly asks for a PR. Steps:
   game and no other. A Cretaceous marine reptile on the Cambrian's pick screen is not a reward
   anybody earned, it is an animal two hundred and fifty million years early; crossing between games
   is what an *earned* visitor is for. Everything else about them is a visitor: `admitVisitors`, never in `CREATURES` or
-  `PLAYABLE`, full grown at the ladder's top scale. `Visitor.era` stays the era whose **folder** holds
+  `PLAYABLE`. But a guest **grows**: an earned visitor arrives full grown because that is the
+  reward and it has already been taken to the top of its own game, where a guest has earned nothing
+  and is admitted because it exists — so it hatches and climbs this game's ladder like anything on
+  the roster (`startScale` in `App.tsx` gives a standing pick no `visitorScale`), which is also what
+  lets it *be* earned. Two halves make that work: `recordableIds` is the roster **plus** that era's
+  guests, so `loadCodex` stops throwing their rungs and their apex away — it cleans against the
+  roster alone, and Archelon and Mosasaurus climbed the ladder and were forgotten the moment the
+  record was read back — and `defOf` resolves a guest id, so an apex recorded against one becomes a
+  visitor in the other two games with its own `origin` on it. `Visitor.era` stays the era whose **folder** holds
   their files, because that is what `'<era>/<id>'` resolves against; where the animal is actually
   *from* is `Visitor.origin`, a display string ("Late Cretaceous"), and anything that says where a
   visitor is from reads that rather than looking the era's name up. Nothing is rippled through

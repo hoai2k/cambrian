@@ -85,7 +85,20 @@ export interface Visitor {
 const naturalLength = (id: string): number | undefined =>
   (NATURAL as Record<string, { adultLength?: number } | undefined>)[id]?.adultLength;
 
-const defOf = (era: EraId, id: string): CreatureDef | undefined => ROSTERS[era].find((c) => c.id === id);
+const defOf = (era: EraId, id: string): CreatureDef | undefined =>
+  ROSTERS[era].find((c) => c.id === id) ?? GUESTS[era].find((c) => c.id === id);
+
+/**
+ * Every id this game may keep a record about: its roster, plus its own standing guests.
+ *
+ * A guest is not on the roster, and `loadCodex` throws away any id that is not — so Archelon and
+ * Mosasaurus climbed the ladder and the record forgot them the moment it was read back. They grow
+ * like anything else and their progress is theirs, so the record keeps them, which is also what
+ * makes an apexed guest into a visitor in the other two games (`earnedVisitors` resolves it through
+ * `defOf` above).
+ */
+export const recordableIds = (era: EraId): string[] =>
+  [...ROSTERS[era].map((c) => c.id), ...GUESTS[era].map((c) => c.id)];
 
 /** Everything the given era could ever send abroad: its own animals, at the size they finish at. */
 export function visitorsFrom(era: EraId): Visitor[] {
@@ -98,7 +111,8 @@ export function visitorsFrom(era: EraId): Visitor[] {
 function makeVisitor(era: EraId, def: CreatureDef): Visitor {
   const scale = APEX_SCALE[era];
   const adult = (era === 'cambrian' ? naturalLength(def.id) : undefined) ?? def.adultLength;
-  return { id: def.id, era, def, scale, length: adult * scale, origin: ERA_NAME[era] };
+  // A guest earned abroad says where it is really from, exactly as the standing copy of it does.
+  return { id: def.id, era, def, scale, length: adult * scale, origin: GUEST_ORIGIN[def.id] ?? ERA_NAME[era] };
 }
 
 /**
