@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { audio, SAMPLES } from '../audio/audio';
 import { distanceAtten, hugeLength } from '../audio/mix';
 import { applyMouse, emptyControls, gamepads, KeyboardInput, MousePlay, readGamepad, rumble, type RawControls } from '../input/input';
+import { cursorFor, cursorState } from '../shared/cursors';
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
 import { bandOf, comingFor, isAlive, isHidden, lengthOf } from '../sim/actors';
 import { creature, type CreatureId } from '../sim/creatures';
@@ -331,6 +332,8 @@ export class Engine {
   private mouseFrame: ReturnType<MousePlay['read']> | undefined;
   /** Scratch for the ray from the camera through the cursor. */
   private tmpRay = new THREE.Vector3();
+  /** The CSS cursor currently set, so the style is only written when it changes. */
+  private cursorNow = '';
   private setups: PlayerSetup[] = [];
   private raf = 0;
   private last = performance.now();
@@ -410,7 +413,13 @@ export class Engine {
   }
   setLook(speed: number, invert: boolean) { this.lookSpeed = speed; this.invertY = invert; }
   setPaused(p: boolean) { this.paused = p; this.syncPointer(); }
-  private syncPointer() { this.mouse.want(this.pointerWanted && !this.paused && !this.attract); }
+  private syncPointer() {
+    const playing = this.pointerWanted && !this.paused && !this.attract;
+    this.mouse.want(playing);
+    // Paused, in a dialog, on the results screen or back at the menus, the cursor belongs to the
+    // buttons again: a targeting reticle over a *Quit to title* is a lie about what a click does.
+    if (!playing) { this.cursorNow = ''; this.container.style.cursor = ''; }
+  }
   /** The match is over but the sea keeps running behind the results: give the cursor back. */
   releasePointer() { this.pointerWanted = false; this.syncPointer(); }
   /** Whether this match is being played on mouse and keyboard, so the HUD can name the buttons. */
@@ -567,6 +576,7 @@ export class Engine {
           // A dash aimed up keeps its aim until the dash is ready again (`climbAimHold`), so a
           // chain of them climbs instead of flattening out between presses.
           cs.climbHold = climbAimHold(cs.climbHold, cs.pitch, p?.dashCd ?? 0, dt);
+          if (this.mouseLook && this.mouseFrame) this.showCursor(this.mouseFrame, game, p, cs);
           if (c.rsClick) {
             // Right stick pressed in: up/down zooms instead of pitching.
             cs.zoom = clamp(cs.zoom * Math.exp(c.lookY * dt * 1.6), 0.55, 2.2);
@@ -802,6 +812,23 @@ export class Engine {
     const ndc = this.mouseFrame?.ndc;
     if (!this.mouseLook || !ndc) return undefined;
     return this.tmpRay.set(ndc.x, ndc.y, 0.5).unproject(cs.camera).sub(cs.camera.position).normalize();
+  }
+
+  /**
+   * Dress the cursor for what it is over and what the buttons are doing, and tell the mouse
+   * whether there is anything there — which is what decides whether the next press is an attack or
+   * a look (`MousePlay.onDown`). The engine is the only thing that knows both.
+   *
+   * Edible or a fight is the size band, the same one every other readout in the game uses: what you
+   * could swallow or chase down is green, what would be a fight is red.
+   */
+  private showCursor(m: ReturnType<MousePlay['read']>, game: Game, p: Actor | undefined, cs: CamState) {
+    const t = p && cs.aimTarget >= 0 ? game.byId(cs.aimTarget) : undefined;
+    const band = t && p && isAlive(t) ? bandOf(p, t) : undefined;
+    const over = !band ? 'none' : band === 'snack' || band === 'prey' ? 'edible' : 'attack';
+    this.mouse.aimingAt(over !== 'none');
+    const want = cursorFor(cursorState(m, over));
+    if (want !== this.cursorNow) { this.cursorNow = want; this.container.style.cursor = want; }
   }
 
   private updateAim(cs: CamState, p: Actor | undefined, aiming: boolean, dt: number) {
@@ -1521,7 +1548,9 @@ export class Engine {
       const watched = this.spectatorTarget(game, i);
       const spectate = watched ? { index: watched.player, name: `P${watched.player + 1}`, color: PLAYER_COLORS[watched.player % 4], creature: watched.creature } : undefined;
       let aim: PlayerHud['aim'];
-      if (p.aiming && cs) {
+      // On a mouse the *cursor* is the crosshair (`src/shared/cursors.ts`), so the reticle is off:
+      // two crosshairs on one screen, one of them nailed to the middle, is worse than either alone.
+      if (p.aiming && cs && !this.mouseLook) {
         const t = lockA && isAlive(lockA) ? lockA : undefined;
         const heavyMove = game.heavyMove(p);
         aim = { hasTarget: !!t, inRange: !!t && p.aimInRange, name: t ? creature(t.creature).name : undefined, color: t ? BAND_COLOR[bandOf(p, t)] : '#eefaf6', ready: heavyMove.ready, action: heavyMove.name };

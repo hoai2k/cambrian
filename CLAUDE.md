@@ -158,12 +158,30 @@ unless the user explicitly asks for a PR. Steps:
   over-the-shoulder *framing* stays on the middle button: the simulation's idea of aiming is "this
   is the body I mean", which is exactly true here, and the camera's is a different question.
   A cursor also gets no snap, because easing the view onto a target would fight the hand holding
-  the mouse. And with no second stick and no lock, nothing is steering the view frame to frame, so
+  the mouse. **The cursor is then the crosshair, so the on-screen reticle is off in mouse play** —
+  two crosshairs on one screen, one of them nailed to the middle, is worse than either alone — and
+  the cursor has to carry what the reticle used to say: `src/shared/cursors.ts` draws six states, a
+  faint cross over nothing, a green ring over something you could eat, a red barbed ring over a
+  fight, four inward arrows while a pounce winds up, a forward arrow while the right button dashes,
+  and the browser's own grab hand while a drag turns the view. They are different *drawings* rather
+  than recolours of one, so they read without relying on colour, and each carries a dark companion
+  stroke because a pale cursor vanishes over a pale animal. `cursorState` puts what a held button is
+  **doing** above what the cursor is **over**, since a press in progress is the more urgent fact.
+  That also settles the one button: **a press with nothing under the cursor is the camera from the
+  first pixel**, and a hold there is never the heavy — there is nothing out there to pounce at, so
+  waiting `DRAG` pixels to discover that only costs the player the start of the movement. A *click*
+  still bites wherever it lands, because biting at the water ahead of you is a real move and is how
+  you attack something you have not pointed at. `npm run cursors` holds the mapping (it is pure) and
+  `npm run mouse` holds the wiring. And with no second stick and no lock, nothing is steering the view frame to frame, so
   it steers itself: `FOLLOW_RATE` eases the camera round behind the body and back to the resting
   pitch, and `FOLLOW_HOLD` stands it aside after a drag so looking somewhere on purpose sticks.
-  The keyboard around it is the mouse's own layout — E up, C down, Q guard, Z camouflage, G sense,
-  space to dash, F for a bite without a mouse — and `npm run mouse` drives the whole of it in a
-  real browser, where every part of it is something a headless test cannot vouch for. That harness
+  The keyboard around it is the mouse's own layout: **A and D turn rather than strafe** — they move
+  the camera's yaw, which is what the right stick does, so turning *composes* with swimming instead
+  of replacing it (hold W, press D, and the body swims forward along a curve, because `mx`/`my` are
+  camera-relative and the camera is what turned) — W forward, X back, E or Q up, S or C down, R the
+  shield, Z camouflage, I sense, space to dash, Shift to sprint. Every attack has a key as well as a
+  mouse button, because a hand already on the keys should not have to reach: J and F bite, G and K
+  are the heavy. `npm run mouse` drives the whole of it in a real browser, where every part of it is something a headless test cannot vouch for. That harness
   waits on the *game's own state and frames*, never on the clock: this page draws about a frame a
   second under the software renderer, so a wait in seconds measures the renderer.
 - **A seat is a claim, and arriving at a screen claims nothing.** Reaching the roster from another

@@ -90,7 +90,8 @@
     "blender": "bash tools/blender-setup.sh",
     "triassic:review": "node tools/triassic/review-bodies.mjs",
     "sim:gate": "npm run -s flora && npm run -s locomotion && npm run -s fight && npm run -s feast && npm run -s respawn && npm run -s corpse && npm run -s environment && npm run -s hunt && npm run -s motion && npm run -s hiding && npm run -s sizing && npm run -s spatial && npm run -s record",
-    "mouse": "node tools/mouse-play-browser.mjs"
+    "mouse": "node tools/mouse-play-browser.mjs",
+    "cursors": "esbuild tools/cursors-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/cursors-test.mjs --log-level=error && node node_modules/.cache/cursors-test.mjs"
   },
   "dependencies": {
     "react": "^19.1.0",

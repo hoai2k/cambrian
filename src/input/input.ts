@@ -184,9 +184,14 @@ export class MousePlay {
   /** Where the cursor is, in NDC. Undefined until it has been over the canvas. */
   private ndc: { x: number; y: number } | undefined;
   /** The left press in progress: when it started, how far it has travelled, what it became. */
-  private press: { t: number; moved: number; dragging: boolean } | undefined;
+  private press: { t: number; moved: number; dragging: boolean; targeted: boolean } | undefined;
   /** A completed click, waiting to be read as one bite. */
   private clicked = false;
+  /**
+   * Whether the cursor is over something worth attacking. Written by the engine each frame (it is
+   * the only thing that knows), and read on the next press: see `onDown`.
+   */
+  private overTarget = false;
   /** Kept for the engine's benefit: nothing is locked, so nothing is ever lost. */
   locked = false;
   onLost: (() => void) | null = null;
@@ -220,16 +225,22 @@ export class MousePlay {
     if (!this.wanted) return;
     e.preventDefault();
     this.buttons.add(e.button);
-    if (e.button === 0) this.press = { t: performance.now() / 1000, moved: 0, dragging: false };
+    // A press with **nothing under the cursor** is the camera from the first pixel. There is no
+    // attack to make out there, so waiting `DRAG` pixels to find that out only costs the player the
+    // start of the movement — and the whole point of a left button that both attacks and looks is
+    // that it is never ambiguous about which. Over an animal, it is the attack until it travels.
+    if (e.button === 0) this.press = { t: performance.now() / 1000, moved: 0, dragging: !this.overTarget, targeted: this.overTarget };
   };
   private onUp = (e: MouseEvent) => {
     this.buttons.delete(e.button);
     if (e.button !== 0) return;
     const p = this.press; this.press = undefined;
-    if (!p || p.dragging) return;                       // a drag was the camera, not an attack
-    // Released before the hold became a heavy: that is a click, and a click is a bite. It is read
-    // once, on the frame after the release, because a bite is an edge and not a state.
-    if (performance.now() / 1000 - p.t < MousePlay.HOLD) this.clicked = true;
+    // A click is a click wherever it lands: pressed and let go without *travelling*, which is the
+    // test whether or not there was anything under it. Biting at the water ahead of you is a real
+    // move — it is how you attack something you have not pointed at — so the bite is never taken
+    // away, only the heavy is. It is read once, on the frame after the release, because a bite is
+    // an edge and not a state.
+    if (p && p.moved <= MousePlay.DRAG && performance.now() / 1000 - p.t < MousePlay.HOLD) this.clicked = true;
   };
   private onContext = (e: Event) => { if (this.wanted) e.preventDefault(); };
   private onBlur = () => { this.buttons.clear(); this.press = undefined; };
@@ -244,6 +255,9 @@ export class MousePlay {
     window.addEventListener('blur', this.onBlur);
   }
 
+  /** Tell the mouse whether the cursor is over a creature. Cheap, and called every frame. */
+  aimingAt(on: boolean) { this.overTarget = on; }
+
   /** Whether the mouse is playing the game. Nothing is locked either way. */
   want(on: boolean) {
     if (this.wanted === on) return;
@@ -254,7 +268,10 @@ export class MousePlay {
   /** Everything the mouse has done since the last frame. Drains the deltas and the click. */
   read() {
     const p = this.press;
-    const held = !!p && !p.dragging && performance.now() / 1000 - p.t >= MousePlay.HOLD;
+    // A **hold is the heavy only over something**. With nothing under the cursor there is nothing
+    // to pounce at, so holding the button there is the camera and only the camera — which is what
+    // makes the one button unambiguous: what it does is decided by what you pointed it at.
+    const held = !!p && p.targeted && p.moved <= MousePlay.DRAG && performance.now() / 1000 - p.t >= MousePlay.HOLD;
     const r = {
       dx: this.dx * MousePlay.SENSITIVITY, dy: this.dy * MousePlay.SENSITIVITY,
       zoom: this.wheel * MousePlay.WHEEL,
@@ -264,6 +281,8 @@ export class MousePlay {
       click: this.clicked,
       /** Turning the camera this frame, so the follow camera knows to stand aside. */
       dragging: !!p?.dragging || this.buttons.has(1),
+      /** The left button is down on a target and has not travelled: a pounce is winding up. */
+      pressing: !!p && p.targeted && p.moved <= MousePlay.DRAG,
       middle: this.buttons.has(1), right: this.buttons.has(2),
       ndc: this.ndc,
     };
