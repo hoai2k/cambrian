@@ -319,11 +319,9 @@ export const DEVONIAN_RULES: EraRules = {
 
   onRespawn(g, a) {
     const d = devActor(g, a);
-    d.standing *= 0.8;
-    // death costs a moult: one stage back (never below hatchling), and the standing to match
-    if (g.mode !== 'reef' && d.stage > 0) d.stage -= 1;
-    a.scale = stageScale(creature(a.creature).adultLength, d.stage);
-    d.standing = Math.min(d.standing, d.stage + 1 <= PRIME_STAGE ? STAGE_AT[d.stage + 1] - 1 : d.standing);
+    // What a death costs the ladder is `DEATH_COST` and is settled centrally, in `respawn`, so all
+    // three games price it the same way: half of the stage you are standing in, which demotes only
+    // if you were less than halfway through it. This hook keeps the rest of what a respawn resets.
     d.atSurface = false; d.windT = 0; d.deadT = 0; d.deadZoneIn = false; d.moultSoft = 0; d.exuvia = -1; d.followers = 0; d.primeT = 0; d.beached = false;
   },
 

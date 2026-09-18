@@ -11,7 +11,7 @@ import { applyHit, endRide, GRIP_BREAK, GRIP_MEAL, GRIP_STRAIN, GRIP_STRIKE, kil
 import { creature, isVisitor, PLAYABLE_IDS, WILD_IDS, type CreatureId, type MoveDef } from './creatures';
 import { resolveFlora, stepFlora, type FloraContact } from './flora';
 import { SpatialHash } from './spatial';
-import { clampMark, fillOf, ladderFill, ladderMark, ladderRung, ladderScale, LADDER_TOP, MARK_NEAR_TOP } from './ladder';
+import { clampMark, deathMark, fillOf, ladderFill, ladderMark, ladderRung, ladderScale, LADDER_TOP, MARK_NEAR_TOP, placeOnLadder } from './ladder';
 import { emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
 import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, RISE_RATE, sampleCurrent, sampleHeight, shoreDistance, shoreZ, type StaticContact, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 import { areaProfile, bandScale, drawBand, headroom, PASSER_BY } from './population';
@@ -999,13 +999,13 @@ export class Game implements AiWorld {
 
   private respawn(a: Actor) {
     const def = creature(a.creature);
-    // death penalty: lose a tier, keep half progress (an era may own this instead)
+    // Death costs half of the rung you are standing on (`DEATH_COST`), not the whole rung you had
+    // climbed — so it demotes only when you were less than halfway through, and costs the same
+    // wherever in a rung it lands. The era hook still runs first for everything else a respawn
+    // resets; the ladder itself is settled here so all three games price a death the same way.
     if (RULES) RULES.onRespawn(this, a);
-    else if (a.tier > 0 && this.mode !== 'reef') {
-      const frac = a.nutrition / TIER_NEED[a.tier];
-      a.tier = (a.tier - 1) as Tier; a.scale = tierScale(a.creature, a.tier);
-      a.nutrition = TIER_NEED[a.tier] * clamp(frac * 0.5 + 0.35, 0, 0.9);
-    } else a.nutrition *= 0.5;
+    if (this.mode !== 'reef') placeOnLadder(this, a, deathMark(ladderMark(this, a)));
+    else if (!RULES) a.nutrition *= 0.5;
     if (this.mode === 'hunted' && this.isHunter(a.player) && !RULES) { a.scale = 3.0; a.tier = 3; }
     applyScaleStats(a, false);
     a.eaten = 0;

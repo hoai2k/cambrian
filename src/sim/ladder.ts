@@ -88,5 +88,34 @@ export const ladderMark = (g: Game, a: Actor): number => {
   return clampMark(rung + Math.max(0, Math.min(0.999, fill)));
 };
 
+/**
+ * What dying costs, as a fraction of a rung.
+ *
+ * Half of the rung you are standing on, rather than the whole rung you had climbed. A death used to
+ * drop you a level outright, which meant the moment after a moult was worth almost nothing and the
+ * moment before it was worth everything — the same mistake costing five minutes or five seconds
+ * depending on where in a rung it landed. Losing half of the current rung is the same price
+ * wherever you are standing in it, and it still demotes: a quarter of the way into adult puts you
+ * three quarters of the way through young, and anything past halfway keeps its rung.
+ */
+export const DEATH_COST = 0.5;
+/** Where a body stands after dying. */
+export const deathMark = (mark: number) => clampMark(mark - DEATH_COST);
+
+/**
+ * Put a body at `mark` on the ladder: rung, size and the meter under it.
+ *
+ * The inverse of `ladderMark`, and era-agnostic — an era that owns its growth stores the rung its
+ * own way (the Cambrian's `tier`, the other two eras' `stage`), so the rung is set by giving the
+ * body the scale that rung is worth and letting the era read it back (`onSwap`, which exists for
+ * exactly this because swapping creature mid-match has the same problem).
+ */
+export const placeOnLadder = (g: Game, a: Actor, mark: number) => {
+  const m = clampMark(mark);
+  a.scale = ladderScale(a.creature, m);
+  if (RULES?.onSwap) RULES.onSwap(g, a); else if (!RULES) a.tier = rungOf(m) as Actor['tier'];
+  ladderFill(g, a, fillOf(m));
+};
+
 /** Adult length is era content, not ladder logic; re-exported so callers need one import. */
 export const adultLength = (id: CreatureId) => creature(id).adultLength;

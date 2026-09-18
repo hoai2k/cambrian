@@ -745,6 +745,16 @@ unless the user explicitly asks for a PR. Steps:
   `spawnAmbient` draws from it; `spawnPreyFor` still keeps food of your own size within reach, and
   `PASSER_BY` sends a large animal through the upper water whatever the seabed holds. Ambient brains
   wander within ~32 units of where they spawned, so a population stays in its biome.
+- **A death costs half the rung you are standing on, not the rung you had climbed.** `DEATH_COST`
+  and `deathMark`/`placeOnLadder` in `src/sim/ladder.ts`, applied centrally in `respawn` so all
+  three games price it the same way and an era hook only resets the rest of what a respawn resets.
+  A whole-rung penalty made the same mistake cost five seconds or five minutes depending on where
+  in a rung it landed — the moment after a moult was worth almost nothing and the moment before it
+  everything. Half a rung is the same price wherever it lands, and it still demotes: a quarter of
+  the way into adult puts you three quarters of the way through young, and anything past halfway
+  keeps its rung. The rung is set by giving the body the scale that rung is worth and letting the
+  era read it back (`onSwap`), because the Cambrian stores a `tier` and the other two a `stage`.
+  `npm run respawn` prices it at four places on the ladder.
 - A death costs a rung, not the swim back. `respawnAt` in `src/sim/game.ts` returns a body to the
   distance from shore it died at — the same biome, the same depth — and away from any giant;
   inshore that is still the nursery, which is the hatchery and in the shore band anyway. Every
