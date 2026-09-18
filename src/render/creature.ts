@@ -256,23 +256,23 @@ export class CreatureView {
    * `PULSE_THRUST` of a `PULSE_CYCLE` and coasts through the refill. The `Swim` clip is exactly one
    * cycle long with its squeeze filling exactly that window, so scrubbing the clip to `pulseT`
    * makes the bell you watch close the water actually being thrown, rather than a loop running
-   * near it. Asking for nothing pins `pulseT` at zero, and the animal falls back to `Idle`, which
-   * is the same beat at a third of the size and half the rate.
+   * near it.
    *
-   * Returns true when it has taken charge of the locomotion layer.
+   * `pulseT` is zero unless the animal is *driving* — sprinting or dashing — because that is the
+   * only time it pulses (`src/sim/game.ts`). Cruising, it is handed straight back to the shared
+   * state machine and swims like anything else, which is what a medusa going nowhere in particular
+   * actually does; taking charge here and falling to `Idle` made every unhurried crossing a
+   * stutter. So this returns **false** off the beat: not "nothing to draw" but "nothing special
+   * about it", which is exactly the right answer.
    */
   private bell(a: Actor) {
     if (this.def.swimStyle !== 'pulse') return false;
     const swim = this.actions.get('Swim');
     if (!swim) return false;
     this.bellPulsing = a.pulseT > 0;
-    if (this.bellPulsing) {
-      this.playLoop('Swim');
-      if (this.loco === swim) { swim.paused = true; swim.time = bellPhase(a.pulseT) * swim.getClip().duration; }
-    } else {
-      swim.paused = false;
-      this.playLoop('Idle');
-    }
+    if (!this.bellPulsing) { swim.paused = false; return false; }
+    this.playLoop('Swim');
+    if (this.loco === swim) { swim.paused = true; swim.time = bellPhase(a.pulseT) * swim.getClip().duration; }
     return true;
   }
 

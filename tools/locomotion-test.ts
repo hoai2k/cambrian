@@ -92,17 +92,21 @@ const flat = (v: { x: number; z: number }) => Math.hypot(v.x, v.z);
 
 // --- the bell: thrust in contractions, with a coast between them ---
 {
-  const trace = (id: CreatureId) => {
+  const trace = (id: CreatureId, burst = 0) => {
     const { p, step } = solo(id);
-    for (let i = 0; i < 30; i++) step({ my: 1 });
+    for (let i = 0; i < 30; i++) step({ my: 1, burst });
     const speeds: number[] = [];
-    for (let i = 0; i < 70; i++) { step({ my: 1 }); speeds.push(flat(p.vel)); }
+    for (let i = 0; i < 70; i++) { step({ my: 1, burst }); speeds.push(flat(p.vel)); }
     const hi = Math.max(...speeds), lo = Math.min(...speeds);
     return { hi, lo, swing: (hi - lo) / Math.max(hi, 1e-3), mean: speeds.reduce((s, v) => s + v, 0) / speeds.length };
   };
-  const bell = trace('burgessomedusa'), steady = trace('anomalocaris');
-  check('a bell surges and coasts', bell.swing > 0.35, `speed swings ${(bell.swing * 100).toFixed(0)}% within a cycle`);
-  check('...where a swimmer holds its speed', steady.swing < bell.swing * 0.4, `${(steady.swing * 100).toFixed(0)}%`);
+  // The pulse is what a bell does *under power*. Cruising, it swims like anything else: surging and
+  // coasting at every speed meant a jellyfish never simply swam, and every unhurried crossing was a
+  // stutter that read as broken rather than as a medusa.
+  const driven = trace('burgessomedusa', 1), bell = trace('burgessomedusa'), steady = trace('anomalocaris');
+  check('a bell under power surges and coasts', driven.swing > 0.35, `speed swings ${(driven.swing * 100).toFixed(0)}% within a cycle`);
+  check('...but cruising it swims smoothly', bell.swing < driven.swing * 0.5, `${(bell.swing * 100).toFixed(0)}% against ${(driven.swing * 100).toFixed(0)}%`);
+  check('...where a swimmer holds its speed', steady.swing < driven.swing * 0.4, `${(steady.swing * 100).toFixed(0)}%`);
   check('...and it still gets somewhere', bell.mean > 0.5, `${bell.mean.toFixed(1)} units/s average`);
 }
 

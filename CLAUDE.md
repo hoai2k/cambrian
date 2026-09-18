@@ -676,7 +676,12 @@ unless the user explicitly asks for a PR. Steps:
   loop beside it: its `Swim` clip is one `PULSE_CYCLE` long with the squeeze filling the thrust
   window, and the renderer scrubs the clip to the actor's `pulseT` (`bellPhase`) and turns the
   apex into the direction of travel while it beats (`bellTilt`), so re-timing that clip breaks the
-  lock — which is what the bell cases in `npm run locomotion` are there to catch. Which animal has what, and how well each is actually
+  lock — which is what the bell cases in `npm run locomotion` are there to catch. **A bell only
+  pulses under power**: sprinting or dashing. It used to surge and coast at every speed, so a
+  jellyfish never simply *swam* — every unhurried crossing was a stutter that read as broken rather
+  than as a medusa. Off the beat `pulseT` is zero and `bell()` returns **false**, which hands the
+  body back to the shared state machine to be animated like anything else: not "nothing to draw"
+  but "nothing special about it". Which animal has what, and how well each is actually
   attested, is `docs/research/locomotion-ideas.md`.
 - **A stick direction is an instruction, on every body.** The tail-flip (`tailFlip`, the caridoid
   escape) used to go straight back along the animal's own axis *whatever the stick asked*, so
