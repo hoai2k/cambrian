@@ -139,6 +139,20 @@ export const bitesFor = (eater: Actor, food: Actor) => clamp(Math.ceil(3 * lengt
 // so open water stays a crossing rather than a second way to live), and a body that stops asking
 // for anything settles back to the bottom, where it belongs.
 /** A leap out of the water: the pull back down, and the least upward speed that gets a fish through the surface. */
+/**
+ * A dash lasts as long as it is held, between these.
+ *
+ * A tap is a short shove and a held button is the full crossing, with the stamina to match — the
+ * dash used to be one length whatever the press was, so the only way to move a little was to move
+ * a lot. `DASH_TAP` is the shortest a dash can be (a press is a commitment: it cannot be taken back
+ * inside its own first moments, which is also what keeps the invulnerability honest), and the full
+ * length is the `stateDur` the move already had. Letting go between them cuts the travel — the body
+ * is pulled up out of the burst — and refunds the part of the cost that was not spent, so a tap is
+ * cheap and a crossing is not.
+ */
+const DASH_TAP = 0.12;
+/** How hard a released dash is reined in, per second. */
+const DASH_BRAKE = 16;
 const BREACH_GRAVITY = 14;
 /**
  * How high, in body lengths, a breach may carry a body above the waterline.
@@ -1831,7 +1845,20 @@ export class Game implements AiWorld {
       // something halfway through leaves the dash covering only the ground it had crossed by then.
       // That is the trade, not a dash cut short by accident.
       if (justHeavy && this.heavyAction(a, def, L, sf, locked, true)) a.iframes = 0;
-      else if (a.stateT >= a.stateDur) { a.state = 'free'; a.stateT = 0; }
+      else if (a.stateT >= a.stateDur) { a.state = 'free'; a.stateT = 0; a.dashCost = 0; }
+      // Held, the dash runs its full length and is billed for it. Let go past `DASH_TAP` and the
+      // body is reined in and the rest of the cost is never charged: a tap is a short, cheap shove
+      // and a crossing is the whole move at the whole price. A dash the player did not ask for —
+      // a bot's, a flip's reflex, one that is over anyway — has no `dashCost` and is untouched.
+      else if (a.dashCost > 0) {
+        if (input.dash) a.stamina = Math.max(0, a.stamina - a.dashCost * (dt / Math.max(1e-3, a.stateDur)));
+        else {
+          // The brake starts the moment the button comes up — what `DASH_TAP` protects is the
+          // *commitment*, the window the dash cannot be taken back inside, not the braking.
+          a.vel = vscale(a.vel, Math.max(0, 1 - DASH_BRAKE * dt));
+          if (a.stateT >= DASH_TAP) { a.state = 'free'; a.stateT = 0; a.dashCost = 0; a.iframes = Math.min(a.iframes, 0.15); }
+        }
+      }
     } else if (a.state === 'stagger') {
       if (a.stateT >= a.stateDur) { a.state = 'free'; a.stateT = 0; a.poise = a.poiseMax * 0.6; }
     } else if (a.state === 'grabbed') {
@@ -2509,7 +2536,12 @@ export class Game implements AiWorld {
     // the reflex fires whatever is left, it just fires weakly (`flipLaunch`).
     const cost = (flip ? FLIP_STAMINA : 12) * (1 - relief);
     const empty = a.stamina < cost;
-    a.iframes = flip ? 0.5 : 0.42; a.stamina = Math.max(0, a.stamina - cost); a.dashCd = flip ? 0.7 : 0.55;
+    // Priced by how far it is actually taken: the tap's share now, the rest billed per second for
+    // as long as the button is held (`stepActions`). A flip is not a held move — the reflex fires
+    // whole — so it pays in full on the frame it goes off.
+    a.dashCost = flip ? 0 : cost;
+    const upFront = flip ? cost : cost * (DASH_TAP / (flip ? 0.5 : 0.42));
+    a.iframes = flip ? 0.5 : 0.42; a.stamina = Math.max(0, a.stamina - upFront); a.dashCd = flip ? 0.7 : 0.55;
     // A punt needs the floor under it; out in the water there is nothing to push off.
     const gap = a.pos.y - groundHeight(this.world, a.pos.x, a.pos.z, []);   // own scratch: called mid-update
     const power = flip ? flipLaunch(a) : (L * 9.5 + 7) * (def.id === 'waptia' ? 1.2 : 1) * punting(a, gap);

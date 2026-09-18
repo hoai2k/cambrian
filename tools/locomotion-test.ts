@@ -250,5 +250,28 @@ const flat = (v: { x: number; z: number }) => Math.hypot(v.x, v.z);
     `${(thrustEnd * 100).toFixed(0)}% of the clip`);
 }
 
+// --- the dash is as long as it is held, and costs what it takes ---
+{
+  /** Dash forward, holding the button for `frames`, and see how far it carried and what it cost. */
+  const dash = (frames: number) => {
+    const { p, step } = solo('anomalocaris');
+    for (let i = 0; i < 20; i++) step();
+    p.stamina = p.staminaMax;
+    const from = { ...p.pos };
+    let lowest = p.stamina;
+    for (let i = 0; i < 60; i++) { step({ my: 1, dash: i < frames }); lowest = Math.min(lowest, p.stamina); }
+    return { moved: Math.hypot(p.pos.x - from.x, p.pos.z - from.z), spent: p.staminaMax - lowest };
+  };
+  const tap = dash(1), half = dash(15), held = dash(60);
+  check('a tap is a short shove', tap.moved < held.moved * 0.45, `${tap.moved.toFixed(1)} against ${held.moved.toFixed(1)} units`);
+  check('...a half-held dash lands between the two', half.moved > tap.moved * 1.3 && half.moved < held.moved,
+    `${tap.moved.toFixed(1)} < ${half.moved.toFixed(1)} < ${held.moved.toFixed(1)}`);
+  check('...and the bar is charged for what was taken', tap.spent < held.spent * 0.6,
+    `${tap.spent.toFixed(1)} against ${held.spent.toFixed(1)} stamina`);
+  // A press is still a commitment: it cannot be taken back inside its own first moments, which is
+  // what keeps the invulnerability worth having.
+  check('...but a dash is never nothing', tap.moved > 3, `${tap.moved.toFixed(1)} units`);
+}
+
 console.log(failed ? `\n${failed} FAILED` : '\nall locomotion tests passed');
 process.exit(failed ? 1 : 0);

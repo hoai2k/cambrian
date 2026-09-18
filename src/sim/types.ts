@@ -177,7 +177,10 @@ export interface Actor {
    */
   carriedTop: boolean;
   dashHoldT: number; dashUsed: boolean; pounceCd: number; aimInRange: boolean; aiming: boolean;
-  dashCd: number; sinceHit: number; lastHitBy: number; swallowedBy: number; holdT: number;
+  dashCd: number;
+  /** What is still owed for the dash being held, if this one is priced by its length. */
+  dashCost: number;
+  sinceHit: number; lastHitBy: number; swallowedBy: number; holdT: number;
   /**
    * A grasping creature is holding its attack button down, so what lands takes hold instead of
    * striking through. Set from the input every step; false for anything that cannot grasp.
