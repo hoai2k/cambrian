@@ -3,7 +3,7 @@ import { BURROWERS, hideLabel } from '../sim/concealment';
 import * as THREE from 'three';
 import { audio, SAMPLES } from '../audio/audio';
 import { distanceAtten, hugeLength } from '../audio/mix';
-import { applyMouse, emptyControls, gamepads, KeyboardInput, MouseLook, readGamepad, rumble, type RawControls } from '../input/input';
+import { applyMouse, emptyControls, gamepads, KeyboardInput, MousePlay, readGamepad, rumble, type RawControls } from '../input/input';
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
 import { bandOf, comingFor, isAlive, isHidden, lengthOf } from '../sim/actors';
 import { creature, type CreatureId } from '../sim/creatures';
@@ -106,7 +106,7 @@ export interface EngineCallbacks {
 
 export const PLAYER_COLORS = ['#61f2d5', '#ffb457', '#c7a3ff', '#ff86a4'];
 
-interface CamState { showBoard: boolean; hatchShot: number; breathT: number; rideBlend: number; yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; climbHold: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
+interface CamState { showBoard: boolean; hatchShot: number; breathT: number; rideBlend: number; yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; climbHold: number; followHold: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
 /** Per-player teleport menu state: opened with D-pad down, steered with the D-pad or stick, A confirms, B closes. */
 /**
  * The D-pad-down menu. A list of places to go, plus one entry that opens a second page: the roster,
@@ -205,6 +205,17 @@ export const BREATH_PEEK = 1.1;
  * which is what was asked for and helps at every width.
  */
 export const AIM_CLOSER = 0.42, AIM_SHOULDER = 0.75;
+/**
+ * The follow camera, for mouse play: how fast it comes round behind the body, and how long it
+ * stands aside after the player has moved it themselves.
+ *
+ * A pad has a second stick and the view is the player's the whole time. A mouse with no pointer
+ * lock has nothing holding the camera, so it has to hold itself: it eases round behind the
+ * creature and back to the resting pitch, which is what a follow camera is for. The hold is what
+ * makes looking somewhere on purpose stick — without it, letting go of a drag would swing the view
+ * straight back and the drag would have been pointless.
+ */
+const FOLLOW_RATE = 1.6, FOLLOW_HOLD = 1.2;
 /** How much a body inside the near field outranks one the same apparent size further off. */
 const NEAR_RANK = 3;
 /** 1 at a full-width view, falling off for a narrow one; never less than a third of the shift. */
@@ -300,7 +311,7 @@ export class Engine {
   private silt = new Silt();
   private eggs = new Eggs();
   private keyboard = new KeyboardInput();
-  private mouse = new MouseLook();
+  private mouse = new MousePlay();
   /**
    * Whether the mouse is steering the camera. Decided once per match, at `startMatch`: with no
    * controller anywhere the game is a mouse-and-keyboard game, and with even one pad in the
@@ -308,11 +319,18 @@ export class Engine {
    */
   private mouseLook = false;
   /**
-   * Whether the match still wants the pointer. Distinct from `mouseLook`, which only says the
-   * match is being played on a mouse: the lock also has to come off while paused, in a dialog and
-   * on the results screen, all of which are places the player needs a cursor back.
+   * Whether the mouse is playing rather than pointing at menus. Distinct from `mouseLook`, which
+   * only says the *match* is a mouse one: the mouse also has to stop being the controls while
+   * paused, in a dialog and on the results screen, where its clicks belong to the buttons.
+   *
+   * Nothing is locked any more, so this takes the mouse's *meaning* rather than the cursor: the
+   * pointer is always visible and always where the player put it.
    */
   private pointerWanted = false;
+  /** What the mouse did this frame, kept between `controlsFor` and the camera. */
+  private mouseFrame: ReturnType<MousePlay['read']> | undefined;
+  /** Scratch for the ray from the camera through the cursor. */
+  private tmpRay = new THREE.Vector3();
   private setups: PlayerSetup[] = [];
   private raf = 0;
   private last = performance.now();
@@ -354,7 +372,8 @@ export class Engine {
     // The mouse is attached to the canvas host, not the canvas: the canvas is torn down and rebuilt
     // when quality changes, and the pointer lock has to survive that.
     this.mouse.attach(container);
-    this.mouse.onLost = () => this.cb.onPointerLost?.();
+    // Nothing to lose: without pointer lock there is no lock to be taken away.
+    this.mouse.onLost = null;
     this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.splash.group, this.mouthfuls.group, this.eggs.group);
     (window as any).__cambrian = this;
     this.resize = new ResizeObserver(() => this.onResize());
@@ -440,7 +459,7 @@ export class Engine {
     this.cams = setups.map((_, i) => {
       const p = this.game!.players[i];
       const cam = new THREE.PerspectiveCamera(60, 1, 0.08, 420);
-      const cs: CamState = { showBoard: false, hatchShot: -1, breathT: 0, rideBlend: 0, yaw: p.yaw, pitch: 0.2, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, climbHold: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4(), tele: freshTele() };
+      const cs: CamState = { showBoard: false, hatchShot: -1, breathT: 0, rideBlend: 0, yaw: p.yaw, pitch: 0.2, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, climbHold: 0, followHold: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4(), tele: freshTele() };
       cam.position.copy(cs.pos); cam.lookAt(cs.look);
       return cs;
     });
@@ -471,7 +490,11 @@ export class Engine {
   private controlsFor(setup: PlayerSetup, index: number): RawControls {
     if (setup.device === 'keyboard') {
       const c = this.keyboard.read(1);
-      return this.mouseLook ? applyMouse(c, this.mouse.read()) : c;
+      if (!this.mouseLook) return c;
+      // One read per frame: `read()` drains the deltas and the click, so the frame keeps it for
+      // the camera and the aim to use after the controls have been folded.
+      this.mouseFrame = this.mouse.read();
+      return applyMouse(c, this.mouseFrame);
     }
     if (setup.device === 'keyboard2') return this.keyboard.read(2);
     const gp = navigator.getGamepads?.()[setup.device];
@@ -494,6 +517,21 @@ export class Engine {
     f.rise = c.rise; f.sink = c.sink;
     f.light = c.light; f.heavy = c.heavy; f.ability = c.ability; f.dodge = c.dodge; f.guard = c.guard; f.lock = c.lock; f.sense = c.sense;
     f.aim = c.aim; f.aimTarget = c.aim ? cs.aimTarget : -1;
+    // On a mouse the cursor is the crosshair, so the animal under it is the one the attacks go to.
+    // `aim` is set on the *frame* and not on the camera: the simulation's idea of aiming is "this
+    // is the body I mean", which is exactly true here, while the over-the-shoulder framing is a
+    // separate thing the middle button asks for (`updateAim` still blends on `c.aim`).
+    const cursor = this.cursorDir(cs);
+    if (cursor) { f.aim = true; f.aimTarget = cs.aimTarget; }
+    // The right button dashes at what the cursor is over: the dash takes its direction from the
+    // stick through the camera, so for those frames the camera's forward *is* the cursor's ray and
+    // a neutral stick is pushed forward along it. Held, the body keeps going that way, which is
+    // what a dash as long as it is held should do.
+    if (cursor && this.mouseFrame?.right) {
+      f.camYaw = Math.atan2(cursor.x, cursor.z);
+      f.camPitch = swimPitch(-Math.asin(clamp(cursor.y, -1, 1)));
+      if (Math.hypot(f.mx, f.my) < 0.3) { f.mx = 0; f.my = 1; }
+    }
     void a;
     return f;
   }
@@ -545,6 +583,20 @@ export class Engine {
             // like it is swimming for you. A mouse holds where it was put: the same drift there
             // would fight the hand every frame.
             if (!this.mouseLook && Math.abs(c.lookY) < 0.05 && cs.climbHold === 0) cs.pitch = damp(cs.pitch, 0.2, 0.6, dt);
+            // On a mouse the camera *follows the body* unless a hand is on it. There is no second
+            // stick and no pointer lock, so nothing is steering the view frame to frame: left to
+            // itself it would stay pointing wherever the animal last turned away from. It eases
+            // round behind the creature and back to the resting pitch, and stands aside for
+            // `FOLLOW_HOLD` after a drag so a player who has just looked somewhere on purpose is
+            // not immediately turned away from it.
+            if (this.mouseLook && p) {
+              if (this.mouseFrame?.dragging || Math.abs(c.lookX) > 0.05 || Math.abs(c.lookY) > 0.05) cs.followHold = FOLLOW_HOLD;
+              else cs.followHold = Math.max(0, cs.followHold - dt);
+              if (cs.followHold === 0 && cs.climbHold === 0) {
+                cs.yaw = wrapAngle(cs.yaw + wrapAngle(p.yaw - cs.yaw) * (1 - Math.exp(-FOLLOW_RATE * dt)));
+                cs.pitch = damp(cs.pitch, 0.2, FOLLOW_RATE * 0.5, dt);
+              }
+            }
           }
           if (c.zoomDelta) cs.zoom = clamp(cs.zoom * Math.exp(c.zoomDelta), 0.55, 2.2);
         }
@@ -742,14 +794,32 @@ export class Engine {
    * and it is the real one. Anything that moves the crosshair off centre, or picks a target from
    * somewhere other than `fwd`, breaks the immersive view as well as the readout.
    */
+  /**
+   * The direction the cursor points, in the world: the camera's own ray through that pixel.
+   *
+   * This is what "aim with the mouse" means with no pointer lock — the crosshair is wherever the
+   * cursor is, not the middle of the screen — so it is what the aim picks a target along and what
+   * a right-button dash goes down. Undefined when the mouse is not playing or has not moved yet,
+   * and every caller then falls back to the way it worked before.
+   */
+  private cursorDir(cs: CamState): THREE.Vector3 | undefined {
+    const ndc = this.mouseFrame?.ndc;
+    if (!this.mouseLook || !ndc) return undefined;
+    return this.tmpRay.set(ndc.x, ndc.y, 0.5).unproject(cs.camera).sub(cs.camera.position).normalize();
+  }
+
   private updateAim(cs: CamState, p: Actor | undefined, aiming: boolean, dt: number) {
     if (!p || !this.game) { cs.aimBlend = 0; cs.aimTarget = -1; return; }
     const wasAiming = cs.aimBlend > 0.5 || cs.aimSnapT > 0;
     cs.aimBlend = damp(cs.aimBlend, aiming ? 1 : 0, 9, dt);
-    if (!aiming) { cs.aimTarget = -1; cs.aimSnapT = 0; return; }
+    // On a mouse the crosshair is the cursor, so a target is picked every frame whether or not aim
+    // mode's framing is on: pointing at an animal *is* aiming at it, and the camera shift is a
+    // separate thing the middle button asks for.
+    const cursor = this.cursorDir(cs);
+    if (!aiming && !cursor) { cs.aimTarget = -1; cs.aimSnapT = 0; return; }
     const L = lengthOf(p);
     const range = this.game.pounceRange(p) * 2.4;
-    const fwd = this.tmpV.copy(cs.look).sub(cs.camera.position).normalize();
+    const fwd = cursor ? this.tmpV.copy(cursor) : this.tmpV.copy(cs.look).sub(cs.camera.position).normalize();
     let best: Actor | undefined; let bestAng = Infinity;
     for (const o of this.game.nearby(p.pos, range)) {
       if (o.id === p.id || !isAlive(o) || isHidden(o)) continue;
@@ -767,11 +837,13 @@ export class Engine {
       const bandW = rival ? 2.4 : band === 'prey' ? 0.85 : band === 'snack' ? 1 : 1.25;
       if (ang * bandW < bestAng) { bestAng = ang * bandW; best = o; }
     }
-    const cone = cs.aimSnapT > 0 || !wasAiming ? 0.6 : 0.2;   // wide on entry (snap), tight afterwards
+    // A cursor gets one cone and no snap: the player is already pointing, and easing the camera
+    // onto a target would fight the hand that is holding the mouse.
+    const cone = cursor ? 0.12 : cs.aimSnapT > 0 || !wasAiming ? 0.6 : 0.2;
     if (best && bestAng < cone) {
       cs.aimTarget = best.id;
-      if (!wasAiming) cs.aimSnapT = 0.25;
-      if (cs.aimSnapT > 0) {
+      if (!wasAiming && !cursor) cs.aimSnapT = 0.25;
+      if (cs.aimSnapT > 0 && !cursor) {
         // ease the camera onto the target
         const dx = best.pos.x - cs.camera.position.x, dy = best.pos.y - cs.camera.position.y, dz = best.pos.z - cs.camera.position.z;
         const ty = Math.atan2(dx, dz), tp = clamp(Math.atan2(-dy, Math.hypot(dx, dz)) + 0.12, PITCH_UP, PITCH_DOWN);

@@ -89,7 +89,8 @@
     "sim": "npm run -s world && npm run -s swim && npm run -s flora && npm run -s locomotion && npm run -s reactions && npm run -s grab && npm run -s fight && npm run -s feast && npm run -s paddle && npm run -s hunt && npm run -s respawn && npm run -s ecology && npm run -s environment && npm run -s corpse && npm run -s modes && npm run -s controls && npm run -s motion && npm run -s hiding && npm run -s sizing && npm run -s spatial && npm run -s record && npm run -s expansion",
     "blender": "bash tools/blender-setup.sh",
     "triassic:review": "node tools/triassic/review-bodies.mjs",
-    "sim:gate": "npm run -s flora && npm run -s locomotion && npm run -s fight && npm run -s feast && npm run -s respawn && npm run -s corpse && npm run -s environment && npm run -s hunt && npm run -s motion && npm run -s hiding && npm run -s sizing && npm run -s spatial && npm run -s record"
+    "sim:gate": "npm run -s flora && npm run -s locomotion && npm run -s fight && npm run -s feast && npm run -s respawn && npm run -s corpse && npm run -s environment && npm run -s hunt && npm run -s motion && npm run -s hiding && npm run -s sizing && npm run -s spatial && npm run -s record",
+    "mouse": "node tools/mouse-play-browser.mjs"
   },
   "dependencies": {
     "react": "^19.1.0",

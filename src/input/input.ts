@@ -100,15 +100,20 @@ export class KeyboardInput {
     if (layout === 1) {
       c.mx = Number(k('KeyD')) - Number(k('KeyA')); c.my = Number(k('KeyW')) - Number(k('KeyS'));
       c.lookX = Number(k('ArrowRight')) - Number(k('ArrowLeft')); c.lookY = Number(k('ArrowDown')) - Number(k('ArrowUp'));
-      c.burst = k('ShiftLeft') ? 1 : 0; c.rise = k('Space'); c.sink = k('KeyC');
-      c.light = k('KeyF'); c.heavy = k('KeyG'); c.ability = k('KeyR'); c.dodge = k('KeyV'); c.dash = k('KeyV'); c.guard = k('KeyQ'); c.lock = k('Tab'); c.aim = k('Tab'); c.sense = k('KeyE');
+      // The mouse-and-keyboard layout is the *mouse's* layout with the keys around it: the left
+      // hand sits on WASD with everything it reaches — E up, C down, Q guard, Z camouflage, G
+      // sense — and the space bar dashes, which is the one thing that has to fire under a thumb.
+      // The attacks are on the mouse (a click bites, a hold is the heavy) and F is the bite's key
+      // for a player without one. Nothing here is on the same key as anything else.
+      c.rise = k('KeyE'); c.sink = k('KeyC');
+      c.light = k('KeyF'); c.ability = k('KeyZ'); c.dodge = k('Space'); c.dash = k('Space'); c.guard = k('KeyQ'); c.lock = k('Tab'); c.aim = k('Tab'); c.sense = k('KeyG');
       if (k('PageUp') || k('PageDown')) { c.rsClick = true; c.lookY = k('PageUp') ? -1 : 1; }
-      c.teleport = k('KeyT'); c.view = k('KeyZ');
+      c.teleport = k('KeyT'); c.view = k('KeyV');
       c.menu = k('Escape'); c.confirm = k('Enter') || k('Space'); c.back = k('Backspace');
       c.dleft = k('ArrowLeft'); c.dright = k('ArrowRight'); c.dup = k('ArrowUp'); c.ddown = k('ArrowDown');
     } else {
       c.mx = Number(k('KeyL')) - Number(k('KeyJ')); c.my = Number(k('KeyI')) - Number(k('KeyK'));
-      c.burst = k('ShiftRight') ? 1 : 0; c.rise = k('KeyN'); c.sink = k('KeyM');
+      c.rise = k('KeyN'); c.sink = k('KeyM');
       c.light = k('Semicolon'); c.heavy = k('Quote'); c.ability = k('KeyP'); c.dodge = k('Slash'); c.dash = k('Slash'); c.guard = k('KeyU'); c.lock = k('KeyO'); c.aim = k('KeyO'); c.sense = k('KeyY');
       c.teleport = k('KeyH'); c.view = k('Comma');
       c.confirm = k('Enter'); c.back = k('Backspace');
@@ -136,43 +141,71 @@ export function rumble(index: number, strong: number, weak: number, ms: number) 
 /**
  * Mouse and keyboard, for a session with no controller in it.
  *
- * A pad is two thumbsticks: one swims, one looks. A keyboard has only one of those, so a solo
- * player without a pad has been steering the camera with the arrow keys — a rate, not a direction,
- * which is exactly as slow as it sounds. When nobody has plugged a controller in there is no
- * reason to keep the mouse as a pointer, so the game takes it: pointer lock, the mouse turns the
- * camera, the wheel zooms, and the three buttons carry the actions the triggers and bumpers do.
+ * **The pointer is not taken.** It used to be: pointer lock, the mouse turning the camera, and the
+ * cursor gone for the match. That is the right scheme for a shooter and the wrong one for this —
+ * the thing a player wants to point at here is an *animal*, and a locked pointer can only ever
+ * point at the middle of the screen. So the cursor stays, the camera follows the body by itself
+ * (`followCam` in the engine), and the mouse is what aims: the creature under it is the one your
+ * attacks go to, and the water under it is where a dash goes.
  *
- * Controllers win when there are any. `Engine.startMatch` decides once, at the dive, and the lock
- * follows the match from there: it is released while paused, in a dialog, and back at the menus.
+ * One button, three meanings, told apart the way every drawing program tells them apart:
+ *   - a **click** — pressed and released without travelling — is a bite, and it fires on the
+ *     *release*, because until the button comes up it is not yet known to be a click;
+ *   - a **hold** past `HOLD` is the heavy: the pounce, the special, whatever that animal's RT does;
+ *   - a **drag** past `DRAG` is the camera, and it cancels the attack. Moving the mouse is how you
+ *     look around, so a press that turned into a movement was never an attack.
  *
- * Two details the browser forces:
- *   - Pointer lock needs a user gesture, and a request too soon after an exit is rejected outright.
- *     So `want()` only marks the intent; a click on the canvas is what actually takes the lock, and
- *     every request is allowed to fail silently.
- *   - Losing the lock (the player pressed Escape, or alt-tabbed) has to reach the game, or it keeps
- *     playing behind a cursor the player cannot see. `onLost` is how the match learns to pause.
+ * The right button dashes at whatever is under the cursor, for as long as it is held (the dash is
+ * as long as it is held). The middle button is aim mode, as it was.
+ *
+ * `ndc` is the cursor in normalised device coordinates (-1..1, y up), which is what a camera
+ * unprojects; it is `undefined` until the mouse has been somewhere over the canvas.
  */
-export class MouseLook {
-  /** Radians of camera per pixel of mouse. Multiplied by the player's camera-speed setting. */
-  static readonly SENSITIVITY = 0.0022;
+export class MousePlay {
+  /** Radians of camera per pixel of drag. Multiplied by the player's camera-speed setting. */
+  static readonly SENSITIVITY = 0.0042;
   /** Wheel notches to zoom exponent; a notch is ~100 in `deltaY` on most mice. */
   static readonly WHEEL = 0.0011;
+  /** Pixels of travel that turn a press into a camera drag rather than an attack. */
+  static readonly DRAG = 6;
+  /** Seconds a press must be held to be the heavy rather than a bite. */
+  static readonly HOLD = 0.18;
 
   private el: HTMLElement | null = null;
   private buttons = new Set<number>();
   private dx = 0; private dy = 0; private wheel = 0;
   private wanted = false;
-  /** Whether the pointer is locked right now. Buttons and motion only count while it is. */
+  /** Where the cursor is, in NDC. Undefined until it has been over the canvas. */
+  private ndc: { x: number; y: number } | undefined;
+  /** The left press in progress: when it started, how far it has travelled, what it became. */
+  private press: { t: number; moved: number; dragging: boolean } | undefined;
+  /** A completed click, waiting to be read as one bite. */
+  private clicked = false;
+  /** Kept for the engine's benefit: nothing is locked, so nothing is ever lost. */
   locked = false;
-  /** Called when the lock goes away without the game asking. The match should pause. */
   onLost: (() => void) | null = null;
 
   private onMove = (e: MouseEvent) => {
-    if (!this.locked) return;
-    this.dx += e.movementX ?? 0; this.dy += e.movementY ?? 0;
+    const el = this.el;
+    if (el) {
+      const r = el.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0) {
+        this.ndc = { x: ((e.clientX - r.left) / r.width) * 2 - 1, y: -(((e.clientY - r.top) / r.height) * 2 - 1) };
+      }
+    }
+    const mx = e.movementX ?? 0, my = e.movementY ?? 0;
+    const p = this.press;
+    if (p) {
+      p.moved += Math.hypot(mx, my);
+      // Past the threshold the press is a camera drag, and stays one until the button comes up.
+      if (!p.dragging && p.moved > MousePlay.DRAG) p.dragging = true;
+    }
+    // Only a drag turns the camera. A bare mouse move is the cursor going somewhere, which is
+    // aiming rather than looking — that is the whole difference between this and pointer lock.
+    if (p?.dragging || this.buttons.has(1)) { this.dx += mx; this.dy += my; }
   };
   private onWheel = (e: WheelEvent) => {
-    if (!this.locked) return;
+    if (!this.wanted) return;
     e.preventDefault();
     // A trackpad reports pixels and a wheel reports lines; normalise before scaling.
     this.wheel += e.deltaY * (e.deltaMode === 1 ? 16 : 1);
@@ -180,20 +213,20 @@ export class MouseLook {
   private onDown = (e: MouseEvent) => {
     if (!this.wanted) return;
     e.preventDefault();
-    // The first click is the gesture that takes the lock, not an attack: a player who clicked back
-    // into the window would otherwise pounce at whatever the cursor happened to be over.
-    if (!this.locked) { this.request(); return; }
     this.buttons.add(e.button);
+    if (e.button === 0) this.press = { t: performance.now() / 1000, moved: 0, dragging: false };
   };
-  private onUp = (e: MouseEvent) => this.buttons.delete(e.button);
+  private onUp = (e: MouseEvent) => {
+    this.buttons.delete(e.button);
+    if (e.button !== 0) return;
+    const p = this.press; this.press = undefined;
+    if (!p || p.dragging) return;                       // a drag was the camera, not an attack
+    // Released before the hold became a heavy: that is a click, and a click is a bite. It is read
+    // once, on the frame after the release, because a bite is an edge and not a state.
+    if (performance.now() / 1000 - p.t < MousePlay.HOLD) this.clicked = true;
+  };
   private onContext = (e: Event) => { if (this.wanted) e.preventDefault(); };
-  private onLockChange = () => {
-    const was = this.locked;
-    this.locked = !!this.el && document.pointerLockElement === this.el;
-    if (!this.locked) { this.buttons.clear(); this.dx = this.dy = this.wheel = 0; }
-    if (was && !this.locked && this.wanted) this.onLost?.();
-  };
-  private onBlur = () => this.buttons.clear();
+  private onBlur = () => { this.buttons.clear(); this.press = undefined; };
 
   attach(el: HTMLElement) {
     this.el = el;
@@ -203,31 +236,32 @@ export class MouseLook {
     window.addEventListener('mousemove', this.onMove);
     window.addEventListener('mouseup', this.onUp);
     window.addEventListener('blur', this.onBlur);
-    document.addEventListener('pointerlockchange', this.onLockChange);
   }
 
-  /** Ask for (or give up) the pointer. Safe to call every frame; only edges do anything. */
+  /** Whether the mouse is playing the game. Nothing is locked either way. */
   want(on: boolean) {
     if (this.wanted === on) return;
     this.wanted = on;
-    if (on) this.request();
-    else if (this.locked) { try { document.exitPointerLock(); } catch { /* already gone */ } }
+    if (!on) { this.buttons.clear(); this.press = undefined; this.clicked = false; this.dx = this.dy = this.wheel = 0; }
   }
 
-  private request() {
-    const el = this.el;
-    if (!el || this.locked || document.pointerLockElement) return;
-    try { void (el.requestPointerLock() as unknown as Promise<void> | undefined)?.catch?.(() => {}); } catch { /* no gesture, or too soon after the last exit */ }
-  }
-
-  /** Everything the mouse has done since the last frame. Drains the deltas. */
+  /** Everything the mouse has done since the last frame. Drains the deltas and the click. */
   read() {
+    const p = this.press;
+    const held = !!p && !p.dragging && performance.now() / 1000 - p.t >= MousePlay.HOLD;
     const r = {
-      dx: this.dx * MouseLook.SENSITIVITY, dy: this.dy * MouseLook.SENSITIVITY,
-      zoom: this.wheel * MouseLook.WHEEL,
-      left: this.buttons.has(0), middle: this.buttons.has(1), right: this.buttons.has(2),
+      dx: this.dx * MousePlay.SENSITIVITY, dy: this.dy * MousePlay.SENSITIVITY,
+      zoom: this.wheel * MousePlay.WHEEL,
+      /** The heavy: the left button held still past `HOLD`. */
+      hold: held,
+      /** One bite, on the frame after a click was completed. */
+      click: this.clicked,
+      /** Turning the camera this frame, so the follow camera knows to stand aside. */
+      dragging: !!p?.dragging || this.buttons.has(1),
+      middle: this.buttons.has(1), right: this.buttons.has(2),
+      ndc: this.ndc,
     };
-    this.dx = this.dy = this.wheel = 0;
+    this.dx = this.dy = this.wheel = 0; this.clicked = false;
     return r;
   }
 
@@ -242,22 +276,16 @@ export class MouseLook {
     window.removeEventListener('mousemove', this.onMove);
     window.removeEventListener('mouseup', this.onUp);
     window.removeEventListener('blur', this.onBlur);
-    document.removeEventListener('pointerlockchange', this.onLockChange);
     this.el = null;
   }
 }
 
-/**
- * Fold the mouse into keyboard 1's controls. Left click is the heavy (RT), right click dashes
- * (LB) and the middle button aims (LT), so the two actions that need to fire the instant they are
- * wanted sit under the fingers already on the mouse. The keys those actions also live on (G, V,
- * Tab) keep working: the mouse adds to the keyboard, it does not replace it.
- */
-export function applyMouse(c: RawControls, m: ReturnType<MouseLook['read']>): RawControls {
+export function applyMouse(c: RawControls, m: ReturnType<MousePlay['read']>): RawControls {
   c.lookDX = m.dx; c.lookDY = m.dy; c.zoomDelta = m.zoom;
-  if (m.left) c.heavy = true;
+  if (m.click) c.light = true;
+  if (m.hold) c.heavy = true;
   if (m.right) { c.dash = true; c.dodge = true; }
   if (m.middle) { c.aim = true; c.lock = true; }
-  if (m.left || m.middle || m.right) c.any = c.anyButton = true;
+  if (m.click || m.hold || m.middle || m.right) c.any = c.anyButton = true;
   return c;
 }
