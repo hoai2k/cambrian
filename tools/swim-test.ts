@@ -2,7 +2,7 @@
  * Swimming near the floor: what a sprint costs, how close to the sand you can get, and how a rock
  * behaves when you swim into it — over it, not into a wall — plus the radar's reading of height.
  */
-import { Game, radarRange } from '../src/sim/game';
+import { breachSpeed, Game, radarRange } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
 import { applyScaleStats, bodyRadius, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, lengthOf, speedFactor } from '../src/sim/actors';
 import { boulderQ, boulderTop, groundHeight, resolveStatic, rockRadius, sampleHeight, type Boulder, type StaticContact, type WorldData } from '../src/sim/world';
@@ -385,6 +385,20 @@ const rockWorld = (boulders: Boulder[]) => ({
   check('...and looking up without dashing drifts as it always did', idle > PITCH_UP + 0.1, `${PITCH_UP.toFixed(2)} → ${idle.toFixed(2)}`);
 }
 
+// --- a breach is a leap, not a launch ---
+{
+  // What a body left the water with used to be whatever it had, and a dash's launch speed is
+  // L * 9.5 + 7, so anything that dashed straight up through the surface went absurdly high.
+  const apex = (L: number) => breachSpeed(L) ** 2 / (2 * 14);   // v^2/2g, BREACH_GRAVITY
+  for (const L of [0.6, 3, 8, 19.4]) {
+    const h = apex(L);
+    check(`a ${L}-unit body clears about its own length`, h > L * 0.8 && h < L * 2.2, `${h.toFixed(1)} units of air`);
+  }
+  // The old behaviour, for the record: the dash's own launch speed straight up.
+  const unchecked = ((8 * 9.5 + 7) ** 2) / (2 * 14);
+  check('...where the dash itself would have thrown it out of sight', unchecked > apex(8) * 20, `${unchecked.toFixed(0)} units against ${apex(8).toFixed(1)}`);
+}
+
 // --- the radar says how far above or below a contact is ---
 {
   const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 11);
@@ -411,5 +425,5 @@ const rockWorld = (boulders: Boulder[]) => ({
 }
 
 check('no climb ever asked for a jump', jumped === 0, `${jumped} oversized lifts`);
-console.log(failed ? `FAILED (${failed})` : 'PASS: sprint endurance, floor grazing, rock colliders, ride-over, camera reach, the dash chain, radar height');
+console.log(failed ? `FAILED (${failed})` : 'PASS: sprint endurance, floor grazing, rock colliders, ride-over, camera reach, the dash chain, the breach, radar height');
 process.exit(failed ? 1 : 0);

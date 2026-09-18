@@ -229,6 +229,18 @@ unless the user explicitly asks for a PR. Steps:
   (the renderer cannot know a dash fired until that step has run) and gives up that one frame of
   drift and no more. `npm run swim` closes the loop end to end — camera drift into the stick into
   the real cooldown — and measures the second dash's own rise against the first's.
+- **A breach is a leap, not a launch.** The vertical a body carried through the surface used to be
+  whatever it had, and a dash's launch speed is `L * 9.5 + 7` — so a five-unit animal that dashed
+  straight up cleared a hundred units of air and a Cymbospondylus over a thousand. `breachSpeed` in
+  `src/sim/game.ts` caps it at `BREACH_LEAP` body lengths of air, which is about what a breaching
+  animal actually does. The *horizontal* is deliberately untouched, so a fast run still carries a
+  long way forward through the air, and the splash is still sized on the speed the animal was
+  travelling at rather than on the capped climb. `npm run swim` holds it at four sizes.
+- **Aim mode is framed across the viewport, not across the world.** The over-the-shoulder shift that
+  makes room for the crosshair is measured in body lengths, which is right, but the room it needs is
+  measured across the *view* — and a split screen has half of one, so two players side by side put
+  the animal off the edge. `aimRoom` in `src/render/engine.ts` scales the shift by the view's own
+  aspect (`AIM_SHOULDER`), and `AIM_CLOSER` brings the camera in further than it did at every width.
 - The climb for air is the era's central act and must stay usable at every size. The shared rise
   rate is scaled by the body, but the water is not — the surface is the same twelve units above the
   shelf whether you hatched this minute or own the sea — so an air-breather's climb has a floor

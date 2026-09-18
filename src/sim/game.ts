@@ -140,6 +140,18 @@ export const bitesFor = (eater: Actor, food: Actor) => clamp(Math.ceil(3 * lengt
 // for anything settles back to the bottom, where it belongs.
 /** A leap out of the water: the pull back down, and the least upward speed that gets a fish through the surface. */
 const BREACH_GRAVITY = 14;
+/**
+ * How high, in body lengths, a breach may carry a body above the waterline.
+ *
+ * The vertical a body left the water with used to be whatever it had, and a dash's launch speed is
+ * `L * 9.5 + 7` — so a five-unit animal that dashed straight up cleared a hundred units of air and
+ * a Cymbospondylus over a thousand. A breaching animal leaps about its own length, which is the
+ * figure this is set near; the *horizontal* is deliberately untouched, so a fast run still carries
+ * you a long way forward through the air, which is the part that is fun.
+ */
+const BREACH_LEAP = 1.25;
+/** The most vertical speed a body of this length may take through the surface. */
+export const breachSpeed = (L: number) => Math.sqrt(2 * BREACH_GRAVITY * BREACH_LEAP * Math.max(0.3, L));
 /** The least upward speed that gets a fish through the surface, at scale 1: bigger bodies need more. */
 const BREACH_MIN_RISE = 3.2;
 const PADDLE_SPEED = 0.7;     // fraction of the crawler's cruise while off the floor: a swim, if a laboured one
@@ -1652,6 +1664,9 @@ export class Game implements AiWorld {
         const launching = a.state === 'free' || a.state === 'dodge';
         if (RULES?.canBreach(a) && isAlive(a) && a.vel.y > BREACH_MIN_RISE * sf && sp > def.speed * sf * 0.85 && launching) {
           a.airborne = true;
+          // What it leaves the water with is capped to a leap of about its own length; what it was
+          // *travelling* at is what the splash is sized on, so a hard breach still reads as one.
+          a.vel.y = Math.min(a.vel.y, breachSpeed(lengthOf(a)));
           this.events.push({ kind: 'breach', pos: { x: a.pos.x, y: SURFACE_Y, z: a.pos.z }, actor: a.id, player: a.player, strength: clamp(sp / 12, 0.4, 1.5) });
         } else { a.pos.y = ceiling; if (a.vel.y > 0) a.vel.y = 0; }
       }

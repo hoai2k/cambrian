@@ -193,6 +193,20 @@ export function fitCameraArm(baseY: number, pitch: number, dist: number, minDist
  * than the camera having changed its mind about where it lives.
  */
 export const BREATH_PEEK = 1.1;
+/**
+ * Aim mode's framing: how far in the camera comes, and how far the specimen is pushed aside.
+ *
+ * The shoulder shift is what makes room for the crosshair at screen centre, and it is measured in
+ * *body lengths*, which is right — but the room it needs is measured across the **viewport**, and
+ * a split screen has half of one. Two players side by side gave a view about as tall as it is wide,
+ * and three quarters of a body length shoved the animal off the edge of it. `aimRoom` scales the
+ * shift by how wide the view actually is, so one player gets the framing it was drawn for and a
+ * narrow view keeps the animal on screen; the camera also comes in a little further than it did,
+ * which is what was asked for and helps at every width.
+ */
+export const AIM_CLOSER = 0.42, AIM_SHOULDER = 0.75;
+/** 1 at a full-width view, falling off for a narrow one; never less than a third of the shift. */
+export const aimRoom = (aspect: number) => clamp(aspect / 1.6, 0.34, 1);
 export const PITCH_UP = -0.95;   // ~54° above the horizon
 export const PITCH_DOWN = 1.32;  // ~76° below it, near enough straight down at the seabed
 /**
@@ -800,7 +814,7 @@ export class Engine {
     const locked = !!target && isAlive(target) && !p.aiming;
     cs.lockBlend = damp(cs.lockBlend, locked ? 1 : 0, 5, dt);
     // Magnification: camera distance and framing scale with body length so the world re-reads at every tier.
-    let dist = magnificationDistance(L) * cs.zoom * (1 - 0.3 * cs.aimBlend);
+    let dist = magnificationDistance(L) * cs.zoom * (1 - AIM_CLOSER * cs.aimBlend);
     if (p.state === 'dead') dist *= 1.5;
     // In the egg the animal is a fraction of its hatched size and the camera would be pressed
     // against the shell. Frame the egg instead, and ease back in as the body comes out of it.
@@ -879,7 +893,7 @@ export class Engine {
     // Aim mode: over-the-shoulder. Shift both the camera and its look point sideways so the
     // specimen sits to the left and the crosshair (screen centre) is free to be steered onto prey.
     if (cs.aimBlend > 0.001) {
-      const k = L * 0.75 * cs.aimBlend;                  // right = (-cos yaw, 0, sin yaw)
+      const k = L * AIM_SHOULDER * aimRoom(cs.camera.aspect) * cs.aimBlend;  // right = (-cos yaw, 0, sin yaw)
       lookAt.x += -Math.cos(yaw) * k; lookAt.z += Math.sin(yaw) * k;
       lookAt.y += L * 0.1 * cs.aimBlend;
     }
