@@ -1271,11 +1271,16 @@ export class Game implements AiWorld {
     // dashing all go where they are aimed, and the nose goes with them. The funnel shows up in
     // the free hover and in the backward dash, not in a sprint that turns the animal round.
     const jets = RULES?.jet(a) ?? false;
-    // A bell contracts and then coasts. The cycle runs whenever the animal is asking to move, and a
-    // sprint pressed while the bell refills throws more water than one held down through the beat.
+    // A bell contracts and then coasts — but only when it is *going* somewhere in a hurry. Cruising
+    // used to surge and coast too, which meant a jellyfish never simply swam: every crossing was a
+    // stutter, and at low speed the animal read as broken rather than as a medusa. The pulse is
+    // what it does under power, so it is what a sprint and a dash look like, and an unhurried bell
+    // swims the way everything else does. A sprint pressed while the bell refills throws more water
+    // than one held down through the beat, which is the one place rhythm beats pressure.
+    const driving = bursting || a.state === 'dodge';
     let pulse = 1;
     if (def.swimStyle === 'pulse') {
-      if (controllable && mag > 0) {
+      if (controllable && mag > 0 && driving) {
         if (bursting && !a.prev.burst && pulseRefilling(a.pulseT)) a.pulseT = 0;   // contract now
         a.pulseT = (a.pulseT + dt) % PULSE_CYCLE;
         pulse = pulseThrust(a.pulseT);

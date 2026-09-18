@@ -52,7 +52,7 @@ try {
   // 1. The pointer is never taken: the cursor stays the player's.
   assert.equal((await state()).locked, false, 'the pointer must not be locked');
 
-  // 2. A click is a bite and a hold is the heavy — one button, told apart by how long it is down.
+  // 2. A click is a bite — wherever it lands. Biting at the water ahead of you is a real move.
   const centre = { x: 640, y: 400 };
   await page.mouse.move(centre.x, centre.y);
   await page.mouse.click(centre.x, centre.y, { delay: 40 });
@@ -60,15 +60,47 @@ try {
   const bit = await page.evaluate(() => window.__cambrian.game.players[0].moveKind);
   assert.equal(bit, 'light', `a click bites (got ${bit})`);
   await settled();
-  // Held long enough for the loop to see it at this frame rate, and read while it is still down.
+
+  // ...and a hold is the heavy — but **only over something**. The cursor is walked until the engine
+  // says it has a target (any animal will do; what is being checked is that the same button, held
+  // on something rather than clicked, reaches the heavy branch instead of the bite), because a hold
+  // over open water is the camera and nothing else.
+  let found = false;
+  for (let i = 0; i < 48 && !found; i++) {
+    await page.mouse.move(centre.x + ((i % 8) - 4) * 80, centre.y + (Math.floor(i / 8) - 3) * 60);
+    await frames(1);
+    found = await page.evaluate(() => window.__cambrian.cams[0].aimTarget >= 0);
+  }
+  assert(found, 'the cursor found an animal to hold on');
   await page.mouse.down();
-  // Whatever *this* animal's heavy is: a pounce, a lunge, or its own special — Opabinia's heavy is
-  // its claw, so the hold comes out as `ability`. What is being checked is that the same button,
-  // held rather than clicked, reaches the heavy branch instead of the bite.
+  // Whatever *this* animal's heavy is: a pounce, a lunge, or its own special.
   await page.waitForFunction(() => ['pounce', 'ability'].includes(window.__cambrian.game.players[0].state)
     || (window.__cambrian.game.players[0].state === 'attack' && window.__cambrian.game.players[0].moveKind === 'heavy'), null, { timeout: 30000 });
   const held = await state(); await page.mouse.up();
-  assert(['attack', 'pounce', 'ability'].includes(held.state), `a hold is the heavy (got ${held.state})`);
+  assert(['attack', 'pounce', 'ability'].includes(held.state), `a hold on a target is the heavy (got ${held.state})`);
+  await settled();
+
+  // 3. The cursor is the crosshair, and the on-screen reticle is gone with it: two crosshairs on
+  // one screen, one of them nailed to the middle, is worse than either alone. *Which* drawing goes
+  // with which state is a pure mapping and is checked properly in `npm run cursors`; what only a
+  // browser can say is that the page is actually wearing one.
+  const cursorAt = () => page.evaluate(() => window.__cambrian.container.style.cursor);
+  await page.mouse.move(60, 60); await frames(3);
+  const idle = await cursorAt();
+  assert(idle.includes('svg'), `the cursor is drawn for the match (${idle.slice(0, 40)})`);
+  assert(!(await page.locator('.hud .aim').count()), 'no on-screen reticle in mouse play');
+
+  // 4. A press over nothing turns the camera from the first pixel, and is not an attack. This is
+  // the rule that makes one button unambiguous: what it does is decided by what you pointed it at.
+  await settled();
+  const beforeLook = await page.evaluate(() => window.__cambrian.cams[0].yaw);
+  await page.mouse.down(); await page.mouse.move(130, 60); await frames(2);
+  const looking = await cursorAt();
+  await page.mouse.up(); await frames(2);
+  const afterLook = await page.evaluate(() => ({ yaw: window.__cambrian.cams[0].yaw, state: window.__cambrian.game.players[0].state }));
+  assert.equal(looking, 'grabbing', `a press over nothing looks around (${looking})`);
+  assert(Math.abs(afterLook.yaw - beforeLook) > 0.02, 'and it turns the camera from the first pixel');
+  assert.equal(afterLook.state, 'free', 'and it is not an attack');
 
   // 3. The camera comes round behind the animal by itself.
   await settled();
@@ -80,16 +112,6 @@ try {
   const back = await page.evaluate(() => { const e = window.__cambrian; return Math.abs(((e.cams[0].yaw - e.game.players[0].yaw + Math.PI * 3) % (Math.PI * 2)) - Math.PI); });
   assert(back < off * 0.5, `the camera follows the body (${off.toFixed(2)} rad off, then ${back.toFixed(2)})`);
 
-  // 4. A drag turns the camera and does not attack.
-  await settled();
-  const beforeDrag = await page.evaluate(() => window.__cambrian.cams[0].yaw);
-  await page.mouse.move(centre.x, centre.y); await page.mouse.down();
-  for (let i = 1; i <= 8; i++) await page.mouse.move(centre.x + i * 24, centre.y);
-  await page.mouse.up(); await frames(3);
-  const afterDrag = await page.evaluate(() => ({ yaw: window.__cambrian.cams[0].yaw, state: window.__cambrian.game.players[0].state }));
-  assert(Math.abs(afterDrag.yaw - beforeDrag) > 0.1, 'a drag turns the camera');
-  assert.equal(afterDrag.state, 'free', 'a drag is not an attack');
-
   // 5. The right button dashes, at the water under the cursor.
   await settled();
   await page.mouse.move(900, 300);
@@ -99,5 +121,5 @@ try {
   assert.equal(dashed.state, 'dodge', `the right button dashes (got ${dashed.state})`);
 
   assert.deepEqual(errors, [], `page errors: ${errors.join(' · ')}`);
-  console.log('PASS browser: no pointer lock, click bites, hold is the heavy, the camera follows, a drag looks, the right button dashes');
+  console.log('PASS browser: no pointer lock, click bites, hold is the heavy, the camera follows, a press over nothing looks, the right button dashes, and the cursor is the crosshair');
 } finally { await browser.close(); }

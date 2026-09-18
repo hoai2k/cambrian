@@ -98,22 +98,28 @@ export class KeyboardInput {
     const k = (c: string) => this.keys.has(c);
     const c = emptyControls();
     if (layout === 1) {
-      c.mx = Number(k('KeyD')) - Number(k('KeyA')); c.my = Number(k('KeyW')) - Number(k('KeyS'));
-      c.lookX = Number(k('ArrowRight')) - Number(k('ArrowLeft')); c.lookY = Number(k('ArrowDown')) - Number(k('ArrowUp'));
-      // The mouse-and-keyboard layout is the *mouse's* layout with the keys around it: the left
-      // hand sits on WASD with everything it reaches — E up, C down, Q guard, Z camouflage, G
-      // sense — and the space bar dashes, which is the one thing that has to fire under a thumb.
-      // The attacks are on the mouse (a click bites, a hold is the heavy) and F is the bite's key
-      // for a player without one. Nothing here is on the same key as anything else.
-      c.rise = k('KeyE'); c.sink = k('KeyC');
-      c.light = k('KeyF'); c.ability = k('KeyZ'); c.dodge = k('Space'); c.dash = k('Space'); c.guard = k('KeyQ'); c.lock = k('Tab'); c.aim = k('Tab'); c.sense = k('KeyG');
+      // **A and D turn; they do not strafe.** The left hand steers the animal the way the right
+      // stick would, so the camera's yaw is what they move — which means turning composes with
+      // swimming rather than replacing it: hold W and press D and the body swims forward along a
+      // curve, because `mx`/`my` are camera-relative and the camera is what turned. The arrow keys
+      // still do it too, for a hand that wants them.
+      c.my = Number(k('KeyW')) - Number(k('KeyX'));
+      c.lookX = Number(k('KeyD')) - Number(k('KeyA')) + Number(k('ArrowRight')) - Number(k('ArrowLeft'));
+      c.lookY = Number(k('ArrowDown')) - Number(k('ArrowUp'));
+      // Up and down are a pair on each hand: E or Q lifts, S or C drops. Every attack has a key as
+      // well as a mouse button, because a hand already on the keys should not have to reach — J and
+      // F bite, G and K are the heavy.
+      c.burst = k('ShiftLeft') ? 1 : 0;
+      c.rise = k('KeyE') || k('KeyQ'); c.sink = k('KeyS') || k('KeyC');
+      c.light = k('KeyF') || k('KeyJ'); c.heavy = k('KeyG') || k('KeyK');
+      c.ability = k('KeyZ'); c.dodge = k('Space'); c.dash = k('Space'); c.guard = k('KeyR'); c.lock = k('Tab'); c.aim = k('Tab'); c.sense = k('KeyI');
       if (k('PageUp') || k('PageDown')) { c.rsClick = true; c.lookY = k('PageUp') ? -1 : 1; }
       c.teleport = k('KeyT'); c.view = k('KeyV');
       c.menu = k('Escape'); c.confirm = k('Enter') || k('Space'); c.back = k('Backspace');
       c.dleft = k('ArrowLeft'); c.dright = k('ArrowRight'); c.dup = k('ArrowUp'); c.ddown = k('ArrowDown');
     } else {
       c.mx = Number(k('KeyL')) - Number(k('KeyJ')); c.my = Number(k('KeyI')) - Number(k('KeyK'));
-      c.rise = k('KeyN'); c.sink = k('KeyM');
+      c.burst = k('ShiftRight') ? 1 : 0; c.rise = k('KeyN'); c.sink = k('KeyM');
       c.light = k('Semicolon'); c.heavy = k('Quote'); c.ability = k('KeyP'); c.dodge = k('Slash'); c.dash = k('Slash'); c.guard = k('KeyU'); c.lock = k('KeyO'); c.aim = k('KeyO'); c.sense = k('KeyY');
       c.teleport = k('KeyH'); c.view = k('Comma');
       c.confirm = k('Enter'); c.back = k('Backspace');
@@ -178,9 +184,14 @@ export class MousePlay {
   /** Where the cursor is, in NDC. Undefined until it has been over the canvas. */
   private ndc: { x: number; y: number } | undefined;
   /** The left press in progress: when it started, how far it has travelled, what it became. */
-  private press: { t: number; moved: number; dragging: boolean } | undefined;
+  private press: { t: number; moved: number; dragging: boolean; targeted: boolean } | undefined;
   /** A completed click, waiting to be read as one bite. */
   private clicked = false;
+  /**
+   * Whether the cursor is over something worth attacking. Written by the engine each frame (it is
+   * the only thing that knows), and read on the next press: see `onDown`.
+   */
+  private overTarget = false;
   /** Kept for the engine's benefit: nothing is locked, so nothing is ever lost. */
   locked = false;
   onLost: (() => void) | null = null;
@@ -214,16 +225,22 @@ export class MousePlay {
     if (!this.wanted) return;
     e.preventDefault();
     this.buttons.add(e.button);
-    if (e.button === 0) this.press = { t: performance.now() / 1000, moved: 0, dragging: false };
+    // A press with **nothing under the cursor** is the camera from the first pixel. There is no
+    // attack to make out there, so waiting `DRAG` pixels to find that out only costs the player the
+    // start of the movement — and the whole point of a left button that both attacks and looks is
+    // that it is never ambiguous about which. Over an animal, it is the attack until it travels.
+    if (e.button === 0) this.press = { t: performance.now() / 1000, moved: 0, dragging: !this.overTarget, targeted: this.overTarget };
   };
   private onUp = (e: MouseEvent) => {
     this.buttons.delete(e.button);
     if (e.button !== 0) return;
     const p = this.press; this.press = undefined;
-    if (!p || p.dragging) return;                       // a drag was the camera, not an attack
-    // Released before the hold became a heavy: that is a click, and a click is a bite. It is read
-    // once, on the frame after the release, because a bite is an edge and not a state.
-    if (performance.now() / 1000 - p.t < MousePlay.HOLD) this.clicked = true;
+    // A click is a click wherever it lands: pressed and let go without *travelling*, which is the
+    // test whether or not there was anything under it. Biting at the water ahead of you is a real
+    // move — it is how you attack something you have not pointed at — so the bite is never taken
+    // away, only the heavy is. It is read once, on the frame after the release, because a bite is
+    // an edge and not a state.
+    if (p && p.moved <= MousePlay.DRAG && performance.now() / 1000 - p.t < MousePlay.HOLD) this.clicked = true;
   };
   private onContext = (e: Event) => { if (this.wanted) e.preventDefault(); };
   private onBlur = () => { this.buttons.clear(); this.press = undefined; };
@@ -238,6 +255,9 @@ export class MousePlay {
     window.addEventListener('blur', this.onBlur);
   }
 
+  /** Tell the mouse whether the cursor is over a creature. Cheap, and called every frame. */
+  aimingAt(on: boolean) { this.overTarget = on; }
+
   /** Whether the mouse is playing the game. Nothing is locked either way. */
   want(on: boolean) {
     if (this.wanted === on) return;
@@ -248,7 +268,10 @@ export class MousePlay {
   /** Everything the mouse has done since the last frame. Drains the deltas and the click. */
   read() {
     const p = this.press;
-    const held = !!p && !p.dragging && performance.now() / 1000 - p.t >= MousePlay.HOLD;
+    // A **hold is the heavy only over something**. With nothing under the cursor there is nothing
+    // to pounce at, so holding the button there is the camera and only the camera — which is what
+    // makes the one button unambiguous: what it does is decided by what you pointed it at.
+    const held = !!p && p.targeted && p.moved <= MousePlay.DRAG && performance.now() / 1000 - p.t >= MousePlay.HOLD;
     const r = {
       dx: this.dx * MousePlay.SENSITIVITY, dy: this.dy * MousePlay.SENSITIVITY,
       zoom: this.wheel * MousePlay.WHEEL,
@@ -258,6 +281,8 @@ export class MousePlay {
       click: this.clicked,
       /** Turning the camera this frame, so the follow camera knows to stand aside. */
       dragging: !!p?.dragging || this.buttons.has(1),
+      /** The left button is down on a target and has not travelled: a pounce is winding up. */
+      pressing: !!p && p.targeted && p.moved <= MousePlay.DRAG,
       middle: this.buttons.has(1), right: this.buttons.has(2),
       ndc: this.ndc,
     };
