@@ -35,6 +35,13 @@ render=R.renderer(scene,cam)
 centre,size=R.subject_bounds()
 span=max(size)*1.08;d=span*1.6;cx,cy,cz=centre
 VIEWS={'side':(cx+d,cy,cz+.05*span),'top':(cx,cy,cz+d),'threeq':(cx+d*.75,cy-d*.55,cz+d*.45)}
+# **Head-on, down this body's own trunk** (T3D-26). Whether the head is in line with the animal is
+# an angle in a dorsal shot and invisible in a lateral one; looked at along the trunk's own run it
+# is simply whether the head is in the middle of the frame or off to one side. The run is read off
+# each file's own rest skeleton, hip to shoulder, so the before and after bodies are each framed
+# down the line they actually hold rather than down a shared world axis.
+_run=(rig.pose.bones['chest'].head-rig.pose.bones['tail_00'].head).normalized()
+VIEWS['front']=tuple(v+_run[i]*d for i,v in enumerate(centre))
 
 def shot(name,clip,t,view,w=760,h=570):
  pose(clip,t)
@@ -52,4 +59,5 @@ for clip,t in RANGE:
  for view in ('top','side'):shot('range',clip,t,view)
 for clip,t in STRIP:shot('strip',clip,t,'threeq')
 for view in ('side','top','threeq'):shot('card','TurnLeft',.2,view,900,675)
+for clip in ('Idle','Swim','Sprint'):shot('frontal',clip,0,'front',760,570)
 print('REVIEW_SWAP_OK',json.dumps({'tag':tag,'source':str(source),'out':str(out)}))

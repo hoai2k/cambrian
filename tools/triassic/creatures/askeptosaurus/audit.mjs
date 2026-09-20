@@ -75,6 +75,10 @@ if(process.argv.includes('--decode')){for(const e of backup.getRoot().listExtens
 report.cutAttachment={};
 for(const suffix of ['', '.puppet', '.backup']){
  const validation=JSON.parse(fs.readFileSync(`${here}/${suffix==='.backup'?'backup-':''}validation.json`));
- report.cutAttachment[suffix||'authored']=await auditCutAttachment(`${base}${suffix}.glb`,-validation.mouth.hingeY*6);
+ // The plane the builder actually cut on, carried to wherever this body's bind now holds it. The
+ // old `-hingeY*6` reading is the same plane whenever nothing has been carried and is kept as the
+ // fallback for a validation record written before T3D-26.
+ report.cutAttachment[suffix||'authored']=await auditCutAttachment(`${base}${suffix}.glb`,
+  validation.mouth.cutPlane??-validation.mouth.hingeY*6);
 }
 write();console.log(JSON.stringify({models:report.models,clips:CLIPS.length,gait:report.gait,backup:report.backup},null,2));
