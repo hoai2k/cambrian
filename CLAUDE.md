@@ -688,6 +688,26 @@ unless the user explicitly asks for a PR. Steps:
   table — with a second parity test against the lining sac, because a modelled open mouth is an
   invagination and a point in the lumen is outside the solid by construction.
 
+- **On a generation that arrived gaping, a mouth built about the mouth line is built in the water.**
+  The shared shells (`T.oral_shells`) put the palate and the floor about one `seam` -- the mid-height
+  of the modelled cavity -- and on a body whose jaws are parted in the bind pose that line runs
+  through open gape: Saurichthys' palate hung 0.011 below the underside of its own upper rostrum,
+  and no room measured from mid-gape and held short of the skin ever reached the jaw it belonged to.
+  The helper now takes `seam` and `room` as a **pair** `(palate, floor)` and a separate
+  `u_front_floor`, and the two fish build each shell about *its own jaw's edge of the lumen*, cast
+  from the mouth's axis (`jaw_face` in their builders), with the floor ending where there is
+  mandible under the axis rather than at the mouth's front -- a gaping mandible's rami reach the
+  front while its symphysis has swung back. Three more things those two ports paid for, each once:
+  the mouth's **lateral centre is measured** (`cx`), because the unbent rostrum runs 0.02-0.035 off
+  the midline and a lining on x = 0 stood beside it; `T.mouth_room`'s **fallback is a positive
+  number**, so a cast that misses reads as room where there is open water and cannot be used to ask
+  whether a jaw is there (cast the ray yourself); and a bmesh vertex **starts every layer at zero**,
+  so `T.cap_cut`'s hub drew as a black slab until it copied the rim's UVs and vertex colour. The
+  containment test those builders assert is the one from the `np.interp` lesson above, asked per
+  shell: rays from every shell vertex to either side and up and down against the closed intake
+  surface, with the exceptions a gaping mouth needs written out -- a point the measured cavity
+  contains may look out through the parted lips, and a point pressed within 0.003 of a body against
+  its own jaw's surface is under its own jaw.
 - **A limbed swimmer's dash has to paddle.** The Triassic's reptiles and amphibians did not scull
   along on a tail beat, and a Sprint clip that waggles the limbs while the body does the work reads
   as a fish with legs attached. The stroke runs from the limb stretched forward to flush with the
