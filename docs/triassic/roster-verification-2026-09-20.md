@@ -150,7 +150,11 @@ vertices against the L's 247 — which is why the lag radius around `pec_tip_R` 
 `neck_05`, Cartorhynchus and Hybodus `caudal_upper`, Hupehsuchus both caudals, Saurichthys `caudal_lower`,
 Ceratites `funnel`, Phragmoteuthis `arm_02_00`/`arm_08_00` dominate no vertex either — every one of them
 still carries weight (`idle-bones --all`: every joint owns skin), so these are blend-only joints, noted
-and not judged.
+and not judged. **Helicoprion's pectorals re-seated (T3D-21)**: the two chains now own 0.03096 / 0.03099
+of blade area (0.1 % apart; the vertex counts 584 / 733 are the two blades' own tessellation, 515 / 646
+thin vertices over the same box), each dominates 99.8 % / 100 % of its own blade, the blade joints sit
+within 3.3 % of each other in mean distance to the skin they drive, and the roots 0.0206 / 0.0210 inside
+the flank.
 
 ### B4 — attacks and anchors
 
@@ -248,7 +252,7 @@ new one, and it now runs inside `npm run triassic` so the next such name fails t
 | Ceratites | 7.73× | `Guard` / `arm_09_04` | 16 / 21 | not in the table |
 | Coelophysis | 7.74× | `SnapRight` / `skull` (2,426 edges) | 22 / 29 | was 4.46× — the hard snaps stretch the skull–neck skin (T3D-09b's record; T3D-15's business) |
 | Placodus | 12.36× | `Pry` / `fore_paddle_L` | 19 / 25 | same |
-| Helicoprion | **14.33×** | `Flop` / `pec_upper_R` | 18 / 22 | was 11.68× (`Parry`); `Flop` is the shore gait `gaits.mjs` added after that table and tears the pectoral root harder |
+| Helicoprion | **14.33×** | `Flop` / `pec_upper_R` | 18 / 22 | was 11.68× (`Parry`); `Flop` is the shore gait `gaits.mjs` added after that table and tears the pectoral root harder. **Fixed (T3D-21)**: pectoral chains measured off the blades and the skin relaxed — **4.21×** (`Eat`, the held jaw), `Flop` 2.01×, 6 / 22 |
 
 Nothing in this sweep changed a skin figure but Placodus' (unchanged at 12.36×, the rebuild being
 byte-identical). `idle-bones.mjs --all`: 34 bodies, every joint owns skin.
