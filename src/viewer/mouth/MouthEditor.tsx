@@ -141,7 +141,7 @@ export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas,
       e.preventDefault();
       canvas.setPointerCapture(e.pointerId);
       const anchor = handleAnchor(h.present, handle);
-      const start = scene.mouthDragPoint(e.offsetX, e.offsetY, anchor) ?? anchor;
+      const start = scene.dragPoint(e.offsetX, e.offsetY, anchor) ?? anchor;
       dragRef.current = { handle, from: h.present, anchor, start };
     };
     const onMove = (e: PointerEvent) => {
@@ -152,7 +152,7 @@ export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas,
         canvas.style.cursor = over ? 'grab' : '';
         return;
       }
-      const p = scene.mouthDragPoint(e.offsetX, e.offsetY, d.anchor);
+      const p = scene.dragPoint(e.offsetX, e.offsetY, d.anchor);
       if (!p) return;
       const c = cutBasis(d.from).centre;
       if (d.handle === 'hinge') {
