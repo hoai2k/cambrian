@@ -1680,6 +1680,140 @@ def relax_weights(o, per_vertex, passes=3, keep=4, hold=.45):
     return out
 
 
+def jaw_junction(body, shell, body_weights, hinge, rear, upper_jaw, axis, down=(0., 0., -1.),
+                 band=.015, back=.06, dz=None, reach_margin=.5, throat=1.):
+    """Skin the mandible shell *into* the head it was cut from, so the jaw's swing is a blend and
+    not a slot.
+
+    **A rigid shell against a skull-weighted throat opens a gap the size of the gape.** Every jawed
+    Triassic body cuts its mandible off the head as a separate object, and every one of them then
+    weighted that shell to `jaw` at 1 and the body it came from to whatever `weights()` said -- the
+    skull, or the skull with a throat share. The two share a rim: the cut duplicates each vertex
+    along it, one copy on each part. When the jaw swings, the shell's copy of a rim point turns
+    about the hinge by its depth below the hinge times the gape and the body's copy stays where it
+    was, and the junction opens by exactly that -- 6 % of a body on Hybodus at `Heavy`, 3.5 % on
+    Saurichthys, 2.2 % on Nothosaurus, a slot under the corner of the mouth on all of them
+    (`tools/triassic/lag.mjs` measures it, because no edge crosses the seam and `skin-tears.mjs`
+    cannot). The hinge tissue plug used to hide it and is hidden in play.
+
+    The repair is **one weight field over both parts**, evaluated on position, so the two copies
+    of a rim point cannot disagree. Its jaw share is:
+
+    - on the body, ``throat`` below the hinge line and falling off with distance from the cut
+      rim (``back``, along the body and round it) and with transverse distance from the hinge past
+      the rim's own reach (``reach_margin`` of it) -- the throat follows the jaw, bounded radially
+      about the hinge as well as along the body -- and zero on the upper jaw;
+    - on the shell, the greater of that and a ramp from the cut rim to full jaw over ``band``: the
+      mandible is rigid on its bone from ``band`` forward of the cut and full at the mouth line,
+      and blends to the body's own field at the rim, where both copies take the same value.
+
+    The remainder of every vertex is the body's relaxed field at the nearest body vertex, which at
+    a rim vertex is its own twin. ``below`` ramps from the hinge's height to ``dz`` under it (a
+    third of the rim's depth unless given), so the cheek behind the corner of the mouth stays with
+    the skull and the throat under the hinge goes with the jaw, which is what a throat does.
+
+    **``band`` is short on purpose.** The mandible is bone and has to read as bone: at 0.05 of a
+    body Mixosaurus' jaw bowed, its dorsal-rear corner held by the skull while its chin dropped,
+    and a mouth that opens by bending its lower jaw is worse than one with a slot behind it. The
+    shell only needs to agree with the body *at the rim*, and the rim's own motion is small where
+    the two fields differ -- the upper part of the cut, within ``dz`` of the hinge's height, where a
+    point turns about the hinge on a short radius -- so a band of 0.015 confines the shear to a
+    strip that barely moves and leaves the rest of the mandible rigid. The throat under the hinge
+    is the part that stretches, and it stretches on the body's side, over ``back``.
+
+    The rim is found, not assumed: every shell vertex coincident with a body vertex is a shared
+    point, and ``rear`` says which of those are the junction -- the cut at the hinge. The others
+    are the mouth line and, where a builder cuts the mandible's front off an overhanging snout,
+    the front cut, and both part by design: Mixosaurus' mandible tip was glued to the snout's
+    own tip at 7.6x the moment the front cut was taken for the junction, because a rim is a rim to
+    a coincidence test. Taking the rear as a predicate is also what lets a cut whose rear edge runs
+    along the generation's own edges rather than a plane (Hybodus' labelled mandible) take the
+    same repair as a plane cut.
+
+    Both objects must still be in raw coordinates. Returns (body field, shell field, report), each
+    field a list of {bone: weight} dicts trimmed to four influences.
+    """
+    import re
+    from mathutils.kdtree import KDTree
+    LIMB = re.compile(r'fore|hind|pec|pelvic|paddle|foot|hand|fin_|flipper', re.I)
+    H = Vector(hinge)
+    axis = Vector(axis).normalized()
+    down = Vector(down).normalized()
+    bco = [v.co.copy() for v in body.data.vertices]
+    sco = [v.co.copy() for v in shell.data.vertices]
+    kd = KDTree(len(bco))
+    for i, c in enumerate(bco):
+        kd.insert(c, i)
+    kd.balance()
+    twin = [kd.find(c) for c in sco]                     # (co, index, dist) of the nearest body vertex
+    rim = [i for i, (_, _, d) in enumerate(twin) if d < 1e-6 and rear(sco[i])]
+    lip = sum(1 for i, (_, _, d) in enumerate(twin) if d < 1e-6 and not rear(sco[i]))
+    assert len(rim) >= 3, ('the mandible shares no cut rim with the body', len(rim), lip)
+    rk = KDTree(len(rim))
+    for k, i in enumerate(rim):
+        rk.insert(sco[i], k)
+    rk.balance()
+
+    def transverse(p):
+        d = Vector(p) - H
+        return (d - axis * d.dot(axis)).length
+    rim_reach = max(transverse(sco[i]) for i in rim)
+    rim_depth = max((Vector(sco[i]) - H).dot(down) for i in rim)
+    if dz is None:
+        dz = max(rim_depth / 3., 1e-4)
+    margin = max(rim_reach * reach_margin, 1e-4)
+
+    def base(p):
+        p = Vector(p)
+        b = smooth((p - H).dot(down) / dz)
+        d_rim = rk.find(p)[2]
+        along = 1. - smooth(d_rim / back)
+        radial = 1. - smooth((transverse(p) - rim_reach) / margin)
+        return throat * b * along * radial
+
+    def trim(w):
+        items = sorted(((n, v) for n, v in w.items() if v > 1e-6), key=lambda kv: -kv[1])[:4]
+        total = sum(v for _, v in items) or 1.
+        return {n: v / total for n, v in items}
+
+    def mix(w, j):
+        out = {n: v * (1. - j) for n, v in w.items()}
+        out['jaw'] = out.get('jaw', 0.) + j
+        return trim(out)
+
+    # **A limb is never throat.** Aphaneramma's and Mystriosuchus' generations stand with the right
+    # forelimb tucked under the snout, inside `back` of the rim and below the hinge, and the field
+    # handed half of that arm to the jaw: a 4.6x tear on the body at Ability, between a vertex the
+    # jaw now carried and its neighbour the forelimb still did. So the throat's share of a vertex
+    # is scaled by whatever of it is *not* a limb's, read off the body's own field -- the same
+    # answer the builders' own throat terms give (`throat_jaw_share(q) * (1 - alpha)`).
+    def axial(w):
+        return 1. - sum(v for n, v in w.items() if LIMB.search(n))
+
+    body_out, body_throat = [], 0
+    for i, c in enumerate(bco):
+        j = 0. if upper_jaw(c) else base(c) * axial(body_weights[i])
+        if j > .05:
+            body_throat += 1
+        body_out.append(mix(body_weights[i], j) if j > 0 else trim(body_weights[i]))
+    shell_out, full = [], 0
+    for i, c in enumerate(sco):
+        w = body_weights[twin[i][1]]
+        j = max(0. if upper_jaw(c) else base(c) * axial(w), smooth(rk.find(c)[2] / band))
+        if j > .99:
+            full += 1
+        shell_out.append(mix(w, j))
+    # The two copies of every rim point must be the same weights, to the last influence: this is
+    # the property the whole thing exists for, and it is asserted rather than trusted.
+    for i in rim:
+        a, b = shell_out[i], body_out[twin[i][1]]
+        assert a.keys() == b.keys() and all(abs(a[n] - b[n]) < 1e-9 for n in a), (i, a, b)
+    report = {'cutRimPairs': len(rim), 'lipPairs': lip, 'rimReach': float(rim_reach), 'rimDepth': float(rim_depth),
+              'dz': float(dz), 'band': band, 'back': back, 'throat': throat,
+              'shellVertices': len(sco), 'shellFullJaw': full, 'bodyThroatVertices': body_throat}
+    return body_out, shell_out, report
+
+
 def depth_probe(o):
     """How far inside the closed intake surface a point is: positive inside, negative outside.
     Every appendage root and the jaw hinge has to clear a margin, or a fin reads as floating

@@ -267,6 +267,18 @@ review. That last review distinguishes a continuous stretched cervical edge from
 forced-visible authoring oral parts still need fit review before enabling them. No document here
 claims every posed surface or camera angle is intersection-free.
 
+## Jaw junction — T3D-15, 20 September 2026
+
+The class behind the owner's Hybodus and Saurichthys report: every jawed body's mandible is a
+separate shell weighted `jaw` at 1 against a skull-weighted body, and the cut opened at the hinge by
+the gape — 6.05 % of a body on Hybodus, eleven bodies past 0.5 %. `tools/triassic/lag.mjs` measures
+it (the rest-coincident pairs at the cut, over every clip), `T.jaw_junction` closes it with one
+weight field over both parts, and nineteen builders were ported and rebuilt. The whole record —
+instrument, helper, the before/after table for all 27 bodies, what was left alone and why — is
+[`../jaw-skinning.md`](../jaw-skinning.md); the renders are `<id>-jaw-before.png` / `-after.png`
+beside this file. Nothing here touches the shells or the verdicts above: the helper writes weights
+only, and `oral-shell-audit.mjs` passes on every rebuilt triplet as before.
+
 ## Oral verdicts — T3D-14, 20 September 2026
 
 Per animal, the decision the mouth rule asks for first — whether the mouth needs filling at all —

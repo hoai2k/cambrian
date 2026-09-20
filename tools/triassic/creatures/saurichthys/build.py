@@ -1806,7 +1806,8 @@ for n, (p, parent) in B.items():
 bpy.ops.object.mode_set(mode='OBJECT')
 
 weight_report = {}
-# The cut jaw shells are rigid on the hinge; everything else is skinned by the measurement.
+# The cut jaw shells are skinned into the head (`T.jaw_junction`); everything else by the measurement.
+JUNCTION = {}
 for o, thin in [(auth, thickness), (puppet, puppet_thickness)]:
     for n in B:
         o.vertex_groups.new(name=n)
@@ -1834,34 +1835,48 @@ for o, thin in [(auth, thickness), (puppet, puppet_thickness)]:
                     acc[n] = acc.get(n, 0.) + v * share
             nxt.append(acc)
         raw = nxt
-    influences, owners = [], {}
+    relaxed = []
     for v in o.data.vertices:
         w = {n: x for n, x in sorted(raw[v.index].items(), key=lambda kv: -kv[1])[:4] if x > 1e-5}
         total = sum(w.values())
-        w = {n: x / total for n, x in w.items()}
-        influences.append(len(w))
-        for n, value in w.items():
-            o.vertex_groups[n].add([v.index], value, 'REPLACE')
-            owners[n] = owners.get(n, 0) + 1
-    for v in o.data.vertices:
-        v.co = tx(v.co)
-    for p in o.data.polygons:
-        p.use_smooth = True
-    mod = o.modifiers.new('Shared articulated skeleton', 'ARMATURE')
-    mod.object = rig
-    o.parent = rig
+        relaxed.append({n: x / total for n, x in w.items()})
+    # The mandible is skinned *into* the head rather than rigid against it: one field over both
+    # parts, the throat under the hinge following the jaw and the shell ramping to full jaw over
+    # `band` from the cut rim, so the two copies of every rim vertex carry the same weights and the
+    # cut cannot open (`T.jaw_junction`; `tools/triassic/lag.mjs` measures the seam it closes).
+    # The rear rim here is not a plane on the authored body -- the mandible is labelled by the
+    # surface each vertex grows from, and the label window runs 0.04 of a body *behind* the hinge --
+    # so the rim is every shared vertex from a hair ahead of the hinge back that the seam cut did
+    # not make. Not the rear *half*: the label boundary also leaves the seam round the roots of the
+    # interlocking teeth, forward of the hinge, and shared vertices there taken for the junction
+    # pinned Saurichthys' mandible to its upper tooth row at 5.6x. Those, and the front label
+    # boundary at the snout tip, part by design like the mouth line.
+    shell = AUTH_JAW if o is auth else PUP_JAW
+    for n in B:
+        shell.vertex_groups.new(name=n)
+    body_w, shell_w, JUNCTION[o.name] = T.jaw_junction(
+        o, shell, relaxed, B['jaw'][0],
+        rear=lambda p: p[1] >= JAW_BACK - .01 * RAW_LENGTH and not _on_seam(p),
+        upper_jaw=lambda p: p[1] < JAW_BACK and p[2] >= seam_z(p[1]) - 1e-6, axis=(0., -1., 0.),
+        band=.015 * RAW_LENGTH, back=.06 * RAW_LENGTH)
+    influences, owners = [], {}
+    for part, field in ((o, body_w), (shell, shell_w)):
+        for v in part.data.vertices:
+            w = field[v.index]
+            influences.append(len(w))
+            for n, value in w.items():
+                part.vertex_groups[n].add([v.index], value, 'REPLACE')
+                if part is o:
+                    owners[n] = owners.get(n, 0) + 1
+        for v in part.data.vertices:
+            v.co = tx(v.co)
+        for p in part.data.polygons:
+            p.use_smooth = True
+        mod = part.modifiers.new('Shared articulated skeleton' if part is o else 'Mandible into the head', 'ARMATURE')
+        mod.object = rig
+        part.parent = rig
     weight_report[o.name] = {'maxInfluences': max(influences), 'vertices': len(influences),
-                             'verticesPerBone': owners}
-for o in [AUTH_JAW, PUP_JAW]:
-    g = o.vertex_groups.new(name='jaw')
-    g.add(list(range(len(o.data.vertices))), 1., 'REPLACE')
-    for v in o.data.vertices:
-        v.co = tx(v.co)
-    for p in o.data.polygons:
-        p.use_smooth = True
-    mo = o.modifiers.new('Rigid jaw', 'ARMATURE')
-    mo.object = rig
-    o.parent = rig
+                             'verticesPerBone': owners, 'jawJunction': JUNCTION[o.name]}
 for o in oralparts:
     o.parent = rig
     o.modifiers.new('Mouth lining', 'ARMATURE').object = rig

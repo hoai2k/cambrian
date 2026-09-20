@@ -580,11 +580,33 @@ def weights(p):
 
 
 rig = K.build_armature(B, tx, 'Tanystropheus shared skeleton', 'Tanystropheus_Rig')
-influences = []
+influences, JUNCTION = [], {}
 for o in [auth, puppet]:
-    K.bind(o, rig, B, weights, tx, influences, passes=RELAX_PASSES)
-for o in parts['lower jaw'].values():
-    K.bind_rigid(o, rig, 'jaw', tx)
+    # The mandible is skinned *into* the head rather than rigid against it: one field over both
+    # parts, the throat under the hinge following the jaw and the shell ramping to full jaw over
+    # `band` from the cut rim, so the two copies of every rim vertex carry the same weights and the
+    # cut cannot open (`T.jaw_junction`; `tools/triassic/lag.mjs` measures the seam it closes).
+    # `K.bind` relaxes and writes in one go, so the relaxation is taken here and the junction laid
+    # over it before either part is bound.
+    shell = parts['lower jaw'][o.name]
+    relaxed = K.relax_weights(o, [weights(v.co) for v in o.data.vertices], passes=RELAX_PASSES, hold=.45)
+    body_w, shell_w, JUNCTION[o.name] = K.jaw_junction(
+        o, shell, relaxed, B['jaw'][0], rear=lambda p: abs(p.x - HINGE_X) < 1e-5,
+        upper_jaw=lambda p: p.x > HINGE_X and p.z >= seam(p.x) - 1e-6, axis=(1., 0., 0.))
+    for part, field in ((o, body_w), (shell, shell_w)):
+        for n in B:
+            part.vertex_groups.new(name=n)
+        for v in part.data.vertices:
+            influences.append(len(field[v.index]))
+            for n, val in field[v.index].items():
+                part.vertex_groups[n].add([v.index], val, 'REPLACE')
+        for v in part.data.vertices:
+            v.co = tx(v.co)
+        for p in part.data.polygons:
+            p.use_smooth = True
+        mod = part.modifiers.new('Shared articulated skeleton' if part is o else 'Mandible into the head', 'ARMATURE')
+        mod.object = rig
+        part.parent = rig
 bone_count_check = len(B)
 
 # The mouth is a palate on the skull and a floor on the jaw, each closed on its own and each

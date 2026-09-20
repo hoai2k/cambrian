@@ -563,31 +563,31 @@ for n, (p, parent) in B.items():
     eb = arm.edit_bones.new(n); eb.head = tx(p); eb.tail = eb.head + Vector((0, .16, 0))
     if parent: eb.parent = arm.edit_bones[parent]
 bpy.ops.object.mode_set(mode='OBJECT')
-influences = []; carapace_vertices = 0
+influences = []; carapace_vertices = 0; JUNCTION = {}
 for o in [auth, puppet]:
-    for n in B: o.vertex_groups.new(name=n)
+    shell = parts['lower jaw'][o.name]
+    for part in (o, shell):
+        for n in B: part.vertex_groups.new(name=n)
+    body_w = []
     for v in o.data.vertices:
         w = weights(v.co); influences.append(len(w))
         if w.get('carapace', 0) > .5: carapace_vertices += 1
-        for n, val in w.items(): o.vertex_groups[n].add([v.index], val, 'REPLACE')
-    for v in o.data.vertices: v.co = tx(v.co)
-    for p in o.data.polygons: p.use_smooth = True
-    mod = o.modifiers.new('Shared articulated skeleton', 'ARMATURE'); mod.object = rig; o.parent = rig
-for o in parts['lower jaw'].values():
-    for n in B: o.vertex_groups.new(name=n)
-    for v in o.data.vertices:
-        # Share the body's weight field at the posterior cut, then become a
-        # rigid mandible forward of the short soft attachment.
-        blend = smooth((v.co.x - HINGE_X) / .018)
-        w = {n: val * (1 - blend) for n, val in weights(v.co).items()}
-        w['jaw'] = w.get('jaw', 0.) + blend
-        top = sorted(w.items(), key=lambda item: -item[1])[:4]
-        total = sum(val for _, val in top)
-        for n, val in top:
-            if val > 1e-8: o.vertex_groups[n].add([v.index], val / total, 'REPLACE')
-        v.co = tx(v.co)
-    for p in o.data.polygons: p.use_smooth = True
-    mo = o.modifiers.new('Rigid lower jaw', 'ARMATURE'); mo.object = rig; o.parent = rig
+        body_w.append(w)
+    # The mandible is skinned *into* the head rather than rigid against it: one field over both
+    # parts, the throat under the hinge following the jaw and the shell ramping to full jaw over
+    # `band` from the cut rim, so the two copies of every rim vertex carry the same weights and the
+    # cut cannot open (`T.jaw_junction`; `tools/triassic/lag.mjs` measures the seam it closes). The
+    # earlier attachment shared the body's field over a 0.018 blend from the hinge and still left 17
+    # rim points opening 0.63 % of a body at Bite, because the body's copy never followed the jaw.
+    body_w, shell_w, JUNCTION[o.name] = T.jaw_junction(
+        o, shell, body_w, B['jaw'][0], rear=lambda p: abs(p.x - HINGE_X) < 1e-5,
+        upper_jaw=lambda p: p.x > HINGE_X and p.z >= cut_height(p) - 1e-6, axis=(1., 0., 0.))
+    for part, field in ((o, body_w), (shell, shell_w)):
+        for v in part.data.vertices:
+            for n, val in field[v.index].items(): part.vertex_groups[n].add([v.index], val, 'REPLACE')
+        for v in part.data.vertices: v.co = tx(v.co)
+        for p in part.data.polygons: p.use_smooth = True
+        mod = part.modifiers.new('Shared articulated skeleton' if part is o else 'Mandible into the head', 'ARMATURE'); mod.object = rig; part.parent = rig
 
 # ---- mouth interior: separate rigid palate and floor ---------------------------------------------
 #

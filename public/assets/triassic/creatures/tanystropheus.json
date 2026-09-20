@@ -34,8 +34,7 @@
     "SnapRight",
     "Retract",
     "Drag",
-    "Severed",
-    "Fish"
+    "Severed"
   ],
   "looping": [
     "Idle",
@@ -45,8 +44,7 @@
     "Eat",
     "Grab",
     "Crawl",
-    "Drag",
-    "Fish"
+    "Drag"
   ],
   "anchors": [
     "anchor_mouth",
