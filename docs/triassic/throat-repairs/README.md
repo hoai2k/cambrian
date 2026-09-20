@@ -28,3 +28,14 @@ Confirmed before repair:
 - Ceratites' old test samples only vertices already wholly weighted to `shell`. That proves those
   vertices rigid by construction, while the outer coil can still inherit head/arm motion. The
   replacement test must select the shell anatomically, independently of its weights.
+
+## Finished: Ceratites
+
+The coil envelope is now enforced after weight diffusion; the collar blends into it while distal
+arms remain free. The existing forward attack performances are preserved. Both bodies retain
+matching rigs, clips and anchors, and the LOD remains the puppet alias. Invented peristome/beak
+geometry is removed, restoring the closed source crown. authored: 5502 anatomical shell vertices, 0 contaminated, maximum pairwise distance change 0. .puppet: 1870 anatomical shell vertices, 0 contaminated, maximum pairwise distance change 0. 
+
+Visual playback frames: [before](ceratites-Attack-before.png), [after](ceratites-Attack-after.png).
+The image change is small; the anatomical weight audit is the stronger evidence. The paired audit,
+TypeScript check and production build pass; portraits are refreshed from the decoded packaged GLB.
