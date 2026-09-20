@@ -81,43 +81,43 @@
       [
         -0.5464,
         0.012,
-        0.0474,
+        0.0349,
         0.0151
       ],
       [
         -0.5345,
         0.0093,
-        0.061,
+        0.039,
         0.0078
       ],
       [
         -0.5227,
         0.0064,
-        0.0616,
+        0.0437,
         0.0104
       ],
       [
         -0.5108,
         0.0033,
-        0.0616,
+        0.0566,
         0.0117
       ],
       [
         -0.499,
         0.0008,
-        0.0627,
+        0.0577,
         0.0107
       ],
       [
         -0.4871,
         -0.0015,
-        0.0679,
+        0.0527,
         0.0075
       ],
       [
         -0.4753,
         -0.0017,
-        0.0682,
+        0.0448,
         0.0059
       ]
     ],
@@ -140,8 +140,8 @@
       "note": "zero by construction. The head is sheared vertically by -seam(y), which carries the measured curve exactly onto the plane z = 0; the cut is taken there and the shear undone, so every vertex the cut adds lands on the measured line itself and every vertex that was already there returns to where it was."
     },
     "generationsOwnDentition": {
-      "oralZoneVertices": 543,
-      "standingProudOfTheirNeighbourhood": 110,
+      "oralZoneVertices": 515,
+      "standingProudOfTheirNeighbourhood": 104,
       "maxProtrusionRaw": 0.00695,
       "maxProtrusionOverMouthHalfDepth": 0.705,
       "authoredReplacement": false,
@@ -165,13 +165,186 @@
       "roofOnlyPlug": 625,
       "noPlug": 667
     },
-    "whatIsLeft": "the cut rim, one polygon thick and at a grazing angle, which a fold closes and a plug can only mask by standing outside the skin. The shipped body material is double-sided, so none of it is drawn at runtime."
+    "whatClosesItInstead": {
+      "hingeCapFaces": {
+        "Hybodus authored body": 17,
+        "Hybodus procedural volume twin": 28
+      },
+      "rimFoldVertices": {
+        "Hybodus authored body": 88,
+        "Hybodus procedural volume twin": 47
+      },
+      "rimFoldRaw": 0.00415,
+      "headSeamsSealed": {
+        "Hybodus authored body": {
+          "faces": 8,
+          "refusedTooWide": 1
+        },
+        "Hybodus procedural volume twin": {
+          "faces": 0,
+          "refusedTooWide": 0
+        }
+      },
+      "boundaryEdgesLeftOpen": {
+        "Hybodus authored body": {
+          "onSeam": 112,
+          "otherOnHead": 178,
+          "behindHead": 12
+        },
+        "Hybodus procedural volume twin": {
+          "onSeam": 49,
+          "otherOnHead": 7,
+          "behindHead": 0
+        }
+      },
+      "note": "the hinge cross-section is fanned shut with its own cut vertices (T.cap_cut) and the seam rim is folded in towards the mouth axis (T.rim_flange), running out before the snout where the two rims meet; the palate then closes the throat behind both. The shipped body material is double-sided, so none of it is drawn at runtime."
+    }
   },
-  "liningClearanceInsideSkinRaw": 0.0042,
+  "oralShells": {
+    "contract": "a palate rigid on skull and a floor rigid on jaw, each a closed shell (T.oral_shells), overlapping behind the hinge, no wall between them",
+    "palateVertices": 168,
+    "floorVertices": 168,
+    "rings": 24,
+    "ring": 14,
+    "backY": -0.43499,
+    "frontY": -0.544,
+    "floorFrontY": -0.54127,
+    "mandibleTipY": -0.55311,
+    "lateralAxisAtStations": [
+      [
+        -0.435,
+        -0.0039
+      ],
+      [
+        -0.4532,
+        -0.0103
+      ],
+      [
+        -0.4713,
+        -0.0274
+      ],
+      [
+        -0.4895,
+        -0.0147
+      ],
+      [
+        -0.5077,
+        -0.005
+      ],
+      [
+        -0.5258,
+        -0.0204
+      ],
+      [
+        -0.544,
+        -0.0146
+      ]
+    ],
+    "palateAndFloorLinesAtStations": [
+      [
+        -0.435,
+        -0.0017,
+        0.0036,
+        -0.0069
+      ],
+      [
+        -0.4532,
+        -0.0017,
+        0.0036,
+        -0.0069
+      ],
+      [
+        -0.4713,
+        -0.0017,
+        0.0036,
+        -0.0069
+      ],
+      [
+        -0.4895,
+        -0.001,
+        0.0099,
+        -0.0083
+      ],
+      [
+        -0.5077,
+        0.0027,
+        0.0152,
+        -0.0076
+      ],
+      [
+        -0.5258,
+        0.0072,
+        0.0183,
+        -0.0016
+      ],
+      [
+        -0.544,
+        0.0115,
+        0.0237,
+        -0.0008
+      ]
+    ],
+    "builtAboutEachJawsOwnEdgeOfTheLumen": true,
+    "throatFraction": 0.5,
+    "mandibleNormalVoteAgainstTheIntakeSurface": {
+      "Hybodus authored body lower jaw": -1292,
+      "Hybodus procedural volume twin lower jaw": 212
+    },
+    "measuredRoomAtStations": [
+      [
+        -0.435,
+        0.0934,
+        0.1103,
+        0.0621
+      ],
+      [
+        -0.4532,
+        0.0945,
+        0.1064,
+        0.0571
+      ],
+      [
+        -0.4713,
+        0.0919,
+        0.1015,
+        0.0504
+      ],
+      [
+        -0.4895,
+        0.0793,
+        0.098,
+        0.0435
+      ],
+      [
+        -0.5077,
+        0.0553,
+        0.089,
+        0.0364
+      ],
+      [
+        -0.5258,
+        0.0616,
+        0.0797,
+        0.0308
+      ],
+      [
+        -0.544,
+        0.0215,
+        0.0705,
+        0.0
+      ]
+    ],
+    "vertexDirectionsOpenToTheOutside": 0,
+    "verticesSeatedInsideTheSilhouette": {
+      "vertices": 125,
+      "maxPullRaw": 0.0688120939516066
+    }
+  },
+  "liningClearanceInsideSkinRaw": 0.00379,
   "scale": 4.22013,
   "bodyLength": 5.0,
-  "authoredTriangles": 22011,
-  "twinTriangles": 7870,
+  "authoredTriangles": 22161,
+  "twinTriangles": 7984,
   "twinRemeshTriangles": 63140,
   "twinDecimateRatio": 0.10294583439826965,
   "twinVerticesHeldBackFromRelaxation": 11372,
@@ -544,13 +717,13 @@
   "weights": {
     "Hybodus authored body": {
       "maxInfluences": 4,
-      "vertices": 9955,
+      "vertices": 10044,
       "verticesPerBone": {
         "dorsal_1": 994,
         "body": 4163,
-        "chest": 5624,
+        "chest": 5627,
         "tail_00": 2664,
-        "skull": 4605,
+        "skull": 4694,
         "pec_mid_L": 711,
         "pec_upper_L": 706,
         "dorsal_2": 530,
@@ -572,7 +745,7 @@
     },
     "Hybodus procedural volume twin": {
       "maxInfluences": 4,
-      "vertices": 3468,
+      "vertices": 3516,
       "verticesPerBone": {
         "tail_05": 356,
         "tail_06": 240,
@@ -585,12 +758,12 @@
         "tail_00": 1130,
         "body": 1566,
         "dorsal_2": 235,
-        "chest": 2031,
+        "chest": 2039,
         "pelvic_L": 253,
         "pelvic_R": 230,
         "dorsal_1": 414,
-        "skull": 1653,
-        "pec_upper_R": 453,
+        "skull": 1701,
+        "pec_upper_R": 450,
         "pec_upper_L": 372,
         "pec_mid_L": 389,
         "pec_tip_L": 210,
@@ -609,23 +782,23 @@
     {
       "fromBodyFraction": 0.0,
       "above": 14,
-      "below": 134,
+      "below": 142,
       "maxOutAbove": 0.0173,
       "maxOutBelow": 0.0301
     },
     {
       "fromBodyFraction": 0.05,
       "above": 61,
-      "below": 92,
+      "below": 195,
       "maxOutAbove": 0.0259,
       "maxOutBelow": 0.03
     },
     {
       "fromBodyFraction": 0.1,
       "above": 0,
-      "below": 15,
+      "below": 40,
       "maxOutAbove": 0.0,
-      "maxOutBelow": 0.0252
+      "maxOutBelow": 0.0282
     },
     {
       "fromBodyFraction": 0.15,
@@ -756,7 +929,7 @@
     "maximumEnvelopeDifference": 0.060456812381744385,
     "maximumEnvelopeDifferenceFractionOfBodyLength": 0.012091362476348877,
     "surfaceDistanceMax": 0.07419749349355698,
-    "surfaceDistanceP95": 0.026287045795470476,
+    "surfaceDistanceP95": 0.026268914341926575,
     "envelopeTolerance": 0.2
   },
   "anchors": {
@@ -789,10 +962,10 @@
   "jawShutFromTheGenerationsPartedPose": {
     "closingRotationDegrees": 18.72,
     "mandibleVerticesMeasured": 849,
-    "verticesInsideTheSkullSurface": 638,
+    "verticesInsideTheSkullSurface": 542,
     "maxPenetrationUnits": 0.23669,
     "maxPenetrationOverBodyLength": 0.04734,
-    "meanPenetrationOverBodyLength": 0.010016,
+    "meanPenetrationOverBodyLength": 0.006697,
     "note": "the mandible posed at the measured closing rotation, against the skull's own surface in the same pose. Anything above zero is the generation's two tooth rows, modelled apart, meeting for the first time."
   },
   "authoredVerticesFarthestFromTheTwin": [
@@ -873,5 +1046,102 @@
   },
   "normalizedWeights": true,
   "rootStable": true,
-  "noScaleChannels": true
+  "noScaleChannels": true,
+  "gapeSolid": {
+    "id": "hybodus",
+    "backdrop": [
+      1.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "shots": [
+      {
+        "clip": "Heavy",
+        "t": 0.5,
+        "pixels": 378000,
+        "differingPixels": 4192,
+        "holesOpenedByCulling": 346,
+        "seenThroughTheBody": 346,
+        "backdropInBothPasses": 6,
+        "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Heavy-0.5-opened.png",
+        "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Heavy-0.5-solid.png",
+        "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Heavy-0.5-culled.png",
+        "openedPixelsAlsoOpenedBeforeThisPort": 343,
+        "openedPixelsNewSinceThisPort": 3,
+        "sharedPixelBox": [
+          525,
+          273,
+          556,
+          394
+        ]
+      },
+      {
+        "clip": "Attack",
+        "t": 0.43,
+        "pixels": 378000,
+        "differingPixels": 4451,
+        "holesOpenedByCulling": 517,
+        "seenThroughTheBody": 517,
+        "backdropInBothPasses": 129,
+        "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Attack-0.43-opened.png",
+        "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Attack-0.43-solid.png",
+        "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Attack-0.43-culled.png",
+        "openedPixelsAlsoOpenedBeforeThisPort": 497,
+        "openedPixelsNewSinceThisPort": 20,
+        "sharedPixelBox": [
+          518,
+          279,
+          553,
+          405
+        ]
+      },
+      {
+        "clip": "Bite",
+        "t": 0.17,
+        "pixels": 378000,
+        "differingPixels": 16970,
+        "holesOpenedByCulling": 6610,
+        "seenThroughTheBody": 6,
+        "backdropInBothPasses": 164,
+        "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Bite-0.17-opened.png",
+        "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Bite-0.17-solid.png",
+        "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Bite-0.17-culled.png",
+        "openedPixelsAlsoOpenedBeforeThisPort": 5710,
+        "openedPixelsNewSinceThisPort": 900,
+        "sharedPixelBox": [
+          192,
+          174,
+          550,
+          380
+        ]
+      }
+    ],
+    "beforeThisPort": {
+      "note": "the one-sac Mouth_lining with no hinge plug, the shipped 15 September body, same shots",
+      "shots": [
+        {
+          "clip": "Heavy",
+          "t": 0.5,
+          "holesOpenedByCulling": 498,
+          "seenThroughTheBody": 498,
+          "backdropInBothPasses": 6
+        },
+        {
+          "clip": "Attack",
+          "t": 0.43,
+          "holesOpenedByCulling": 667,
+          "seenThroughTheBody": 667,
+          "backdropInBothPasses": 130
+        },
+        {
+          "clip": "Bite",
+          "t": 0.17,
+          "holesOpenedByCulling": 5984,
+          "seenThroughTheBody": 222,
+          "backdropInBothPasses": 34
+        }
+      ]
+    }
+  }
 }

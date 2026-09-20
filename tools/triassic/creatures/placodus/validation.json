@@ -5,16 +5,16 @@
   "removedFlakeVertices": 0,
   "remeshTriangles": 83996,
   "puppetBudget": 6500,
-  "fullTriangles": 21701,
-  "puppetTriangles": 8446,
+  "fullTriangles": 22119,
+  "puppetTriangles": 8314,
   "parts": {
-    "authoredBody": 17362,
-    "authoredJaw": 706,
+    "authoredBody": 17752,
+    "authoredJaw": 1062,
     "authoredArmour": 2025,
-    "puppetBody": 6183,
-    "puppetJaw": 160,
+    "puppetBody": 6281,
+    "puppetJaw": 258,
     "puppetArmour": 495,
-    "sharedOral": 1608
+    "sharedOral": 1280
   },
   "bones": 26,
   "clips": {
@@ -388,11 +388,11 @@
   "maximumEnvelopeDifference": 0.011147856712341309,
   "envelopeTolerance": 0.2,
   "envelopeTolerancePercent": 4.0,
-  "surfaceDistanceMax": 0.21310493350028992,
-  "surfaceDistanceP95": 0.01401138715445995,
-  "surfaceDistanceP99": 0.12939764559268943,
-  "surfaceOutliersOver0p15": 71,
-  "surfaceVertices": 10393,
+  "surfaceDistanceMax": 0.1352657824754715,
+  "surfaceDistanceP95": 0.012515064142644347,
+  "surfaceDistanceP99": 0.06533670425415039,
+  "surfaceOutliersOver0p15": 0,
+  "surfaceVertices": 10672,
   "seatingDepthRaw": {
     "fore_upper_L": 0.023843050003051758,
     "fore_upper_R": 0.03000234067440033,
@@ -402,7 +402,7 @@
     "gastralia": 0.030410489067435265
   },
   "maxInfluences": 4,
-  "meanInfluences": 1.91503703087293,
+  "meanInfluences": 1.9044847093547594,
   "mouth": {
     "method": "the modelled oral cavity, found by casting each head vertex normal back into the mesh over 0.030 raw units; the seam is the mid height of that cavity per station and the lining is its measured section",
     "cavityVertices": 193,
@@ -880,7 +880,7 @@
           -0.05603727325797081,
           -0.03663491830229759
         ],
-        "proudMax": 0.007136027794331312,
+        "proudMax": 0.007136037107557058,
         "tooth": true,
         "onJaw": 0,
         "onSkull": 11
@@ -918,7 +918,7 @@
           -0.07633280009031296,
           -0.06203725188970566
         ],
-        "proudMax": 0.00787416473031044,
+        "proudMax": 0.007874177768826485,
         "tooth": true,
         "onJaw": 0,
         "onSkull": 9
@@ -937,7 +937,7 @@
           -0.011450253427028656,
           0.0037026903592050076
         ],
-        "proudMax": 0.005322815850377083,
+        "proudMax": 0.0053227911703288555,
         "tooth": false,
         "onJaw": 0,
         "onSkull": 8
@@ -956,7 +956,7 @@
           -0.06044125184416771,
           -0.05426495149731636
         ],
-        "proudMax": 0.005463363137096167,
+        "proudMax": 0.0054633659310638905,
         "tooth": false,
         "onJaw": 7,
         "onSkull": 0
@@ -975,7 +975,7 @@
           -0.012318992055952549,
           0.002753899898380041
         ],
-        "proudMax": 0.004617441911250353,
+        "proudMax": 0.0046174488961696625,
         "tooth": false,
         "onJaw": 0,
         "onSkull": 7
@@ -994,7 +994,7 @@
           -0.060479797422885895,
           -0.05342055484652519
         ],
-        "proudMax": 0.00523098511621356,
+        "proudMax": 0.005230982322245836,
         "tooth": false,
         "onJaw": 7,
         "onSkull": 0
@@ -1032,7 +1032,7 @@
           -0.0771067664027214,
           -0.06993775814771652
         ],
-        "proudMax": 0.0048684244975447655,
+        "proudMax": 0.004868379328399897,
         "tooth": false,
         "onJaw": 6,
         "onSkull": 0
@@ -1144,24 +1144,98 @@
         0.465,
         0.95,
         0.95
-      ],
-      [
-        0.4675,
-        0.95,
-        0.95
-      ],
-      [
-        0.47,
-        0.95,
-        0.95
       ]
     ],
     "liningRings": 22,
     "liningRing": 14,
     "liningBackX": 0.39799999999999996,
-    "liningFrontX": 0.4771,
+    "liningFrontX": 0.4711,
     "skinDoubleSided": true,
-    "liningCullsBackfaces": true
+    "liningCullsBackfaces": true,
+    "oralShells": {
+      "contract": "a palate rigid on skull and a floor rigid on jaw, each a closed shell (T.oral_shells), overlapping behind the hinge, no wall between them",
+      "palateVertices": 154,
+      "floorVertices": 154,
+      "measuredRoomAtStations": [
+        [
+          0.398,
+          0.0686,
+          0.0937,
+          0.0384
+        ],
+        [
+          0.4102,
+          0.0619,
+          0.0866,
+          0.039
+        ],
+        [
+          0.4224,
+          0.0481,
+          0.0805,
+          0.0367
+        ],
+        [
+          0.4345,
+          0.0143,
+          0.0749,
+          0.0326
+        ],
+        [
+          0.4467,
+          0.0417,
+          0.0696,
+          0.0282
+        ],
+        [
+          0.4589,
+          0.0391,
+          0.0628,
+          0.0231
+        ],
+        [
+          0.4711,
+          0.0298,
+          0.0505,
+          0.0148
+        ]
+      ],
+      "vertexDirectionsOpenToTheOutside": 0,
+      "verticesSeatedInsideTheSilhouette": {
+        "vertices": 13,
+        "maxPullRaw": 0.011694618548295102
+      }
+    },
+    "hingeTissue": {
+      "plug": "none",
+      "closedBy": {
+        "cutCrossSectionCaps": {
+          "Placodus authored body": {
+            "skullAtHinge": 64,
+            "skullAtJawFront": 36,
+            "jawAtHinge": 64,
+            "jawAtFront": 36
+          },
+          "Placodus procedural volume puppet": {
+            "skullAtHinge": 25,
+            "skullAtJawFront": 21,
+            "jawAtHinge": 25,
+            "jawAtFront": 21
+          }
+        },
+        "rimFoldVertices": {
+          "Placodus authored body": {
+            "skull": 150,
+            "jaw": 125
+          },
+          "Placodus procedural volume puppet": {
+            "skull": 26,
+            "jaw": 26
+          }
+        },
+        "rimFoldRaw": 0.0035
+      }
+    }
   },
   "tailStraightening": {
     "maxVertexMove": 0.30864355132087284,
@@ -1175,5 +1249,78 @@
   "normalizedWeights": true,
   "rootStable": true,
   "armourBoneUnanimated": true,
-  "noScaleChannels": true
+  "noScaleChannels": true,
+  "gapeSolid": {
+    "id": "placodus",
+    "backdrop": [
+      1.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "shots": [
+      {
+        "clip": "CrushBite",
+        "t": 0.25,
+        "pixels": 378000,
+        "differingPixels": 2021,
+        "holesOpenedByCulling": 10,
+        "seenThroughTheBody": 10,
+        "backdropInBothPasses": 418,
+        "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/CrushBite-0.25-opened.png",
+        "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/CrushBite-0.25-solid.png",
+        "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/CrushBite-0.25-culled.png"
+      },
+      {
+        "clip": "Bite",
+        "t": 0.25,
+        "pixels": 378000,
+        "differingPixels": 2099,
+        "holesOpenedByCulling": 10,
+        "seenThroughTheBody": 10,
+        "backdropInBothPasses": 571,
+        "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Bite-0.25-opened.png",
+        "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Bite-0.25-solid.png",
+        "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Bite-0.25-culled.png"
+      },
+      {
+        "clip": "Heavy",
+        "t": 0.15,
+        "pixels": 378000,
+        "differingPixels": 2118,
+        "holesOpenedByCulling": 12,
+        "seenThroughTheBody": 0,
+        "backdropInBothPasses": 2,
+        "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Heavy-0.15-opened.png",
+        "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Heavy-0.15-solid.png",
+        "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Heavy-0.15-culled.png"
+      }
+    ],
+    "beforeThisPort": {
+      "note": "the one-sac Oral_cavity_lining and the blended Seated jaw hinge tissue, same shots",
+      "shots": [
+        {
+          "clip": "CrushBite",
+          "t": 0.25,
+          "holesOpenedByCulling": 66,
+          "seenThroughTheBody": 0,
+          "backdropInBothPasses": 6
+        },
+        {
+          "clip": "Bite",
+          "t": 0.25,
+          "holesOpenedByCulling": 62,
+          "seenThroughTheBody": 0,
+          "backdropInBothPasses": 17
+        },
+        {
+          "clip": "Heavy",
+          "t": 0.15,
+          "holesOpenedByCulling": 66,
+          "seenThroughTheBody": 0,
+          "backdropInBothPasses": 0
+        }
+      ]
+    }
+  }
 }

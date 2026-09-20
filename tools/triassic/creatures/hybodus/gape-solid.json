@@ -1,0 +1,97 @@
+{
+  "id": "hybodus",
+  "backdrop": [
+    1.0,
+    0.0,
+    1.0,
+    1.0
+  ],
+  "shots": [
+    {
+      "clip": "Heavy",
+      "t": 0.5,
+      "pixels": 378000,
+      "differingPixels": 4192,
+      "holesOpenedByCulling": 346,
+      "seenThroughTheBody": 346,
+      "backdropInBothPasses": 6,
+      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Heavy-0.5-opened.png",
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Heavy-0.5-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Heavy-0.5-culled.png",
+      "openedPixelsAlsoOpenedBeforeThisPort": 343,
+      "openedPixelsNewSinceThisPort": 3,
+      "sharedPixelBox": [
+        525,
+        273,
+        556,
+        394
+      ]
+    },
+    {
+      "clip": "Attack",
+      "t": 0.43,
+      "pixels": 378000,
+      "differingPixels": 4451,
+      "holesOpenedByCulling": 517,
+      "seenThroughTheBody": 517,
+      "backdropInBothPasses": 129,
+      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Attack-0.43-opened.png",
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Attack-0.43-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Attack-0.43-culled.png",
+      "openedPixelsAlsoOpenedBeforeThisPort": 497,
+      "openedPixelsNewSinceThisPort": 20,
+      "sharedPixelBox": [
+        518,
+        279,
+        553,
+        405
+      ]
+    },
+    {
+      "clip": "Bite",
+      "t": 0.17,
+      "pixels": 378000,
+      "differingPixels": 16970,
+      "holesOpenedByCulling": 6610,
+      "seenThroughTheBody": 6,
+      "backdropInBothPasses": 164,
+      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Bite-0.17-opened.png",
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Bite-0.17-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Bite-0.17-culled.png",
+      "openedPixelsAlsoOpenedBeforeThisPort": 5710,
+      "openedPixelsNewSinceThisPort": 900,
+      "sharedPixelBox": [
+        192,
+        174,
+        550,
+        380
+      ]
+    }
+  ],
+  "beforeThisPort": {
+    "note": "the one-sac Mouth_lining with no hinge plug, the shipped 15 September body, same shots",
+    "shots": [
+      {
+        "clip": "Heavy",
+        "t": 0.5,
+        "holesOpenedByCulling": 498,
+        "seenThroughTheBody": 498,
+        "backdropInBothPasses": 6
+      },
+      {
+        "clip": "Attack",
+        "t": 0.43,
+        "holesOpenedByCulling": 667,
+        "seenThroughTheBody": 667,
+        "backdropInBothPasses": 130
+      },
+      {
+        "clip": "Bite",
+        "t": 0.17,
+        "holesOpenedByCulling": 5984,
+        "seenThroughTheBody": 222,
+        "backdropInBothPasses": 34
+      }
+    ]
+  }
+}
