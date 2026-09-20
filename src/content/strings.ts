@@ -295,6 +295,14 @@ export interface GameStrings {
     readonly airBarAria: (percent: number, low: boolean) => string;
     readonly airRecoveryOff: string;
     readonly airSurfaceNow: string;
+    /**
+     * Out of the water, on the sand (`src/sim/beach.ts`). A water-breather has a minute on it and
+     * gets a bar; anything that breathes air is simply somewhere else and gets the quiet line.
+     */
+    readonly strandBarAria: (percent: number, low: boolean) => string;
+    readonly ashoreStranded: string;
+    readonly ashoreStrandedNow: string;
+    readonly ashore: string;
     /** The aim reticle: what the heavy would do to what is under it. */
     readonly aimCooling: string;
     /** Three separate chips at the foot of the screen, so each is its own string. */
@@ -505,6 +513,14 @@ export interface GameStrings {
       readonly aim: string;
       readonly grip: string;
       readonly teleport: string;
+      /**
+       * Out of the water (`src/sim/beach.ts`). The shore belongs to every era, so these come
+       * before the era's own line: a gill has a minute to get back in, a lung has all day, and an
+       * amphibian is told the sea is behind it rather than told to hurry.
+       */
+      readonly strandedGills: string;
+      readonly ashoreAmphibious: string;
+      readonly ashoreLungs: string;
       /** The era's own opening line, by rung: index 0 is the bottom rung. */
       readonly opening: readonly string[];
       /** What this body in particular can do, said once in its first seconds. */
@@ -777,6 +793,10 @@ export const SHARED_STRINGS: GameStrings = {
     airBarAria: (percent, low) => `Air ${percent}%${low ? ', surface soon' : ''}`,
     airRecoveryOff: 'Out of air: no stamina recovery',
     airSurfaceNow: 'Surface for air',
+    strandBarAria: (percent, low) => `Out of the water ${percent}%${low ? ', get back in' : ''}`,
+    ashoreStranded: 'OUT OF THE WATER · flop back to the sea',
+    ashoreStrandedNow: 'OUT OF THE WATER · flop back in now',
+    ashore: 'ON THE SHORE · the sea is behind you',
     aimCooling: '…',
     tallyEaten: (n) => `${n} eaten`,
     tallyKills: (n) => `${n} kills`,
@@ -950,6 +970,9 @@ export const SHARED_STRINGS: GameStrings = {
       aim: 'Hold {aim} to aim at prey. When the crosshair fills, {heavy} pounces.',
       grip: 'Hold {heavy} and you take hold — it costs nothing and hurts nothing. Let go of prey to eat it; hold on to anything your own size or bigger and ride it, then {light} to bite.',
       teleport: '{teleport}: teleport home, or to another player.',
+      strandedGills: 'Out of the water. {swim} toward the sea to flop back in. You have a minute.',
+      ashoreAmphibious: 'On the shore. The sea is behind you; walk back in when you like.',
+      ashoreLungs: 'On the shore. Walk back down to the water.',
       // The eras that have a ladder fill these in; the Cambrian opens on the lines above.
       opening: [],
       shell: 'Your funnel makes rise and sink free, and no direction is slow. Block withdraws into the shell.',

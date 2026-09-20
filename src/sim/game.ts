@@ -3581,9 +3581,9 @@ export class Game implements AiWorld {
     if (!p || !pr || this.mode === 'reef') return undefined;
     // The shore is every era's, so its hint comes before the era's own.
     if (p.ashore && isAlive(p)) {
-      return !breathesAir(p.creature) ? 'Out of the water. {swim} toward the sea to flop back in. You have a minute.'
-        : amphibious(p.creature) ? 'On the shore. The sea is behind you; walk back in when you like.'
-        : 'On the shore. Walk back down to the water.';
+      return !breathesAir(p.creature) ? SAY.hints.strandedGills
+        : amphibious(p.creature) ? SAY.hints.ashoreAmphibious
+        : SAY.hints.ashoreLungs;
     }
     if (RULES) return RULES.hint(this, i);
     const f = pr.flags;

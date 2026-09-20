@@ -145,7 +145,7 @@ function SensePanel({ p }: { p: PlayerHud }) {
           {p.strandLeft != null && (
             <div className={`bar air strand ${p.strandLow ? 'low' : ''}`}
                  role="img"
-                 aria-label={`Out of the water ${Math.round(p.strandLeft * 100)}%${p.strandLow ? ', get back in' : ''}`}>
+                 aria-label={COPY.strandBarAria(Math.round(p.strandLeft * 100), !!p.strandLow)}>
               <i style={{ width: `${p.strandLeft * 100}%` }} />
             </div>
           )}
@@ -493,7 +493,7 @@ const RUNG_NUMERALS = ['', 'I', 'II', 'III', 'IV'];
 
 /** Every era's shore, said the same way: what the sand is doing to this body and the way off it. */
 function ShoreStatus({ stranded, low }: { stranded: boolean; low: boolean }) {
-  const warn = stranded ? (low ? 'OUT OF THE WATER · flop back in now' : 'OUT OF THE WATER · flop back to the sea') : 'ON THE SHORE · the sea is behind you';
+  const warn = stranded ? (low ? COPY.ashoreStrandedNow : COPY.ashoreStranded) : COPY.ashore;
   return <div className="era-status"><div className={`era-warn ${stranded ? 'danger' : ''}`}>{warn}</div></div>;
 }
 
