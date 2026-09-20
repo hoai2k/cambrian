@@ -53,15 +53,24 @@ walk hand over without a seam and lets the camera come up out of the water as th
   between. Nothing steers it: every flop goes seaward, whatever the stick says. The HUD shows the
   minute as the thin gauge under the stamina bar, and shows it *only here* — under water a gill
   has nothing to count. Do nothing and the minute ends the animal.
-- **An air-breather walks.** No clock. It goes where it likes along the shore at a walk
-  (`LAND_WALK` of its cruise for a body without legs, `LAND_WALK_LEGS` for one with them) and
+- **An air-breather walks, and bounds.** No clock. It goes where it likes along the shore at a
+  walk (`LAND_WALK` of its cruise for a body without legs, `LAND_WALK_LEGS` for one with them) and
   turns to face where it is going however slowly it is going, since a walk is under the speed at
   which a swimmer's heading follows its travel. It cannot go far inland: `LAND_REACH` (36 units)
   is the same wall facing the other way. A Triassic lung fills on the sand as it does at the
   surface, because the sand *is* the surface for that purpose — `brokeSurface` was already true
   for a body with its back out of the water.
-- **Everything is pinned to the sand.** Rise and sink do nothing, the current is not there, a
-  dash is not there (a stranded body's dash is its flop; a walker has no water to dash through),
+- **The dash is the hop.** There is no water to dash through, so ashore the dash button throws a
+  hop instead — a bound for a legged air-breather, in the direction it is facing or the stick
+  asked for, and a harder flip for a stranded water-breather (`FLOP_DASH_BOOST`), still seaward.
+  Both are one timer (`flopT`) and one bell-shaped arc; what differs is where they go, how far and
+  what the body does in the air. A bound is worth `JUMP_GAIN` of the ground the same body would
+  have walked in the same time — measured against the walk rather than set in body lengths,
+  because a length-based throw is slower than a hatchling's own walk and a bolt for a giant — and
+  it is committed at the throw, not steered after it, like every other launch in the game.
+  `JUMP_STAMINA` is a gate rather than a drain: ashore *is* the surface, so the bar refills there
+  every step and what the price does is refuse the throw to a body with nothing left.
+- **Everything else is pinned to the sand.** Rise and sink do nothing, the current is not there,
   and the body lies along the slope as a crawler does.
 - **The AI has one idea:** the sea. Nothing with a brain plans to be here, so a bot or an ambient
   animal ashore is given the seaward stick (`ashoreInput`) and flops or walks back in.
@@ -80,15 +89,17 @@ who can be there and what the beach holds.
   legless and slow. The era's old `beached` state — the limbed animals' push past the fixed wall
   into the shallows, where nothing with gills can follow — is unchanged and now also true of a
   body that is `ashore`. The beach is bare sand.
-- **Triassic.** Six walkers and nine other air-breathers. The beach is bare *for now*: the shore
-  animals (`docs/triassic/06-shore-visitors.md`) are designed and switched off, and when they are
-  switched on the beach becomes the dangerous place the design wants — a body walking up it is
-  walking into their reach. Nothing here needs changing for that: they are pinned and brainless
-  and the strike already targets bodies in the water in front of them.
+- **Triassic.** Six walkers and nine other air-breathers, a planted shore, and the shore animals
+  (`docs/triassic/06-shore-visitors.md`) one live switch away. With them on the beach is the
+  dangerous place the design wants: a body walking up it is walking into their reach.
 
-The land is a wasteland in every era by construction — `generateChunk` places no flora inland of
-`SHORE_WALL` and no boulders either — so what is on the beach is sand and whatever the sea threw
-onto it.
+The land is a wasteland unless the era plants it. `generateChunk` places no boulders inland of
+`SHORE_WALL` in any era and no biome flora either, so the Cambrian's and the Devonian's beaches
+are sand and whatever the sea threw onto them. An era may declare a **shore fringe**
+(`environment.shoreFlora`): kinds with a band in `shoreDistance` and a density, placed by their
+own pass along the coastline. Only the Triassic has one — *Neocalamites* with its feet in the
+water, *Pleuromeia* on the salty strand, *Bjuvia* at the dry back of the beach — and it is thin,
+because a fringe that hid the shore animals would spoil them and the beach both.
 
 ## What is drawn
 
@@ -116,4 +127,8 @@ onto it.
   lent to lobe fins, palms and paddles.
 - **The Triassic shore animals** are built and switchable (`docs/triassic/06-shore-visitors.md`,
   `Settings → Shore animals`): they take what lingers at the edge of the water *or on the sand*.
+- **The bound** is the dash ashore, and is what makes a beach worth walking on at all.
+- **The Triassic's shore fringe** is planted: three land plants in three bands off the waterline.
+- **`Settings → Shore animals` is live** — turned on mid-match the banks fill from the next step,
+  turned off every body on the beach leaves.
 - **A flop sound** is still asked for in `docs/audio-requests.md`.

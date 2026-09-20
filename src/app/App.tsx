@@ -266,8 +266,12 @@ export function App() {
   useEffect(() => {
     engineRef.current?.setQuality(settings.quality);
     engineRef.current?.setLook(settings.lookSpeed, settings.invertY);
-    // Not mid-match: the running simulation is already built around the lengths it started with.
-    if (screenRef.current !== 'playing') { setEquivalentSizing(settings.equivalentSizing); RULES?.settings?.shoreAnimals?.(settings.shoreAnimals); }
+    // Sizing is not mid-match: the running simulation is already built around the lengths it
+    // started with. The shore is, because it is only ever a question of what stands on the beach
+    // from the next step on, and a player who turns it on wants to see it now rather than next
+    // match (see `setShoreAnimals` in src/sim/triassic/shore.ts).
+    if (screenRef.current !== 'playing') setEquivalentSizing(settings.equivalentSizing);
+    RULES?.settings?.shoreAnimals?.(settings.shoreAnimals);
     audio.setVolume(settings.volume); audio.setMuted(settings.muted); audio.setMusic(settings.music);
     try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch { /* ignore */ }
   }, [settings]);

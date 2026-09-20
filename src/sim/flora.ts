@@ -1,7 +1,7 @@
 import { clamp, smoothstep } from '../shared/math';
 import { propShapeFor } from '../content/prop-shapes';
 import { fpMax, fpReachAt, FOOTPRINT_BANDS, ROUND, type Footprint, type Reach } from './footprint';
-import { bodyRadius } from './actors';
+import { bodyRadius, floorClearance } from './actors';
 import { WEED_LEVERAGE, WEED_PULL } from './locomotion';
 import { creature } from './creatures';
 import type { Actor } from './types';
@@ -164,6 +164,17 @@ export function resolveFlora(world: WorldData, a: Actor, dt: number, scratch: Fl
     const H = f.H;
     if (pos.y - ra * 0.6 > f.pos.y + H || pos.y + ra * 0.6 < f.pos.y) continue;
     const P = FLORA_PHYS[f.kind];
+    // Substrate is not an obstacle. A kind that never bends (`maxLean: 0`) is a carpet on the
+    // seabed rather than something standing in it — a salt crust, a shell pavement, a mud ripple, a
+    // crinoid litter, none of them a third of a unit tall — and having no bend to give, it resists
+    // in *full*: `resist` is `(1 - give) * stout` with nothing taken off for bending, so it pushes
+    // the body out and kills its inward velocity every step for as long as it is touched. A
+    // ten-centimetre salt crust stopped a ten-metre Nothosaurus dead on the last stretch of shelf
+    // before the beach, which is exactly where those carpets are thickest. Anything shorter than the
+    // height a body *rides* at passes under it, the way a low rock is glided over rather than
+    // collided with (`glideOver`); a body small enough for the carpet to be real furniture still
+    // meets it.
+    if (P.maxLean <= 0 && H <= floorClearance(a)) continue;
     const fr = clamp((pos.y - f.pos.y) / H, 0.08, 1);
     const lean = Math.pow(fr, BEND_EXP);
     const cx = f.pos.x + f.bx * lean, cz = f.pos.z + f.bz * lean;

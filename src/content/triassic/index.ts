@@ -4,7 +4,7 @@ import type { DevonianCreatureId } from '../devonian/ids';
 import type { Slot } from '../../shared/palettes';
 import { TRIASSIC_CREATURES } from './creatures';
 import { SNACK_SCHOOLS, GIANTS } from './ecology';
-import { BIOME_NAMES, BIOME_DANGER, BIOME_PLATES, ATMOS, SAND_COLORS, FLORA_BASE, FLORA_DENSITY, FLORA_PROPS, SURFACE_Y, FLOOR_DEPTH } from './environment';
+import { BIOME_NAMES, BIOME_DANGER, BIOME_PLATES, ATMOS, SAND_COLORS, FLORA_BASE, FLORA_DENSITY, FLORA_PROPS, SHORE_FLORA, SURFACE_Y, FLOOR_DEPTH } from './environment';
 import { MUSIC } from './music';
 import { SCHEMES, CREATURE_SCHEMES } from './palettes';
 import { TRIASSIC_SCENERY } from './scenery';
@@ -88,7 +88,7 @@ export const TRIASSIC = defineEra({
     title: ['cymbospondylus', 'nothosaurus', 'mixosaurus', 'rhaeticosaurus'],
   },
   ecology: { schools: SNACK_SCHOOLS, giants: GIANTS, shadow: { creature: 'shonisaurus', scale: 1.0 } },
-  environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, flora: FLORA_DENSITY, floraProps: FLORA_PROPS, surfaceY: SURFACE_Y, floorDepth: FLOOR_DEPTH, biomePlates: BIOME_PLATES },
+  environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, flora: FLORA_DENSITY, floraProps: FLORA_PROPS, shoreFlora: SHORE_FLORA, surfaceY: SURFACE_Y, floorDepth: FLOOR_DEPTH, biomePlates: BIOME_PLATES },
   assets: {
     // Portraits began as the placeholder set cut from docs/triassic/canonical/; undelivered models
     // remain borrowed (see TRIASSIC_STAND_INS) until this folder fills. The UI

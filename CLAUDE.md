@@ -274,8 +274,13 @@ unless the user explicitly asks for a PR. Steps:
   it out and keep their flat floor), and shore animals (`shore: true`, never pickable) are brainless,
   scripted actors on the beach (`src/sim/triassic/shore.ts`, built to
   `docs/triassic/06-shore-visitors.md`). **They are off by default and `Settings → Shore animals`
-  turns them on** (`RULES.settings.shoreAnimals`, read once when a match starts, because `src/sim`
-  replays from its inputs; `forceOccupancy` is for the tests only). What they take is **what
+  turns them on** (`RULES.settings.shoreAnimals`; `forceOccupancy` is for the tests only). The
+  switch is **live**: turned on mid-match `ensurePosts` fills the banks from the next step and
+  turned off `clearShore` takes every body off the beach and forgets every post, because a setting
+  that silently did nothing until the next match read as a broken switch. It is the one thing that
+  reaches into a running simulation from outside, and it is safe to because it changes the world
+  the same way in the same place whenever it is flipped and the schedule behind it (`occupied`) is
+  pure in the post and the clock rather than in the history. What they take is **what
   lingers**: a body still within a post's reach — under `STILL_SPEED` of its own cruise, at the
   surface or on the sand — for `STILL_TIME_LURKER`/`STILL_TIME_RUNNER`; a swimmer passing at its own
   pace is never touched, which is what makes the shore a trap rather than a fence. The boom takes a
@@ -357,9 +362,34 @@ unless the user explicitly asks for a PR. Steps:
   inland than `LAND_REACH`, and a Triassic lung fills on the sand because the sand is the surface.
   The flop's hop, twist and nose-up are the simulation's own (`pos.y`, `bank`, `pitch` through
   `flopT`), so no clip is needed for it to read; the renderer throws the swim stroke on top. A
-  brainless body ashore is handed the seaward stick (`ashoreInput`). The land is bare in every era
-  by construction — `generateChunk` places nothing inland of `SHORE_WALL` — and the Triassic's
-  beach becomes dangerous when its shore animals are switched on, not before.
+  brainless body ashore is handed the seaward stick (`ashoreInput`). The Triassic's beach becomes
+  dangerous when its shore animals are switched on, not before.
+- **The dash is the hop, and on the sand the dash is the only gait worth having.** A walk is
+  `LAND_WALK_LEGS` of a cruise that was already slow, so a beach crossed at a walk is a chore. The
+  dash button ashore throws a *hop* instead (`JUMP_PERIOD`, one bell-shaped arc, `flopT`), and it
+  is a different animal's move at each end: a legged air-breather **bounds** in the direction it is
+  facing or the stick asked for, committed at the throw and not steered after it like every other
+  launch in the game; a stranded water-breather **flips**, harder for a dash than for a nudge of
+  the stick (`FLOP_DASH_BOOST`), and always seaward whatever the stick says. What a bound is worth
+  is set against the *walk* (`JUMP_GAIN`) rather than in body lengths, because the promise is that
+  it is the fast way along a beach and a length-based throw is not: a hatchling's walk outruns a
+  hatchling-sized bound, so the jump would be a way of going slower for a small animal and a bolt
+  for a big one. `JUMP_STAMINA` is a *gate* rather than a drain — an air-breather ashore is at the
+  surface by definition, so both eras that have walkers refill its bar there every step and the
+  throw's cost is handed straight back; what the price does is refuse the throw to a body with
+  nothing left, and bounding is meant to be the land gait rather than a sprint. A hop once thrown
+  always finishes, including the one that carries a body over the `ashore` threshold, or a body
+  walking the line restarts a hop it never gets to take.
+- **The land is bare unless the era plants it.** `generateChunk` places nothing inland of
+  `SHORE_WALL`, which is the Cambrian's and the Devonian's beach entire: sand, rock, and whatever
+  the sea throws up. An era may declare a **shore fringe** (`environment.shoreFlora`) and the
+  Triassic does — each kind naming a band in `shoreDistance` and a density on the same scale as
+  the biome table, placed by a separate pass that works along the coastline column by column so
+  the strip stays an even line where a chunk boundary crosses it. The bands are the plants' own
+  tolerance of salt and wet, which is why they are a fact about the era's flora: *Neocalamites*
+  stands with its feet in the water, *Pleuromeia* takes the salty strand behind it, *Bjuvia* holds
+  the dry back of the beach. Thin on purpose — a fringe that hid the shore animals would spoil
+  both them and the beach.
 - **A breach is a leap, not a launch.** The vertical a body carried through the surface used to be
   whatever it had, and a dash's launch speed is `L * 9.5 + 7` — so a five-unit animal that dashed
   straight up cleared a hundred units of air and a Cymbospondylus over a thousand. `breachSpeed` in
@@ -998,6 +1028,18 @@ unless the user explicitly asks for a PR. Steps:
   keeps its rung. The rung is set by giving the body the scale that rung is worth and letting the
   era read it back (`onSwap`), because the Cambrian stores a `tier` and the other two a `stage`.
   `npm run respawn` prices it at four places on the ladder.
+- **An apex is one seat's and one animal's, never the match's.** It used to be the match's: one
+  latch on the whole game (`Game.endless`) closed the mode the first time anybody finished, and
+  carrying on (`continueMatch`) zeroed *every* seat's hold timer — so a player two thirds of the
+  way through their own ninety seconds was sent back to nothing because somebody else had arrived,
+  and could never be told about it when they did. `PlayerProgress.apexDone` is the record instead:
+  the creatures that *seat* has taken to the top, so a seat standing at apex on an animal already
+  in it simply goes on swimming, a second seat finishes its own apex in the same sea afterwards,
+  and one player who grows a second animal up gets a second results screen for it. `continueMatch`
+  clears only the winner's clock, and the era hook is handed the winning seat for the same reason
+  (the Devonian and the Triassic count their own `primeT`). The `endless` latch stays for what it
+  was always about — the board's own "the reef is won" line — and for a bot, which has no seat to
+  remember with.
 - A death costs a rung, not the swim back. `respawnAt` in `src/sim/game.ts` returns a body to the
   distance from shore it died at — the same biome, the same depth — and away from any giant;
   inshore that is still the nursery, which is the hatchery and in the shore band anyway. Every
@@ -1231,6 +1273,23 @@ unless the user explicitly asks for a PR. Steps:
   measured the wrong one and so listed no neighbours at all in eleven hundred samples. `npm run
   record` checks that a recording distinguishes a grab that worked from one that could not, names
   the reason, and lists the animal it is about however big that animal is.
+- **Whatever the crosshair is on is the target.** `updateAim` used to skip the threat and giant
+  bands outright, so a player holding the crosshair squarely on something their own size or larger
+  was told there was nothing there — and what you do about a big animal (ride it, take hold of it,
+  pounce at it) is exactly what aiming is for. Two rankings, not one: the **entry snap**, which
+  happens on the frame aim mode comes on and picks a target without the player having pointed at
+  anything, still leans toward what they probably meant (food ahead of a fight) and still refuses
+  another player outright; a crosshair being *held* ranks on pure angle, because it is not
+  choosing for you at all.
+- **Another player is never handed to you, but one you are aiming at is your own choice.** Four
+  automatic picks in `game.ts` — the charge, the grip, the bite's aim nudge and the lunge — refused
+  a player-controlled target outright, which between them meant a player could aim squarely at
+  another, hold the grab, and find that nothing at all would take. `Game.handedOver` is the one
+  rule now: a player is skipped unless the aiming player has actually locked onto them, and then
+  every path admits them. So player-versus-player grabs work the way they read — aim, hold the
+  grab button — while nothing picks a friend for you by accident. Everything after that is
+  unchanged: an equal-sized rival is a *ride* rather than a mouthful, so `takeRide`'s head-end rule
+  still says you cannot cling to the jaws.
 - Taking hold is not an attack. Holding costs nothing — no clock, no stamina — and hurts nothing: a
   player's grip never crushes, button down or up. Anything from the animal's own size upwards is
   *ridden* (`takeRide`) until the player lets go or the host shakes them off with a dash; anything
