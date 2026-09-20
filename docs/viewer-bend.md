@@ -34,6 +34,33 @@ something different on each:
   exact, so a turn can be chosen by eye on the real animal; the numbers then go to that animal's
   builder. `use: "builder-measurement"`.
 
+## Which body the numbers describe
+
+The panel says it in as many words, above everything else, and `appliesTo` carries it into the file.
+That matters more here than in any of the other editors, and on the animal this mode was built for
+it is the difference between measuring the fault and measuring the repair.
+
+Askeptosaurus' shipped body **rests in a shape the generation never held**. T3D-26 put the whole aim
+of its head into the bind (`carry` in its `validation.json`: `restHeadVsTrunkRunDegrees` 4.17 against
+`headVsTrunkRunDegreesUncorrected` 67.68), so bend mode on the shipped body — which holds the rig at
+rest, as it must — shows a head that has already been corrected. There is nothing there to aim.
+
+The pre-carry body is reached by the route that already existed rather than by a new artefact.
+`tools/triassic/base-poses.mjs` republishes the untouched generation of every body whose builder
+moved the mesh before binding, and the viewer's Model control offers it as *Original pose (no rig)*.
+A rest-pose **carry** is such a move — it is not a mesh unbending, which is why it carries no
+`applied` flag and is told instead by there being bones in `carriedBones` with some share of the aim
+in them — so Askeptosaurus now publishes `askeptosaurus.origpose.glb` beside the other six, and that
+file is the geometry T3D-26's correction was measured from.
+
+So the panel, on a body like that, says what was moved and points at the original pose by the name
+the Model control gives it; on the original pose itself it says it is the untouched generation. The
+export's `appliesTo` is `origpose` rather than `generation`, because `built` and `origpose` on this
+animal are opposite claims about the same creature and a consumer must be able to tell them apart.
+An `origpose` body carries no rig and is still `use: "builder-measurement"`: the file on stage is a
+published *copy* of the generation in `tripo-raw/`, so an edit to it would be an edit to a copy, and
+what the numbers are for is the builder that turns that generation into the body.
+
 There is **no bake** either way. A rigged body cannot have one — every clip in these files
 re-specifies each joint's translation on every frame, so a bent bind pose would show correctly at
 rest and then be both overridden and deformed the moment anything played — and a generation's bend
@@ -58,25 +85,33 @@ A bend hinged out in the water beside the animal treats the whole body as an out
 stretches it rather than bending it, so an end is seated on the body — automatically at first, by
 hand when the automatic seat lands on a limb.
 
-## The turn
+## The two planes
 
-| Number | What it is |
+Each end of the span is a **plane with its own orientation**, and a plane's normal is the direction
+the creature's axis line runs through it. That is the whole control.
+
+| | What it is |
 | --- | --- |
-| **At the base** | How hard the body turns where the span begins, in degrees **across the whole span**. |
-| **At the tip** | The same where it ends. Interpolated linearly between. |
-| **Bend plane** | The plane the turn happens in, as a roll about the span: 0 lifts the tip the way up is, 90° swings it towards +lateral. |
+| **Base plane** | Where the axis line runs **in**. A pure reference: nothing behind the base cut moves under any bend, so aiming it never moves the body. What a reviewer aiming it is saying is *which direction they are calling the trunk* — which is the argument this tool was built out of, made into a thing you can point at. |
+| **Tip plane, at rest** | Where the axis line ran **out** when the plane was seated on the body. Measured, never typed, and re-measured whenever the span moves: it is the animal's own heading there and the pivot every turn is taken from. |
+| **Tip plane, as aimed** | Where the axis line is **to** run out. Seated equal to the rest, so the editor opens on the body as it stands. |
 
-The total the span turns through is the **mean** of the two, and the panel prints it. Equal values
-are a circular arc; a zero base and a full tip is a bend that starts straight and tightens, which is
-a real shape a neck has.
+The bend is the rotation carrying the tip plane's rest onto its aim, spread linearly across the
+span. So **aim both planes the same way and the run between them comes straight**: with the tip
+plane set to the base plane, the head's own heading is turned onto the trunk's, which is exactly
+what straightening a curve is. *Straighten it* is that one press.
 
-They are **rates, not offsets**, and that is the one choice here worth arguing about. Under the
-other reading — "the base angle is the angle already turned at the first cut" — a non-zero base
-angle puts a **kink** at the base cut, because the rotation would jump from nothing to that angle
-across it. As a rate the rotation at the base cut is exactly identity however large the numbers are,
-so the only seam is the slope one the stretcher already documents. Both readings give the reviewer
-the thing they want to say — how tight the bend is where the neck leaves the shoulder, and how tight
-where the head begins — and only one of them cannot kink.
+The panel's headline is how far apart the two planes are aimed — nought is straight — with the
+animal's own curve across that span beside it and the turn that closes the difference under both.
+
+This replaced a pair of turn **rates**, one at each end of the span, and it keeps what those were
+for. The rates existed because the obvious reading of two *angles* — "the base angle is the angle
+already turned at the first cut" — puts a kink at the base cut, the rotation jumping from nothing to
+that angle across it. An orientation per plane cannot do that at all: the rotation at the base cut
+is the rotation carrying the tip plane's rest onto itself, which is identity by construction however
+far apart the two planes are aimed. What is given up is the rates' one extra shape — a bend that
+starts straight and tightens — and two orientations are a circular arc. That is the shape
+straightening wants, and a distribution nobody can measure was never the thing being argued over.
 
 What that does to a vertex:
 
@@ -93,6 +128,13 @@ turned, which is not what bending a body does.
 its own length. 1 is no squeeze; below 0 the turn is tighter than the body is thick and the surface
 has folded through itself.
 
+**Seating the planes.** They are measured from the same two traced runs the geometry reading is
+taken over, so a freshly seated pair says the same number that reading does — on purpose, and the
+panel prints both. *Seat the planes on the body* takes them back off a reviewer and re-measures;
+*Seat them on the bone chords* takes them from the two chords the bone reading is between instead,
+which is the answer on a body whose trace wandered. An aim a person has given survives the span
+moving under it, and the tip plane's *rest* never does: it is not an opinion.
+
 **The span is a slab, and that is the editor's honest limit.** Everything between the two cut
 planes is turned, so an oblique span across a curled body takes in whatever else happens to lie
 between them: on Askeptosaurus' neck the lit vertices include the near forelimb, because a plane
@@ -101,8 +143,16 @@ rather than hiding it, in the same way the mouth editor's two half-spaces cannot
 from a paddle tucked under the snout. What the editor settles is *where the span is and how far it
 turns*; which vertices near a limb belong to the run is still the builder's polyline question.
 
-The bend axis is always **square to the span**. A component along it would be a twist of the span
-about its own length, which turns no direction any reading is about and is not a bend.
+**The axle is derived, not dialled.** It is whatever the two plane normals imply — the shortest
+rotation carrying the tip plane's rest onto its aim — so there is no bend-plane control and no
+*Aim the plane* button any more. There used to be both, and the control a reviewer grabbed swept
+round the creature's own long axis, which is a twist, while the body it bent went ninety degrees the
+other way: the handle's motion was not the bend it produced. A plane's is.
+
+Where the aim is oblique the hinge can carry a little of itself **along** the span, which is a twist
+of the span about its own length. That is the honest consequence of the aim rather than something to
+clamp away — clamping it would mean the turn no longer carried the tip plane where it was aimed — so
+the panel says so past a degree and the file records it as `axis.twistDegrees`.
 
 ## The two readings
 
@@ -171,13 +221,15 @@ by the in-plane angle and see what is left — because projecting onto a plane c
 
 ## The handles
 
-Three spheres on the stage, drawn without a depth test because a span through a neck is inside the
+Four spheres on the stage, drawn without a depth test because a span through a neck is inside the
 neck:
 
 - **Base** (amber) and **tip** (lagoon), the two ends of the span. Drag either one anywhere on the
   animal: the cuts, the direction and the length all follow. The drag runs in the plane facing the
   camera through the handle, so it goes where the pointer goes.
-- **Axle** (magenta), standing out square to the span. Drag it round to turn the bend plane.
+- **Base plane** (pale amber) and **tip plane** (magenta), each standing out from its own end along
+  that plane's normal. Drag one and the plane goes where the pointer took it; drag the **tip**
+  plane's and the body follows it, because the plane's motion *is* the bend.
 
 Every vertex inside the span is **lit**, and both traced centrelines are **drawn on the body** — so
 a trace that has set off down a flipper is seen rather than believed. That is the single most
@@ -186,12 +238,17 @@ useful thing on the screen.
 **Right-drag orbits**, shift+right-drag pans, scroll zooms, as in mark and mouth mode. The rig goes
 to its **bind pose**: a swimming body is drawn somewhere its vertex positions are not.
 
-The panel's numeric fields set every number exactly. **Aim the plane** turns the bend plane onto the
-plane the measured turn actually lies in, which is the hardest thing to do by eye and the easiest to
-measure. **Straighten it** turns the span so the geometry reading comes out at zero — an *aim*
-rather than a solve, because the result is then measured and shown. **Re-seat on the body** puts
-both ends back where the body's own centre is near them. Undo and redo are ⌘/Ctrl+Z and ⇧⌘/Ctrl+Z;
-one drag is one step.
+The panel's numeric fields set every number exactly. A plane's three are the components of a
+direction, and the document keeps a plane as a unit vector — so setting one component re-normalises
+it with the other two, and typing a whole direction in takes a pass or two to land. The pointer,
+which drags the whole direction at once, has no such problem.
+
+**Straighten it** aims the tip plane at the base plane, which is the whole act; the result is then
+*measured* and shown, so a base plane aimed somewhere the body's own centre line does not run
+straightens the body onto that and says what it got. **No bend** puts the tip plane back on the
+body's own heading there. **Seat the planes on the body** and **Seat them on the bone chords**
+re-measure both. **Re-seat on the body** puts both *ends* back where the body's own centre is near
+them. Undo and redo are ⌘/Ctrl+Z and ⇧⌘/Ctrl+Z; one drag is one step.
 
 ## The first guess
 
@@ -224,8 +281,13 @@ mean; the span is two points and may run anywhere.
     "baseSource": "manual", "tipSource": "manual",
     "direction": [-0.4831, 0.1156, 0.8679], "length": 0.8135, "percentOfBody": 9.43
   },
-  "axis": { "rollDegrees": 0, "vector": [-0.8737, 0, -0.4864], "vectorBlenderZUp": [-0.8737, 0.4864, 0] },
-  "turn": { "baseDegrees": 20, "tipDegrees": 20, "totalDegrees": 20 },
+  "planes": {
+    "baseNormal": [0.6284, -0.1919, 0.7538], "baseSource": "trace",
+    "tipRest": [0.9285, -0.2835, 0.2404], "tipNormal": [0.6284, -0.1919, 0.7538], "tipSource": "manual",
+    "apartDegrees": 0, "apartBeforeDegrees": 41.4
+  },
+  "axis": { "vector": [-0.8737, 0, -0.4864], "vectorBlenderZUp": [-0.8737, 0.4864, 0], "twistDegrees": 5.7 },
+  "turn": { "totalDegrees": 41.4 },
   "reading": {
     "window": 0.12, "reach": 0.05,
     "geometry": { "baseReference": "…", "tipReference": "…", "baseResidual": 0.062, "before": { "…": "…" }, "after": { "…": "…" } },
@@ -245,6 +307,10 @@ mean; the span is two points and may run anywhere.
   the bytes the browser already has) and equal to `sha256sum` of that file on disk.
 - `axis.vectorBlenderZUp` is the axle in a Z-up armature frame (`[x, −z, y]`), because the creature
   builders work in Blender and a number a builder has to re-derive is the failure this tool is about.
+  Both plane normals are given that way too.
+- `schema` is `bend-span/2`. A `bend-span/1` file is **refused by name**: it carries turn rates and a
+  bend-plane roll, which no longer describe a bend at all, and half-reading one would silently ignore
+  its turn.
 - `joints` is the shape a builder consumes: a **local** rotation per joint whose product down the
   chain is the accumulated one, in chain order. That is exactly what `uncurl` returns and
   `carry_rest` takes in `tools/triassic/creatures/askeptosaurus/build.py` — a list of bone names and
@@ -279,9 +345,9 @@ Against the *same* tip chord (`neck_03 → skull`), three defensible readings of
 
 | Base reference | Reading |
 | --- | --- |
-| `body → chest` | +0.7° in the plane · 2.8° out · **2.8° in all** |
-| `tail_00 → chest` (hip to shoulder) | −6.7° in the plane · 13.0° out · **14.3° in all** |
-| `chest → neck_00` (the takeoff chord) | +0.6° in the plane · 32.0° out · **32.0° in all** |
+| `body → chest` | −0.5° in the plane · 2.8° out · **2.8° in all** |
+| `tail_00 → chest` (hip to shoulder) | +5.2° in the plane · 13.4° out · **14.3° in all** |
+| `chest → neck_00` (the takeoff chord) | +1.2° in the plane · 32.0° out · **32.0° in all** |
 
 **29.1° apart**, on one span, on one screen, each labelled with what it is between. That is the
 whole argument of T3D-25/T3D-26 reproduced in a tool, and it is why the panel never shows an angle
@@ -291,8 +357,40 @@ Renders: [the default span](triassic/verification/askeptosaurus-bend-opened.png)
 neck](triassic/verification/askeptosaurus-bend-neck.png), the three trunk readings
 ([`body`](triassic/verification/askeptosaurus-bend-trunk-body.png),
 [`tail_00`](triassic/verification/askeptosaurus-bend-trunk-tail_00.png),
-[`chest`](triassic/verification/askeptosaurus-bend-trunk-chest.png)), and [a 20°
-turn](triassic/verification/askeptosaurus-bend-turned.png).
+[`chest`](triassic/verification/askeptosaurus-bend-trunk-chest.png)), and [the tip plane aimed off
+the body's own heading](triassic/verification/askeptosaurus-bend-turned.png).
+
+The per-joint table that span asks for is
+[`askeptosaurus-bend-joints.txt`](triassic/verification/askeptosaurus-bend-joints.txt) — `chest`,
+`neck_00`…`neck_03`, `skull` in chain order with a local rotation each, summing to the whole turn,
+which is the same six bones and the same shape as `carry.frontCarryPerJointDegrees` in that animal's
+`validation.json` and is what `carry_rest` takes.
+
+### The headline: straightening the neck on the body that still has the fault
+
+On the **original pose**, `askeptosaurus.origpose.glb` — the generation before T3D-26 carried the
+head's aim into the bind — with the span on its neck, `(0.101, −0.007, 0.263)` to
+`(0.347, −0.082, 0.422)`:
+
+| | |
+| --- | --- |
+| at the default window and reach | both traces wander on this curled generation and the panel says so in orange, which is the warning doing its job |
+| at a **26 %** window and a **2 %** reach | residuals 0.035 behind and 0.047 ahead, both under the bar |
+| the two planes, seated | **41.40° apart** — the animal's own curve across this span, and the geometry reading says the same 41.4° because they are seated on the same two runs |
+| *Straighten it* | 0.00° apart, a turn of 41.40° |
+| the geometry reading, re-measured over the warped mesh | **1.05° in the plane** |
+
+[Before](triassic/verification/askeptosaurus-bend-origpose-seated.png) and
+[after](triassic/verification/askeptosaurus-bend-straightened.png), same camera; the numbers are
+[`askeptosaurus-bend-straightening.txt`](triassic/verification/askeptosaurus-bend-straightening.txt),
+and [the default seat](triassic/verification/askeptosaurus-bend-origpose.png) is the one the panel
+refuses to report a confident angle for.
+
+The 1.05° left over is the trace's own noise, not a failure of the warp: past the tip cut the body
+is carried by one rigid rotation, so the tip trace after the bend is the tip trace before it turned
+by exactly that rotation, and the rotation is by construction the one carrying that heading onto the
+base plane's. Nothing at the base cut moves at all, to the last decimal, whatever the planes are
+aimed at.
 
 ### Where it agrees with the builder, and where it does not
 
@@ -323,7 +421,7 @@ Two things the tool says that the ticket could not:
 
 | | Sculpt | Stretch | Bend | Mouth | Mark |
 | --- | --- | --- | --- | --- | --- |
-| Changes | proportions, station by station | the length of one run | the direction of one run | nothing — it aims a cut | nothing — it names vertices |
+| Changes | proportions, station by station | the length of one run | the direction one run leaves on | nothing — it aims a cut | nothing — it names vertices |
 | On | a built body, Cambrian and Devonian | a generation or a built body | a generation or a built body | any body | any body |
 
 Bend sits exactly where stretch does, because it asks the same kind of question about the same run
@@ -338,9 +436,10 @@ exported off the twin would name the right creature and describe the wrong mesh.
 | `src/viewer/bend/bend.ts` | The document, the warp, the traces, the readings and the file. Pure — no DOM, no three.js. |
 | `src/viewer/bend/BendEditor.tsx` | The handles, the drags, the hashing and the panel. |
 | `src/viewer/bend/store.ts` | The session's documents, in memory only. |
-| `src/viewer/scene.ts` | `showBend`, `bendPick` and the shared `dragPoint`: the cut planes, the axle, the traces, the lit span and the pointer's ray. |
-| `tools/bend-test.ts` | `npm run bend` — the span, the warp, the rate, the traces, the readings, the joint table, the file and its refusals. |
-| `tools/bend-browser.mjs` | The editor in a real browser, on Askeptosaurus: the handles, the fields, the references, the export, the consumer, and the three trunk readings. |
+| `src/viewer/scene.ts` | `showBend`, `bendPick` and the shared `dragPoint`: the two oriented planes, the derived axle, the traces, the lit span and the pointer's ray. |
+| `tools/triassic/base-poses.mjs` | Publishes each untouched generation, which is how the pre-carry body is on the stage at all. |
+| `tools/bend-test.ts` | `npm run bend` — the span, the two planes, the warp, the traces, the readings, the joint table, the file and its refusals. |
+| `tools/bend-browser.mjs` | The editor in a real browser, on Askeptosaurus: the body note, the handles, the fields, the references, the joint table, the export, the consumer, the three trunk readings and the straightening on the original pose. |
 | `tools/triassic/bend-check.ts` | `npm run triassic:bend` — the consumer, which re-measures rather than reprinting. |
 
 Nothing is saved. The document lives in the session so a trip through view mode does not lose it,
