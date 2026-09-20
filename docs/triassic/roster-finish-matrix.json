@@ -1,0 +1,3101 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "deterministic; run tools/triassic/roster-finish-audit.mjs",
+  "contract": {
+    "requiredClips": [
+      "Idle",
+      "Swim",
+      "Sprint",
+      "TurnLeft",
+      "TurnRight",
+      "Dive",
+      "Rise",
+      "Attack",
+      "Bite",
+      "Heavy",
+      "Hit",
+      "Death",
+      "Guard",
+      "Parry",
+      "Dodge",
+      "Eat",
+      "Stagger",
+      "Ability",
+      "Grab",
+      "Breath",
+      "Growth"
+    ],
+    "requiredLoopingClips": [
+      "Idle",
+      "Swim",
+      "Sprint",
+      "Guard",
+      "Eat",
+      "Grab"
+    ],
+    "requiredAnchors": [
+      "anchor_mouth",
+      "anchor_mouth_inside",
+      "anchor_attack_primary"
+    ]
+  },
+  "summary": {
+    "shippedBodies": 26,
+    "contractMet": 21,
+    "repairNeeded": [
+      "henodus",
+      "keichousaurus",
+      "nothosaurus",
+      "placodus",
+      "shonisaurus"
+    ]
+  },
+  "rows": [
+    {
+      "id": "aphaneramma",
+      "models": {
+        "authored": "aphaneramma.glb",
+        "puppet": "aphaneramma.puppet.glb",
+        "lod1": "aphaneramma.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Breathe",
+          "Crawl",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab",
+          "Breathe",
+          "Crawl"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "archelon",
+      "models": {
+        "authored": "archelon.glb",
+        "puppet": "archelon.puppet.glb",
+        "lod1": "archelon.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Breathe",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab",
+          "Breathe"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "atopodentatus",
+      "models": {
+        "authored": "atopodentatus.glb",
+        "puppet": "atopodentatus.puppet.glb",
+        "lod1": "atopodentatus.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Breathe",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Graze",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab",
+          "Breathe",
+          "Ability",
+          "Graze"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "birgeria",
+      "models": {
+        "authored": "birgeria.glb",
+        "puppet": "birgeria.puppet.glb",
+        "lod1": "birgeria.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "FastStart",
+          "Gape",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "cartorhynchus",
+      "models": {
+        "authored": "cartorhynchus.glb",
+        "puppet": "cartorhynchus.puppet.glb",
+        "lod1": "cartorhynchus.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Breathe",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Haul",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab",
+          "Breathe",
+          "Haul"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "ceratites",
+      "models": {
+        "authored": "ceratites.glb",
+        "puppet": "ceratites.puppet.glb",
+        "lod1": "ceratites.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab",
+          "Breath"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_grasp",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "coelophysis",
+      "models": {
+        "authored": "coelophysis.glb",
+        "puppet": "coelophysis.puppet.glb",
+        "lod1": "coelophysis.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Charge",
+          "Crawl",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Lower",
+          "Parry",
+          "Retract",
+          "Retreat",
+          "Rise",
+          "Run",
+          "SnapLeft",
+          "SnapRight",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab",
+          "Crawl",
+          "Run"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "cymbospondylus",
+      "models": {
+        "authored": "cymbospondylus.glb",
+        "puppet": "cymbospondylus.puppet.glb",
+        "lod1": "cymbospondylus.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Breathe",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Lunge",
+          "Parry",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab",
+          "Breathe"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "dinocephalosaurus",
+      "models": {
+        "authored": "dinocephalosaurus.glb",
+        "puppet": "dinocephalosaurus.puppet.glb",
+        "lod1": "dinocephalosaurus.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Breathe",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "NeckStrike",
+          "Parry",
+          "Periscope",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab",
+          "Periscope",
+          "Breathe"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "helicoprion",
+      "models": {
+        "authored": "helicoprion.glb",
+        "puppet": "helicoprion.puppet.glb",
+        "lod1": "helicoprion.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "henodus",
+      "models": {
+        "authored": "henodus.glb",
+        "puppet": "henodus.puppet.glb",
+        "lod1": "henodus.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Breathe",
+          "Crawl",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Graze",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Crawl",
+          "Graze",
+          "Breathe"
+        ],
+        "missingLoops": [
+          "Grab"
+        ]
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "repair-needed"
+    },
+    {
+      "id": "hupehsuchus",
+      "models": {
+        "authored": "hupehsuchus.glb",
+        "puppet": "hupehsuchus.puppet.glb",
+        "lod1": "hupehsuchus.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Breathe",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Gulp",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab",
+          "Breathe"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "hybodus",
+      "models": {
+        "authored": "hybodus.glb",
+        "puppet": "hybodus.puppet.glb",
+        "lod1": "hybodus.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Rise",
+          "Shake",
+          "SpineBrace",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab",
+          "SpineBrace"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "keichousaurus",
+      "models": {
+        "authored": "keichousaurus.glb",
+        "puppet": "keichousaurus.puppet.glb",
+        "lod1": "keichousaurus.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Breathe",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Rise",
+          "Shoal",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Shoal",
+          "Breathe"
+        ],
+        "missingLoops": [
+          "Grab"
+        ]
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "repair-needed"
+    },
+    {
+      "id": "macrocnemus",
+      "models": {
+        "authored": "macrocnemus.glb",
+        "puppet": "macrocnemus.puppet.glb",
+        "lod1": "macrocnemus.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Charge",
+          "Crawl",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Retreat",
+          "Rise",
+          "Run",
+          "Snatch",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab",
+          "Crawl",
+          "Run"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "mixosaurus",
+      "models": {
+        "authored": "mixosaurus.glb",
+        "puppet": "mixosaurus.puppet.glb",
+        "lod1": "mixosaurus.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Breathe",
+          "Dart",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab",
+          "Breathe"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "mosasaurus",
+      "models": {
+        "authored": "mosasaurus.glb",
+        "puppet": "mosasaurus.puppet.glb",
+        "lod1": "mosasaurus.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Breathe",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab",
+          "Breathe"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "mystriosuchus",
+      "models": {
+        "authored": "mystriosuchus.glb",
+        "puppet": "mystriosuchus.puppet.glb",
+        "lod1": "mystriosuchus.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Breathe",
+          "Crawl",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Lower",
+          "Parry",
+          "Retract",
+          "Rise",
+          "SnapLeft",
+          "SnapRight",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab",
+          "Breathe",
+          "Crawl"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "nothosaurus",
+      "models": {
+        "authored": "nothosaurus.glb",
+        "puppet": "nothosaurus.puppet.glb",
+        "lod1": "nothosaurus.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat"
+        ],
+        "missingLoops": [
+          "Grab"
+        ]
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "repair-needed"
+    },
+    {
+      "id": "odontochelys",
+      "models": {
+        "authored": "odontochelys.glb",
+        "puppet": "odontochelys.puppet.glb",
+        "lod1": "odontochelys.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Breathe",
+          "Crawl",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab",
+          "Breathe",
+          "Crawl"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "phragmoteuthis",
+      "models": {
+        "authored": "phragmoteuthis.glb",
+        "puppet": "phragmoteuthis.puppet.glb",
+        "lod1": "phragmoteuthis.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab",
+          "Breath"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_grasp",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "placodus",
+      "models": {
+        "authored": "placodus.glb",
+        "puppet": "placodus.puppet.glb",
+        "lod1": "placodus.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Breathe",
+          "Crawl",
+          "CrushBite",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Pry",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Crawl",
+          "Pry",
+          "Breathe"
+        ],
+        "missingLoops": [
+          "Grab"
+        ]
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "repair-needed"
+    },
+    {
+      "id": "rhaeticosaurus",
+      "models": {
+        "authored": "rhaeticosaurus.glb",
+        "puppet": "rhaeticosaurus.puppet.glb",
+        "lod1": "rhaeticosaurus.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Breathe",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Glide",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab",
+          "Breathe",
+          "Glide"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "saurichthys",
+      "models": {
+        "authored": "saurichthys.glb",
+        "puppet": "saurichthys.puppet.glb",
+        "lod1": "saurichthys.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "FastStart",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Hover",
+          "Idle",
+          "Parry",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab",
+          "Hover"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "shonisaurus",
+      "models": {
+        "authored": "shonisaurus.glb",
+        "puppet": "shonisaurus.puppet.glb",
+        "lod1": "shonisaurus.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [
+          "Grab",
+          "Breath"
+        ],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat"
+        ],
+        "missingLoops": [
+          "Grab"
+        ]
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": false,
+        "evidence": "missing decoded paired audit",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "repair-needed"
+    },
+    {
+      "id": "tanystropheus",
+      "models": {
+        "authored": "tanystropheus.glb",
+        "puppet": "tanystropheus.puppet.glb",
+        "lod1": "tanystropheus.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Crawl",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Drag",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Lower",
+          "Parry",
+          "Retract",
+          "Rise",
+          "Severed",
+          "SnapLeft",
+          "SnapRight",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab",
+          "Crawl",
+          "Drag"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    }
+  ]
+}

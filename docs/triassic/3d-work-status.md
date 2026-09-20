@@ -14,6 +14,9 @@ Updated: 19 September 2026.
 | T3D-02 | **active** | `/root/throat_audit` | Audit actual shipped Triassic actions for broken throat, jaw/body seam and mouth-lining geometry; port the settled palate-and-floor implementation from preserved branch `worktree-agent-ab601ca5ebb512c9f` onto the current pipeline without reversing later skinning/animation repairs; repair confirmed faults, including Hupehsuchus' short mouth opening, Henodus' cut through the hanging upper teeth and the rigid Ceratites shell. | Before/after evidence identifies every inspected failure; the current shared builder creates separate palate and mandibular floor surfaces without a wall stretching between them; repaired authored/puppet/LOD assets pass their creature audits and visual playback review. |
 | T3D-03 | **active** | `/root/roster_finish` | Audit the roster-wide rest-pose and animation contract: neutral/base pose, mouth closure, dynamic attack/dash motion, anchors, paired-body parity and missing required clips. Land small deterministic repairs, including `Grab` where absent, and record larger findings without starting optional regeneration. | Machine-readable roster matrix plus actual-GLB checks; repaired assets and shared tooling validated. |
 | T3D-04 | **active** | `/root/roster_finish` | Port proven centreline and limb-root blending corrections into the shared Triassic pipeline without changing already-correct output. | Pipeline regression checks and representative rebuilds pass. |
+| T3D-05 | **active** | `/root/roster_finish` | Make the shipped `Grab` clips loop for Henodus, Keichousaurus, Nothosaurus and Placodus, then rebuild the authored/puppet/LOD triplets and refresh paired audits. | The generated roster matrix reports no missing `Grab` loop; every rebuilt pair passes its audit. |
+| T3D-06 | **unclaimed** | — | Add Shonisaurus' required `Grab` and `Breath` clips, then create its first shared paired audit and review the new action playback. | Packaged GLBs contain both clips; `Grab` loops; a decoded paired audit passes. |
+| T3D-07 | **unclaimed** | — | Render and publish the 13 still-missing Triassic roster portrait sets without changing creature bodies. | `node tools/triassic/publish-portraits.mjs --check` reports no missing sets. |
 
 ## Finished baseline
 
@@ -33,3 +36,11 @@ Updated: 19 September 2026.
 Before starting a newly discovered repair, add a row with state **active**, a single owner and a
 bounded completion test, then commit and push that claim. If a task cannot proceed, change its
 state to **blocked** and name the missing input. Never leave completed work marked active.
+
+## Current evidence
+
+[`roster-finish-matrix.json`](roster-finish-matrix.json) is generated from the packaged GLBs;
+[`roster-finish-audit.md`](roster-finish-audit.md) explains its checks and records the scoped
+follow-ups. The matrix currently passes the core packaged-body contract for 21 of 26 bodies; the
+four non-looping `Grab` clips and Shonisaurus' missing action clips are the remaining animation
+contract work. The throat review remains T3D-02's separate visual gate.
