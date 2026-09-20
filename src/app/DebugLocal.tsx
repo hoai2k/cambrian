@@ -59,6 +59,7 @@ const SETTINGS_FIELDS: Field[] = [
   { kind: 'range', key: 'volume', label: 'Volume', min: 0, max: 1, step: 0.05 },
   { kind: 'toggle', key: 'muted', label: 'Muted' },
   { kind: 'toggle', key: 'music', label: 'Music' },
+  { kind: 'toggle', key: 'shoreAnimals', label: 'Shore animals', note: 'Puts the shore animals on the beach (src/sim/triassic/shore.ts): they come and go, and take what holds still at the edge of the water or on the sand. Triassic only, off by default, and read when a match starts.' },
   { kind: 'toggle', key: 'equivalentSizing', label: 'Equivalent sizing', note: 'Flattens the roster back to one size for every animal, instead of the natural lengths it plays at (docs/research/cambrian-sizes.md). Cambrian only, and read when a match starts.' },
 ];
 

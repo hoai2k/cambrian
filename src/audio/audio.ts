@@ -14,7 +14,7 @@ import { assetPaths } from '../content/asset-paths';
  * oscillator.
  */
 import { AUDIBLE_FLOOR, MIN_GAP } from './mix';
-import { AREA_ENTER, AREA_FADE, AREA_LEAVE, CROSSFADE, FIRST_FADE, MISSING, openingTrack, pickNext, themeFor, type MusicTrack } from './music';
+import { AREA_ENTER, AREA_FADE, AREA_LEAVE, CROSSFADE, DEAD_AIR, FIRST_FADE, MISSING, openingTrack, pickNext, themeFor, type MusicTrack } from './music';
 import type { Biome } from '../sim/world';
 import { appBase, setAppBase } from '../shared/base';
 
@@ -47,6 +47,9 @@ export const SAMPLES: Record<string, string[]> = {
   sense: ['sense'], ability: ['ability'], heartbeat: ['heartbeat'], noticed: ['noticed'], respawn: ['respawn'],
   pounce: ['pounce'], swallow: ['swallow'], disintegrate: ['disintegrate'], routed: ['routed'],
   'ui-move': ['ui-move'], 'ui-confirm': ['ui-confirm'], 'ui-back': ['ui-back'], 'ui-join': ['ui-join'], 'ui-start': ['ui-start'], won: ['won'],
+  // A body coming down on the sand (src/sim/beach.ts): every era can land on its shore now, and
+  // the Devonian's own recording is the one that exists, so the shared table borrows it.
+  beach: ['devonian/beach'],
 };
 /**
  * The two always-on beds, from the era rather than from a constant: the Devonian's ambience is
@@ -66,6 +69,9 @@ export class GameAudio {
   private sfxBus?: GainNode;
   private ambGain?: GainNode;
   private tensionGain?: GainNode;
+  /** The sprint wash: a loop held at silence and wound up while a local player is driving. */
+  private sprintGain?: GainNode;
+  private sprintStarted = false;
   private musicGain?: GainNode;
   private musicStarted = false;
   private music?: MusicVoice;
@@ -77,6 +83,8 @@ export class GameAudio {
   private fadeEnds = 0;
   /** Where each track had got to when it was last faded down, so returning resumes it. */
   private resumeAt = new Map<string, number>();
+  /** Seconds the soundtrack has been silent while it was meant to be playing; see `reviveMusic`. */
+  private deadAir = 0;
   /** The track the score returns to when the player is nowhere in particular. */
   private roamingTrack?: MusicTrack;
   /** What the area rules want playing, and how long they have wanted it. */
@@ -113,6 +121,7 @@ export class GameAudio {
     // Sample-based ambience and tension (start silent, fade in once loaded)
     this.ambGain = ctx.createGain(); this.ambGain.gain.value = 0; this.ambGain.connect(this.master);
     this.tensionGain = ctx.createGain(); this.tensionGain.gain.value = 0; this.tensionGain.connect(this.master);
+    this.sprintGain = ctx.createGain(); this.sprintGain.gain.value = 0; this.sprintGain.connect(this.master);
     this.musicGain = ctx.createGain(); this.musicGain.gain.value = 0; this.musicGain.connect(this.master);
     if (this.ambience) this.startSoundtrack();
     void this.preload();
@@ -168,7 +177,12 @@ export class GameAudio {
     // Pick the track up where it was left rather than replaying its opening: a minute in the
     // shallows and back should sound like a passage, not like the score starting over.
     const at = this.resumeAt.get(track.name);
-    if (at) el.addEventListener('loadedmetadata', () => { if (Number.isFinite(el.duration)) el.currentTime = Math.min(at, Math.max(0, el.duration - 1)); }, { once: true });
+    // Never resume into the last few seconds: a position that close is a track about to end, and
+    // picking it up there is the same as not playing it.
+    if (at) el.addEventListener('loadedmetadata', () => {
+      if (!Number.isFinite(el.duration) || at >= el.duration - CROSSFADE * 2) return;
+      el.currentTime = at;
+    }, { once: true });
     const gain = ctx.createGain(); gain.gain.value = 0;
     const node = ctx.createMediaElementSource(el);
     node.connect(gain); gain.connect(this.musicGain);
@@ -198,9 +212,20 @@ export class GameAudio {
     voice.gain.gain.linearRampToValueAtTime(to, ctx.currentTime + seconds);
   }
 
-  /** Silence `voice`, remember where it had got to, and take it apart. */
+  /**
+   * Silence `voice`, remember where it had got to, and take it apart.
+   *
+   * Only an **area theme** is remembered. The rotation's own tracks are handed over *near their
+   * end* — that is what the crossfade is — so remembering one parked it a second from finishing,
+   * and the next time it came round it played that second and ended. One cycle of the rotation
+   * left every track parked at its end and the music turned into a string of one-second snippets
+   * and then nothing. Resuming is for the excursion an area theme is: a minute in the shallows and
+   * back should sound like a passage rather than the score starting over. A rotation track has no
+   * such thread to pick up; it starts at the top.
+   */
   private endVoice(voice: MusicVoice) {
-    if (Number.isFinite(voice.el.currentTime)) this.resumeAt.set(voice.track.name, voice.el.currentTime);
+    const t = voice.el.currentTime;
+    if (voice.track.biomes?.length && Number.isFinite(t) && t > 1) this.resumeAt.set(voice.track.name, t);
     voice.el.pause(); voice.el.removeAttribute('src'); voice.el.load();
     voice.node.disconnect(); voice.gain.disconnect();
     if (this.fadingOut === voice) this.fadingOut = undefined;
@@ -234,6 +259,30 @@ export class GameAudio {
     this.ramp(voice, 1, fade);
     if (outgoing) { this.fadingOut = outgoing; this.ramp(outgoing, 0, fade); this.scheduleTeardown(fade); }
     if (!track.biomes?.length) this.roamingTrack = track;
+  }
+
+  /**
+   * The soundtrack is never allowed to end.
+   *
+   * Everything that moves it on is an *event* on a media element — `ended`, `timeupdate`, `error` —
+   * and an element that never gets one leaves the rotation stopped for the rest of the match with
+   * nothing to restart it: a `play()` the browser refused before the first gesture, a stream that
+   * stalled, a voice torn down by a crossfade that then had nowhere to hand over to. So the
+   * soundtrack is also *checked*, on the clock the game already runs: if music is meant to be on
+   * and nothing has been playing for `DEAD_AIR`, pick a track and start one. Two seconds is long
+   * enough to sit through a legitimate gap (a crossfade is `CROSSFADE`, an area swap `AREA_FADE`)
+   * and short enough that a player does not decide the music is over.
+   */
+  private reviveMusic(dt: number) {
+    const live = this.music && !this.music.el.paused && !this.music.el.ended;
+    if (!this.musicOn || live) { this.deadAir = 0; return; }
+    this.deadAir += dt;
+    if (this.deadAir < DEAD_AIR) return;
+    this.deadAir = 0;
+    const was = this.music;
+    this.music = undefined;                 // the silent voice is not something to crossfade from
+    if (was) this.endVoice(was);
+    this.playTrack(pickNext(this.lastHeard), FIRST_FADE);
   }
 
   /** Take the outgoing voice apart once the fade it is in has actually finished. */
@@ -299,7 +348,9 @@ export class GameAudio {
    * the score gives it up. See the note on those constants in music.ts for why the two differ.
    */
   private stepArea(dt: number) {
-    if (!this.ctx || !this.musicStarted || !this.music) return;
+    if (!this.ctx || !this.musicStarted) return;
+    this.reviveMusic(dt);
+    if (!this.music) return;
     const theme = themeFor(this.biome);
     const target = theme ?? this.roamingTrack;
     if (!target || target.name === this.music.track.name) { this.areaWant = undefined; this.areaWantT = 0; return; }
@@ -326,6 +377,31 @@ export class GameAudio {
     this.ambGain.gain.linearRampToValueAtTime(0.55, t + 2.5);
   }
   private startDrone() { if (this.tensionGain) this.startLoop(loops().drone, this.tensionGain); }
+
+  /**
+   * How hard the local player is driving, 0..1 — the wash of water over a body that is sprinting.
+   *
+   * Sprinting used to be a *sting*: one whoosh on every press, at the loudest volume in the game,
+   * and on a body over `HUGE_LENGTH` the giant's own surge sample. Sprint is not an event, it is a
+   * thing you are doing, sometimes for a minute at a time, so it is a bed now: a loop that fades up
+   * while the body is driving and away when it stops, well under the ambience. The sample is the
+   * delivered `burst` whoosh looped on itself (see `startLoop` for the seam) until there is a
+   * purpose-made one — docs/audio-requests.md has the ask.
+   */
+  setSprint(level: number) {
+    if (!this.ctx || !this.sprintGain) return;
+    const want = Math.max(0, Math.min(1, level));
+    const name = SAMPLES.burst?.[0];
+    if (!this.sprintStarted && want > 0 && name) {
+      if (!this.buffers.has(name)) { void this.load(name); return; }   // next frame, with the sound
+      this.sprintStarted = true;
+      this.startLoop(name, this.sprintGain);
+    }
+    // Quiet: this sits under the reef rather than over it. Up quickly, out slowly, so a tap is a
+    // swell rather than a click and letting go trails off the way the water would.
+    const now = this.ctx.currentTime;
+    this.sprintGain.gain.setTargetAtTime(want * 0.16, now, want > 0 ? 0.08 : 0.25);
+  }
 
   resume() { this.ctx?.resume(); }
   setVolume(v: number) { this.volume = v; this.applyGain(); }

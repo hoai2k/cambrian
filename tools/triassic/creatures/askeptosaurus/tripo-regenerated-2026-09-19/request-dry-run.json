@@ -1,0 +1,18 @@
+{
+  "dry_run": true,
+  "name": "askeptosaurus",
+  "image": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-askeptosaurus/docs/triassic/canonical/model-inputs/askeptosaurus/input.png",
+  "image_bytes": 1380978,
+  "image_sha256": "7bafe2ec6b3786e9f78cffb5f50575969c761da1039ebbea5fb74d2a586e8993",
+  "out": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-askeptosaurus/tools/triassic/creatures/askeptosaurus/tripo-regenerated-2026-09-19",
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "resume_task_id": null
+}

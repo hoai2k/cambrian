@@ -20,7 +20,10 @@ const { devActor, stageScale, ADULT_STAGE, PRIME_STAGE, STAGE_AT } = await impor
 const { AIR_LOW, AIR_MAX, triActor } = await import('../src/sim/triassic/state');
 /** Mirrors AIR_BOT_SEEK in the rules: the breath at which a bot starts up. Kept here so the test says what it is testing. */
 const AIR_BOT_SEEK_T = 80;
-const { shorePosts } = await import('../src/sim/triassic/shore');
+const { setShoreAnimals, shoreAnimalsOn, shoreClip, shorePosts } = await import('../src/sim/triassic/shore');
+const { applyHit } = await import('../src/sim/combat');
+const { forceOccupancy } = await import('../src/sim/triassic/shore');
+void setShoreAnimals;
 const { brokeSurface, isAlive, lengthOf, bandOf, swimCeiling } = await import('../src/sim/actors');
 const { PLAYABLE, creature, CREATURES } = await import('../src/sim/creatures');
 const { emptyInput } = await import('../src/sim/types');
@@ -63,7 +66,34 @@ if (!process.env.TRIASSIC_SKIP_ASSETS) for (const c of TRIASSIC.creatures) {
   }
   for (const k of ['select', 'card', 'thumb'] as const) ok(fs.existsSync(`public/${paths.portrait(c.id, k)}`), `${c.id} has a ${k} portrait (placeholder from the canonical pose)`);
 }
-ok(Object.keys(TRIASSIC_STAND_INS).length === 25 - TRIASSIC_SHIPPED.length, 'every undelivered animal has a stand-in, and no delivered one does');
+// **`TRIASSIC_SHIPPED` is every id in the era's folder, not every id on its roster.** Archelon and
+// Mosasaurus are Late Cretaceous, are deliberately absent from TRIASSIC_CREATURES, and ship their
+// bodies here all the same; counting them against the roster made this read two stand-ins short.
+const SHIPPED_ROSTER = TRIASSIC.creatures.filter((c) => TRIASSIC_SHIPPED.includes(c.id)).length;
+ok(Object.keys(TRIASSIC_STAND_INS).length === 25 - SHIPPED_ROSTER, 'every undelivered animal has a stand-in, and no delivered one does');
+
+// ---- the standing guests: in the folder, off the roster ----
+{
+  const GUESTS = ['archelon', 'mosasaurus'];
+  for (const id of GUESTS) {
+    ok(!TRIASSIC.creatures.some((c) => c.id === id), `${id} is not on the roster (its era is undecided)`);
+    ok(!(id in (TRIASSIC.assets.standIns ?? {})), `${id} borrows nothing: it is in no sea`);
+    if (!process.env.TRIASSIC_SKIP_ASSETS && TRIASSIC_SHIPPED.includes(id)) {
+      for (const f of [`${id}.glb`, `${id}.puppet.glb`, `${id}.lod1.glb`, `${id}.json`]) {
+        ok(fs.existsSync(`public/assets/triassic/creatures/${f}`), `${id} ships ${f}`);
+      }
+      // **A guest needs its own portraits published, and nothing else will do it.** A roster animal
+      // keeps a placeholder card cut from its canonical pose until its model lands, which is why
+      // `render.py --portraits` deliberately writes into the creature folder rather than into
+      // `public/`. These two have no canonical pose and no placeholder: the pick screen draws a
+      // visitor's tile from `assets/triassic/creatures/<id>.<kind>.png`, so the renders are copied
+      // out of `portraits/` when the body ships, and this is the check that they were.
+      for (const k of ['select', 'card', 'thumb'] as const) {
+        ok(fs.existsSync(`public/assets/triassic/creatures/${id}.${k}.png`), `${id} has a published ${k} portrait`);
+      }
+    }
+  }
+}
 if (!process.env.TRIASSIC_SKIP_ASSETS) {
 for (const files of Object.values(TRIASSIC_SAMPLES)) for (const f of files) ok(fs.existsSync(`public/assets/${f.replace(/^([^/]+)\//, '$1/sfx/')}.mp3`), `${f} sample exists`);
 for (const b of ['shallows', 'nursery', 'shelf', 'forest', 'boulders', 'flats', 'channel', 'escarpment', 'basin']) ok(fs.existsSync(`public/${paths.biome(b)}`), `biome plate ${b} exists`);
@@ -283,18 +313,21 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
   g.skipHatch();
 }
 {
-  const g = new Game('rise', [{ creature: 'mixosaurus', device: 'keyboard', ready: true }]);
-  g.skipHatch();
-  const calf = g.players[0];
-  run(g, 1);
-  const t = triActor(g, calf);
-  const mother = t.mother >= 0 ? g.byId(t.mother) : undefined;
-  ok(!!mother && mother.creature === 'mixosaurus' && lengthOf(mother) > lengthOf(calf) * 2, 'an adult of its kind is beside a live-bearer');
-  ok(t.calfT > 50 && t.calfT < 60, 'and it stays a minute');
-  const e = new Game('rise', [{ creature: 'placodus', device: 'keyboard', ready: true }]);
-  e.skipHatch();
-  run(e, 1);
-  ok(triActor(e, e.players[0]).mother < 0, 'an egg-layer gets no escort');
+  // A live-bearer hatches exactly like an egg-layer: no parent, no escort. `birth: 'live'` is a
+  // fact on the animal's card and nothing the sea does to you — a grown adult of your own kind
+  // arriving and swimming off spent the one beat the series opens with.
+  for (const kind of ['mixosaurus', 'placodus'] as const) {
+    const g = new Game('rise', [{ creature: kind, device: 'keyboard', ready: true }]);
+    g.skipHatch();
+    const you = g.players[0];
+    run(g, 1);
+    // The escort was spawned two body lengths behind on the first step, so what is checked is the
+    // absence of anything *stationed on you*: the sea's own grown animals pass by from the first
+    // minute (`population.ts`) and one of them happening to be your species is ordinary.
+    const close = g.actors.filter((o) => o.id !== you.id && o.creature === kind
+      && lengthOf(o) > lengthOf(you) * 2 && Math.hypot(o.pos.x - you.pos.x, o.pos.y - you.pos.y, o.pos.z - you.pos.z) < lengthOf(you) * 6);
+    ok(close.length === 0, `${kind} hatches with no grown escort of its own kind alongside (${close.length} within six lengths)`);
+  }
 }
 // The shell an animal comes out of says what it is: a reptile's is leathery, and the sharks, fish,
 // amphibian and cephalopods on the roster lay nothing of the kind.
@@ -333,13 +366,23 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
 }
 // Holding the climb is asking for something, so it must not be treated as coasting.
 {
-  const g = new Game('rise', [{ creature: 'nothosaurus', device: 'keyboard', ready: true }], 99);
-  g.skipHatch();
-  const p = g.players[0]; p.spawnProtect = 0;
-  const y0 = p.pos.y;
-  const m = new Map([[0, { ...emptyInput(), rise: true } as InputFrame]]);
-  for (let i = 0; i < 60; i++) { g.step(1 / 60, m); g.events.length = 0; }
-  ok(p.pos.y - y0 > 1, `one second of the climb button is worth more than a metre (${(p.pos.y - y0).toFixed(2)} units)`);
+  // Over several seeds, and against the same body asking for nothing rather than against an
+  // absolute number: what this is really about is that holding the climb is an *ask* and not
+  // coasting, and one lucky seed measuring 1.04 against a 1-unit bar was how it came to be
+  // checked. (A hatchling climbs about 0.99 units a second here; still is about 0.00.)
+  const oneSecond = (seed: number, rise: boolean) => {
+    const g = new Game('rise', [{ creature: 'nothosaurus', device: 'keyboard', ready: true }], seed);
+    g.skipHatch();
+    const p = g.players[0]; p.spawnProtect = 0;
+    const y0 = p.pos.y;
+    const m = new Map([[0, { ...emptyInput(), rise } as InputFrame]]);
+    for (let i = 0; i < 60; i++) { g.step(1 / 60, m); g.events.length = 0; }
+    return p.pos.y - y0;
+  };
+  const seeds = [99, 5, 21, 7, 41];
+  const climbs = seeds.map((s) => oneSecond(s, true)), stills = seeds.map((s) => oneSecond(s, false));
+  ok(climbs.every((d) => d > 0.9), `one second of the climb button is worth about a metre at every seed (${climbs.map((d) => d.toFixed(2)).join(', ')})`);
+  ok(climbs.every((d, i) => d > stills[i] + 0.8), `...and holding it is nothing like coasting (still: ${stills.map((d) => d.toFixed(2)).join(', ')})`);
 }
 // The winded heartbeat is a heartbeat. It used to fire every second for as long as a player stayed
 // down — a hundred and forty times in three minutes — each one a loud cue and a puff of bubbles.
@@ -381,48 +424,268 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
 
 // ---- the shore that reaches in ----
 {
-  const g = new Game('reef', [{ creature: 'keichousaurus', device: 'keyboard', ready: true }]);
-  g.skipHatch();
-  run(g, 0.5);
+  // Off in every match unless Settings → Shore animals is on (`SHORE_ANIMALS` in shore.ts, set
+  // through `RULES.settings.shoreAnimals` once when a match starts). This block turns it on
+  // deliberately, which is what the switch is for.
+  const off = new Game('reef', [{ creature: 'keichousaurus', device: 'keyboard', ready: true }]);
+  off.skipHatch(); run(off, 0.5);
+  ok(!shoreAnimalsOn(), 'shore animals are off by default');
+  ok(typeof RULES!.settings?.shoreAnimals === 'function', 'and the era offers the switch to the Settings screen');
+  ok(shorePosts(off, off.players[0].pos, 3000).length === 0, '...so no bank near a player holds one');
+  ok(off.actors.every((a) => !creature(a.creature).shore), '...and none is spawned into the sea either');
+  RULES!.settings!.shoreAnimals!(true);
+  ok(shoreAnimalsOn(), 'the setting turns them on');
+}
+
+/** A match with the shore on and every bank held occupied (the schedule has its own block), the player stripped of protection, and a helper that parks it still at a spot. */
+const shoreMatch = (seed?: number, schedule = false) => {
+  forceOccupancy(schedule ? undefined : true);
+  const g = new Game('reef', [{ creature: 'keichousaurus', device: 'keyboard', ready: true }], seed);
+  g.skipHatch(); run(g, 0.5);
   const p = g.players[0];
-  const posts = shorePosts(g, p.pos, 600);
-  ok(posts.length >= 2, `shore animals stand on the banks near the players (${posts.length} posts within 600)`);
-  for (const post of posts) {
-    const a = g.byId(post.actor)!;
-    ok(creature(a.creature).shore === true && a.brain === undefined, `${post.kind} on the bank is a shore animal with no brain`);
-    ok(shoreDistance(a.pos.x, a.pos.z) < 8 && a.pos.y > SURFACE_Y - 2, `${post.kind} stands at the waterline (s ${shoreDistance(a.pos.x, a.pos.z).toFixed(1)}, y ${a.pos.y.toFixed(1)})`);
+  const park = (at: { x: number; y: number; z: number }) => {
+    p.pos = { ...at }; p.prevT.x = at.x; p.prevT.y = at.y; p.prevT.z = at.z; p.vel = { x: 0, y: 0, z: 0 };
+    p.spawnProtect = 0; p.iframes = 0;
+  };
+  return { g, p, park };
+};
+/** A spot in real water `s` units off the waterline at `x`: on the sand's own height, never under it (a body under the sand is stalled by the slope and reads as still). */
+const swimSpot = (x: number, s: number) => { const z = shoreZ(x) - s; return { x, y: Math.max(sampleHeight(x, z) + 0.35, SURFACE_Y - 6), z }; };
+/** Posts exist only near the players, so which kinds stand near the nursery is the seed's business: the first seed that puts `kind` on a bank there. */
+const seedFor = (kind: CreatureId): number | undefined => {
+  for (let s = 1; s < 80; s++) {
+    forceOccupancy(true);
+    const g = new Game('reef', [{ creature: 'keichousaurus', device: 'keyboard', ready: true }], s);
+    g.skipHatch(); run(g, 0.2);
+    if (shorePosts(g, { x: 0, y: 0, z: 0 }, 6000).some((q) => q.kind === kind)) return s;
   }
-  const boom = posts.find((q) => q.kind === 'tanystropheus') ?? [...shorePosts(g, { x: 0, y: 0, z: 0 }, 3000)].find((q) => q.kind === 'tanystropheus');
-  ok(!!boom, 'there is a Tanystropheus on a bank within reach of the test');
+  return undefined;
+};
+/** Bring a lurker post to its watch: run the schedule until its body is at the edge. */
+const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
+  const post = shorePosts(g, { x: 0, y: 0, z: 0 }, 3000).find((q) => q.kind === kind);
+  if (!post) return undefined;
+  for (let i = 0; i < 60 * 400 && post.phase !== 'watch'; i++) tick(g);
+  return post.phase === 'watch' ? post : undefined;
+};
+
+// ---- the boom: only what lingers, only what it can take ----
+{
+  const { g, p, park } = shoreMatch();
+  const boom = lurkerAtEdge(g, 'tanystropheus');
+  ok(!!boom, 'a Tanystropheus comes down to a bank within reach of the test');
   if (boom) {
     const neck = g.byId(boom.actor)!;
-    // a small animal at the surface inside its reach is warned, then struck
-    p.pos = { x: neck.pos.x, y: SURFACE_Y - 1.5, z: neck.pos.z - lengthOf(neck) * 0.3 }; p.prevT.x = p.pos.x; p.prevT.z = p.pos.z; p.prevT.y = p.pos.y;
-    p.spawnProtect = 0; p.iframes = 0;
-    const hp0 = p.hp;
-    let warned = 0, hit = false;
-    for (let i = 0; i < 60 * 4; i++) {
-      p.pos = { x: neck.pos.x, y: SURFACE_Y - 1.5, z: neck.pos.z - lengthOf(neck) * 0.3 }; p.vel = { x: 0, y: 0, z: 0 };
-      tick(g);
-      const w = RULES!.hud(g, 0)?.shoreWarn ?? 0; if (w > warned) warned = w;
-      if (p.hp < hp0 - 1) { hit = true; break; }
+    ok(creature(neck.creature).shore === true && neck.brain === undefined, 'the boom is a shore animal with no brain');
+    ok(shoreDistance(neck.pos.x, neck.pos.z) < 8 && neck.pos.y > SURFACE_Y - 2, `it stands at the waterline (s ${shoreDistance(neck.pos.x, neck.pos.z).toFixed(1)})`);
+    const watch = RULES!.clip?.(neck);
+    ok(watch?.name === 'Fish' && watch.loop === true, `the watch is the Fish loop (${watch?.name})`);
+    const spot = swimSpot(neck.pos.x, 10);
+    // A swimmer passing at its own cruise is never touched.
+    park(spot);
+    const cruise = creature(p.creature).speed * Math.pow(p.scale, 0.45);
+    let lowered = false;
+    for (let i = 0; i < 60 * 6; i++) { p.pos.x = spot.x + Math.sin(i / 20) * cruise * 0.5; p.pos.z = spot.z; p.pos.y = spot.y; p.vel = { x: cruise, y: 0, z: 0 }; tick(g); if (boom.phase === 'lower' || boom.phase === 'strike') lowered = true; }
+    ok(!lowered && p.hp === p.hpMax, 'a swimmer moving past the bank at its own pace is never struck');
+    // One that stops is watched, warned, and then struck.
+    park(spot);
+    let watched = 0, warned = 0, hit = false;
+    const clipsSeen = new Map<string, number>();
+    for (let i = 0; i < 60 * 8; i++) {
+      park(spot); tick(g);
+      const c = RULES!.clip?.(neck); if (c) clipsSeen.set(c.name, c.dur);
+      const h = RULES!.hud(g, 0)!; watched = Math.max(watched, h.shoreWatch ?? 0); warned = Math.max(warned, h.shoreWarn ?? 0);
+      if (p.hp < p.hpMax - 1 || p.state === 'swallowed') { hit = true; break; }
     }
-    ok(warned > 0.5, `the strike is telegraphed on the HUD (warn reached ${warned.toFixed(2)})`);
-    ok(hit, `and it lands (hp ${hp0.toFixed(0)} → ${p.hp.toFixed(0)})`);
-    ok(isAlive(neck) && Math.abs(neck.pos.x - boom.pos.x) < 1e-6, 'the shore animal never leaves its post');
-    // deep water is out of its reach (the strike may well have killed a Keichousaurus outright:
-    // a respawned body is protected, and the protection is stripped so the test is about reach)
-    p.pos = { x: neck.pos.x, y: SURFACE_Y - 14, z: neck.pos.z - lengthOf(neck) * 0.3 }; p.hp = p.hpMax; p.spawnProtect = 0; p.iframes = 0; p.state = 'free'; p.hatching = false;
-    for (let i = 0; i < 60 * 8; i++) { p.pos = { x: neck.pos.x, y: SURFACE_Y - 14, z: neck.pos.z - lengthOf(neck) * 0.3 }; p.vel = { x: 0, y: 0, z: 0 }; tick(g); }
-    ok(p.hp === p.hpMax, 'fourteen units down, it cannot reach');
-    // a big enough bite on the neck while it is out severs it
-    const notho = g.spawn('nothosaurus', 'ambient', { x: neck.pos.x, y: SURFACE_Y - 1.5, z: neck.pos.z - lengthOf(neck) * 0.3 }, 1);
-    p.pos = { ...notho.pos }; p.prevT.y = p.pos.y; p.spawnProtect = 0; p.iframes = 0; p.state = 'free'; p.hatching = false; p.hp = p.hpMax;
-    for (let i = 0; i < 60 * 2 && boom.phase !== 'lower'; i++) { p.pos = { x: neck.pos.x, y: SURFACE_Y - 1.5, z: neck.pos.z - lengthOf(neck) * 0.3 }; p.vel = { x: 0, y: 0, z: 0 }; tick(g); }
+    ok(watched > 0, `holding still is noticed first (watch reached ${watched.toFixed(2)})`);
+    ok(warned > 0.5, `then the strike is telegraphed on the HUD (warn reached ${warned.toFixed(2)})`);
+    ok(hit, `and it lands on a hatchling that stayed (state ${p.state}, hp ${p.hp.toFixed(0)}/${p.hpMax})`);
+    ok(clipsSeen.get('Lower') === 1.5, 'the telegraph names Lower, at TELEGRAPH');
+    ok([...clipsSeen.keys()].some((n) => n === 'SnapLeft' || n === 'SnapRight'), `the strike names a snap and a side (${[...clipsSeen.keys()].join(', ')})`);
+    for (const [n, d] of clipsSeen) if (n.startsWith('Snap')) ok(d === 0.6, `${n} is the strike window`);
+    // A hatchling is a snack: taken whole, the camera's predator, and dead at the end of the swallow.
+    ok(p.state === 'swallowed' && p.swallowedBy === neck.id, 'a snack is taken whole into the boom');
+    run(g, 3);
+    ok(!isAlive(p), 'and is gone at the end of the gulp, whatever it pressed');
+    ok(shoreClip(p) === undefined, 'a body that is not on a post is left to the shared state machine');
+    ok(Math.abs(neck.pos.x - boom.pos.x) < 1e-6, 'the boom never leaves its post');
+    // Out of reach is out of reach: still, but further out than the neck goes, and nothing happens.
+    for (let i = 0; i < 60 * 40 && !isAlive(p); i++) tick(g);
+    ok(isAlive(p), 'the snack comes back');
+    p.hp = p.hpMax; p.state = 'free'; p.hatching = false; p.spawnProtect = 0;
+    const far = swimSpot(neck.pos.x, 22);
+    for (let i = 0; i < 60 * 8; i++) { park(far); tick(g); }
+    ok(p.hp === p.hpMax && p.state === 'free' && boom.phase === 'watch', `twenty-two units out, it cannot reach (hp ${p.hp.toFixed(1)}/${p.hpMax}, state ${p.state}, boom ${boom.phase})`);
+    // Something big holding still is ignored: the neck does not lower for what could bite it off.
+    const big = g.spawn('cymbospondylus', 'bot', { ...spot }, 1);
+    big.spawnProtect = 0;
+    let loweredForBig = false;
+    for (let i = 0; i < 60 * 8; i++) { big.pos = { ...spot }; big.vel = { x: 0, y: 0, z: 0 }; big.holdT = 1; park(far); tick(g); if (boom.target === big.id) loweredForBig = true; }
+    ok(!loweredForBig && isAlive(big) && big.hp === big.hpMax, 'a giant holding still under it is left alone');
+    (g as unknown as { despawn(a: typeof big): void }).despawn(big);
+    // One that stops for less than the wait and moves on is not struck.
+    boom.phase = 'watch'; boom.t = 0; boom.target = -1; boom.still.clear();
+    p.hp = p.hpMax; p.state = 'free'; p.hatching = false;
+    park(spot);
+    for (let i = 0; i < 60 * 2; i++) { park(spot); tick(g); }
+    ok(boom.phase === 'watch', 'two seconds still is not yet enough');
+    for (let i = 0; i < 60 * 2; i++) { p.pos.x += cruise * DT; p.vel.x = cruise; tick(g); }
+    ok(boom.phase === 'watch' && p.hp === p.hpMax, 'and moving on resets the clock: nothing happens');
+    // A rung III bite on the neck while it is out severs it.
+    const notho = g.spawn('nothosaurus', 'ambient', { ...spot }, 1);
+    park(spot);
+    for (let i = 0; i < 60 * 8 && boom.phase !== 'lower'; i++) { park(spot); tick(g); }
     ok(boom.phase === 'lower', 'the neck is out (winding up)');
     neck.lastHitBy = notho.id; neck.sinceHit = 0; neck.hp -= 5;
     tick(g);
     ok(!isAlive(neck) && boom.cleared, 'a rung III bite on the neck while it is out severs it: the bank is clear');
+    const dead = RULES!.clip?.(neck);
+    ok(dead?.name === 'Severed' && dead.dur === 2.2, `the severed neck names Severed (${dead?.name ?? 'nothing'})`);
+    run(g, 200);
+    ok(boom.cleared && boom.actor === neck.id, 'a cleared bank stays clear: the schedule never refills it');
+  }
+}
+
+// ---- the phytosaur: the same gate, its own watch ----
+{
+  const seed = seedFor('mystriosuchus');
+  ok(seed !== undefined, `some seed puts a Mystriosuchus near the nursery (${seed})`);
+  const { g, p, park } = shoreMatch(seed);
+  const post = lurkerAtEdge(g, 'mystriosuchus');
+  ok(!!post, 'a Mystriosuchus comes to a bank');
+  if (post) {
+    const a = g.byId(post.actor)!;
+    ok(RULES!.clip?.(a)?.name === 'Breathe', 'its watch is the crest at the surface');
+    const spot = swimSpot(a.pos.x, 10);
+    let hit = false;
+    for (let i = 0; i < 60 * 8 && !hit; i++) { park(spot); tick(g); if (p.hp < p.hpMax - 1 || p.state === 'swallowed') hit = true; }
+    ok(hit, 'what lingers in front of it is taken');
+  }
+}
+
+// ---- comings and goings ----
+{
+  const seed = 5052026;
+  const w = (await import('../src/sim/triassic/shore'));
+  forceOccupancy(undefined);                                   // the real schedule, for this block
+  const same = [0, 1, 2, 3, 4, 5].every((k) => [0, 100, 400, 900].every((t) => w.occupied(k, seed, t) === w.occupied(k, seed, t)));
+  ok(same, 'occupancy is a pure function of post, seed and time');
+  let changes = 0;
+  for (let k = -20; k <= 20; k++) { let last = w.occupied(k, seed, 0); for (let t = 0; t < 3000; t += 10) { const o = w.occupied(k, seed, t); if (o !== last) changes++; last = o; } }
+  ok(changes > 10, `banks change over as the match goes on (${changes} changes over 41 posts in 50 minutes)`);
+  // A lurker arrives by walking down the beach and leaves by walking back up, never by teleport.
+  const { g } = shoreMatch(seed, true);
+  const posts = shorePosts(g, { x: 0, y: 0, z: 0 }, 6000).filter((q) => !w.isRunner(q.kind));
+  ok(posts.length > 0, 'there are lurker posts');
+  let worst = 0, arrivals = 0, departures = 0, bodies = 0;
+  for (let i = 0; i < 60 * 700; i++) {
+    tick(g);
+    for (const q of posts) {
+      const a = q.actor >= 0 ? g.byId(q.actor) : undefined;
+      if (a) { worst = Math.max(worst, Math.hypot(a.pos.x - a.prevT.x, a.pos.z - a.prevT.z)); if (q.phase === 'arrive') arrivals++; if (q.phase === 'leave') departures++; }
+    }
+    bodies = Math.max(bodies, g.actors.filter((a) => creature(a.creature).shore).length);
+  }
+  ok(arrivals > 0 && departures > 0, `lurkers arrive (${arrivals} steps) and leave (${departures} steps) over twelve minutes`);
+  ok(worst < 0.5, `and no step moves one further than a walk (${worst.toFixed(3)} units)`);
+  ok(bodies > 0, `the beach held up to ${bodies} shore animals at once`);
+}
+
+// ---- the runners: an excursion, straight in and straight out ----
+{
+  const w = (await import('../src/sim/triassic/shore'));
+  for (const kind of ['macrocnemus', 'coelophysis'] as const) {
+    const seed = seedFor(kind);
+    ok(seed !== undefined, `some seed puts a ${kind} near the nursery (${seed})`);
+    const { g, p, park } = shoreMatch(seed);
+    const post = shorePosts(g, { x: 0, y: 0, z: 0 }, 6000).find((q) => q.kind === kind);
+    ok(!!post, `a ${kind} post exists somewhere along the coast`);
+    if (!post) continue;
+    ok(post.actor < 0 && post.phase === 'away', `${kind} is not in the world between excursions`);
+    // Wait at the edge, still: the runner comes down, looks, and charges.
+    const spot = swimSpot(post.pos.x, 12);
+    const phases = new Set<string>(); const clips = new Set<string>();
+    let deepest = 0, furthest = 0, inWater = 0, hit = false, bodyWhileAway = false;
+    for (let i = 0; i < 60 * 600 && !hit; i++) {
+      park(spot); tick(g);
+      phases.add(post.phase);
+      const a = post.actor >= 0 ? g.byId(post.actor) : undefined;
+      if (post.phase === 'away' && a) bodyWhileAway = true;
+      if (a) {
+        const c = RULES!.clip?.(a); if (c) clips.add(c.name);
+        if (post.phase === 'charge' || (post.phase === 'retreat' && shoreDistance(a.pos.x, a.pos.z) > 0)) inWater += DT;
+        deepest = Math.max(deepest, SURFACE_Y - a.pos.y); furthest = Math.max(furthest, shoreDistance(a.pos.x, a.pos.z));
+      }
+      if (p.hp < p.hpMax - 1 || p.state === 'swallowed') hit = true;
+    }
+    ok(phases.has('approach') && phases.has('peer') && phases.has('charge'), `${kind} came down, peered and charged (${[...phases].join(' → ')})`);
+    ok(hit, `${kind} bit the hatchling that held still at the edge (state ${p.state})`);
+    ok(!bodyWhileAway, 'no runner body exists while its post is away');
+    const a0 = g.byId(post.actor);
+    const L = a0 ? lengthOf(a0) : creature(kind).adultLength;
+    ok(furthest <= L * (kind === 'macrocnemus' ? 3 : 2) + 1, `${kind} never went further in than its reach (${furthest.toFixed(1)} of ${(L * (kind === 'macrocnemus' ? 3 : 2)).toFixed(1)})`);
+    ok(deepest <= w.CHARGE_DEPTH + 1, `${kind} never went deeper than ${w.CHARGE_DEPTH} under the surface (${deepest.toFixed(2)})`);
+    ok(clips.has('Run') && clips.has('Charge'), `${kind} ran and charged on its own clips (${[...clips].join(', ')})`);
+    // It runs back out and leaves the world, eating what it took inland.
+    let left = false; let ate = false;
+    for (let i = 0; i < 60 * 30 && !left; i++) { tick(g); if (post.phase === 'eat') ate = true; if (post.phase === 'away') left = true; }
+    ok(left && post.actor < 0, `${kind} retreated up the beach and left the world`);
+    ok(inWater < 3, `and was in the water for under three seconds all told (${inWater.toFixed(2)} s)`);
+    if (p.state === 'swallowed' || !isAlive(p)) ok(ate || !isAlive(p), `the snack it carried was eaten inland (${ate ? 'eat phase seen' : 'dead'})`);
+  }
+  // A committed charge does not track: the victim that moves after the commit is missed.
+  const { g, p, park } = shoreMatch(seedFor('macrocnemus'));
+  const post = shorePosts(g, { x: 0, y: 0, z: 0 }, 6000).find((q) => q.kind === 'macrocnemus')!;
+  const spot = swimSpot(post.pos.x, 12);
+  p.hp = p.hpMax; p.state = 'free';
+  for (let i = 0; i < 60 * 600 && post.phase !== 'charge'; i++) { park(spot); tick(g); }
+  ok(post.phase === 'charge', 'the runner commits');
+  const away = { x: spot.x + 12, y: spot.y, z: spot.z - 8 };
+  for (let i = 0; i < 60 * 2; i++) { park(away); tick(g); }
+  ok(p.hp === p.hpMax && p.state === 'free', 'and a victim that bolted on the commit is missed: the dash goes where it was aimed');
+}
+
+// ---- a runner in the water is a body like any other ----
+{
+  const { g, p, park } = shoreMatch(seedFor('macrocnemus'));
+  const post = shorePosts(g, { x: 0, y: 0, z: 0 }, 6000).find((q) => q.kind === 'macrocnemus')!;
+  const spot = swimSpot(post.pos.x, 12);
+  for (let i = 0; i < 60 * 600 && post.phase !== 'charge'; i++) { park(spot); tick(g); }
+  const a = g.byId(post.actor)!;
+  ok(post.phase === 'charge' && !!a, 'a runner mid-charge');
+  a.hp = 1; a.lastHitBy = p.id; a.sinceHit = 0;
+  applyHit({ events: g.events, byId: (id) => g.byId(id), time: g.time, rng: g.rng }, p, a, { ...creature('nothosaurus').heavy, damage: 50 }, 1);
+  tick(g);
+  ok(!isAlive(a), 'it can be killed in the water');
+  ok(post.actor < 0 && post.phase === 'away', 'its post then waits for the next window rather than clearing for the match');
+}
+
+// ---- the snap goes toward what it is striking, not away from it ----
+{
+  // `src/render/creature.ts`: increasing yaw turns a creature to its left, so its right is
+  // (-cos yaw, 0, sin yaw). A shore animal is pinned facing the sea at yaw = PI, where that is +x.
+  // Reading "larger x is to its left" named the snap that swings the head the wrong way, which is
+  // invisible to every other check here: the hit lands either way.
+  const { g, p, park } = shoreMatch();
+  const boom = lurkerAtEdge(g, 'tanystropheus');
+  ok(!!boom, 'a Tanystropheus to test the sides on');
+  if (boom) {
+    const neck = g.byId(boom.actor)!;
+    const right = { x: -Math.cos(neck.yaw), z: Math.sin(neck.yaw) };
+    for (const [label, sign, want] of [['its left', -1, 'SnapLeft'], ['its right', 1, 'SnapRight']] as const) {
+      boom.phase = 'watch'; boom.t = 0; boom.target = -1; boom.still.clear();
+      const off = lengthOf(neck) * 0.15 * sign;
+      const put = () => { const s = swimSpot(neck.pos.x + right.x * off, 10); park({ x: s.x, y: s.y, z: s.z + right.z * off }); p.hp = p.hpMax; p.state = 'free'; p.hatching = false; };
+      put();
+      let named: string | undefined;
+      for (let i = 0; i < 60 * 8 && !named; i++) {
+        put(); tick(g);
+        const c = RULES!.clip?.(neck);
+        if (c && c.name.startsWith('Snap')) named = c.name;
+      }
+      ok(named === want, `a target on ${label} is struck with ${want} (got ${named ?? 'no snap'})`);
+      for (let i = 0; i < 60 * 30 && (!isAlive(p) || p.state === 'swallowed'); i++) tick(g);
+    }
   }
 }
 
@@ -481,7 +744,7 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
     run(g, 8, inputs);
     return JSON.stringify(g.actors.map((a) => [a.creature, a.pos.x.toFixed(4), a.pos.y.toFixed(4), a.pos.z.toFixed(4), a.hp.toFixed(3), a.stamina.toFixed(3), a.state]));
   };
-  ok(play() === play(), 'the same seed and inputs replay the same match, shore animals and mothers included');
+  ok(play() === play(), 'the same seed and inputs replay the same match, whatever is on the banks');
 }
 
 // ---- the raw generated bodies the viewer offers ----
@@ -507,7 +770,16 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
     ok(!shippedIds.has(id), `${id} has shipped, so it must not keep an estimated yaw`);
     ok(manifest.some((r) => r.id === id), `${id} has a yaw estimate and a published body to use it`);
   }
-  ok(manifest.length > 0, `the viewer offers ${manifest.length} generated bodies`);
+  ok(manifest.length > 0 || TRIASSIC.creatures.every(c => shippedIds.has(c.id)), 'no generated previews remain only once every roster creature has shipped');
+  const backups = JSON.parse(fs.readFileSync('src/content/triassic/backup-models.json', 'utf8')) as { id: string; model: string }[];
+  ok(backups.some(row => row.id === 'askeptosaurus'), 'Askeptosaurus retains its animated backup');
+  for (const row of backups) {
+    ok(shippedIds.has(row.id), `${row.id}: backup accompanies a shipped replacement`);
+    ok(fs.existsSync(`public/${row.model}`), `${row.id}: backup is published`);
+    const buf = fs.readFileSync(`public/${row.model}`);
+    const gltf = JSON.parse(buf.toString('utf8', 20, 20 + buf.readUInt32LE(12)));
+    ok(gltf.skins?.length > 0 && gltf.animations?.length === 24, `${row.id}: backup retains a rig and the full 24-clip action set`);
+  }
 }
 
 // ---- the viewer's scenery catalogue ----
@@ -516,9 +788,9 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
 // viewer. This ties the catalogue to the manifest the builder writes.
 {
   const manifest = JSON.parse(fs.readFileSync('public/assets/triassic/props-instanced/manifest.json', 'utf8')) as
-    { assets: { id: string; path: string; portrait: string }[] };
+    { assets: { id: string; path: string; portrait: string; status?: string }[] };
   const specimens = JSON.parse(fs.readFileSync('src/content/triassic/specimens.json', 'utf8')) as
-    { id: string; category: string; model: string; image: string; lod?: string; looping: string[]; modelNote?: string }[];
+    { id: string; category: string; model: string; image: string; lod?: string; looping: string[]; modelStatus?: string; modelNote?: string }[];
   const props = new Map(specimens.filter((s) => s.category === 'prop').map((s) => [s.id, s]));
   ok(props.size === manifest.assets.length, `every authored prop is in the viewer catalogue (${props.size} of ${manifest.assets.length})`);
   for (const a of manifest.assets) {
@@ -531,7 +803,11 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
     // A static prop must not offer a detail switch or an animation list it cannot honour.
     ok(row.lod === undefined, `${a.id} declares no reduced model`);
     ok(row.looping.length === 0, `${a.id} declares no looping clips`);
-    ok(!!row.modelNote, `${a.id} says why it carries the preview badge`);
+    // A preview carries a reason on its badge; a prop reviewed from its canonical and shipped final
+    // carries no badge, so a reason there would be a note about nothing. The manifest's `status`
+    // and the catalogue's `modelStatus` have to agree about which it is.
+    ok((a.status === 'final') === (row.modelStatus === 'final'), `${a.id}: manifest and catalogue agree it is ${a.status}`);
+    if (row.modelStatus !== 'final') ok(!!row.modelNote, `${a.id} says why it carries the preview badge`);
   }
 }
 

@@ -1,0 +1,19 @@
+{
+  "id": "phragmoteuthis",
+  "moot": true,
+  "shots": [
+    {
+      "clip": "Bite",
+      "t": 0.22
+    },
+    {
+      "clip": "Attack",
+      "t": 0.4
+    },
+    {
+      "clip": "Eat",
+      "t": 0.37
+    }
+  ],
+  "reason": "no oral lining, beak or peristome on this body: the crown is the closed surface the generation delivered, so there is nothing drawn where a mouth would be for this tool to judge; gape-solid.py is the check that applies"
+}

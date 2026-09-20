@@ -1,0 +1,71 @@
+{
+  "id": "keichousaurus",
+  "backdrop": [
+    1.0,
+    0.0,
+    1.0,
+    1.0
+  ],
+  "shots": [
+    {
+      "clip": "Bite",
+      "t": 0.25,
+      "pixels": 378000,
+      "differingPixels": 3391,
+      "holesOpenedByCulling": 59,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0,
+      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/keichousaurus/gape-solid/Bite-0.25-opened.png",
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/keichousaurus/gape-solid/Bite-0.25-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/keichousaurus/gape-solid/Bite-0.25-culled.png"
+    },
+    {
+      "clip": "Heavy",
+      "t": 0.1,
+      "pixels": 378000,
+      "differingPixels": 3476,
+      "holesOpenedByCulling": 59,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0,
+      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/keichousaurus/gape-solid/Heavy-0.1-opened.png",
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/keichousaurus/gape-solid/Heavy-0.1-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/keichousaurus/gape-solid/Heavy-0.1-culled.png"
+    },
+    {
+      "clip": "Attack",
+      "t": 0.1,
+      "pixels": 378000,
+      "differingPixels": 3490,
+      "holesOpenedByCulling": 62,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 1,
+      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/keichousaurus/gape-solid/Attack-0.1-opened.png",
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/keichousaurus/gape-solid/Attack-0.1-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/keichousaurus/gape-solid/Attack-0.1-culled.png"
+    },
+    {
+      "clip": "Eat",
+      "t": 0.4,
+      "pixels": 378000,
+      "differingPixels": 3561,
+      "holesOpenedByCulling": 61,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 2,
+      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/keichousaurus/gape-solid/Eat-0.4-opened.png",
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/keichousaurus/gape-solid/Eat-0.4-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/keichousaurus/gape-solid/Eat-0.4-culled.png"
+    },
+    {
+      "clip": "Ability",
+      "t": 0.1,
+      "pixels": 378000,
+      "differingPixels": 3452,
+      "holesOpenedByCulling": 55,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0,
+      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/keichousaurus/gape-solid/Ability-0.1-opened.png",
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/keichousaurus/gape-solid/Ability-0.1-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/keichousaurus/gape-solid/Ability-0.1-culled.png"
+    }
+  ]
+}

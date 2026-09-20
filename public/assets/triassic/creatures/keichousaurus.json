@@ -1,0 +1,60 @@
+{
+  "id": "keichousaurus",
+  "name": "Keichousaurus",
+  "species": "Keichousaurus hui",
+  "description": "Canonical Tripo body and procedural volume twin on one 27-joint rig: a three-joint neck, a seven-joint tail, broad male forelimbs that row and an articulated jaw with a closed oral lining.",
+  "modelLength": 5.0,
+  "lengthMeters": 0.3,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth",
+    "Shoal",
+    "Breathe"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "Shoal",
+    "Breathe"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "puppet": "keichousaurus.puppet.glb",
+  "notes": [
+    "The raised curving tail, the broad male forelimb paddles, the small hind pair and the countershaded flank are retained from the accepted Tripo volume.",
+    "The generation lies along +Y with the head at +Y; intake turns it a quarter turn about Z through the object, so the exporter's split normals come with it, into the era's raw frame.",
+    "The generation models no mouth at all -- casting head vertex normals back into the mesh finds zero hits at every gap from 0.008 to 0.030 -- so the lip line is read off the albedo, as Dinocephalosaurus' is: the light/dark step off the pale throat on each flank of 20 head stations, both sides averaged, least-squares fitted to the ramp the jaw is cut on.",
+    "The twin resurfaces a 0.0026-unit voxel occupancy field, relaxes it and reduces the new topology. It reuses no source vertex or face.",
+    "Same rest rig, inverse binds, sockets and all 23 action sample arrays for authored body and puppet. The LOD keeps every clip.",
+    "Original albedo retained with white COLOR_0; normal relief limited to 0.15 and skin explicitly nonmetallic at roughness 0.7. Puppet pigment samples triangle-local UVs to avoid seam bleed.",
+    "Swim, Sprint and Shoal are a forelimb row against a tail wave, with the hind pair at 55 per cent of the fore pair's throw, which is what the research reads off the enlarged male humerus. Shoal is the tight schooling cruise and holds the head steady; Breathe is the settled surface loop.",
+    "Living colours, soft tissues and movements are artistic reconstruction. Locomotor translation remains engine-owned."
+  ]
+}

@@ -1,3 +1,4 @@
+import { ACTIVE_ERA } from '../content';
 /**
  * The mix rules: how loud a world sound is at a distance, and how often the same kind of sound
  * may retrigger. Shared by the audio module, the render engine, the audio workbench and
@@ -44,3 +45,14 @@ export const MIN_GAP: Record<string, number> = {
  * this, so it marks the top of the roster rather than any one era.
  */
 export const HUGE_LENGTH = 6;
+/**
+ * The threshold this era actually uses (`audio.hugeLength`, defaulting to `HUGE_LENGTH`).
+ *
+ * Resolved lazily and cached, because `ACTIVE_ERA` is chosen by the entry page and this module
+ * must not read it at import time.
+ */
+let hugeCached: number | undefined;
+export function hugeLength(): number {
+  if (hugeCached === undefined) hugeCached = ACTIVE_ERA.audio.hugeLength ?? HUGE_LENGTH;
+  return hugeCached;
+}

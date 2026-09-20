@@ -1,0 +1,97 @@
+{
+  "id": "nothosaurus",
+  "verdict": "separate closed rigid palate/floor",
+  "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present. A body with no lining mesh is reported as such, with the hidden oral parts it does carry listed, and all three variants must agree.",
+  "models": [
+    {
+      "variant": "authored",
+      "sha256": "f014437356006335f9a66010d22dbbc1a765b967882f54bcad973a26536bf8a3",
+      "meshes": [
+        {
+          "name": "Nothosaurus oral lining",
+          "vertices": 432,
+          "triangles": {
+            "skull": 428,
+            "jaw": 428
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        },
+        {
+          "name": "Nothosaurus oral lining",
+          "vertices": 290,
+          "triangles": {
+            "skull": 286,
+            "jaw": 286
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ],
+      "otherOralMeshes": [],
+      "oralShells": "separate palate and floor"
+    },
+    {
+      "variant": ".puppet",
+      "sha256": "933e51cfe59bee2c068dc7c38c24bd93906ac60effb8d7368e3d7302ff0f10f2",
+      "meshes": [
+        {
+          "name": "Nothosaurus oral lining",
+          "vertices": 432,
+          "triangles": {
+            "skull": 428,
+            "jaw": 428
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        },
+        {
+          "name": "Nothosaurus oral lining",
+          "vertices": 290,
+          "triangles": {
+            "skull": 286,
+            "jaw": 286
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ],
+      "otherOralMeshes": [],
+      "oralShells": "separate palate and floor"
+    },
+    {
+      "variant": ".lod1",
+      "sha256": "933e51cfe59bee2c068dc7c38c24bd93906ac60effb8d7368e3d7302ff0f10f2",
+      "meshes": [
+        {
+          "name": "Nothosaurus oral lining",
+          "vertices": 432,
+          "triangles": {
+            "skull": 428,
+            "jaw": 428
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        },
+        {
+          "name": "Nothosaurus oral lining",
+          "vertices": 290,
+          "triangles": {
+            "skull": 286,
+            "jaw": 286
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ],
+      "otherOralMeshes": [],
+      "oralShells": "separate palate and floor"
+    }
+  ]
+}

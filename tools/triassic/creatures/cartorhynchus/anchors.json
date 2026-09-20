@@ -1,0 +1,34 @@
+{
+  "cartorhynchus": [
+    {
+      "name": "anchor_mouth",
+      "bone": "jaw",
+      "point": [
+        -0.008237180300056934,
+        -1.0595970153808594,
+        0.20294900238513947
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "skull",
+      "point": [
+        -0.005284802056849003,
+        -1.10759699344635,
+        0.2233043909072876
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "skull",
+      "point": [
+        -0.008237180300056934,
+        -1.0775970220565796,
+        0.23294900357723236
+      ],
+      "role": "attack"
+    }
+  ]
+}

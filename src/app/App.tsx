@@ -8,20 +8,27 @@ import type { Quality } from '../render/sea';
 import { PLAYABLE_IDS as CREATURE_IDS, PLAYABLE as CREATURES, creature, setEquivalentSizing, type CreatureId } from '../sim/creatures';
 import { MODE_IDS, type Mode, type PlayerSetup } from '../sim/types';
 import { clampMark } from '../sim/ladder';
+import { RULES } from '../sim/era-rules';
 import { emptyCodex, hasNewFinds, loadCodex, mergeCodex, recordFinds, type Codex } from './codex';
 import { Hud } from './Hud';
 import { LoadingScreen, useSlow } from './Loading';
 import { Dialogs, PauseMenu, Results, type MenuItem } from './Overlays';
+import { TEXT } from '../shared/text';
 import { debugGame } from '../shared/debug';
 import { enterFullscreen, rememberFullscreen, restoreFullscreenOnGesture } from '../shared/fullscreen';
 import { exportRecording, recordingPhase, resetRecording, startRecording, stopRecording } from './debug-record';
 import { atMain, cycle, groupsFor, stops, type Focus, type FocusGroup } from './focus-ring';
 import { rectsOf, step as spatialStep, type Dir } from './spatial-nav';
 import { gridColumns, SelectScreen } from './Select';
+import { gridStep, rosterGrid, sameSlot, type ExtraId, type Slot } from './roster-grid';
+import { visitorsInBrowser, type EraId, type Visitor } from '../content/visitors';
+import { registerVisitorAssets } from '../content/asset-paths';
+import { admitVisitors } from '../sim/creatures';
 import { TitleScreen } from './Title';
 import { Toolbar } from './Toolbar';
 import { toolbarPlace } from './toolbar-place';
 import { menuScheme } from '../shared/controls';
+import { assignSeatSchemes } from '../shared/seat-schemes';
 import { freshCursor, menuPress, MENU_LOCKOUT, type MenuCursor, type MenuEvent } from './menu-cursor';
 
 export type Screen = 'title' | 'select' | 'playing' | 'results';
@@ -33,14 +40,26 @@ export type DialogKind = null | 'help' | 'settings';
  * input to almost everything in the simulation, and `src/sim` has to replay the same way from the
  * same inputs.
  */
-export interface Settings { quality: Quality; lookSpeed: number; invertY: boolean; volume: number; muted: boolean; music: boolean; equivalentSizing: boolean; }
+export interface Settings { quality: Quality; lookSpeed: number; invertY: boolean; volume: number; muted: boolean; music: boolean; equivalentSizing: boolean; shoreAnimals: boolean; }
 
 /** The active era's modes, in its order; the first is the default selection. */
+/**
+ * The size a visitor starts at.
+ *
+ * An **earned** visitor arrives full grown: that is the reward, and it has already been taken to
+ * the top of its own game. A **standing guest** has earned nothing — it is admitted because it
+ * exists — so it hatches and climbs this game's ladder like anything else on the roster, which is
+ * also what lets it *be* earned: its rungs are saved (`recordableIds`) and reaching the top makes
+ * it a visitor in the other two games. Handing one the apex scale for free skipped the whole game
+ * and left nothing to record.
+ */
+const startScale = (v: Visitor) => (v.standing ? undefined : v.scale);
+
 const MODES: Mode[] = ACTIVE_ERA.modes.map((m) => m.id);
 const SETTINGS_KEY = ACTIVE_ERA.copy.settingsKey;
 const defaultSettings = (): Settings => {
-  try { const s = localStorage.getItem(SETTINGS_KEY); if (s) return { ...{ quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false }, ...JSON.parse(s) }; } catch { /* ignore */ }
-  return { quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false };
+  try { const s = localStorage.getItem(SETTINGS_KEY); if (s) return { ...{ quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false, shoreAnimals: false }, ...JSON.parse(s) }; } catch { /* ignore */ }
+  return { quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false, shoreAnimals: false };
 };
 
 /**
@@ -153,6 +172,28 @@ export function App() {
   const [carry, setCarry] = useState<boolean[]>([]);
   const carryRef = useRef<boolean[]>([]);
   /**
+   * The buttons in the pick grid beside the creatures. Random is always there; Visitors only where
+   * this device has taken something to the top in another game. Held in a ref as well as state
+   * because the cursor maths runs from callbacks that must see the current grid, and the grid the
+   * cursor walks has to be the grid that is drawn.
+   */
+  /**
+   * Animals from outside this game's roster: the standing guests, which are always here once their
+   * bodies have shipped, and whatever this device has taken to the top somewhere else. Between them
+   * they are what the Visitors button holds, and the button appears only when there is one.
+   */
+  const visitors = useMemo(() => visitorsInBrowser(ACTIVE_ERA.id as EraId), []);
+  useEffect(() => {
+    if (!visitors.length) return;
+    admitVisitors(visitors.map((v) => v.def));
+    registerVisitorAssets(visitors.map((v) => ({ id: v.id, era: v.era })));
+  }, [visitors]);
+  const extras = useMemo<ExtraId[]>(() => (visitors.length ? ['random', 'visitors'] : ['random']), [visitors]);
+  const extrasRef = useRef<ExtraId[]>(extras);
+  extrasRef.current = extras;
+  const visitorsRef = useRef<Visitor[]>(visitors);
+  visitorsRef.current = visitors;
+  /**
    * What this match has added to the record, so the results screen can mark it new.
    *
    * It has to be accumulated as it happens rather than worked out at the end. The record is
@@ -165,7 +206,15 @@ export function App() {
   const clearFresh = useCallback(() => { freshRef.current = emptyCodex(); setFresh(freshRef.current); }, []);
   const setCarryBoth = useCallback((c: boolean[]) => { carryRef.current = c; setCarry(c); }, []);
 
-  const updatePlayers = useCallback((p: PlayerSetup[]) => { playersRef.current = p; setPlayers(p); }, []);
+  /**
+   * Every change to the lineup goes through here, which is why the seats' colours are settled here
+   * too: two players on the same animal have to be told apart, and the one place that knows the
+   * whole lineup is the one place that can say which of them is the duplicate.
+   */
+  const updatePlayers = useCallback((p: PlayerSetup[]) => {
+    const settled = assignSeatSchemes(p, Math.random);
+    playersRef.current = settled; setPlayers(settled);
+  }, []);
   /**
    * Fold what a match finds into the record as it finds it — biomes swum through, landmarks come
    * across, species taken to the top, growth marks moved.
@@ -205,6 +254,10 @@ export function App() {
       onProgress: (p) => setProgress(p),
     });
     engineRef.current = engine;
+    // Visitors stream like anything else. Queued here rather than where they are registered,
+    // because the queue builds its URLs from `assetPaths` and there is no queue to add them to
+    // until the engine exists.
+    for (const v of visitorsRef.current) engine.assets.addVisitor(v.id);
     engine.setLook(settings.lookSpeed, settings.invertY);
     return () => { engine.dispose(); engineRef.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -214,7 +267,7 @@ export function App() {
     engineRef.current?.setQuality(settings.quality);
     engineRef.current?.setLook(settings.lookSpeed, settings.invertY);
     // Not mid-match: the running simulation is already built around the lengths it started with.
-    if (screenRef.current !== 'playing') setEquivalentSizing(settings.equivalentSizing);
+    if (screenRef.current !== 'playing') { setEquivalentSizing(settings.equivalentSizing); RULES?.settings?.shoreAnimals?.(settings.shoreAnimals); }
     audio.setVolume(settings.volume); audio.setMuted(settings.muted); audio.setMusic(settings.music);
     try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch { /* ignore */ }
   }, [settings]);
@@ -270,14 +323,24 @@ export function App() {
     return () => { for (const e of events) window.removeEventListener(e, mark); clearInterval(id); };
   }, [loaded]);
 
-  // Arriving on the roster from the other game's picker: the seat the title screen would have
-  // opened. Audio needs no help — any gesture wakes it below — and the parameter is cleared so the
-  // address bar stops claiming a screen the player may since have left.
+  // Arriving on the roster from the other game's picker.
+  //
+  // It used to open the seat the title screen would have — a keyboard player, on the era's default
+  // animal — and that is wrong twice over. A seat is a *claim*: it belongs to whoever pressed
+  // something to take it, and arriving at a screen is not pressing anything, so the roster would
+  // show somebody playing before anybody had chosen. (The keyboard takes its seat when it is used
+  // to choose: `setCreature` below opens one, as Enter and the pads always did.) And the audio it
+  // said needed no help does: switching game is a page *load*, so the new document has had no
+  // gesture of its own and its context starts suspended — the title screen's press start is what
+  // normally wakes it, and a player who skipped past the title skipped that too. Arriving is not a
+  // gesture either, so this cannot simply resume; what it can do is be ready the instant the first
+  // click or key lands, which is what `wake` below is for. What was lost was the *ui-start* that
+  // the press would have played, and the era's own beds and rotation starting with it.
   useEffect(() => {
     if (!deepLinkedToSelect()) return;
-    updatePlayers([{ creature: ACTIVE_ERA.defaults.player, device: 'keyboard', ready: false }]);
+    audio.init(); audio.resume();
     try { history.replaceState(null, '', location.pathname + location.hash); } catch { /* a file:// page has no history to rewrite */ }
-  }, [updatePlayers]);
+  }, []);
 
   // Any user gesture: wake audio (browsers require it)
   useEffect(() => {
@@ -314,6 +377,7 @@ export function App() {
     clearFresh();
     // Fixed for the length of the match, whatever the settings panel does while it runs.
     setEquivalentSizing(settingsRef.current.equivalentSizing);
+    RULES?.settings?.shoreAnimals?.(settingsRef.current.shoreAnimals);
     engineRef.current.startMatch(modeRef.current, withCarry(ps));
     setPausedBoth(false);
     go('playing');
@@ -435,36 +499,102 @@ export function App() {
    * that row every horizontal press landed back on the creature you were already on. The default
    * pick sat there, which made the first thing a Devonian player ever pressed do nothing.
    *
-   * So left and right walk the roster itself and always move, wrapping at the ends; up and down
-   * move by a row and clamp into a short one. Both are what a grid of tiles is expected to do,
-   * and neither can be a no-op.
+   * So left and right walk the grid itself and always move, wrapping at the ends; up and down move
+   * by a row and land on the nearest column that is occupied. Both are what a grid of tiles is
+   * expected to do, and neither can be a no-op.
+   *
+   * The grid also holds buttons now — Random, and Visitors where the player has earned one — so
+   * this walks a *model* of the layout (src/app/roster-grid.ts) rather than indexing the roster.
+   * A button has a position and no index in the creature list, and arithmetic over the roster
+   * would put the cursor on one tile while another lit up.
    */
   const moveCursor = useCallback((index: number, dx: number, dy: number) => {
     const ps = [...playersRef.current];
-    const p = ps[index]; if (!p || p.ready) return;
-    const n = CREATURES.length, cols = gridColumns(n), rows = Math.ceil(n / cols);
-    const i = CREATURE_IDS.indexOf(p.creature);
-    if (i < 0 || n === 0) return;
-    let j = i;
-    if (dx) j = (i + dx + n) % n;
-    if (dy) {
-      const r = (Math.floor(j / cols) + dy + rows) % rows;
-      const rowLength = Math.min(cols, n - r * cols);
-      j = r * cols + Math.min(j % cols, rowLength - 1);
+    const p = ps[index]; if (!p) return;
+    // A seat that has taken the Visitors button is locked in on purpose, and left and right walk
+    // the animals it has earned rather than the grid behind them. This is the one place a locked
+    // seat still answers the stick.
+    if (p.cursor === 'visitors' && p.ready) {
+      const list = visitorsRef.current;
+      if (!list.length || !dx) return;
+      const at = Math.max(0, list.findIndex((v) => v.id === p.creature));
+      const v = list[(at + dx + list.length) % list.length];
+      ps[index] = { ...p, creature: v.id as CreatureId, visitorScale: startScale(v) };
+      updatePlayers(ps); audio.play('ui-move');
+      return;
     }
-    if (j === i || j < 0 || j >= n) return;
-    ps[index] = { ...p, creature: CREATURE_IDS[j] };
+    if (p.ready) return;
+    const model = rosterGrid(CREATURE_IDS, extrasRef.current);
+    const from: Slot = p.cursor ? { kind: 'extra', id: p.cursor } : { kind: 'creature', id: p.creature };
+    const to = gridStep(model, from, dx, dy);
+    if (sameSlot(to, from)) return;
+    ps[index] = to.kind === 'extra'
+      ? { ...p, cursor: to.id }
+      : { ...p, cursor: undefined, creature: to.id as CreatureId };
     updatePlayers(ps); audio.play('ui-move');
   }, [updatePlayers]);
   const cycleCreature = useCallback((index: number, dir: number) => moveCursor(index, dir, 0), [moveCursor]);
   const setCreature = useCallback((index: number, c: CreatureId) => {
-    const ps = [...playersRef.current]; if (!ps[index] || ps[index].ready) return;
+    const ps = [...playersRef.current];
+    // Choosing an animal with nobody seated *is* the keyboard joining. A player who reached the
+    // roster without pressing start (from the other game's picker) has no seat, and clicking a
+    // creature is exactly the gesture that should open one — on the animal they clicked, rather
+    // than on a default somebody has to correct.
+    if (!ps.length && index === 0) {
+      updatePlayers([{ creature: c, device: 'keyboard', ready: false }]);
+      audio.init(); audio.resume(); audio.play('ui-join');
+      return;
+    }
+    if (!ps[index] || ps[index].ready) return;
     ps[index] = { ...ps[index], creature: c }; updatePlayers(ps); audio.play('ui-move');
   }, [updatePlayers]);
   const toggleReady = useCallback((index: number) => {
-    const ps = [...playersRef.current]; if (!ps[index]) return;
-    ps[index] = { ...ps[index], ready: !ps[index].ready }; updatePlayers(ps); audio.play(ps[index].ready ? 'ui-confirm' : 'ui-back');
+    const ps = [...playersRef.current]; const p = ps[index]; if (!p) return;
+    const ready = !p.ready;
+    // Letting go of a visitor hands the local roster back: the seat keeps an animal this sea has,
+    // rather than a foreign body it is no longer locked in on.
+    ps[index] = ready || !p.visitorScale
+      ? { ...p, ready }
+      : { ...p, ready, visitorScale: undefined, cursor: undefined, creature: ACTIVE_ERA.defaults.player };
+    updatePlayers(ps); audio.play(ready ? 'ui-confirm' : 'ui-back');
   }, [updatePlayers]);
+  /**
+   * Take whatever the cursor is on. On a creature that is locking in, which is what confirm has
+   * always meant here; on one of the grid's buttons it is pressing the button.
+   *
+   * Random hands you a creature and leaves the cursor on it rather than locking in as well: it is
+   * an answer to "I don't mind", not a commitment, and a player who dislikes the roll should be
+   * able to press it again or walk away from it.
+   */
+  const activate = useCallback((index: number) => {
+    const ps = [...playersRef.current];
+    const p = ps[index]; if (!p) return;
+    if (p.cursor === 'random' && !p.ready) {
+      const pool = CREATURE_IDS.filter((id) => id !== p.creature);
+      const pick = (pool.length ? pool : CREATURE_IDS)[Math.floor(Math.random() * (pool.length || CREATURE_IDS.length))];
+      ps[index] = { ...p, cursor: undefined, creature: pick };
+      updatePlayers(ps); audio.play('ui-confirm');
+      return;
+    }
+    if (p.cursor === 'visitors' && !p.ready) {
+      const v = visitorsRef.current[0];
+      if (v) {
+        ps[index] = { ...p, creature: v.id as CreatureId, visitorScale: startScale(v), ready: true };
+        updatePlayers(ps); audio.play('ui-confirm');
+        return;
+      }
+    }
+    if (p.ready) startMatch(); else toggleReady(index);
+  }, [startMatch, toggleReady, updatePlayers]);
+  /** A pointer press on one of the grid's buttons: put that seat's cursor on it, then take it. */
+  const pressExtra = useCallback((index: number, id: ExtraId) => {
+    const ps = [...playersRef.current];
+    const p = ps[index]; if (!p || p.ready) return;
+    ps[index] = { ...p, cursor: id };
+    playersRef.current = ps;
+    updatePlayers(ps);
+    activate(index);
+  }, [activate, updatePlayers]);
   /**
    * Start as a hatchling, or carry on from the furthest this creature has been taken in Rise.
    *
@@ -575,7 +705,7 @@ export function App() {
             const lastRep = repeat.get(gp.index) ?? 0;
             if (dx || dy) { moveCursor(idx, dx, dy); repeat.set(gp.index, now); }
             else if ((stickX || stickY) && now - lastRep > 240) { moveCursor(idx, stickX, stickY); repeat.set(gp.index, now); }
-            if (just('confirm')) { if (ps[idx].ready) startMatch(); else toggleReady(idx); }
+            if (just('confirm')) activate(idx);
             if (just('back')) { if (ps[idx].ready) toggleReady(idx); else removePlayer(idx); }
             if (just('menu')) startMatch();
             // Hatch, or carry on from your record. On `light` — X — because it is the one attack
@@ -632,7 +762,7 @@ export function App() {
     // padIndices is deliberately not a dependency: it is written from inside this loop, and
     // listing it would tear the loop down and rebuild it every time a pad connects, losing the
     // button edges held in `prev`.
-  }, [addPlayer, changeMode, menuInput, moveCursor, openDialog, removePlayer, setPausedBoth, startFromTitle, startMatch, toggleCarry, toggleReady]);
+  }, [activate, addPlayer, changeMode, menuInput, moveCursor, openDialog, removePlayer, setPausedBoth, startFromTitle, startMatch, toggleCarry, toggleReady]);
 
   // ---- Keyboard menu navigation ----
   useEffect(() => {
@@ -649,7 +779,7 @@ export function App() {
           if (e.code === 'ArrowLeft' || e.code === 'KeyA') moveCursor(idx, -1, 0);
           if (e.code === 'ArrowDown' || e.code === 'KeyS') moveCursor(idx, 0, 1);
           if (e.code === 'ArrowUp' || e.code === 'KeyW') moveCursor(idx, 0, -1);
-          if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); if (ps[idx].ready) startMatch(); else toggleReady(idx); }
+          if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); activate(idx); }
           if (e.code === 'Escape') { if (ps[idx].ready) toggleReady(idx); else backToTitle(); }
           // The keyboard's own way to the same choice the pad makes with Y.
           if (e.code === 'KeyC') toggleCarry(idx);
@@ -683,7 +813,7 @@ export function App() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [addKeyboard, backToTitle, changeMode, menuInput, moveCursor, openDialog, setPausedBoth, startFromTitle, startMatch, toggleCarry, toggleReady]);
+  }, [activate, addKeyboard, backToTitle, changeMode, menuInput, moveCursor, openDialog, setPausedBoth, startFromTitle, startMatch, toggleCarry, toggleReady]);
 
   // Idle-time preloading: tell the loader what is most likely to be needed next.
   useEffect(() => {
@@ -715,29 +845,29 @@ export function App() {
     if (screen === 'results') {
       const items: MenuItem[] = [];
       // Co-op modes are milestones, not verdicts: the sea is still there to swim in.
-      if (hud?.canContinue) items.push({ label: 'Continue', run: keepPlaying, primary: true });
-      items.push({ label: 'Play again', run: playAgain, primary: !hud?.canContinue });
+      if (hud?.canContinue) items.push({ label: TEXT.results.continue, run: keepPlaying, primary: true });
+      items.push({ label: TEXT.results.playAgain, run: playAgain, primary: !hud?.canContinue });
       // Quitting the match lands on the choice screen, which is where you go to play again with
       // something else and where the way back to the title already is. A second button that left
       // the game altogether sat one careless press from the end of a session.
-      items.push({ label: 'Quit', run: backToSelect });
+      items.push({ label: TEXT.results.quit, run: backToSelect });
       return items;
     }
     if (screen === 'playing' && paused) {
-      const items: MenuItem[] = [{ label: 'Resume', run: () => setPausedBoth(false), primary: true }];
+      const items: MenuItem[] = [{ label: TEXT.pause.resume, run: () => setPausedBoth(false), primary: true }];
       // The match recorder, and only when the URL asked for it (`?debug=game`). One button walking
       // through its own three states, because that is the whole of the tool: record, stop, hand it
       // over. Recording carries on while the menu is open — pausing to think is not a reason to
       // lose the frames — and resuming is what gets you back to the action being recorded.
       if (debugGame()) {
-        if (recPhase === 'idle') items.push({ label: 'Start recording', run: () => { startRecording(); setRecPhase('recording'); setPausedBoth(false); } });
-        else if (recPhase === 'recording') items.push({ label: 'End recording', run: () => { stopRecording(); setRecPhase('ready'); } });
+        if (recPhase === 'idle') items.push({ label: TEXT.pause.startRecording, run: () => { startRecording(); setRecPhase('recording'); setPausedBoth(false); } });
+        else if (recPhase === 'recording') items.push({ label: TEXT.pause.endRecording, run: () => { stopRecording(); setRecPhase('ready'); } });
         else items.push(
-          { label: 'Export debug', run: () => { exportRecording(); } },
-          { label: 'Discard recording', run: () => { resetRecording(); setRecPhase('idle'); } },
+          { label: TEXT.pause.exportRecording, run: () => { exportRecording(); } },
+          { label: TEXT.pause.discardRecording, run: () => { resetRecording(); setRecPhase('idle'); } },
         );
       }
-      items.push({ label: 'Quit', run: backToSelect });
+      items.push({ label: TEXT.pause.quit, run: backToSelect });
       return items;
     }
     return [];
@@ -794,7 +924,8 @@ export function App() {
 
   return (
     <main className={`shell screen-${screen}`}>
-      <div className="sea-canvas" ref={canvasRef} aria-label="Cambrian sea" />
+      {/* Named for whichever game this is, not for the one it was written in. */}
+      <div className="sea-canvas" ref={canvasRef} aria-label={ACTIVE_ERA.title} />
       <div className="vignette" />
 
       {/*
@@ -824,14 +955,16 @@ export function App() {
           players={players} mode={mode} modes={MODES} modeInfo={modeInfo} allReady={allReady} padIndices={padIndices}
           scheme={scheme}
           best={best} carry={carry} modeFocus={focus.group === 'modes' ? focus.index : -1}
+          extras={extras} onExtra={pressExtra}
+          visitorCount={visitors.length} visitorOrigin={(id) => visitors.find((v) => v.id === id)?.origin}
           onPick={setCreature} onReady={toggleReady} onRemove={removePlayer}
           onMode={changeMode} onStart={startMatch} onBack={backToTitle} onCarry={toggleCarry}
         />
       )}
 
       {(screen === 'playing' || screen === 'results') && hud && <Hud snapshot={hud} />}
-      {screen === 'playing' && paused && <PauseMenu scheme={scheme} items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
-      {screen === 'results' && hud && <Results snapshot={hud} players={players} record={record} fresh={fresh} scheme={scheme} items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
+      {screen === 'playing' && paused && <PauseMenu items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
+      {screen === 'results' && hud && <Results snapshot={hud} players={players} record={record} fresh={fresh} items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
 
       <Toolbar place={toolbar} isFs={isFs} muted={settings.muted} focus={focus.group === 'icons' ? focus.index : -1} onHelp={() => openDialog(dialog === 'help' ? null : 'help')} onSettings={() => openDialog(dialog === 'settings' ? null : 'settings')} onMute={() => setSettings((s) => ({ ...s, muted: !s.muted }))} onFullscreen={toggleFullscreen} />
       <Dialogs kind={dialog} onClose={() => openDialog(null)} settings={settings} onSettings={setSettings} scheme={scheme} />
@@ -839,7 +972,7 @@ export function App() {
       {(notice || error) && (
         <div className={`notice ${error ? 'notice-error' : ''}`} role="status">
           <span>{error || notice}</span>
-          <button aria-label="Dismiss" onClick={() => { setNotice(''); setError(''); }}>×</button>
+          <button aria-label={TEXT.common.dismiss} onClick={() => { setNotice(''); setError(''); }}>×</button>
         </div>
       )}
     </main>

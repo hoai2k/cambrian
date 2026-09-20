@@ -24,33 +24,32 @@ export type Action =
   | 'sprint' | 'rise' | 'sink'
   | 'light' | 'heavy' | 'ability' | 'dash' | 'guard' | 'aim'
   | 'sense' | 'teleport' | 'view' | 'menu'
-  | 'confirm' | 'back' | 'modePrev' | 'modeNext' | 'pick';
+  | 'confirm' | 'back' | 'modePrev' | 'modeNext';
 
 interface Label { pad: string; kbm: string; key1: string; key2: string; short?: Partial<Record<Scheme, string>>; }
 
 /** Long names, for prose and for the diagrams. `short` overrides them inside a chip or a <kbd>. */
 const LABELS: Record<Action, Label> = {
-  swim:     { pad: 'Left stick', kbm: 'WASD', key1: 'WASD', key2: 'IJKL' },
-  look:     { pad: 'Right stick', kbm: 'Mouse', key1: 'Arrow keys', key2: 'IJKL (no camera)' },
+  swim:     { pad: 'Left stick', kbm: 'W forward, X back, A / D turn', key1: 'W / X, A / D turn', key2: 'IJKL' },
+  look:     { pad: 'Right stick', kbm: 'Drag', key1: 'Arrow keys', key2: 'IJKL (no camera)' },
   zoom:     { pad: 'Right stick click + up/down', kbm: 'Mouse wheel', key1: 'PgUp / PgDn', key2: '—', short: { pad: 'RS + ▲▼', kbm: 'Wheel' } },
   sprint:   { pad: 'LB', kbm: 'Shift', key1: 'Shift', key2: 'Right Shift', short: { key2: 'R-Shift' } },
-  rise:     { pad: 'RB', kbm: 'Space', key1: 'Space', key2: 'N' },
-  sink:     { pad: 'Left stick click', kbm: 'C', key1: 'C', key2: 'M', short: { pad: 'LS click' } },
-  light:    { pad: 'X', kbm: 'F', key1: 'F', key2: ';' },
-  heavy:    { pad: 'RT', kbm: 'Left click', key1: 'G', key2: '’', short: { kbm: 'LMB' } },
-  ability:  { pad: 'Y', kbm: 'R', key1: 'R', key2: 'P' },
-  dash:     { pad: 'A', kbm: 'Right click', key1: 'V', key2: '/', short: { kbm: 'RMB' } },
-  guard:    { pad: 'B', kbm: 'Q', key1: 'Q', key2: 'U' },
+  rise:     { pad: 'RB', kbm: 'E or Q', key1: 'E or Q', key2: 'N' },
+  sink:     { pad: 'Left stick click', kbm: 'S or C', key1: 'S or C', key2: 'M', short: { pad: 'LS click' } },
+  light:    { pad: 'X', kbm: 'Click, or J', key1: 'J or F', key2: ';', short: { kbm: 'LMB' } },
+  heavy:    { pad: 'RT', kbm: 'Hold click, or G', key1: 'G or K', key2: '’', short: { kbm: 'Hold LMB', key1: 'G' } },
+  ability:  { pad: 'Y', kbm: 'Z', key1: 'Z', key2: 'P' },
+  dash:     { pad: 'A', kbm: 'Space or right click', key1: 'Space', key2: '/', short: { pad: 'A', kbm: 'Space / RMB' } },
+  guard:    { pad: 'B', kbm: 'R', key1: 'R', key2: 'U' },
   aim:      { pad: 'LT', kbm: 'Middle click', key1: 'Tab', key2: 'O', short: { kbm: 'MMB' } },
-  sense:    { pad: 'D-pad up', kbm: 'E', key1: 'E', key2: 'Y', short: { pad: '▲' } },
+  sense:    { pad: 'D-pad up', kbm: 'I', key1: 'I', key2: 'Y', short: { pad: '▲' } },
   teleport: { pad: 'D-pad down', kbm: 'T', key1: 'T', key2: 'H', short: { pad: '▼' } },
-  view:     { pad: 'View', kbm: 'Z', key1: 'Z', key2: ',' },
+  view:     { pad: 'View', kbm: 'V', key1: 'V', key2: ',' },
   menu:     { pad: 'Menu', kbm: 'Esc', key1: 'Esc', key2: 'Esc' },
   confirm:  { pad: 'A', kbm: 'Enter', key1: 'Enter', key2: 'Enter' },
   back:     { pad: 'B', kbm: 'Backspace', key1: 'Backspace', key2: 'Backspace', short: { kbm: 'Bksp', key1: 'Bksp', key2: 'Bksp' } },
   modePrev: { pad: 'LB', kbm: 'Q', key1: 'Q', key2: 'Q' },
   modeNext: { pad: 'RB', kbm: 'E', key1: 'E', key2: 'E' },
-  pick:     { pad: 'D-pad', kbm: 'Arrow keys', key1: 'Arrow keys', key2: 'Arrow keys', short: { pad: 'D-pad ◀▶', kbm: 'Arrows', key1: 'Arrows', key2: 'Arrows' } },
 };
 
 /** The action's name in this scheme's words, as it reads in a sentence. */

@@ -1,16 +1,18 @@
 {
   "schemaVersion": 1,
-  "canonicalStatus": "greenlit",
+  "canonicalStatus": "user-authorized-regeneration",
   "canonical": "canonical.png",
   "canonicalSource": "../../askeptosaurus.png",
-  "canonicalSha256": "60323254c3b9a26003dc4db2c9686f4d6027d1c686a591e5d687fa5b58a5eaba",
+  "canonicalSha256": "7bafe2ec6b3786e9f78cffb5f50575969c761da1039ebbea5fb74d2a586e8993",
   "input": "input.png",
-  "inputSha256": "bcbd577fe27b6481fcbad0e61ea29469d4347085959405db1e68bc138b244195",
+  "inputSha256": "7bafe2ec6b3786e9f78cffb5f50575969c761da1039ebbea5fb74d2a586e8993",
   "turnaround": "turnaround.png",
-  "turnaroundSha256": "a95c7d84846faca5c03654c54c54af2aa9ab076e8959add9e13cc624f63183e7",
+  "turnaroundSha256": "be23882e44a4d3d665bad4a8ca340f96d4eb35fee987d5453184291bb81c9420",
   "generator": "builtin imagegen",
-  "subjectSpec": "Askeptosaurus italicus, very long slender marine reptile, four paddle limbs, narrow pointed head and extremely long tapering tail",
-  "inputPrompt": "Create ONE full-body subject derived strictly from the supplied approved canonical. Preserve canonical anatomy, proportions, head, appendage count and placement, silhouette, coloration, markings, and texture exactly; no redesign. Single clean three-quarter front view from slightly above in a straight neutral symmetric extended pose, with paired appendages separated and the entire subject fully framed on flat pale neutral studio gray. No water, scenery, text, labels, borders, cropping, or extra animals.",
-  "turnaroundPrompt": "Derive a clean four-view orthographic modeling sheet from the supplied approved canonical, which is the sole visual authority. Preserve exact anatomy, proportions, appendage count and placement, silhouette, coloration, markings, and texture. Use a pale neutral studio gray background and a 2x2 grid containing strict left profile, dorsal/top, frontal, and three-quarter front views; keep the entire subject and every extremity fully framed. No labels, text, scenery, or extra animals.",
-  "review": "Single input is complete and identity-faithful, but the long tail retains a broad curve. Turnaround is a qualitative proportional guide; canonical.png remains the identity and marking authority."
+  "subjectSpec": "Askeptosaurus italicus: straight slender thalattosaur, distinct neck, four separated small paddle limbs, closed mouth, laterally compressed tail about two-thirds of total length.",
+  "inputPrompt": "Make one precise final correction to this Askeptosaurus modeling reference: shorten ONLY the extremely long tail by 25 percent, from hip pair to tip, so the tail is two times the combined head+neck+trunk length. Keep everything else identical: small narrow pointed head, closed mouth, distinct narrow neck, slender trunk, exactly four half-spread paddle limbs separated clearly, slate and cream mottled scale texture, pale tail crossbars, flat gray background, 3:1 wide image, camera looking from above and slightly in front. All anatomy remains straight along ONE diagonal axis, no curl, no bend, no tail fluke, no dorsal fin. Frame entire animal with margins. This image will be both the canonical and the single image-to-3D input. No labels, text, grid, shadow or extra animals.",
+  "turnaroundPrompt": "Use case: scientific-educational. Derive a human-review orthographic turnaround sheet of this EXACT corrected canonical Askeptosaurus. Four views in a clean 2x2 grid: strict side profile, strict dorsal/top, frontal, and elevated three-quarter. All four views show the identical animal, same scale patterns, slim shape, small narrow pointed head, closed mouth, distinct neck, exactly four separated small paddle limbs; tail approximately two-thirds of total length and laterally compressed. All bodies completely straight, neutral symmetrical pose, NO curling or bending. Preserve slate dorsal/cream underside mottling and pale tail bands. Each view must show entire animal with no cropping. Pale neutral gray studio background. No text, no labels, no grid lines, no water, no scenery. Wide landscape composition to fit extraordinarily long animals. This is a human review sheet only; it will not be submitted to the 3D service.",
+  "review": "Visually reviewed 19 September 2026: single input has four separated limbs, closed mouth, distinct neck, straight non-overlapping axis and complete tail. Tail approximately 64% of projected snout-to-tip length. Canonical and single input are byte-identical, preventing downstream shape drift. Turnaround is a qualitative human review sheet only; do not submit it to Tripo. Generation anatomy still requires measurement after download.",
+  "authorization": "19 September 2026: user requested new canonical images with intended characteristics and regeneration/integration, authorizing this pose correction.",
+  "backup": "backup-2026-09-19/"
 }

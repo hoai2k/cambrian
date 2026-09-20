@@ -1,0 +1,65 @@
+{
+  "id": "birgeria",
+  "name": "Birgeria",
+  "species": "Birgeria stensioei",
+  "provenance": "Middle Triassic \u00b7 Monte San Giorgio",
+  "description": "Large predatory ray-finned fish with a very wide gape, fangs in three sizes, a naked body and a deeply forked caudal fin. Authored Tripo body and measured procedural volume twin share one armature, one set of inverse binds, one set of sockets and one set of actions.",
+  "modelLength": 5.0,
+  "lengthMeters": 5.53,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth",
+    "FastStart",
+    "Gape",
+    "Flop"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "Flop"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "puppet": "birgeria.puppet.glb",
+  "sources": [
+    "docs/triassic/canonical/birgeria.png",
+    "tools/triassic/creatures/birgeria/tripo-raw/birgeria.raw.glb",
+    "tools/triassic/creatures/birgeria/birgeria.preview.glb"
+  ],
+  "notes": [
+    "Thunniform, and built to read as such: the gain curve is under 0.1 at mid-body, the wave carries about a third of a wavelength over the chain, and the two lobes of the forked caudal carry nearly all the travel. Saurichthys and the sharks are the comparison.",
+    "The mouth is **modelled** on this generation: Placodus' geometric method finds the slit over the front eighth of the body and nothing behind it, and the independently read painted line agrees with it to within 0.28 of the local radius. The cut follows the measured curve station for station; a straight ramp through the same points would have deviated by 0.19 of the local radius, which is small -- on a fish the line very nearly is straight, and that is recorded rather than dressed up.",
+    "The pectorals are control surfaces, not oars, and `limbSweepDegrees` records the swept angle so the reviewer does not have to take that on trust. This is a fish: the tail is the engine.",
+    "Recorded pose fault, not corrected here: the large dorsal fin sits at frac 0.40-0.57 against the research's \"single dorsal set far back\", and a second dorsal stood behind it. The second was collapsed into the back by smooth-region.py in the published preview (0.9 % of its protrusion left); the placement of the first is the greenlit pose and a redraw question. See docs/triassic/proportion-audit.md.",
+    "The body was measured into its own frame before anything was rigged: this generation lies 27.7 degrees across the file axes and its roll was read off the countershading. Which end is the head was decided by the caudal blade rather than by the principal component's sign, and the build asserts it.",
+    "The twin resurfaces a voxel occupancy field of the authored body, relaxes it and reduces the new topology. It reuses no source vertex or face.",
+    "Living colours, soft tissues and movements are artistic reconstruction. World travel remains engine-owned."
+  ]
+}

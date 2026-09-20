@@ -1,0 +1,64 @@
+{
+  "id": "mixosaurus",
+  "name": "Mixosaurus",
+  "species": "Mixosaurus cornalianus",
+  "provenance": "Middle Triassic \u00b7 Besano Formation, Monte San Giorgio",
+  "description": "Small early ichthyosaur with the oldest dorsal fin of any backboned animal, long forefins, short hindfins and a lobed tail. Authored Tripo body and measured procedural volume twin share one armature, one set of inverse binds, one set of sockets and one set of actions.",
+  "modelLength": 4.0,
+  "lengthMeters": 1.5,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth",
+    "Dart",
+    "Breathe"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "Breathe"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "puppet": "mixosaurus.puppet.glb",
+  "sources": [
+    "docs/triassic/canonical/mixosaurus.png",
+    "tools/triassic/creatures/mixosaurus/tripo-raw/mixosaurus.raw.glb"
+  ],
+  "notes": [
+    "Carangiform, not anguilliform: half a wavelength on the body, the front third almost still, and the amplitude piled into the peduncle. The research calls this animal more fish-like than its basal relatives, and it is built to read against Cymbospondylus.",
+    "The dorsal fin -- the oldest in any backboned animal, and this animal's headline -- is the generation's own blade on its own seated joint. It is a keel: it holds the line at sprint and leans into a turn and a dart, and it never flaps.",
+    "Dart is a C-start, the roster's shoalDart: the whole body folds one way in a sixth of a second and snaps through straight. It is not a short Attack.",
+    "The body was measured into its own frame before anything was rigged: this generation lies 25.2 degrees across the file axes -- the most crooked of the four -- and its roll was read off the countershading rather than transported.",
+    "This generation has **no modelled mouth**: Placodus' geometric method finds nothing on the rostrum, so the mouth line was read off the albedo as Dinocephalosaurus' was. There is therefore no source dentition either, and none was authored; see the README.",
+    "The caudal fin is deeply forked with two near-equal lobes, which the research denies this animal -- \"not the post-Triassic lunate fluke\". That is the pose and the generation, recorded rather than remodelled; see the README.",
+    "The twin resurfaces a voxel occupancy field of the authored body, relaxes it and reduces the new topology. It reuses no source vertex or face.",
+    "Living colours, soft tissues and movements are artistic reconstruction. World travel remains engine-owned."
+  ]
+}

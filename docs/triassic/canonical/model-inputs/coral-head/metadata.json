@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-19",
+  "canonicalStatus": "approved-scenery",
+  "canonical": "canonical.png",
+  "canonicalSource": "../../coral-head.png",
+  "canonicalSha256": "e5089cbfcba558441359c954d6e142e93942e3440fd2aa4bfae8413e96120015",
+  "input": "input.png",
+  "inputSha256": "e5089cbfcba558441359c954d6e142e93942e3440fd2aa4bfae8413e96120015",
+  "turnaround": "turnaround.png",
+  "turnaroundSource": "../../coral-head-turnaround.png",
+  "turnaroundSha256": "085c5a9e11e4c85dae7418fe12014498cdc2db54f0a1eb8d5032704074f186bd",
+  "generator": "existing approved scenery canonical set",
+  "review": "Packaged without regeneration: the existing four-panel sheet already supplies profile, top, three-quarter, and surface-detail views, so it is the lowest-drift Tripo input."
+}

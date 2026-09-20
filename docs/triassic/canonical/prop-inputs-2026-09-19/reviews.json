@@ -1,0 +1,37 @@
+{
+  "bjuvia": {
+    "verdict": "pass",
+    "evidence": "Entire broad undivided leaves, central midribs and short scarred trunk retained; all leaf tips and base visible; no soil or exposed roots.",
+    "risk": "Thin overlapping leaves may fuse in inferred 3D. Keep broad blade silhouettes and avoid converting trunk fibres into topology."
+  },
+  "pleuromeia": {
+    "verdict": "pass",
+    "evidence": "One unbranched scarred trunk, strap-leaf crown and one terminal cone retained; all tips and flat basal termination visible; no substrate or exposed rhizomorph.",
+    "risk": "Leaf intersections and cone scales need mesh review. The buried rhizomorph is intentionally excluded, not reconstructed."
+  },
+  "neocalamites": {
+    "verdict": "pass",
+    "evidence": "All six stems and their basal sheaths retained, including the fully visible tallest shoot; jointed stems and narrow nodal leaf whorls clear. No ground slab, root filaments or soil.",
+    "risk": "Fine whorl leaves may collapse or disappear in reconstruction; six independent stem bases need a common authored contact plane."
+  },
+  "brachiopod-cluster": {
+    "verdict": "pass",
+    "evidence": "Nine rounded biconvex lampshells now have smooth surfaces with subtle concentric growth lines and stout beaks; former radial ribs and sharp median keels removed. No sand or matrix.",
+    "risk": "Some shells overlap in projection; verify distinct shell volumes and margin seams rather than fused bulbs. Underside attachments are not established by this view."
+  },
+  "daonella-bed": {
+    "verdict": "pass",
+    "evidence": "Dense shallow overlap, broad low-convexity valves, extended dorsal hinge edges and fine radial sculpture. Complete finite patch on clean gray background; no sand slab or colored alpha fringe.",
+    "risk": "A single high-angle view cannot establish exact underside or valve thickness. Keep a very shallow shell aggregate; reject a generated solid mound or terrain plate."
+  },
+  "cidaris": {
+    "verdict": "pass",
+    "evidence": "Club-spine silhouette retained; giant perforated washer plates replaced by narrow pore bands and orderly raised spine-base fields. Complete test, primary tips and lower contact spines visible; no ground.",
+    "risk": "Single view does not prove hidden-side pentaradial organization. Reconstructed test must retain fivefold zones and seated spines; tiny pores and secondary spines are appearance detail, not a mandate for dense topology."
+  },
+  "encrinus-litter": {
+    "verdict": "pass",
+    "evidence": "Twelve loose circular columnals and three stem lengths share consistent circular lumina, flat end faces and short straight peripheral radial crenulation. Ornate star motifs and giant hollow ragged stem ends removed. Single shallow scatter, no sand or slab.",
+    "risk": "Disconnected scatter elements must share a controlled base plane. Avoid underside terrain, overly thick discs or reconstructing minute articular texture as excessive geometry."
+  }
+}

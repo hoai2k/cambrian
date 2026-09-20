@@ -61,6 +61,14 @@ oral anatomy rather than copying the illustration's visible tooth count or assum
 retraction mechanism. Model the interior, lower jaw and tooth supports together for coherent rest,
 gape and feeding poses. Brief: `tools/devonian/creatures/onychodus/rework-v3/ANATOMY_REFERENCE_BRIEF.md`.
 
+15 September: the palatal-clearance half of this is done ahead of the rework. The tusks were on a
+crescent platform that stood their bases .07 above the mouth line, and closed, three of the four
+came out through the roof of the snout; they are now the lower jaw's own front teeth, the palate's
+receiving recesses carry them, the snout's roof rose over the rostrum, and the builder asserts the
+closed fit rather than eyeing it (`build_v2.py`, `oralClearanceClosed` in `validation.json`). The
+rest of this entry — the dermal cranial map, the cheek and gill-cover volumes, the supported eye,
+the surface relief — is untouched and still wanted.
+
 ### Rhinodipterus
 
 Reference: `../devonian-authoring/rhinodipterus/user-reference/rhinodipterus-user-reference-2026-09-08.webp`

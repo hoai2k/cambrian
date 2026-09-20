@@ -430,6 +430,18 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const stromatoliteFallback = G(new THREE.SphereGeometry(.36, 10, 5)); stromatoliteFallback.scale(1, .87, 1); stromatoliteFallback.translate(0, 0, 0);
   const saltCrustFallback = G(new THREE.CylinderGeometry(.5, .46, .097, 9)); saltCrustFallback.translate(0, .048, 0);
   const mudRippleFallback = G(new THREE.BoxGeometry(2, .184, 1.7)); mudRippleFallback.translate(0, .092, 0);
+  // The seven Tripo-derived Triassic props, at their authored scale-1 sizes (`FLORA_PHYS`): three
+  // ground decals and a small mound, an urchin, and three shore plants. A kind missing from
+  // `floraSets` is not drawn at all — the sim scatters it and collides against it, and the
+  // renderer never fetches its mesh, which is how the first delivery shipped with an invisible
+  // horsetail stand round every nursery.
+  const encrinusLitterFallback = G(new THREE.CylinderGeometry(.3, .3, .071, 9)); encrinusLitterFallback.translate(0, .036, 0);
+  const daonellaBedFallback = G(new THREE.CylinderGeometry(.6, .6, .216, 9)); daonellaBedFallback.translate(0, .108, 0);
+  const brachiopodFallback = G(new THREE.SphereGeometry(.15, 8, 5)); brachiopodFallback.scale(1, .146 / .15, 1); brachiopodFallback.translate(0, .146, 0);
+  const cidarisFallback = G(new THREE.SphereGeometry(.15, 8, 5)); cidarisFallback.scale(1, .258 / .15 / 2, 1); cidarisFallback.translate(0, .129, 0);
+  const neocalamitesFallback = G(new THREE.CylinderGeometry(.12, .2, 3, 6)); neocalamitesFallback.translate(0, 1.5, 0);
+  const pleuromeiaFallback = G(new THREE.ConeGeometry(.35, 2, 6)); pleuromeiaFallback.translate(0, 1, 0);
+  const bjuviaFallback = G(new THREE.ConeGeometry(.75, 1.5, 7)); bjuviaFallback.translate(0, .75, 0);
   const cushionFallback = G(sacGeo.clone()); cushionFallback.scale(1.28, .6 / 1.13, 1.28);
   const lettuceFallback = G(tuftGeo.clone()); lettuceFallback.scale(.8, .45 / .55, .8);
   const spineFallback = G(sacGeo.clone()); spineFallback.scale(1.14, 2.6 / 1.13, 1.14);
@@ -456,7 +468,10 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const variantAt = (f: Flora, n: number) => n < 2 ? 0
     : ((Math.round(f.pos.x * 8) * 73856093 ^ Math.round(f.pos.z * 8) * 19349663) >>> 0) % n;
   const floraSlots = new Map<Flora, { attr: THREE.InstancedBufferAttribute; i: number }>();
-  const floraSets: Record<string, { geo: THREE.BufferGeometry; mat: THREE.Material }> = {
+  // Total over `FloraKind` on purpose: this table is what the chunk builder iterates, so a kind
+  // the simulation places that is missing here is scattered, collided against and never drawn,
+  // with nothing fetched and nothing in the console to say so. The compiler catches it instead.
+  const floraSets: Record<Flora['kind'], { geo: THREE.BufferGeometry; mat: THREE.Material }> = {
     cushion: { geo: cushionFallback, mat: spongeMat }, lettuce: { geo: lettuceFallback, mat: tuftMat },
     spine: { geo: spineFallback, mat: spongeMat }, glass: { geo: glassFallback, mat: spongeMat },
     vauxia: { geo: vauxiaGeo, mat: spongeMat }, sac: { geo: sacGeo, mat: spongeMat },
@@ -466,6 +481,10 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     lilyColumn: { geo: lilyGeo, mat: crinoidMat }, frondTower: { geo: towerGeo, mat: reedMat },
     stromatolite: { geo: stromatoliteFallback, mat: moundMat }, saltCrust: { geo: saltCrustFallback, mat: rockMat },
     mudRipple: { geo: mudRippleFallback, mat: rockMat },
+    encrinusLitter: { geo: encrinusLitterFallback, mat: rockMat }, daonellaBed: { geo: daonellaBedFallback, mat: rockMat },
+    brachiopodCluster: { geo: brachiopodFallback, mat: moundMat }, cidaris: { geo: cidarisFallback, mat: spongeMat },
+    neocalamites: { geo: neocalamitesFallback, mat: reedMat }, pleuromeia: { geo: pleuromeiaFallback, mat: reedMat },
+    bjuvia: { geo: bjuviaFallback, mat: crinoidMat },
   };
   const microGeo = G(new THREE.ConeGeometry(0.012, 0.22, 3, 1, true));
   microGeo.translate(0, 0.11, 0);

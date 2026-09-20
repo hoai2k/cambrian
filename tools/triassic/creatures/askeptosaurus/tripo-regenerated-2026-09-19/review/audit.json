@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-publish/tools/triassic/creatures/askeptosaurus/tripo-regenerated-2026-09-19/askeptosaurus.raw.glb",
+    "bytes": 1311504,
+    "sha256": "fc074bb6df131052de8bd258909d1a876b90ae5400c73713f33b47159db24747"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 10670,
+    "faces": 18778,
+    "triangles": 18778,
+    "connected_components": 34,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.208181,
+      -0.5,
+      -0.113408
+    ],
+    "max_xyz": [
+      0.208181,
+      0.5,
+      0.113408
+    ],
+    "center_xyz": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "size_xyz": [
+      0.416361,
+      1.0,
+      0.226815
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_5b497dd2-0f06-4764-8d91-401dd19f5ad0",
+      "mesh": "tripo_mesh_5b497dd2-0f06-4764-8d91-401dd19f5ad0",
+      "vertices": 10670,
+      "edges": 29414,
+      "faces": 18778,
+      "triangles": 18778,
+      "connected_components": 34,
+      "material_slots": [
+        "tripo_material_5b497dd2-0f06-4764-8d91-401dd19f5ad0"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_5b497dd2-0f06-4764-8d91-401dd19f5ad0",
+      "image_textures": [
+        "Color_5b497dd2-0f06-4764-8d91-401dd19f5ad0",
+        "NormalGL_5b497dd2-0f06-4764-8d91-401dd19f5ad0",
+        "ORM_5b497dd2-0f06-4764-8d91-401dd19f5ad0"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_5b497dd2-0f06-4764-8d91-401dd19f5ad0",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_5b497dd2-0f06-4764-8d91-401dd19f5ad0",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_5b497dd2-0f06-4764-8d91-401dd19f5ad0",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-publish/tools/triassic/creatures/askeptosaurus/tripo-regenerated-2026-09-19/review/side.png",
+    "top": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-publish/tools/triassic/creatures/askeptosaurus/tripo-regenerated-2026-09-19/review/top.png",
+    "three-quarter": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-publish/tools/triassic/creatures/askeptosaurus/tripo-regenerated-2026-09-19/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-publish/tools/triassic/creatures/askeptosaurus/askeptosaurus-regenerated.preview.glb",
+    "triangle_limit": 40000,
+    "triangles_before": 18778,
+    "triangles_after": 18778,
+    "bytes": 1198600,
+    "sha256": "175eb7921aeac141f7a339f699d066f2857abdab7f28bdc9f2b71aac5c9c141e"
+  }
+}

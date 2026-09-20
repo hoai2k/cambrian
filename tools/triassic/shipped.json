@@ -1,6 +1,31 @@
 {
   "creatures": [
+    "aphaneramma",
+    "archelon",
+    "askeptosaurus",
+    "atopodentatus",
+    "birgeria",
+    "cartorhynchus",
+    "ceratites",
+    "coelophysis",
+    "cymbospondylus",
+    "dinocephalosaurus",
+    "helicoprion",
+    "henodus",
+    "hupehsuchus",
+    "hybodus",
+    "keichousaurus",
+    "macrocnemus",
+    "mixosaurus",
+    "mosasaurus",
+    "mystriosuchus",
     "nothosaurus",
-    "shonisaurus"
+    "odontochelys",
+    "phragmoteuthis",
+    "placodus",
+    "rhaeticosaurus",
+    "saurichthys",
+    "shonisaurus",
+    "tanystropheus"
   ]
 }

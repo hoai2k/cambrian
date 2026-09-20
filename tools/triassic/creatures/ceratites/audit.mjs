@@ -1,0 +1,274 @@
+/**
+ * Package the Ceratites family, prove the authored body and its twin are the same rig playing the
+ * same samples, then play every clip through Three.js and measure the things *this* animal has to
+ * do. None of them is a thing any earlier body in this era was asked for, because none of them had
+ * a shell, a funnel or an arm crown.
+ *
+ * Four questions, and each is a number rather than an impression:
+ *
+ * 1. **Does the shell breathe?** It must not. The coil is one rigid bone with no channel in any
+ *    clip, so every vertex it owns has to move as one rigid body with `body`: the check is that the
+ *    pairwise distances between shell vertices are unchanged at every phase of every clip, to
+ *    floating point. This is the one thing about this body that is easy to get wrong and impossible
+ *    to see afterwards, because a shell that flexes by a per cent reads as a shell.
+ * 2. **Does the crown do the work?** `Swim` and `Sprint` are a funnel pump with the arms sweeping
+ *    against it, and `Attack` and `Grab` are the crown closing, because that is what this animal
+ *    reaches with. Measured as arm-tip travel, and against the head's own travel so "the arms move"
+ *    cannot be satisfied by moving the whole animal.
+ * 3. **Is the attack anchor on something that swings?** The era's rule says the attack anchor goes
+ *    on the bone that delivers the blow and is not the skull for an animal that does not lead with
+ *    a bite. Here it is an arm tip, so it has to travel further on the strike clips than the mouth
+ *    socket does -- which is the difference between an animal that grabs and one that lunges.
+ * 4. **Is the beak left alone?** It must be. A beak inside an arm crown is never on screen, so the
+ *    two mouth bones hold their bind pose in every clip and the mouth is an anchor and nothing more;
+ *    the check is that neither moves, measured in the skull's own frame.
+ * 5. **Does the strike reach, or does it recoil?** The attack anchor's forward excursion against its
+ *    rearward one, because a crown that pulls in at the moment of the blow reads as a retreat.
+ *
+ *   node tools/triassic/creatures/ceratites/audit.mjs --package --decode
+ */
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'meshoptimizer';
+import { auditPair, tracker, anchorTravel } from '../_pipeline/paired-audit.mjs';
+
+const id = 'ceratites';
+const base = `public/assets/triassic/creatures/${id}`;
+const validation = JSON.parse(fs.readFileSync(`tools/triassic/creatures/${id}/validation.json`, 'utf8'));
+const { report, CLIPS, authored, write } = await auditPair({
+  id,
+  base,
+  here: `tools/triassic/creatures/${id}`,
+  local: `local/triassic-authoring/${id}`,
+  joints: validation.bones, sockets: 4,
+});
+const track = tracker(authored);
+const ARMS = validation.arms.map((a) => a.name);
+// The **joint** at the start of each arm's last segment, not `:tip`. Every bone in these rigs is
+// authored with its tail at head + (0, 0.16, 0), so a bone's own +Y is world +Y and not the
+// direction of the arm it belongs to: `:tip` on a radial rig measures a point sticking backwards
+// out of the wrist, which is a rotation proxy and not the arm's reach. The distal joint's own
+// world position is the reach, and it carries the whole chain's accumulated swing.
+const TIPS = ARMS.map((n) => `${n}_04`);
+const travelOf = (rows, n) => {
+  let max = 0;
+  for (const r of rows) {
+    const d = Math.hypot(r[n][0] - rows[0][n][0], r[n][1] - rows[0][n][1], r[n][2] - rows[0][n][2]);
+    if (d > max) max = d;
+  }
+  return max;
+};
+
+// --- 1. the shell must not breathe -------------------------------------------------------------
+// Played on the packaged authored body, not on the builder's own pose: the vertices `shell` owns
+// are found from the skin weights, and their mutual distances are compared at every phase against
+// the bind pose. A rigid part stays rigid or it does not, and there is no tolerance band worth
+// having between those two.
+await MeshoptDecoder.ready;
+globalThis.self = globalThis;
+globalThis.createImageBitmap = async () => ({ width: 2048, height: 2048, close() {} });
+report.rigidShellModels = [];
+for (const suffix of ['', '.puppet']) {
+  const bytes = fs.readFileSync(`${base}${suffix}.glb`);
+  const gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
+    .parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
+  const mixer = new THREE.AnimationMixer(gltf.scene);
+  const meshes = [];
+  gltf.scene.traverse((o) => { if (o.isSkinnedMesh) meshes.push(o); });
+  const mesh = meshes.find((m) => m.skeleton.bones.some((b) => b.name === 'shell')
+    && m.geometry.attributes.skinIndex);
+  const shellBone = mesh.skeleton.bones.findIndex((b) => b.name === 'shell');
+  const ji = mesh.geometry.attributes.skinIndex;
+  const jw = mesh.geometry.attributes.skinWeight;
+  // Purity has to be *exact*, not nearly exact. A vertex holding 0.9995 of the shell and 0.0005 of
+  // the head does move when the head does, by about a ten-thousandth of a body -- which is not the
+  // shell flexing, it is the boundary ramp doing its job one vertex further in than it looks. So
+  // the rigid-body test runs only on vertices the shell owns outright, and the near-pure set is
+  // reported beside it as the measured width of that ramp rather than smuggled into the verdict.
+  const shellWeight = (v) => {
+    let w = 0;
+    for (let k = 0; k < 4; k++) if (ji.getComponent(v, k) === shellBone) w += jw.getComponent(v, k);
+    return w;
+  };
+  const pure = [];
+  let nearPure = 0;
+  let anatomicalVertices = 0, contaminatedVertices = 0;
+  const centre = validation.coil.centre, radius = validation.coil.outerWhorlRadius;
+  const position = mesh.geometry.attributes.position;
+  for (let v = 0; v < ji.count; v++) {
+    const w = shellWeight(v);
+    if (w > 0.999) nearPure++;
+    // The coil selection is geometric, independent of the weights being tested.
+    const y = -position.getZ(v) / 5, z = position.getY(v) / 5;
+    const inShell = (y >= centre[1] - radius * .64 || z >= centre[2] + radius * .18)
+      && Math.hypot(y - centre[1], z - centre[2]) <= radius + .019;
+    if (inShell) {
+      anatomicalVertices++;
+      if (w < 1 - 1e-6) contaminatedVertices++;
+      pure.push(v);
+    }
+  }
+  assert.equal(contaminatedVertices, 0, 'anatomical shell has moving head/arm weights');
+  assert(pure.length > 100, `the shell must own a solid block of skin outright (${pure.length})`);
+  const p = new THREE.Vector3();
+  const snapshot = () => {
+    const out = [];
+    for (const v of pure) {
+      p.fromBufferAttribute(mesh.geometry.attributes.position, v);
+      mesh.applyBoneTransform(v, p);
+      out.push(p.clone());
+    }
+    return out;
+  };
+  const pairs = [];
+  for (let i = 0; i < pure.length; i += 7) for (let j = i + 13; j < pure.length; j += 53) pairs.push([i, j]);
+  mixer.stopAllAction();
+  gltf.scene.updateMatrixWorld(true);
+  for (const m of meshes) m.skeleton.update();
+  const rest = snapshot();
+  const restD = pairs.map(([i, j]) => rest[i].distanceTo(rest[j]));
+  let worst = 0;
+  let worstClip = null;
+  for (const clip of gltf.animations) {
+    mixer.stopAllAction();
+    mixer.clipAction(clip).reset().play();
+    for (let s = 0; s <= 24; s++) {
+      mixer.setTime(clip.duration * s / 24);
+      gltf.scene.updateMatrixWorld(true);
+      for (const m of meshes) m.skeleton.update();
+      const now = snapshot();
+      pairs.forEach(([i, j], k) => {
+        const d = Math.abs(now[i].distanceTo(now[j]) - restD[k]);
+        if (d > worst) { worst = d; worstClip = `${clip.name}@${(s / 24).toFixed(2)}`; }
+      });
+    }
+  }
+  report.rigidShell = { anatomicalVertices, contaminatedVertices, pureShellVertices: pure.length, nearPureShellVertices: nearPure,
+                        pairsChecked: pairs.length,
+                        worstPairwiseDistanceChange: worst, worstAt: worstClip,
+                        shellHasNoAnimationChannel:
+                          gltf.animations.every((a) => a.tracks.every((t) => !t.name.startsWith('shell.'))) };
+  assert(report.rigidShell.shellHasNoAnimationChannel, 'the shell must carry no animation channel');
+  // 5 engine units of body: 1e-5 is two millionths of it, which is packing noise and nothing else.
+  assert(worst < 1e-5, `the shell flexes by ${worst} at ${worstClip}`);
+  report.rigidShellModels.push({ variant: suffix || 'authored', ...report.rigidShell });
+}
+
+// --- 2. the crown, and the funnel ---------------------------------------------------------------
+report.crown = [];
+for (const clip of CLIPS) {
+  const rows = track(clip, [...TIPS, 'funnel:tip', 'head', 'shell'], 60);
+  const tips = TIPS.map((n) => travelOf(rows, n));
+  report.crown.push({
+    clip,
+    meanArmTipTravel: tips.reduce((a, b) => a + b, 0) / tips.length,
+    minArmTipTravel: Math.min(...tips),
+    funnelTravel: travelOf(rows, 'funnel:tip'),
+    headTravel: travelOf(rows, 'head'),
+    shellTravel: travelOf(rows, 'shell'),
+  });
+}
+const crown = (n) => report.crown.find((c) => c.clip === n);
+
+// --- 3. the anchors -----------------------------------------------------------------------------
+report.anchorTravel = anchorTravel(track, CLIPS,
+  ['anchor_mouth', 'anchor_mouth_inside', 'anchor_attack_primary', 'anchor_grasp']);
+const anchor = (n) => report.anchorTravel.find((r) => r.clip === n);
+
+// --- 4. the beak --------------------------------------------------------------------------------
+report.beak = [];
+for (const clip of CLIPS) {
+  const rows = track(clip, ['anchor_mouth'], 48);
+  const angles = rows.map((r) => r.jawAngle);
+  report.beak.push({
+    clip,
+    maxOpenRadians: Math.max(...angles),
+    minRadians: Math.min(...angles),
+    peakPhase: rows[angles.indexOf(Math.max(...angles))].phase,
+    mouthSocketTravelInSkullFrame: Math.max(...rows.map((r) => Math.hypot(
+      r.gape[0] - rows[0].gape[0], r.gape[1] - rows[0].gape[1], r.gape[2] - rows[0].gape[2]))),
+  });
+}
+const beak = (n) => report.beak.find((b) => b.clip === n);
+
+write();
+
+const problems = [];
+const need = (ok, msg) => { if (!ok) problems.push(msg); };
+
+// The shell is carried, never driven: in a clip that is not moving the whole animal it should be
+// the quietest thing on the body, and quieter than the head that sticks out of it.
+for (const c of ['Swim', 'Sprint', 'Attack', 'Grab', 'Eat']) {
+  need(crown(c).shellTravel <= crown(c).headTravel + 1e-9,
+    `${c}: the shell must not move more than the head it houses`);
+}
+// The crown is the locomotion and the weapon, so it has to be used in both roles. Measured against
+// the head's own travel: an arm that only moves because the animal moved has not been animated.
+for (const c of ['Swim', 'Sprint']) {
+  need(crown(c).minArmTipTravel > 0.12, `${c}: every arm must sweep (${crown(c).minArmTipTravel.toFixed(3)})`);
+  need(crown(c).minArmTipTravel > 3 * crown(c).headTravel + 0.02,
+    `${c}: the arms must move rather than be carried (arms ${crown(c).minArmTipTravel.toFixed(3)} vs head ${crown(c).headTravel.toFixed(3)})`);
+  need(crown(c).funnelTravel > 0.05, `${c}: the funnel must pump (${crown(c).funnelTravel.toFixed(3)})`);
+}
+for (const c of ['Attack', 'Grab', 'Heavy']) {
+  need(crown(c).minArmTipTravel > 0.35, `${c}: the crown must close (${crown(c).minArmTipTravel.toFixed(3)})`);
+}
+// **The attack anchor is an arm tip and not the beak**, which is the whole of this animal's reach:
+// on the strike clips it has to out-travel the mouth socket, or it is on the wrong bone.
+for (const c of ['Attack', 'Grab']) {
+  need(anchor(c).anchor_attack_primary > 2 * anchor(c).anchor_mouth,
+    `${c}: the attack anchor must out-travel the mouth (${anchor(c).anchor_attack_primary.toFixed(3)} vs ${anchor(c).anchor_mouth.toFixed(3)})`);
+  // **And a floor under it, because that ratio is now free.** With the beak held still the mouth
+  // socket does not move at all in these clips, so "twice the mouth" is twice nothing and passes
+  // whatever the crown does. What the rule is actually for is that the attack anchor is on the bone
+  // that delivers the blow, so the arm tip has to go somewhere: a tenth of a body length.
+  need(anchor(c).anchor_attack_primary > 0.5,
+    `${c}: the attack anchor must travel (${anchor(c).anchor_attack_primary.toFixed(3)})`);
+  need(anchor(c).anchor_grasp > 0.2, `${c}: the grasp anchor must reach (${anchor(c).anchor_grasp.toFixed(3)})`);
+}
+// **The beak is not animated, in any clip, and that is the check.** It sits at the bottom of a
+// well of thirteen arms and is never on screen; what this animal reaches with, catches with and is
+// read by is the crown, and `anchor_mouth` riding a still `jaw` is the whole of what the game needs
+// to know about its mouth. A gape authored down there is motion spent where nothing can see it, and
+// it stretches the oral lining for nothing.
+for (const b of report.beak) {
+  need(Math.abs(b.maxOpenRadians) < 1e-4 && Math.abs(b.minRadians) < 1e-4,
+    `${b.clip}: the beak must not be animated (${b.maxOpenRadians.toFixed(5)} / ${b.minRadians.toFixed(5)})`);
+  need(b.mouthSocketTravelInSkullFrame < 1e-4,
+    `${b.clip}: the mouth socket must hold still in the skull's own frame (${b.mouthSocketTravelInSkullFrame.toFixed(5)})`);
+}
+
+// --- 5. a strike reaches; a flinch recoils ------------------------------------------------------
+// The shipped Attack gathered the crown 0.30 forward over the first eighth of the clip and then
+// threw 1.16 of its travel *backwards*, which is the shape of an animal pulling its arms in and
+// reads as a retreat rather than a blow. So the attack anchor's own forward excursion is measured
+// against its rearward one, and the reach has to be both the larger and the later of the two.
+report.strike = [];
+for (const c of ['Attack', 'Bite', 'Grab']) {
+  const rows = track(c, ['anchor_attack_primary'], 48);
+  const z = rows.map((r) => r.anchor_attack_primary[2]);
+  const forward = Math.max(...z) - z[0];
+  const backward = z[0] - Math.min(...z);
+  const reachPhase = rows[z.indexOf(Math.max(...z))].phase;
+  const gatherPhase = rows[z.indexOf(Math.min(...z))].phase;
+  report.strike.push({ clip: c, forwardReach: forward, rearwardGather: backward, reachPhase, gatherPhase });
+  need(forward > 0.45, `${c}: the crown must reach (forward ${forward.toFixed(3)})`);
+  need(forward > 3 * backward,
+    `${c}: the crown must reach forward rather than recoil (forward ${forward.toFixed(3)} vs back ${backward.toFixed(3)})`);
+  need(reachPhase > gatherPhase,
+    `${c}: the reach must come after the gather (reach at ${reachPhase.toFixed(2)}, gather at ${gatherPhase.toFixed(2)})`);
+}
+
+assert.equal(problems.join(' | '), '', 'measured performance checks');
+console.log(JSON.stringify({
+  models: report.models, clips: report.clips, joints: report.joints,
+  twinTriangleFraction: report.twinTriangleFraction,
+  rigidShell: report.rigidShell,
+  crown: report.crown.filter((c) => ['Idle', 'Swim', 'Sprint', 'Attack', 'Grab', 'Heavy', 'Guard'].includes(c.clip)),
+  anchorTravel: report.anchorTravel.filter((r) => ['Swim', 'Attack', 'Grab', 'Bite', 'Eat'].includes(r.clip)),
+  beak: report.beak.filter((b) => ["Idle", "Swim", "Bite", "Attack", "Eat", "Heavy"].includes(b.clip)),
+  strike: report.strike,
+  exactRigParity: true, exactAnimationParity: true, exactAnchorParity: true,
+}, null, 2));

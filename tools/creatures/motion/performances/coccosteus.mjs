@@ -4,6 +4,7 @@
  */
 import { UP, DOWN } from '../lib.mjs';
 import { wave, beatPhase } from '../common.mjs';
+import { flopClip } from '../gaits.mjs';
 
 const TAIL = ['tail0', 'tail1', 'tail2', 'tail3', 'tail4', 'tail5'];
 
@@ -29,3 +30,6 @@ export const clips = [
     },
   },
 ];
+
+// The flop (src/sim/beach.ts): stranded, the arthrodire lashes its tail at the sand.
+clips.push(flopClip({ tail: ['tail0','tail1','tail2','tail3','tail4','tail5'], pectorals: ['pectoral0L','pectoral0R'], skull: 'skull', jaw: 'jaw' }));

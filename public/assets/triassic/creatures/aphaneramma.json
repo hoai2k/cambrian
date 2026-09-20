@@ -1,0 +1,63 @@
+{
+  "id": "aphaneramma",
+  "name": "Aphaneramma",
+  "species": "Aphaneramma rostratum",
+  "provenance": "Early Triassic \u00b7 Spitsbergen",
+  "description": "A trematosaur temnospondyl: a marine amphibian with a gharial's snout, four sprawling webbed limbs and a flattened swimming tail. Authored Tripo body and measured procedural volume twin share one armature, one set of inverse binds, one set of sockets and one set of actions.",
+  "modelLength": 5.0,
+  "lengthMeters": 1.6,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth",
+    "Breathe",
+    "Crawl"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "Breathe",
+    "Crawl"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "puppet": "aphaneramma.puppet.glb",
+  "sources": [
+    "docs/triassic/canonical/aphaneramma.png",
+    "tools/triassic/creatures/aphaneramma/tripo-raw/aphaneramma.raw.glb"
+  ],
+  "notes": [
+    "Swimming is the locomotion, as it is for every playable Triassic animal: the research gives this body an elongate anguilliform swim, so the axial gain climbs monotonically from the shoulder to the tail tip and the lag spreads a full wavelength over the body. Crawl is an extra clip beside that set, not the locomotion the rest is built on \u2014 the generation is posed for land because that is the pose that shows the animal.",
+    "The limbs row on the same beat rather than hanging off it, in a diagonal couplet, and the swept angle at each limb root is measured from the limb's own direction (root joint to tip joint in world space) rather than read off an Euler channel. The build refuses a limb that sweeps under 60 degrees in Sprint or under 45 in Swim.",
+    "The mouth is painted, not modelled: Placodus' geometric method returns 34 scattered vertices over the whole front third, spread over the entire depth of the head, which is the gular folds finding each other and not a slit. The painted line is read as a continuous curve, and the jump penalty had to be raised from the kit's 1.2 to 3.0 \u2014 at 1.2 the path let go of the lip over the last quarter of the head and followed the gular fold down. The seam is extrapolated over the last 0.037 of body on its own slope, because the jaw corner is where the mandible flares and no reading there is the lip.",
+    "Heavy and Ability are the animal's side swipe \u2014 the sideways sweep of a long rostrum \u2014 rather than a bigger Attack, and the audit measures the lateral share of the snout's travel to say so.",
+    "The twin resurfaces a voxel occupancy field of the authored body, relaxes it and reduces the new topology. It reuses no source vertex or face.",
+    "Living colours, soft tissues and movements are artistic reconstruction. World travel remains engine-owned."
+  ]
+}

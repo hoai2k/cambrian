@@ -590,16 +590,18 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(finned.fastest > rigid.fastest * 1.5, `...where a finned body tips as fast as it likes (${finned.fastest.toFixed(2)} rad/s)`);
   ok(rigid.turned < finned.turned, `...so it takes longer to commit to a dive (${rigid.turned.toFixed(2)} rad against ${finned.turned.toFixed(2)})`);
 
-  // The era's own tail-flip and its one body with no front.
-  const flip = (() => {
+  // The era's own tail-flip and its one body with no front. Asked for nothing the reflex throws it
+  // astern; asked for a direction it goes there, as every other body's dash does.
+  const flip = (my: number) => {
     const { p, step } = solo('nahecaris');
     for (let i = 0; i < 20; i++) step();
     const from = { ...p.pos }, h = heading(p.yaw);
-    step({ my: 1, dash: true });
-    for (let i = 0; i < 24; i++) step({ my: 1 });
+    step({ my, dash: true });
+    for (let i = 0; i < 24; i++) step({ my });
     return h.x * (p.pos.x - from.x) + h.z * (p.pos.z - from.z);
-  })();
-  ok(flip < -2, `Nahecaris flips away from what touched it (${flip.toFixed(1)} units astern)`);
+  };
+  ok(flip(0) < -2, `Nahecaris flips away from what touched it (${flip(0).toFixed(1)} units astern)`);
+  ok(flip(1) > 2, `...and follows the stick when it is given one (${flip(1).toFixed(1)} units ahead)`);
   const star = (() => {
     const { p, step } = solo('furcaster');
     for (let i = 0; i < 10; i++) step();

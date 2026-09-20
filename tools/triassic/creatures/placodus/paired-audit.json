@@ -2,24 +2,24 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 2111872,
-      "sha256": "58bd12ce335d244861808935b55212fc3254a496fe962c4aebc9dab7b1315ca1",
-      "triangles": 21701,
-      "vertices": 13409
+      "bytes": 2122312,
+      "sha256": "d941fbc745c480da93eba682e8ad38160643d4dd141fca9333448cb8efcabdbd",
+      "triangles": 22119,
+      "vertices": 13641
     },
     {
       "suffix": ".puppet",
-      "bytes": 793848,
-      "sha256": "961e99bd4b45af68e66727a34b54b35ef0b09970d51d17727716450b7728ab7a",
-      "triangles": 8446,
-      "vertices": 4495
+      "bytes": 789192,
+      "sha256": "d51f4671a47e2353c61a1b516897a578771789045bf85f3d3f3fd547818ebcd8",
+      "triangles": 8314,
+      "vertices": 4362
     },
     {
       "suffix": ".lod1",
-      "bytes": 793848,
-      "sha256": "961e99bd4b45af68e66727a34b54b35ef0b09970d51d17727716450b7728ab7a",
-      "triangles": 8446,
-      "vertices": 4495
+      "bytes": 789192,
+      "sha256": "d51f4671a47e2353c61a1b516897a578771789045bf85f3d3f3fd547818ebcd8",
+      "triangles": 8314,
+      "vertices": 4362
     }
   ],
   "sockets": [
@@ -137,7 +137,7 @@
     },
     {
       "name": "Grab",
-      "sha256": "bce19c568421c5a4a0c9e687f09a70270f8dabc45109309e399c315f1fe66823"
+      "sha256": "49cc28be034b1fd1ff924b96985b9e1546bb53356dadbc4ff56b5c777c1b098c"
     },
     {
       "name": "Growth",
@@ -173,7 +173,7 @@
     },
     {
       "name": "Sprint",
-      "sha256": "3511d3ec2514e592f4a47ce0b9a4dab78d17a31c6cc4dd184fd1b9d43a858e05"
+      "sha256": "8df78eacd52c0592a3521635eca126574ed0516b980c5a280f9d96827bc5af2a"
     },
     {
       "name": "Stagger",
@@ -192,7 +192,7 @@
       "sha256": "c93a1bd6364223fc767af87c66c9f3a87eab2a1b189f08471282268ae2dee6d3"
     }
   ],
-  "lodTriangleFraction": 0.38919865443988755,
+  "lodTriangleFraction": 0.37587594375875943,
   "playback": [
     {
       "suffix": "",
@@ -225,7 +225,7 @@
           "clip": "Breathe",
           "duration": 3,
           "samples": 61,
-          "maxVertexTravel": 0.29704676378873796
+          "maxVertexTravel": 0.29562228368787014
         },
         {
           "clip": "Crawl",
@@ -237,7 +237,7 @@
           "clip": "CrushBite",
           "duration": 1.399999976158142,
           "samples": 61,
-          "maxVertexTravel": 0.6926878964625773
+          "maxVertexTravel": 0.6920809335652159
         },
         {
           "clip": "Death",
@@ -261,13 +261,13 @@
           "clip": "Eat",
           "duration": 1.600000023841858,
           "samples": 61,
-          "maxVertexTravel": 0.21410366160103153
+          "maxVertexTravel": 0.21268221069632928
         },
         {
           "clip": "Grab",
           "duration": 1.2000000476837158,
           "samples": 61,
-          "maxVertexTravel": 0.5978489231527365
+          "maxVertexTravel": 0.601336126515811
         },
         {
           "clip": "Growth",
@@ -380,7 +380,7 @@
           "clip": "Breathe",
           "duration": 3,
           "samples": 61,
-          "maxVertexTravel": 0.29704676378873796
+          "maxVertexTravel": 0.29562228368787014
         },
         {
           "clip": "Crawl",
@@ -392,7 +392,7 @@
           "clip": "CrushBite",
           "duration": 1.399999976158142,
           "samples": 61,
-          "maxVertexTravel": 0.6926878964625773
+          "maxVertexTravel": 0.6920809335652159
         },
         {
           "clip": "Death",
@@ -416,13 +416,13 @@
           "clip": "Eat",
           "duration": 1.600000023841858,
           "samples": 61,
-          "maxVertexTravel": 0.21410366160103153
+          "maxVertexTravel": 0.21268221069632928
         },
         {
           "clip": "Grab",
           "duration": 1.2000000476837158,
           "samples": 61,
-          "maxVertexTravel": 0.6159489552645563
+          "maxVertexTravel": 0.61974314879199
         },
         {
           "clip": "Growth",
@@ -525,7 +525,7 @@
       "clip": "Sprint",
       "tailTipLateral": 1.7128538517902605,
       "skullLateral": 0.21735449202442908,
-      "forePaddleLateral": 0.43991289449499305,
+      "forePaddleLateral": 0.7331397276570409,
       "caudalPhaseLags": [
         0.25,
         0.33333332505491076,

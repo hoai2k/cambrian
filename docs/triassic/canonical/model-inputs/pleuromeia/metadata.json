@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-19",
+  "task": "T3D-10A",
+  "canonicalStatus": "approved-design-ground-free-derivative",
+  "humanApprovalClaimed": false,
+  "canonical": "canonical.png",
+  "canonicalSource": "../../pleuromeia-candidate02.png",
+  "canonicalSha256": "cdfb2b15f59ade1b43c5e3ce037906aaf4729258fe21dc5112a120c0f21a3e83",
+  "input": "input.png",
+  "inputSha256": "8117bd19884b3ec53d6dabffb1afc73452a66f2a4a18e33268fc75456fd64fa2",
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "nativeInput": "../../prop-inputs-2026-09-19/native/pleuromeia-attempt1.png",
+  "nativeDimensions": [
+    1254,
+    1254
+  ],
+  "resolutionProcessing": "Lanczos3 resampling from the native 1254-square ImageGen output; not native 2048 detail.",
+  "original": "../../originals/2026-09-19-prop-candidate02/pleuromeia-candidate02.png",
+  "originalSha256": "cdfb2b15f59ade1b43c5e3ce037906aaf4729258fe21dc5112a120c0f21a3e83",
+  "generator": "builtin image_gen.imagegen",
+  "inputPrompt": "Use case: background-extraction. Edit target: supplied approved candidate02 Pleuromeia design. Preserve the entire organism in form: one unbranched scarred trunk, a dense crown of narrow strap leaves, ONE tall terminal cone, existing proportions and leaf arrangement, natural colors, camera and realistic neutral studio lighting. Create a ground-free single-object Tripo input, square 2048 by 2048 pixels. Remove ALL sand, stones, soil, litter, surrounding terrain and the low sandy mound. End the stem at the original ground-contact level with a clean flat base, retaining only the above-ground stem. Do not expose or invent rhizomorphs, roots, a root ball or a ground slab. Isolate the whole plant on uniform light gray; all leaf tips, cone tip and base must fit with at least 7 percent clear margins. No cropping, no added branches or cones, no text, no labels, no multiple views. Output must have an opaque neutral light-gray studio background, not alpha transparency.",
+  "provenance": "../../prop-inputs-2026-09-19/provenance.json",
+  "review": {
+    "verdict": "pass",
+    "evidence": "One unbranched scarred trunk, strap-leaf crown and one terminal cone retained; all tips and flat basal termination visible; no substrate or exposed rhizomorph.",
+    "risk": "Leaf intersections and cone scales need mesh review. The buried rhizomorph is intentionally excluded, not reconstructed."
+  },
+  "tripoSubmitted": false,
+  "downstreamApproval": {
+    "reviewer": "/root",
+    "method": "Visual contact-sheet review of all seven final input images",
+    "scope": "Approved for Tripo submission",
+    "note": "Complete silhouettes, neutral background, no substrate slab, and revised morphology reads correctly.",
+    "humanApprovalClaimed": false
+  }
+}

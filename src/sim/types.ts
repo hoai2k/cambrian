@@ -1,8 +1,10 @@
 import type { Vec3 } from '../shared/math';
 import type { CreatureId, MoveDef } from './creatures';
+import { TEXT } from '../shared/text';
 
 export type Tier = 0 | 1 | 2 | 3 | 4;
-export const TIER_NAMES = ['Larva', 'Juvenile', 'Adult', 'Giant', 'Apex'] as const;
+/** The rungs of the Cambrian ladder, as the HUD names them (`TEXT.sim.ladder.tiers`). */
+export const TIER_NAMES: readonly string[] = TEXT.sim.ladder.tiers;
 /**
  * The rungs' scales, as multiples of the creature's adult length. Ask `tierScale` in
  * src/sim/tiers.ts rather than indexing this: with equivalent sizing on the two rungs below Adult
@@ -14,6 +16,13 @@ export const TIER_SCALE = [0.25, 0.5, 1.0, 1.7, 2.6] as const;
 export const TIER_NEED = [30, 60, 85, 120, Infinity] as const;
 
 export type Band = 'snack' | 'prey' | 'rival' | 'threat' | 'giant';
+/**
+ * The mark for something that is not after you: one colour whatever its size, because size is the
+ * glyph's job and the colour is the warning's. `BAND_COLOR.giant` — the red — is reserved for a
+ * body that is actually coming for you (`comingFor` in actors.ts).
+ */
+export const CALM_MARK = '#d9cfa4';
+
 export const BAND_COLOR: Record<Band, string> = {
   snack: '#7ef0a8', prey: '#5fd9d1', rival: '#ffc45c', threat: '#ff8a3d', giant: '#ff4b5c',
 };
@@ -155,6 +164,13 @@ export interface Actor {
   climbTo: number;
   /** Out of the water: a leap in flight, gravity only, until the splash. */
   airborne: boolean;
+  /**
+   * The shore (src/sim/beach.ts). `wade` is how far out of the water the sand under this body
+   * puts it, 0 afloat to 1 with the sand at the waterline, continuous in position; `ashore` is the
+   * rule that follows from it, past `ASHORE_WADE`. `strandT` is how long a water-breather has been
+   * ashore, against `STRAND_BREATH`; `flopT` counts down through one flop, 0 between them.
+   */
+  wade: number; ashore: boolean; strandT: number; flopT: number;
   prev: { light: boolean; heavy: boolean; ability: boolean; dodge: boolean; guard: boolean; lock: boolean; sense: boolean; rise: boolean; burst: boolean; dash: boolean; aim: boolean };
   brain?: BrainState;
   respawnT: number; hatching: boolean;
@@ -170,7 +186,10 @@ export interface Actor {
    */
   carriedTop: boolean;
   dashHoldT: number; dashUsed: boolean; pounceCd: number; aimInRange: boolean; aiming: boolean;
-  dashCd: number; sinceHit: number; lastHitBy: number; swallowedBy: number; holdT: number;
+  dashCd: number;
+  /** What is still owed for the dash being held, if this one is priced by its length. */
+  dashCost: number;
+  sinceHit: number; lastHitBy: number; swallowedBy: number; holdT: number;
   /**
    * A grasping creature is holding its attack button down, so what lands takes hold instead of
    * striking through. Set from the input every step; false for anything that cannot grasp.
@@ -251,6 +270,25 @@ export interface PlayerSetup {
    * and ignore it. See src/sim/ladder.ts.
    */
   startRung?: number;
+  /**
+   * Which palette this seat's body is drawn in, when it is not the creature's authored one. Set
+   * only where two seats have picked the same animal and one of them has to be told apart; the
+   * first seat on a creature never carries it. Presentation only — `src/sim` passes it through and
+   * never reads it, so it cannot change how a match plays or replays (see src/shared/seat-schemes.ts).
+   */
+  scheme?: string;
+  /**
+   * Pick-screen only: the cursor is on one of the grid's buttons (Random, Visitors) rather than on
+   * a creature. `creature` still holds the last animal this seat was on, so the crew card and the
+   * match have something real to use. Never read by `src/sim`.
+   */
+  cursor?: 'random' | 'visitors';
+  /**
+   * This seat is playing an animal from another game (src/content/visitors.ts), at the body scale
+   * the top of *its own* ladder is worth. Set, it replaces every other answer about how big this
+   * player starts: a visitor arrives finished, because finishing is what earned it.
+   */
+  visitorScale?: number;
 }
 
 /** The three modes, shared by both eras: an era changes the sea and the animals, not the match. */

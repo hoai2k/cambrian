@@ -42,22 +42,26 @@ function solo(id: CreatureId, seed = 11) {
 }
 const flat = (v: { x: number; z: number }) => Math.hypot(v.x, v.z);
 
-// --- the tail-flip: straight back, whatever the stick asked, and weaker as the tail runs down ---
+// --- the tail-flip: back by default, where it is asked when it is asked, weaker as the tail runs down ---
 {
-  /** Push the stick forward and hit dash: a flipper goes the other way. */
-  const flip = (id: CreatureId) => {
+  /** Dash, with the stick held where `my` says. A neutral stick is the reflex; a pushed one steers. */
+  const flip = (id: CreatureId, my: number) => {
     const { p, step } = solo(id);
     for (let i = 0; i < 20; i++) step();
     const from = { ...p.pos }, yaw0 = p.yaw;
-    step({ my: 1, dash: true });
-    for (let i = 0; i < 24; i++) step({ my: 1 });
+    step({ my, dash: true });
+    for (let i = 0; i < 24; i++) step({ my });
     const h = heading(yaw0), dx = p.pos.x - from.x, dz = p.pos.z - from.z;
     return { along: h.x * dx + h.z * dz, moved: Math.hypot(dx, dz), turn: Math.abs(wrapAngle(p.yaw - yaw0)) };
   };
-  const shrimp = flip('waptia'), fish = flip('anomalocaris');
-  check('a tail-flip throws the body backwards', shrimp.along < -2, `${shrimp.along.toFixed(1)} units along its own heading`);
-  check('...even with the stick pushed forward', shrimp.moved > 2, `${shrimp.moved.toFixed(1)} units travelled`);
-  check('...without turning to do it', shrimp.turn < 0.5, `${shrimp.turn.toFixed(2)} rad`);
+  // Asked for nothing, the caridoid reflex throws the body away from whatever touched it.
+  const reflex = flip('waptia', 0);
+  check('a tail-flip with no stick throws the body backwards', reflex.along < -2, `${reflex.along.toFixed(1)} units along its own heading`);
+  check('...without turning to do it', reflex.turn < 0.5, `${reflex.turn.toFixed(2)} rad`);
+  // But a stick direction is an instruction, and wins here as it does on every other body: it used
+  // to be overridden outright, so swimming forward and dashing sent the animal backwards.
+  const steered = flip('waptia', 1), fish = flip('anomalocaris', 1);
+  check('...and a stick pushed forward dashes forward', steered.along > 2, `${steered.along.toFixed(1)} units along its heading`);
   check('a finned body dashes where it is pointed', fish.along > 2, `${fish.along.toFixed(1)} units along its heading`);
 
   // The reflex is the whole abdomen, so it costs the tail: flip on empty and it barely clears.
@@ -88,17 +92,21 @@ const flat = (v: { x: number; z: number }) => Math.hypot(v.x, v.z);
 
 // --- the bell: thrust in contractions, with a coast between them ---
 {
-  const trace = (id: CreatureId) => {
+  const trace = (id: CreatureId, burst = 0) => {
     const { p, step } = solo(id);
-    for (let i = 0; i < 30; i++) step({ my: 1 });
+    for (let i = 0; i < 30; i++) step({ my: 1, burst });
     const speeds: number[] = [];
-    for (let i = 0; i < 70; i++) { step({ my: 1 }); speeds.push(flat(p.vel)); }
+    for (let i = 0; i < 70; i++) { step({ my: 1, burst }); speeds.push(flat(p.vel)); }
     const hi = Math.max(...speeds), lo = Math.min(...speeds);
     return { hi, lo, swing: (hi - lo) / Math.max(hi, 1e-3), mean: speeds.reduce((s, v) => s + v, 0) / speeds.length };
   };
-  const bell = trace('burgessomedusa'), steady = trace('anomalocaris');
-  check('a bell surges and coasts', bell.swing > 0.35, `speed swings ${(bell.swing * 100).toFixed(0)}% within a cycle`);
-  check('...where a swimmer holds its speed', steady.swing < bell.swing * 0.4, `${(steady.swing * 100).toFixed(0)}%`);
+  // The pulse is what a bell does *under power*. Cruising, it swims like anything else: surging and
+  // coasting at every speed meant a jellyfish never simply swam, and every unhurried crossing was a
+  // stutter that read as broken rather than as a medusa.
+  const driven = trace('burgessomedusa', 1), bell = trace('burgessomedusa'), steady = trace('anomalocaris');
+  check('a bell under power surges and coasts', driven.swing > 0.35, `speed swings ${(driven.swing * 100).toFixed(0)}% within a cycle`);
+  check('...but cruising it swims smoothly', bell.swing < driven.swing * 0.5, `${(bell.swing * 100).toFixed(0)}% against ${(driven.swing * 100).toFixed(0)}%`);
+  check('...where a swimmer holds its speed', steady.swing < driven.swing * 0.4, `${(steady.swing * 100).toFixed(0)}%`);
   check('...and it still gets somewhere', bell.mean > 0.5, `${bell.mean.toFixed(1)} units/s average`);
 }
 
@@ -244,6 +252,29 @@ const flat = (v: { x: number; z: number }) => Math.hypot(v.x, v.z);
   check('a bell finishes closing exactly as its thrust runs out',
     pulseThrust(PULSE_CYCLE * 0.379) > 0 && pulseThrust(PULSE_CYCLE * 0.381) === 0 && Math.abs(thrustEnd - 0.38) < 1e-9,
     `${(thrustEnd * 100).toFixed(0)}% of the clip`);
+}
+
+// --- the dash is as long as it is held, and costs what it takes ---
+{
+  /** Dash forward, holding the button for `frames`, and see how far it carried and what it cost. */
+  const dash = (frames: number) => {
+    const { p, step } = solo('anomalocaris');
+    for (let i = 0; i < 20; i++) step();
+    p.stamina = p.staminaMax;
+    const from = { ...p.pos };
+    let lowest = p.stamina;
+    for (let i = 0; i < 60; i++) { step({ my: 1, dash: i < frames }); lowest = Math.min(lowest, p.stamina); }
+    return { moved: Math.hypot(p.pos.x - from.x, p.pos.z - from.z), spent: p.staminaMax - lowest };
+  };
+  const tap = dash(1), half = dash(15), held = dash(60);
+  check('a tap is a short shove', tap.moved < held.moved * 0.45, `${tap.moved.toFixed(1)} against ${held.moved.toFixed(1)} units`);
+  check('...a half-held dash lands between the two', half.moved > tap.moved * 1.3 && half.moved < held.moved,
+    `${tap.moved.toFixed(1)} < ${half.moved.toFixed(1)} < ${held.moved.toFixed(1)}`);
+  check('...and the bar is charged for what was taken', tap.spent < held.spent * 0.6,
+    `${tap.spent.toFixed(1)} against ${held.spent.toFixed(1)} stamina`);
+  // A press is still a commitment: it cannot be taken back inside its own first moments, which is
+  // what keeps the invulnerability worth having.
+  check('...but a dash is never nothing', tap.moved > 3, `${tap.moved.toFixed(1)} units`);
 }
 
 console.log(failed ? `\n${failed} FAILED` : '\nall locomotion tests passed');

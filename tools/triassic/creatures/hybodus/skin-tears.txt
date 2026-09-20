@@ -1,0 +1,16 @@
+
+public/assets/triassic/creatures/hybodus.glb   35534 edges x 17 phases x 23 clips
+clip           worst  on bone             >2x  worst bones
+Shake          5.93x  skull               157  0.017->0.099  skull:66 pec_tip_L:37 pec_tip_R:28 pec_mid_L:16
+Heavy          5.19x  skull                17  0.023->0.118  jaw:13 skull:4
+Bite           5.01x  skull                24  0.023->0.114  jaw:16 skull:8
+Attack         4.62x  skull                 7  0.023->0.105  jaw:4 skull:3
+Death          3.62x  skull               154  0.028->0.103  skull:55 pec_tip_L:50 pec_tip_R:38 pec_mid_R:7
+Grab           2.66x  pec_tip_R            17  0.043->0.115  pec_tip_R:9 skull:6 pec_mid_R:1 pec_tip_L:1
+Ability        2.40x  pec_tip_R             5  0.043->0.103  skull:2 pec_tip_R:2 pec_tip_L:1
+Parry          2.06x  pec_tip_L             3  0.046->0.096  skull:2 pec_tip_L:1
+Dive           1.88x  skull                 0  0.054->0.101  
+Dodge          1.82x  pec_tip_L             0  0.061->0.111  
+TurnLeft       1.78x  skull                 0  0.054->0.095  
+Growth         1.70x  pec_tip_L             0  0.061->0.104  
+8 of 23 clips tear an edge past 2x

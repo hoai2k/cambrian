@@ -1,0 +1,47 @@
+{
+  "id": "phragmoteuthis",
+  "backdrop": [
+    1.0,
+    0.0,
+    1.0,
+    1.0
+  ],
+  "shots": [
+    {
+      "clip": "Bite",
+      "t": 0.22,
+      "pixels": 378000,
+      "differingPixels": 1,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 8908,
+      "markedImage": null,
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/phragmoteuthis/gape-solid/Bite-0.22-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/phragmoteuthis/gape-solid/Bite-0.22-culled.png"
+    },
+    {
+      "clip": "Attack",
+      "t": 0.4,
+      "pixels": 378000,
+      "differingPixels": 0,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 11608,
+      "markedImage": null,
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/phragmoteuthis/gape-solid/Attack-0.4-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/phragmoteuthis/gape-solid/Attack-0.4-culled.png"
+    },
+    {
+      "clip": "Eat",
+      "t": 0.37,
+      "pixels": 378000,
+      "differingPixels": 0,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 4484,
+      "markedImage": null,
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/phragmoteuthis/gape-solid/Eat-0.37-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-a6c340b335b50edac/local/triassic-authoring/phragmoteuthis/gape-solid/Eat-0.37-culled.png"
+    }
+  ]
+}

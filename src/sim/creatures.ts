@@ -1,5 +1,5 @@
 import { ACTIVE_ERA } from '../content';
-import type { CreatureId } from '../content/creature-types';
+import type { CreatureDef, CreatureId } from '../content/creature-types';
 export type { CreatureId, AbilityId, CreatureDef, MoveDef } from '../content/creature-types';
 
 // Shared systems consume only the selected build's roster.
@@ -11,6 +11,17 @@ export const CREATURE_IDS = CREATURES.map((c) => c.id);
  * has no portrait of its own, so those creatures stay off the selection screen until their own
  * model lands. Ecology, bots and the simulation still use the whole roster.
  */
+/**
+ * The animals the *sea* is populated with: the roster minus the shore animals.
+ *
+ * A `shore: true` creature stands on the beach and strikes into the water (`src/sim/triassic/
+ * shore.ts` places them, one per post, pinned and brainless). It is not a swimmer, so it has no
+ * business in the ambient draw — and it was in it, because that draw took the whole roster: the
+ * Triassic was spawning hatchling Tanystropheus out in open water with ordinary brains, walking
+ * animals swimming around biting people. Ecology and bots take this rather than `CREATURES`.
+ */
+export const WILD = CREATURES.filter((c) => !c.shore);
+export const WILD_IDS = WILD.map((c) => c.id);
 export const PLAYABLE = CREATURES.filter((c) => !c.shore && (ACTIVE_ERA.assets.standInsPlayable || !ACTIVE_ERA.assets.standIns?.[c.id]));
 export const PLAYABLE_IDS = PLAYABLE.map((c) => c.id);
 /**
@@ -65,7 +76,21 @@ export function setEquivalentSizing(on: boolean) { byId = on ? flat : natural; }
  * from the resized numbers would report the size a second time and tell the player Marrella was
  * slow, when what it is is small.
  */
-export const authoredCreature = (id: CreatureId) => flat.get(id)!;
+export const authoredCreature = (id: CreatureId) => (guests.get(id as string) as typeof CREATURES[number] | undefined) ?? flat.get(id)!;
 /** The animal's own length in centimetres, where the era knows it. */
 export const realCm = (id: CreatureId) => ACTIVE_ERA.naturalSizes?.[id]?.realCm;
-export const creature = (id: CreatureId) => byId.get(id)!;
+/**
+ * Animals from the other games, admitted as visitors (src/content/visitors.ts).
+ *
+ * They are kept in their own map rather than folded into the roster on purpose: the roster is what
+ * the pick grid draws, what bots are drawn from and what the sea is populated with, and a visitor
+ * belongs to none of that — it is one body a player brought with them. So `creature()` finds it and
+ * nothing that walks `CREATURES` ever does.
+ */
+const guests = new Map<string, CreatureDef>();
+export function admitVisitors(defs: readonly CreatureDef[]) {
+  for (const d of defs) guests.set(d.id, d);
+}
+/** Is this id a visitor rather than one of this game's own? */
+export const isVisitor = (id: string) => guests.has(id);
+export const creature = (id: CreatureId) => byId.get(id) ?? (guests.get(id as string) as typeof CREATURES[number]);

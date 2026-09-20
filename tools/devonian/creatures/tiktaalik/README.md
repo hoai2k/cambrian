@@ -81,3 +81,59 @@ snout at the corners (oral clearance 20/625 negative → 0/625, min +0.024 vs V2
 135,948 / 38,060 triangles; intake, check-export, check-pose-attachments PASS; portraits from the V3
 build; `anchors.json` is V3's. `build.py` still reproduces V2. The user accepted the study on 12
 September; badge cleared.
+
+## Sculpt port shipped — 15 September 2026
+
+The user's viewer sculpt (`docs/viewer-sculpt.md`) asked for a deeper, narrower animal: the head
+and neck much deeper top and bottom (stations 15–18, dorsal +26/+56/+28/+25%, ventral
++42/+76/+83/+50%), the tail deeper (stations 1–5), the trunk 1.4–5.8% narrower, the fore body's
+top-view outline pulled in 7.7–18.7% over the pectoral fin, and the eyes 0.077 in towards the
+midline. It lands in `anatomy_v3.py` alone — `SEC`'s `h`/`z` columns, `PEC_X`/`PEC_BONE` for the
+fin and its bone chain, and `EYE`/`EYE_DEPTH`. How the height rows are derived was rewritten the
+next day; the section below is the one that describes what ships.
+
+Where the outline is the fin rather than the trunk, the fin is what narrows: `PEC_X` scales each
+pectoral control row's centre and its `.84w` lateral spread, never the `.54w` fore-and-aft sweep,
+and `PEC_BONE` moves the shoulder/elbow/distal/web joints with it. The eyes are seated by depth
+below the surface at their own station (`EYE_DEPTH`, the shipped pair's own .06825) instead of at a
+fixed z, because the roof over them rose with the deeper head and a fixed z would have buried them.
+
+Oral clearance 0/625 negative, minimum +0.0214 (V3's own +0.0241); the 126-pose attachment check
+passes all four fin-root centroids and all 72 tooth bases, maximum tooth-base-to-lining distance
+unchanged at 0.00427.
+
+## Corrected — 15 September 2026
+
+The first go at that port put an **indent in the snout**, in front of the eye. It solved each
+`SEC` row against the *station table* and corrected it proportionally three times over, and a
+station is a windowed extreme: it reports the highest point in its window, so a back that humps and
+then troughs inside one window measures exactly as well as a smooth one. Every station read within
+a few percent and the head had a local maximum at y=−2.25 and a local minimum at y=−2.00. The
+metric was fine; it was being optimised against instead of the shape it stands for.
+
+`port-sculpt.mjs` replaces that with one pass of the thing the user actually approved. The preview
+is `profileWarp` in `src/viewer/sculpt/profile.ts`: at each axis it reads the base and edited
+dorsal/ventral curves, moves the section's midline to the edited one, and scales the half-height
+about it. The tool imports `evaluate` from the viewer module rather than reimplementing its
+Hermite, applies it to the builder's own rows, and prints the table. Nothing iterates and nothing
+is free, so the rows land on a smooth curve.
+
+Measured against the viewer's own preview — the shipped mesh with `profileWarp` applied to every
+vertex — the new table is within **2.4%** of the local depth at every station on both curves,
+where the three-round table was out by **7.7%**. Against `npm run sculpt:measure` it reads *worse*
+than that table did, and deliberately: that tool interpolates the target curve linearly between
+stations while the viewer previews it as a cubic Hermite, and a station's window is half a station
+wide, so they part company wherever the edited curve bends sharply. Station 19 is the extreme —
+the sculpt pins the snout tip to no change while station 18 asks +50% ventral — and the viewer's
+own preview reads +26.4% there against this build's +25.9%.
+
+`checkLoft` in `anatomy_v3.py` is the guard, asserted on every build and recorded as
+`loftExcursion`: between each pair of rows the lofted dorsal line may not leave the range its own
+two rows span by more than 1% of the section's height. The pre-sculpt table runs to 0.3%, this one
+to **0.2%**, the indent to 1.9%.
+
+One thing the sculpt itself asks for and this build reproduces: a dip in the dorsal line at
+station 14 (−8.2%, between station 15 at +26% and station 13 at 0%), which lands at builder
+y ≈ −0.4, over the shoulder. It is in the exported file and it was in the viewer's preview, so it
+is drawn rather than introduced — but it is a dip, and worth a second look if the back reads oddly
+there.

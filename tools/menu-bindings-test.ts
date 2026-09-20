@@ -113,14 +113,18 @@ for (const { button, name, drives } of PAD_LAYOUT) {
  * and never a menu action — a mouse press must not be able to confirm, back out or pause, or a
  * click aimed at the sea would also answer whatever the menus were asking.
  */
-const MOUSE: { name: string; press: Partial<Record<'left' | 'middle' | 'right', boolean>>; expect: (keyof RawControls)[] }[] = [
-  { name: 'left click', press: { left: true }, expect: ['heavy'] },
+const MOUSE: { name: string; press: Partial<Record<'click' | 'hold' | 'middle' | 'right', boolean>>; expect: (keyof RawControls)[] }[] = [
+  // The left button is two of these, told apart by how long it was down: a click is the bite and a
+  // hold is the heavy. They are different presses, so they may share a button the way a tap and a
+  // hold always can — what must not happen is one press driving both.
+  { name: 'left click', press: { click: true }, expect: ['light'] },
+  { name: 'left hold', press: { hold: true }, expect: ['heavy'] },
   { name: 'right click', press: { right: true }, expect: ['dash', 'dodge'] },
   { name: 'middle click', press: { middle: true }, expect: ['aim', 'lock'] },
 ];
-const MOUSE_FORBIDDEN: (keyof RawControls)[] = ['confirm', 'back', 'menu', 'lb', 'rb', 'view', 'teleport', 'light', 'ability', 'guard', 'rise', 'sink'];
+const MOUSE_FORBIDDEN: (keyof RawControls)[] = ['confirm', 'back', 'menu', 'lb', 'rb', 'view', 'teleport', 'ability', 'guard', 'rise', 'sink'];
 for (const m of MOUSE) {
-  const c = applyMouse(emptyControls(), { dx: 0, dy: 0, zoom: 0, left: false, middle: false, right: false, ...m.press });
+  const c = applyMouse(emptyControls(), { dx: 0, dy: 0, zoom: 0, click: false, hold: false, dragging: false, middle: false, right: false, ndc: undefined, ...m.press });
   for (const k of m.expect) if (!c[k]) fail(`${m.name} does not drive "${String(k)}"`);
   for (const k of MOUSE_FORBIDDEN) if (c[k]) fail(`${m.name} drives the menu/gameplay control "${String(k)}"`);
   const others = MOUSE.filter((o) => o !== m).flatMap((o) => o.expect).filter((k) => !m.expect.includes(k));

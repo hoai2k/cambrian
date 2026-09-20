@@ -1,0 +1,1779 @@
+{
+  "sourceSha256": "25fe69221698be87f6c7939edff529638baec8bc2b55988aeb315a865d14984a",
+  "sourceTriangles": 19974,
+  "sourceComponents": 1,
+  "componentSizes": [
+    9989
+  ],
+  "removedComponents": [],
+  "removedVertices": 0,
+  "remeshTriangles": 78028,
+  "puppetBudget": 7000,
+  "voxel": 0.0034,
+  "fullTriangles": 21828,
+  "puppetTriangles": 8574,
+  "parts": {
+    "authoredBody": 20288,
+    "authoredJaw": 532,
+    "puppetBody": 7243,
+    "puppetJaw": 323,
+    "sharedOral": 1008
+  },
+  "bones": 33,
+  "cervicals": 6,
+  "caudals": 10,
+  "clips": {
+    "Idle": 3.0,
+    "Swim": 1.6,
+    "Sprint": 1.0,
+    "TurnLeft": 1.4,
+    "TurnRight": 1.4,
+    "Dive": 1.2,
+    "Rise": 1.2,
+    "Attack": 0.8,
+    "Bite": 0.4,
+    "Heavy": 0.9,
+    "Hit": 0.5,
+    "Death": 1.6,
+    "Guard": 1.0,
+    "Parry": 0.3,
+    "Dodge": 0.4,
+    "Eat": 1.4,
+    "Stagger": 1.0,
+    "Ability": 1.0,
+    "Grab": 1.0,
+    "Breath": 2.0,
+    "Growth": 1.4,
+    "Crawl": 1.4,
+    "Run": 0.62,
+    "Charge": 1.0,
+    "Snatch": 0.7,
+    "Retreat": 1.2
+  },
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "Crawl",
+    "Run"
+  ],
+  "loopSeams": {
+    "Idle": 4.0155406735770374e-17,
+    "Swim": 1.102182101152202e-17,
+    "Sprint": 1.4879458861863095e-17,
+    "TurnLeft": 2.6995675923855084e-33,
+    "TurnRight": 2.6995675923855084e-33,
+    "Dive": 3.2994715834360624e-33,
+    "Rise": 3.2994715834360624e-33,
+    "Attack": 0.0,
+    "Bite": 6.898894795055417e-33,
+    "Heavy": 0.0,
+    "Hit": 2.9995195879107854e-33,
+    "Death": 1.149999976158142,
+    "Guard": 6.245004348080383e-18,
+    "Parry": 3.5994235789613394e-33,
+    "Dodge": 5.999039175821571e-33,
+    "Eat": 9.367506935710881e-18,
+    "Stagger": 2.9995195879107854e-33,
+    "Ability": 0.0,
+    "Grab": 1.9433475254494188e-17,
+    "Breath": 2.0996637850059467e-33,
+    "Growth": 3.8993755744866164e-33,
+    "Crawl": 7.347880950074885e-18,
+    "Run": 1.469576190014977e-17,
+    "Charge": 0.0,
+    "Snatch": 0.0,
+    "Retreat": 0.0
+  },
+  "boundsAt13Phases": {
+    "Idle": [
+      [
+        -0.9673757553100586,
+        -2.4451165199279785,
+        -1.1245462894439697
+      ],
+      [
+        0.9759810566902161,
+        2.4428212642669678,
+        1.1195882558822632
+      ]
+    ],
+    "Swim": [
+      [
+        -0.867182731628418,
+        -2.371778964996338,
+        -1.3726699352264404
+      ],
+      [
+        0.8942135572433472,
+        2.3844149112701416,
+        1.1443194150924683
+      ]
+    ],
+    "Sprint": [
+      [
+        -1.1202532052993774,
+        -2.3739120960235596,
+        -1.3975616693496704
+      ],
+      [
+        1.1456488370895386,
+        2.333791971206665,
+        1.1444792747497559
+      ]
+    ],
+    "TurnLeft": [
+      [
+        -0.9292178153991699,
+        -2.4593706130981445,
+        -1.1649820804595947
+      ],
+      [
+        1.104291558265686,
+        2.4428212642669678,
+        1.0892810821533203
+      ]
+    ],
+    "TurnRight": [
+      [
+        -1.1247550249099731,
+        -2.4428212642669678,
+        -1.1677641868591309
+      ],
+      [
+        0.9381275773048401,
+        2.4430298805236816,
+        1.081999659538269
+      ]
+    ],
+    "Dive": [
+      [
+        -0.9565110802650452,
+        -2.6827232837677,
+        -1.3659394979476929
+      ],
+      [
+        0.9608571529388428,
+        2.4428212642669678,
+        1.081999659538269
+      ]
+    ],
+    "Rise": [
+      [
+        -0.9566808938980103,
+        -2.4428212642669678,
+        -1.2509509325027466
+      ],
+      [
+        0.9605163931846619,
+        2.445800542831421,
+        1.4869846105575562
+      ]
+    ],
+    "Attack": [
+      [
+        -0.9566456079483032,
+        -2.8133201599121094,
+        -1.1057356595993042
+      ],
+      [
+        0.960638165473938,
+        2.4428844451904297,
+        1.081999659538269
+      ]
+    ],
+    "Bite": [
+      [
+        -0.9566456079483032,
+        -2.605743408203125,
+        -1.1057356595993042
+      ],
+      [
+        0.960638165473938,
+        2.4428212642669678,
+        1.081999659538269
+      ]
+    ],
+    "Heavy": [
+      [
+        -0.9565724730491638,
+        -3.0049524307250977,
+        -1.3200119733810425
+      ],
+      [
+        0.9603716135025024,
+        2.523664712905884,
+        1.3111865520477295
+      ]
+    ],
+    "Hit": [
+      [
+        -1.1371439695358276,
+        -2.529414176940918,
+        -1.2199287414550781
+      ],
+      [
+        0.9381275773048401,
+        2.4428796768188477,
+        1.081999659538269
+      ]
+    ],
+    "Death": [
+      [
+        -1.387333631515503,
+        -2.610011100769043,
+        -1.6716125011444092
+      ],
+      [
+        0.9381275773048401,
+        2.4428212642669678,
+        1.081999659538269
+      ]
+    ],
+    "Guard": [
+      [
+        -0.951198399066925,
+        -2.366178512573242,
+        -1.3607728481292725
+      ],
+      [
+        0.9564123153686523,
+        2.4430081844329834,
+        0.9734209179878235
+      ]
+    ],
+    "Parry": [
+      [
+        -1.1580368280410767,
+        -2.4428212642669678,
+        -1.24495267868042
+      ],
+      [
+        0.9381275773048401,
+        2.4429337978363037,
+        1.100429892539978
+      ]
+    ],
+    "Dodge": [
+      [
+        -0.9292178153991699,
+        -2.5152828693389893,
+        -1.3020333051681519
+      ],
+      [
+        1.1403930187225342,
+        2.4428212642669678,
+        1.081999659538269
+      ]
+    ],
+    "Eat": [
+      [
+        -0.9619999527931213,
+        -2.6641407012939453,
+        -1.3849612474441528
+      ],
+      [
+        0.965339720249176,
+        2.4246394634246826,
+        0.6304000616073608
+      ]
+    ],
+    "Stagger": [
+      [
+        -1.1418942213058472,
+        -2.537855386734009,
+        -1.2203787565231323
+      ],
+      [
+        0.9381275773048401,
+        2.4429051876068115,
+        1.081999659538269
+      ]
+    ],
+    "Ability": [
+      [
+        -0.932574450969696,
+        -2.720743179321289,
+        -1.4933041334152222
+      ],
+      [
+        0.9387212991714478,
+        2.4428844451904297,
+        1.5820502042770386
+      ]
+    ],
+    "Grab": [
+      [
+        -0.9620950222015381,
+        -2.3560006618499756,
+        -1.1186103820800781
+      ],
+      [
+        0.9653605222702026,
+        2.4355247020721436,
+        1.2443084716796875
+      ]
+    ],
+    "Breath": [
+      [
+        -0.9836092591285706,
+        -2.4428212642669678,
+        -1.1269919872283936
+      ],
+      [
+        0.9824382662773132,
+        2.4428212642669678,
+        1.372319221496582
+      ]
+    ],
+    "Growth": [
+      [
+        -1.017625331878662,
+        -2.4428212642669678,
+        -1.0817865133285522
+      ],
+      [
+        0.9381275773048401,
+        2.4429497718811035,
+        1.3723450899124146
+      ]
+    ],
+    "Crawl": [
+      [
+        -0.8674029111862183,
+        -2.452319383621216,
+        -1.3506944179534912
+      ],
+      [
+        0.9204208254814148,
+        2.4359495639801025,
+        1.0820250511169434
+      ]
+    ],
+    "Run": [
+      [
+        -0.9569789171218872,
+        -2.620689630508423,
+        -1.3917381763458252
+      ],
+      [
+        0.9768955707550049,
+        2.4871346950531006,
+        1.4687469005584717
+      ]
+    ],
+    "Charge": [
+      [
+        -0.9292178153991699,
+        -2.697295904159546,
+        -1.4928613901138306
+      ],
+      [
+        0.9381275773048401,
+        2.5174379348754883,
+        1.5101137161254883
+      ]
+    ],
+    "Snatch": [
+      [
+        -0.952705979347229,
+        -2.855062484741211,
+        -1.3751457929611206
+      ],
+      [
+        0.9604419469833374,
+        2.491201162338257,
+        1.081999659538269
+      ]
+    ],
+    "Retreat": [
+      [
+        -2.8150744438171387,
+        -2.4737606048583984,
+        -1.3299167156219482
+      ],
+      [
+        1.4712364673614502,
+        2.4428212642669678,
+        1.3030924797058105
+      ]
+    ]
+  },
+  "modelLength": 4.8856425285339355,
+  "rawLength": 0.9771285057067871,
+  "maximumEnvelopeDifference": 0.04972201585769653,
+  "envelopeTolerance": 0.19542570114135743,
+  "envelopeTolerancePercent": 4.0,
+  "surfaceDistanceMax": 0.15205222368240356,
+  "surfaceDistanceP95": 0.017074478417634837,
+  "surfaceDistanceP99": 0.08527925580739978,
+  "surfaceOutliersOverThreePercent": 1,
+  "surfaceVertices": 10517,
+  "seatingDepthRaw": {
+    "fore_upper_L": 0.017384666949510574,
+    "fore_upper_R": 0.01929374225437641,
+    "hind_upper_L": 0.014803403057157993,
+    "hind_upper_R": 0.012359676882624626,
+    "skull": 0.010119035840034485,
+    "jaw": 0.013005769811570644,
+    "neck_00": 0.02767355740070343,
+    "body": 0.024770189076662064,
+    "chest": 0.02723407745361328,
+    "tail_00": 0.008103884756565094,
+    "tail_01": 0.016688402742147446,
+    "tail_02": 0.013191535137593746,
+    "tail_03": 0.012232395820319653,
+    "tail_04": 0.010174506343901157,
+    "tail_05": 0.008221735246479511,
+    "tail_06": 0.0064773401245474815,
+    "tail_07": 0.005154476035386324,
+    "tail_08": 0.0033023518044501543,
+    "tail_09": 0.0014002766693010926,
+    "neck_01": 0.019117794930934906,
+    "neck_02": 0.018871193751692772,
+    "neck_03": 0.01863851211965084,
+    "neck_04": 0.016919231042265892,
+    "neck_05": 0.0180591382086277
+  },
+  "jawHingeHeadRadius": 0.033916642054059996,
+  "headLateralOffset": 0.013911303468977114,
+  "jawHingeDepthAsFractionOfHeadRadius": 0.3834627788576666,
+  "oralInteriorDepthRaw": 0.00012034643441438675,
+  "oralSeatingCorrection": {
+    "Oral cavity lining": 0.008417234435249865,
+    "Upper tooth row": 0.0025432465658884115,
+    "Lower tooth row": 0.0018737601449019506,
+    "Seated jaw hinge tissue": 0.0
+  },
+  "maxInfluences": 4,
+  "meanInfluences": 3.323289958945098,
+  "trunkYawCorrectionDegrees": -83.327,
+  "unbending": {
+    "applied": true,
+    "tail": {
+      "stations": 52,
+      "arc": 0.6924399285127268,
+      "turningDegrees": 112.72,
+      "maxVertexMove": 0.32498679090905036,
+      "tipLateralMeanBefore": 0.08462154351579437,
+      "tipLateralMeanAfter": -0.04809142734833543
+    }
+  },
+  "restPose": {
+    "curvature": {
+      "tail": {
+        "arc": 0.6313,
+        "totalTurningDeg": 389.1,
+        "meanCurvatureRadius": 0.093,
+        "sectionRadius": 0.0159,
+        "meanCurvatureRadiusOverSection": 5.85,
+        "reliable": false,
+        "unreliableBecause": "the run turns through more than a full circle, which on a standing animal means the band centroids are picking up limb geometry rather than the axis"
+      },
+      "spine": {
+        "arc": 0.7196,
+        "totalTurningDeg": 576.9,
+        "meanCurvatureRadius": 0.0715,
+        "sectionRadius": 0.1345,
+        "meanCurvatureRadiusOverSection": 0.53,
+        "reliable": false,
+        "unreliableBecause": "the run turns through more than a full circle, which on a standing animal means the band centroids are picking up limb geometry rather than the axis"
+      },
+      "neck": {
+        "arc": 0.2778,
+        "totalTurningDeg": 72.3,
+        "meanCurvatureRadius": 0.2201,
+        "sectionRadius": 0.0283,
+        "meanCurvatureRadiusOverSection": 7.77,
+        "reliable": true,
+        "unreliableBecause": null
+      }
+    },
+    "method": "measured on the rows each run is unbent from, coarsened to every third station; a geodesic banding of a standing animal is contaminated by limb geometry at both ends",
+    "limbAsymmetry": {
+      "pairs": [
+        {
+          "pair": "fore",
+          "joints": 4,
+          "meanJointOffset": 0.03205,
+          "overBodyLength": 0.0328
+        },
+        {
+          "pair": "hind",
+          "joints": 4,
+          "meanJointOffset": 0.04763,
+          "overBodyLength": 0.04874
+        }
+      ],
+      "meanJointOffset": 0.03984,
+      "overBodyLength": 0.04077
+    }
+  },
+  "caudalChainStart": 0.16999999999999998,
+  "pelvisFractionOfTrunk": 0.2,
+  "mouth": {
+    "method": "no modelled cavity on this head; the seam follows the head's own measured section at the painted mouth line's measured height, and the teeth are authored",
+    "cavityVerticesFound": 9,
+    "jawFractionOfHeadSection": 0.2289839935175053,
+    "pigmentContrast": 0.2925887526722335,
+    "pigmentStations": [
+      [
+        0.36521266210079195,
+        0.20376892619545617,
+        0.1918889819507552
+      ],
+      [
+        0.375330191731453,
+        0.3024101751186421,
+        0.17582733662054406
+      ],
+      [
+        0.3854477213621139,
+        0.088843022118147,
+        0.17193495250552335
+      ],
+      [
+        0.39556525099277495,
+        0.6600990110992827,
+        0.15826192448844215
+      ],
+      [
+        0.405682780623436,
+        0.5116263715389396,
+        0.1323624305914879
+      ],
+      [
+        0.415800310254097,
+        0.2176392801396414,
+        0.3129187695133922
+      ],
+      [
+        0.42591783988475795,
+        0.16740791313794928,
+        0.28321460815789273
+      ],
+      [
+        0.436035369515419,
+        0.24032870689536925,
+        0.34880663598374306
+      ],
+      [
+        0.44615289914608003,
+        0.2562266058038475,
+        0.34088956212296984
+      ],
+      [
+        0.456270428776741,
+        0.16740050920341557,
+        0.325937906443326
+      ],
+      [
+        0.46638795840740205,
+        0.24795228809761719,
+        0.3019628971865742
+      ],
+      [
+        0.47650548803806303,
+        0.17965169708673762,
+        0.30954318627755517
+      ]
+    ],
+    "proudPatches": [
+      {
+        "vertices": 18,
+        "proudMax": 0.004397829994559288,
+        "x": [
+          0.4571416974067688,
+          0.48856425285339355
+        ],
+        "onJaw": 0,
+        "onSkull": 18
+      },
+      {
+        "vertices": 16,
+        "proudMax": 0.0035087165888398886,
+        "x": [
+          0.4623205065727234,
+          0.48818325996398926
+        ],
+        "onJaw": 9,
+        "onSkull": 7
+      },
+      {
+        "vertices": 7,
+        "proudMax": 0.0031840456649661064,
+        "x": [
+          0.41559797525405884,
+          0.4298335313796997
+        ],
+        "onJaw": 7,
+        "onSkull": 0
+      },
+      {
+        "vertices": 6,
+        "proudMax": 0.0033101963344961405,
+        "x": [
+          0.4231894016265869,
+          0.44326746463775635
+        ],
+        "onJaw": 0,
+        "onSkull": 6
+      }
+    ],
+    "hingeX": 0.40117341817855834,
+    "mouthBackX": 0.39317341817855833,
+    "mouthFrontX": 0.48056425285339355,
+    "liningInset": 0.94,
+    "liningCullsBackfaces": true,
+    "skinDoubleSided": true
+  },
+  "gait": {
+    "Run": {
+      "hindAmplitude": 1.2253844738006592,
+      "foreAmplitude": 0.976717621088028,
+      "hindOverFore": 1.2545944163837501,
+      "bodyRise": 0.21849974989891052
+    },
+    "Charge": {
+      "hindAmplitude": 1.3649345636367798,
+      "foreAmplitude": 0.8761491179466248,
+      "hindOverFore": 1.5578792875300618,
+      "bodyRise": 0.226080022752285
+    }
+  },
+  "limbRadii": {
+    "foreL": {
+      "rows": [
+        [
+          0.395,
+          0.01203,
+          0.03406
+        ],
+        [
+          0.545,
+          0.01622,
+          0.02629
+        ],
+        [
+          0.675,
+          0.01398,
+          0.02414
+        ],
+        [
+          0.805,
+          0.02361,
+          0.03374
+        ],
+        [
+          0.935,
+          0.04783,
+          0.05857
+        ]
+      ],
+      "jointBlend": [
+        0.02441,
+        0.01262
+      ],
+      "segments": [
+        0.14042,
+        0.06976,
+        0.03607
+      ],
+      "flooded": 441,
+      "reach": 0.1213,
+      "seedVertex": 2573,
+      "tFloor": 0.48
+    },
+    "foreR": {
+      "rows": [
+        [
+          0.395,
+          0.01203,
+          0.03406
+        ],
+        [
+          0.545,
+          0.01687,
+          0.02806
+        ],
+        [
+          0.675,
+          0.01363,
+          0.02382
+        ],
+        [
+          0.805,
+          0.02052,
+          0.03191
+        ],
+        [
+          0.935,
+          0.05059,
+          0.06259
+        ]
+      ],
+      "jointBlend": [
+        0.02641,
+        0.01174
+      ],
+      "segments": [
+        0.13715,
+        0.07545,
+        0.03354
+      ],
+      "flooded": 558,
+      "reach": 0.1232,
+      "seedVertex": 6542,
+      "tFloor": 0.48
+    },
+    "hindL": {
+      "rows": [
+        [
+          0.395,
+          0.0145,
+          0.04068
+        ],
+        [
+          0.545,
+          0.02592,
+          0.03609
+        ],
+        [
+          0.675,
+          0.04567,
+          0.05594
+        ],
+        [
+          0.935,
+          0.09922,
+          0.11229
+        ]
+      ],
+      "jointBlend": [
+        0.02901,
+        0.01712
+      ],
+      "segments": [
+        0.13992,
+        0.08288,
+        0.04893
+      ],
+      "flooded": 681,
+      "reach": 0.1226,
+      "seedVertex": 4515,
+      "tFloor": 0.48
+    },
+    "hindR": {
+      "rows": [
+        [
+          0.395,
+          0.0145,
+          0.04068
+        ],
+        [
+          0.545,
+          0.0234,
+          0.03424
+        ],
+        [
+          0.675,
+          0.03297,
+          0.04345
+        ],
+        [
+          0.805,
+          0.02512,
+          0.03531
+        ],
+        [
+          0.935,
+          0.07258,
+          0.0853
+        ]
+      ],
+      "jointBlend": [
+        0.02297,
+        0.01809
+      ],
+      "segments": [
+        0.12583,
+        0.06563,
+        0.05167
+      ],
+      "flooded": 623,
+      "reach": 0.1243,
+      "seedVertex": 960,
+      "tFloor": 0.48
+    }
+  },
+  "authoredLimbRadii": {
+    "fore": [
+      0.01,
+      0.013,
+      0.03,
+      0.026
+    ],
+    "hind": [
+      0.012,
+      0.016,
+      0.036,
+      0.03
+    ]
+  },
+  "weightRelaxationPasses": 14,
+  "throatRegion": {
+    "vertices": 191,
+    "box": [
+      0.0343,
+      0.0542,
+      0.043
+    ],
+    "span": 0.034,
+    "reach": 0.048,
+    "seam": 0.15779
+  },
+  "mandible": {
+    "Macrocnemus authored body": {
+      "vertices": 317,
+      "polygons": 384,
+      "box": [
+        0.0853,
+        0.0625,
+        0.0353
+      ],
+      "xRange": [
+        0.4012,
+        0.4864
+      ]
+    },
+    "Macrocnemus procedural volume puppet": {
+      "vertices": 197,
+      "polygons": 220,
+      "box": [
+        0.0853,
+        0.0615,
+        0.0354
+      ],
+      "xRange": [
+        0.4012,
+        0.4865
+      ]
+    }
+  },
+  "rimFlangeVertices": {
+    "Macrocnemus authored body": 115,
+    "Macrocnemus procedural volume puppet": 69,
+    "Macrocnemus authored body lower jaw": 100,
+    "Macrocnemus procedural volume puppet lower jaw": 69
+  },
+  "hingePlugFit": 0.4517,
+  "liningPower": 3.0,
+  "liningInset": 0.94,
+  "limbSweep": {
+    "Idle": {
+      "fore_upper_L": {
+        "sweptDeg": 5.7,
+        "peakToPeakDeg": [
+          2.3,
+          1.3,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 5.7,
+        "peakToPeakDeg": [
+          2.3,
+          1.3,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 5.7,
+        "peakToPeakDeg": [
+          2.3,
+          1.3,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 5.7,
+        "peakToPeakDeg": [
+          2.3,
+          1.3,
+          0.0
+        ]
+      }
+    },
+    "Swim": {
+      "fore_upper_L": {
+        "sweptDeg": 50.4,
+        "peakToPeakDeg": [
+          25.2,
+          0.0,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 50.4,
+        "peakToPeakDeg": [
+          25.2,
+          0.0,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 96.3,
+        "peakToPeakDeg": [
+          48.1,
+          0.0,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 96.3,
+        "peakToPeakDeg": [
+          48.1,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "Sprint": {
+      "fore_upper_L": {
+        "sweptDeg": 67.7,
+        "peakToPeakDeg": [
+          33.8,
+          0.0,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 67.7,
+        "peakToPeakDeg": [
+          33.8,
+          0.0,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 129.2,
+        "peakToPeakDeg": [
+          64.6,
+          0.0,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 129.2,
+        "peakToPeakDeg": [
+          64.6,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "TurnLeft": {
+      "fore_upper_L": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      }
+    },
+    "TurnRight": {
+      "fore_upper_L": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      }
+    },
+    "Dive": {
+      "fore_upper_L": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      }
+    },
+    "Rise": {
+      "fore_upper_L": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      }
+    },
+    "Attack": {
+      "fore_upper_L": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      }
+    },
+    "Bite": {
+      "fore_upper_L": {
+        "sweptDeg": 4.7,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 4.7,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 4.7,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 4.7,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      }
+    },
+    "Heavy": {
+      "fore_upper_L": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      }
+    },
+    "Hit": {
+      "fore_upper_L": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      }
+    },
+    "Death": {
+      "fore_upper_L": {
+        "sweptDeg": 15.8,
+        "peakToPeakDeg": [
+          11.5,
+          10.3,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 15.8,
+        "peakToPeakDeg": [
+          11.5,
+          10.3,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 15.8,
+        "peakToPeakDeg": [
+          11.5,
+          10.3,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 15.8,
+        "peakToPeakDeg": [
+          11.5,
+          10.3,
+          0.0
+        ]
+      }
+    },
+    "Guard": {
+      "fore_upper_L": {
+        "sweptDeg": 5.1,
+        "peakToPeakDeg": [
+          2.1,
+          1.1,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 5.1,
+        "peakToPeakDeg": [
+          2.1,
+          1.1,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 5.1,
+        "peakToPeakDeg": [
+          2.1,
+          1.1,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 5.1,
+        "peakToPeakDeg": [
+          2.1,
+          1.1,
+          0.0
+        ]
+      }
+    },
+    "Parry": {
+      "fore_upper_L": {
+        "sweptDeg": 4.7,
+        "peakToPeakDeg": [
+          1.7,
+          1.3,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 4.7,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 4.7,
+        "peakToPeakDeg": [
+          1.7,
+          1.3,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 4.7,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      }
+    },
+    "Dodge": {
+      "fore_upper_L": {
+        "sweptDeg": 20.8,
+        "peakToPeakDeg": [
+          7.4,
+          6.3,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 20.9,
+        "peakToPeakDeg": [
+          7.3,
+          6.3,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 20.8,
+        "peakToPeakDeg": [
+          7.4,
+          6.3,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 20.9,
+        "peakToPeakDeg": [
+          7.3,
+          6.3,
+          0.0
+        ]
+      }
+    },
+    "Eat": {
+      "fore_upper_L": {
+        "sweptDeg": 7.7,
+        "peakToPeakDeg": [
+          3.1,
+          1.7,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 7.7,
+        "peakToPeakDeg": [
+          3.1,
+          1.7,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 7.7,
+        "peakToPeakDeg": [
+          3.1,
+          1.7,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 7.7,
+        "peakToPeakDeg": [
+          3.1,
+          1.7,
+          0.0
+        ]
+      }
+    },
+    "Stagger": {
+      "fore_upper_L": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 4.8,
+        "peakToPeakDeg": [
+          1.7,
+          1.4,
+          0.0
+        ]
+      }
+    },
+    "Ability": {
+      "fore_upper_L": {
+        "sweptDeg": 56.2,
+        "peakToPeakDeg": [
+          26.2,
+          8.0,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 71.6,
+        "peakToPeakDeg": [
+          32.9,
+          5.9,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 86.6,
+        "peakToPeakDeg": [
+          40.3,
+          5.7,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 71.7,
+        "peakToPeakDeg": [
+          34.4,
+          8.0,
+          0.0
+        ]
+      }
+    },
+    "Grab": {
+      "fore_upper_L": {
+        "sweptDeg": 7.7,
+        "peakToPeakDeg": [
+          3.1,
+          1.7,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 7.7,
+        "peakToPeakDeg": [
+          3.1,
+          1.7,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 7.7,
+        "peakToPeakDeg": [
+          3.1,
+          1.7,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 7.7,
+        "peakToPeakDeg": [
+          3.1,
+          1.7,
+          0.0
+        ]
+      }
+    },
+    "Breath": {
+      "fore_upper_L": {
+        "sweptDeg": 9.6,
+        "peakToPeakDeg": [
+          3.3,
+          2.9,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 9.7,
+        "peakToPeakDeg": [
+          3.4,
+          2.8,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 9.6,
+        "peakToPeakDeg": [
+          3.3,
+          2.9,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 9.7,
+        "peakToPeakDeg": [
+          3.4,
+          2.8,
+          0.0
+        ]
+      }
+    },
+    "Growth": {
+      "fore_upper_L": {
+        "sweptDeg": 7.7,
+        "peakToPeakDeg": [
+          2.7,
+          2.3,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 7.7,
+        "peakToPeakDeg": [
+          2.7,
+          2.3,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 7.7,
+        "peakToPeakDeg": [
+          2.7,
+          2.3,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 7.7,
+        "peakToPeakDeg": [
+          2.7,
+          2.3,
+          0.0
+        ]
+      }
+    },
+    "Crawl": {
+      "fore_upper_L": {
+        "sweptDeg": 56.0,
+        "peakToPeakDeg": [
+          27.6,
+          3.4,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 56.0,
+        "peakToPeakDeg": [
+          27.6,
+          3.4,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 71.1,
+        "peakToPeakDeg": [
+          35.3,
+          3.4,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 71.1,
+        "peakToPeakDeg": [
+          35.3,
+          3.4,
+          0.0
+        ]
+      }
+    },
+    "Run": {
+      "fore_upper_L": {
+        "sweptDeg": 98.6,
+        "peakToPeakDeg": [
+          49.1,
+          3.3,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 99.6,
+        "peakToPeakDeg": [
+          49.6,
+          3.4,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 127.6,
+        "peakToPeakDeg": [
+          63.6,
+          3.4,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 127.6,
+        "peakToPeakDeg": [
+          63.6,
+          3.4,
+          0.0
+        ]
+      }
+    },
+    "Charge": {
+      "fore_upper_L": {
+        "sweptDeg": 289.8,
+        "peakToPeakDeg": [
+          48.5,
+          8.0,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 291.0,
+        "peakToPeakDeg": [
+          46.9,
+          8.0,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 390.6,
+        "peakToPeakDeg": [
+          72.6,
+          8.0,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 398.4,
+        "peakToPeakDeg": [
+          71.5,
+          8.0,
+          0.0
+        ]
+      }
+    },
+    "Snatch": {
+      "fore_upper_L": {
+        "sweptDeg": 27.3,
+        "peakToPeakDeg": [
+          13.4,
+          1.4,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 27.8,
+        "peakToPeakDeg": [
+          13.6,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 14.6,
+        "peakToPeakDeg": [
+          7.0,
+          1.4,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 14.1,
+        "peakToPeakDeg": [
+          6.7,
+          1.4,
+          0.0
+        ]
+      }
+    },
+    "Retreat": {
+      "fore_upper_L": {
+        "sweptDeg": 359.6,
+        "peakToPeakDeg": [
+          53.2,
+          8.0,
+          0.0
+        ]
+      },
+      "fore_upper_R": {
+        "sweptDeg": 363.5,
+        "peakToPeakDeg": [
+          52.5,
+          8.0,
+          0.0
+        ]
+      },
+      "hind_upper_L": {
+        "sweptDeg": 462.5,
+        "peakToPeakDeg": [
+          68.4,
+          8.0,
+          0.0
+        ]
+      },
+      "hind_upper_R": {
+        "sweptDeg": 459.5,
+        "peakToPeakDeg": [
+          68.1,
+          8.0,
+          0.0
+        ]
+      }
+    }
+  },
+  "mouthCut": {
+    "maxDeviationRaw": 0.03043,
+    "maxDeviationOverBodyLength": 0.03114,
+    "worstStation": {
+      "x": 0.3956,
+      "measuredFraction": 0.6601,
+      "usedFraction": 0.229,
+      "sectionHeight": 0.07058
+    },
+    "stations": 12,
+    "measuredFractionMin": 0.0888,
+    "measuredFractionMax": 0.6601,
+    "measuredFractionMedianUsed": 0.229,
+    "method": "no modelled mouth slit on this head (the cavity instrument finds no cavity), so the lip line is read off the albedo per station and the cut is the head section at the median of those readings"
+  },
+  "normalizedWeights": true,
+  "rootStable": true,
+  "noScaleChannels": true
+}

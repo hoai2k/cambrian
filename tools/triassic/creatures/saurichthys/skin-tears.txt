@@ -1,0 +1,18 @@
+
+public/assets/triassic/creatures/saurichthys.glb   35544 edges x 17 phases x 23 clips
+clip            skin  on bone             all     >2x  worst bones
+Death          3.61x  pec_tip_R         3.61x      22  0.024->0.086  pec_tip_R:14 chest:8
+Grab           2.40x  pec_tip_R         4.90x    1343  0.032->0.076  skull:764 jaw:577 chest:1 pec_tip_R:1
+Dive           2.07x  chest             2.07x       3  0.049->0.100  chest:3
+TurnLeft       2.05x  chest             2.05x       3  0.049->0.099  chest:3
+FastStart      1.97x  chest             5.61x     109  0.049->0.096  skull:65 jaw:44
+Heavy          1.96x  chest             6.27x     133  0.049->0.095  skull:77 jaw:56
+Ability        1.95x  chest             4.70x      85  0.049->0.095  skull:49 jaw:36
+Attack         1.93x  chest             6.05x     123  0.049->0.094  skull:71 jaw:52
+Parry          1.84x  chest             1.84x       0  0.049->0.089  
+Dodge          1.65x  pec_mid_L         1.65x       0  0.048->0.079  
+Bite           1.64x  chest             6.56x     475  0.049->0.080  skull:276 jaw:199
+Sprint         1.63x  chest             1.63x       0  0.049->0.079  
+Eat            1.12x  pec_mid_R         4.55x     464  0.076->0.085  skull:246 jaw:218
+10 of 23 clips tear an edge past 2x
+worst SKIN 3.61x · worst including the oral lining 6.56x (the lining is a sac built to stretch; the skin figure is the one to judge)

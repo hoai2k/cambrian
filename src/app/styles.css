@@ -287,7 +287,9 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .hint { position: absolute; left: 50%; bottom: 5.4em; transform: translateX(-50%); margin: 0; padding: .6em 1.1em; border-radius: 1em; background: rgba(6,22,28,.72); border: 1px solid rgba(255,179,107,.5); color: var(--foam); font-weight: 700; font-size: 1em; white-space: nowrap; animation: rise-in .4s both; max-width: 90%; text-overflow: ellipsis; overflow: hidden; }
 .hint.danger { border-color: var(--coral); color: #ffd4da; }
 .marker { position: absolute; width: calc(.7em * var(--s)); height: calc(.7em * var(--s)); transform: translate(-50%, -50%) rotate(45deg); border: 2px solid currentColor; border-radius: 2px; opacity: .8; box-shadow: 0 0 8px currentColor; transition: left .1s linear, top .1s linear; }
-.marker-giant { animation: blink .8s infinite; }
+/* Only a mark that is *about* you blinks. It used to be every giant-band body on screen. */
+.marker.hot { animation: blink .8s infinite; }
+.marker:not(.hot) { opacity: .55; box-shadow: none; }
 .hunter-arrow { position: absolute; left: 50%; top: 50%; color: var(--coral); font-size: 2.2em; text-shadow: 0 0 14px var(--coral); }
 .hunter-arrow span { display: inline-block; transform: rotate(90deg); }
 /* Death: a line low on the viewport, not a panel over it. You watch what got you finish the job;
@@ -408,7 +410,6 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .results-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-right: 4px; }
 .menu-buttons { flex: none; display: grid; gap: 8px; margin-top: 18px; }
 .menu-choices { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.menu-hint { margin: 0; font-size: 12px; color: var(--dim); }
 /* The highlight, for a menu that is steered rather than button-mapped. Deliberately loud: on the
    results screen it is the only thing saying which choice a press will take. */
 .menu-choices .selected { outline: 2px solid var(--ember); outline-offset: 3px; }
@@ -452,6 +453,12 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .apex-card.unfound img { filter: grayscale(1) brightness(.32) contrast(.6); opacity: .5; }
 .apex-card.found { background: rgba(238,250,246,.06); }
 .apex-card.found span { color: var(--foam); }
+/* The mark that says this animal is now playable in the other two games. Opposite corner to NEW,
+   since a card that has just been earned carries both, and no bigger than it has to be on a tile
+   this size. Matches the glyph on the Visitors button in the pick grid. */
+.discoveries .visitor-tag { position: absolute; top: 3px; left: 3px; display: grid; place-items: center; width: 14px; height: 14px; border-radius: 50%; background: rgba(6,22,28,.82); font: 700 9px/1 var(--font-display); color: #ffd27a; }
+.apex-note { margin: 6px 2px 0; font-size: 10px; line-height: 1.5; color: var(--dim); }
+.apex-note b { color: var(--foam); font-weight: 700; }
 
 /* ---------- Dialogs ---------- */
 .tools-dialog { position: fixed; inset: 0; margin: auto; width: min(94vw, 900px); max-height: 92vh; padding: 0; border: 1px solid rgba(238,250,246,.16); border-radius: 24px; background: rgba(6,22,28,.92); color: var(--foam); box-shadow: 0 40px 100px rgba(0,0,0,.6); overflow: auto; }
@@ -666,6 +673,23 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .cell.locked { animation: cell-lock .5s ease-out both; }
 @keyframes cursor-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
 @keyframes badge-pop { from { transform: scale(0); } to { transform: scale(1); } }
+/* The grid's buttons (Random, Visitors). A card is a photograph of an animal; these are not, so
+   they are smaller and plainer, and they say so with a glyph rather than a picture. They keep the
+   cell's 3-row subgrid so the row they sit on lines up with the cards beside them, and they are
+   placed by column from the same model the cursor walks (src/app/roster-grid.ts) — right-aligned
+   under the last card column — so adding one never moves a card. */
+.cell.extra { align-content: center; justify-items: center; row-gap: 2px; background: rgba(6,22,28,.5); border-style: dashed; }
+.cell.extra .extra-glyph { font: 700 1.6em var(--font-display); line-height: 1; color: var(--c); opacity: .9; }
+.cell.extra .extra-name { font: 700 .72em var(--font-display); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
+.cell.extra:hover, .cell.extra.hover { border-style: solid; }
+.cell.extra.hover .extra-name { color: var(--foam); }
+/* Smaller than a card: the tile keeps its grid slot, and the button shrinks inside it. */
+.cell.extra { padding: 4px; align-self: center; transform: scale(.82); transform-origin: center; }
+.cell.extra .extra-count { position: absolute; top: 3px; right: 5px; font: 700 .62em var(--font-display); color: var(--foam); opacity: .75; }
+/* A visitor is not this game's animal and carries none of its records, so the crew card says what
+   it is instead of showing a growth badge it could never fill. */
+.visitor-note { margin: .2em 0 0; font: 600 .78em var(--font-display); letter-spacing: .1em; color: #ffd27a; }
+.visitor-note b { color: var(--foam); letter-spacing: .18em; }
 @keyframes cell-lock { 0% { box-shadow: 0 0 0 0 var(--c); } 100% { box-shadow: 0 0 0 18px transparent; } }
 
 /* ---------- Hero card ---------- */

@@ -89,7 +89,7 @@ from an impression.
 | **Birgeria** | **WRONG** | two dorsal fins, the large one at frac 0.42–0.46, against "single dorsal set far back" |
 | **Mixosaurus** | **WRONG** | caudal fin 0.284 L deep, deeply forked, two comparable lobes, against "not the post-Triassic lunate fluke" |
 | **Helicoprion** | ~~WRONG~~ → **OK on placement, WRONG on form** | the "disc outside the chin" was the dropped mandible of an open-mouthed generation — see the correction in section 8. The whorl is correctly seated inside the lower jaw; its *shape* is a lumpy rosette rather than a spiral, and there is phantom upper-jaw dentition |
-| **Askeptosaurus** | **WRONG** | tail 0.49–0.54 against "about two-thirds"; no neck (body full width within 0.06 of the snout) against 13 elongate cervicals |
+| **Askeptosaurus** | ~~WRONG~~ → **the measurement was, see [askeptosaurus-verdict.md](askeptosaurus-verdict.md)** | measured along the animal's own surface rather than along a straight axis through a body bent 1.81×: tail **0.58** (not 0.49–0.54) against 0.63–0.66, and head+neck **0.193** (not 0.06), which is a neck. What is wrong is the *pose*, not the proportions: the frame is 42° off the file axis with a 33° roll and the kit's axis swings 3.28× the trunk's own half width |
 | Atopodentatus | OK | T-bar 0.208 L across and only 0.050 L deep; present and reading |
 | Hybodus | OK | two spined dorsals at frac 0.29 and 0.46, heterocercal tail |
 | Saurichthys | OK | rostrum 0.17 L, opposed dorsal/anal at frac 0.76–0.82, trunk 0.12 L deep |
@@ -186,6 +186,12 @@ of body length. **Back to the canonical pose.** Target for a brief: **fore- and 
 about 0.25 L, total span about 0.75 L**, with the hind pair slightly the larger, and the barrel
 trunk kept.
 
+*As built (September 2026).* The body was built from the greenlit pose rather than corrected, as the
+pipeline requires. The published preview carries a **neck stretch**, which lengthens the animal
+without touching the limbs, so the same fault measures a little smaller on the delivery: fore tips at
+x −0.416 and +0.414 give a span of **0.83 L**, each flipper standing about **0.31 L** clear of the
+flank against the ~0.25 L the reference asks for. The redraw brief above stands unchanged.
+
 ### 4. Birgeria — two dorsal fins, and the big one amidships
 
 Preview, length 1.000 along glTF −x, nose at frac 0, body 0.631 L deep (fins included).
@@ -202,6 +208,11 @@ Measured, there are two, and the principal one is at mid-body.
 mid-body dorsal with smaller finlets behind it, a tuna template rather than the fish. **Back to the
 canonical pose.** Target: **one dorsal fin, its leading edge no further forward than 0.65 of body
 length, no finlets**; keep the naked skin, the big head and the deep fork.
+
+*As built (September 2026).* The second dorsal is collapsed into the back in the published preview
+(`smooth-region.py`, 0.9 % of its protrusion left) and the delivery carries the remaining 129-vertex
+patch on axial weights, so the silhouette has one dorsal. Its **placement is untouched**: measured on
+the delivery it runs frac 0.40–0.57 with its own seated joint. The redraw brief above stands.
 
 ### 5. Mixosaurus — a Jurassic fluke on a Triassic tail
 
@@ -240,6 +251,15 @@ sweeps right across the frame and back), but it sets the head close on the trunk
 mesh does. **The tail is fixable downstream** — regenerate and hold it at two-thirds — **but the
 missing neck goes back to the pose.** Target: **tail 0.63–0.66
 of total length; a neck of 13 cervicals reading as about 0.12–0.15 L between skull and shoulder.**
+
+> **Corrected, 15 September 2026 — [askeptosaurus-verdict.md](askeptosaurus-verdict.md).** This
+> entry's own caveat turns out to be the whole story. Measured along the animal's surface instead of
+> along the straight axis, the tail is **0.580** and the head-and-neck run is **0.193**, so there
+> *is* a neck and the tail is 12 % short rather than a third short. Both original figures are
+> artefacts of the same thing: along the measured y axis this body's stations interleave its tail
+> with its trunk — the section half width runs 0.089 → 0.358 (tail crossing the frame) → 0.034
+> (rostrum) → 0.088 (trunk) → 0.020 (tail again). The redraw is still the recommendation, but for
+> the pose's 1.81× bend rather than for its proportions.
 
 ### 7. Cymbospondylus — the first giant has a head twice the size it should have
 

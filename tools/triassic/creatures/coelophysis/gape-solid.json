@@ -1,0 +1,35 @@
+{
+  "id": "coelophysis",
+  "backdrop": [
+    1.0,
+    0.0,
+    1.0,
+    1.0
+  ],
+  "shots": [
+    {
+      "clip": "Bite",
+      "t": 0.25,
+      "pixels": 378000,
+      "differingPixels": 2012,
+      "holesOpenedByCulling": 3,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 4,
+      "markedImage": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/coelophysis/gape-solid/Bite-0.25-opened.png",
+      "solid": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/coelophysis/gape-solid/Bite-0.25-solid.png",
+      "culled": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/coelophysis/gape-solid/Bite-0.25-culled.png"
+    },
+    {
+      "clip": "SnapRight",
+      "t": 0.24,
+      "pixels": 378000,
+      "differingPixels": 2232,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0,
+      "markedImage": null,
+      "solid": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/coelophysis/gape-solid/SnapRight-0.24-solid.png",
+      "culled": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/coelophysis/gape-solid/SnapRight-0.24-culled.png"
+    }
+  ]
+}

@@ -11,9 +11,10 @@ import { btn } from '../shared/controls';
 /** Keys that carry an action, laid out the way they sit under a left hand resting on WASD. */
 const KEYS: { cap: string; x: number; y: number; w?: number }[] = [
   { cap: 'Q', x: 40, y: 90 }, { cap: 'W', x: 82, y: 90 }, { cap: 'E', x: 124, y: 90 }, { cap: 'R', x: 166, y: 90 }, { cap: 'T', x: 208, y: 90 },
-  { cap: 'A', x: 61, y: 132 }, { cap: 'S', x: 103, y: 132 }, { cap: 'D', x: 145, y: 132 }, { cap: 'F', x: 187, y: 132 },
-  { cap: 'Z', x: 82, y: 174 }, { cap: 'C', x: 124, y: 174 },
-  { cap: 'Shift', x: 40, y: 216, w: 96 }, { cap: 'Space', x: 142, y: 216, w: 108 },
+  { cap: 'A', x: 61, y: 132 }, { cap: 'S', x: 103, y: 132 }, { cap: 'D', x: 145, y: 132 }, { cap: 'F', x: 187, y: 132 }, { cap: 'G', x: 229, y: 132 },
+  { cap: 'Z', x: 82, y: 174 }, { cap: 'X', x: 124, y: 174 }, { cap: 'C', x: 166, y: 174 }, { cap: 'V', x: 208, y: 174 },
+  { cap: 'Shift', x: 40, y: 216, w: 96 }, { cap: 'Space', x: 142, y: 216, w: 150 },
+  { cap: 'I', x: 330, y: 90 }, { cap: 'J', x: 320, y: 132 }, { cap: 'K', x: 362, y: 132 },
 ];
 
 /** The legend: every control, and what it does. */
@@ -21,14 +22,14 @@ const ROWS: [string, string][] = [
   [btn('swim', 'kbm'), 'Swim'],
   [btn('look', 'kbm'), 'Look around'],
   [btn('zoom', 'kbm'), 'Zoom the camera'],
-  [btn('heavy', 'kbm'), 'Heavy attack / pounce'],
-  [btn('dash', 'kbm'), 'Dash, with a direction held'],
+  [btn('light', 'kbm'), 'Bite — click, on the release'],
+  [btn('heavy', 'kbm'), 'Heavy attack / pounce — hold'],
+  [btn('sprint', 'kbm'), 'Sprint (hold)'],
+  [btn('dash', 'kbm'), 'Dash · right click dashes at the cursor'],
   [`${btn('aim', 'kbm')} / Tab`, 'Aim (hold) · crosshair'],
-  [btn('light', 'kbm'), 'Bite (chain ×3)'],
   [btn('guard', 'kbm'), 'Shield (tap = parry)'],
   [btn('ability', 'kbm'), 'Hide / camouflage'],
   [btn('sense', 'kbm'), 'Sense: marks and radar on/off'],
-  [btn('sprint', 'kbm'), 'Sprint (hold)'],
   [btn('rise', 'kbm'), 'Rise / hop'],
   [btn('sink', 'kbm'), 'Sink'],
   [btn('teleport', 'kbm'), 'Teleport menu'],
@@ -40,10 +41,12 @@ export function KeyboardDiagram() {
   return (
     <svg className="xbox-diagram kbm-diagram" viewBox="0 0 860 400" role="img" aria-labelledby="kbm-title">
       <title id="kbm-title">
-        Mouse and keyboard layout: WASD swims, the mouse looks and the wheel zooms, left click is
-        the heavy attack, right click dashes, the middle button aims, F bites, Q shields, R hides,
-        E is the sense pulse, Shift sprints, Space rises, C sinks, T opens the teleport menu, Z
-        holds the scoreboard open and Escape pauses.
+        Mouse and keyboard layout: W swims forward and X backwards, A and D turn, the camera
+        follows the creature and dragging the mouse turns it, the wheel zooms. A left click bites
+        and holding it is the heavy attack, both aimed at whatever the cursor is over; the right
+        button dashes at the cursor and the middle button aims. Space dashes, Shift sprints, E or Q
+        rise, S or C sink, R shields, Z is camouflage, I is the sense pulse, J or F bite, G or K is
+        the heavy, T opens the teleport menu, V holds the scoreboard open and Escape pauses.
       </title>
       <defs>
         <linearGradient id="key-cap" x2="0" y2="1"><stop stopColor="#2f4d58" /><stop offset="1" stopColor="#162b34" /></linearGradient>

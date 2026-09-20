@@ -29,6 +29,12 @@ const CLIP_ORDER = [
 ];
 
 /** A clip kept for comparison after being re-authored: `replaced/<Name>` (tools/creatures/motion). */
+import { isOralGeometryNamed } from '../shared/oral-geometry';
+
+/** Whether a loaded mesh is authored mouth geometry (see `src/shared/oral-geometry.ts`). */
+export const isOralGeometry = (o: THREE.Mesh) =>
+  isOralGeometryNamed(o.name, (Array.isArray(o.material) ? o.material : [o.material]).map((m) => m?.name));
+
 export const REPLACED_PREFIX = 'replaced/';
 export const isReplaced = (name: string) => name.startsWith(REPLACED_PREFIX);
 /** The name a replaced clip had, and that its replacement now carries. */
@@ -59,8 +65,28 @@ export interface SculptTarget {
   meshes: SculptMesh[];
   /** The mouth socket in the root frame, when the model has one. */
   mouth?: [number, number, number];
+  /** The swallow socket (`anchor_mouth_inside`) and the `jaw` bone's head, root frame, when the rig has them. */
+  mouthInside?: [number, number, number];
+  jaw?: [number, number, number];
   /** Whether anything on stage is skinned — a built body is, a raw generation is not. */
   skinned: boolean;
+}
+
+/** Which handle of the mouth cut the pointer is on. */
+export type MouthHandle = 'hinge' | 'front' | 'side';
+/**
+ * The mouth cut as the stage draws it, in the model's root frame: the three directions, the point
+ * they meet at, and how far the helpers reach — to the nose along `forward`, half the head across
+ * `hinge`, the head's height along `normal`.
+ */
+export interface MouthCut {
+  centre: [number, number, number];
+  forward: [number, number, number];
+  hinge: [number, number, number];
+  normal: [number, number, number];
+  reach: number;
+  halfWidth: number;
+  height: number;
 }
 export type WarpFn = (x: number, y: number, z: number, out: [number, number, number], eye?: boolean) => void;
 
@@ -143,6 +169,10 @@ export interface ViewerScene {
   setOrthoView(view: 'side' | 'top', v: OrthoView): void;
   /** Stops the clips and puts the rig in its bind pose, or hands it back to the resting clip. */
   setRestPose(on: boolean): void;
+  /** Show or hide the authored mouth geometry, so the generation's own mouth can be seen plain. */
+  setOralGeometry(on: boolean): void;
+  /** Whether the specimen on stage has any authored mouth geometry to hide. */
+  hasOralGeometry(): boolean;
   /** The specimen's vertices for region marking, in world and in the file's own coordinates. */
   markTarget(): MarkTarget | undefined;
   /** What the pointer is over, in world space: canvas CSS pixels in, the surface point out. */
@@ -156,6 +186,19 @@ export interface ViewerScene {
    * buttons back. The scene owns it because OrbitControls owns the canvas's pointer events.
    */
   setMarkInteraction(on: boolean): void;
+  /**
+   * Draws the mouth cut — the plane, the hinge line, the three handles — and lights every vertex
+   * on the mandible side of it (null takes it all down). The test is the document's own, handed in
+   * as a closure so the scene knows nothing about how a mouth is aimed.
+   */
+  showMouthCut(cut: MouthCut | null, mandible: ((x: number, y: number, z: number) => boolean) | null): void;
+  /** Which of the mouth cut's handles is under the pointer, if any: canvas CSS pixels in. */
+  mouthPick(x: number, y: number): MouthHandle | undefined;
+  /**
+   * Where the pointer's ray crosses the camera-facing plane through a root-frame anchor, in the
+   * root frame — how a drag on a handle in the orbit view becomes a point the document can use.
+   */
+  mouthDragPoint(x: number, y: number, anchor: readonly [number, number, number]): [number, number, number] | undefined;
   dispose(): void;
 }
 
@@ -282,6 +325,8 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   scene.add(stage);
 
   let model: THREE.Object3D | undefined;
+  /** Survives a change of specimen, because a reviewer comparing mouths is comparing across them. */
+  let oralGeometry = false;
   let source: GLTF | undefined;
   let mixer: THREE.AnimationMixer | undefined;
   let actions = new Map<string, THREE.AnimationAction>();
@@ -335,6 +380,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     model = undefined; mixer = undefined; current = undefined;
     sculptTarget = undefined;
     markTargetCache = undefined; markIndexOf = new Map(); markPoints.visible = false;
+    mouthRootCache = undefined; mouthGroup.visible = false; mouthPoints.visible = false;
     actions = new Map();
     paused = false;
     setClip('');
@@ -402,6 +448,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
 
     model = src;
     stage.add(model);
+    applyOralGeometry();
     modelCenter = center.clone(); modelUnit = unit;
     sculptTarget = buildSculptTarget(src);
     mixer = new THREE.AnimationMixer(model);
@@ -489,15 +536,20 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
       const eye = names.some((n) => /eye|ocul|orbit/i.test(n) && !/eyelid|socket/i.test(n));
       meshes.push({ geometry: o.geometry, base: Float32Array.from(position.array as ArrayLike<number>), toRoot, fromRoot: toRoot.clone().invert(), eye, name: o.name });
     });
-    let mouth: [number, number, number] | undefined;
-    const socket = root.getObjectByName('anchor_mouth');
-    if (socket) {
-      const p = socket.getWorldPosition(new THREE.Vector3()).applyMatrix4(rootInverse);
-      mouth = [p.x, p.y, p.z];
-    }
+    // The rig's own statements about its mouth, root frame: the socket at the lips, the swallow
+    // socket behind it, and the jaw bone — whose head is the hinge the clips swing it about.
+    const landmark = (name: string): [number, number, number] | undefined => {
+      const node = root.getObjectByName(name);
+      if (!node) return undefined;
+      const p = node.getWorldPosition(new THREE.Vector3()).applyMatrix4(rootInverse);
+      return [p.x, p.y, p.z];
+    };
+    const mouth = landmark('anchor_mouth');
+    const mouthInside = landmark('anchor_mouth_inside');
+    const jaw = landmark('jaw');
     let skinned = false;
     root.traverse((o) => { if (o instanceof THREE.SkinnedMesh) skinned = true; });
-    return { meshes, mouth, skinned };
+    return { meshes, mouth, mouthInside, jaw, skinned };
   }
 
   function applySculpt(fn: WarpFn | null, finalize: boolean) {
@@ -634,6 +686,127 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
       ? { LEFT: null, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE }
       : { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
     if (!on) { markPoints.visible = false; }
+  }
+
+  // ---- the mouth cut ----
+  // Everything the mouth editor draws lives in one group whose matrix is the model's own, so its
+  // children are placed in the root frame — the frame the document is measured in — and a raw
+  // generation's preview turn (`previewYaw`) is applied to the helpers exactly as it is to the
+  // body. The plane and the two lines are drawn without a depth test, because a cut through a
+  // head is inside the head, and a helper the head hides is a helper nobody can aim.
+  const mouthGroup = new THREE.Group();
+  mouthGroup.matrixAutoUpdate = false;
+  mouthGroup.visible = false;
+  scene.add(mouthGroup);
+  const helperMat = (color: string, opacity: number) => M(new THREE.MeshBasicMaterial({ color, transparent: true, opacity, depthTest: false, depthWrite: false, side: THREE.DoubleSide }));
+  // The cut plane, from the hinge to the nose: unit square with its near edge on the hinge line.
+  const mouthPlane = new THREE.Mesh(G(new THREE.PlaneGeometry(1, 1).translate(0.5, 0, 0)), helperMat('#61f2d5', 0.22));
+  // The hinge plane, square to it: the wall behind which nothing is mandible.
+  const hingePlane = new THREE.Mesh(G(new THREE.PlaneGeometry(1, 1).rotateY(Math.PI / 2)), helperMat('#ffb36b', 0.12));
+  const lineMat = M(new THREE.LineBasicMaterial({ color: '#ffb36b', transparent: true, opacity: 0.95, depthTest: false, depthWrite: false }));
+  const hingeLine = new THREE.Line(G(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, -1, 0), new THREE.Vector3(0, 1, 0)])), lineMat);
+  const mouthLine = new THREE.Line(G(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 0, 0)])), M(new THREE.LineBasicMaterial({ color: '#61f2d5', transparent: true, opacity: 0.95, depthTest: false, depthWrite: false })));
+  const handleGeo = G(new THREE.SphereGeometry(1, 14, 10));
+  const mouthHandles: Record<MouthHandle, THREE.Mesh> = {
+    hinge: new THREE.Mesh(handleGeo, helperMat('#ffb36b', 0.95)),
+    front: new THREE.Mesh(handleGeo, helperMat('#61f2d5', 0.95)),
+    side: new THREE.Mesh(handleGeo, helperMat('#ff2fa8', 0.95)),
+  };
+  for (const [name, h] of Object.entries(mouthHandles)) { h.name = `mouth-${name}`; h.renderOrder = 5; }
+  mouthPlane.renderOrder = 4; hingePlane.renderOrder = 4; hingeLine.renderOrder = 5; mouthLine.renderOrder = 5;
+  mouthGroup.add(mouthPlane, hingePlane, hingeLine, mouthLine, mouthHandles.hinge, mouthHandles.front, mouthHandles.side);
+  // The mandible side, lit point by point over the surface — the same overlay mark mode uses,
+  // in the hinge's colour, and for the same reason: it touches no material and comes off whole.
+  // A vertex-colour tint would have been the obvious alternative, and would have broken the
+  // recolour hook, which reads the body's own COLOR_0 as the mask for what a scheme repaints.
+  const mouthGeo = G(new THREE.BufferGeometry());
+  mouthGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(3), 3).setUsage(THREE.DynamicDrawUsage));
+  const mouthPoints = new THREE.Points(mouthGeo, M(new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false,
+    vertexShader: `void main(){vec4 mv=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mv;gl_Position.z-=.0016*gl_Position.w;gl_PointSize=clamp(420./max(1.,-mv.z),2.5,7.);}`,
+    fragmentShader: `void main(){float r=length(gl_PointCoord-.5)*2.;if(r>1.)discard;gl_FragColor=vec4(1.,.7,.42,.9-.3*r);}`,
+  })));
+  mouthPoints.frustumCulled = false;
+  mouthPoints.visible = false;
+  mouthPoints.renderOrder = 3;
+  scene.add(mouthPoints);
+  /** Every sculptable mesh's shipped positions in the root frame, once per body, for the test to run over. */
+  let mouthRootCache: { mesh: SculptMesh; root: Float32Array }[] | undefined;
+
+  function showMouthCut(cut: MouthCut | null, mandible: ((x: number, y: number, z: number) => boolean) | null) {
+    if (!cut || !mandible || !model || !sculptTarget) { mouthGroup.visible = false; mouthPoints.visible = false; return; }
+    model.updateMatrixWorld();
+    mouthGroup.matrix.copy(model.matrixWorld);
+    mouthGroup.matrixWorldNeedsUpdate = true;
+    // The basis as a rotation: columns are forward, hinge, normal — the plane geometry's own x, y, z.
+    const f = new THREE.Vector3(...cut.forward), h = new THREE.Vector3(...cut.hinge), n = new THREE.Vector3(...cut.normal);
+    const rot = new THREE.Matrix4().makeBasis(f, h, n);
+    const q = new THREE.Quaternion().setFromRotationMatrix(rot);
+    const c = new THREE.Vector3(...cut.centre);
+    const wide = cut.halfWidth * 1.3;
+    const place = (o: THREE.Object3D, at: THREE.Vector3, scale: THREE.Vector3) => { o.position.copy(at); o.quaternion.copy(q); o.scale.copy(scale); };
+    place(mouthPlane, c, new THREE.Vector3(cut.reach, wide * 2, 1));
+    place(hingePlane, c, new THREE.Vector3(1, wide * 2, cut.height));
+    place(hingeLine, c, new THREE.Vector3(1, wide, 1));
+    place(mouthLine, c, new THREE.Vector3(cut.reach, 1, 1));
+    // Handles are sized to the head, so a hatchling's and a shonisaur's are equally grabbable.
+    const r = Math.max(cut.height, cut.halfWidth) * 0.07;
+    const rs = new THREE.Vector3(r, r, r);
+    place(mouthHandles.hinge, c, rs);
+    place(mouthHandles.front, c.clone().addScaledVector(f, cut.reach), rs);
+    place(mouthHandles.side, c.clone().addScaledVector(h, wide), rs);
+    mouthGroup.visible = true;
+
+    if (!mouthRootCache) mouthRootCache = sculptTarget.meshes.map((mesh) => ({ mesh, root: rootFramePositions(mesh.base, mesh.toRoot) }));
+    let n2 = 0;
+    for (const { root } of mouthRootCache) for (let i = 0; i < root.length; i += 3) if (mandible(root[i], root[i + 1], root[i + 2])) n2++;
+    const attr = mouthGeo.getAttribute('position') as THREE.BufferAttribute;
+    if (attr.count < Math.max(n2, 1)) {
+      mouthGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(Math.max(n2, 1) * 3), 3).setUsage(THREE.DynamicDrawUsage));
+    }
+    const dst = (mouthGeo.getAttribute('position') as THREE.BufferAttribute).array as Float32Array;
+    const v = new THREE.Vector3();
+    let w = 0;
+    for (const { root } of mouthRootCache) for (let i = 0; i < root.length; i += 3) {
+      if (!mandible(root[i], root[i + 1], root[i + 2])) continue;
+      v.set(root[i], root[i + 1], root[i + 2]).applyMatrix4(model.matrixWorld);
+      dst[w++] = v.x; dst[w++] = v.y; dst[w++] = v.z;
+    }
+    (mouthGeo.getAttribute('position') as THREE.BufferAttribute).needsUpdate = true;
+    mouthGeo.setDrawRange(0, n2);
+    mouthPoints.visible = n2 > 0;
+  }
+
+  function mouthPick(x: number, y: number): MouthHandle | undefined {
+    if (!mouthGroup.visible) return undefined;
+    const w = canvas.clientWidth || 1, h = canvas.clientHeight || 1;
+    raycaster.setFromCamera(new THREE.Vector2((x / w) * 2 - 1, -(y / h) * 2 + 1), camera);
+    const hit = raycaster.intersectObjects(Object.values(mouthHandles), false)[0];
+    if (!hit) return undefined;
+    return (Object.entries(mouthHandles).find(([, m]) => m === hit.object)?.[0] as MouthHandle | undefined);
+  }
+
+  function mouthDragPoint(x: number, y: number, anchor: readonly [number, number, number]): [number, number, number] | undefined {
+    if (!model) return undefined;
+    const w = canvas.clientWidth || 1, h = canvas.clientHeight || 1;
+    raycaster.setFromCamera(new THREE.Vector2((x / w) * 2 - 1, -(y / h) * 2 + 1), camera);
+    const a = rootToWorld(anchor[0], anchor[1], anchor[2]);
+    const plane = new THREE.Plane().setFromNormalAndCoplanarPoint(camera.getWorldDirection(new THREE.Vector3()).negate(), a);
+    const p = raycaster.ray.intersectPlane(plane, new THREE.Vector3());
+    if (!p) return undefined;
+    p.applyMatrix4(model.matrixWorld.clone().invert());
+    return [p.x, p.y, p.z];
+  }
+
+  /** Applies the current oral-geometry setting to whatever is on stage. Re-applied on every load. */
+  function applyOralGeometry() {
+    model?.traverse((o) => { if (o instanceof THREE.Mesh && isOralGeometry(o)) o.visible = oralGeometry; });
+  }
+  function setOralGeometry(on: boolean) { oralGeometry = on; applyOralGeometry(); }
+  function hasOralGeometry() {
+    let found = false;
+    model?.traverse((o) => { if (o instanceof THREE.Mesh && isOralGeometry(o)) found = true; });
+    return found;
   }
 
   function setRestPose(on: boolean) {
@@ -802,11 +975,16 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     setLayout(next, main) { const changed = next !== layout; layout = next; mainRect = main; resize(); if (changed) frame(); },
     setOrthoView(view, v) { orthoViews[view] = v; },
     setRestPose,
+    setOralGeometry,
+    hasOralGeometry,
     markTarget,
     markPick,
     markProject,
     showMarks,
     setMarkInteraction,
+    showMouthCut,
+    mouthPick,
+    mouthDragPoint,
     dispose() {
       if (disposed) return;
       disposed = true;

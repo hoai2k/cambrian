@@ -1,9 +1,10 @@
-# Triassic substrate props: first authored batch
+# Triassic instanced scenery library
 
-Six static specimens implement three B2 requests. Every GLB is a single mesh and
-single material, with vertex pigmentation, a base-centred pivot, no texture fetches,
-and fewer than 800 triangles. Blender authors in Z-up and exports glTF Y-up.
-Dimensions follow the brief's game-space scale-1 sizes, not a measured fossil.
+Thirteen static specimens implement ten B2 requests. Every GLB is a single mesh and material,
+with vertex pigmentation, a base-centred pivot and no runtime texture fetch. The procedural
+substrates stay below 800 triangles; organic Tripo reductions use their explicit 3,000–6,000
+triangle manifest budgets. Blender authors in Z-up and exports glTF Y-up. Dimensions follow the
+brief's game-space scale-1 sizes, not a measured fossil.
 
 | Family | Variants | Shape and intended use |
 | --- | --- | --- |
@@ -30,7 +31,15 @@ Mineral substrates are static and have no creature action clips: they set `maxLe
 
 ## Files and reproduction
 
-`public/assets/triassic/props-instanced/manifest.json` lists six GLBs, six transparent
+`public/assets/triassic/props-instanced/manifest.json` lists the original six procedural GLBs plus
+seven canonical-reviewed, Tripo-derived props: *Encrinus* litter, a *Daonella* bed, a
+*Coenothyris* cluster, *Cidaris*, *Neocalamites*, *Pleuromeia* and *Bjuvia*. The generated source,
+sanitized task metadata and three-view intake review are preserved under `tripo-raw/<id>/`; the
+editable reductions are under `sources/`. `process_tripo.py` reduces each source to a bounded
+instancing budget, sets the base-centre pivot and bakes the generated albedo into `COLOR_0`, which
+is the pigment contract the shared scenery renderer consumes.
+
+The manifest lists all shipped GLBs and transparent
 preview renders, source paths, dimensions, triangle counts and hashes. Editable
 Blender sources are committed under `sources/`; the builder is deterministic.
 
@@ -39,7 +48,8 @@ Blender sources are committed under `sources/`; the builder is deterministic.
 node tools/triassic/props/validate.mjs
 ```
 
-The Blender builder checks watertight topology and nonzero face areas before export.
+The procedural Blender builder checks watertight topology and nonzero face areas before export;
+`process_tripo.py` supplies the corresponding reproducible reduction path for a reviewed raw GLB.
 The independent Node validator loads the actual GLBs, checks the manifest hashes,
 one-mesh/material contract, colours, geometry, transforms and base pivots. It measures
 each footprint with the repository's existing `measure()` from `tools/prop-shapes.mjs`;
@@ -51,9 +61,8 @@ the supplied assets already target repeated instancing.
 
 ## Resumption
 
-The integration this note asked for is done: the substrate kinds exist, the biome densities are
-set from the design's table, and `npm run shapes` / `npm run props` have run and pass. What is
-still open is in-scene review of scale and contrast against the painted biome plates, the other
-B2 organic families (Encrinus, Diplopora, Thecosmilia, calcisponge, the shell beds), and the four
-T1 scenery subjects, whose canonical poses and modelling sheets are in
-`docs/triassic/canonical/`. No creature or Tripo work is started by this batch.
+The integration this note asked for is done: the delivered kinds exist, the biome densities are
+set from the design's table, and `npm run shapes` / `npm run props` pass. What remains is in-scene
+tuning against the painted biome plates and the other unbuilt B2/T1 families, including living
+*Encrinus*, Diplopora, Thecosmilia, calcisponges, reef blocks, Voltzia and the log raft. Their
+canonical poses and modelling sheets are in `docs/triassic/canonical/`.

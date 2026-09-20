@@ -66,6 +66,7 @@ There are two ways to act on it, and **the collapse is the right one for anythin
 | **Askeptosaurus** | the extra belly fin | 628 verts | 0.1823 → 0.0097 (**5.3%**) |
 | **Rhaeticosaurus** | the two spare tail blades | 361 verts | 0.1186 → 0.0073 (**6.1%**) |
 | **Atopodentatus** | the ventral fins | 1054 verts | 0.1838 → 0.0137 (**7.4%**) |
+| **Birgeria** | the second dorsal fin | 151 verts | 0.1131 → 0.0010 (**0.9%**) |
 
 All four are the published previews now; the untouched generations remain in
 `tools/triassic/creatures/<id>/tripo-raw/`. Rhaeticosaurus' neck stretch was re-baked on top, and
@@ -119,9 +120,28 @@ first).
 
 | Animal | Reported | Status |
 |---|---|---|
-| **Birgeria** | a second dorsal fin, where the research says "single dorsal set far back" | welded |
 | **Mixosaurus** | a deeply forked lunate fluke it should not have | welded |
 | **Helicoprion** | pelvic and anal fins, against *Fadenia*'s "no pelvic fins" | welded, **and in the greenlit pose** — needs a redraw, not just a regeneration |
+| **Phragmoteuthis** | **twelve appendages where a decabrachian has ten** | welded, and **not** in the greenlit pose — needs a regeneration |
+
+**Phragmoteuthis has two arms too many**, found while building its body (14 September 2026) and
+measured rather than eyeballed: a cut-sphere sweep about the crown settles on **12** separable
+appendages over three radii at two centres, and the count is stable enough that it is the
+generation's answer and not the instrument's. The greenlit pose draws **eight arms and two clubbed
+tentacles**, which is what a phragmoteuthid is, so this is a generation defect and not a pose
+defect — a regeneration fixes it and no redraw is needed.
+
+It is deliberately **not** smoothed away in the meantime. Smoothing collapses an appendage into the
+body it grows from, which is right for a spare tail standing on its own and wrong for two arms in
+the middle of a ring of twelve identical ones: there is no "extra pair" to point at, because which
+two are extra is not a question the geometry can answer. Choosing two would be sculpting the animal
+rather than repairing the generation. The shipped-for-review body rigs all twelve, the two longest
+as the tentacles, and records the discrepancy in its own `validation.json` and README.
+
+**Ceratites carries thirteen arms**, measured the same way, and that is *not* on this list: ammonoid
+soft parts are not preserved for the genus, the arm count is artistic reconstruction in the pose as
+much as in the generation, and the pose draws about as many. It is recorded in that body's README as
+a property of the reconstruction rather than as a defect.
 
 **Rhaeticosaurus has two separate problems, not one.** A first pass here guessed that the "two
 extra tails" were its over-long flippers read from above. That guess was wrong, and a top-down
@@ -135,13 +155,17 @@ recorded in `docs/triassic/proportion-audit.md` (each flipper 0.36 of a body len
 flank, span 1.00 L, against about 0.25 L for a plesiosaur forelimb). The tails are a generation
 defect; the flipper length is drawn that way in the pose, so that one needs a redraw first.
 
-## Not defects
+## Not defects, and one that has been resolved
 
-**Mystriosuchus and Aphaneramma are missing because they were never generated.** They are the only
-two animals on the roster with a greenlit canonical pose and no Tripo body at all — Nothosaurus and
-Shonisaurus also have no preview, but only because they have shipped and their previews retired on
-schedule. Nothing is broken; the generations do not exist. They cannot be reviewed, built or
-compared until someone makes them, and they are the first thing to ask Tripo for.
+**Mystriosuchus and Aphaneramma have now been generated** (14 September 2026) and are in. They were
+the last two subjects with a greenlit pose and no Tripo body; the generations were made outside
+this session and handed over through `intake/`, and both match their poses — the long-snouted
+temnospondyl with sprawling limbs and spotted flanks, and the scute-backed phytosaur. Both arrived
+head at −z and carry an estimated yaw of 180.
+
+Nothosaurus and Shonisaurus still have no preview, and should not: they have shipped, and
+`preview-bodies.mjs` retires a preview the day its animal lands. **Every subject on the roster now
+has either a generation or a body.**
 
 ## What unblocks the welded ones, and how to use it
 
@@ -163,3 +187,73 @@ attempt — is `docs/viewer-mark.md`. Two things it deliberately does not do: it
 folder reads to `review-bodies.mjs` as a delivered body), and it does not decide anything. Whether a
 cut mesh replaces the preview it came from is a human call, and Helicoprion's row is still a redraw
 either way, because its pelvic and anal fins are in the greenlit pose.
+
+### What the two builds then measured on those generations (15 September 2026)
+
+Both are now built (`tools/triassic/creatures/{aphaneramma,mystriosuchus}/`), and three things the
+intake measured are worth keeping here rather than only in each README.
+
+- **The estimated yaw of 180 was never used, and would not have been enough.** Neither build reads
+  `preview-orientation.json`. Aphaneramma's own principal axis lies **18.5 degrees** off the file's
+  Y, and Mystriosuchus carries a **14.6 degree roll** that only the countershading finds — a body
+  this symmetric has no geometric cue for roll at all, and left uncorrected it swims with its flank
+  to the sky.
+- **Neither generation models a mouth.** Placodus' geometric method returns 34 scattered vertices on
+  Aphaneramma and 87 on Mystriosuchus, spread over the *whole depth of the head* in both cases,
+  which is the gular folds and the scute relief finding each other across a crease. Both mouths are
+  read off the painted line.
+- **Both tails carry a real rest curve**, and the ratio that decides rig-versus-mesh straightening
+  does not see it. `meanCurvatureRadiusOverSection` says how *tight* a bend is against the body's
+  own thickness — Aphaneramma's tail is 13.3 mean and 3.97 tightest, comfortably the gentle case —
+  and says nothing about how far the run turns altogether: that same tail turns **62 degrees** from
+  its first segment to its last, and Mystriosuchus' **44.6**. Both builders now record the turning
+  angle beside the ratio (`restTurning` in `validation.json`), because the `Neutral` pose pass needs
+  the second number to know there is anything to do. Nothing has been unbent in the mesh.
+
+And one of them **is** a defect, found by rendering the raw generation rather than by any
+measurement. **Aphaneramma's tail is hooked right round**: it sweeps out to 0.22 from the axis at
+0.38 of a body and comes back to 0.09 at the tip, so a slab across the body at the last few stations
+cuts the tail *twice* and the y-parameterised centreline every builder in this era measures folds
+the hook flat — which is why `restTurning` reports a mild-sounding 62 degrees and the picture shows
+a closed ring. It is present in `tripo-raw/aphaneramma.raw.glb` before any rig, so nothing
+downstream caused it, and the built body carries it into every clip: the animal swims with its tail
+curled over its own back.
+
+It is left in, because taking it out is either a Neutral-pose **mesh** unbend or a regeneration, and
+both are decisions for the pass that owns them rather than for a build. It is recorded here with
+Rhaeticosaurus' spare tails because it is the same kind of thing — a generation that drew the
+animal in a pose nothing downstream can undo on the rig — and because the metric that was supposed
+to catch it is structurally blind to it. Mystriosuchus' 44.6 degrees is a real sweep and reads
+correctly; only Aphaneramma's folds back.
+
+A *posed* tail as such is not a defect: it is what the canonical pose draws and what Tripo was asked
+for. A tail that crosses its own station is.
+
+## The two off-roster Cretaceous generations
+
+Archelon and Mosasaurus were never *preview* bodies for long — both are built now — but what their
+generations carry is worth recording in the same place, because the next Cretaceous subject will
+arrive from the same generator with the same habits.
+
+**Archelon: none.** One turtle, one connected piece after welding, 19,058 triangles, a modelled beak
+slit, and no spare fins or tails. It is the cleanest generation this era has had, and the reason is
+recorded in its own README: it is the *second* one, made from a single cropped panel after the first
+— fed a six-panel contact sheet whole — came back as six turtles in one GLB.
+
+**Mosasaurus: the mouth is open, and it is open as a pose.** The jaws part over 0.176 of a body
+length and the rotation that brings the two lips together measures **32.55°**, so the bind pose is a
+gaping head and every clip that is not a strike has to close it. That is not a mesh defect — it is
+what the source sheet drew, and the CLAUDE.md rule covers it — but it is a *cost*, and the cost is
+0.72 % of a body length of mandible pushed out through the head's own measured section at the shut
+pose, on 13 % of the mandible's vertices. A mouth-closed regeneration would remove it entirely.
+
+Two smaller things about that body, neither fixable by script:
+
+- **Its teeth are painted, not modelled.** `T.protrusions` finds five patches on the whole head and
+  the largest is 27 vertices, so the closed mouth reads as a lipped seam rather than as interlocking
+  tooth rows. Every method this era has for finding a lip line off *geometry* therefore has nothing
+  to hold onto except the gape itself — which is why the builder counts surface crossings instead.
+- **Both of its ends are thin and deep**, within a thousandth of each other, which is what made the
+  shared frame's arbitrary principal-component sign put the head at the tail. That is a property of
+  the animal rather than a fault in the mesh, and the lesson it produced is in CLAUDE.md: which end
+  is the head is decided by the flippers and asserted, never read off the silhouette.

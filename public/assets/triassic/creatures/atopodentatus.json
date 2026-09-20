@@ -1,0 +1,67 @@
+{
+  "id": "atopodentatus",
+  "name": "Atopodentatus",
+  "species": "Atopodentatus unicus",
+  "provenance": "Middle Triassic \u00b7 Luoping, Yunnan",
+  "description": "The hammerhead grazer: a T-bar rostrum with a comb of chisel teeth along its front edge, four broad rowing paddles and a long tail. Authored Tripo body and measured procedural volume twin share one armature, one set of inverse binds, one set of sockets and one set of actions.",
+  "modelLength": 5.0,
+  "lengthMeters": 3.0,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth",
+    "Breathe",
+    "Graze"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "Breathe",
+    "Ability",
+    "Graze"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "puppet": "atopodentatus.puppet.glb",
+  "sources": [
+    "docs/triassic/canonical/atopodentatus.png",
+    "tools/triassic/creatures/atopodentatus/tripo-raw/atopodentatus.raw.glb",
+    "tools/triassic/creatures/atopodentatus/atopodentatus.preview.glb"
+  ],
+  "notes": [
+    "A rower, not a flyer: the paddles sweep fore and aft with the two sides in antiphase and the hind pair a quarter cycle behind the fore, and the long tail carries a real share of the cruise. The swept angle at each limb root is measured from the limb's own direction in world space rather than read off an Euler channel, and the build refuses a paddle that sweeps under 60 degrees in Sprint.",
+    "Ability is scrapeSieve and is a held loop, as the roster declares it: the head goes down on the meadow, works side to side along it, and the jaws open on the scrape and shut on the sieve.",
+    "Heavy is the hammer sweep and is built on a different shape from the bite: the bar is cocked to one side and swung across with the whole animal behind it, and the jaws stay nearly shut through it.",
+    "The mouth is **modelled**, which makes this the easy case of the three the pipeline records: Placodus' geometric method returns a real cavity and the seam is that cavity's own measured mid height per station. The albedo read is taken as a second opinion and recorded beside it.",
+    "The frame is taken head-negative and the T-bar is what settles it: the front section is flat and broad where the far end tapers to a thread. The check is in the builder.",
+    "The source is the published preview, whose ventral fins were collapsed by smooth-region.py (recorded in docs/triassic/preview-mesh-defects.md). The raw generation is preserved unchanged.",
+    "The twin resurfaces a voxel occupancy field of the authored body, relaxes it and reduces the new topology. It reuses no source vertex or face.",
+    "Living colours, soft tissues and movements are artistic reconstruction. World travel remains engine-owned."
+  ]
+}

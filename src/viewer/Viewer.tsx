@@ -11,6 +11,8 @@ import { isIdentity, warp } from './sculpt/profile';
 import { StretchEditor } from './stretch/StretchEditor';
 import { getStretch } from './stretch/store';
 import { isIdentity as stretchIsIdentity, warp as stretchWarp } from './stretch/stretch';
+import { MouthEditor } from './mouth/MouthEditor';
+import type { AppliesTo } from './mouth/mouth';
 
 const SPEEDS = [0.25, 0.5, 1, 2];
 
@@ -34,14 +36,14 @@ function readPicks(): Picks {
   }
 }
 
-/** What the page is doing with the specimen: looking at it, reshaping it, lengthening a run of it, or marking it up. */
-type Mode = 'view' | 'sculpt' | 'mark' | 'stretch';
+/** What the page is doing with the specimen: looking at it, reshaping it, lengthening a run of it, marking it up, or aiming its mouth. */
+type Mode = 'view' | 'sculpt' | 'mark' | 'stretch' | 'mouth';
 
 /**
  * The page remembers which specimen it is showing in the URL (`?specimen=<key>`, and `&mode=sculpt`,
- * `&mode=mark` or `&mode=stretch` while editing), so a reload — or a link — comes back to the same
- * creature. Nothing else is kept there: the view, the clip, any sculpt in progress and any marked
- * region start over.
+ * `&mode=mark`, `&mode=stretch` or `&mode=mouth` while editing), so a reload — or a link — comes
+ * back to the same creature. Nothing else is kept there: the view, the clip, any sculpt in
+ * progress, any marked region and any mouth cut start over.
  *
  * `mode=stretch` does not also restore the generated body it applies to, because which body is on
  * stage is not in the URL at all; the editor is shown only once one is, and the mode falls back to
@@ -58,7 +60,7 @@ function readUrlState(): { key: string; mode: Mode } {
   // not export anything portable.
   const collection = specimenByKey.get(key)?.collection;
   const editable = !isPropCollection(collection);
-  const asking = asked === 'mark' || asked === 'stretch' || (asked === 'sculpt' && collection !== 'triassic');
+  const asking = asked === 'mark' || asked === 'stretch' || asked === 'mouth' || (asked === 'sculpt' && collection !== 'triassic');
   return { key, mode: editable && asking ? asked as Mode : 'view' };
 }
 function writeUrlState(key: string, mode: Mode) {
@@ -90,7 +92,7 @@ export function Viewer() {
    * in play — so the raw generation stands in at the head of the list, which is what the roster's
    * preview badge already says about it.
    */
-  type Stage = { id: string; label: string; model: string; kind: 'full' | 'reduced' | 'twin' | 'generated' | 'borrowed' };
+  type Stage = { id: string; label: string; model: string; kind: 'full' | 'reduced' | 'twin' | 'generated' | 'borrowed' | 'origpose' | 'backup' };
   const stages = (c: ViewerSpecimen): Stage[] => {
     const own = !c.generated || !!c.inReview;
     const out: Stage[] = [];
@@ -99,7 +101,13 @@ export function Viewer() {
     if (c.puppet) out.push({ id: 'twin', label: 'Procedural twin · reduced', model: c.puppet, kind: 'twin' });
     else if (c.lod && own) out.push({ id: 'reduced', label: 'Reduced model', model: c.lod, kind: 'reduced' });
     if (c.generated) out.push({ id: 'generated', label: 'Generated mesh (no rig)', model: c.generated, kind: 'generated' });
-    if (!own) out.push({ id: 'borrowed', label: 'Borrowed body (in play)', model: c.model, kind: 'borrowed' });
+    // Where a builder moved the mesh before binding, the shipped body rests in a shape the
+    // generation never held. Both are offered: the full model IS the base pose every clip is
+    // authored from, and this is what Tripo made.
+    if (c.backup) out.push({ id: 'backup', label: 'Backup Model', model: c.backup, kind: 'backup' });
+    if (c.origPose) out.push({ id: 'origpose', label: 'Original pose (no rig)', model: c.origPose, kind: 'origpose' });
+    // An off-roster subject is in no sea, so there is no body it borrows to offer.
+    if (!own && !c.offRoster) out.push({ id: 'borrowed', label: 'Borrowed body (in play)', model: c.model, kind: 'borrowed' });
     return out;
   };
   /**
@@ -134,6 +142,15 @@ export function Viewer() {
     return p.defaults[c.id] ?? p.schemes[0].id;
   };
   const [clips, setClips] = useState<string[]>([]);
+  /**
+   * Whether to draw the authored mouth geometry — the palate and floor that close each jaw, the
+   * hinge tissue, a cephalopod's beak. **Off by default, and off in the game entirely**, because
+   * its first form read as gum filling the mouth; on shows what is currently authored, off shows
+   * the mouth the generation actually arrived with. It survives a change of specimen on purpose:
+   * comparing mouths means comparing across animals.
+   */
+  const [oralGeometry, setOralGeometry] = useState(false);
+  const [hasOral, setHasOral] = useState(false);
   const [active, setActive] = useState('');
   const [loop, setLoop] = useState(false);
   const [speed, setSpeed] = useState(1);
@@ -174,6 +191,11 @@ export function Viewer() {
   // the one carrying fins nobody asked for, and it is the reason the mode exists. A prop is the
   // only thing it refuses — there is nothing on a stromatolite for a builder to cut away.
   const canMark = !isPropCollection(collection) && ready;
+  // The mouth editor takes whatever body is on stage as well: a cut is aimed on one file, and the
+  // file it is most wanted on is the raw generation, before any builder has measured a mouth on
+  // it. What the export says the file *is* follows the stage rather than the animal.
+  const canMouth = canMark;
+  const appliesTo: AppliesTo = stage.kind === 'generated' ? 'preview' : stage.kind === 'origpose' ? 'generation' : stage.kind === 'twin' ? 'twin' : 'built';
   /**
    * Whether `model` is this animal's own body or one it borrows in play.
    *
@@ -189,7 +211,7 @@ export function Viewer() {
     // Stretch is the one mode a *built* body still answers: there it is a measurement rather than
     // an edit, so all it refuses is a prop and the comparison twin.
     if (mode === 'stretch' && (isPropCollection(collection) || showPuppet)) setMode('view');
-    if (mode === 'mark' && isPropCollection(collection)) setMode('view');
+    if ((mode === 'mark' || mode === 'mouth') && isPropCollection(collection)) setMode('view');
   }, [mode, collection, sculptable, showPuppet, showGenerated]);
 
   // The show effect must not re-run when a pick changes, so it reads the picks through a ref.
@@ -208,7 +230,7 @@ export function Viewer() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true); setLoadedId(''); setError(''); setClips([]); setSlots([]);
+    setLoading(true); setLoadedId(''); setError(''); setClips([]); setSlots([]); setHasOral(false);
     // The specimen on stage leaves before the next one is fetched: watching the last creature
     // repaint into the new one's colours, then pop out of frame, read as a glitch.
     if (requestedId.current !== id) sceneRef.current?.clear();
@@ -227,6 +249,7 @@ export function Viewer() {
         const stretch = showGenerated ? getStretch(id) : undefined;
         if (stretch && stretch.model === modelPath && !stretchIsIdentity(stretch)) sceneRef.current?.applySculpt(stretchWarp(stretch), true);
         setClips(names); setSlots(sceneRef.current?.activeSlots() ?? []); setLoading(false); setLoadedId(id);
+        setHasOral(sceneRef.current?.hasOralGeometry() ?? false);
       })
       .catch((e: Error) => { if (!cancelled) { setError(e.message); setLoading(false); } });
     return () => { cancelled = true; };
@@ -234,6 +257,7 @@ export function Viewer() {
 
   useEffect(() => { sceneRef.current?.setSpeed(speed); }, [speed]);
   useEffect(() => { sceneRef.current?.setScheme(schemeId); }, [schemeId]);
+  useEffect(() => { sceneRef.current?.setOralGeometry(oralGeometry); }, [oralGeometry, loadedId]);
   useEffect(() => {
     try { sessionStorage.setItem(STORE_KEY, JSON.stringify(picks)); } catch { /* private mode: picks stay in memory */ }
   }, [picks]);
@@ -259,7 +283,7 @@ export function Viewer() {
   const changed = roster.filter((c) => (picks[c.key] ?? defaultScheme(c.key)) !== defaultScheme(c.key)).length;
 
   return (
-    <div className={`viewer ${mode === 'sculpt' ? 'sculpting' : mode === 'stretch' ? 'stretching' : mode === 'mark' ? 'marking' : ''}`} data-mode={mode}>
+    <div className={`viewer ${mode === 'sculpt' ? 'sculpting' : mode === 'stretch' ? 'stretching' : mode === 'mark' ? 'marking' : mode === 'mouth' ? 'mouthing' : ''}`} data-mode={mode}>
       <div className="stage">
         <canvas ref={canvasRef} className="viewer-canvas" />
         {/* The notice sits on the stage, over where the specimen will stand. `status` stays in the
@@ -287,6 +311,14 @@ export function Viewer() {
       {mode === 'mark' && canMark && sceneRef.current && canvasRef.current && (
         <MarkEditor key={`${id}|${modelPath}`} scene={sceneRef.current} specimen={def} model={modelPath}
           sha256={showGenerated ? def.generatedSha256 : undefined}
+          canvas={canvasRef.current} onExit={() => setMode('view')} />
+      )}
+      {/* Mouth mode is the same shape as mark mode — handles on the orbit view, a panel where the
+          info card was — and is keyed by the body on stage for the same reason: the cut is aimed
+          on one file. */}
+      {mode === 'mouth' && canMouth && sceneRef.current && canvasRef.current && (
+        <MouthEditor key={`${id}|${modelPath}|mouth`} scene={sceneRef.current} specimen={def} model={modelPath}
+          sha256={showGenerated ? def.generatedSha256 : undefined} appliesTo={appliesTo}
           canvas={canvasRef.current} onExit={() => setMode('view')} />
       )}
 
@@ -327,7 +359,7 @@ export function Viewer() {
         {def.kindNote && <p className="specimen-description">{def.kindNote}</p>}
         {def.description && <p className="specimen-description">{def.description}</p>}
         {def.lengthMeters != null && <p className="specimen-scale">Representative length: {new Intl.NumberFormat('en', { maximumSignificantDigits: 3 }).format(def.lengthMeters)} m · views individually framed</p>}
-        {collection !== 'cambrian' && <p className="specimen-downloads"><a href={`${ASSET_BASE}${def.model}`} download>Full model</a>{def.lod && <a href={`${ASSET_BASE}${def.lod}`} download>Reduced model</a>}{def.puppet && <a href={`${ASSET_BASE}${def.puppet}`} download>Procedural twin</a>}{def.generated && <a href={`${ASSET_BASE}${def.generated}`} download>Generated mesh</a>}</p>}
+        {collection !== 'cambrian' && <p className="specimen-downloads">{!def.offRoster && <a href={`${ASSET_BASE}${def.model}`} download>Full model</a>}{def.lod && <a href={`${ASSET_BASE}${def.lod}`} download>Reduced model</a>}{def.puppet && <a href={`${ASSET_BASE}${def.puppet}`} download>Procedural twin</a>}{def.generated && <a href={`${ASSET_BASE}${def.generated}`} download>Generated mesh</a>}{def.backup && <a href={`${ASSET_BASE}${def.backup}`} download>Backup Model</a>}</p>}
         {choices.length > 1 && <label className="scheme-pick">
           <span>Model</span>
           <select aria-label="Which model" value={stage.id} disabled={loading} onChange={e => setStageId(e.target.value)}>
@@ -335,6 +367,17 @@ export function Viewer() {
           </select>
         </label>}
         {choices.length > 1 && <p className="hint">Swapping holds the view and the animation time, so a difference between two of these reads as movement. Missing clips return to rest.</p>}
+        {hasOral && <><label className="toggle">
+          <input type="checkbox" checked={oralGeometry} onChange={(e) => setOralGeometry(e.target.checked)} />
+          <span>Mouth geometry</span>
+        </label>
+        <p className="hint">
+          The palate and floor that close each jaw, the tissue at the hinge, and a beak where there
+          is one, are <em>authored</em> rather than generated. <strong>The game does not draw any of
+          it</strong> and this starts off, because the first form of it read as gum filling the
+          mouth; turn it on to see what is currently authored, and off for the mouth the generation
+          arrived with. The setting follows you from one animal to the next.
+        </p></>}
         {def.inReview && <p className="hint">
           <strong>Awaiting review:</strong> this animal's own body, twin and clips are built, but it
           is not in <code>shipped.json</code> yet — so the game still draws the body it borrows and
@@ -350,6 +393,13 @@ export function Viewer() {
           are redone properly when the body is cleaned and rigged, and every bit of this preview is
           thrown away the day the real one lands. Until then the animal still borrows another era's
           body in play.
+        </p>}
+        {def.origPose && <p className="hint">
+          <strong>Two poses.</strong> This generation arrived too strongly posed to rig, so its
+          builder moved the mesh before binding: {def.origPoseChanged?.join('; ')}. <em>Full
+          model</em> is the <strong>base pose</strong> — the rig at rest, and what every clip is
+          authored from. <em>Original pose</em> is the untouched generation, with no rig, so it sits
+          still. Swapping holds the view, so the difference between them reads as movement.
         </p>}
         {def.puppet && <p className="hint">
           The twin is rebuilt to this body's own volume on the same skeleton, and is where the clips
@@ -370,6 +420,9 @@ export function Viewer() {
           </button>}
           {!isPropCollection(collection) && <button className="ghost" onClick={() => setMode('mark')} disabled={!canMark} title="Paint the geometry that should not be there and export it as a region file for tools/triassic/cut-region.py">
             Mark region
+          </button>}
+          {!isPropCollection(collection) && <button className="ghost" onClick={() => setMode('mouth')} disabled={!canMouth} title="Aim the mouth cut on this body — how far back the hinge goes, where the line sits, its angle — and export it for the builder">
+            Mouth
           </button>}
         </div>
 
@@ -431,6 +484,18 @@ export function Viewer() {
         </div>}
         {!loading && !clips.length && <p className="hint">Static specimen</p>}
         <div className="clip-grid">
+          {/* The rig at rest is the neutral pose: jaw shut, body straight, limbs where the builder
+              bound them, which is the shape every clip here is authored from. It is a pose rather
+              than a clip, so it is offered beside them as one — the way to see what the animations
+              start from, and to check that a body whose generation arrived bent or gaping was
+              actually unbent and shut before binding rather than posed that way by its Idle. */}
+          {!loading && clips.length > 0 && (
+            <button className={`clip clip-base ${active === '' ? 'active' : ''}`} aria-pressed={active === ''}
+              title="The rig at rest: the neutral pose every clip is authored from"
+              onClick={() => sceneRef.current?.setRestPose(true)}>
+              Base pose
+            </button>
+          )}
           {clips.filter((n) => !isReplaced(n)).map((name) => {
             // A clip queued for rework is flagged on its own button rather than on the creature:
             // the body is finished, this motion is not, and that is what a viewer wants to know.

@@ -1,0 +1,62 @@
+{
+  "id": "henodus",
+  "name": "Henodus",
+  "species": "Henodus chelyops",
+  "description": "Canonical Tripo body and procedural volume twin on one 25-joint rig: a fused rigid carapace, an articulated beak with a closed oral lining, four rowing limbs and a trailing tail.",
+  "modelLength": 5.0,
+  "lengthMeters": 1.0,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth",
+    "Crawl",
+    "Graze",
+    "Breathe"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "Crawl",
+    "Graze",
+    "Breathe"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "puppet": "henodus.puppet.glb",
+  "notes": [
+    "The squared plated carapace, the five-toed manus and pes, the denticle fringe along the beak and the plated flank are retained from the accepted Tripo volume.",
+    "The generation bifurcated the tail behind raw x -0.370. The greenlit pose draws one tapering tail, so intake cuts the fork off square and closes the opening with a fan to a single apex on the tail's own centreline, restoring the original length; the cap takes its UVs from the boundary it sits between. FORK_CUT=False in build.py rebuilds the forked tail. A tail that forks is a generation disagreeing with its pose and the honest fix is a fresh generation.",
+    "The carapace is a rigid part on its own unanimated bone, as Placodus' gastral basket is; only skin that is not on a limb joins it, so no shoulder goes rigid.",
+    "The twin resurfaces a 0.0055-unit voxel occupancy field, relaxes it and reduces the new topology. It reuses no source vertex or face.",
+    "Same rest rig, inverse binds, sockets and all 24 action sample arrays for authored body and puppet. The LOD keeps every clip.",
+    "Original albedo retained with white COLOR_0; normal relief limited to 0.15 and skin explicitly nonmetallic at roughness 0.7. Puppet pigment samples triangle-local UVs to avoid seam bleed.",
+    "Swim and Sprint are a four-limb row, not a tail scull: a flat armoured disc has no trunk to send a wave down, and the research reads Henodus as the roster's slowest swimmer. Crawl is the bottom walk, Graze the fringe raking sediment, Breathe the settled surface loop.",
+    "Living colours, soft tissues and movements are artistic reconstruction. Locomotor translation remains engine-owned."
+  ]
+}

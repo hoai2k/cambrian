@@ -127,7 +127,7 @@ Deliver per subject, in this order, the same way the creatures went:
 | --- | --- | --- |
 | The 14 original B2 canonical subjects: `encrinus`, `encrinus-litter`, `diplopora`, `thecosmilia`, `calcisponge`, `placunopsis-mound`, `daonella-bed`, `brachiopod-cluster`, `cidaris`, `reef-block`, `neocalamites`, `pleuromeia`, `bjuvia`, `shore-boulder` | **Delivered as first-pass canonicals; awaiting human greenlight in the viewer.** | **Not requested.** The approved canonical plus builder parameters is sufficient. |
 | The 3 built B2 kinds: `stromatolite`, `salt-crust`, `mud-ripple` | Not requested retroactively. | Not requested retroactively. |
-| The 4 Tier 1 scenery: `log-raft`, `coral-head`, `sponge-mound`, `voltzia` | **Delivered** (A3), though approved through `scenery-prompts.json` rather than the viewer, and only as side and top. | **Requested — none exists.** These go through Tripo, so they need the same four-view sheet the creatures get; A3's three views predate the `model-inputs/` mechanism. |
+| The 4 Tier 1 scenery: `log-raft`, `coral-head`, `sponge-mound`, `voltzia` | **Delivered** (A3), approved through `scenery-prompts.json` rather than the viewer. | **Delivered 19 September 2026.** The already-authored four-panel turnarounds are packaged with canonical and single-image inputs under `canonical/model-inputs/`; no regeneration was needed, avoiding visual drift from the approved scenery. |
 
 `ceratite-drift` stays blocked on the `ceratites` model as B2 says: it is that shell reused, so it
 takes the animal's canonical pose and needs no pose of its own — only the half-buried placement
@@ -209,8 +209,11 @@ follow the instanced-prop rules on the requests page.
 cover both variants of `stromatolite`, `salt-crust`, and `mud-ripple`, with source
 projects, renders, measured footprints and validation. See
 [`tools/triassic/props/README.md`](../../tools/triassic/props/README.md).
-**Placed 13 September 2026:** all three families are scattered at the densities this page's table
-gives them and collided against their measured union envelopes. All other B2 rows remain unbuilt.
+**Placed 19 September 2026:** the original three substrate families and the canonical-reviewed
+*Encrinus* litter, *Daonella* bed, *Coenothyris* cluster, *Cidaris*, *Neocalamites*, *Pleuromeia*
+and *Bjuvia* are scattered at the densities this page's table gives them and collide against their
+measured envelopes. Their exact Tripo sources and Blender reductions are preserved under
+`tools/triassic/props/`. The other B2 rows remain unbuilt.
 
 Instanced props by builder script (`tools/triassic/props/`), one mesh, base pivot, vertex colours,
 a few hundred triangles, at the scale-1 sizes in [02](02-biomes-and-depth.md#props-and-plants-the-models-each-biome-needs);

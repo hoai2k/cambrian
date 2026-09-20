@@ -83,8 +83,9 @@ run tools/modes-test.ts           # Hunter & Hunted turns and scoring, and the s
 run tools/assets-test.ts          # every path each era asks for exists, and neither reaches into the other's
 run tools/ecology-test.ts         # the day/night cycle, appetite by the hour, grumpy and territorial animals
 run tools/motion-test.ts          # smooth motion: the interpolation snapshot, no step-to-step oscillation
-node --experimental-transform-types tools/anchors-test.mjs
-node --experimental-transform-types tools/feeding-test.mjs
+npm run rigs                      # the rigs: every creature's anchors, and the attachment pass that feeds, grabs and aims
+npm run ancientseas               # the site root: its links, its art, and the ?debug index of every dev tool
+npm run debug                     # the debug entry points open only when asked for, and never by accident
 node tools/hallucigenia-test.mjs  # the revised rig: skinning, loop seams, gait
 node tools/check-creature-assets.mjs --strict
 npm run palettes                  # every material lands in the colour slot its scheme assumes

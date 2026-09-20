@@ -4,6 +4,7 @@ import type { Biome, FloraKind } from '../sim/world';
 import type { Mode } from '../sim/types';
 import type { Slot, Scheme } from '../shared/palettes';
 import type { PortraitRecord } from '../shared/portrait-match';
+import type { StringOverrides } from './strings';
 
 /** Plain data only: safe to import from the deterministic simulation and Node tooling. */
 /** A selectable mode and the copy the selection screen shows for it. */
@@ -74,6 +75,13 @@ export interface EraDefinition {
   readonly id: string;
   readonly title: string;
   readonly copy: EraCopy;
+  /**
+   * What this game says differently from the other two: its loading lines, its onboarding hints,
+   * the help-page sentences that name its own animals. Laid over `SHARED_STRINGS` by
+   * `src/shared/text.ts`, so an era lists only what it says for itself. Absent, it says exactly
+   * what the shared table says.
+   */
+  readonly strings?: StringOverrides;
   /** The modes this era offers, in selection order. The simulation's win checks are keyed by id. */
   readonly modes: readonly ModeInfo[];
   readonly creatures: readonly CreatureDef[];
@@ -187,6 +195,15 @@ export interface EraDefinition {
      * to be one shared constant, which is why the Devonian played the Cambrian reef.
      */
     readonly loops: { readonly ambient: string; readonly drone: string };
+    /**
+     * Body length at which an animal gets the big-body take of a sound (`HUGE_LENGTH` in
+     * `src/audio/mix.ts` is the default). It marks the *top of this era's roster*, which is why it
+     * is per era rather than one number: 6 metres is the top seventh of the Devonian (3 of 21) and
+     * the Cambrian's giants only, but the Triassic's median animal is 5.86, so the same 6 gave
+     * half that roster the giant's hit, crunch, dodge and burst — every ordinary scuffle in the
+     * era playing as something enormous.
+     */
+    readonly hugeLength?: number;
   };
   readonly presentation: {
     readonly schemes: readonly Scheme[];

@@ -1,4 +1,5 @@
 import { assetPaths } from '../content/asset-paths';
+import { isOralGeometryNamed } from '../shared/oral-geometry';
 import * as THREE from 'three';
 import { CreatureAnchors } from './anchors';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -14,6 +15,8 @@ import { schemeForCreature } from '../shared/palettes';
 import { creature, type CreatureId } from '../sim/creatures';
 import { lengthOf } from '../sim/actors';
 import { bellPhase, bellTilt } from '../sim/locomotion';
+import { ASHORE_WADE, breathesAir, LAND_WALK_LEGS } from '../sim/beach';
+import { RULES } from '../sim/era-rules';
 import type { Actor } from '../sim/types';
 import { appBase } from '../shared/base';
 import type { AuthoredFeeding } from './attachments';
@@ -90,6 +93,8 @@ export class CreatureView {
   private baseOpacity: number[] = [];
   private baseTransparent: boolean[] = [];
   private spine: THREE.Bone[] = [];
+  /** The era-driven clip this body is in, so a change of phase fires a new one-shot. */
+  private eraClip?: string;
   private wasAttack = false; private wasHit = false; private wasDead = false; private wasStagger = false; private wasDodge = false; private wasParry = false;
   private shield: THREE.Mesh;
   private shieldMat: THREE.MeshBasicMaterial;
@@ -106,6 +111,16 @@ export class CreatureView {
   readonly heightUnits: number;
   /** Arms that lie along what they are on, where the creature asks for it. */
   private armConform?: ArmConform;
+  /**
+   * The palette this body is drawn in, when it is not the creature's authored one — how a second
+   * player on the same animal is told from the first (src/shared/seat-schemes.ts). Settable rather
+   * than fixed at construction because camouflage re-derives the base every frame, so a per-seat
+   * scheme has to live somewhere the blend can find it rather than being applied once and stomped.
+   */
+  seatScheme?: string;
+  private baseScheme(): string { return this.seatScheme ?? schemeForCreature(this.creatureId); }
+  /** Re-apply the palette after `seatScheme` changes. Uniform writes only; nothing recompiles. */
+  refreshScheme() { this.recolor.setScheme(this.baseScheme()); }
   /** The Eat clip is a progress-driven performance rather than a loop. */
   readonly feedingPerformance: boolean;
   readonly authoredFeeding?: AuthoredFeeding;
@@ -131,6 +146,11 @@ export class CreatureView {
     this.model.traverse((o) => {
       if (o instanceof THREE.Mesh) {
         o.castShadow = true; o.receiveShadow = true; o.frustumCulled = false;
+        // The authored mouth interior is not drawn in the game. Its first form read as gum filling
+        // the mouth and its replacement is still being judged; the simulation reaches a mouth
+        // through bones, so this costs nothing but the sight of it.
+        const matNames = (Array.isArray(o.material) ? o.material : [o.material]).map((m) => m?.name);
+        if (isOralGeometryNamed(o.name, matNames)) o.visible = false;
         const mats = Array.isArray(o.material) ? o.material : [o.material];
         const cloned = mats.map((m) => { const c = (m as THREE.MeshStandardMaterial).clone(); return c; });
         o.material = Array.isArray(o.material) ? cloned : cloned[0];
@@ -146,7 +166,7 @@ export class CreatureView {
     // the materials cloned just above rather than a second set of models. Both LODs share the
     // material names the slots are read from, so a distant creature keeps its colours.
     if (this.def.conformArms) { const c = new ArmConform(this.model); if (c.active) this.armConform = c; }
-    this.recolor = makeRecolor(this.model); this.recolor.setScheme(schemeForCreature(creatureId));
+    this.recolor = makeRecolor(this.model); this.recolor.setScheme(this.baseScheme());
     // Distance haze, chained after the palette hook (which owns onBeforeCompile). Mixing the
     // finished pixel toward the water it is seen through is the only correct way to fade a body
     // into the background: tinting the albedo would darken it instead, since a creature's colour
@@ -237,23 +257,23 @@ export class CreatureView {
    * `PULSE_THRUST` of a `PULSE_CYCLE` and coasts through the refill. The `Swim` clip is exactly one
    * cycle long with its squeeze filling exactly that window, so scrubbing the clip to `pulseT`
    * makes the bell you watch close the water actually being thrown, rather than a loop running
-   * near it. Asking for nothing pins `pulseT` at zero, and the animal falls back to `Idle`, which
-   * is the same beat at a third of the size and half the rate.
+   * near it.
    *
-   * Returns true when it has taken charge of the locomotion layer.
+   * `pulseT` is zero unless the animal is *driving* — sprinting or dashing — because that is the
+   * only time it pulses (`src/sim/game.ts`). Cruising, it is handed straight back to the shared
+   * state machine and swims like anything else, which is what a medusa going nowhere in particular
+   * actually does; taking charge here and falling to `Idle` made every unhurried crossing a
+   * stutter. So this returns **false** off the beat: not "nothing to draw" but "nothing special
+   * about it", which is exactly the right answer.
    */
   private bell(a: Actor) {
     if (this.def.swimStyle !== 'pulse') return false;
     const swim = this.actions.get('Swim');
     if (!swim) return false;
     this.bellPulsing = a.pulseT > 0;
-    if (this.bellPulsing) {
-      this.playLoop('Swim');
-      if (this.loco === swim) { swim.paused = true; swim.time = bellPhase(a.pulseT) * swim.getClip().duration; }
-    } else {
-      swim.paused = false;
-      this.playLoop('Idle');
-    }
+    if (!this.bellPulsing) { swim.paused = false; return false; }
+    this.playLoop('Swim');
+    if (this.loco === swim) { swim.paused = true; swim.time = bellPhase(a.pulseT) * swim.getClip().duration; }
     return true;
   }
 
@@ -319,11 +339,24 @@ export class CreatureView {
     // Crawlers carry their vertical motion in `hopVel` (hop and paddle), not in `vel.y`.
     const paddling = def.ground && !a.grounded && a.state !== 'dead';
     const vy = def.ground ? (paddling ? a.hopVel : 0) : a.vel.y;
+    // Out of the water, on the sand: the swim hands over to the walk at the same point the rules
+    // call the body ashore, so what is drawn and what is ruled agree.
+    const onLand = a.wade >= ASHORE_WADE && !a.airborne && a.state !== 'dead';
 
     if (animate) {
       // locomotion layer
       const held = a.state === 'ability' && a.abilityActive && ['collectorWake','pharyngealPump','planktonComb','whipSearch'].includes(def.ability);
+      // An era's own performance, for a body the shared state machine has nothing to say about:
+      // the Triassic's shore animals are pinned and brainless and would otherwise watch, telegraph
+      // and strike entirely in Idle. It names the clip the body should be *in*, and a change of
+      // name is what fires it; a model without that clip is left to the state machine below. A
+      // looping era clip (a walk down the beach, a watch at the edge) *is* the locomotion, so it
+      // is decided here, ahead of the shared machine, rather than fought with Idle every frame.
+      const era = RULES?.clip?.(a);
+      const eraName = era && this.has(era.name) ? era.name : undefined;
+      const eraLoop = !!(eraName && era?.loop);
       if (a.state === 'dead') { /* handled by one-shot */ }
+      else if (eraLoop) { this.playLoop(eraName!); this.loco?.setEffectiveTimeScale(1); }
       else if (a.state === 'eating' || a.holdT > 0) { this.playLoop((this.authoredFeeding && a.state !== 'eating' ? this.pick('Grab', 'Idle') : this.pick('Eat', 'Grab')) ?? (def.ground ? 'Crawl' : 'Swim')); this.loco?.setEffectiveTimeScale(this.has('Eat') ? 1 : 0.55); }
       else if (a.state === 'swallowed') { this.playLoop(this.pick('Stagger', 'Hit') ?? 'Idle'); this.loco?.setEffectiveTimeScale(0.8); }
       else if ((a.hideMode === 'burrowed' || ((a.state === 'guard' || a.state === 'parry') && ['anchor','enroll','shellUp','bristleFlare'].includes(def.ability))) && this.has('Ability')) { this.playLoop('Ability'); this.loco?.setEffectiveTimeScale(.55); }
@@ -340,14 +373,46 @@ export class CreatureView {
         // swimmer is materially above cruise; older rigs without Sprint keep the Swim fallback.
         const canSprint = moving && !def.ground && this.has('Sprint');
         this.sprinting = canSprint && speed > cruise * (this.sprinting ? 1.1 : 1.2);
-        if (this.bell(a)) { /* a bell picks its own clip and its own place in it */ }
-        else this.playLoop(moving ? (def.ground ? 'Crawl' : this.sprinting ? 'Sprint' : 'Swim') : 'Idle');
         // smaller creatures beat faster
         const rateScale = 1 / Math.pow(Math.max(a.scale, 0.1), 0.35);
-        const beat = Math.max(speed, paddling ? cruise * 0.85 : 0);
-        if (!this.bellPulsing) this.loco?.setEffectiveTimeScale(
-          moving ? this.sprinting ? clamp(rateScale, 0.8, 1.35) : clamp((beat / cruise) * rateScale, 0.5, 2.6) : 0.75 * rateScale,
-        );
+        if (onLand) {
+          // On the sand (src/sim/beach.ts). A walker plays its walking clip where it has one, at
+          // the pace it is walking; one with no such clip swims slowly through the air, which is
+          // what a paddle-limbed body dragging itself down a beach looks like. A stranded
+          // water-breather has no gait at all: each flop is the body's own lash (an authored `Flop`,
+          // one FLOP_PERIOD long so the loop is the flop; the swim stroke thrown hard at the sand
+          // on a rig that has none) and between flops it lies still. The twist and the hop are
+          // the simulation's own, so the clip is only the lash on top of them.
+          const gait = this.pick('Walk', 'Crawl');
+          if (!breathesAir(a.creature)) {
+            const flop = a.flopT > 0, authored = this.has('Flop');
+            this.playLoop(flop ? this.pick('Flop', 'Sprint', 'Swim') ?? 'Idle' : 'Idle');
+            this.loco?.setEffectiveTimeScale(flop ? (authored ? 1 : 2.2 * rateScale) : 0.6 * rateScale);
+          } else if (gait) {
+            const walking = speed > 0.2;
+            this.playLoop(walking ? gait : 'Idle');
+            this.loco?.setEffectiveTimeScale(walking ? clamp((speed / Math.max(cruise * LAND_WALK_LEGS, 0.1)) * rateScale, 0.5, 1.8) : 0.75 * rateScale);
+          } else {
+            const walking = speed > 0.2;
+            this.playLoop(walking ? 'Swim' : 'Idle');
+            this.loco?.setEffectiveTimeScale(walking ? 0.6 * rateScale : 0.75 * rateScale);
+          }
+        }
+        else if (this.bell(a)) { /* a bell picks its own clip and its own place in it */ }
+        else {
+          this.playLoop(moving ? (def.ground ? 'Crawl' : this.sprinting ? 'Sprint' : 'Swim') : 'Idle');
+          const beat = Math.max(speed, paddling ? cruise * 0.85 : 0);
+          if (!this.bellPulsing) this.loco?.setEffectiveTimeScale(
+            moving ? this.sprinting ? clamp(rateScale, 0.8, 1.35) : clamp((beat / cruise) * rateScale, 0.5, 2.6) : 0.75 * rateScale,
+          );
+        }
+      }
+      // The era's one-shots (a telegraph, a strike, a gulp), fired on the change of name and timed
+      // to the phase; the loops were taken above.
+      if (eraName !== this.eraClip) {
+        this.eraClip = eraName;
+        if (eraName && era && !era.loop) this.playOnce(eraName, era.dur, false);
+        else if (!eraName) this.oneShot?.fadeOut(0.15);
       }
       // one-shots
       const inAttack = a.state === 'attack' || a.state === 'grabbing' || a.state === 'pounce' || (a.state === 'ability' && !held);
@@ -421,7 +486,7 @@ export class CreatureView {
       // zero. The bend then compounds on its own result, and since a frozen clock makes it a
       // constant rather than a wave, a paused animal screws slowly round its own axis. There is no
       // wave to add to a still frame anyway, so the pose simply holds.
-      if (dt > 0 && this.spine.length > 3 && def.proceduralUndulation !== false && !def.ground && a.state !== 'dead') {
+      if (dt > 0 && this.spine.length > 3 && def.proceduralUndulation !== false && !def.ground && !onLand && a.state !== 'dead') {
         const amp = clamp(speed / Math.max(cruise, 0.1), 0, 1.6) * 0.045 + Math.abs(a.bank) * 0.02;
         const freq = 5.5 / Math.pow(Math.max(a.scale, 0.1), 0.35);
         // Local-space bend: each spine bone yaws slightly about its own up axis. Cheaper than
@@ -434,7 +499,7 @@ export class CreatureView {
       }
     }
 
-    this.recolor.blend(schemeForCreature(this.creatureId), a.camoColors, a.camoStrength);
+    this.recolor.blend(this.baseScheme(), a.camoColors, a.camoStrength);
     // Transform
     const t = a.prevT;
     const jump = Math.hypot(a.pos.x - t.x, a.pos.y - t.y, a.pos.z - t.z) > Math.max(2, L * 3);

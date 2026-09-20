@@ -76,4 +76,32 @@ assert(hatchSeen,'Respawn must play its hatch/moult state');
   console.log(`PASS: held still for ${HATCH_HOLD.toFixed(1)} s in the shell, swimming ${freed.toFixed(1)} units in the second after the crack.`);
 }
 
+// --- what a death costs the ladder: half the rung you are standing on, not the whole rung ---
+{
+  const { ladderMark, placeOnLadder, deathMark, DEATH_COST, rungOf } = await import('../src/sim/ladder');
+  const at = (mark: number) => {
+    const g = new Game('rise', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 5);
+    const p = g.players[0]; g.skipHatch(); p.spawnProtect = 0;
+    placeOnLadder(g, p, mark);
+    const before = ladderMark(g, p);
+    (g as unknown as { respawn(a: typeof p): void }).respawn(p);
+    return { before, after: ladderMark(g, p) };
+  };
+  // A quarter of the way into a rung loses the rung and lands three quarters of the way down the
+  // one below; past halfway it keeps its rung, which is what a whole-rung penalty never did.
+  const early = at(3.25), late = at(3.6);
+  assert(Math.abs(early.after - 2.75) < 0.02, `a quarter into rung 3 falls to 2.75 (got ${early.after.toFixed(2)})`);
+  assert(rungOf(late.after) === 3 && Math.abs(late.after - 3.1) < 0.02, `past halfway keeps the rung (got ${late.after.toFixed(2)})`);
+  // And it is the same price wherever it lands, which is the whole point.
+  for (const m of [1.1, 2.4, 3.9, 4.0]) {
+    const r = at(m);
+    const paid = r.before - r.after;
+    assert(Math.abs(paid - Math.min(DEATH_COST, r.before)) < 0.02, `a death at ${m} costs ${paid.toFixed(2)}, not ${DEATH_COST}`);
+  }
+  // The bottom rung cannot go below itself.
+  assert(at(0.2).after === 0, 'a hatchling cannot be demoted below the bottom');
+  console.log(`PASS: a death costs ${DEATH_COST} of a rung, wherever in the ladder it lands.`);
+  void deathMark;
+}
+
 console.log(`PASS: lethal combat -> swallowed/dead -> hatch -> living player; respawn at ${respawned.toFixed(2)} s.`);

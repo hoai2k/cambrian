@@ -208,3 +208,39 @@ a.as-slot-title:focus-visible img { outline: 2px solid #15100a; outline-offset: 
 @media (prefers-reduced-motion: reduce) {
   .as-game, .as-art, .as-slot-title { transition: none; }
 }
+
+/*
+ * The debug index (`?debug`). A contents list, not a composition: the plate's parchment and ink,
+ * and then out of the way. No grain, no vignette, no paintings — it is read rather than looked at,
+ * and it must stay legible on a phone held in one hand at the end of a long session.
+ */
+.dbg { max-width: 62rem; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+.dbg-head { border-bottom: 1px solid rgba(230, 194, 122, .28); padding-bottom: 1.25rem; margin-bottom: 2rem; }
+.dbg-back { display: inline-block; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--as-cream-dim); text-decoration: none; margin-bottom: .75rem; }
+.dbg-back:hover { color: var(--as-gold); }
+.dbg h1 { font-family: var(--as-serif); font-size: clamp(1.75rem, 5vw, 2.5rem); font-weight: 600; letter-spacing: .02em; margin: 0 0 .5rem; color: var(--as-gold); }
+.dbg-sub, .dbg-note { color: var(--as-cream-dim); margin: 0; max-width: 54rem; }
+.dbg-sub { font-size: .95rem; }
+.dbg-section { margin-bottom: 3rem; }
+.dbg-section h2 { font-family: var(--as-serif); font-size: 1.15rem; letter-spacing: .12em; text-transform: uppercase; color: var(--as-cream); margin: 0 0 .35rem; }
+.dbg-note { font-size: .85rem; margin-bottom: 1.25rem; }
+.dbg-list { list-style: none; margin: 0; padding: 0; }
+.dbg-row { padding: 1rem 0; border-top: 1px solid rgba(230, 194, 122, .14); }
+.dbg-row:first-child { border-top: 0; }
+/* The link is the name and the address together, so the whole of it is the target. */
+.dbg-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: .6rem; text-decoration: none; }
+.dbg-name b { font-family: var(--as-serif); font-size: 1.1rem; font-weight: 600; color: var(--as-gold); }
+a.dbg-name:hover b { text-decoration: underline; }
+.dbg-name small, .dbg-mode small { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .8rem; color: var(--as-sepia); background: rgba(230, 194, 122, .08); padding: .1rem .4rem; border-radius: 3px; min-width: 0; overflow-wrap: anywhere; }
+.dbg-name-static b { color: var(--as-cream); }
+.dbg-flag { font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--as-gold-2); font-style: normal; border: 1px solid rgba(180, 136, 60, .5); padding: .05rem .4rem; border-radius: 3px; }
+.dbg-blurb { color: var(--as-cream-dim); font-size: .9rem; margin: .4rem 0 0; max-width: 54rem; }
+.dbg-modes { list-style: none; margin: .85rem 0 0; padding: 0 0 0 1rem; border-left: 1px solid rgba(230, 194, 122, .18); }
+.dbg-modes > li + li { margin-top: .75rem; }
+.dbg-mode { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem; text-decoration: none; }
+.dbg-mode b { font-size: .95rem; color: var(--as-gold); font-weight: 600; }
+.dbg-mode:hover b { text-decoration: underline; }
+/* One game per chip: the same parameter, three addresses. */
+.dbg-games { list-style: none; display: flex; flex-wrap: wrap; gap: .5rem; margin: .7rem 0 0; padding: 0; }
+.dbg-game { display: inline-block; font-size: .8rem; text-decoration: none; color: var(--as-cream); border: 1px solid rgba(230, 194, 122, .3); border-radius: 3px; padding: .2rem .6rem; }
+.dbg-game:hover { border-color: var(--as-gold); color: var(--as-gold); }

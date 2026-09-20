@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-19",
+  "task": "T3D-10A",
+  "canonicalStatus": "agent-reviewed-candidate",
+  "humanApprovalClaimed": false,
+  "canonical": "canonical.png",
+  "canonicalSource": "../../neocalamites-candidate03.png",
+  "canonicalSha256": "ea3a6d91ca305030f8a4b48f7b130338da49098427a422da2c70d5b9264d7f63",
+  "input": "input.png",
+  "inputSha256": "ea3a6d91ca305030f8a4b48f7b130338da49098427a422da2c70d5b9264d7f63",
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "nativeInput": "../../prop-inputs-2026-09-19/native/neocalamites-attempt1.png",
+  "nativeDimensions": [
+    1254,
+    1254
+  ],
+  "resolutionProcessing": "Lanczos3 resampling from the native 1254-square ImageGen output; not native 2048 detail.",
+  "original": "../../originals/2026-09-19-prop-candidate02/neocalamites-candidate02.png",
+  "originalSha256": "aeb118eefea76e33e606136ee328c28fdcdfdf048912a76431870314c999a947",
+  "generator": "builtin image_gen.imagegen",
+  "inputPrompt": "Use case: precise-object-edit. Edit target: supplied candidate02 Neocalamites clump. Preserve the six jointed green stems, their relative heights, black-brown swollen nodal bands, narrow free leaves in nodal whorls, basal sheaths, natural slight stem bends and overall botanical identity. Correct framing so the COMPLETE highest shoot tip is visible with at least 8 percent blank space above it; retain full width and base with generous margins. Create a single ground-free Tripo reference, square 2048 by 2048 pixels, realistic neutral studio lighting. Remove ALL sand, terrain, soil, scattered litter and exposed root/rhizome filaments. The stems end cleanly at their shared natural ground-contact level, basal sheaths retained, no root ball, no underground roots, no connecting ground slab. Uniform light gray background. Keep leaves individually separated and clearly visible, not fused into a bush. No additional stems, no different plant species, no text, no labels, no multiple views. Output must have an opaque neutral light-gray studio background, not alpha transparency.",
+  "provenance": "../../prop-inputs-2026-09-19/provenance.json",
+  "review": {
+    "verdict": "pass",
+    "evidence": "All six stems and their basal sheaths retained, including the fully visible tallest shoot; jointed stems and narrow nodal leaf whorls clear. No ground slab, root filaments or soil.",
+    "risk": "Fine whorl leaves may collapse or disappear in reconstruction; six independent stem bases need a common authored contact plane."
+  },
+  "tripoSubmitted": false,
+  "downstreamApproval": {
+    "reviewer": "/root",
+    "method": "Visual contact-sheet review of all seven final input images",
+    "scope": "Approved for Tripo submission",
+    "note": "Complete silhouettes, neutral background, no substrate slab, and revised morphology reads correctly.",
+    "humanApprovalClaimed": false
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "hupehsuchus": [
+    {
+      "name": "anchor_mouth",
+      "bone": "jaw",
+      "point": [
+        0.02171514369547367,
+        -1.9752715826034546,
+        -0.05551580712199211
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "skull",
+      "point": [
+        0.009331649169325829,
+        -1.3232715129852295,
+        0.006250426638871431
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "jaw",
+      "point": [
+        0.02171514369547367,
+        -1.9912716150283813,
+        -0.047515809535980225
+      ],
+      "role": "attack"
+    }
+  ]
+}

@@ -592,10 +592,10 @@
     }
   ],
   "maximumEnvelopeDifference": 0.011147856712341309,
-  "surfaceDistanceMax": 0.21310493350028992,
-  "surfaceDistanceP95": 0.014011383801698682,
+  "surfaceDistanceMax": 0.1352657824754715,
+  "surfaceDistanceP95": 0.012515064142644347,
   "surfaceTolerance": 0.25,
-  "surfaceOutliersOver0p15": 71,
+  "surfaceOutliersOver0p15": 0,
   "surfaceOutlierRegion": "the source lip crease at raw x 0.42, a fold finer than the 0.0055 voxel",
   "seatingDepthRaw": {
     "fore_upper_L": 0.023843050003051758,
@@ -823,16 +823,6 @@
     ],
     [
       0.465,
-      0.95,
-      0.95
-    ],
-    [
-      0.4675,
-      0.95,
-      0.95
-    ],
-    [
-      0.47,
       0.95,
       0.95
     ]

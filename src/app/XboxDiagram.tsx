@@ -5,7 +5,7 @@ export function XboxDiagram() {
   const line = (x1: number, y1: number, x2: number, y2: number) => <line x1={x1} y1={y1} x2={x2} y2={y2} className="pad-line" />;
   return (
     <svg className="xbox-diagram" viewBox="0 0 860 400" role="img" aria-labelledby="xbox-title">
-      <title id="xbox-title">Xbox controller layout: left stick swims and clicking it sinks, right stick looks and click-plus-up-or-down zooms, RT heavy attack, LB sprints, LT aims, RB rises, A dashes, X bites, Y hides, B guards, D-pad up senses, D-pad down opens the teleport menu, D-pad left and right pick a creature in the menus, View holds the scoreboard open, Menu pauses.</title>
+      <title id="xbox-title">Xbox controller layout: left stick swims and clicking it sinks, right stick looks and click-plus-up-or-down zooms, RT heavy attack, LB sprints, LT aims, RB rises, A dashes (tap short, hold long), X bites, Y hides, B guards, D-pad up senses, D-pad down opens the teleport menu, D-pad left and right pick a creature in the menus, View holds the scoreboard open, Menu pauses.</title>
       <defs>
         <linearGradient id="pad-shell" x2="0" y2="1"><stop stopColor="#2f4d58" /><stop offset="1" stopColor="#13262f" /></linearGradient>
       </defs>

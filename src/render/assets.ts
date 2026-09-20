@@ -105,12 +105,35 @@ export class AssetQueue {
    * then roster neighbours). Cards for the visible roster come right after the selected models;
    * sounds trail everything but stay ahead of unlikely models once the UI ones are in.
    */
+  /**
+   * Queue an animal visiting from another game, so it streams like anything else rather than being
+   * fetched the moment the match starts. Its files live under the era that built it, which
+   * `assetPaths` already resolves; what it has no entry for is a measured size, so the model is
+   * given the largest this era ships as an honest over-estimate — a loading bar that finishes
+   * early is better than one that stalls at 99%.
+   */
+  addVisitor(id: string) {
+    if (this.items.has(`glb:${id}`)) return;
+    const B = base();
+    const biggest = Math.max(600_000, ...Object.values(GLB_SIZES as Record<string, number>).filter((n) => typeof n === 'number'));
+    const put = (kind: AssetItem['kind'], url: string, size: number, priority: number) =>
+      this.items.set(`${kind}:${id}`, { key: `${kind}:${id}`, kind, url: `${B}${url}`, size, priority, status: 'queued', loaded: 0 });
+    put('glb', assetPaths.model(id), biggest, 130);
+    put('lod', assetPaths.model(id, 1), 600_000, 95);
+    put('thumb', creaturePortrait(id, 'thumb').src, THUMB_SIZE, 205);
+    put('select', creaturePortrait(id, 'select').src, SELECT_SIZE, 255);
+  }
+
   prioritize(creatures: CreatureId[], phase: 'boot' | 'title' | 'select' | 'playing') {
     for (const id of creatures) this.wanted.add(id);
     const order = [...creatures, ...CREATURE_IDS.filter((c) => !creatures.includes(c))];
     order.forEach((id, i) => {
-      const glb = this.items.get(`glb:${id}`)!, lod = this.items.get(`lod:${id}`)!;
+      // A visitor from another game is not on this era's list and so has no queue entry of its
+      // own until `addVisitor` gives it one. Nothing here may assume there is one: a pick that is
+      // not in the queue is simply not something to order, and the model still loads on demand.
+      const glb = this.items.get(`glb:${id}`), lod = this.items.get(`lod:${id}`);
       const thumb = this.items.get(`thumb:${id}`), hero = this.items.get(`select:${id}`);
+      if (!glb || !lod) return;
       // Small files that cut distant-creature cost dramatically: load them before the models of
       // creatures nobody picked.
       lod.priority = (phase === 'playing' ? 15 : 90) + i;

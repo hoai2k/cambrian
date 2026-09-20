@@ -1,0 +1,21 @@
+
+public/assets/triassic/creatures/rhaeticosaurus.glb   33625 edges x 17 phases x 23 clips
+clip            skin  on bone             all     >2x  worst bones
+Ability        2.81x  tail_00           2.81x     201  0.072->0.203  tail_00:79 fore_outer_R:47 hind_upper_L:31 hind_upper_R:22
+Sprint         2.53x  fore_outer_R      2.53x      86  0.036->0.092  fore_outer_R:26 tail_00:25 hind_upper_R:20 hind_upper_L:13
+Dodge          2.26x  hind_upper_R      2.26x      21  0.047->0.107  hind_upper_R:16 tail_00:3 fore_outer_R:2
+Dive           2.13x  hind_upper_R      2.13x       8  0.047->0.101  hind_upper_R:7 tail_00:1
+Swim           2.10x  fore_outer_R      2.10x       7  0.036->0.076  tail_00:3 fore_outer_R:2 hind_upper_R:2
+Death          2.01x  hind_upper_R      4.22x      26  0.047->0.095  skull:13 jaw:12 hind_upper_R:1
+TurnRight      1.87x  tail_00           1.87x       0  0.043->0.081  
+Heavy          1.84x  fore_outer_R     11.81x     209  0.041->0.075  jaw:119 skull:90
+Attack         1.83x  fore_outer_R     10.85x     169  0.041->0.075  jaw:96 skull:73
+Grab           1.75x  hind_upper_R      2.76x      19  0.052->0.091  skull:17 jaw:2
+Breath         1.70x  hind_upper_R      2.90x       4  0.047->0.081  skull:3 jaw:1
+Breathe        1.45x  fore_outer_R      2.69x       7  0.058->0.084  skull:7
+Stagger        1.44x  fore_outer_R      4.84x      50  0.058->0.083  jaw:34 skull:16
+Hit            1.43x  fore_outer_R      4.84x      50  0.058->0.083  jaw:34 skull:16
+Bite           1.41x  tail_00          12.75x     209  0.072->0.102  jaw:128 skull:81
+Eat            1.35x  tail_00          11.12x     381  0.072->0.098  jaw:212 skull:169
+15 of 23 clips tear an edge past 2x
+worst SKIN 2.81x · worst including the oral lining 12.75x (the lining is a sac built to stretch; the skin figure is the one to judge)

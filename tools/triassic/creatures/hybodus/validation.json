@@ -1,0 +1,1175 @@
+{
+  "sourceFile": "tools/triassic/creatures/hybodus/hybodus.preview.glb",
+  "sourceSha256": "f28722ca94cbe5a5396d92eccb58faf800699b9f57f43a4a147c174222fbac1f",
+  "preservedRawSha256": "e453ee9d120f3f18bda26b294c419691912fa788dc0d444d3392490cab0825c9",
+  "sourceAlbedoSha256": "d7ac80e5e150103429f42b4a6c346817f66869815b2471308839912a260a41c8",
+  "sourceTriangles": 19402,
+  "weldedComponents": 1,
+  "largestComponents": [
+    9695
+  ],
+  "removedFlakeVertices": 0,
+  "unbending": {
+    "bands": 61,
+    "arc": 1.2121,
+    "totalTurningDeg": 87.6,
+    "medianSectionRadius": 0.0546,
+    "meanCurvatureRadiusOverSection": 14.51,
+    "headArcFraction": 0.13,
+    "headStationIndex": 8,
+    "maxVertexMove": 0.3322,
+    "lengthBefore": 1.0,
+    "lengthAfterStraightening": 1.1848,
+    "tailTipOffsetFromTheChordBefore": 0.0658,
+    "tailTipOffsetFromTheMidlineAfter": 0.0067,
+    "snoutAfter": [
+      -0.0093,
+      -0.5638,
+      0.0214
+    ],
+    "roll": {
+      "meanHarmonicStrength": 0.614,
+      "stationsRead": 57,
+      "stations": 60,
+      "measuredDorsalDriftDeg": 33.2
+    },
+    "bulkAtHeadEnd": 0.0945,
+    "bulkAtCaudalEnd": 0.0206
+  },
+  "restPoseCurvature": {
+    "wholeSpine": {
+      "arc": 1.1919,
+      "totalTurningDeg": 87.6,
+      "sectionRadius": 0.0567,
+      "meanCurvatureRadius": 0.7792,
+      "meanCurvatureRadiusOverSection": 13.75
+    },
+    "headAndTrunk": {
+      "arc": 0.5657,
+      "totalTurningDeg": 35.8,
+      "sectionRadius": 0.0952,
+      "meanCurvatureRadius": 0.906,
+      "meanCurvatureRadiusOverSection": 9.52
+    },
+    "tail": {
+      "arc": 0.4646,
+      "totalTurningDeg": 41.1,
+      "sectionRadius": 0.0267,
+      "meanCurvatureRadius": 0.6479,
+      "meanCurvatureRadiusOverSection": 24.26
+    },
+    "note": "measured on the generation's own centreline before anything was carried; this animal has no neck to measure separately"
+  },
+  "pairedFinAsymmetry": {
+    "jointPairs": 4,
+    "meanJointGapRaw": 0.0,
+    "meanJointGapOverBodyLength": 0.0,
+    "maxJointGapOverBodyLength": 0.0,
+    "finVerticesMeasured": 2860,
+    "meanMirroredSurfaceGapOverBodyLength": 0.01043,
+    "p95MirroredSurfaceGapOverBodyLength": 0.04238
+  },
+  "mouth": {
+    "method": "geometric: every head vertex casts its own outward normal back into the mesh",
+    "cavityVertices": 190,
+    "cavityStations": 7,
+    "cavityExtentY": [
+      -0.5464,
+      -0.4753
+    ],
+    "seamTable": [
+      [
+        -0.5464,
+        0.012,
+        0.0349,
+        0.0151
+      ],
+      [
+        -0.5345,
+        0.0093,
+        0.039,
+        0.0078
+      ],
+      [
+        -0.5227,
+        0.0064,
+        0.0437,
+        0.0104
+      ],
+      [
+        -0.5108,
+        0.0033,
+        0.0566,
+        0.0117
+      ],
+      [
+        -0.499,
+        0.0008,
+        0.0577,
+        0.0107
+      ],
+      [
+        -0.4871,
+        -0.0015,
+        0.0527,
+        0.0075
+      ],
+      [
+        -0.4753,
+        -0.0017,
+        0.0448,
+        0.0059
+      ]
+    ],
+    "restingGape": {
+      "closingRotationDegrees": 18.72,
+      "jawLengthRaw": 0.0889,
+      "meanSlitThicknessOverHeadDepth": 0.1704,
+      "maxSlitThicknessOverHeadDepth": 0.331,
+      "meanSlitThicknessOverBodyLength": 0.01665,
+      "verdict": "the generation arrived GAPING: the bind pose carries that gape, closing it for the locomotion clips is a large jaw rotation, and this animal wants a mouth-closed regeneration"
+    },
+    "howCurvedTheMouthLineIs": {
+      "straightFitResidualMaxRaw": 0.00153,
+      "asFractionOfBodyLength": 0.00129,
+      "note": "how far the measured lip line departs from a straight line. A fish mouth is often genuinely straight and this is the easy case -- but the cut follows the measured curve either way, so the number below is what the cut costs and this one is only how much work the curve was doing."
+    },
+    "cutDeviationFromTheMeasuredLipLine": {
+      "maxRaw": 0.0,
+      "asFractionOfBodyLength": 0.0,
+      "note": "zero by construction. The head is sheared vertically by -seam(y), which carries the measured curve exactly onto the plane z = 0; the cut is taken there and the shear undone, so every vertex the cut adds lands on the measured line itself and every vertex that was already there returns to where it was."
+    },
+    "generationsOwnDentition": {
+      "oralZoneVertices": 515,
+      "standingProudOfTheirNeighbourhood": 104,
+      "maxProtrusionRaw": 0.00695,
+      "maxProtrusionOverMouthHalfDepth": 0.705,
+      "authoredReplacement": false,
+      "note": "kept as generated and weighted to the jaw they grow from; nothing is authored here",
+      "verticesCarriedOntoTheMandible": 504
+    }
+  },
+  "mouthSideLabelling": {
+    "method": "the height of the surface each vertex grows out of, against the measured mouth line",
+    "jawSideVertices": 578,
+    "skullSideVertices": 9117,
+    "note": "a height test on the vertex itself splits interlocking teeth down the middle and a graded one stretches each half between two bones -- which is how this fish's upper tooth row first came out as a comb of needles two head-depths long. Taking the height of the smoothed surface instead, which is the tooth's own base, puts every tooth whole on the jaw it grows from. Flood-filling labels from the skin was tried first and is worse on a needle rostrum: the seeds are sparse on a tube that thin and the label boundary wanders through it, which tore the snout into ribbons."
+  },
+  "hingePlug": {
+    "plug": "none",
+    "why": "the plug this builder shipped was fitted against an np.interp clearance test that clamps rather than refusing, so it passed while standing 1.29 units clear of the snout with 126 of its 207 vertices outside the animal; it is the spike and the white shoulder in the delivered renders.",
+    "seenThroughTheBodyAtAttack043": {
+      "giantPlugOutsideTheAnimal": 1,
+      "containedPlugAt0.6x": 666,
+      "containedPlugAt1.8x": 44,
+      "roofOnlyPlug": 625,
+      "noPlug": 667
+    },
+    "whatClosesItInstead": {
+      "hingeCapFaces": {
+        "Hybodus authored body": 17,
+        "Hybodus procedural volume twin": 28
+      },
+      "rimFoldVertices": {
+        "Hybodus authored body": 88,
+        "Hybodus procedural volume twin": 47
+      },
+      "rimFoldRaw": 0.00415,
+      "headSeamsSealed": {
+        "Hybodus authored body": {
+          "faces": 8,
+          "refusedTooWide": 1
+        },
+        "Hybodus procedural volume twin": {
+          "faces": 0,
+          "refusedTooWide": 0
+        }
+      },
+      "boundaryEdgesLeftOpen": {
+        "Hybodus authored body": {
+          "onSeam": 112,
+          "otherOnHead": 178,
+          "behindHead": 12
+        },
+        "Hybodus procedural volume twin": {
+          "onSeam": 49,
+          "otherOnHead": 7,
+          "behindHead": 0
+        }
+      },
+      "note": "the hinge cross-section is fanned shut with its own cut vertices (T.cap_cut) and the seam rim is folded in towards the mouth axis (T.rim_flange), running out before the snout where the two rims meet; the palate then closes the throat behind both. The shipped body material is double-sided, so none of it is drawn at runtime."
+    }
+  },
+  "oralShells": {
+    "contract": "a palate rigid on skull and a floor rigid on jaw, each a closed shell (T.oral_shells), overlapping behind the hinge, no wall between them",
+    "palateVertices": 168,
+    "floorVertices": 168,
+    "rings": 24,
+    "ring": 14,
+    "backY": -0.43499,
+    "frontY": -0.544,
+    "floorFrontY": -0.54127,
+    "mandibleTipY": -0.55311,
+    "lateralAxisAtStations": [
+      [
+        -0.435,
+        -0.0039
+      ],
+      [
+        -0.4532,
+        -0.0103
+      ],
+      [
+        -0.4713,
+        -0.0274
+      ],
+      [
+        -0.4895,
+        -0.0147
+      ],
+      [
+        -0.5077,
+        -0.005
+      ],
+      [
+        -0.5258,
+        -0.0204
+      ],
+      [
+        -0.544,
+        -0.0146
+      ]
+    ],
+    "palateAndFloorLinesAtStations": [
+      [
+        -0.435,
+        -0.0017,
+        0.0036,
+        -0.0069
+      ],
+      [
+        -0.4532,
+        -0.0017,
+        0.0036,
+        -0.0069
+      ],
+      [
+        -0.4713,
+        -0.0017,
+        0.0036,
+        -0.0069
+      ],
+      [
+        -0.4895,
+        -0.001,
+        0.0099,
+        -0.0083
+      ],
+      [
+        -0.5077,
+        0.0027,
+        0.0152,
+        -0.0076
+      ],
+      [
+        -0.5258,
+        0.0072,
+        0.0183,
+        -0.0016
+      ],
+      [
+        -0.544,
+        0.0115,
+        0.0237,
+        -0.0008
+      ]
+    ],
+    "builtAboutEachJawsOwnEdgeOfTheLumen": true,
+    "throatFraction": 0.5,
+    "mandibleNormalVoteAgainstTheIntakeSurface": {
+      "Hybodus authored body lower jaw": -1292,
+      "Hybodus procedural volume twin lower jaw": 212
+    },
+    "measuredRoomAtStations": [
+      [
+        -0.435,
+        0.0934,
+        0.1103,
+        0.0621
+      ],
+      [
+        -0.4532,
+        0.0945,
+        0.1064,
+        0.0571
+      ],
+      [
+        -0.4713,
+        0.0919,
+        0.1015,
+        0.0504
+      ],
+      [
+        -0.4895,
+        0.0793,
+        0.098,
+        0.0435
+      ],
+      [
+        -0.5077,
+        0.0553,
+        0.089,
+        0.0364
+      ],
+      [
+        -0.5258,
+        0.0616,
+        0.0797,
+        0.0308
+      ],
+      [
+        -0.544,
+        0.0215,
+        0.0705,
+        0.0
+      ]
+    ],
+    "vertexDirectionsOpenToTheOutside": 0,
+    "verticesSeatedInsideTheSilhouette": {
+      "vertices": 125,
+      "maxPullRaw": 0.0688120939516066
+    }
+  },
+  "liningClearanceInsideSkinRaw": 0.00379,
+  "scale": 4.22013,
+  "bodyLength": 5.0,
+  "authoredTriangles": 22161,
+  "twinTriangles": 7984,
+  "twinRemeshTriangles": 63140,
+  "twinDecimateRatio": 0.10294583439826965,
+  "twinVerticesHeldBackFromRelaxation": 11372,
+  "bladeDilation": 0.006,
+  "voxel": 0.006,
+  "bones": 24,
+  "boneNames": [
+    "root",
+    "body",
+    "chest",
+    "skull",
+    "jaw",
+    "tail_00",
+    "tail_01",
+    "tail_02",
+    "tail_03",
+    "tail_04",
+    "tail_05",
+    "tail_06",
+    "caudal_upper",
+    "caudal_lower",
+    "dorsal_1",
+    "dorsal_2",
+    "pec_upper_R",
+    "pec_mid_R",
+    "pec_tip_R",
+    "pelvic_R",
+    "pec_upper_L",
+    "pec_mid_L",
+    "pec_tip_L",
+    "pelvic_L"
+  ],
+  "clips": {
+    "Idle": 2.6,
+    "Swim": 1.8,
+    "Sprint": 1.1,
+    "TurnLeft": 1.6,
+    "TurnRight": 1.6,
+    "Dive": 1.4,
+    "Rise": 1.4,
+    "Attack": 1.0,
+    "Bite": 0.5,
+    "Heavy": 1.2,
+    "Hit": 0.6,
+    "Death": 1.8,
+    "Guard": 1.2,
+    "Parry": 0.4,
+    "Dodge": 0.5,
+    "Eat": 1.6,
+    "Stagger": 1.2,
+    "Ability": 1.0,
+    "Grab": 1.1,
+    "Breath": 2.4,
+    "Growth": 1.5,
+    "Shake": 1.4,
+    "SpineBrace": 1.2
+  },
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab",
+    "SpineBrace"
+  ],
+  "loopSeams": {
+    "Idle": 1.4921396918919534e-17,
+    "Swim": 2.664535364979494e-16,
+    "Sprint": 4.2632563192693945e-16,
+    "TurnLeft": 6.298990804004863e-33,
+    "TurnRight": 6.298990804004863e-33,
+    "Dive": 5.399135184771017e-33,
+    "Rise": 5.399135184771017e-33,
+    "Attack": 0.0,
+    "Bite": 1.4997597939553927e-33,
+    "Heavy": 0.0,
+    "Hit": 3.8993755744866164e-33,
+    "Death": 2.549999952316284,
+    "Guard": 1.0658141129045731e-17,
+    "Parry": 5.09918318924574e-33,
+    "Dodge": 8.248678958590156e-33,
+    "Eat": 4.9845572840200426e-17,
+    "Stagger": 3.8993755744866164e-33,
+    "Ability": 3.5994235789613394e-33,
+    "Grab": 1.1756609520119815e-16,
+    "Breath": 2.0996637850059467e-33,
+    "Growth": 3.8993755744866164e-33,
+    "Shake": 3.5994235789613394e-33,
+    "SpineBrace": 9.59232718157728e-18
+  },
+  "boundsAt13Phases": {
+    "Idle": [
+      [
+        -1.363551139831543,
+        -2.503028392791748,
+        -0.9596453905105591
+      ],
+      [
+        1.297282338142395,
+        2.5152664184570312,
+        1.045843243598938
+      ]
+    ],
+    "Swim": [
+      [
+        -1.3831545114517212,
+        -2.503612518310547,
+        -0.9969311952590942
+      ],
+      [
+        1.313684105873108,
+        2.5152664184570312,
+        1.0505831241607666
+      ]
+    ],
+    "Sprint": [
+      [
+        -1.3890748023986816,
+        -2.503836154937744,
+        -1.0268348455429077
+      ],
+      [
+        1.3264713287353516,
+        2.5152664184570312,
+        1.0535202026367188
+      ]
+    ],
+    "TurnLeft": [
+      [
+        -1.3512964248657227,
+        -2.5028133392333984,
+        -1.295689344406128
+      ],
+      [
+        1.3033463954925537,
+        2.5152664184570312,
+        1.0460145473480225
+      ]
+    ],
+    "TurnRight": [
+      [
+        -1.3852930068969727,
+        -2.5087218284606934,
+        -1.368780255317688
+      ],
+      [
+        1.2908520698547363,
+        2.5152664184570312,
+        1.0436943769454956
+      ]
+    ],
+    "Dive": [
+      [
+        -1.3575379848480225,
+        -2.5149989128112793,
+        -1.1902780532836914
+      ],
+      [
+        1.2946195602416992,
+        2.5152664184570312,
+        1.0436943769454956
+      ]
+    ],
+    "Rise": [
+      [
+        -1.3625727891921997,
+        -2.5028133392333984,
+        -1.330580234527588
+      ],
+      [
+        1.293092966079712,
+        2.515584945678711,
+        1.1012121438980103
+      ]
+    ],
+    "Attack": [
+      [
+        -1.3901662826538086,
+        -2.8304789066314697,
+        -1.0319724082946777
+      ],
+      [
+        1.3211524486541748,
+        2.5382211208343506,
+        1.0599169731140137
+      ]
+    ],
+    "Bite": [
+      [
+        -1.36684250831604,
+        -2.5973949432373047,
+        -0.9540560245513916
+      ],
+      [
+        1.2939140796661377,
+        2.5152664184570312,
+        1.0453497171401978
+      ]
+    ],
+    "Heavy": [
+      [
+        -1.4556549787521362,
+        -3.0260074138641357,
+        -1.0899887084960938
+      ],
+      [
+        1.3718035221099854,
+        2.5592081546783447,
+        1.0481345653533936
+      ]
+    ],
+    "Hit": [
+      [
+        -1.6204930543899536,
+        -2.5028133392333984,
+        -1.1751490831375122
+      ],
+      [
+        1.2991951704025269,
+        2.6125540733337402,
+        1.0436943769454956
+      ]
+    ],
+    "Death": [
+      [
+        -1.6060290336608887,
+        -2.5155954360961914,
+        -1.6809359788894653
+      ],
+      [
+        1.2908520698547363,
+        2.5152664184570312,
+        1.27655827999115
+      ]
+    ],
+    "Guard": [
+      [
+        -1.3815058469772339,
+        -2.515414237976074,
+        -1.0739277601242065
+      ],
+      [
+        1.3263835906982422,
+        2.5152664184570312,
+        1.0436943769454956
+      ]
+    ],
+    "Parry": [
+      [
+        -1.3512964248657227,
+        -2.5090012550354004,
+        -1.2978887557983398
+      ],
+      [
+        1.6773293018341064,
+        2.5152664184570312,
+        1.0460093021392822
+      ]
+    ],
+    "Dodge": [
+      [
+        -1.6556757688522339,
+        -2.5028133392333984,
+        -1.4239375591278076
+      ],
+      [
+        1.2908520698547363,
+        2.5152664184570312,
+        1.0436943769454956
+      ]
+    ],
+    "Eat": [
+      [
+        -1.3642178773880005,
+        -2.5083775520324707,
+        -0.9608973860740662
+      ],
+      [
+        1.3052054643630981,
+        2.5152664184570312,
+        1.0460021495819092
+      ]
+    ],
+    "Stagger": [
+      [
+        -1.6102657318115234,
+        -2.5028133392333984,
+        -1.1751490831375122
+      ],
+      [
+        1.291979432106018,
+        2.607111692428589,
+        1.0436943769454956
+      ]
+    ],
+    "Ability": [
+      [
+        -1.3512964248657227,
+        -2.5028133392333984,
+        -1.0663607120513916
+      ],
+      [
+        1.2926791906356812,
+        2.51556134223938,
+        1.1134276390075684
+      ]
+    ],
+    "Grab": [
+      [
+        -1.4618123769760132,
+        -2.676755666732788,
+        -1.1428862810134888
+      ],
+      [
+        1.403503656387329,
+        2.3752663135528564,
+        1.0472521781921387
+      ]
+    ],
+    "Breath": [
+      [
+        -1.35891592502594,
+        -2.5028133392333984,
+        -1.0258007049560547
+      ],
+      [
+        1.2941257953643799,
+        2.5154669284820557,
+        1.1179367303848267
+      ]
+    ],
+    "Growth": [
+      [
+        -1.3512964248657227,
+        -2.5028133392333984,
+        -1.0291568040847778
+      ],
+      [
+        1.3496891260147095,
+        2.5153963565826416,
+        1.0608258247375488
+      ]
+    ],
+    "Shake": [
+      [
+        -1.5803512334823608,
+        -2.6349830627441406,
+        -1.5609536170959473
+      ],
+      [
+        1.5361145734786987,
+        2.5152664184570312,
+        1.0475062131881714
+      ]
+    ],
+    "SpineBrace": [
+      [
+        -1.3677442073822021,
+        -2.4841861724853516,
+        -1.1729650497436523
+      ],
+      [
+        1.2979018688201904,
+        2.5129616260528564,
+        1.0683256387710571
+      ]
+    ]
+  },
+  "weights": {
+    "Hybodus authored body": {
+      "maxInfluences": 4,
+      "vertices": 10893,
+      "verticesPerBone": {
+        "dorsal_1": 994,
+        "body": 4158,
+        "chest": 5600,
+        "tail_00": 2664,
+        "skull": 4667,
+        "pec_mid_L": 650,
+        "pec_upper_L": 704,
+        "dorsal_2": 530,
+        "tail_01": 1949,
+        "jaw": 514,
+        "tail_02": 1359,
+        "pec_mid_R": 825,
+        "pec_upper_R": 796,
+        "tail_03": 1295,
+        "tail_04": 1176,
+        "pelvic_R": 485,
+        "tail_05": 908,
+        "pelvic_L": 546,
+        "tail_06": 619,
+        "caudal_upper": 241,
+        "caudal_lower": 284,
+        "pec_tip_R": 538,
+        "pec_tip_L": 393
+      },
+      "jawJunction": {
+        "cutRimPairs": 81,
+        "lipPairs": 163,
+        "rimReach": 0.13483949961039995,
+        "rimDepth": 0.0638849288225174,
+        "dz": 0.021294976274172466,
+        "band": 0.017771944999694825,
+        "back": 0.0710877799987793,
+        "throat": 1.0,
+        "shellVertices": 849,
+        "shellFullJaw": 708,
+        "bodyThroatVertices": 424
+      }
+    },
+    "Hybodus procedural volume twin": {
+      "maxInfluences": 4,
+      "vertices": 3691,
+      "verticesPerBone": {
+        "tail_05": 356,
+        "tail_06": 240,
+        "tail_04": 431,
+        "tail_03": 449,
+        "caudal_lower": 123,
+        "caudal_upper": 97,
+        "tail_02": 494,
+        "tail_01": 878,
+        "tail_00": 1130,
+        "body": 1564,
+        "dorsal_2": 235,
+        "chest": 2021,
+        "pelvic_L": 253,
+        "pelvic_R": 230,
+        "dorsal_1": 414,
+        "skull": 1691,
+        "pec_upper_R": 437,
+        "pec_upper_L": 369,
+        "pec_mid_L": 388,
+        "pec_tip_L": 210,
+        "jaw": 84,
+        "pec_mid_R": 404,
+        "pec_tip_R": 227
+      },
+      "jawJunction": {
+        "cutRimPairs": 28,
+        "lipPairs": 50,
+        "rimReach": 0.1270104257457621,
+        "rimDepth": 0.046013303101062775,
+        "dz": 0.015337767700354258,
+        "band": 0.017771944999694825,
+        "back": 0.0710877799987793,
+        "throat": 1.0,
+        "shellVertices": 175,
+        "shellFullJaw": 149,
+        "bodyThroatVertices": 71
+      }
+    }
+  },
+  "finBladeSpansMeasuredOffTheGeneration": {
+    "caudal": [
+      0.00266,
+      0.01508
+    ]
+  },
+  "bladeVerticesByStation": [
+    {
+      "fromBodyFraction": 0.0,
+      "above": 14,
+      "below": 142,
+      "maxOutAbove": 0.0173,
+      "maxOutBelow": 0.0301
+    },
+    {
+      "fromBodyFraction": 0.05,
+      "above": 61,
+      "below": 195,
+      "maxOutAbove": 0.0259,
+      "maxOutBelow": 0.03
+    },
+    {
+      "fromBodyFraction": 0.1,
+      "above": 0,
+      "below": 40,
+      "maxOutAbove": 0.0,
+      "maxOutBelow": 0.0282
+    },
+    {
+      "fromBodyFraction": 0.15,
+      "above": 25,
+      "below": 521,
+      "maxOutAbove": 0.0162,
+      "maxOutBelow": 0.18
+    },
+    {
+      "fromBodyFraction": 0.2,
+      "above": 0,
+      "below": 739,
+      "maxOutAbove": 0.0,
+      "maxOutBelow": 0.1845
+    },
+    {
+      "fromBodyFraction": 0.25,
+      "above": 18,
+      "below": 408,
+      "maxOutAbove": 0.1068,
+      "maxOutBelow": 0.1851
+    },
+    {
+      "fromBodyFraction": 0.3,
+      "above": 226,
+      "below": 53,
+      "maxOutAbove": 0.1796,
+      "maxOutBelow": 0.1153
+    },
+    {
+      "fromBodyFraction": 0.35,
+      "above": 268,
+      "below": 0,
+      "maxOutAbove": 0.2213,
+      "maxOutBelow": 0.0
+    },
+    {
+      "fromBodyFraction": 0.4,
+      "above": 21,
+      "below": 0,
+      "maxOutAbove": 0.097,
+      "maxOutBelow": 0.0
+    },
+    {
+      "fromBodyFraction": 0.45,
+      "above": 14,
+      "below": 62,
+      "maxOutAbove": 0.0833,
+      "maxOutBelow": 0.0835
+    },
+    {
+      "fromBodyFraction": 0.5,
+      "above": 120,
+      "below": 356,
+      "maxOutAbove": 0.1238,
+      "maxOutBelow": 0.1357
+    },
+    {
+      "fromBodyFraction": 0.55,
+      "above": 189,
+      "below": 228,
+      "maxOutAbove": 0.1542,
+      "maxOutBelow": 0.1473
+    },
+    {
+      "fromBodyFraction": 0.6,
+      "above": 18,
+      "below": 74,
+      "maxOutAbove": 0.1624,
+      "maxOutBelow": 0.0796
+    },
+    {
+      "fromBodyFraction": 0.65,
+      "above": 0,
+      "below": 82,
+      "maxOutAbove": 0.0,
+      "maxOutBelow": 0.0819
+    },
+    {
+      "fromBodyFraction": 0.7,
+      "above": 0,
+      "below": 85,
+      "maxOutAbove": 0.0,
+      "maxOutBelow": 0.1099
+    },
+    {
+      "fromBodyFraction": 0.75,
+      "above": 0,
+      "below": 295,
+      "maxOutAbove": 0.0,
+      "maxOutBelow": 0.1765
+    },
+    {
+      "fromBodyFraction": 0.8,
+      "above": 0,
+      "below": 125,
+      "maxOutAbove": 0.0,
+      "maxOutBelow": 0.0723
+    },
+    {
+      "fromBodyFraction": 0.85,
+      "above": 46,
+      "below": 138,
+      "maxOutAbove": 0.0172,
+      "maxOutBelow": 0.0571
+    },
+    {
+      "fromBodyFraction": 0.9,
+      "above": 52,
+      "below": 115,
+      "maxOutAbove": 0.0177,
+      "maxOutBelow": 0.0515
+    },
+    {
+      "fromBodyFraction": 0.95,
+      "above": 39,
+      "below": 83,
+      "maxOutAbove": 0.016,
+      "maxOutBelow": 0.0367
+    }
+  ],
+  "weightRelaxation": {
+    "passes": 10,
+    "keptPerPass": 0.45,
+    "note": "each pass replaces a vertex's weights with this much of its own and the rest shared equally among its neighbours on the mesh graph"
+  },
+  "envelope": {
+    "maximumEnvelopeDifference": 0.060456812381744385,
+    "maximumEnvelopeDifferenceFractionOfBodyLength": 0.012091362476348877,
+    "surfaceDistanceMax": 0.07419749349355698,
+    "surfaceDistanceP95": 0.026268914341926575,
+    "envelopeTolerance": 0.2
+  },
+  "anchors": {
+    "anchor_mouth": {
+      "nearestSurfaceRaw": 0.00327,
+      "nearestSurfaceUnits": 0.01378,
+      "fractionOfBodyLength": 0.00276
+    },
+    "anchor_mouth_inside": {
+      "nearestSurfaceRaw": 0.0028,
+      "nearestSurfaceUnits": 0.01183,
+      "fractionOfBodyLength": 0.00237
+    },
+    "anchor_attack_primary": {
+      "nearestSurfaceRaw": 0.00408,
+      "nearestSurfaceUnits": 0.0172,
+      "fractionOfBodyLength": 0.00344
+    }
+  },
+  "appendageRootSeating": {
+    "pec_upper_R": 0.0323,
+    "pec_upper_L": 0.0257,
+    "pelvic_R": 0.0195,
+    "pelvic_L": 0.0289,
+    "jaw": 0.0261,
+    "skull": 0.0598,
+    "chest": 0.0968,
+    "body": 0.0638
+  },
+  "jawShutFromTheGenerationsPartedPose": {
+    "closingRotationDegrees": 18.72,
+    "mandibleVerticesMeasured": 849,
+    "verticesInsideTheSkullSurface": 584,
+    "maxPenetrationUnits": 0.1996,
+    "maxPenetrationOverBodyLength": 0.03992,
+    "meanPenetrationOverBodyLength": 0.007619,
+    "note": "the mandible posed at the measured closing rotation, against the skull's own surface in the same pose. Anything above zero is the generation's two tooth rows, modelled apart, meeting for the first time."
+  },
+  "authoredVerticesFarthestFromTheTwin": [
+    [
+      0.0742,
+      [
+        0.042,
+        -0.642,
+        0.373
+      ]
+    ],
+    [
+      0.0712,
+      [
+        0.022,
+        -0.665,
+        0.367
+      ]
+    ],
+    [
+      0.0675,
+      [
+        0.063,
+        -0.622,
+        0.363
+      ]
+    ],
+    [
+      0.0644,
+      [
+        -0.214,
+        -2.121,
+        0.073
+      ]
+    ],
+    [
+      0.0634,
+      [
+        -0.17,
+        -2.166,
+        0.083
+      ]
+    ],
+    [
+      0.0616,
+      [
+        -0.026,
+        -2.138,
+        0.074
+      ]
+    ],
+    [
+      0.0615,
+      [
+        0.017,
+        -0.651,
+        0.364
+      ]
+    ],
+    [
+      0.0609,
+      [
+        0.075,
+        -0.671,
+        0.371
+      ]
+    ]
+  ],
+  "pairedFinSweptAngleInSprint": {
+    "radiansPerCycleSummedOverTheThreeAxes": {
+      "pec_upper_R": 0.9538,
+      "pec_upper_L": 0.9538,
+      "pelvic_R": 1.2726,
+      "pelvic_L": 1.2726
+    },
+    "cycles": 2,
+    "note": "total absolute change in each paired-fin root's Euler angles over the whole Sprint clip, which holds two tail beats. These are control surfaces and take no propulsive stroke, but they sweep with the beat rather than hanging."
+  },
+  "normalizedWeights": true,
+  "rootStable": true,
+  "noScaleChannels": true,
+  "gapeSolid": {
+    "id": "hybodus",
+    "backdrop": [
+      1.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "shots": [
+      {
+        "clip": "Heavy",
+        "t": 0.5,
+        "pixels": 378000,
+        "differingPixels": 4192,
+        "holesOpenedByCulling": 346,
+        "seenThroughTheBody": 346,
+        "backdropInBothPasses": 6,
+        "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Heavy-0.5-opened.png",
+        "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Heavy-0.5-solid.png",
+        "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Heavy-0.5-culled.png",
+        "openedPixelsAlsoOpenedBeforeThisPort": 343,
+        "openedPixelsNewSinceThisPort": 3,
+        "sharedPixelBox": [
+          525,
+          273,
+          556,
+          394
+        ]
+      },
+      {
+        "clip": "Attack",
+        "t": 0.43,
+        "pixels": 378000,
+        "differingPixels": 4451,
+        "holesOpenedByCulling": 517,
+        "seenThroughTheBody": 517,
+        "backdropInBothPasses": 129,
+        "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Attack-0.43-opened.png",
+        "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Attack-0.43-solid.png",
+        "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Attack-0.43-culled.png",
+        "openedPixelsAlsoOpenedBeforeThisPort": 497,
+        "openedPixelsNewSinceThisPort": 20,
+        "sharedPixelBox": [
+          518,
+          279,
+          553,
+          405
+        ]
+      },
+      {
+        "clip": "Bite",
+        "t": 0.17,
+        "pixels": 378000,
+        "differingPixels": 16970,
+        "holesOpenedByCulling": 6610,
+        "seenThroughTheBody": 6,
+        "backdropInBothPasses": 164,
+        "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Bite-0.17-opened.png",
+        "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Bite-0.17-solid.png",
+        "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/hybodus/gape-solid/Bite-0.17-culled.png",
+        "openedPixelsAlsoOpenedBeforeThisPort": 5710,
+        "openedPixelsNewSinceThisPort": 900,
+        "sharedPixelBox": [
+          192,
+          174,
+          550,
+          380
+        ]
+      }
+    ],
+    "beforeThisPort": {
+      "note": "the one-sac Mouth_lining with no hinge plug, the shipped 15 September body, same shots",
+      "shots": [
+        {
+          "clip": "Heavy",
+          "t": 0.5,
+          "holesOpenedByCulling": 498,
+          "seenThroughTheBody": 498,
+          "backdropInBothPasses": 6
+        },
+        {
+          "clip": "Attack",
+          "t": 0.43,
+          "holesOpenedByCulling": 667,
+          "seenThroughTheBody": 667,
+          "backdropInBothPasses": 130
+        },
+        {
+          "clip": "Bite",
+          "t": 0.17,
+          "holesOpenedByCulling": 5984,
+          "seenThroughTheBody": 222,
+          "backdropInBothPasses": 34
+        }
+      ]
+    }
+  }
+}

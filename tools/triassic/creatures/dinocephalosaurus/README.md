@@ -1,24 +1,38 @@
 # Dinocephalosaurus — the generated neck, unbent, on a thirty-two joint chain
 
+> **Current repair, 20 September 2026 (T3D-12B):** the one-sac oral lining is removed and nothing
+> replaces it. Measured at full gape with the strict backface cull, the sac closed nothing the seated
+> hinge tissue was not already closing (0–3 px through the head without it, against 98–113 px without
+> the hinge tissue too). Fangs, hinge tissue, rig, clips and anchors are unchanged. The lining
+> passages below are kept as history and say so where they start.
+
 The delivered Tripo body and its procedural twin share one **57-joint skeleton**, the same three
 mouth/attack sockets and **24 byte-for-byte equivalent decoded animation performances**. The twin
 is also the runtime LOD, with every clip retained so either model can perform the same gameplay.
 
 The whole of this build is one question — *what do you do with a heavily posed generation?* — and
-the answer here is: **keep it and unbend it**. The neck that ships is the neck Tripo made. Every
-generated vertex of it, its UVs and the source albedo are the delivery; intake carries each
-cross-section rigidly out of the pose and onto a straight axis, and nothing about the neck is
+the answer here is: **keep it, unbend it, and then use both.** The neck that ships is the neck Tripo
+made. Every generated vertex of it, its UVs and the source albedo are the delivery; intake carries
+each cross-section rigidly out of the pose and onto a straight axis, and nothing about the neck is
 procedural except where it is pointing.
+
+The two shapes that come out of that do two different jobs. **The straightened body is what ships,
+what is rigged and what performs** — a bind pose with a doubled-back neck makes every clip a large
+correction and pinches at the tight bends. **The generated pose is what the roster's portraits are
+rendered from**, because the pose is the better picture and a still has no bind pose to be good
+for. They are the same animal folded two ways, and [what that costs](#the-portrait-is-not-the-body)
+is said plainly below rather than left for someone to notice.
 
 | Delivery | Triangles | Packaged bytes |
 | --- | ---: | ---: |
-| `dinocephalosaurus.glb` — authored Tripo body | 21,738 | 2,696,404 |
-| `dinocephalosaurus.puppet.glb` — procedural twin | 8,264 | 1,493,884 |
-| `dinocephalosaurus.lod1.glb` — identical puppet alias | 8,264 | 1,493,884 |
+| `dinocephalosaurus.glb` — authored Tripo body | 21,276 | 2,686,276 |
+| `dinocephalosaurus.puppet.glb` — procedural twin | 8,092 | 1,490,832 |
+| `dinocephalosaurus.lod1.glb` — identical puppet alias | 8,092 | 1,490,832 |
 
 The reduced model is **38.0 %** of the authored triangles, inside the contract's 40 %. Files are in
 `public/assets/triassic/creatures/`, with studio, 1600 × 1200 transparent select, card and thumbnail
-portraits and metadata. Meshopt packaging preserves mesh attributes and animation sample values
+portraits — all four rendered from the **generated pose**, not from this body — and metadata.
+Meshopt packaging preserves mesh attributes and animation sample values
 exactly; textures are embedded. The model is **5.5 engine authoring units** long, faces +Z in glTF
 and uses +Y up; the runtime normalises by the bounding box and applies the species' natural size.
 The research registry gives 5.5 m as the representative length.
@@ -32,8 +46,9 @@ SHA-256 `df0704b432a7480952c58e16e04c258aef9d8c888b87eefb13968eeb412f0fd2`, from
 
 Intake welds coincident texture-seam vertices (11,032 loose-UV vertices collapse to 9,631; the raw
 file's 39 apparent components are one shell once welded) and finds no detached flake to remove. A
-true separate lower-jaw shell is cut along the mouth seam and rigidly skinned to its hinge, with a
-curved oral floor, palate, two rows of conical fangs and seated hinge tissue closing the interior.
+true separate lower-jaw shell is cut along the mouth seam and rigidly skinned to its hinge, with
+two rows of conical fangs and seated hinge tissue at the hinge — and **no lining, palate or floor**,
+which is a measured verdict rather than an omission (see *No lining: the verdict, measured*).
 
 ## What is actually in the mesh
 
@@ -103,6 +118,35 @@ of why the neck was the hard one:
 The tail tip's mean lateral offset drops from **−0.2304 to −0.0432**; the residue is the tail base's
 own offset from the mesh midline, which is the trunk's asymmetry and not the tail's.
 
+## The portrait is not the body
+
+The four roster portraits — `.card.png`, `.select.png`, `.thumb.png` and the `.png` studio render —
+are rendered from the generated pose, from `dinocephalosaurus.posed.glb`, which `build.py` copies
+off the intake surface **before** anything is unbent and writes to the workbench. It carries no rig,
+no jaw cut and no mouth interior, because it is a still at rest with the mouth closed; its material
+is the same datablock as the shipped body's, so it is lit and shaded identically.
+
+**Say it plainly: the portrait and the playable body are different shapes.** Same vertices, same
+UVs, same albedo, different fold. The portrait animal measures **3.32 engine units** along its
+longest axis and the playable body **5.5**, because unbending a neck that turns through 283° makes
+the animal longer. Nothing about the portrait is evidence about the model — if you want to know what
+the game draws, look at the volume sheet, not the card.
+
+Framing is measured rather than typed. `portrait()` in `render.py` projects the subject's own
+vertices into the camera, centres on them and sets `ortho_scale` so the animal takes `FILL` of the
+frame; at 0.74 the card comes out **66.2 % of the frame wide and 74.0 % tall**, against Placodus'
+69.6 % wide and Nothosaurus' 78.1 %. One rule, and it cannot go stale when a body changes shape.
+
+The camera is nearly side-on — (8.5, −1.2, 3.0) — rather than the three-quarter the review shots
+use, at the same elevation, lights and output sizes as the rest of the roster. The generated pose
+throws the neck up and back in one plane and the review camera looks straight down that plane, so
+from there the animal reads as a lump with its head foreshortened into its own shoulder.
+`render.py -- --posed --probe` renders that camera at six azimuths into the workbench, which is how
+this one was picked; it is a looking tool, not a measurement.
+
+The twin's studio render, `dinocephalosaurus.puppet.png`, is still the straightened twin. It is a
+review artefact about the reduced model, so it shows the body the reduced model actually is.
+
 ## The roll, read off the animal's colouring
 
 A roughly circular cross-section is rotationally ambiguous: a centreline fit tells you the neck's
@@ -129,6 +173,97 @@ pale belly climbs onto the neck's upper flank near the base. Both were rendered 
 at. The reviewer's idea worked, and it is the reason this delivery keeps the generated surface at
 all.
 
+## The head was rolled 83.6°, and the mouth was built on it
+
+The previous delivery listed "the head's roll is inherited, not independently verified" as open. It
+was wrong, and by most of a right angle.
+
+`HEAD_UP` was taken from the neck target curve's parallel-transport normal — the very frame this
+build already measures a **117.6° drift** in, and corrects the neck's own sections against. The head
+frame never got that correction, so the frame the entire mouth was constructed in was rolled about
+its own axis, and `is_jaw` was cutting the mandible off the **side** of the snout. The jaw swung
+sideways; the gape was a chip at the tip; the fangs sat on a flank.
+
+The head's dorsal is now measured the way the neck's is, and for the same reason — a roughly round
+section is rotationally ambiguous and the animal's own colouring is the only measurement there is:
+
+| | |
+| --- | ---: |
+| Stations round the head sampled for the first harmonic of darkness | 20 |
+| Mean harmonic strength | **0.613** |
+| Roll error in the inherited frame | **83.6°** |
+
+With the frame square, the pale belly runs from about 110° to 250° round every station, centred on
+ventral, where before it sat centred on a flank. That is the check, and it is the same check the
+neck's roll gets.
+
+### The mouth line, measured
+
+**Placodus' cavity method does not reach this animal.** Casting every head vertex's own outward
+normal back into the mesh — the measurement that found Placodus' oral cavity — finds **0 vertices
+here** against Placodus' 120-plus. This generation has no modelled mouth slit at all: the snout is
+one smooth closed tube and the mouth is *painted on it*. So the mouth line is read off the albedo
+instead, which is what this build already does for the roll.
+
+Per station, on each flank, walking **outwards from the belly** rather than inwards from the back —
+the pale belly is one solid block and the step off it is sharp, where the dark back is mottled and
+crosses mid-value several times — the light/dark boundary is the lip. The jaw is cut with planes, so
+what the cut can follow is a ramp, and the measurement's job is to say *which* ramp:
+
+| | Value |
+| --- | ---: |
+| Stations measured along the head | 24 |
+| Flank-to-flank disagreement, maximum | 0.00499 raw (this animal is not symmetric) |
+| Fitted ramp at the hinge | −0.00874 raw |
+| Fitted ramp slope | 0.0519 |
+| Measured line's worst distance from that ramp | 0.00117 raw, **0.142 of the local radius** |
+
+The build refuses a fit worse than 0.20 of a local radius. The mouth line runs at −0.22 of the local
+radius at the back of the head and −0.43 at the snout tip; the shipped rule was a flat −0.38 at both
+ends, which in *magnitude* was not far off — the roll was the whole of the error.
+
+### No lining: the verdict, measured
+
+> **T3D-12B, 20 September 2026.** The one-sac `Mouth lining` described in the paragraph after this
+> one is **removed**, and nothing is built in its place: no palate, no floor. The paragraphs below
+> it are the history of how the sac came to be, kept because the measurements in them are still the
+> measurements; the sac itself is not.
+
+The first question `CLAUDE.md` asks of a mouth is whether it needs filling at all, and on this head
+it is answered by three renders of the same five shots — the peak jaw rotation of `Bite`, `Attack`,
+`Heavy`, `Eat` and `NeckStrike`, read off the packaged rig — through `gape-solid.py`, with and
+without the backface-cull shim, at the backdrop test `r > .90, g < .20, b > .90`:
+
+| Body at full gape, pixels seen through the head (tolerance 12) | `Bite` | `Attack` | `Heavy` | `Eat` | `NeckStrike` |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| shipped, with the one-sac lining | 0 | 0 | 0 | 0 | 0 |
+| **the sac stripped out, everything else as it was** | **0** | **2** | **3** | **1** | **1** |
+| the sac *and* the seated hinge tissue stripped out | 98 | 87 | 113 | 50 | 101 |
+
+So the sac was closing nothing that the hinge tissue was not already closing. What a plane cut
+through a closed head leaves open is the head's own cross-section at the hinge — the back wall of
+the mouth — and the seated hinge tissue fills it, as it does on every jawed body in the era. This
+generation paints its lip on a closed snout and models no cavity (the normals-cast method finds zero
+vertices; the lip is read off the albedo), so there is no lumen wall for a gape to open onto: what
+an open mouth shows here is the inside of the skin, which is double-sided for exactly that reason,
+and the two rows of fangs between the jaws. And the sac was what the reviewer called gum: at
+`Heavy`'s widest it photographed as a flat pink triangle filling the whole gape from hinge to snout
+(`docs/triassic/throat-repairs/dinocephalosaurus-Heavy-before.png`, against
+[after](../../../../docs/triassic/throat-repairs/dinocephalosaurus-Heavy-after.png)).
+
+The verdict — **neither** — and the counts are on the record in
+`docs/triassic/throat-repairs/oral-verdicts.md` and in `qa.json`, which the build folds into
+`validation.json`. The hinge tissue and the fangs are unchanged; the skin figure is unchanged at
+7.00× (`Sprint`, the paddle row against the chest, nowhere near the mouth), and the figure
+"including the oral lining" is now the same number because there is no oral lining to stretch.
+
+#### The lining, and the hole under it (historical)
+
+**The fangs are on the jaws they belong to by construction**: two rows of conical teeth, the upper
+rigid on `skull` and the lower rigid on `jaw`, authored either side of the measured seam rather than
+cut out of source geometry — so there is no equivalent of Placodus' sawn chisels to find here. The
+front pair are the largest; they interlock, and both rows read against the lining in the front view.
+
 ## The twin
 
 The twin is a procedural **volume resurfacing**, not a decimation of the authored faces: Blender
@@ -150,8 +285,13 @@ meshes (body and lower jaw together).
 | Nearest twin-surface distance, 95th percentile | 0.00386 | 0.07 % | — |
 | Nearest twin-surface distance, maximum | 0.03382 | 0.62 % | — |
 | Appendage roots seated inside the intake surface | 0.024–0.090 raw | 1.5–5.4 % deep | inside |
-| Jaw hinge seated inside the head | 0.0195 raw | 1.2 % deep, 74 % of the local head radius | inside |
+| Jaw hinge seated inside the head | 0.0168 raw | 1.0 % deep | inside |
 | Neck root (`neck_00`) seated inside the chest | 0.0552 raw | 3.3 % deep | inside |
+| Head frame's inherited roll error | 83.6° | corrected from the countershading | — |
+| Measured mouth line vs. the fitted straight ramp | 0.00117 raw max | 0.142 of the local radius | < 0.20 |
+| Gape see-through at peak gape, side view | 0.01–0.04 % of the aperture | `Bite` was 3.60 % | — |
+| Fangs and hinge tissue inside the intake surface | 0.0013–0.0037 raw | — | inside |
+| Seen through the head at peak gape, strict cull, no lining | 0–3 px of 378,000 | 98–113 px without the hinge tissue | ≤ 12 |
 
 No authored vertex is further than 0.034 from the twin — there is no outlier region at all on this
 body, where Placodus had a lip crease finer than one voxel. Joint and socket coordinates are shared,
@@ -197,17 +337,60 @@ packaged clips and the live Three.js skeleton:
 
 | Clip | cervicals working | median ÷ max joint amplitude | joints peaking in order | skull travel ÷ chest travel |
 | --- | ---: | ---: | ---: | ---: |
-| NeckStrike | **32 / 32** | 0.81 | 31 / 31 | **40.7** |
-| Ability | 32 / 32 | 0.81 | 31 / 31 | 24.4 |
+| NeckStrike | **32 / 32** | 0.82 | 31 / 31 | **36.6** |
+| Ability | 32 / 32 | 0.83 | 31 / 31 | 20.7 |
 | Periscope | 32 / 32 | 1.00 | 31 / 31 | 18.8 |
 | Swim | 32 / 32 | 0.71 | 23 / 31 | 14.7 |
 
 A hosepipe would show one joint with all the amplitude and thirty-one with none; the median joint
-here carries 81 % of what the busiest one does. The strike **travels**: the shoulder end of the
-chain peaks at phase 0.38 and the skull end at 0.62, and the build refuses a strike that does not
-run down the chain in order. The head reaches 2.56 units while the chest moves 0.063 — the body
+here carries 82 % of what the busiest one does. The strike **travels**: the shoulder end of the
+chain peaks at phase 0.50 and the skull end at 0.79, and the build refuses a strike that does not
+run down the chain in order. The head reaches 2.30 units while the chest moves 0.063 — the body
 stays where it is, which is the animal's whole hunting kit and the roster's own description of the
 ability. Periscope stands the skull 1.95 units above where Idle keeps it.
+
+### The neck attacks
+
+This animal is a long neck with a body attached, so a clip in which the neck merely follows the
+trunk is a wasted clip. Nine of them are now built out of one shape — **cock, drive, follow through,
+gather** — rather than out of a sine:
+
+- `runs(u0, w, lead, ph)` is a bump that **runs down the chain**: joint `ph` starts it `lead · ph`
+  of the clip after the shoulder does, so the shape arrives at the skull last. `sharp` above 1
+  narrows it in place, which is what makes a strike read as committed rather than as a swell. It
+  asserts `u0 + w + lead ≤ 1`, because a bump that has not finished at the skull by the last frame
+  leaves a clip whose first and last poses differ and which therefore cannot be blended out of —
+  which is exactly how the first pass of this work broke `Heavy`, at a seam of 4.7e-4.
+- **NeckStrike** (1.4 s) and **Ability** (1.0 s) load into a deep lateral S with the head carried
+  back and high, hold a beat, unroll it head-last, throw the skull through the target and down, and
+  re-form the S the other way coming back. NeckStrike is the longer, deeper performance; Ability is
+  the roster's tighter one. The throw is deliberately kept short of curling the head back under the
+  shoulder: the first version reached a pitch of 1.05 rad across the chain and the head passed below
+  and behind the fore paddle, which reads as a knot rather than as a strike.
+- **Attack** (1.0 s) and **Heavy** (1.2 s) cock the neck back into an S with the head drawn up over
+  the shoulders, then drive it forward and down, overshoot past straight and gather. The trunk shifts
+  its weight behind the neck — back on the cock, forward as the chain unrolls — rather than doing
+  the striking itself.
+- **Bite** (0.5 s) is half a second, so the whole of it is the snap: a short sharp cock and a stab,
+  at `sharp = 2`.
+- **Eat** (1.7 s) throws the fish back head-up and then **swallows it**, and on a neck this long the
+  bolus is something you can watch travel — skull to shoulder, against the direction everything else
+  runs. It is `peristalsis()` rather than `runs()`: a travelling *bulge*, where each joint goes one
+  way and then the other as the wave passes it, so the chain's net curvature stays about where it
+  was. The same bump with one sign bends the whole neck progressively instead, and the first attempt
+  at this read as the animal dropping its head under its own chest. Eat's resting head-down was also
+  cut from 0.45 to 0.16, because at `NK` the old baseline was most of a right angle of neck and it
+  buried the swallow.
+- **Grab** (1.1 s) is no longer a sway: the neck braces back and hauls in heaves, with a worrying
+  shake running out to the head between them.
+- **Dodge** (0.5 s) sends the head first and the rest of the chain after it, so it reads as the
+  animal taking its head off the line rather than sliding sideways.
+- **Guard** (1.1 s) keeps the fold back over the shoulder — the only cover this animal has — but
+  folded is also cocked, so it is held as a loaded S with the head drawn back and up, breathing.
+
+The gape is timed to the strike rather than to the button: it parts on the cock, is widest as the
+neck unrolls, and shuts on the follow-through, which is the frame the fish is in. Peak openings are
+0.50 rad on Bite and Attack, 0.56 on Heavy, 0.52 on NeckStrike, 0.48 on Ability.
 
 **Swim is axial, with a steady head.** A travelling wave runs down the eight caudal joints — each
 peaks 0.067–0.083 of a cycle after the one in front of it — with the four paddles rowing and the
@@ -245,7 +428,19 @@ models:
 - [Remaining actions: Sprint, Dive, Rise, Hit, Stagger, Guard, Parry, Eat, Death, Grab, Breath, Growth, Breathe](paired-actions-sheet.jpg)
 - [This animal's own clips: NeckStrike, Ability, Periscope, Breathe](paired-era-clips-sheet.jpg)
 - **[The neck bending along its length](paired-neck-sheet.jpg)** — the strike from the side and from
-  above at seven phases, Periscope, a turn and Guard. This is the sheet this animal is judged on.
+  above at its own seven beats (rest, the cock, the drive, the follow-through, the gather),
+  Periscope, a turn and Guard. This is the sheet this animal is judged on.
+- **[The neck as the actor in the rest of the clip set](paired-neck-attacks-sheet.jpg)** — Attack,
+  Heavy, Ability, Bite, Eat, Grab and Dodge at the phases their performances turn on.
+- **[The mouth, before and after](mouth-fix-sheet.jpg)** — the gape as shipped (a chip at the snout
+  tip, cut off the side by the rolled frame), with the frame corrected but the two split tubes still
+  parting, and with the one skinned lining under a double-sided skin. Three rows at `Bite`'s widest,
+  from three-quarter, front and side, with the backface cull emulated. This one is a **record of the
+  fix, not a reproducible artefact**: the first two rows are earlier states of the builder, and their
+  cameras are the fixed world-space ones `mouth-views.py` used before it learned to frame on the
+  skull, which is why the middle column changes what it is looking at between rows. Its third row is
+  now history too: the sac it shows was removed in T3D-12B, and the current mouth is the pair of
+  plates under `docs/triassic/throat-repairs/`.
 
 - **[The pose study](pose-study-sheet.jpg)** — the generation untouched, the unbend that ships, and
   the rebuilt loft that was measured and not used, side and top from one fixed camera. The unbend is
@@ -264,8 +459,15 @@ From the repository root with Blender 5.2 and the project's Node dependencies in
 ```sh
 /opt/blender/blender --background --factory-startup --python tools/triassic/creatures/dinocephalosaurus/build.py
 node tools/triassic/creatures/dinocephalosaurus/audit.mjs --package --decode
+/opt/blender/blender --background --factory-startup --python tools/triassic/gape-solid.py -- dinocephalosaurus \
+    Bite@0.133 Attack@0.367 Heavy@0.5 Eat@0.233 NeckStrike@0.567
+node tools/triassic/oral-shell-audit.mjs dinocephalosaurus
+node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/dinocephalosaurus.glb
+node tools/triassic/idle-bones.mjs public/assets/triassic/creatures/dinocephalosaurus.glb
+/opt/blender/blender --background --factory-startup --python tools/triassic/creatures/dinocephalosaurus/render.py -- --posed
 /opt/blender/blender --background --factory-startup --python tools/triassic/creatures/dinocephalosaurus/render.py -- --decoded
 /opt/blender/blender --background --factory-startup --python tools/triassic/creatures/dinocephalosaurus/render.py -- --decoded --puppet
+/opt/blender/blender --background --factory-startup --python tools/triassic/creatures/dinocephalosaurus/mouth-views.py -- local/triassic-authoring/dinocephalosaurus/mouth
 python3 tools/triassic/creatures/dinocephalosaurus/contact-sheets.py
 python3 tools/triassic/creatures/dinocephalosaurus/pose-sheet.py
 node tools/triassic/creatures/dinocephalosaurus/delivery-record.mjs
@@ -293,6 +495,24 @@ writes only this species' asset family; it touches no shared registry and perfor
 - The four portraits in `public/assets/triassic/creatures/` are now model renders rather than the
   crops `tools/triassic/placeholder-portraits.mjs` writes; re-running that tool would put the crops
   back.
+- **The portrait is a different shape from the playable body** — the generated pose against the
+  straightened one, 3.32 units long against 5.5. That is what was asked for and it is defensible for
+  a dramatic still, but it means the card is not evidence about the model, and a reviewer comparing
+  the two should expect the neck to disagree. Nothing else about them differs: same vertices, same
+  UVs, same albedo, same material.
+- **The portrait camera is the one framing decision made by eye.** The fill fraction and the centring
+  are measured off the subject, but which azimuth shows this pose was picked by looking at six of
+  them. There is no measurement that says a pose reads.
+- **The mandible's cut face shows when the jaw drops.** Opening the jaw swings the square the cut
+  leaves at the hinge into view, and the hinge envelope — a sphere at 0.80/0.68/0.60 of the local
+  head radius — does not quite cover it, so at full gape the back of the lower jaw reads as a blunt
+  pale block. Placodus had the same thing and enlarged its envelope; this one has not been.
+- **`Grab` still rears the neck a long way up** at the top of each heave. It reads as hauling, which
+  is what it is for, but it is at the edge of what a held prey item would allow.
+- **The lower jaw is 143 triangles.** The mandible is a genuinely small piece of a 5.5-unit animal —
+  a slender snout on a body whose whole authored mesh is 21,276 triangles — but it is thin enough
+  that the jaw reads as a blade rather than as a modelled mandible in a close-up. With the sac gone
+  the mouth's volume is the head's own interior, which is what the measurement said it always was.
 - **The unbend is a deliberate departure from the generated pose.** It is bounded, measured and
   reversible from one constant, but it moves a vertex as much as 0.71 raw units, and it is the one
   place this delivery changes what Tripo returned. A reviewer who wants the pose can rebuild with
@@ -304,20 +524,22 @@ writes only this species' asset family; it touches no shared registry and perfor
   simply do not match each other in the rest pose. The same is true of the trunk, whose tail base
   sits 0.043 left of the mesh's own midline. If the reviewer wants a symmetric animal, that is a
   fresh generation, not a Blender push-and-pull.
-- **The head's roll is inherited, not independently verified.** It comes from the measured dorsal at
-  the last neck station, which is a good measurement of the *neck*; that the skull sits square on it
-  is an assumption checked only by looking at the renders.
+- ~~The head's roll is inherited, not independently verified.~~ **Closed, and it was wrong by 83.6°**
+  — see above. The head's dorsal is now measured off its own countershading at harmonic strength
+  0.613. What remains assumed is the head's *pitch* relative to the neck's last frame, which is
+  fitted to the head's own slab centroids and checked only by looking.
 - **There are no eye globes.** The generated head has sculpted eyes in its surface and albedo, and
   this build does not cut and seat separate globes, as Nothosaurus and Placodus do not. The pipeline
   contract asks for them; this is outstanding on all three.
-- The mouth interior — palate, oral floor, fangs and hinge tissue — is authored geometry scaled to
-  the head's measured radius profile, not source detail. Two attempts put it outside the animal: the
-  first hung it off the neck's last frame rather than the head's own (the head sits 14° below the
-  neck's end tangent, so the whole mouth floated beside the snout), and the second used fixed
-  offsets on a snout that tapers to r = 0.008. The head frame is now fitted to the head's own slab
-  centroids, everything inside the mouth is a fraction of the local radius, and the build asserts
-  every oral vertex is inside the closed intake surface — it now clears it by 0.0024 to 0.0059 raw.
-  Nothing in the measured numbers caught either mistake before that assertion existed.
+- The mouth interior — fangs and hinge tissue; the lining is gone — is authored geometry scaled to
+  the head's measured radius profile, not source detail, because there is no source detail: the
+  generation has no modelled mouth. Three attempts put it in the wrong place: the first hung it off the neck's last
+  frame rather than the head's own, the second used fixed offsets on a snout that tapers to
+  r = 0.008, and the third — the one that shipped — built it all on a frame rolled 83.6°. Only the
+  last of those was caught by a measurement (the countershading harmonic); the first two were caught
+  by an assertion added after the fact, and the third by *looking at a render*. The build now asserts
+  every oral vertex is inside the closed intake surface, clearing it by 0.0013 to 0.0037 raw, and
+  the seating margin on the hinge tissue at 0.0013 is thin.
 - **The twin's head is smoother than the authored head.** At 0.0050 voxels the remesh keeps the
   silhouette (the envelope agrees to 0.12 %) but loses the snout's fine creases and the eye relief.
   That is visible in the mouth-closed pair on the volume sheet and is what a reduced model is for;

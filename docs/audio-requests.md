@@ -10,6 +10,24 @@ size budget, a description of the sound, and the code that will consume it.
 
 ## Open
 
+- **The flop — 1 file.** `public/assets/sfx/flop.mp3`, ~0.5 s, mono, -20 LUFS,
+  under 20 KB. A stranded animal throwing itself down the beach at the sea
+  (`src/sim/beach.ts`): a wet slap on sand with grit in it, smaller than the
+  landing, heard from the animal itself rather than from under water. One hop
+  every 0.8 s while the player asks for it, so it wants no tail. Shared between
+  the eras. Nothing is played for a flop until it lands; the landing itself
+  plays the delivered `devonian/beach`, which the shared table now borrows.
+
+- **Sprint bed — 1 file.** `public/assets/sfx/sprint-loop.mp3`, 3–5 s, seamless
+  loop, mono, -26 LUFS, under 60 KB. The wash of water over a body driving hard:
+  broadband, no transient, nothing that reads as a repeating swoosh when it comes
+  round. Sprint is held down for minutes at a time, so it is a bed rather than a
+  sting — `audio.setSprint` in `src/audio/audio.ts` fades it up while a local
+  player is driving and away when they stop, at 0.16 gain under the reef. It
+  loops the delivered one-shot `burst` sample on itself until this lands, which
+  is audible as a pulse if you listen for it. Shared between the eras; a
+  nautiloid's jet keeps its own discrete `jet` sting and does not want this.
+
 - **Egg hatch — 2 files.** `public/assets/sfx/egg-poke.mp3` (~0.4 s) and
   `public/assets/sfx/egg-crack.mp3` (~1.2 s), mono, -18 LUFS, under 30 KB each.
   Every player now hatches out of an egg on the bottom rung: five seconds of a

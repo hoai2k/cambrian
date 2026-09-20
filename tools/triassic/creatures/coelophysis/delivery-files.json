@@ -1,0 +1,62 @@
+{
+  "coelophysis.card.png": {
+    "bytes": 230473,
+    "sha256": "d3dea0d883c4cf17913d2b4a3888ee66b912e5d31e583ed15a3dc01981131053",
+    "dimensions": [
+      800,
+      600
+    ]
+  },
+  "coelophysis.glb": {
+    "bytes": 2225332,
+    "sha256": "a884e57144a8ca07939abc954814d37f97085de9fef2dd0e5a53e1817b10b3e8"
+  },
+  "coelophysis.json": {
+    "bytes": 2803,
+    "sha256": "ec22e865ea63f64ac0f829c5e3891a8e6d854838d2d8554b2fb3a6dc7d253cc6"
+  },
+  "coelophysis.lod1.glb": {
+    "bytes": 1730900,
+    "sha256": "689ecf5a740e58cbe692aa3a88016b6df58bebcb706eca6ff531d7388e81aa21"
+  },
+  "coelophysis.origpose.glb": {
+    "bytes": 1483572,
+    "sha256": "a9ea66a7183de767367fe7943d69f5d07fe306d7794ca3a56403d596d3070118"
+  },
+  "coelophysis.png": {
+    "bytes": 484269,
+    "sha256": "d354ee71054efb7681ae1ac3df38144d624db5fb5a7f59da4dfc49ddf2b3bd2e",
+    "dimensions": [
+      1200,
+      900
+    ]
+  },
+  "coelophysis.puppet.glb": {
+    "bytes": 1730900,
+    "sha256": "689ecf5a740e58cbe692aa3a88016b6df58bebcb706eca6ff531d7388e81aa21"
+  },
+  "coelophysis.puppet.png": {
+    "bytes": 448824,
+    "sha256": "032f147c18183fdc65a3833269ebf709069c6fcb2a025a530b05cc485fcffe45",
+    "dimensions": [
+      1200,
+      900
+    ]
+  },
+  "coelophysis.select.png": {
+    "bytes": 826500,
+    "sha256": "6e6a630b7da1ec44c7306b7b69809c835482fea2a9766433f295cc0f5476b16f",
+    "dimensions": [
+      1600,
+      1200
+    ]
+  },
+  "coelophysis.thumb.png": {
+    "bytes": 29883,
+    "sha256": "1bf9c90132204a426df24c9c0d37cb3634748285ccffc6f4c097e6a43b0524c6",
+    "dimensions": [
+      256,
+      192
+    ]
+  }
+}

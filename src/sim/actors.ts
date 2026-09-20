@@ -20,6 +20,17 @@ export const speedFactor = (scale: number) => Math.pow(scale, 0.45);
 export const clearanceOf = (a: Actor) => lengthOf(a) * (creature(a.creature).clearance ?? (creature(a.creature).ground ? 0.13 : 0.2));
 export const bodyRadius = (a: Actor) => lengthOf(a) * (creature(a.creature).bodyRadius ?? .22);
 /**
+ * How far a bite reaches from the mouth point — the size of the mouth, not of the animal.
+ *
+ * It was two fifths of the body's *length*, which is a sphere the size of a head on a shark and
+ * the size of half a neck on a plesiosaur: a long-necked, small-headed swimmer bit things a body
+ * width away from its jaws, and a big animal bit a whole shoal at once. Girth is the better
+ * measure of a head — a body carries its jaws at roughly its own thickness — so the mouth is
+ * mostly `bodyRadius`, with a little of the length in it so that a long slender fish still has a
+ * bite with some length to it, and a floor so a hatchling can always close on something.
+ */
+export const mouthReach = (a: Actor, L = lengthOf(a)) => Math.max(0.35, bodyRadius(a) * 1.15 + L * 0.08);
+/**
  * How far a body's surface is from a point, treating the animal as a capsule down its own axis
  * rather than as a ball around its middle.
  *
@@ -103,6 +114,25 @@ export function applyScaleStats(a: Actor, keepFraction = true) {
   a.stamina = Math.min(a.stamina || a.staminaMax, a.staminaMax);
 }
 
+/**
+ * Whether `o` is actually coming for `a`: hunting it, fighting it, or seeing it off its own ground.
+ *
+ * Being *large* is not this. A giant on its patrol route is no more dangerous than the water it is
+ * swimming in, and a warning drawn over every big animal means "something big is there", which the
+ * animal's own size already said. The colour of a mark is for intent; the glyph under it is still
+ * the size band.
+ */
+export const comingFor = (o: Actor, a: Actor): boolean => {
+  if (o.id === a.id || !isAlive(o)) return false;
+  // A body somebody is steering says so by aiming: it has no brain to read.
+  if (o.controller === 'player' || o.controller === 'bot') {
+    if (o.lockTarget === a.id && (o.aiming || o.state === 'attack' || o.state === 'pounce')) return true;
+  }
+  const b = o.brain;
+  if (!b || b.target !== a.id) return false;
+  return b.goal === 'hunt' || b.goal === 'fight' || b.goal === 'defend';
+};
+
 export function makeActor(id: number, creatureId: CreatureId, controller: Controller, pos: Vec3, scale: number, player = -1): Actor {
   const a: Actor = {
     id, creature: creatureId, controller, player,
@@ -118,9 +148,9 @@ export function makeActor(id: number, creatureId: CreatureId, controller: Contro
     hitFlash: 0, hitDir: v3(), hitStop: 0,
     grabbedBy: -1, grabbing: -1, grabT: 0, grabOff: v3(0, 0, 1), eatingTarget: -1, eatProgress: 0,
     corpseT: 0, eaten: 0, eatBites: 0, killer: -1, noise: 0.5, cover: 0, stillness: 0,
-    dodgeDir: v3(0, 0, 1), dodgeTapT: 0, hopVel: 0, grounded: true, climbPush: 0, climbTo: -Infinity, airborne: false,
+    dodgeDir: v3(0, 0, 1), dodgeTapT: 0, hopVel: 0, grounded: true, climbPush: 0, climbTo: -Infinity, airborne: false, wade: 0, ashore: false, strandT: 0, flopT: 0,
     prev: { light: false, heavy: false, ability: false, dodge: false, guard: false, lock: false, sense: false, rise: false, burst: false, dash: false, aim: false },
-    respawnT: 0, reviveT: 0, carriedTop: false, hatching: false, dashHoldT: 0, dashUsed: false, pounceCd: 0, dashCd: 0, sinceHit: 99, lastHitBy: -1, swallowedBy: -1, holdT: 0, graspHold: false, graspT: 0, graspSpent: false, rideHost: -1, rideT: 0, rideOff: v3(), riddenBy: -1, gripSyncT: -1, drive: v3(), deathY: 0, sparkled: false, tumble: v3(), aimInRange: false, aiming: false, kills: 0, eats: 0, escapes: 0, hunted: 0, hunterId: -1, wasHunted: false, seen: 0, bubbles: 0,
+    respawnT: 0, reviveT: 0, carriedTop: false, hatching: false, dashHoldT: 0, dashUsed: false, pounceCd: 0, dashCd: 0, dashCost: 0, sinceHit: 99, lastHitBy: -1, swallowedBy: -1, holdT: 0, graspHold: false, graspT: 0, graspSpent: false, rideHost: -1, rideT: 0, rideOff: v3(), riddenBy: -1, gripSyncT: -1, drive: v3(), deathY: 0, sparkled: false, tumble: v3(), aimInRange: false, aiming: false, kills: 0, eats: 0, escapes: 0, hunted: 0, hunterId: -1, wasHunted: false, seen: 0, bubbles: 0,
     spawnProtect: controller === 'player' ? 3 : 0,
     home: { ...pos }, teleportCd: 0,
     prevT: { x: pos.x, y: pos.y, z: pos.z, yaw: 0, pitch: 0, bank: 0 },

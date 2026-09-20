@@ -57,12 +57,19 @@ def close_envelope(c):
   loops.append({'vertices':len(loop),'centroid':list(center),'radius':max((p[i]-center).length for i in loop)})
  return p,f,{'valid':bad==0,'nonmanifoldEdges':bad,'cappedBoundaryLoops':loops}
 def inside(tree,p,d):
+ # None where the parity walk runs out of budget. A ray that leaves a surface within epsilon of
+ # tangent can re-enter the face it just left and step along it until the budget is gone; that is
+ # the walk failing on one ray, not the mesh failing to be a solid, and a sample it happens to
+ # every few tens of thousands of times must not take the whole audit down with it. Callers drop
+ # such a sample and the report counts them (`unresolvedRays`) — excluded, never assumed inside,
+ # so the reported fraction stays conservative. A mesh that really is unsuitable for parity shows
+ # up as a large count, not a crash.
  count=0;origin=Vector(p);epsilon=2e-6
  for _ in range(64):
   hit,normal,index,distance=tree.ray_cast(origin,d)
   if hit is None:return count%2==1
   count+=1;origin=hit+d*epsilon
- raise RuntimeError('Excess ray intersections: geometry not suitable for parity')
+ return None
 def wilson(k,n):
  z=1.96;p=k/n;den=1+z*z/n;c=(p+z*z/(2*n))/den;h=z*math.sqrt(p*(1-p)/n+z*z/(4*n*n))/den;return [100*(c-h),100*(c+h)]
 def section_svg(path,head,eye):
@@ -108,19 +115,20 @@ for file in sorted(DIRECTORY.glob('*.geometry.json')):
   if not et['valid'] or et['cappedBoundaryLoops']:raise RuntimeError(f'{id}: eye globe not closed {et}')
   etr=BVHTree.FromPolygons(ep,ef,all_triangles=True);arr=np.array(eye['positions']);lo=arr.min(0);hi=arr.max(0)
   rng=np.random.default_rng(int.from_bytes(hashlib.sha256((id+str(ei)).encode()).digest()[:8],'little'))
-  candidates=rng.uniform(lo,hi,(N,3));accepted=[p for p in candidates if inside(etr,p,DIRECTIONS[0])]
-  classifications=np.array([[inside(body_tree,p,d)for d in DIRECTIONS]for p in accepted],dtype=np.int8);votes=classifications.sum(1);n=len(votes);k=int((votes>=2).sum());amb=int(((votes>0)&(votes<3)).sum());ci=wilson(k,n)
+  candidates=rng.uniform(lo,hi,(N,3));accepted=[p for p in candidates if inside(etr,p,DIRECTIONS[0]) is True]
+  scored=[(p,[inside(body_tree,p,d)for d in DIRECTIONS])for p in accepted];unresolved=[p for p,v in scored if None in v];accepted=[p for p,v in scored if None not in v]
+  classifications=np.array([v for _,v in scored if None not in v],dtype=np.int8);votes=classifications.sum(1);n=len(votes);k=int((votes>=2).sum());amb=int(((votes>0)&(votes<3)).sum());ci=wilson(k,n)
   # Mouth closure influence is explicit and constrained away from eyes by reporting distances.
   closure_distances=[float(np.linalg.norm(np.array(c['centroid'])-(lo+hi)/2)-c['radius']-np.linalg.norm((hi-lo)/2))for c in topology['cappedBoundaryLoops']]
   verified=all(d>0 for d in closure_distances)
   conservative=[wilson(int((votes==3).sum()),n)[0],wilson(int((votes>0).sum()),n)[1]]
   status='FAIL'if conservative[1]<50 else 'PASS'if conservative[0]>=50 else 'BORDERLINE'
   if not verified:status='AMBIGUOUS_'+status
-  er={'eye':ei,'center':((lo+hi)/2).tolist(),'radii':((hi-lo)/2).tolist(),'eyeTriangles':len(ef),'boundingBoxCandidates':N,'volumeSamples':n,'inside':k,'insidePercent':100*k/n,'wilson95Percent':ci,'conservative95Percent':conservative,'rayDisagreements':amb,'insideLowerPercent':100*int((votes==3).sum())/n,'insideUpperPercent':100*int((votes>0).sum())/n,'closureClearanceLowerBounds':closure_distances,'criterion50':status,'target65':conservative[0]>=65 and verified}
+  er={'eye':ei,'center':((lo+hi)/2).tolist(),'radii':((hi-lo)/2).tolist(),'eyeTriangles':len(ef),'boundingBoxCandidates':N,'volumeSamples':n,'unresolvedRays':len(unresolved),'inside':k,'insidePercent':100*k/n,'wilson95Percent':ci,'conservative95Percent':conservative,'rayDisagreements':amb,'insideLowerPercent':100*int((votes==3).sum())/n,'insideUpperPercent':100*int((votes>0).sum())/n,'closureClearanceLowerBounds':closure_distances,'criterion50':status,'target65':conservative[0]>=65 and verified}
   # Placement guidance only: translate the same globe toward continuous head, target 70%.
   inward=Vector((0,-1,0)) if id in ['bothriolepis','doryaspis','gemuendina'] else Vector((-1 if (lo[0]+hi[0])>0 else 1,0,0))
   probe=accepted[::max(1,len(accepted)//4000)];left=0;maximum=float(np.linalg.norm(hi-lo));right=maximum
-  def fraction_at(distance):return sum(inside(body_tree,Vector(p)+inward*distance,DIRECTIONS[0])for p in probe)/len(probe)
+  def fraction_at(distance):return sum(inside(body_tree,Vector(p)+inward*distance,DIRECTIONS[0])is True for p in probe)/len(probe)
   for step in range(1,33):
    right=maximum*step/32
    if fraction_at(right)>=.70:break

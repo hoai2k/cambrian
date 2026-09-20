@@ -1,0 +1,70 @@
+{
+  "id": "cymbospondylus",
+  "verdict": "separate closed rigid palate/floor",
+  "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present. A body with no lining mesh is reported as such, with the hidden oral parts it does carry listed, and all three variants must agree.",
+  "models": [
+    {
+      "variant": "authored",
+      "sha256": "eecdfe855124cce4f2a993404b83cdaabc09f44319fe1e03715b725924f3501e",
+      "meshes": [
+        {
+          "name": "Oral cavity lining",
+          "vertices": 364,
+          "triangles": {
+            "skull": 360,
+            "jaw": 360
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ],
+      "otherOralMeshes": [
+        "Seated jaw hinge tissue"
+      ],
+      "oralShells": "separate palate and floor"
+    },
+    {
+      "variant": ".puppet",
+      "sha256": "64aa8dc5f2b4557aea71e282aaf12e2bb8505fcde8a79fa88546ea2d1bff4f28",
+      "meshes": [
+        {
+          "name": "Oral cavity lining",
+          "vertices": 364,
+          "triangles": {
+            "skull": 360,
+            "jaw": 360
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ],
+      "otherOralMeshes": [
+        "Seated jaw hinge tissue"
+      ],
+      "oralShells": "separate palate and floor"
+    },
+    {
+      "variant": ".lod1",
+      "sha256": "64aa8dc5f2b4557aea71e282aaf12e2bb8505fcde8a79fa88546ea2d1bff4f28",
+      "meshes": [
+        {
+          "name": "Oral cavity lining",
+          "vertices": 364,
+          "triangles": {
+            "skull": 360,
+            "jaw": 360
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ],
+      "otherOralMeshes": [
+        "Seated jaw hinge tissue"
+      ],
+      "oralShells": "separate palate and floor"
+    }
+  ]
+}

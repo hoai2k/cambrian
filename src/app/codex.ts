@@ -1,7 +1,9 @@
+import { recordableIds, type EraId } from '../content/visitors';
 import { ACTIVE_ERA } from '../content';
 import type { CreatureId } from '../sim/creatures';
 import type { Biome, LandmarkKind } from '../sim/world';
 import { clampMark } from '../sim/ladder';
+import { TEXT } from '../shared/text';
 
 /**
  * The record of everything the player has found in this era, kept across sessions on this device.
@@ -50,7 +52,7 @@ const clean = <T extends string>(v: unknown, allowed?: readonly T[]): T[] => {
 const cleanBest = (v: unknown): Partial<Record<CreatureId, number>> => {
   const out: Partial<Record<CreatureId, number>> = {};
   if (!v || typeof v !== 'object') return out;
-  const ids = new Set<string>(ACTIVE_ERA.creatures.map((c) => c.id));
+  const ids = new Set<string>(recordableIds(ACTIVE_ERA.id as EraId));
   for (const [k, n] of Object.entries(v as Record<string, unknown>)) {
     if (!ids.has(k) || typeof n !== 'number') continue;
     const m = clampMark(n);
@@ -69,7 +71,7 @@ export function loadCodex(): Codex {
     return {
       biomes: clean<Biome>(v.biomes),
       landmarks: clean<LandmarkKind>(v.landmarks, ['arch', 'stack', 'bones']),
-      apex: clean<CreatureId>(v.apex, ACTIVE_ERA.creatures.map((c) => c.id)),
+      apex: clean<CreatureId>(v.apex, recordableIds(ACTIVE_ERA.id as EraId) as CreatureId[]),
       best: cleanBest(v.best),
     };
   } catch { return EMPTY; }
@@ -144,13 +146,6 @@ export function saveCodex(codex: Codex) {
   try { localStorage.setItem(key(), JSON.stringify(codex)); } catch { /* nothing to do about it */ }
 }
 
-export const LANDMARK_NAMES: Record<LandmarkKind, string> = {
-  arch: 'The Arch',
-  stack: 'The Stack',
-  bones: 'A Giant’s Bones',
-};
-export const LANDMARK_BLURBS: Record<LandmarkKind, string> = {
-  arch: 'A span of rock with the sea running under it.',
-  stack: 'Boulders piled into a tower you can climb.',
-  bones: 'A dead giant on the floor. Food — and something comes back for it.',
-};
+/** What each landmark is called, and what it is. The words are in `TEXT.discoveries`. */
+export const LANDMARK_NAMES: Record<LandmarkKind, string> = TEXT.discoveries.landmarkNames;
+export const LANDMARK_BLURBS: Record<LandmarkKind, string> = TEXT.discoveries.landmarkBlurbs;

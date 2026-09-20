@@ -17,6 +17,10 @@ OUT = ROOT / 'public/assets/triassic/creatures'
 HERE = Path(__file__).resolve().parent
 LOCAL = ROOT / 'local/triassic-authoring/helicoprion'
 TWIN = '--twin' in sys.argv
+# The whorl's holes turned out to be painted rather than modelled, so the same geometry has to be
+# renderable without the generated albedo: `--flat` swaps the body onto one matte material and
+# changes nothing else, and the pair is what `whorl-albedo.jpg` is assembled from.
+FLAT = '--flat' in sys.argv
 SUFFIX = '.puppet' if TWIN else ''
 REVIEW = LOCAL / ('twin-review' if TWIN else 'authored-review')
 REVIEW.mkdir(parents=True, exist_ok=True)
@@ -40,6 +44,16 @@ s.render.film_transparent = True
 s.view_settings.view_transform = 'AgX'
 s.world.use_nodes = True
 s.world.node_tree.nodes['Background'].inputs[1].default_value = .35
+
+if FLAT:
+    matte = bpy.data.materials.new('Helicoprion flat')
+    matte.use_nodes = True
+    bsf = matte.node_tree.nodes['Principled BSDF']
+    bsf.inputs['Base Color'].default_value = (.84, .80, .76, 1)
+    bsf.inputs['Roughness'].default_value = .55
+    for o in [x for x in s.objects if x.type == 'MESH']:
+        o.data.materials.clear()
+        o.data.materials.append(matte)
 
 rig = next(o for o in s.objects if o.type == 'ARMATURE')
 for tr in rig.animation_data.nla_tracks:
@@ -79,6 +93,19 @@ def render(file, w=800, h=600, loc=(7, -5, 4.2), target=(0, 0, 0), scale=6.4):
 # under the snout, which is what the mouth cameras are aimed at.
 MOUTH = dict(loc=(3.4, -3.6, -.2), target=(0, -2.15, -.15), scale=1.5)
 BELOW = dict(loc=(.2, -2.6, -3.4), target=(0, -2.05, -.12), scale=1.6)
+# Close on the whorl itself: the reviewer judges this feature by eye, so it gets a camera that
+# fills the frame with it rather than with the head. Side is the plane the coil lies in; the
+# three-quarter looks in past the snout with the gape open, which is how a player meets it.
+WHORL_SIDE = dict(loc=(5, -2.05, -.13), target=(0, -2.05, -.13), scale=1.0)
+WHORL_3Q = dict(loc=(2.6, -4.2, -1.1), target=(0, -2.1, -.20), scale=1.15)
+
+if '--whorl-only' in sys.argv:
+    tag = 'flat-' if FLAT else ''
+    for clip, t in [('Idle', 0), ('Bite', .25), ('Attack', .4)]:
+        pose(clip, t)
+        render(REVIEW / ('%swhorl-side-%s-%s.png' % (tag, clip, t)), 1000, 1000, **WHORL_SIDE)
+        render(REVIEW / ('%swhorl-3q-%s-%s.png' % (tag, clip, t)), 1000, 1000, **WHORL_3Q)
+    sys.exit(0)
 
 if '--mouth-only' in sys.argv:
     pose('Bite', .25)

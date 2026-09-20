@@ -527,7 +527,7 @@ const pctOfBody = (doc: StretchDoc, factor = 1) => (regionLength(doc) * factor /
  * dragged across the body reads as "0.15999999999999998", which is a true number and an unusable
  * label.
  */
-function NumberField({ value, step, range, places = 3, onChange }: { value: number; step: number; range?: [number, number]; places?: number; onChange(v: number): void }) {
+export function NumberField({ value, step, range, places = 3, onChange }: { value: number; step: number; range?: [number, number]; places?: number; onChange(v: number): void }) {
   const shown = (v: number) => v.toFixed(places);
   const [text, setText] = useState(shown(value));
   useEffect(() => { setText(shown(value)); }, [value]);

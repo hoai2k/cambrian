@@ -1,0 +1,35 @@
+{
+  "id": "macrocnemus",
+  "backdrop": [
+    1.0,
+    0.0,
+    1.0,
+    1.0
+  ],
+  "shots": [
+    {
+      "clip": "Bite",
+      "t": 0.2,
+      "pixels": 378000,
+      "differingPixels": 365,
+      "holesOpenedByCulling": 79,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0,
+      "markedImage": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/macrocnemus/gape-solid/Bite-0.2-opened.png",
+      "solid": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/macrocnemus/gape-solid/Bite-0.2-solid.png",
+      "culled": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/macrocnemus/gape-solid/Bite-0.2-culled.png"
+    },
+    {
+      "clip": "Snatch",
+      "t": 0.3,
+      "pixels": 378000,
+      "differingPixels": 265,
+      "holesOpenedByCulling": 26,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0,
+      "markedImage": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/macrocnemus/gape-solid/Snatch-0.3-opened.png",
+      "solid": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/macrocnemus/gape-solid/Snatch-0.3-solid.png",
+      "culled": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/macrocnemus/gape-solid/Snatch-0.3-culled.png"
+    }
+  ]
+}
