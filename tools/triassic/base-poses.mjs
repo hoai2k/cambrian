@@ -28,12 +28,27 @@ const MANIFEST = 'src/content/triassic/base-poses.json';
 const shipped = new Set(JSON.parse(fs.readFileSync('tools/triassic/shipped.json', 'utf8')).creatures);
 const sha = (b) => createHash('sha256').update(b).digest('hex');
 
-/** Keys a builder writes when it moved the mesh before binding, and what each one means. */
+/**
+ * Keys a builder writes when the body's *rest* is not the shape the generation held, and what each
+ * one means. `applied` is how a builder says it actually did the thing rather than only measuring
+ * it, and most of these carry that flag; `carry` does not, because it is not a mesh move but a
+ * **rest-pose carry** — a chain posed and the pose taken as the new bind — so what says it happened
+ * is that there are bones in `carriedBones` and some share of the aim was carried into them.
+ *
+ * It belongs on this list for exactly the reason the list exists. Askeptosaurus' head stood 67.7°
+ * off its trunk and T3D-26 put the whole aim into the bind (`restHeadVsTrunkRunDegrees` 4.17), so
+ * the shipped body rests in a shape the generation never held — and a reviewer aiming that
+ * correction in the bend editor was aiming it on the body that already carries it.
+ */
 const MOVES = {
-  neckUnbending: 'the neck unbent onto its own measured axis',
-  unbending: 'the body unbent onto its own measured axis',
-  tailStraightening: 'the tail straightened out of its sweep',
-  neckStretch: 'the neck lengthened',
+  neckUnbending: { why: 'the neck unbent onto its own measured axis', applied: (v) => v.applied === true },
+  unbending: { why: 'the body unbent onto its own measured axis', applied: (v) => v.applied === true },
+  tailStraightening: { why: 'the tail straightened out of its sweep', applied: (v) => v.applied === true },
+  neckStretch: { why: 'the neck lengthened', applied: (v) => v.applied === true },
+  carry: {
+    why: 'the rest pose carried the front\u2019s aim into the bind',
+    applied: (v) => Array.isArray(v.carriedBones) && v.carriedBones.length > 0 && Number(v.carriedAimFraction) > 0,
+  },
 };
 
 const rows = [], problems = [];
@@ -45,8 +60,8 @@ for (const id of [...shipped].sort()) {
   // Only a move that was actually *applied* counts. A builder that measured a curve and left it
   // alone records the measurement too, and that body's base pose is the generation's own.
   const applied = Object.entries(MOVES)
-    .filter(([k]) => v[k] && typeof v[k] === 'object' && v[k].applied === true)
-    .map(([, why]) => why);
+    .filter(([k, m]) => v[k] && typeof v[k] === 'object' && m.applied(v[k]))
+    .map(([, m]) => m.why);
   if (!applied.length) continue;
   const bytes = fs.readFileSync(raw);
   const dest = path.join(OUT, `${id}.origpose.glb`);
