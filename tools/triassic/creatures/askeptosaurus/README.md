@@ -133,7 +133,10 @@ puts the fault back in the bind the renderer sizes by and in every portrait shot
 Carrying the front moves the head, and two things had to follow it. The **anchors** are points in
 the measured frame attached to `skull` and `jaw`, so `carry_rest` now hands back the per-bone map it
 bakes the skin through and the three anchors are placed through it — exactly what a weight-1 vertex
-on that bone does. And the **posterior cut plane** is no longer square to the file's axes:
+on that bone does, and measurably so: each anchor's distance to the nearest skin vertex in the
+shipped file is unchanged to four decimals across the fix (`anchor_mouth` 0.0123,
+`anchor_mouth_inside` 0.0033, `anchor_attack_primary` 0.0086) while all three have moved with the
+head. And the **posterior cut plane** is no longer square to the file's axes:
 `auditCutAttachment` selected its rim by a coordinate on one axis and found *zero* vertices rather
 than failing, so the builder records the plane it actually cut on, carried, and the shared audit
 takes a `{point, normal, tolerance}` as well as a coordinate. The other four bodies that use it are
@@ -238,6 +241,16 @@ the twin, 39 on the backup at 5.3e-5), and the lip's own worst parting went *dow
 every joint owns skin. `oral-shell-audit.mjs`: separate closed rigid palate and floor on authored,
 puppet and LOD. `throat-audit.mjs` and `hidden-parts.mjs --check` clean.
 `askeptosaurus-profile.json` records the paired envelope. All 27 bodies still pass `lag.mjs --all`.
+
+One thing the front fix does **not** fix, and did not break: the two mouth close-ups under
+`local/triassic-authoring/askeptosaurus/authored-review/` are of a flank rather than a mouth. The
+shared renderer guesses where a head is off the bounding box, and on a body lying along x with its
+head at the far end that guess has always landed 2.79 of an 8.72-unit body away from
+`anchor_mouth` — measured on the pre-T3D-26 file, so it is not something the carry caused. It is
+written up in `docs/triassic/builder-requests.md` rather than half-fixed here, because the cameras
+are *aimed* in world axes as well as targeted and what that wants is a head frame from the builder.
+Nothing in the delivery depends on it: `oral-shell-audit.mjs`, `throat-audit.mjs`, `lag.mjs`' gape
+and `auditCutAttachment` are what prove this mouth, and none of them frames a camera.
 
 `posedExtentOverBind` stays centred on the bind the renderer sizes by — `Idle` 0.94–0.97, `Swim`
 1.01–1.05, `Sprint` 1.03–1.06, `Dive` 1.01–1.02, `Rise` 0.97–0.98, `Grab` 0.96–0.98 — and the

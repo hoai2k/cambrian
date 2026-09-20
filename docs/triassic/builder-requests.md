@@ -126,3 +126,29 @@ standard two: a regeneration asked for with the mouth closed, which is what the 
 did not get here, or accepting the profile close and leaving the front view as it is. Nothing should
 be modelled by hand: a lower jaw and a lip line are a long way past what this era allows to be
 authored onto a Tripo body.
+
+## Askeptosaurus: the shared mouth camera cannot find this animal's head (T3D-26, open)
+
+`creature_render.run` frames its two mouth close-ups on a point guessed off the bounding box —
+`head = (cx, cy - size[1] * .40, cz + size[2] * .10)`, which reads "the head is 40 % of the box
+toward -Y from the centre, in the middle of the other two axes". That holds for a body that lies
+along the frame's own long axis, which is twenty-six of the twenty-seven.
+
+Askeptosaurus lies along **x** with its head at the far end. Measured on the body as it shipped
+before T3D-26 — so this is not something the front fix caused — the guess lands at (2.79, 0.369,
+−0.178) while `anchor_mouth` is at (0.005, 0.054, −0.033): **2.79 out of an 8.72-unit body away**,
+almost all of it in x. The mouth close-ups for this animal have always been of a flank, and after
+the front was brought into line they are of a slightly different flank.
+
+Moving the point alone is not the fix and would read as one. The two cameras are also *aimed* in
+world axes — `MOUTH` stands off the head at (+.30, −.34, +.10) of the span, on the assumption that
+−Y is in front of the snout — so a head that points along −x needs the camera's **direction** to
+follow it too, not just its target. What that wants is a head *frame* from the builder (point,
+forward, up; the builder has all three, and `anchors.json` already carries two points on the head's
+own axis) rather than a second guess. It is a shared renderer for twenty-seven bodies and the
+change is worth making deliberately rather than as a side effect of an animal's own task.
+
+Nothing in the shipped delivery depends on it: these are review renders under
+`local/triassic-authoring/`, and what actually proves this mouth is `oral-shell-audit.mjs`,
+`throat-audit.mjs`, `lag.mjs`' gape reading and `auditCutAttachment`, all of which pass and none of
+which frames a camera.

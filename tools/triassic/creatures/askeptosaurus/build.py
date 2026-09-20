@@ -977,7 +977,7 @@ def build(body):
  'hipFraction':hip/AC[-1],'tailFraction':1-hip/AC[-1],'mouth':{'hingeY':hinge,'cutPlane':cut_plane,'lip':lip,'throatCaps':caps,'maxGapeRadians':.29},
  'models':reports,'clips':CLIPS,'looping':LOOPS,'loopSeams':seams,'motion':motion,'heldShape':holds,
  'pectorals':paddles,
- 'restingShape':{'appliesTo':'clips only; the bind pose is unchanged',
+ 'restingShape':{'appliesTo':'the clips, over a bind carried by `carry` and `fcarry` and nothing else',
   'note':'unit values; every clip scales them by its own row in heldShape',
   'chestArchRadians':REST[body]['chest'],'neckArchRadiansPerJoint':REST[body]['neck'],'neckJoints':len(NECK),
   'skullLevellingRadians':REST[body]['skull'],'tailFallRadiansPerJoint':REST[body]['fall'],

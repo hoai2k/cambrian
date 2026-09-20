@@ -3204,7 +3204,7 @@
     }
   },
   "restingShape": {
-    "appliesTo": "clips only; the bind pose is unchanged",
+    "appliesTo": "the clips, over a bind carried by `carry` and `fcarry` and nothing else",
     "note": "unit values; every clip scales them by its own row in heldShape",
     "chestArchRadians": 0.022,
     "neckArchRadiansPerJoint": 0.016,
