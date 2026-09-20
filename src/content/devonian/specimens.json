@@ -15,7 +15,8 @@
       "Idle",
       "Swim",
       "Guard",
-      "Eat"
+      "Eat",
+      "Flop"
     ],
     "sources": [
       "https://doi.org/10.26879/1343",
@@ -89,7 +90,8 @@
       "Idle",
       "Swim",
       "Guard",
-      "Eat"
+      "Eat",
+      "Flop"
     ],
     "sources": [
       "https://www.cambridge.org/core/journals/earth-and-environmental-science-transactions-of-royal-society-of-edinburgh/article/abs/ixthe-placoderm-fish-coccosteus-cuspidatus-miller-ex-agassiz-from-the-middle-old-red-sandstone-of-scotland-part-i-descriptive-morphology/97AA5B04F2B9E00AA1FA5FC3D41627C7",
@@ -151,7 +153,8 @@
       "Idle",
       "Swim",
       "Guard",
-      "Eat"
+      "Eat",
+      "Flop"
     ],
     "sources": [
       {
@@ -198,7 +201,8 @@
       "Swim",
       "Guard",
       "Eat",
-      "Grab"
+      "Grab",
+      "Flop"
     ],
     "sources": [
       "https://doi.org/10.1038/s42003-024-06837-8",
@@ -230,7 +234,8 @@
       "Idle",
       "Swim",
       "Guard",
-      "Eat"
+      "Eat",
+      "Flop"
     ],
     "sources": [
       {
@@ -275,7 +280,8 @@
       "Idle",
       "Swim",
       "Guard",
-      "Eat"
+      "Eat",
+      "Flop"
     ],
     "sources": [
       "https://www.app.pan.pl/archive/published/app52/app52-705.pdf",
@@ -307,7 +313,8 @@
       "Idle",
       "Swim",
       "Guard",
-      "Eat"
+      "Eat",
+      "Flop"
     ],
     "sources": [
       {
@@ -419,7 +426,8 @@
       "Idle",
       "Swim",
       "Guard",
-      "Eat"
+      "Eat",
+      "Walk"
     ],
     "sources": [
       {
@@ -467,7 +475,8 @@
       "Idle",
       "Swim",
       "Guard",
-      "Eat"
+      "Eat",
+      "Walk"
     ],
     "sources": [
       {
