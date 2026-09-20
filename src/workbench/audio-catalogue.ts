@@ -60,7 +60,10 @@ export const GROUPS: SoundGroup[] = [
       { kind: 'silt', label: 'Silt', spatial: true, usage: 'A retreating dodge along the bottom, or a burrowing creature kicking up sediment.' },
       { kind: 'ability', label: 'Ability', spatial: true, usage: 'A creature’s special move fires — the generic whoosh under every ability.' },
       { kind: 'sense', label: 'Sense', spatial: true, usage: 'The sonar-style sense pulse. Flat and full volume for your own pulse; attenuated when another creature pings.' },
-      { kind: 'respawn', label: 'Respawn / hatch', spatial: true, usage: 'A creature hatches back into a nursery after dying (the sim reuses the moult state for the hatch-in). This event had no sound at all before.' },
+      { kind: 'flop', label: 'Flop', spatial: false, usage: 'A stranded water-breather throws itself toward the sea. Randomly chooses between two wet, gritty slap takes.' },
+      { kind: 'sprint', label: 'Sprint beds', spatial: false, usage: 'Three seamless water-wash loops crossfaded by depth: shallow, middle, then deep. Their shared gain follows the strongest local sprint.' },
+      { kind: 'hatch', label: 'Egg crack', spatial: true, usage: 'The wet tear of a soft egg wall giving way when a new player hatches.' },
+      { kind: 'respawn', label: 'Respawn', spatial: true, usage: 'A creature hatches back into a nursery after dying (the sim reuses the moult state for the hatch-in).' },
     ],
   },
   {

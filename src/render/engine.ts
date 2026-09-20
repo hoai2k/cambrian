@@ -675,14 +675,19 @@ export class Engine {
 
     // The sprint bed follows whichever local body is driving hardest, and only while it has the
     // stamina to be driving at all — an empty bar is a body labouring, not one surging.
-    let sprint = 0;
+    let sprint = 0, sprintDepth = 0;
     if (!this.attract && running) {
       for (const [i, f] of inputs) {
         const p = game.players[i];
-        if (p && isAlive(p) && p.exhausted === 0 && p.stamina > 0) sprint = Math.max(sprint, Math.min(1, f.burst));
+        const drive = Math.min(1, f.burst);
+        if (p && isAlive(p) && p.exhausted === 0 && p.stamina > 0 && drive > sprint) {
+          sprint = drive;
+          const column = ACTIVE_ERA.environment.floorDepth?.[biomeAt(p.pos.x, p.pos.z)] ?? 60;
+          sprintDepth = clamp((SURFACE_Y - p.pos.y) / column, 0, 1);
+        }
       }
     }
-    audio.setSprint(sprint);
+    audio.setSprint(sprint, sprintDepth);
 
     // Fixed step. Capped at 3 sub-steps so a slow frame cannot spiral into more simulation work.
     const tSim = performance.now();
@@ -1575,9 +1580,8 @@ export class Engine {
         // frame's own inputs): it is held down for minutes at a time, and one loud whoosh per press
         // was the single most repeated sound in the game.
         case 'burst': { const b = game.byId(e.actor); if (b && RULES?.jet(b)) { world('jet', e.pos); this.bubbles.emit(e.pos, 30, 0.9, 3, 0.1, 1.4); } break; }
-        // Coming out of an egg. There is no shell-crack sample yet (docs/audio-requests.md), so it
-        // borrows the hatch-in sound rather than synthesising a stand-in for one.
-        case 'hatch': { if (e.player != null && e.player >= 0) audio.play('respawn'); else world('respawn', e.pos, 1, 0.5); break; }
+        // Coming out of an egg: a wet tear as the soft shell opens.
+        case 'hatch': { if (e.player != null && e.player >= 0) audio.play('hatch'); else world('hatch', e.pos, 1, 0.5); break; }
         // Hatching out of a nursery after a respawn (the moult state is reused for the hatch-in).
         case 'moult': { if (e.player != null && e.player >= 0) audio.play(e.strength === 1 && RULES ? 'moult' : 'respawn'); else world('respawn', e.pos, 1, 0.5); break; }
         // Era events (Devonian). Their samples are registered by the era's entry page; an
@@ -1629,6 +1633,7 @@ export class Engine {
           break;
         }
         case 'anoxia': { personal('anoxia', 0.8); break; }
+        case 'flop': { personal('flop', 0.75); break; }
         case 'beach': { if (e.strength) { this.bubbles.emit(e.pos, 12, 0.5, 2, 0.06, 1); personal('beach', 0.9); } break; }
         case 'shoalJoin': { this.sparkles.emit(e.pos, 16, 0.6, 1.2, 0.05, 1.2); personal('shoalJoin', 0.7); break; }
         case 'teleport': {
