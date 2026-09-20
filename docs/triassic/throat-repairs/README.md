@@ -87,3 +87,9 @@ The earlier skinning-repair batch is present on main. High strain candidates in 
 Helicoprion and Dinocephalosaurus still merit targeted visual review; this numerical report does
 not classify all strain as a throat tear or mark unseen intersections as fixed. Askeptosaurus
 was not a shipped authored/puppet pair at baseline and is covered by its separate regeneration.
+
+`node tools/triassic/oral-shell-audit.mjs <id> ...` verifies the replacement in the actual packaged
+files: each lining vertex has one unit skull or jaw weight, no triangle spans both bones, each
+indexed edge belongs to exactly two faces, and both closed halves are present. Authored, puppet
+and LOD variants are all checked. This catches the old stretching-sac architecture directly;
+it does not substitute for a rendered check of the shells' fit inside the head.
