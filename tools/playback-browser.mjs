@@ -15,7 +15,8 @@
  *  4. `Attack` is 1.333 s on Hallucigenia and 1.100 s on Anomalocaris, so the end of the long one
  *     clamps to the end of the short one — and coming back gives the 1.333 s back, which is the
  *     proof that the clamp landed on what was playing and not on what was chosen.
- *  5. The Base pose crosses bodies like a clip does, and a reload forgets the lot: this is a
+ *  5. A model swap — the same specimen's reduced body — holds the clip and the frame too.
+ *  6. The Base pose crosses bodies like a clip does, and a reload forgets the lot: this is a
  *     session's selection, not a saved one.
  *
  * Run it against a preview build:
@@ -120,6 +121,22 @@ try {
   assert.equal(await page.locator('.clip-fallback').count(), 0, 'nothing is standing in here');
   await page.screenshot({ path: path.join(out, 'playback-3-returned.png') });
 
+  // ---- and it survives a change of *model* too, which is a load of its own ----
+  const model = page.locator('select[aria-label="Which model"]');
+  const full = await pane().getAttribute('data-loaded-model');
+  await model.selectOption({ label: 'Reduced model' });
+  await page.waitForFunction((was) => {
+    const el = document.querySelector('.clips');
+    return el?.getAttribute('data-loaded-model') && el.getAttribute('data-loaded-model') !== was;
+  }, full, { timeout: 60000 });
+  assert.equal(await playing(), 'Crawl', 'swapping the model on stage holds the clip');
+  assert.equal(await intent(), 'Crawl');
+  assert.equal(await paused(), true);
+  assert.match(await readout(), /^1\.80 \/ 2\.00 s$/, 'and the frame, which is what makes the two comparable');
+  await model.selectOption({ label: 'Full model' });
+  await page.waitForFunction((was) => document.querySelector('.clips')?.getAttribute('data-loaded-model') === was,
+    full, { timeout: 60000 });
+
   // ---- 4. a shorter clip clamps, and the clamp is not written back ----
   await open('hallucigenia', 'Hallucigenia');
   await clip('Attack').click();
@@ -156,6 +173,7 @@ try {
   assert.deepEqual(errors, [], 'no page errors');
   if (offsite.length) console.log(`note: ${offsite.length} off-site request(s) failed (no route out of the container): ${offsite.join(', ')}`);
   console.log('PASS: viewer playback in a browser — Crawl at 1.80 s paused carried to Wiwaxia through an Anomalocaris that has '
-    + 'no Crawl, Attack clamped 1.33 → 1.10 and back to 1.33, base pose sticky, pause held throughout, reload forgets it. '
+    + 'no Crawl, held across a model swap, Attack clamped 1.33 → 1.10 and back to 1.33, base pose sticky, '
+    + 'pause held throughout, reload forgets it. '
     + `Screenshots in ${out}`);
 } finally { await browser.close(); }

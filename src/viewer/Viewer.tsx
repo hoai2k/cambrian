@@ -552,7 +552,8 @@ export function Viewer() {
           in, and keeping them both on the pane is what lets a browser drive prove the difference.
           The base pose says so by name, since it is a selection with no clip in it. */}
       <section className="clips" aria-label="Animations" data-loaded-specimen={loadedId} data-loaded-model={loadedId ? modelPath : ''}
-        data-clip-intent={intent ? intent.clip ?? 'base' : ''} data-clip-playing={loadedId ? active || 'base' : ''}>
+        data-clip-intent={intent ? intent.clip ?? 'base' : ''}
+        data-clip-playing={!loadedId ? '' : !clips.length ? 'none' : active || 'base'}>
         <div className="clips-head">
           <h3>Animations</h3>
           {(clips.length > 0 || loading) && <><label className="toggle">
