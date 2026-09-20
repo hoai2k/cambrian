@@ -1,4 +1,4 @@
-"""Render the actual decoded backup GLB in its preserved posed rest geometry."""
+"""Render the actual decoded backup GLB in its own rest geometry, whichever body is the backup."""
 import math,sys
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parent.parent/'_pipeline'))

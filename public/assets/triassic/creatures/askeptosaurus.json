@@ -3,8 +3,8 @@
   "name": "Askeptosaurus",
   "species": "Askeptosaurus italicus",
   "provenance": "Middle Triassic \u00b7 Monte San Giorgio",
-  "description": "Slender thalattosaur with a long lateral swimming tail. Authored body and volume twin share one rig; original posed generation retained as an animated backup.",
-  "modelLength": 6.0,
+  "description": "Slender thalattosaur with a long lateral swimming tail. Authored body and volume twin share one rig; the straight regeneration is retained as an animated backup.",
+  "modelLength": 8.726,
   "lengthMeters": 2.5,
   "locomotion": "Swim",
   "clips": [
@@ -48,11 +48,11 @@
   ],
   "puppet": "askeptosaurus.puppet.glb",
   "sources": [
-    "tools/triassic/creatures/askeptosaurus/tripo-regenerated-2026-09-19/askeptosaurus.raw.glb",
+    "tools/triassic/creatures/askeptosaurus/askeptosaurus.preview.glb",
     "docs/triassic/canonical/askeptosaurus.png"
   ],
   "notes": [
-    "The preserved backup has a pose-matched rest skeleton and the same public clip names.",
+    "The retained backup body has its own rest skeleton and the same public clip names.",
     "Heavy and TailWhip strike with the long tail; Ability and Coil curl and recover. World turning is simulation-owned.",
     "Living colours, soft tissues and movements are artistic reconstruction."
   ]
