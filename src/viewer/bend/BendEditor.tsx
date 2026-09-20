@@ -262,9 +262,11 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, canvas, 
         </div>
         {error && <p className="sculpt-error">{error}</p>}
         <p className="hint">
-          Put the two ends on the animal, turn the span, and read what it measures. The file
-          names <code>{model.split('/').pop()}</code> by its hash, so a bend measured here cannot be
-          read back against a body that has changed since.
+          Put the two ends on the animal, turn the span, and read what it measures. The lit vertices
+          are everything between the two cuts, which is everything the turn would carry — on a span
+          cut obliquely across a curled body that takes in whatever else lies between them, and the
+          stage says so rather than hiding it. The file names <code>{model.split('/').pop()}</code> by
+          its hash, so a bend measured here cannot be read back against a body that has changed since.
         </p>
 
         {doc && readings && <>

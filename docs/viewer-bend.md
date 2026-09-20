@@ -93,6 +93,14 @@ turned, which is not what bending a body does.
 its own length. 1 is no squeeze; below 0 the turn is tighter than the body is thick and the surface
 has folded through itself.
 
+**The span is a slab, and that is the editor's honest limit.** Everything between the two cut
+planes is turned, so an oblique span across a curled body takes in whatever else happens to lie
+between them: on Askeptosaurus' neck the lit vertices include the near forelimb, because a plane
+square to that neck cuts the shoulder as well. The stage lights exactly what the turn would carry
+rather than hiding it, in the same way the mouth editor's two half-spaces cannot tell a mandible
+from a paddle tucked under the snout. What the editor settles is *where the span is and how far it
+turns*; which vertices near a limb belong to the run is still the builder's polyline question.
+
 The bend axis is always **square to the span**. A component along it would be a twist of the span
 about its own length, which turns no direction any reading is about and is not a bend.
 
