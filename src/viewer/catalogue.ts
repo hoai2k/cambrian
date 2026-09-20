@@ -14,6 +14,7 @@ import previewBodies from '../content/triassic/preview-bodies.json';
 import reviewBodies from '../content/triassic/review-bodies.json';
 import expansion from '../content/triassic/expansion.json';
 import basePoses from '../content/triassic/base-poses.json';
+import backupModels from '../content/triassic/backup-models.json';
 import { DEVONIAN_SPECIMENS } from '../content/devonian/specimens';
 import { DEVONIAN_CREATURES } from '../content/devonian/creatures';
 import devonianPending from '../content/devonian/pending-refinements.json';
@@ -95,6 +96,8 @@ export interface ViewerSpecimen {
    * against, not to animate.
    */
   origPose?: string;
+  /** Preserved previous model, including its rig, clips and corrections when available. */
+  backup?: string;
   /** What the builder moved, in words, for the hint beside the control. */
   origPoseChanged?: readonly string[];
   /**
@@ -130,6 +133,8 @@ const TRIASSIC_PUPPETS = new Map(TRIASSIC_SPECIMENS.filter(c => c.category === '
 /** The untouched generation of each body whose builder moved the mesh before binding. */
 const TRIASSIC_ORIG_POSE = new Map((basePoses as { id: string; model: string; changed: string[] }[])
   .map(b => [b.id, b]));
+const TRIASSIC_BACKUPS = new Map((backupModels as { id: string; model: string }[])
+  .map(b => [b.id, b.model]));
 const TRIASSIC_REVIEW = new Map((reviewBodies as { id: string; model: string; puppet: string | null; lod: string | null; clips: string[] }[])
   .map(b => [b.id, b]));
 /**
@@ -197,6 +202,7 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     previewLength: TRIASSIC_PREVIEW.get(c.id)?.lengthUnits ?? undefined,
     generatedSha256: TRIASSIC_PREVIEW.get(c.id)?.sha256,
     origPose: TRIASSIC_ORIG_POSE.get(c.id)?.model,
+    backup: TRIASSIC_BACKUPS.get(c.id),
     origPoseChanged: TRIASSIC_ORIG_POSE.get(c.id)?.changed,
     inReview: TRIASSIC_REVIEW.has(c.id),
     looping: ['Idle', 'Swim', 'Crawl', 'Guard', 'Eat', ...(c.abilityLoop ? ['Ability'] : [])],

@@ -18,6 +18,8 @@
     "sha256": "a57ec31122d5eeadd314b0c2eafa2f92d6b472054ff7d15adbb7a9e2808a92cd",
     "bytes": 1516160,
     "skins": 0,
-    "animations": []
+    "animations": [],
+    "retiredFromPublic": true,
+    "preservedIdenticalSource": "tools/triassic/creatures/askeptosaurus/askeptosaurus.preview.glb"
   }
 ]

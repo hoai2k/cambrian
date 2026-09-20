@@ -1,4 +1,4 @@
-# Askeptosaurus: what is actually wrong with it, measured
+# Askeptosaurus: original diagnosis and completed regeneration
 
 *15 September 2026. Reproduce with `local/askepto.py`, `local/askepto2.py`, `local/askepto3.py` and
 `local/askcurv.py` — each is a Blender or plain-Python script that prints its numbers.*
@@ -118,29 +118,26 @@ Two routes out, and the recommendation is the first:
 What is **not** recommended is building it on the shared kit as it stands. That is what was tried
 once, and the numbers above say why it could not have worked.
 
-## Regeneration in progress · 19 September 2026
+## Regeneration delivered · 19–20 September 2026
 
-The owner requested a new canonical and Tripo generation, retaining the previous body as
-**Model: Backup Model** with its corrections and animations. The new canonical and single
-Tripo input are byte-identical studio images: a straight axis, closed mouth, separated limbs,
-a visible neck, and a projected tail fraction around 0.64. The four-view sheet is only a
-qualitative review aid; the single image is the submission authority.
+The owner's selected straight-pose route is complete. The updated canonical and single Tripo
+input produced a textured body for 30 credits; its measured neutral-axis tail fraction is 0.6323.
+The authored model and independent volume twin now ship with one exact 33-joint rig, 24 dynamic
+clips, three anchors, LOD and fresh portraits. The game uses the replacement. The viewer offers
+**Model: Backup Model**, preserving the original corrected surface on a pose-matched animated rig.
 
-All previous canonical/model-input files are preserved in
-`canonical/model-inputs/askeptosaurus/backup-2026-09-19/`. The original raw GLB and corrected
-preview remain untouched at their existing paths; their hashes and actual animation state
-are recorded in `tools/triassic/creatures/askeptosaurus/backup-source-manifest.json`. They
-currently contain **zero skins and zero animation clips**. A final animated backup therefore
-requires new rigging of the preserved corrected surface, not merely relabeling the raw preview.
+The earlier source files and canonical images remain preserved. The old sources had zero skins
+and zero clips; the backup adds the complete action set rather than claiming preexisting animation.
+Its curved rest pose differs from the replacement, and its coil/whip range is limited to prevent
+skin stretching. The reconstruction does not force the old surface onto a straight axis.
 
-The reviewed request is ready to run from the repository root (requires `TRIPO_API_KEY`):
+All 24 clips pass dynamic playback and skin checks. Full/twin rig, clips and anchors match exactly.
+The posterior throat attachment has zero gap at 61 phases of every clip for full, twin and backup.
+Real Chrome viewer swaps load all three bodies with 24 actions and no page errors. The game build,
+typecheck, 442 Triassic checks and asset check pass. T3D-01 is finished.
 
-```sh
-node tools/triassic/tripo/run-image-to-model.mjs --name askeptosaurus --image docs/triassic/canonical/model-inputs/askeptosaurus/input.png --out tools/triassic/creatures/askeptosaurus/tripo-regenerated-2026-09-19 --submit
-```
+See [the build and validation record](../../tools/triassic/creatures/askeptosaurus/README.md),
+[paired audit](../../tools/triassic/creatures/askeptosaurus/paired-audit.json), and
+[review images](../../tools/triassic/creatures/askeptosaurus/review/).
 
-The new output directory prevents overwriting or resuming the previous generation. Its
-`request-dry-run.json` records the exact image digest and textured v3.1 request. The canonical
-change is authorized by the owner's regeneration instruction; it is not marked delivered.
-T3D-01 remains active until the replacement, animated backup, authored/puppet parity, portraits,
-LOD, anchors and runtime integration have actually passed review.
+The preceding September 15 analysis is retained as the historical diagnosis, not current work.

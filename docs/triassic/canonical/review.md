@@ -17,13 +17,14 @@ sends the subject back to the undecided pile, where the viewer shows the candida
 
 | Delivered | Greenlit | Redo | Not yet reviewed |
 | --- | --- | --- | --- |
-| 24 | 1 | 0 | 77 |
+| 25 | 0 | 0 | 78 |
 
 ## Delivered — the model exists
 
 | Subject | Slot | Built from | Landed |
 | --- | --- | --- | --- |
 | **Aphaneramma rostratum** `aphaneramma` | T12 · Rung II · the sensor (marine amphibian) | the greenlit pose | 2026-09-15 |
+| **Askeptosaurus italicus** `askeptosaurus` | T08 · Rung II · the turner | the greenlit pose | 2026-09-20 |
 | **Atopodentatus unicus** `atopodentatus` | T07 · Rung III · the grazer (hammerhead) | the greenlit pose | 2026-09-15 |
 | **Birgeria stensioei** `birgeria` | T11 · Rung II · the tuna | the greenlit pose | 2026-09-15 |
 | **Cartorhynchus lenticarpus** `cartorhynchus` | T18 · Rung I · the shallow-water sucker | the greenlit pose | 2026-09-15 |
@@ -53,9 +54,7 @@ shipped with the body, the specimen viewer switches between the two in place.
 
 ## Greenlit — build from the canonical pose
 
-| Subject | Slot | Canon image | Note |
-| --- | --- | --- | --- |
-| **Askeptosaurus italicus** `askeptosaurus` | T08 · Rung II · the turner | the pose | — |
+Nothing greenlit yet.
 
 ## Redo — regenerate the canonical pose
 
@@ -63,4 +62,4 @@ Nothing queued for rework.
 
 ## Not yet reviewed
 
-`acrodus` · `anshunsaurus` · `antrimpos` · `aphaneramma` · `atopodentatus` · `birgeria` · `bjuvia` · `brachiopod-cluster` · `calcisponge` · `cartorhynchus` · `ceratites` · `chaohusaurus` · `choristoceras` · `cidaris` · `coelophysis` · `coral-head` · `cyamodus` · `cymbospondylus` · `cymbospondylus-buchseri` · `dachstein-reef` · `daonella` · `daonella-bed` · `dinocephalosaurus` · `diplopora` · `encrinus` · `encrinus-litter` · `eusaurosphargis` · `fadenia` · `germanonautilus` · `gipskeuper` · `guizhouichthyosaurus` · `helicoprion` · `helveticosaurus` · `henodus` · `hupehsuchus` · `hybodus` · `ichthyotitan` · `keichousaurus` · `log-raft` · `macrocnemus` · `mixosaurus` · `monte-san-giorgio` · `muschelkalk` · `mystriosuchus` · `nanchangosaurus` · `neocalamites` · `neusticosaurus` · `nothosaurus` · `odontochelys` · `phragmoteuthis` · `pistosaurus` · `placochelys` · `placodus` · `placunopsis` · `placunopsis-mound` · `pleuromeia` · `psephoderma` · `rebellatrix` · `reef-block` · `retiophyllia` · `rhaeticosaurus` · `saurichthys` · `saurosphargis` · `shastasaurus` · `shonisaurus` · `shore-boulder` · `sponge-mound` · `stromatolite` · `tanystropheus` · `thecosmilia` · `thylacocephala` · `traumatocrinus` · `tropites` · `utatsusaurus` · `voltzia` · `xinpusaurus` · `yunnanolimulus`
+`acrodus` · `anshunsaurus` · `antrimpos` · `aphaneramma` · `askeptosaurus` · `atopodentatus` · `birgeria` · `bjuvia` · `brachiopod-cluster` · `calcisponge` · `cartorhynchus` · `ceratites` · `chaohusaurus` · `choristoceras` · `cidaris` · `coelophysis` · `coral-head` · `cyamodus` · `cymbospondylus` · `cymbospondylus-buchseri` · `dachstein-reef` · `daonella` · `daonella-bed` · `dinocephalosaurus` · `diplopora` · `encrinus` · `encrinus-litter` · `eusaurosphargis` · `fadenia` · `germanonautilus` · `gipskeuper` · `guizhouichthyosaurus` · `helicoprion` · `helveticosaurus` · `henodus` · `hupehsuchus` · `hybodus` · `ichthyotitan` · `keichousaurus` · `log-raft` · `macrocnemus` · `mixosaurus` · `monte-san-giorgio` · `muschelkalk` · `mystriosuchus` · `nanchangosaurus` · `neocalamites` · `neusticosaurus` · `nothosaurus` · `odontochelys` · `phragmoteuthis` · `pistosaurus` · `placochelys` · `placodus` · `placunopsis` · `placunopsis-mound` · `pleuromeia` · `psephoderma` · `rebellatrix` · `reef-block` · `retiophyllia` · `rhaeticosaurus` · `saurichthys` · `saurosphargis` · `shastasaurus` · `shonisaurus` · `shore-boulder` · `sponge-mound` · `stromatolite` · `tanystropheus` · `thecosmilia` · `thylacocephala` · `traumatocrinus` · `tropites` · `utatsusaurus` · `voltzia` · `xinpusaurus` · `yunnanolimulus`

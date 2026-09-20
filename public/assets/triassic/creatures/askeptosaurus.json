@@ -1,0 +1,59 @@
+{
+  "id": "askeptosaurus",
+  "name": "Askeptosaurus",
+  "species": "Askeptosaurus italicus",
+  "provenance": "Middle Triassic \u00b7 Monte San Giorgio",
+  "description": "Slender thalattosaur with a long lateral swimming tail. Authored body and volume twin share one rig; original posed generation retained as an animated backup.",
+  "modelLength": 6.0,
+  "lengthMeters": 2.5,
+  "locomotion": "Swim",
+  "clips": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "TurnLeft",
+    "TurnRight",
+    "Dive",
+    "Rise",
+    "Attack",
+    "Bite",
+    "Heavy",
+    "Hit",
+    "Death",
+    "Guard",
+    "Parry",
+    "Dodge",
+    "Eat",
+    "Stagger",
+    "Ability",
+    "Grab",
+    "Breath",
+    "Growth",
+    "TailWhip",
+    "Coil",
+    "Dash"
+  ],
+  "looping": [
+    "Idle",
+    "Swim",
+    "Sprint",
+    "Guard",
+    "Eat",
+    "Grab"
+  ],
+  "anchors": [
+    "anchor_mouth",
+    "anchor_mouth_inside",
+    "anchor_attack_primary"
+  ],
+  "puppet": "askeptosaurus.puppet.glb",
+  "sources": [
+    "tools/triassic/creatures/askeptosaurus/tripo-regenerated-2026-09-19/askeptosaurus.raw.glb",
+    "docs/triassic/canonical/askeptosaurus.png"
+  ],
+  "notes": [
+    "The preserved backup has a pose-matched rest skeleton and the same public clip names.",
+    "Heavy and TailWhip strike with the long tail; Ability and Coil curl and recover. World turning is simulation-owned.",
+    "Living colours, soft tissues and movements are artistic reconstruction."
+  ]
+}

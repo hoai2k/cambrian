@@ -10,7 +10,7 @@ Updated: 19 September 2026.
 
 | ID | State | Owner | Work | Completion evidence |
 | --- | --- | --- | --- | --- |
-| T3D-01 | **active** | `/root/askeptosaurus_regen` | Redraw Askeptosaurus in a straight neutral modeling pose with the tail near two-thirds of total length; generate a new textured Tripo body; preserve the current generated body as viewer-selectable **Backup Model**; build the authored/puppet pair with matching rig, clips, anchors, LODs and portraits; ship it and clear its preview status. | 19 September: corrected canonical/input and source backup are committed. Tripo task `5b497dd2-0f06-4764-8d91-401dd19f5ad0` succeeded; the 18,778-triangle textured source and visual review are preserved on `main`. Integration is active. Completion requires new and rigged backup bodies selectable, paired audits/validators and runtime checks. |
+| T3D-01 | **finished** | `/root/askeptosaurus_regen` | Redraw Askeptosaurus in a straight neutral modeling pose with the tail near two-thirds of total length; generate a new textured Tripo body; preserve the current generated body as viewer-selectable **Backup Model**; build the authored/puppet pair with matching rig, clips, anchors, LODs and portraits; ship it and clear its preview status. | Canonical and Tripo replacement delivered; 33 joints, 24 clips and 3 anchors; exact authored/twin/LOD parity; animated preserved-pose **Backup Model**; 61-phase throat and skin checks, real viewer playback, portraits, typecheck, build, Triassic suite and asset checks passed. See `tools/triassic/creatures/askeptosaurus/README.md`. |
 | T3D-02 | **active** | `/root/throat_audit` | Audit actual shipped Triassic actions for broken throat, jaw/body seam and mouth-lining geometry; port the settled palate-and-floor implementation from preserved branch `worktree-agent-ab601ca5ebb512c9f` onto the current pipeline without reversing later skinning/animation repairs; repair confirmed faults, including Hupehsuchus' short mouth opening, Henodus' cut through the hanging upper teeth and the rigid Ceratites shell. | Before/after evidence identifies every inspected failure; the current shared builder creates separate palate and mandibular floor surfaces without a wall stretching between them; repaired authored/puppet/LOD assets pass their creature audits and visual playback review. |
 | T3D-02a | **finished** | `/root/throat_audit` | Keep the complete Ceratites coil rigid and retire invented crown mouth geometry. | `82786a19`: anatomical shell checks on both variants across every clip; zero contaminated vertices/deformation; paired audit, refreshed portraits, typecheck and build pass. |
 | T3D-02b | **finished** | `/root/throat_audit` | Extend Hupehsuchus' jaw to the full lip and keep the posterior jaw attached to its pouch. | Paired audit passes; 162 authored/67 puppet shared-rim vertices stay attached at all 61 phases of 23 clips (zero gap); portraits refreshed. |
@@ -36,8 +36,9 @@ Updated: 19 September 2026.
 
 ## Finished baseline
 
-- Twenty-six Triassic authored bodies, procedural puppets and LODs are shipped and structurally
-  validated. Askeptosaurus is the sole roster animal without a finished body.
+- Twenty-seven Triassic authored bodies, procedural puppets and LODs are shipped and structurally
+  validated. Every roster animal now has a finished body; Askeptosaurus also has an animated
+  viewer-selectable backup model preserving its former generated surface.
 - Archelon and Mosasaurus are shipped as standing visitors.
 - The shared palate/floor oral-geometry architecture and first skinning-repair batch are on `main`.
   Current builders are being moved to its measured-room interface in small claimed batches so
