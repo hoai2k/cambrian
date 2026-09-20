@@ -128,11 +128,20 @@ for (const suffix of ['', '.puppet', '.lod1']) {
   const durOf = (n) => Math.max(...c.find((a) => a.name === n).channels.map((ch) => ch.times.at(-1)));
   assert(Math.abs(durOf('Lower') - 1.5) < 1e-3, 'Lower is the 1.5 s telegraph: ' + durOf('Lower'));
   for (const n of ['SnapLeft', 'SnapRight']) assert(Math.abs(durOf(n) - 0.6) < 1e-3, n + ' is the 0.6 s strike');
-  let tris = 0, verts = 0;
+  let tris = 0, verts = 0, longestRestEdge = 0;
   for (const m of d.getRoot().listMeshes()) {
     for (const p of m.listPrimitives()) {
       tris += (p.getIndices()?.getCount() ?? p.getAttribute('POSITION').getCount()) / 3;
       verts += p.getAttribute('POSITION').getCount();
+      // A cap may only span its local head cut. A half-space selector once fanned
+      // an unrelated foot boundary to the throat, adding 1.74-unit rest-pose strands.
+      const pos = p.getAttribute('POSITION').getArray(), indices = p.getIndices()?.getArray();
+      if (indices) for (let i = 0; i < indices.length; i += 3) {
+        for (let k = 0; k < 3; k++) {
+          const a = indices[i + k] * 3, b = indices[i + (k + 1) % 3] * 3;
+          longestRestEdge = Math.max(longestRestEdge, Math.hypot(pos[a] - pos[b], pos[a + 1] - pos[b + 1], pos[a + 2] - pos[b + 2]));
+        }
+      }
       const w = p.getAttribute('WEIGHTS_0');
       assert(w, 'skinned');
       for (let i = 0; i < w.getCount(); i++) {
@@ -140,7 +149,8 @@ for (const suffix of ['', '.puppet', '.lod1']) {
       }
     }
   }
-  report.models.push({ suffix, bytes: fs.statSync(file).size, sha256: hash(fs.readFileSync(file)), triangles: tris, vertices: verts });
+  assert(longestRestEdge < 0.7, 'nonlocal cap/skin strand in rest mesh: ' + longestRestEdge);
+  report.models.push({ suffix, longestRestEdge, bytes: fs.statSync(file).size, sha256: hash(fs.readFileSync(file)), triangles: tris, vertices: verts });
 }
 report.lodTriangleFraction = report.models[1].triangles / report.models[0].triangles;
 assert(report.lodTriangleFraction <= 0.40, 'the reduced model must be at most 40% of the triangles');

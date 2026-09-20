@@ -1,59 +1,59 @@
 {
   "coelophysis.card.png": {
-    "bytes": 231625,
-    "sha256": "76e47812fd34e141d61d03c1407d87ec4bbfc6c5a074512c9561c5a31197a98b",
+    "bytes": 230473,
+    "sha256": "d3dea0d883c4cf17913d2b4a3888ee66b912e5d31e583ed15a3dc01981131053",
     "dimensions": [
       800,
       600
     ]
   },
   "coelophysis.glb": {
-    "bytes": 2227296,
-    "sha256": "373bd4e8a7202e2b3aadad26bdbed9dab7155f8310376456bfe76989bb785cec"
+    "bytes": 2225332,
+    "sha256": "a884e57144a8ca07939abc954814d37f97085de9fef2dd0e5a53e1817b10b3e8"
   },
   "coelophysis.json": {
     "bytes": 2803,
     "sha256": "ec22e865ea63f64ac0f829c5e3891a8e6d854838d2d8554b2fb3a6dc7d253cc6"
   },
   "coelophysis.lod1.glb": {
-    "bytes": 1730796,
-    "sha256": "220fad5cebdc1f1b44c43f9a7bc8f029d6ea94ab817e73177cdb26242216c5f8"
+    "bytes": 1730900,
+    "sha256": "689ecf5a740e58cbe692aa3a88016b6df58bebcb706eca6ff531d7388e81aa21"
   },
   "coelophysis.origpose.glb": {
     "bytes": 1483572,
     "sha256": "a9ea66a7183de767367fe7943d69f5d07fe306d7794ca3a56403d596d3070118"
   },
   "coelophysis.png": {
-    "bytes": 487961,
-    "sha256": "a72db08e448d7382cc116be4504f1e39fee0714f295e8ad7be517bb4d56541f7",
+    "bytes": 484269,
+    "sha256": "d354ee71054efb7681ae1ac3df38144d624db5fb5a7f59da4dfc49ddf2b3bd2e",
     "dimensions": [
       1200,
       900
     ]
   },
   "coelophysis.puppet.glb": {
-    "bytes": 1730796,
-    "sha256": "220fad5cebdc1f1b44c43f9a7bc8f029d6ea94ab817e73177cdb26242216c5f8"
+    "bytes": 1730900,
+    "sha256": "689ecf5a740e58cbe692aa3a88016b6df58bebcb706eca6ff531d7388e81aa21"
   },
   "coelophysis.puppet.png": {
-    "bytes": 448668,
-    "sha256": "78ddac961fcec3922b251f3386580cdfdcd1abcd771bbba51a7c1f2a0555c8a5",
+    "bytes": 448824,
+    "sha256": "032f147c18183fdc65a3833269ebf709069c6fcb2a025a530b05cc485fcffe45",
     "dimensions": [
       1200,
       900
     ]
   },
   "coelophysis.select.png": {
-    "bytes": 831124,
-    "sha256": "7f1620c784b20e24dab21975c0b58bd6d044cfaa56da4c18d41f714be594e027",
+    "bytes": 826500,
+    "sha256": "6e6a630b7da1ec44c7306b7b69809c835482fea2a9766433f295cc0f5476b16f",
     "dimensions": [
       1600,
       1200
     ]
   },
   "coelophysis.thumb.png": {
-    "bytes": 30171,
-    "sha256": "afe6819701a058860a59cd059eb7e12b969f1b6196793c79e994619ff1eeaf69",
+    "bytes": 29883,
+    "sha256": "1bf9c90132204a426df24c9c0d37cb3634748285ccffc6f4c097e6a43b0524c6",
     "dimensions": [
       256,
       192

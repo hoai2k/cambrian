@@ -442,11 +442,13 @@ for o in [auth, puppet]:
 # backfacing, and no oral geometry anywhere near it. A hinge envelope is an ellipsoid and fills the
 # middle of a section while leaving its corners; this fills the section itself, out of vertices the
 # cut already made. See `K.cap_cut`, which was written for this and had never been wired to a body.
+# Select the posterior head plane, not the entire half-space behind it: a tiny
+# unrelated source boundary on a foot must never be fanned to this throat's hub.
 CAP = {}
 for _o, _out in ((auth, Vector((1, 0, 0))), (puppet, Vector((1, 0, 0))),
                  (parts['lower jaw'][auth.name], Vector((-1, 0, 0))),
                  (parts['lower jaw'][puppet.name], Vector((-1, 0, 0)))):
-    CAP[_o.name] = K.cap_cut(_o, (lambda c: c.x < HINGE_X + .004), _out)
+    CAP[_o.name] = K.cap_cut(_o, (lambda c: abs(c.x - HINGE_X) < 1e-5 and on_head(c, .070)), _out)
 print('CAP', json.dumps(CAP))
 assert all(v > 2 for v in CAP.values()), ('the cut left no section to cap', CAP)
 
@@ -606,7 +608,21 @@ def body_mouth_pin(q, relaxed):
     # pieces. Independent diffusion otherwise opens this seam under neck turns.
     if abs(q.x - HINGE_X) < 1e-5 and q.z <= seam(q.x) + 1e-5:
         relaxed = weights(q)
-    return mouth_skin_weights(q, relaxed)
+    w = mouth_skin_weights(q, relaxed)
+    # The final cervical controls the short collar behind the cranium. Its fitted
+    # centre is close to the skull centre, so a rigid-skull constraint would otherwise
+    # leave it owning no direct skin. Assign the anatomical collar explicitly; this
+    # window ends behind the palate and does not reintroduce skull flexion.
+    collar = (K.smooth((q.x - (MOUTH_BACK - .060)) / .025)
+              * K.smooth((MOUTH_BACK - .005 - q.x) / .025)
+              * K.smooth((.070 - K.project(HP, HCUM, Vector(q))[0]) / .015))
+    if collar > 0:
+        w = {n: v * (1 - collar) for n, v in w.items()}
+        w['neck_07'] = w.get('neck_07', 0.) + collar
+        top = sorted(w.items(), key=lambda item: -item[1])[:4]
+        total = sum(v for _, v in top)
+        w = {n: v / total for n, v in top if v > 1e-8}
+    return w
 
 
 def mandible_weights(q):
