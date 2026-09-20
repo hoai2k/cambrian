@@ -15,6 +15,8 @@ import { CloseIcon } from './icons';
 import { XboxDiagram } from './XboxDiagram';
 import { KeyboardDiagram } from './KeyboardDiagram';
 import { btn, type Scheme } from '../shared/controls';
+import { TEXT } from '../shared/text';
+import type { HelpButtons } from '../content/strings';
 
 const LANDMARK_KINDS = ['arch', 'stack', 'bones'] as const;
 
@@ -29,7 +31,7 @@ const LANDMARK_KINDS = ['arch', 'stack', 'bones'] as const;
  */
 export interface MenuItem { label: string; run: () => void; primary?: boolean }
 
-export function MenuButtons({ items, sel, shown, onHover, scheme }: { items: MenuItem[]; sel: number; shown: boolean; onHover: (i: number) => void; scheme: Scheme }) {
+export function MenuButtons({ items, sel, shown, onHover }: { items: MenuItem[]; sel: number; shown: boolean; onHover: (i: number) => void }) {
   return (
     <div className="menu-buttons">
       <div className="menu-choices" role="menu">
@@ -39,24 +41,23 @@ export function MenuButtons({ items, sel, shown, onHover, scheme }: { items: Men
             onMouseEnter={() => onHover(i)} onFocus={() => onHover(i)} onClick={it.run}>{it.label}</button>
         ))}
       </div>
-      <p className="menu-hint">{btn('pick', scheme)} chooses · {btn('confirm', scheme)} confirms</p>
     </div>
   );
 }
 
-export function PauseMenu({ items, sel, shown, onHover, scheme }: { items: MenuItem[]; sel: number; shown: boolean; onHover: (i: number) => void; scheme: Scheme }) {
+export function PauseMenu({ items, sel, shown, onHover }: { items: MenuItem[]; sel: number; shown: boolean; onHover: (i: number) => void }) {
   return (
     <div className="overlay">
       <div className="panel">
-        <p className="eyebrow">PAUSED</p>
-        <h2>Catch your breath.</h2>
-        <MenuButtons items={items} sel={sel} shown={shown} onHover={onHover} scheme={scheme} />
+        <p className="eyebrow">{TEXT.pause.eyebrow}</p>
+        <h2>{TEXT.pause.heading}</h2>
+        <MenuButtons items={items} sel={sel} shown={shown} onHover={onHover} />
       </div>
     </div>
   );
 }
 
-export function Results({ snapshot, players, record, fresh, items, sel, shown, onHover, scheme }: { snapshot: HudSnapshot; players: PlayerSetup[]; record: Codex; fresh: Codex; items: MenuItem[]; sel: number; shown: boolean; onHover: (i: number) => void; scheme: Scheme }) {
+export function Results({ snapshot, players, record, fresh, items, sel, shown, onHover }: { snapshot: HudSnapshot; players: PlayerSetup[]; record: Codex; fresh: Codex; items: MenuItem[]; sel: number; shown: boolean; onHover: (i: number) => void }) {
   // Both come from the shell, which writes finds to the record as the match makes them and keeps a
   // running list of what this one added. This screen no longer works out what is new by comparing
   // the store against the match: the store already contains the match by the time it gets here.
@@ -67,26 +68,26 @@ export function Results({ snapshot, players, record, fresh, items, sel, shown, o
           scrolls, so the buttons are on screen whatever the window is doing. They used to be the
           last thing inside one tall scroller and simply fell off the bottom of a short screen. */}
       <div className="panel results">
-        <p className="eyebrow">{MODE_INFO[snapshot.mode].name.toUpperCase()} · {snapshot.status === 'won' ? 'VICTORY' : ACTIVE_ERA.copy.lose}</p>
+        <p className="eyebrow">{MODE_INFO[snapshot.mode].name.toUpperCase()} · {snapshot.status === 'won' ? TEXT.results.victory : ACTIVE_ERA.copy.lose}</p>
         <h2>{snapshot.message}</h2>
         <div className="results-scroll">
         <div className="result-grid">
           {snapshot.players.map((p, i) => (
             <div key={i} className="result-card" style={{ ['--player' as string]: p.color }}>
-              <span className="player-chip">P{i + 1}</span>
+              <span className="player-chip">{TEXT.common.playerChip(i + 1)}</span>
               <b>{creature(players[i]?.creature ?? p.creature).name}</b>
               {creature(players[i]?.creature ?? p.creature).kind && <span className="result-kind">{creature(players[i]?.creature ?? p.creature).kind}</span>}
               <span>{p.tierName}</span>
-              <small>{p.eats} eaten · {p.kills} kills · {p.escapes} escapes</small>
+              <small>{TEXT.results.tally(p.eats, p.kills, p.escapes)}</small>
               {/* Rise keeps a high-water mark per creature; say so when this match moved one. The
                   shell hands us the list, because the stored record already has this match in it. */}
-              {fresh.best[players[i]?.creature ?? p.creature] !== undefined && <span className="new-tag best-tag">NEW BEST</span>}
+              {fresh.best[players[i]?.creature ?? p.creature] !== undefined && <span className="new-tag best-tag">{TEXT.results.newBest}</span>}
             </div>
           ))}
         </div>
         <Discoveries codex={codex} fresh={fresh} />
         </div>
-        <MenuButtons items={items} sel={sel} shown={shown} onHover={onHover} scheme={scheme} />
+        <MenuButtons items={items} sel={sel} shown={shown} onHover={onHover} />
       </div>
     </div>
   );
@@ -103,12 +104,12 @@ export function Discoveries({ codex, fresh }: { codex: Codex; fresh: Codex }) {
   const seenBiome = new Set(codex.biomes), newBiome = new Set(fresh.biomes);
   const seenMark = new Set(codex.landmarks), newMark = new Set(fresh.landmarks);
   const newApex = new Set(fresh.apex);
-  const roster = ACTIVE_ERA.creatures;
+  const roster = ACTIVE_ERA.creatures, d = TEXT.discoveries;
   return (
     <div className="discoveries">
       <div className="discovery-head">
-        <p className="eyebrow">DISCOVERED</p>
-        <span>{seenBiome.size}/{BIOMES.length} biomes · {seenMark.size}/{LANDMARK_KINDS.length} landmarks · {codex.apex.length}/{roster.length} at Apex</span>
+        <p className="eyebrow">{d.eyebrow}</p>
+        <span>{d.counts(seenBiome.size, BIOMES.length, seenMark.size, LANDMARK_KINDS.length, codex.apex.length, roster.length)}</span>
       </div>
 
       <ul className="biome-strip">
@@ -117,8 +118,8 @@ export function Discoveries({ codex, fresh }: { codex: Codex; fresh: Codex }) {
           return (
             <li key={b} className={`biome-card ${seen ? 'found' : 'unfound'} ${newBiome.has(b) ? 'fresh' : ''}`}>
               {seen && <img src={`${base}${biomeArtPath(b)}`} alt="" loading="lazy" />}
-              <b>{seen ? ACTIVE_ERA.environment.biomeNames[b] : '???'}</b>
-              {newBiome.has(b) && <span className="new-tag">NEW</span>}
+              <b>{seen ? ACTIVE_ERA.environment.biomeNames[b] : d.unfoundBiome}</b>
+              {newBiome.has(b) && <span className="new-tag">{TEXT.common.newTag}</span>}
             </li>
           );
         })}
@@ -129,9 +130,9 @@ export function Discoveries({ codex, fresh }: { codex: Codex; fresh: Codex }) {
           const seen = seenMark.has(k);
           return (
             <li key={k} className={`landmark-card ${seen ? 'found' : 'unfound'} ${newMark.has(k) ? 'fresh' : ''}`}>
-              <b>{seen ? LANDMARK_NAMES[k] : 'Not found yet'}</b>
-              <small>{seen ? LANDMARK_BLURBS[k] : 'Somewhere out there.'}</small>
-              {newMark.has(k) && <span className="new-tag">NEW</span>}
+              <b>{seen ? LANDMARK_NAMES[k] : d.unfoundLandmark}</b>
+              <small>{seen ? LANDMARK_BLURBS[k] : d.unfoundLandmarkBlurb}</small>
+              {newMark.has(k) && <span className="new-tag">{TEXT.common.newTag}</span>}
             </li>
           );
         })}
@@ -142,7 +143,7 @@ export function Discoveries({ codex, fresh }: { codex: Codex; fresh: Codex }) {
           const seen = codex.apex.includes(c.id);
           return (
             <li key={c.id} className={`apex-card ${seen ? 'found' : 'unfound'} ${newApex.has(c.id) ? 'fresh' : ''}`}
-                title={seen ? `${c.name} · reached Apex · unlocked in the other Ancient Seas games` : `${c.name} · not yet at Apex`}>
+                title={seen ? d.apexReached(c.name) : d.apexNotYet(c.name)}>
               <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={base} alt={c.name} loading="lazy" />
               <span>{c.name}</span>
               {/* Reaching the top here is what admits an animal to the *other* games, so the card
@@ -150,7 +151,7 @@ export function Discoveries({ codex, fresh }: { codex: Codex; fresh: Codex }) {
                   their pick screens, which is where this ends up mattering. Top left, because NEW
                   already owns the other corner and these cards are 54 pixels wide. */}
               {seen && <span className="visitor-tag" aria-hidden="true">★</span>}
-              {newApex.has(c.id) && <span className="new-tag">NEW</span>}
+              {newApex.has(c.id) && <span className="new-tag">{TEXT.common.newTag}</span>}
             </li>
           );
         })}
@@ -170,7 +171,7 @@ export function Discoveries({ codex, fresh }: { codex: Codex; fresh: Codex }) {
           another game. */}
       {codex.apex.length > 0 && (
         <p className="apex-note">
-          ★ <b>Unlocked</b> — playable in the other Ancient Seas games, from the <b>Visitors</b> button.
+          {d.apexNote.star} <b>{d.apexNote.unlocked}</b> {d.apexNote.body} <b>{d.apexNote.visitorsButton}</b> {d.apexNote.tail}
         </p>
       )}
     </div>
@@ -186,84 +187,125 @@ export function Dialogs({ kind, onClose, settings, onSettings, scheme }: { kind:
   }, [kind]);
   return (
     <dialog ref={ref} className="tools-dialog" onCancel={(e) => { e.preventDefault(); onClose(); }} onClick={(e) => { if (e.target === ref.current) onClose(); }}>
-      <button className="tools-close icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button>
-      {kind === 'help' && (
-        <div className="dialog-body">
-          <p className="eyebrow">HOW TO PLAY</p>
-          <h2>One rule: size.</h2>
-          <p>Everything is colour-coded by how big it is next to you. <span className="band snack">Green</span> you swim through and eat. <span className="band prey">Teal</span> runs; chase it and bite. <span className="band rival">Amber</span> can fight back: circle, bait, parry, punish. <span className="band threat">Orange</span> will hurt you. <span className="band giant">Red</span> ends you. Break line of sight, get into sponges, hold still.</p>
-          {scheme === 'pad' ? <XboxDiagram /> : <KeyboardDiagram />}
-          <div className="help-columns">
-            <section>
-              <h3>Hunting</h3>
-              <p>Hold <b>{btn('aim', scheme)}</b> to aim: the view moves over your shoulder and a crosshair sits at the centre of the screen. It snaps to nearby prey as you enter aim; after that, steer it with the {scheme === 'pad' ? 'right stick' : 'mouse'}. <b>{btn('heavy', scheme)}</b> performs your creature’s heavy move: snatch, seize, rake, crush, charge or feeding sweep. Creatures without a special heavy pounce toward aimed prey or lunge forward. <b>{btn('guard', scheme)}</b> blocks with the creature’s natural defense; tap for a parry. Hallucigenia braces, Canadia flares its bristles, Olenoides rolls while blocking, and Wiwaxia releases a shove after holding block. <b>{btn('dash', scheme)}</b> dashes: press it with a direction held to burst that way with a moment of invulnerability, far enough to clear a giant's bite — and it scales with your body, so a grown creature covers real ground. Press it with no direction and you dash along your own axis: ahead for most animals, and out behind for a shelled jetter, which is how it escapes. How long you hold it is how far you go, and how much stamina it costs: tap for a short shove, hold for the whole crossing. <b>{btn('sprint', scheme)}</b> sprints, <b>{btn('rise', scheme)}</b> rises — seafloor creatures hop with it, and holding it paddles them up into open water, where they swim — slower than a swimmer, but aimed with the camera and able to sprint and dash like anything else. Gaining height costs stamina, and a walker that stops asking to go anywhere settles back to the bottom. <b>{btn('zoom', scheme)}</b> pulls the camera in and out. <b>{btn('sense', scheme)}</b> turns Sense on and off: on, the size-band marks over creatures and the radar are drawn; off, nothing is drawn over the sea but the bar at the bottom. It is on to begin with, costs nothing and never runs out — turning it off is for the look of the thing.</p>
-              <h3>The sea</h3>
-              <p>It has one edge: the shore you hatch beside. Swim along it and the world stays gentle; swim <b>away</b> from it and the biomes change: shelf, sponge forest, boulder fields, the channels, the escarpment, and the deep basin, where the giants live. The <b>radar</b> at the top right shows anything big enough to hurt you, whatever is hunting you, the nearest shoals worth eating, your nursery and the shore. Creatures show only while they are inside its reach; the other players, your nursery and the shore sit hollow on the rim when they are past it, pointing the way. Press <b>{btn('teleport', scheme)}</b> for the teleport menu: back to your nursery, or straight to another player. Hold <b>{btn('view', scheme)}</b> for the scoreboard: everyone in the match, what they have done, and what this mode is asking of them.</p>
-              <h3>Fighting</h3>
-              <p><b>{btn('light', scheme)}</b> chains three bites, the third hits hard. <b>{btn('heavy', scheme)}</b> is your heavy: the creature’s special if it has one, otherwise a pounce — either way a long committed lunge that carries you onto what you aimed at. The crosshair names it when it will connect. Press it while sprinting or mid-dash and it becomes a charge: it takes whatever is nearest the line you are travelling along, for extra stamina. <b>{btn('guard', scheme)}</b> held raises a shield; tapped as a hit lands, it parries and staggers them (Waptia cannot guard, so it dodges instead). Hits from behind or below hurt more. Stamina runs everything: an exhausted creature can't dash. Nothing dies in one bite unless it is far smaller than you: a peer takes a couple of hits, a giant needs about three good bites to kill you, and after six seconds out of the fight your health starts to return. Bite a bigger predator enough and it breaks off and runs.</p>
-              </section>
-            <section>
-              <h3>Giants</h3>
-              <p>The big ones cruise high in the light and only dive when they are hungry. When one turns your way an eye fills at the top of your screen: <b>stop moving</b>, or slip under the sponges and <b>hold still</b> until it loses you. They are slow to turn and cannot get their heads into dense cover. Their bite is a slow heavy: dash the moment you see the wind-up. If one does catch you at zero health, it swallows you whole.</p>
-              {scheme === 'pad' && <>
-                <h3>Menus on a pad</h3>
-                <p>The stick and D-pad steer whatever the screen is about — the roster, a menu's choices — and move by where the buttons actually are, so a row answers left and right. <b>LB</b> and <b>RB</b> step through every other button on the screen, one at a time, and round to the roster again: the other era on the title screen, the mode chips, and the icons in the corner from anywhere — so settings and fullscreen are reachable without a mouse. <b>A</b> takes the one you land on and <b>B</b> gives the sticks back. On a shared screen only the pad that reached for them follows; everyone else keeps picking.</p>
-              </>}
-              <h3>Growing</h3>
-              <p>The ring fills as you eat. Fill it, moult, get bigger. Kills of your own size are worth far more than plankton. Dying drops you a tier but keeps half your progress. <b>{btn('ability', scheme)}</b> hides at every size. Marrella and Ottoia sink and burrow for free; hide or heavy emerges with a free strike. Other creatures gradually copy the nearest plant, rock, seabed or creature colours, spending stamina. Idle camouflage slowly sinks: move in any direction to counter it. Attacking, blocking, sprinting or being hit reveals you.</p>
-              {scheme === 'pad'
-                ? <>
-                    <h3>Keyboard</h3>
-                    <p>No controller? The game switches to mouse and keyboard on its own the moment none is connected. Share a screen and the second player gets the right-hand keys.<br /><b>1:</b> WASD swim · arrows look · PgUp/PgDn zoom · Shift sprint · Space rise · C sink · F bite · G heavy · R hide · V dash · Q guard · Tab aim · E sense · T teleport · Z scoreboard · Esc pause.<br /><b>2:</b> IJKL swim · Right Shift sprint · N rise · M sink · ; bite · ' heavy · P hide · / dash · U guard · O aim · Y sense · H teleport · , scoreboard.</p>
-                  </>
-                : <>
-                    <h3>Controller</h3>
-                    <p>Plug an Xbox-style pad in and press a button: the game hands it the match and every prompt here changes to read <b>RT</b>, <b>LB</b>, <b>Y</b> instead. Up to four can play at once, and the mouse goes back to being a cursor.</p>
-                    <p>Sharing one keyboard? A second player takes the right-hand keys: <b>IJKL</b> swim · Right Shift sprint · N rise · M sink · ; bite · ' heavy · P hide · / dash · U guard · O aim · Y sense · H teleport · , scoreboard. The mouse stays with player one.</p>
-                  </>}
-            </section>
-          </div>
-        </div>
-      )}
-      {kind === 'settings' && (
-        <div className="dialog-body settings">
-          <p className="eyebrow">SETTINGS</p>
-          <h2>Tune the sea.</h2>
-          <label className="setting-row">
-            <span>Detail <small>Shadows, density, resolution</small></span>
-            <div className="seg">
-              {(['high', 'low'] as const).map((q) => <button key={q} aria-pressed={settings.quality === q} onClick={() => onSettings({ ...settings, quality: q })}>{q === 'high' ? 'High' : 'Performance'}</button>)}
-            </div>
-          </label>
-          <label className="setting-row" htmlFor="look-speed">
-            <span>Camera speed <small>{settings.lookSpeed.toFixed(1)}×</small></span>
-            <input id="look-speed" type="range" min={0.4} max={2} step={0.1} value={settings.lookSpeed} onChange={(e) => onSettings({ ...settings, lookSpeed: Number(e.target.value) })} />
-          </label>
-          <label className="setting-row">
-            <span>Invert camera Y</span>
-            <input type="checkbox" checked={settings.invertY} onChange={(e) => onSettings({ ...settings, invertY: e.target.checked })} />
-          </label>
-          <label className="setting-row" htmlFor="volume">
-            <span>Volume <small>{Math.round(settings.volume * 100)}%</small></span>
-            <input id="volume" type="range" min={0} max={1} step={0.05} value={settings.volume} onChange={(e) => onSettings({ ...settings, volume: Number(e.target.value) })} />
-          </label>
-          <label className="setting-row">
-            <span>Music <small>Tide of First Bones</small></span>
-            <input type="checkbox" checked={settings.music} onChange={(e) => onSettings({ ...settings, music: e.target.checked })} />
-          </label>
-          <label className="setting-row">
-            <span>Mute</span>
-            <input type="checkbox" checked={settings.muted} onChange={(e) => onSettings({ ...settings, muted: e.target.checked })} />
-          </label>
-          {hasEquivalentSizing() && (
-            <label className="setting-row">
-              <span>Equivalent sizing <small>Give every animal the same size, instead of its own. Takes effect next match.</small></span>
-              <input type="checkbox" checked={settings.equivalentSizing} onChange={(e) => onSettings({ ...settings, equivalentSizing: e.target.checked })} />
-            </label>
-          )}
-          <p className="dim">Settings apply to every local player and are remembered on this device.</p>
-        </div>
-      )}
+      <button className="tools-close icon-button" aria-label={TEXT.common.close} onClick={onClose}><CloseIcon /></button>
+      {kind === 'help' && <HelpPage scheme={scheme} />}
+      {kind === 'settings' && <SettingsPage settings={settings} onSettings={onSettings} />}
     </dialog>
   );
 }
+
+/**
+ * The button names the help prose is written around, in whatever this player is holding. The words
+ * themselves are `TEXT.help`, so the page is a layout and the copy is config.
+ */
+const helpButtons = (scheme: Scheme): HelpButtons => ({
+  aim: btn('aim', scheme), heavy: btn('heavy', scheme), guard: btn('guard', scheme),
+  dash: btn('dash', scheme), sprint: btn('sprint', scheme), rise: btn('rise', scheme),
+  zoom: btn('zoom', scheme), sense: btn('sense', scheme), light: btn('light', scheme),
+  teleport: btn('teleport', scheme), view: btn('view', scheme), ability: btn('ability', scheme),
+  pad: scheme === 'pad',
+});
+
+/**
+ * A paragraph of help prose, with `**...**` drawn emphasised. The copy stays one sentence in the
+ * text table — which is what a translator needs — while the button names in it still stand out.
+ */
+function Prose({ text }: { text: string }) {
+  return <p>{text.split('**').map((part, i) => (i % 2 ? <b key={i}>{part}</b> : part))}</p>;
+}
+
+function HelpPage({ scheme }: { scheme: Scheme }) {
+  const t = TEXT.help, b = helpButtons(scheme);
+  return (
+    <div className="dialog-body">
+      <p className="eyebrow">{t.eyebrow}</p>
+      <h2>{t.heading}</h2>
+      <p>
+        {t.bands.lead} <span className="band snack">{t.bands.snack}</span> {t.bands.snackText}{' '}
+        <span className="band prey">{t.bands.prey}</span> {t.bands.preyText}{' '}
+        <span className="band rival">{t.bands.rival}</span> {t.bands.rivalText}{' '}
+        <span className="band threat">{t.bands.threat}</span> {t.bands.threatText}{' '}
+        <span className="band giant">{t.bands.giant}</span> {t.bands.giantText} {t.bands.tail}
+      </p>
+      {scheme === 'pad' ? <XboxDiagram /> : <KeyboardDiagram />}
+      <div className="help-columns">
+        <section>
+          <h3>{t.huntingHeading}</h3>
+          <Prose text={t.hunting(b) + (t.huntingEraNote ? ` ${t.huntingEraNote}` : '')} />
+          <h3>{t.seaHeading}</h3>
+          <Prose text={t.sea(b) + (t.seaEraNote ? ` ${t.seaEraNote}` : '')} />
+          <h3>{t.fightingHeading}</h3>
+          <Prose text={t.fighting(b) + (t.fightingEraNote ? ` ${t.fightingEraNote}` : '')} />
+        </section>
+        <section>
+          <h3>{t.giantsHeading}</h3>
+          <Prose text={t.giants(b)} />
+          {scheme === 'pad' && <>
+            <h3>{t.padMenusHeading}</h3>
+            <Prose text={t.padMenus} />
+          </>}
+          <h3>{t.growingHeading}</h3>
+          <Prose text={t.growing(b) + (t.growingEraNote ? ` ${t.growingEraNote}` : '')} />
+          {scheme === 'pad'
+            ? <>
+                <h3>{t.keyboardHeading}</h3>
+                <p><b>1:</b> {t.keyboardPlayerOne}<br /><b>2:</b> {t.keyboardPlayerTwo}</p>
+              </>
+            : <>
+                <h3>{t.controllerHeading}</h3>
+                <Prose text={t.controller} />
+                <p>{t.sharedKeyboard} {t.keyboardPlayerTwo}</p>
+              </>}
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function SettingsPage({ settings, onSettings }: { settings: Settings; onSettings: (s: Settings) => void }) {
+  const t = TEXT.settings;
+  return (
+    <div className="dialog-body settings">
+      <p className="eyebrow">{t.eyebrow}</p>
+      <h2>{t.heading}</h2>
+      <label className="setting-row">
+        <span>{t.detail} <small>{t.detailNote}</small></span>
+        <div className="seg">
+          {(['high', 'low'] as const).map((q) => <button key={q} aria-pressed={settings.quality === q} onClick={() => onSettings({ ...settings, quality: q })}>{q === 'high' ? t.qualityHigh : t.qualityLow}</button>)}
+        </div>
+      </label>
+      <label className="setting-row" htmlFor="look-speed">
+        <span>{t.cameraSpeed} <small>{t.cameraSpeedNote(settings.lookSpeed.toFixed(1))}</small></span>
+        <input id="look-speed" type="range" min={0.4} max={2} step={0.1} value={settings.lookSpeed} onChange={(e) => onSettings({ ...settings, lookSpeed: Number(e.target.value) })} />
+      </label>
+      <label className="setting-row">
+        <span>{t.invertY}</span>
+        <input type="checkbox" checked={settings.invertY} onChange={(e) => onSettings({ ...settings, invertY: e.target.checked })} />
+      </label>
+      <label className="setting-row" htmlFor="volume">
+        <span>{t.volume} <small>{t.volumeNote(Math.round(settings.volume * 100))}</small></span>
+        <input id="volume" type="range" min={0} max={1} step={0.05} value={settings.volume} onChange={(e) => onSettings({ ...settings, volume: Number(e.target.value) })} />
+      </label>
+      <label className="setting-row">
+        {/* The name under the switch is this era's own opening track, read off its soundtrack
+            rather than written out: it used to say "Tide of First Bones" in all three games. */}
+        <span>{t.music} <small>{OPENING_TRACK}</small></span>
+        <input type="checkbox" checked={settings.music} onChange={(e) => onSettings({ ...settings, music: e.target.checked })} />
+      </label>
+      <label className="setting-row">
+        <span>{t.mute}</span>
+        <input type="checkbox" checked={settings.muted} onChange={(e) => onSettings({ ...settings, muted: e.target.checked })} />
+      </label>
+      {hasEquivalentSizing() && (
+        <label className="setting-row">
+          <span>{t.equivalentSizing} <small>{t.equivalentSizingNote}</small></span>
+          <input type="checkbox" checked={settings.equivalentSizing} onChange={(e) => onSettings({ ...settings, equivalentSizing: e.target.checked })} />
+        </label>
+      )}
+      <p className="dim">{t.footnote}</p>
+    </div>
+  );
+}
+
+/** The era's opening track, which is what the Music switch is named after. */
+const OPENING_TRACK = (ACTIVE_ERA.audio.music.find((m) => m.opening) ?? ACTIVE_ERA.audio.music[0])?.name ?? '';

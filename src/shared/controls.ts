@@ -24,7 +24,7 @@ export type Action =
   | 'sprint' | 'rise' | 'sink'
   | 'light' | 'heavy' | 'ability' | 'dash' | 'guard' | 'aim'
   | 'sense' | 'teleport' | 'view' | 'menu'
-  | 'confirm' | 'back' | 'modePrev' | 'modeNext' | 'pick';
+  | 'confirm' | 'back' | 'modePrev' | 'modeNext';
 
 interface Label { pad: string; kbm: string; key1: string; key2: string; short?: Partial<Record<Scheme, string>>; }
 
@@ -50,7 +50,6 @@ const LABELS: Record<Action, Label> = {
   back:     { pad: 'B', kbm: 'Backspace', key1: 'Backspace', key2: 'Backspace', short: { kbm: 'Bksp', key1: 'Bksp', key2: 'Bksp' } },
   modePrev: { pad: 'LB', kbm: 'Q', key1: 'Q', key2: 'Q' },
   modeNext: { pad: 'RB', kbm: 'E', key1: 'E', key2: 'E' },
-  pick:     { pad: 'D-pad', kbm: 'Arrow keys', key1: 'Arrow keys', key2: 'Arrow keys', short: { pad: 'D-pad ◀▶', kbm: 'Arrows', key1: 'Arrows', key2: 'Arrows' } },
 };
 
 /** The action's name in this scheme's words, as it reads in a sentence. */

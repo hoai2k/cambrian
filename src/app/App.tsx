@@ -12,6 +12,7 @@ import { emptyCodex, hasNewFinds, loadCodex, mergeCodex, recordFinds, type Codex
 import { Hud } from './Hud';
 import { LoadingScreen, useSlow } from './Loading';
 import { Dialogs, PauseMenu, Results, type MenuItem } from './Overlays';
+import { TEXT } from '../shared/text';
 import { debugGame } from '../shared/debug';
 import { enterFullscreen, rememberFullscreen, restoreFullscreenOnGesture } from '../shared/fullscreen';
 import { exportRecording, recordingPhase, resetRecording, startRecording, stopRecording } from './debug-record';
@@ -842,29 +843,29 @@ export function App() {
     if (screen === 'results') {
       const items: MenuItem[] = [];
       // Co-op modes are milestones, not verdicts: the sea is still there to swim in.
-      if (hud?.canContinue) items.push({ label: 'Continue', run: keepPlaying, primary: true });
-      items.push({ label: 'Play again', run: playAgain, primary: !hud?.canContinue });
+      if (hud?.canContinue) items.push({ label: TEXT.results.continue, run: keepPlaying, primary: true });
+      items.push({ label: TEXT.results.playAgain, run: playAgain, primary: !hud?.canContinue });
       // Quitting the match lands on the choice screen, which is where you go to play again with
       // something else and where the way back to the title already is. A second button that left
       // the game altogether sat one careless press from the end of a session.
-      items.push({ label: 'Quit', run: backToSelect });
+      items.push({ label: TEXT.results.quit, run: backToSelect });
       return items;
     }
     if (screen === 'playing' && paused) {
-      const items: MenuItem[] = [{ label: 'Resume', run: () => setPausedBoth(false), primary: true }];
+      const items: MenuItem[] = [{ label: TEXT.pause.resume, run: () => setPausedBoth(false), primary: true }];
       // The match recorder, and only when the URL asked for it (`?debug=game`). One button walking
       // through its own three states, because that is the whole of the tool: record, stop, hand it
       // over. Recording carries on while the menu is open — pausing to think is not a reason to
       // lose the frames — and resuming is what gets you back to the action being recorded.
       if (debugGame()) {
-        if (recPhase === 'idle') items.push({ label: 'Start recording', run: () => { startRecording(); setRecPhase('recording'); setPausedBoth(false); } });
-        else if (recPhase === 'recording') items.push({ label: 'End recording', run: () => { stopRecording(); setRecPhase('ready'); } });
+        if (recPhase === 'idle') items.push({ label: TEXT.pause.startRecording, run: () => { startRecording(); setRecPhase('recording'); setPausedBoth(false); } });
+        else if (recPhase === 'recording') items.push({ label: TEXT.pause.endRecording, run: () => { stopRecording(); setRecPhase('ready'); } });
         else items.push(
-          { label: 'Export debug', run: () => { exportRecording(); } },
-          { label: 'Discard recording', run: () => { resetRecording(); setRecPhase('idle'); } },
+          { label: TEXT.pause.exportRecording, run: () => { exportRecording(); } },
+          { label: TEXT.pause.discardRecording, run: () => { resetRecording(); setRecPhase('idle'); } },
         );
       }
-      items.push({ label: 'Quit', run: backToSelect });
+      items.push({ label: TEXT.pause.quit, run: backToSelect });
       return items;
     }
     return [];
@@ -921,7 +922,8 @@ export function App() {
 
   return (
     <main className={`shell screen-${screen}`}>
-      <div className="sea-canvas" ref={canvasRef} aria-label="Cambrian sea" />
+      {/* Named for whichever game this is, not for the one it was written in. */}
+      <div className="sea-canvas" ref={canvasRef} aria-label={ACTIVE_ERA.title} />
       <div className="vignette" />
 
       {/*
@@ -959,8 +961,8 @@ export function App() {
       )}
 
       {(screen === 'playing' || screen === 'results') && hud && <Hud snapshot={hud} />}
-      {screen === 'playing' && paused && <PauseMenu scheme={scheme} items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
-      {screen === 'results' && hud && <Results snapshot={hud} players={players} record={record} fresh={fresh} scheme={scheme} items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
+      {screen === 'playing' && paused && <PauseMenu items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
+      {screen === 'results' && hud && <Results snapshot={hud} players={players} record={record} fresh={fresh} items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
 
       <Toolbar place={toolbar} isFs={isFs} muted={settings.muted} focus={focus.group === 'icons' ? focus.index : -1} onHelp={() => openDialog(dialog === 'help' ? null : 'help')} onSettings={() => openDialog(dialog === 'settings' ? null : 'settings')} onMute={() => setSettings((s) => ({ ...s, muted: !s.muted }))} onFullscreen={toggleFullscreen} />
       <Dialogs kind={dialog} onClose={() => openDialog(null)} settings={settings} onSettings={setSettings} scheme={scheme} />
@@ -968,7 +970,7 @@ export function App() {
       {(notice || error) && (
         <div className={`notice ${error ? 'notice-error' : ''}`} role="status">
           <span>{error || notice}</span>
-          <button aria-label="Dismiss" onClick={() => { setNotice(''); setError(''); }}>×</button>
+          <button aria-label={TEXT.common.dismiss} onClick={() => { setNotice(''); setError(''); }}>×</button>
         </div>
       )}
     </main>

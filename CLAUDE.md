@@ -1177,6 +1177,48 @@ unless the user explicitly asks for a PR. Steps:
   page it opens): a network that blocks the counter makes the browser log a console error, and
   these tools fail on console errors — one blocked counter would otherwise fail a check about
   creature meshes.
+- **Every word the games say is config.** `src/content/strings.ts` is the shared table — the shell,
+  the HUD, the menus, the help page, the settings panel, the feedback form — and
+  `src/content/<era>/strings.ts` is what one game says for itself, laid over it by
+  `src/shared/text.ts` (`TEXT`). The trilogy page has its own, `src/ancientseas/strings.ts`, and it
+  must stay separate: that page is no game's, reads `ACTIVE_ERA` nowhere, and importing `TEXT`
+  would pull a roster into the entry bundle. A component asks the table and never spells a sentence
+  out, which is what makes the messaging editable without reading the code that draws it and makes
+  a second language a second table. Keys are named for **where the player sees the words** —
+  `pause.`, `results.`, `hud.grip.`, `select.crew.` — never for what they mean, and a line with a
+  number or a name in it is a *function* of that value rather than a string with a placeholder, so
+  the argument is typed and a translator can put it where the sentence needs it. An era overrides
+  only what it says differently; `mergeStrings` walks plain objects and treats a function or an
+  array as one whole value, so replacing the loading facts means *that era's* facts rather than its
+  facts interleaved with the Cambrian's — which is what those lines were before, shared and about
+  Hallucigenia in all three games. Button names are the one exception and stay in
+  `src/shared/controls.ts`: that is the binding table, what the key *is* rather than what the game
+  *says*, and `src/input/input.ts` and both diagrams read the same rows. `npm run eras` holds the split: an era
+  may only *override* a key the shared table already has (a key it invents is a key nothing reads,
+  which is how a renamed string quietly stops being drawn), every leaf of the merged table has to be
+  a string, a function or a list of strings, and no two eras may show the same loading line.
+- Nothing in a menu describes how to work the menu. The pause and results choices used to carry a
+  line under them naming the D-pad and the confirm button; the cursor already answers left, right,
+  up and down by where the buttons actually are (`src/app/spatial-nav.ts`), so the line was
+  explaining something that needs no explaining and naming one input device out of four while doing
+  it. The `pick` action went with it, since nothing else asked for its name.
+- A burrower shows the sand it is moving. `Sand` in `src/render/fx.ts` and `burrowSand` in
+  `src/render/engine.ts`: a steady shower while a body works itself down, one throw as the floor
+  closes over it, and a harder one thrown clear as it surfaces — so both ends of the act are seen
+  rather than only the disappearing. Presentation only, off the actors' own `hideMode`, so `src/sim`
+  keeps its determinism and gains no event; the silt cloud it already pushes on burial is the
+  *rule* (that is what hides the animal) and stays where it is. The grains take the biome's own
+  floor colour per grain, because a burrow in the shelf mosaic and one in the black basin must not
+  shower the same beige. The *decision* — which of the three moments a body's move between two
+  hiding states is, and what that owes — is `sandThrow`, which is pure and held by `npm run sand`;
+  the renderer keeps only the accumulator that turns a rate into whole grains, and
+  `node tools/sand-browser.mjs` drives the whole of it in a real browser against a preview build.
+  That harness is a worked example of the rule about this page's frame clock: the engine clamps
+  `dt` to 0.08 s and the software renderer draws about a frame a second, so a wall-clock second is
+  a twelfth of a second of particle life and a key held for a fraction of a second can fall
+  entirely *between* two frames and never be sampled. Hold presses for seconds, arm the watchers
+  before the press, and wait on the game's own state rather than on `waitForTimeout`.
+
 - All docs live in `docs/`. Design docs are in `docs/redesign/`. Image, glyph and prop
   needs go in `docs/image-requests.md` and move to `docs/image-requests-history.md` once
   delivered and integrated; sound and music needs go in `docs/audio-requests.md`.
