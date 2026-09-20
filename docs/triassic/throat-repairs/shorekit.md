@@ -18,3 +18,15 @@ verifies their definitions exist in the marine module. Previously it rejected va
 such as `cap_cut` and `rim_flange`; simply accepting all imports would conceal misspellings.
 The updated check resolves all 116 references in the three builders, and all four Python sources
 pass AST parsing. Rebuilt asset and playback results are recorded below as each delivery finishes.
+
+## Tanystropheus — finished
+
+The authored/puppet/LOD exports have two independently closed shells: 236 skull-owned and 236
+jaw-owned triangles, no mixed vertices, no bridging triangles and no boundary edges. The packaged
+paired audit passes all 28 clips and 38-bone/anchor parity. The strict culling comparison passes
+Bite at 0.25 s and SnapRight at 0.25 s with **zero pixels seen through the body**. The before/after
+Bite close-ups show the floor seated in the mandible without a wall across the gape. Portraits and
+the SHA-bound delivery record are refreshed. The viewer/runtime oral-geometry hide stays unchanged.
+
+![Before](tanystropheus-bite-before.png)
+![After](tanystropheus-bite-after.png)
