@@ -14,138 +14,138 @@
   },
   "sourceAlbedoSha256": "4a0b6a522da7887090f8f12ac80e2f5b4b1e26d94e0344f2c0d3a434607078ff",
   "frame": {
-    "rawLengthAlongMeasuredAxis": 1.0308439888872036,
+    "rawLengthAlongMeasuredAxis": 1.0308439888872032,
     "principalAxisInFile": [
-      0.11915260717816344,
-      0.9749801354644673,
-      0.18766030920878035
+      0.11915260717816377,
+      0.9749801354644668,
+      0.18766030920878066
     ],
     "boundingBoxWouldHaveSaid": "y",
-    "angleBetweenPrincipalAxisAndFileAxis": 12.843689230179413,
+    "angleBetweenPrincipalAxisAndFileAxis": 12.843689230179526,
     "countershadingStations": 24,
     "countershadingMeanStrength": 0.3670132569497808,
-    "measuredDorsalDegrees": 91.94862261809811,
-    "rollCorrectionDegrees": 1.948622618098109,
+    "measuredDorsalDegrees": 91.94862261809816,
+    "rollCorrectionDegrees": 1.9486226180981598,
     "perStation": [
       {
         "y": -0.29553714576320333,
         "strength": 0.35205930928197077,
-        "dorsalDegrees": 90.46272477031704
+        "dorsalDegrees": 90.4627247703171
       },
       {
         "y": -0.26075453706755114,
         "strength": 0.5478939042965313,
-        "dorsalDegrees": 99.51641878118582
+        "dorsalDegrees": 99.51641878118586
       },
       {
-        "y": -0.225971928371899,
-        "strength": 0.4338480574180923,
-        "dorsalDegrees": 168.81828685147417
+        "y": -0.22597192837189897,
+        "strength": 0.43384805741809224,
+        "dorsalDegrees": 168.8182868514742
       },
       {
         "y": -0.1911893196762468,
-        "strength": 0.10654495640619492,
-        "dorsalDegrees": 49.75987178644747
+        "strength": 0.10654495640619485,
+        "dorsalDegrees": 49.75987178644752
       },
       {
-        "y": -0.15640671098059464,
+        "y": -0.1564067109805946,
         "strength": 0.30045271059478057,
-        "dorsalDegrees": 28.34790333419396
+        "dorsalDegrees": 28.347903334194047
       },
       {
-        "y": -0.12162410228494247,
-        "strength": 0.31991827037360426,
-        "dorsalDegrees": 83.42788864554134
+        "y": -0.12162410228494241,
+        "strength": 0.3199182703736042,
+        "dorsalDegrees": 83.42788864554137
       },
       {
-        "y": -0.08684149358929028,
-        "strength": 0.4427269918608157,
-        "dorsalDegrees": 98.76390461369552
+        "y": -0.08684149358929025,
+        "strength": 0.44272699186081593,
+        "dorsalDegrees": 98.76390461369554
       },
       {
-        "y": -0.05205888489363811,
-        "strength": 0.34632920149482876,
-        "dorsalDegrees": 130.1619120950722
+        "y": -0.05205888489363808,
+        "strength": 0.346329201494829,
+        "dorsalDegrees": 130.1619120950723
       },
       {
-        "y": -0.01727627619798594,
-        "strength": 0.03947614231615467,
-        "dorsalDegrees": 108.88573308108164
+        "y": -0.017276276197985885,
+        "strength": 0.03947614231615468,
+        "dorsalDegrees": 108.88573308108172
       },
       {
-        "y": 0.017506332497666255,
+        "y": 0.01750633249766631,
         "strength": 0.19932655610125435,
-        "dorsalDegrees": 18.91652178326663
+        "dorsalDegrees": 18.91652178326666
       },
       {
-        "y": 0.052288941193318395,
+        "y": 0.052288941193318506,
         "strength": 0.20381350742913304,
-        "dorsalDegrees": 26.450396696522912
+        "dorsalDegrees": 26.450396696522976
       },
       {
-        "y": 0.08707154988897059,
-        "strength": 0.5154796241042107,
-        "dorsalDegrees": 86.0889640957898
+        "y": 0.08707154988897065,
+        "strength": 0.5154796241042106,
+        "dorsalDegrees": 86.08896409578985
       },
       {
-        "y": 0.12185415858462278,
+        "y": 0.12185415858462284,
         "strength": 0.5808627058091749,
-        "dorsalDegrees": 99.63373266877831
+        "dorsalDegrees": 99.63373266877836
       },
       {
-        "y": 0.15663676728027492,
+        "y": 0.15663676728027504,
         "strength": 0.5803503512549353,
-        "dorsalDegrees": 100.07726638173031
+        "dorsalDegrees": 100.07726638173037
       },
       {
-        "y": 0.19141937597592712,
-        "strength": 0.38733276581813725,
-        "dorsalDegrees": 107.4330682252704
+        "y": 0.19141937597592718,
+        "strength": 0.3873327658181374,
+        "dorsalDegrees": 107.43306822527045
       },
       {
-        "y": 0.22620198467157926,
+        "y": 0.22620198467157937,
         "strength": 0.3591294106352425,
-        "dorsalDegrees": 71.24100174690477
+        "dorsalDegrees": 71.2410017469048
       },
       {
-        "y": 0.26098459336723145,
+        "y": 0.26098459336723157,
         "strength": 0.4164401911009868,
-        "dorsalDegrees": 85.77433696373336
+        "dorsalDegrees": 85.77433696373339
       },
       {
-        "y": 0.29576720206288365,
+        "y": 0.29576720206288376,
         "strength": 0.4450014748139915,
-        "dorsalDegrees": 104.99621946107322
+        "dorsalDegrees": 104.9962194610733
       },
       {
-        "y": 0.33054981075853584,
-        "strength": 0.3488212734138734,
-        "dorsalDegrees": 85.0862115045267
+        "y": 0.33054981075853596,
+        "strength": 0.3488212734138736,
+        "dorsalDegrees": 85.08621150452674
       },
       {
-        "y": 0.36533241945418793,
-        "strength": 0.37073971877909645,
-        "dorsalDegrees": 95.78075940871807
+        "y": 0.36533241945418815,
+        "strength": 0.3707397187790964,
+        "dorsalDegrees": 95.7807594087181
       },
       {
-        "y": 0.4001150281498401,
-        "strength": 0.4201981589958801,
-        "dorsalDegrees": 77.15856913873363
+        "y": 0.40011502814984035,
+        "strength": 0.42019815899588,
+        "dorsalDegrees": 77.15856913873367
       },
       {
-        "y": 0.4348976368454923,
-        "strength": 0.40304811584140554,
-        "dorsalDegrees": 86.35625861717446
+        "y": 0.43489763684549243,
+        "strength": 0.4030481158414056,
+        "dorsalDegrees": 86.35625861717452
       },
       {
-        "y": 0.4696802455411445,
-        "strength": 0.3473189933077313,
-        "dorsalDegrees": 83.07548646561662
+        "y": 0.4696802455411446,
+        "strength": 0.3473189933077312,
+        "dorsalDegrees": 83.07548646561666
       },
       {
-        "y": 0.5044628542367966,
+        "y": 0.5044628542367968,
         "strength": 0.3412057753467136,
-        "dorsalDegrees": 105.19601499993823
+        "dorsalDegrees": 105.19601499993824
       }
     ]
   },
@@ -308,7 +308,7 @@
         "mid": -0.004836551612243056,
         "disagreement": 0.0018570567481219769,
         "asFractionOfLocalDepth": 0.30100692807772156,
-        "centreZ": -0.00037208655621374394
+        "centreZ": -0.000372086556213744
       },
       {
         "y": -0.38690555903786106,
@@ -317,7 +317,7 @@
         "mid": -0.003118139458820224,
         "disagreement": 0.0015797675587236881,
         "asFractionOfLocalDepth": 0.24326408135045255,
-        "centreZ": -0.00018540897436252
+        "centreZ": -0.00018540897436252005
       },
       {
         "y": -0.38358976956417684,
@@ -326,7 +326,7 @@
         "mid": -0.004836551612243056,
         "disagreement": 0.0018570567481219769,
         "asFractionOfLocalDepth": 0.27235139830313126,
-        "centreZ": 1.2686074887039486e-06
+        "centreZ": 1.2686074887038878e-06
       },
       {
         "y": -0.3802739800904926,
@@ -335,7 +335,7 @@
         "mid": -0.003971561556681991,
         "disagreement": 0.0001270766369998455,
         "asFractionOfLocalDepth": 0.01778995643395598,
-        "centreZ": 0.0001879461893399279
+        "centreZ": 0.00018794618933992778
       },
       {
         "y": -0.37695819061680846,
@@ -344,7 +344,7 @@
         "mid": -0.003971561556681991,
         "disagreement": 0.0001270766369998455,
         "asFractionOfLocalDepth": 0.01668865013714693,
-        "centreZ": 0.0002673793710531307
+        "centreZ": 0.00026737937105313065
       },
       {
         "y": -0.37364240114312425,
@@ -353,7 +353,7 @@
         "mid": -0.006049982970580459,
         "disagreement": 0.0040297661907970905,
         "asFractionOfLocalDepth": 0.49181255503195026,
-        "centreZ": 0.00026810106642650473
+        "centreZ": 0.0002681010664265047
       },
       {
         "y": -0.37032661166944003,
@@ -362,7 +362,7 @@
         "mid": -0.005265820072963834,
         "disagreement": 0.002461440395563841,
         "asFractionOfLocalDepth": 0.28057470291613706,
-        "centreZ": 0.0002688227617998787
+        "centreZ": 0.00026882276179987865
       },
       {
         "y": -0.3670108221957558,
@@ -371,7 +371,7 @@
         "mid": -0.004778021248057485,
         "disagreement": 0.0034370380453765392,
         "asFractionOfLocalDepth": 0.3675189990047573,
-        "centreZ": 0.0002695444571732527
+        "centreZ": 0.00026954445717325263
       },
       {
         "y": -0.3636950327220716,
@@ -380,7 +380,7 @@
         "mid": -0.005849621258676052,
         "disagreement": 0.0012938380241394043,
         "asFractionOfLocalDepth": 0.13028078811088037,
-        "centreZ": 0.0002702661525466267
+        "centreZ": 0.00027026615254662666
       },
       {
         "y": -0.3603792432483874,
@@ -389,7 +389,7 @@
         "mid": -0.006222408032044768,
         "disagreement": 0.0020394115708768368,
         "asFractionOfLocalDepth": 0.19166509182481717,
-        "centreZ": 0.000295105090031907
+        "centreZ": 0.00029510509003190694
       },
       {
         "y": -0.35706345377470317,
@@ -398,7 +398,7 @@
         "mid": -0.006286106305196881,
         "disagreement": 0.0019120150245726109,
         "asFractionOfLocalDepth": 0.16689707503667106,
-        "centreZ": 0.0003396552350124951
+        "centreZ": 0.00033965523501249505
       },
       {
         "y": -0.35374766430101895,
@@ -424,7 +424,7 @@
         "right": -0.005330098792910576,
         "mid": -0.006286106305196881,
         "disagreement": 0.0019120150245726109,
-        "asFractionOfLocalDepth": 0.13752018357279655,
+        "asFractionOfLocalDepth": 0.13752018357279652,
         "centreZ": 0.0004733056699542595
       },
       {
@@ -443,7 +443,7 @@
         "mid": -0.003995012724772096,
         "disagreement": 0.0017401115037500858,
         "asFractionOfLocalDepth": 0.11362769264011838,
-        "centreZ": 0.0004496562320804387
+        "centreZ": 0.0004496562320804386
       },
       {
         "y": -0.3371687169325979,
@@ -452,7 +452,7 @@
         "mid": -0.0029811967979185283,
         "disagreement": 0.0037677433574572206,
         "asFractionOfLocalDepth": 0.23570567578803955,
-        "centreZ": 0.0004202143681693103
+        "centreZ": 0.0004202143681693102
       },
       {
         "y": -0.3338529274589137,
@@ -461,7 +461,7 @@
         "mid": -0.0029811967979185283,
         "disagreement": 0.0037677433574572206,
         "asFractionOfLocalDepth": 0.22621277752959962,
-        "centreZ": 0.0003907725042581819
+        "centreZ": 0.0003907725042581818
       },
       {
         "y": -0.3305371379852295,
@@ -470,7 +470,7 @@
         "mid": -0.0009204283123835921,
         "disagreement": 0.007889280328527093,
         "asFractionOfLocalDepth": 0.45532899597694615,
-        "centreZ": 0.0003613306403470534
+        "centreZ": 0.00036133064034705336
       }
     ],
     "throatCaps": {
@@ -526,30 +526,1807 @@
     "Grab"
   ],
   "loopSeams": {
-    "Idle": 1.2246467698671066e-17,
-    "Swim": 3.91886972974919e-17,
-    "Sprint": 6.368163104047281e-17,
-    "TurnLeft": 2.249639599097593e-33,
-    "TurnRight": 2.249639599097593e-33,
-    "Dive": 1.7997117894806697e-33,
-    "Rise": 1.7997117894806697e-33,
-    "Attack": 1.1998077984301157e-33,
-    "Bite": 1.1998077984301157e-33,
-    "Heavy": 3.8993755744866164e-33,
-    "Hit": 1.1998077984301157e-33,
+    "Idle": 3.918869895185313e-18,
+    "Swim": 1.1756608858375325e-17,
+    "Sprint": 1.9104490635630823e-17,
+    "TurnLeft": 2.2926740799392122e-33,
+    "TurnRight": 2.2066051182559735e-33,
+    "Dive": 3.599423395290347e-34,
+    "Rise": 3.599423395290347e-34,
+    "Attack": 3.599423395290347e-34,
+    "Bite": 3.599423395290347e-34,
+    "Heavy": 1.1698126723459849e-33,
+    "Hit": 7.498798969776963e-34,
     "Death": 1.149999976158142,
-    "Guard": 1.2246467698671066e-17,
-    "Parry": 5.399135184771017e-33,
+    "Guard": 3.673940475037442e-18,
+    "Parry": 2.5926260754644892e-33,
     "Dodge": 4.499279198195186e-33,
-    "Eat": 1.2246467698671066e-17,
-    "Stagger": 1.1998077984301157e-33,
-    "Ability": 3.8993755744866164e-33,
-    "Grab": 1.2246467698671066e-17,
-    "Breath": 1.1998077984301157e-33,
-    "Growth": 1.1998077984301157e-33,
-    "TailWhip": 3.8993755744866164e-33,
-    "Coil": 3.8993755744866164e-33,
-    "Dash": 1.9054359350646185e-33
+    "Eat": 3.967855531060703e-18,
+    "Stagger": 7.498798969776963e-34,
+    "Ability": 1.1698126723459849e-33,
+    "Grab": 3.747419342440834e-18,
+    "Breath": 3.599423395290347e-34,
+    "Growth": 3.599423395290347e-34,
+    "TailWhip": 1.1698126723459849e-33,
+    "Coil": 1.1698126723459849e-33,
+    "Dash": 3.7493994848884817e-34
+  },
+  "motion": {
+    "Idle": {
+      "tailChainYawSweptRadians": 0.5055816542590037,
+      "tailChainPitchSweptRadians": 0.13145005889236927,
+      "tailRootSweptRadians": [
+        0.007017247378826141,
+        0.0,
+        0.027000000700354576
+      ],
+      "tailTipSweptRadians": [
+        0.015598289668560028,
+        0.0,
+        0.05999477952718735
+      ],
+      "neckYawSweptRadians": 0.028799917548894882,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.017999999225139618,
+        0.09999999403953552
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.010796114802360535,
+        0.05997845530509949
+      ],
+      "jawSweptRadians": 0.0,
+      "tailTipTravel": 0.05380947332642819,
+      "skullTravel": 0.005862218226533004,
+      "forePaddleTravel": 0.004481547874487812
+    },
+    "Swim": {
+      "tailChainYawSweptRadians": 1.633978683501482,
+      "tailChainPitchSweptRadians": 0.4248622173909098,
+      "tailRootSweptRadians": [
+        0.022682514507323503,
+        0.0,
+        0.08725859224796295
+      ],
+      "tailTipSweptRadians": [
+        0.050415164325386286,
+        0.0,
+        0.1938403695821762
+      ],
+      "neckYawSweptRadians": 0.09304903820157051,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.05757267773151398,
+        0.3198482319712639
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.034534942358732224,
+        0.19186077266931534
+      ],
+      "jawSweptRadians": 0.0,
+      "tailTipTravel": 0.18834903329937783,
+      "skullTravel": 0.0015898414572354028,
+      "forePaddleTravel": 0.00951783175791526
+    },
+    "Sprint": {
+      "tailChainYawSweptRadians": 2.3903328329324722,
+      "tailChainPitchSweptRadians": 0.6220528385601938,
+      "tailRootSweptRadians": [
+        0.03321488527581096,
+        0.0,
+        0.12780000269412994
+      ],
+      "tailTipSweptRadians": [
+        0.07373937219381332,
+        0.0,
+        0.2830846309661865
+      ],
+      "neckYawSweptRadians": 0.1358647644519806,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.09359999839216471,
+        0.5200000200420618
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.05595533922314644,
+        0.3108629994094372
+      ],
+      "jawSweptRadians": 0.0,
+      "tailTipTravel": 0.27359516994938876,
+      "skullTravel": 0.002336053798596064,
+      "forePaddleTravel": 0.015119998008885334
+    },
+    "TurnLeft": {
+      "tailChainYawSweptRadians": 0.665358261205256,
+      "tailChainPitchSweptRadians": 0.13402754627168179,
+      "tailRootSweptRadians": [
+        0.007014463655650616,
+        0.0,
+        0.04367668367922306
+      ],
+      "tailTipSweptRadians": [
+        0.01636587455868721,
+        0.0,
+        0.039698400534689426
+      ],
+      "neckYawSweptRadians": 0.12359371455386281,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.014399997889995575,
+        0.07999999821186066
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.014399997889995575,
+        0.07999999821186066
+      ],
+      "jawSweptRadians": 0.0,
+      "tailTipTravel": 0.27281981512261005,
+      "skullTravel": 0.0221382997717583,
+      "forePaddleTravel": 0.015145010398628244
+    },
+    "TurnRight": {
+      "tailChainYawSweptRadians": 0.5553439781069756,
+      "tailChainPitchSweptRadians": 0.13402754627168179,
+      "tailRootSweptRadians": [
+        0.007014463655650616,
+        0.0,
+        0.04367668367922306
+      ],
+      "tailTipSweptRadians": [
+        0.01636587455868721,
+        0.0,
+        0.0852084644138813
+      ],
+      "neckYawSweptRadians": 0.15988105535507202,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.014399997889995575,
+        0.07999999821186066
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.014399997889995575,
+        0.07999999821186066
+      ],
+      "jawSweptRadians": 0.0,
+      "tailTipTravel": 0.18377253179553224,
+      "skullTravel": 0.021464891767532798,
+      "forePaddleTravel": 0.011249124344230954
+    },
+    "Dive": {
+      "tailChainYawSweptRadians": 0.5232227824162692,
+      "tailChainPitchSweptRadians": 0.13414897660095448,
+      "tailRootSweptRadians": [
+        0.007037244853563607,
+        0.0,
+        0.02922835759818554
+      ],
+      "tailTipSweptRadians": [
+        0.016385173425078392,
+        0.0,
+        0.05925442464649677
+      ],
+      "neckYawSweptRadians": 0.029725948814302683,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.014376655220985413,
+        0.07987029105424881
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.014376655220985413,
+        0.07987029105424881
+      ],
+      "jawSweptRadians": 0.0,
+      "tailTipTravel": 0.09958000994355541,
+      "skullTravel": 0.024998753648646066,
+      "forePaddleTravel": 0.01015038047251037
+    },
+    "Rise": {
+      "tailChainYawSweptRadians": 0.5232227824162692,
+      "tailChainPitchSweptRadians": 0.1341489814221859,
+      "tailRootSweptRadians": [
+        0.007037246599793434,
+        0.0,
+        0.02922835759818554
+      ],
+      "tailTipSweptRadians": [
+        0.016385171562433243,
+        0.0,
+        0.05925442464649677
+      ],
+      "neckYawSweptRadians": 0.029725948814302683,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.014376655220985413,
+        0.07987029105424881
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.014376655220985413,
+        0.07987029105424881
+      ],
+      "jawSweptRadians": 0.0,
+      "tailTipTravel": 0.09009078998290299,
+      "skullTravel": 0.025248588551968498,
+      "forePaddleTravel": 0.010174480983688354
+    },
+    "Attack": {
+      "tailChainYawSweptRadians": 0.5619448218640173,
+      "tailChainPitchSweptRadians": 0.3201880839187652,
+      "tailRootSweptRadians": [
+        0.022038031835108995,
+        0.0,
+        0.02903606928884983
+      ],
+      "tailTipSweptRadians": [
+        0.03847560007125139,
+        0.0,
+        0.05923148710280657
+      ],
+      "neckYawSweptRadians": 0.029737860430032015,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.056314267218112946,
+        0.34736505150794983
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.04596893489360809,
+        0.37136033177375793
+      ],
+      "jawSweptRadians": 0.28999999165534973,
+      "tailTipTravel": 0.1228212090940826,
+      "skullTravel": 0.049376647906992116,
+      "forePaddleTravel": 0.04595387847487828
+    },
+    "Bite": {
+      "tailChainYawSweptRadians": 0.5461951354227494,
+      "tailChainPitchSweptRadians": 0.30032051890157163,
+      "tailRootSweptRadians": [
+        0.020899201277643442,
+        0.0,
+        0.02855914644896984
+      ],
+      "tailTipSweptRadians": [
+        0.03526029735803604,
+        0.0,
+        0.057519761845469475
+      ],
+      "neckYawSweptRadians": 0.029532117303460836,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.08822310715913773,
+        0.344314344227314
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.06464450806379318,
+        0.26027994602918625
+      ],
+      "jawSweptRadians": 0.25999999046325684,
+      "tailTipTravel": 0.11544418451407311,
+      "skullTravel": 0.025293228709138554,
+      "forePaddleTravel": 0.023050774878607294
+    },
+    "Heavy": {
+      "tailChainYawSweptRadians": 4.376191392540932,
+      "tailChainPitchSweptRadians": 0.15706436894834042,
+      "tailRootSweptRadians": [
+        0.004785047844052315,
+        0.0,
+        0.22526296973228455
+      ],
+      "tailTipSweptRadians": [
+        0.021572425961494446,
+        0.0,
+        0.43010595440864563
+      ],
+      "neckYawSweptRadians": 0.05052810348570347,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.09480000287294388,
+        0.5300000011920929
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.0828000009059906,
+        0.4700000137090683
+      ],
+      "jawSweptRadians": 0.0,
+      "tailTipTravel": 0.7577967143382699,
+      "skullTravel": 0.016381241586406404,
+      "forePaddleTravel": 0.012171710699551232
+    },
+    "Hit": {
+      "tailChainYawSweptRadians": 0.5819378682062961,
+      "tailChainPitchSweptRadians": 0.25406750477850437,
+      "tailRootSweptRadians": [
+        0.007580110803246498,
+        0.0,
+        0.028742240741848946
+      ],
+      "tailTipSweptRadians": [
+        0.03437437117099762,
+        0.0,
+        0.057944050058722496
+      ],
+      "neckYawSweptRadians": 0.0296588777564466,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.0804000124335289,
+        0.4400000274181366
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.06390000879764557,
+        0.35999999940395355
+      ],
+      "jawSweptRadians": 0.0,
+      "tailTipTravel": 0.21633528781168931,
+      "skullTravel": 0.05642382951769733,
+      "forePaddleTravel": 0.026422020002755276
+    },
+    "Death": {
+      "tailChainYawSweptRadians": 0.6925297072157264,
+      "tailChainPitchSweptRadians": 0.4324659314006567,
+      "tailRootSweptRadians": [
+        0.022944796830415726,
+        0.0,
+        0.03999999910593033
+      ],
+      "tailTipSweptRadians": [
+        0.053981080651283264,
+        0.0,
+        0.0751441940665245
+      ],
+      "neckYawSweptRadians": 0.029776834417134523,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.05460000038146973,
+        0.4819999933242798
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.03060000389814377,
+        0.4260000139474869
+      ],
+      "jawSweptRadians": 0.10000000149011612,
+      "tailTipTravel": 0.24033070498283973,
+      "skullTravel": 0.02854671596800218,
+      "forePaddleTravel": 0.009219869543986764
+    },
+    "Guard": {
+      "tailChainYawSweptRadians": 0.45462783006951213,
+      "tailChainPitchSweptRadians": 0.11817095801234245,
+      "tailRootSweptRadians": [
+        0.006301753222942352,
+        0.0,
+        0.024299999698996544
+      ],
+      "tailTipSweptRadians": [
+        0.014031372964382172,
+        0.0,
+        0.05396368354558945
+      ],
+      "neckYawSweptRadians": 0.02591031603515148,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.018000006675720215,
+        0.10000000521540642
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.010799974203109741,
+        0.059999898076057434
+      ],
+      "jawSweptRadians": 0.0,
+      "tailTipTravel": 0.051745641070244534,
+      "skullTravel": 0.00043439896156390506,
+      "forePaddleTravel": 0.0029464516400187477
+    },
+    "Parry": {
+      "tailChainYawSweptRadians": 0.5759959887946025,
+      "tailChainPitchSweptRadians": 0.19086937047541142,
+      "tailRootSweptRadians": [
+        0.004949748516082764,
+        0.0,
+        0.02922835759818554
+      ],
+      "tailTipSweptRadians": [
+        0.026464276015758514,
+        0.0,
+        0.05685459356755018
+      ],
+      "neckYawSweptRadians": 0.029609472956508398,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.12480000406503677,
+        0.6840000152587891
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.10979999601840973,
+        0.6120000034570694
+      ],
+      "jawSweptRadians": 0.0,
+      "tailTipTravel": 0.2060712512677584,
+      "skullTravel": 0.020743656309199013,
+      "forePaddleTravel": 0.03282273364455173
+    },
+    "Dodge": {
+      "tailChainYawSweptRadians": 1.826653864234686,
+      "tailChainPitchSweptRadians": 0.2267608404508792,
+      "tailRootSweptRadians": [
+        0.017039668280631304,
+        0.0,
+        0.14355076849460602
+      ],
+      "tailTipSweptRadians": [
+        0.02277148701250553,
+        0.0,
+        0.18463961780071259
+      ],
+      "neckYawSweptRadians": 0.0296588777564466,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.05447150766849518,
+        0.36928486824035645
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.05758187174797058,
+        0.3784692585468292
+      ],
+      "jawSweptRadians": 0.0,
+      "tailTipTravel": 0.15661283521314048,
+      "skullTravel": 0.05611507312567999,
+      "forePaddleTravel": 0.05598975685319273
+    },
+    "Eat": {
+      "tailChainYawSweptRadians": 0.606208932469599,
+      "tailChainPitchSweptRadians": 0.15770353563129902,
+      "tailRootSweptRadians": [
+        0.008420675992965698,
+        0.0,
+        0.03240000084042549
+      ],
+      "tailTipSweptRadians": [
+        0.01869449019432068,
+        0.0,
+        0.0719078853726387
+      ],
+      "neckYawSweptRadians": 0.03455540910363197,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.018000006675720215,
+        0.09999999776482582
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.010788828134536743,
+        0.05993789620697498
+      ],
+      "jawSweptRadians": 0.12999999523162842,
+      "tailTipTravel": 0.06939956096105836,
+      "skullTravel": 0.002774399752803483,
+      "forePaddleTravel": 0.0030699786226228323
+    },
+    "Stagger": {
+      "tailChainYawSweptRadians": 0.5875113034853712,
+      "tailChainPitchSweptRadians": 0.2553485482931137,
+      "tailRootSweptRadians": [
+        0.007649749517440796,
+        0.0,
+        0.02922835759818554
+      ],
+      "tailTipSweptRadians": [
+        0.03440938889980316,
+        0.0,
+        0.05925380066037178
+      ],
+      "neckYawSweptRadians": 0.029609472956508398,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.0804000124335289,
+        0.4400000274181366
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.06390000879764557,
+        0.35999999940395355
+      ],
+      "jawSweptRadians": 0.0,
+      "tailTipTravel": 0.3161609620805621,
+      "skullTravel": 0.08833931659580992,
+      "forePaddleTravel": 0.04049566761178335
+    },
+    "Ability": {
+      "tailChainYawSweptRadians": 2.9595429505388893,
+      "tailChainPitchSweptRadians": 0.2105096559971571,
+      "tailRootSweptRadians": [
+        0.005274239927530289,
+        0.0,
+        0.236927658708737
+      ],
+      "tailTipSweptRadians": [
+        0.027248907834291458,
+        0.0,
+        0.20011939108371735
+      ],
+      "neckYawSweptRadians": 0.15042744576931,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.1066940501332283,
+        0.5834113657474518
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.09169404208660126,
+        0.5114113539457321
+      ],
+      "jawSweptRadians": 0.0,
+      "tailTipTravel": 0.8233174932435893,
+      "skullTravel": 0.05253452274564294,
+      "forePaddleTravel": 0.04789163601813167
+    },
+    "Grab": {
+      "tailChainYawSweptRadians": 0.5722973004449159,
+      "tailChainPitchSweptRadians": 0.14879055880010128,
+      "tailRootSweptRadians": [
+        0.007946757599711418,
+        0.0,
+        0.03056534007191658
+      ],
+      "tailTipSweptRadians": [
+        0.01765284687280655,
+        0.0,
+        0.06790827214717865
+      ],
+      "neckYawSweptRadians": 0.032572610303759575,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.01797962188720703,
+        0.09988673590123653
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.010781675577163696,
+        0.05989821068942547
+      ],
+      "jawSweptRadians": 0.03595922142267227,
+      "tailTipTravel": 0.06592506807687278,
+      "skullTravel": 0.008194811802786533,
+      "forePaddleTravel": 0.0030647649646698707
+    },
+    "Breath": {
+      "tailChainYawSweptRadians": 0.5238170623779297,
+      "tailChainPitchSweptRadians": 0.1343399416655302,
+      "tailRootSweptRadians": [
+        0.007045367732644081,
+        0.0,
+        0.02922835759818554
+      ],
+      "tailTipSweptRadians": [
+        0.01636587083339691,
+        0.0,
+        0.05925380066037178
+      ],
+      "neckYawSweptRadians": 0.02978093223646283,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.014399997889995575,
+        0.07999999821186066
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.014399997889995575,
+        0.07999999821186066
+      ],
+      "jawSweptRadians": 0.0,
+      "tailTipTravel": 0.06925036839350322,
+      "skullTravel": 0.017944050190092015,
+      "forePaddleTravel": 0.006938387830316861
+    },
+    "Growth": {
+      "tailChainYawSweptRadians": 0.5235334634780884,
+      "tailChainPitchSweptRadians": 0.13413989543914795,
+      "tailRootSweptRadians": [
+        0.00701446458697319,
+        0.0,
+        0.02922835759818554
+      ],
+      "tailTipSweptRadians": [
+        0.016306936740875244,
+        0.0,
+        0.05932083539664745
+      ],
+      "neckYawSweptRadians": 0.0297329630702734,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.014382459223270416,
+        0.07990255951881409
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.014382459223270416,
+        0.07990255951881409
+      ],
+      "jawSweptRadians": 0.0,
+      "tailTipTravel": 0.060250077649255725,
+      "skullTravel": 0.013063331684852507,
+      "forePaddleTravel": 0.004819021555886978
+    },
+    "TailWhip": {
+      "tailChainYawSweptRadians": 4.38171960413456,
+      "tailChainPitchSweptRadians": 0.1570742316544056,
+      "tailRootSweptRadians": [
+        0.0047765374183654785,
+        0.0,
+        0.22723492980003357
+      ],
+      "tailTipSweptRadians": [
+        0.02160845324397087,
+        0.0,
+        0.4297681003808975
+      ],
+      "neckYawSweptRadians": 0.050230301916599274,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.09480000287294388,
+        0.5300000011920929
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.0828000009059906,
+        0.4700000137090683
+      ],
+      "jawSweptRadians": 0.0,
+      "tailTipTravel": 0.7590723184900116,
+      "skullTravel": 0.016368232496000588,
+      "forePaddleTravel": 0.012137922035732551
+    },
+    "Coil": {
+      "tailChainYawSweptRadians": 2.958818442421034,
+      "tailChainPitchSweptRadians": 0.21055555529892445,
+      "tailRootSweptRadians": [
+        0.005277080461382866,
+        0.0,
+        0.23691255296580493
+      ],
+      "tailTipSweptRadians": [
+        0.027266032993793488,
+        0.0,
+        0.19994884729385376
+      ],
+      "neckYawSweptRadians": 0.15076281130313873,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.10672413557767868,
+        0.5835784375667572
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.09172412753105164,
+        0.5115784555673599
+      ],
+      "jawSweptRadians": 0.0,
+      "tailTipTravel": 0.8233706456713302,
+      "skullTravel": 0.05255284797686413,
+      "forePaddleTravel": 0.04789198004075171
+    },
+    "Dash": {
+      "tailChainYawSweptRadians": 1.8477017730474472,
+      "tailChainPitchSweptRadians": 0.22750447248108685,
+      "tailRootSweptRadians": [
+        0.017088103399146348,
+        0.0,
+        0.14812318980693817
+      ],
+      "tailTipSweptRadians": [
+        0.022785497829318047,
+        0.0,
+        0.1837308704853058
+      ],
+      "neckYawSweptRadians": 0.029398783575743437,
+      "foreLimbSweptRadians": [
+        0.0,
+        0.05668255686759949,
+        0.3713475316762924
+      ],
+      "hindLimbSweptRadians": [
+        0.0,
+        0.05904047191143036,
+        0.37876394391059875
+      ],
+      "jawSweptRadians": 0.0,
+      "tailTipTravel": 0.16079520541464934,
+      "skullTravel": 0.05614968225055587,
+      "forePaddleTravel": 0.055864229149633064
+    }
+  },
+  "heldShape": {
+    "Idle": {
+      "start": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "mid": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "end": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      }
+    },
+    "Swim": {
+      "start": {
+        "arch": 0.8,
+        "head": 1.0,
+        "fall": 0.8,
+        "bow": 0.5,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.3,
+        "lift": 0.7,
+        "trunkArchTotalRadians": 0.0736,
+        "tailFallTotalRadians": -0.2784,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.234
+      },
+      "mid": {
+        "arch": 0.8,
+        "head": 1.0,
+        "fall": 0.8,
+        "bow": 0.5,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.3,
+        "lift": 0.7,
+        "trunkArchTotalRadians": 0.0736,
+        "tailFallTotalRadians": -0.2784,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.234
+      },
+      "end": {
+        "arch": 0.8,
+        "head": 1.0,
+        "fall": 0.8,
+        "bow": 0.5,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.3,
+        "lift": 0.7,
+        "trunkArchTotalRadians": 0.0736,
+        "tailFallTotalRadians": -0.2784,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.234
+      }
+    },
+    "Sprint": {
+      "start": {
+        "arch": 0.55,
+        "head": 1.0,
+        "fall": 0.6,
+        "bow": 0.2,
+        "lean": 0.0,
+        "pitch": -0.02,
+        "sweep": 1.55,
+        "lift": 0.5,
+        "trunkArchTotalRadians": 0.0231,
+        "tailFallTotalRadians": -0.2088,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.279
+      },
+      "mid": {
+        "arch": 0.55,
+        "head": 1.0,
+        "fall": 0.6,
+        "bow": 0.2,
+        "lean": 0.0,
+        "pitch": -0.02,
+        "sweep": 1.55,
+        "lift": 0.5,
+        "trunkArchTotalRadians": 0.0231,
+        "tailFallTotalRadians": -0.2088,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.279
+      },
+      "end": {
+        "arch": 0.55,
+        "head": 1.0,
+        "fall": 0.6,
+        "bow": 0.2,
+        "lean": 0.0,
+        "pitch": -0.02,
+        "sweep": 1.55,
+        "lift": 0.5,
+        "trunkArchTotalRadians": 0.0231,
+        "tailFallTotalRadians": -0.2088,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.279
+      }
+    },
+    "TurnLeft": {
+      "start": {
+        "arch": 0.9,
+        "head": 1.0,
+        "fall": 0.85,
+        "bow": 1.6,
+        "lean": 1.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.0938,
+        "tailFallTotalRadians": -0.2958,
+        "trunkLeanTotalRadians": 0.468,
+        "forePaddleSweepRadians": -0.18
+      },
+      "mid": {
+        "arch": 0.9,
+        "head": 1.0,
+        "fall": 0.85,
+        "bow": 1.6,
+        "lean": 1.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.0938,
+        "tailFallTotalRadians": -0.2958,
+        "trunkLeanTotalRadians": 0.468,
+        "forePaddleSweepRadians": -0.18
+      },
+      "end": {
+        "arch": 0.9,
+        "head": 1.0,
+        "fall": 0.85,
+        "bow": 1.6,
+        "lean": 1.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.0938,
+        "tailFallTotalRadians": -0.2958,
+        "trunkLeanTotalRadians": 0.468,
+        "forePaddleSweepRadians": -0.18
+      }
+    },
+    "TurnRight": {
+      "start": {
+        "arch": 0.9,
+        "head": 1.0,
+        "fall": 0.85,
+        "bow": -1.6,
+        "lean": -1.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.0938,
+        "tailFallTotalRadians": -0.2958,
+        "trunkLeanTotalRadians": -0.468,
+        "forePaddleSweepRadians": -0.18
+      },
+      "mid": {
+        "arch": 0.9,
+        "head": 1.0,
+        "fall": 0.85,
+        "bow": -1.6,
+        "lean": -1.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.0938,
+        "tailFallTotalRadians": -0.2958,
+        "trunkLeanTotalRadians": -0.468,
+        "forePaddleSweepRadians": -0.18
+      },
+      "end": {
+        "arch": 0.9,
+        "head": 1.0,
+        "fall": 0.85,
+        "bow": -1.6,
+        "lean": -1.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.0938,
+        "tailFallTotalRadians": -0.2958,
+        "trunkLeanTotalRadians": -0.468,
+        "forePaddleSweepRadians": -0.18
+      }
+    },
+    "Dive": {
+      "start": {
+        "arch": 1.35,
+        "head": 1.7,
+        "fall": 0.3,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.1,
+        "sweep": 1.0,
+        "lift": 1.3,
+        "trunkArchTotalRadians": 0.1231,
+        "tailFallTotalRadians": -0.1044,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "mid": {
+        "arch": 1.35,
+        "head": 1.7,
+        "fall": 0.3,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.1,
+        "sweep": 1.0,
+        "lift": 1.3,
+        "trunkArchTotalRadians": 0.1231,
+        "tailFallTotalRadians": -0.1044,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "end": {
+        "arch": 1.35,
+        "head": 1.7,
+        "fall": 0.3,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.1,
+        "sweep": 1.0,
+        "lift": 1.3,
+        "trunkArchTotalRadians": 0.1231,
+        "tailFallTotalRadians": -0.1044,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      }
+    },
+    "Rise": {
+      "start": {
+        "arch": 0.3,
+        "head": -0.7,
+        "fall": 1.5,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": -0.1,
+        "sweep": 1.0,
+        "lift": 0.7,
+        "trunkArchTotalRadians": 0.1222,
+        "tailFallTotalRadians": -0.522,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "mid": {
+        "arch": 0.3,
+        "head": -0.7,
+        "fall": 1.5,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": -0.1,
+        "sweep": 1.0,
+        "lift": 0.7,
+        "trunkArchTotalRadians": 0.1222,
+        "tailFallTotalRadians": -0.522,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "end": {
+        "arch": 0.3,
+        "head": -0.7,
+        "fall": 1.5,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": -0.1,
+        "sweep": 1.0,
+        "lift": 0.7,
+        "trunkArchTotalRadians": 0.1222,
+        "tailFallTotalRadians": -0.522,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      }
+    },
+    "Attack": {
+      "start": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "mid": {
+        "arch": 0.4243,
+        "head": 0.5572,
+        "fall": 0.5129,
+        "bow": 0.3357,
+        "lean": 0.0,
+        "pitch": 0.0177,
+        "sweep": 1.5314,
+        "lift": 0.6457,
+        "trunkArchTotalRadians": 0.0367,
+        "tailFallTotalRadians": -0.1785,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.2757
+      },
+      "end": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      }
+    },
+    "Bite": {
+      "start": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "mid": {
+        "arch": 0.4243,
+        "head": 0.5572,
+        "fall": 0.5129,
+        "bow": 0.3357,
+        "lean": 0.0,
+        "pitch": 0.0177,
+        "sweep": 1.5314,
+        "lift": 0.6457,
+        "trunkArchTotalRadians": 0.0367,
+        "tailFallTotalRadians": -0.1785,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.2757
+      },
+      "end": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      }
+    },
+    "Heavy": {
+      "start": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "mid": {
+        "arch": 1.4,
+        "head": 1.0,
+        "fall": 1.25,
+        "bow": 1.4,
+        "lean": -0.33,
+        "pitch": 0.0,
+        "sweep": -0.5,
+        "lift": 1.4,
+        "trunkArchTotalRadians": 0.1948,
+        "tailFallTotalRadians": -0.435,
+        "trunkLeanTotalRadians": -0.1544,
+        "forePaddleSweepRadians": 0.09
+      },
+      "end": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      }
+    },
+    "Hit": {
+      "start": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "mid": {
+        "arch": 1.7,
+        "head": 0.3,
+        "fall": 1.6,
+        "bow": 1.5,
+        "lean": 0.0,
+        "pitch": -0.05,
+        "sweep": -1.0,
+        "lift": 1.55,
+        "trunkArchTotalRadians": 0.317,
+        "tailFallTotalRadians": -0.5568,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": 0.18
+      },
+      "end": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": -0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      }
+    },
+    "Death": {
+      "start": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "mid": {
+        "arch": 0.4337,
+        "head": 0.467,
+        "fall": 1.7995,
+        "bow": 0.7335,
+        "lean": 0.0,
+        "pitch": 0.04,
+        "sweep": 0.0672,
+        "lift": 0.467,
+        "trunkArchTotalRadians": 0.0465,
+        "tailFallTotalRadians": -0.6262,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.0121
+      },
+      "end": {
+        "arch": 0.15,
+        "head": 0.2,
+        "fall": 2.2,
+        "bow": 0.6,
+        "lean": 0.0,
+        "pitch": 0.06,
+        "sweep": -0.4,
+        "lift": 0.2,
+        "trunkArchTotalRadians": 0.0127,
+        "tailFallTotalRadians": -0.7656,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": 0.072
+      }
+    },
+    "Guard": {
+      "start": {
+        "arch": 1.5,
+        "head": 1.4,
+        "fall": 1.3,
+        "bow": 1.3,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": -0.6,
+        "lift": 1.55,
+        "trunkArchTotalRadians": 0.1798,
+        "tailFallTotalRadians": -0.4524,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": 0.108
+      },
+      "mid": {
+        "arch": 1.5,
+        "head": 1.4,
+        "fall": 1.3,
+        "bow": 1.3,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": -0.6,
+        "lift": 1.55,
+        "trunkArchTotalRadians": 0.1798,
+        "tailFallTotalRadians": -0.4524,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": 0.108
+      },
+      "end": {
+        "arch": 1.5,
+        "head": 1.4,
+        "fall": 1.3,
+        "bow": 1.3,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": -0.6,
+        "lift": 1.55,
+        "trunkArchTotalRadians": 0.1798,
+        "tailFallTotalRadians": -0.4524,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": 0.108
+      }
+    },
+    "Parry": {
+      "start": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "mid": {
+        "arch": 1.6,
+        "head": 1.4,
+        "fall": 1.4,
+        "bow": 1.5,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": -0.8,
+        "lift": 1.5,
+        "trunkArchTotalRadians": 0.2,
+        "tailFallTotalRadians": -0.4872,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": 0.144
+      },
+      "end": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      }
+    },
+    "Dodge": {
+      "start": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "mid": {
+        "arch": 0.35,
+        "head": 0.5,
+        "fall": 0.35,
+        "bow": 0.1,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.6,
+        "lift": 0.4,
+        "trunkArchTotalRadians": 0.0267,
+        "tailFallTotalRadians": -0.1218,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.288
+      },
+      "end": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      }
+    },
+    "Eat": {
+      "start": {
+        "arch": 0.45,
+        "head": 1.9,
+        "fall": 1.25,
+        "bow": 0.8,
+        "lean": 0.0,
+        "pitch": 0.1,
+        "sweep": 0.4,
+        "lift": 1.2,
+        "trunkArchTotalRadians": -0.0763,
+        "tailFallTotalRadians": -0.435,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.072
+      },
+      "mid": {
+        "arch": 0.45,
+        "head": 1.9,
+        "fall": 1.25,
+        "bow": 0.8,
+        "lean": 0.0,
+        "pitch": 0.1,
+        "sweep": 0.4,
+        "lift": 1.2,
+        "trunkArchTotalRadians": -0.0763,
+        "tailFallTotalRadians": -0.435,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.072
+      },
+      "end": {
+        "arch": 0.45,
+        "head": 1.9,
+        "fall": 1.25,
+        "bow": 0.8,
+        "lean": 0.0,
+        "pitch": 0.1,
+        "sweep": 0.4,
+        "lift": 1.2,
+        "trunkArchTotalRadians": -0.0763,
+        "tailFallTotalRadians": -0.435,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.072
+      }
+    },
+    "Stagger": {
+      "start": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "mid": {
+        "arch": 1.7,
+        "head": 0.3,
+        "fall": 1.6,
+        "bow": 1.5,
+        "lean": 0.0,
+        "pitch": -0.05,
+        "sweep": -1.0,
+        "lift": 1.55,
+        "trunkArchTotalRadians": 0.317,
+        "tailFallTotalRadians": -0.5568,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": 0.18
+      },
+      "end": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": -0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      }
+    },
+    "Ability": {
+      "start": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "mid": {
+        "arch": 1.6,
+        "head": 1.4,
+        "fall": 1.4,
+        "bow": 1.5,
+        "lean": 0.9,
+        "pitch": 0.0,
+        "sweep": -0.8,
+        "lift": 1.5,
+        "trunkArchTotalRadians": 0.2,
+        "tailFallTotalRadians": -0.4872,
+        "trunkLeanTotalRadians": 0.4212,
+        "forePaddleSweepRadians": 0.144
+      },
+      "end": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      }
+    },
+    "Grab": {
+      "start": {
+        "arch": 1.2,
+        "head": 1.55,
+        "fall": 1.15,
+        "bow": 0.6,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": -0.3,
+        "lift": 1.35,
+        "trunkArchTotalRadians": 0.106,
+        "tailFallTotalRadians": -0.4002,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": 0.054
+      },
+      "mid": {
+        "arch": 1.2,
+        "head": 1.55,
+        "fall": 1.15,
+        "bow": 0.6,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": -0.3,
+        "lift": 1.35,
+        "trunkArchTotalRadians": 0.106,
+        "tailFallTotalRadians": -0.4002,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": 0.054
+      },
+      "end": {
+        "arch": 1.2,
+        "head": 1.55,
+        "fall": 1.15,
+        "bow": 0.6,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": -0.3,
+        "lift": 1.35,
+        "trunkArchTotalRadians": 0.106,
+        "tailFallTotalRadians": -0.4002,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": 0.054
+      }
+    },
+    "Breath": {
+      "start": {
+        "arch": 0.4,
+        "head": -0.4,
+        "fall": 1.3,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": -0.06,
+        "sweep": 1.0,
+        "lift": 0.8,
+        "trunkArchTotalRadians": 0.116,
+        "tailFallTotalRadians": -0.4524,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "mid": {
+        "arch": 0.4,
+        "head": -0.4,
+        "fall": 1.3,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": -0.06,
+        "sweep": 1.0,
+        "lift": 0.8,
+        "trunkArchTotalRadians": 0.116,
+        "tailFallTotalRadians": -0.4524,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "end": {
+        "arch": 0.4,
+        "head": -0.4,
+        "fall": 1.3,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": -0.06,
+        "sweep": 1.0,
+        "lift": 0.8,
+        "trunkArchTotalRadians": 0.116,
+        "tailFallTotalRadians": -0.4524,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      }
+    },
+    "Growth": {
+      "start": {
+        "arch": 0.5,
+        "head": 0.4,
+        "fall": 0.7,
+        "bow": 0.4,
+        "lean": 0.0,
+        "pitch": -0.03,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.0658,
+        "tailFallTotalRadians": -0.2436,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "mid": {
+        "arch": 0.5,
+        "head": 0.4,
+        "fall": 0.7,
+        "bow": 0.4,
+        "lean": 0.0,
+        "pitch": -0.03,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.0658,
+        "tailFallTotalRadians": -0.2436,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "end": {
+        "arch": 0.5,
+        "head": 0.4,
+        "fall": 0.7,
+        "bow": 0.4,
+        "lean": 0.0,
+        "pitch": -0.03,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.0658,
+        "tailFallTotalRadians": -0.2436,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      }
+    },
+    "TailWhip": {
+      "start": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "mid": {
+        "arch": 1.4,
+        "head": 1.0,
+        "fall": 1.25,
+        "bow": 1.4,
+        "lean": -0.33,
+        "pitch": 0.0,
+        "sweep": -0.5,
+        "lift": 1.4,
+        "trunkArchTotalRadians": 0.1948,
+        "tailFallTotalRadians": -0.435,
+        "trunkLeanTotalRadians": -0.1544,
+        "forePaddleSweepRadians": 0.09
+      },
+      "end": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      }
+    },
+    "Coil": {
+      "start": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "mid": {
+        "arch": 1.6,
+        "head": 1.4,
+        "fall": 1.4,
+        "bow": 1.5,
+        "lean": 0.9,
+        "pitch": 0.0,
+        "sweep": -0.8,
+        "lift": 1.5,
+        "trunkArchTotalRadians": 0.2,
+        "tailFallTotalRadians": -0.4872,
+        "trunkLeanTotalRadians": 0.4212,
+        "forePaddleSweepRadians": 0.144
+      },
+      "end": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      }
+    },
+    "Dash": {
+      "start": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      },
+      "mid": {
+        "arch": 0.35,
+        "head": 0.5,
+        "fall": 0.35,
+        "bow": 0.1,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.6,
+        "lift": 0.4,
+        "trunkArchTotalRadians": 0.0267,
+        "tailFallTotalRadians": -0.1218,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.288
+      },
+      "end": {
+        "arch": 1.0,
+        "head": 1.0,
+        "fall": 1.0,
+        "bow": 1.0,
+        "lean": 0.0,
+        "pitch": 0.0,
+        "sweep": 1.0,
+        "lift": 1.0,
+        "trunkArchTotalRadians": 0.114,
+        "tailFallTotalRadians": -0.348,
+        "trunkLeanTotalRadians": 0.0,
+        "forePaddleSweepRadians": -0.18
+      }
+    }
+  },
+  "restingShape": {
+    "appliesTo": "clips only; the bind pose is unchanged",
+    "note": "unit values; every clip scales them by its own row in heldShape",
+    "chestArchRadians": 0.05,
+    "neckArchRadiansPerJoint": 0.038,
+    "neckJoints": 4,
+    "skullLevellingRadians": -0.088,
+    "tailFallRadiansPerJoint": 0.04,
+    "tailBowRadians": 0.042,
+    "leanRadiansPerJoint": 0.045,
+    "foreLimbSetRadians": [
+      -0.18,
+      0.12
+    ],
+    "hindLimbSetRadians": [
+      -0.14,
+      0.09
+    ],
+    "waveStep": 0.4,
+    "waveVerticalShare": 0.26
   },
   "anchors": [
     {
@@ -593,8 +2370,8 @@
   "bladeDilation": 0.001,
   "envelope": {
     "maximumEnvelopeDifference": 0.03686755895614624,
-    "surfaceDistanceMax": 0.014903889037668705,
-    "surfaceDistanceP95": 0.006670709839090703,
+    "surfaceDistanceMax": 0.014903892762959003,
+    "surfaceDistanceP95": 0.006670705508440731,
     "envelopeTolerance": 0.24
   }
 }
