@@ -480,7 +480,16 @@ export interface Reading {
   total: number;
 }
 
-/** The signed angle in the bend plane, plus whatever the plane does not hold. */
+/**
+ * The signed angle in the bend plane, plus whatever the plane does not hold.
+ *
+ * `offPlane` is measured rather than subtracted: turn the base direction by `inPlane` about the
+ * axle, and the angle that is still left to the tip direction is what the plane cannot account for.
+ * The obvious shortcut — the total angle and the in-plane angle as two sides of a right triangle —
+ * is wrong wherever the two directions lean along the axle, because projecting onto a plane can
+ * make an angle *larger* than it is in space: Askeptosaurus' own neck reads 17.7° in the plane and
+ * 16.6° in all, and the shortcut turned that into a flat zero and hid the disagreement.
+ */
 export function angleBetween(base: Vec3, tip: Vec3, axis: Vec3): Reading {
   const b = norm(base), t = norm(tip);
   const proj = (v: Vec3): Vec3 => addTo(v, axis, -dot(v, axis));
@@ -490,8 +499,10 @@ export function angleBetween(base: Vec3, tip: Vec3, axis: Vec3): Reading {
     const nb = norm(pb), nt = norm(pt);
     inPlane = Math.atan2(dot(axis, cross(nb, nt)), dot(nb, nt));
   }
+  const turned: Vec3 = [0, 0, 0];
+  rotateAbout(b, axis, inPlane, turned);
+  const offPlane = Math.acos(clamp(dot(turned, t), -1, 1));
   const total = Math.acos(clamp(dot(b, t), -1, 1));
-  const offPlane = Math.sqrt(Math.max(0, total * total - inPlane * inPlane));
   return { base: b, tip: t, inPlane, offPlane, total };
 }
 
@@ -1411,10 +1422,18 @@ export function fromExport(payload: unknown, actual?: { sha256?: string | null; 
   return doc;
 }
 
-/** "+54.6° in the bend plane · 12.1° out of it" — the live readout's own words. */
+/**
+ * "+54.6° in the bend plane · 12.1° out of it · 56.0° in all" — the live readout's own words.
+ *
+ * All three, because each hides the other two. The in-plane figure is the one an edit changes and
+ * the one a target is dialled to; the out-of-plane figure is the tell that the axle is aimed wrong;
+ * and the total is the number everybody quotes, which is exactly why it must not be the only one
+ * shown — two readings of one animal can differ by thirty degrees in total and by seven in the
+ * plane, and a reviewer comparing definitions wants the first.
+ */
 export function describeReadingText(r: Reading | null): string {
   if (!r) return 'no reading — nothing traceable in the window';
   const d = (x: number) => (x * 180 / Math.PI).toFixed(1);
   const sign = r.inPlane > 0 ? '+' : '';
-  return `${sign}${d(r.inPlane)}° in the bend plane · ${d(r.offPlane)}° out of it`;
+  return `${sign}${d(r.inPlane)}° in the bend plane · ${d(r.offPlane)}° out of it · ${d(r.total)}° in all`;
 }

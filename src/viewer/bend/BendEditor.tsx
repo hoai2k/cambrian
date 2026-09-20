@@ -428,7 +428,9 @@ function Readout({ name, what, before, after, edited, residual }: {
   return (
     <div className="bend-reading" data-reading={name.toLowerCase().replace(/\s+/g, '-')}
       data-before={before ? (before.inPlane * 180 / Math.PI).toFixed(2) : ''}
-      data-after={after ? (after.inPlane * 180 / Math.PI).toFixed(2) : ''}>
+      data-after={after ? (after.inPlane * 180 / Math.PI).toFixed(2) : ''}
+      data-before-total={before ? (before.total * 180 / Math.PI).toFixed(2) : ''}
+      data-after-total={after ? (after.total * 180 / Math.PI).toFixed(2) : ''}>
       <h4>{name}</h4>
       <p className="bend-reading-value">
         <b>{describeReadingText(before)}</b>

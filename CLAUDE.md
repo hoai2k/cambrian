@@ -1282,6 +1282,48 @@ unless the user explicitly asks for a PR. Steps:
   `tripo-raw/`, and it refuses a rigged body by name), importing the viewer's own `warp()` so the
   file is what was previewed and reading the result back to prove it. `docs/viewer-stretch.md` is
   the whole of it; Blender work it implies goes in `docs/triassic/builder-requests.md`.
+- The stretcher lengthens a run of body; the **bend editor** (`&mode=bend`, the *Bend* button) turns
+  one, and its **readout is the tool rather than the warp**. It is the answer to a diagnosis that
+  went wrong three times on one animal: Askeptosaurus' head stood 67.7° off its trunk, a coordinator
+  derived 78.6° by adding a chain's *absolute* per-joint turn to its takeoff when that chain was an S
+  whose signed turn was three degrees, and underneath both, **three defensible readings of "the
+  trunk" disagreed by up to 43°** (`axis.front` in its `validation.json`). Every number in that
+  argument was taken on trust and none was ever looked at. So the panel never shows an angle without
+  naming the two references it is between, and on a rigged body it shows **both** the geometry's
+  answer and the bone chain's, side by side, because those are the two that disagreed — with each
+  said three ways (in the bend plane, out of it, and in all), since the total is the number everybody
+  quotes and is exactly the one that hides the other two. A reading *after* an edit is measured
+  again rather than predicted, because predicting the answer from the numbers that produced it is
+  what the original argument did. The span is **two points on the animal** rather than the
+  stretcher's coordinates-plus-tilts: both cuts are square to the line between them, that line is
+  the direction and the length, and it has to be, because Askeptosaurus' neck leaves its shoulder at
+  **61° to its own long axis** and cuts square to the frame's axis would swing the head rather than
+  bend the neck. The two angles are the turn at the base and at the tip, in degrees across the whole
+  span, interpolated linearly (the stretcher's reason: easing piles the change into the middle and
+  kinks both ends) — and they are **rates, not offsets**, so the rotation at the base cut is exactly
+  identity however large they are and no number can kink the body where the span begins. Behind the
+  base cut nothing moves at all, past the tip cut the far part is carried rigidly, and the span
+  keeps its own length, because a rotation about one fixed pivot is a spiral and not a bend.
+  The geometry reading **traces the body rather than binning a coordinate**, and that is Askeptosaurus
+  again: its left paddle reaches *further forward than its own snout*, so an axial slab ahead of the
+  neck averages the head with a flipper and reports the head running backwards. Each step takes the
+  surface near where the trace stood one step back — `reach` is what refuses a limb, and it never
+  starves the trace, because a body is a shell and the surface at a station stands at that station's
+  own radius. The trace is **drawn on the body** and reports its own `residual`: past about 0.05 it
+  wandered, and the angle it gives is between two directions nothing in the animal runs in. On that
+  animal it reads 0.009 ahead of the span and 0.062 behind it — excellent at the head, unusable at
+  the curled limb-crossed trunk — which is a judgement for the reviewer rather than a number to
+  hide. Which bone chords a reading is between, and which run of the rig the joint table follows,
+  are **dropdowns**: guessed from where the span is, re-guessed whenever it moves (a stale default
+  left the tip chord at `skull → jaw`, pointing at the chin, reading that head as 97° off its trunk)
+  and never re-guessed once a person has named one. The export carries the span, the axle in the
+  root frame *and* in the builders' Z-up one, both readings before and after, and a **per-joint
+  table of local rotations in chain order** — which is exactly what `uncurl` returns and `carry_rest`
+  consumes in that animal's builder. `npm run bend` and `node tools/bend-browser.mjs` check it,
+  `npm run triassic:bend -- <file>` is the consumer and **re-measures rather than reprinting**,
+  failing loudly where it disagrees with what the viewer recorded. There is no bake in either
+  direction: a rigged body cannot have one (a bent bind pose flails the moment a clip plays) and a
+  generation's bend belongs at the pose. `docs/viewer-bend.md` is the whole of it.
 - The viewer's **mouth editor** (`&mode=mouth`, the *Mouth* button) is the human answer to the
   mouth rule above: every builder finds the mouth by a measurement that has been fooled at least
   once, and this lets a person aim the cut by eye and hand it over as numbers. The document is a

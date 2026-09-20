@@ -43,10 +43,15 @@ const loaded = () => page.waitForFunction((k) => document.querySelector('.clips'
 const field = (label) => page.locator('.bend-fields label', { hasText: label }).locator('input');
 const pick = (label) => page.locator('.bend-fields label', { hasText: label }).locator('select');
 /** A reading, as the panel published it: the in-plane degrees before and after the edit. */
-const reading = async (which) => ({
-  before: Number(await page.locator(`.bend-reading[data-reading="${which}"]`).getAttribute('data-before')),
-  after: Number(await page.locator(`.bend-reading[data-reading="${which}"]`).getAttribute('data-after')),
-});
+const reading = async (which) => {
+  const el = page.locator(`.bend-reading[data-reading="${which}"]`);
+  return {
+    before: Number(await el.getAttribute('data-before')),
+    after: Number(await el.getAttribute('data-after')),
+    beforeTotal: Number(await el.getAttribute('data-before-total')),
+    afterTotal: Number(await el.getAttribute('data-after-total')),
+  };
+};
 const hashOnDisk = (rel) => createHash('sha256').update(fs.readFileSync(path.join('public', rel))).digest('hex');
 const measuredHash = async () => {
   await page.waitForSelector('.bend-hash[data-hash-source="measured"]', { timeout: 30000 });
@@ -212,10 +217,52 @@ try {
   await page.waitForTimeout(1500);
   assert.equal(Number(await field('At the base').inputValue()), 0, 'and starts again from no turn at all');
 
+  // ---- the worked case, captured: three defensible readings of one animal's trunk ----
+  //
+  // This is the argument the mode was built out of. The span is the neck T3D-26 corrected; the
+  // reading is taken three times against three chords a person could reasonably call "the trunk",
+  // and once more against the head's own axis, which is what that ticket's own figure was taken
+  // between. Nothing here asserts a number — what it asserts is that they *differ*, which is the
+  // finding — and the numbers are written out for `docs/triassic/verification/`.
+  await page.waitForSelector('.bend-panel', { timeout: 20000 });
+  await page.waitForTimeout(500);
+  for (const end of ['base', 'tip']) for (const i of [0, 1, 2]) {
+    const f = field(`${end === 'base' ? 'Base' : 'Tip'} ${'XYZ'[i]}`);
+    await f.fill(String(neck[end][i]));
+    await f.press('Enter');
+    await page.waitForTimeout(150);
+  }
+  await page.waitForTimeout(800);
+  const rows = [];
+  for (const [from, to] of [['body', 'chest'], ['tail_00', 'chest'], ['chest', 'neck_00']]) {
+    await refPick('Base', 'from').selectOption(from);
+    await refPick('Base', 'to').selectOption(to);
+    await page.waitForTimeout(600);
+    const r = await reading('bone-chain');
+    const text = await page.locator('.bend-reading[data-reading="bone-chain"] .bend-reading-value').textContent();
+    rows.push({ base: `${from} → ${to}`, tip: await refPick('Tip', 'from').inputValue() + ' → ' + await refPick('Tip', 'to').inputValue(), inPlane: r.before, total: r.beforeTotal, text: text.trim() });
+    await page.locator('.bend-panel').evaluate((el) => { el.scrollTop = 0; });
+    await page.waitForTimeout(200);
+    await page.screenshot({ path: path.join(out, `askeptosaurus-bend-trunk-${from}.png`) });
+  }
+  // Compared on the *total* angle rather than the in-plane one: how far apart two definitions are
+  // is a question about directions, not about the plane a bend happens to be being edited in.
+  const spread = Math.max(...rows.map((r) => r.total)) - Math.min(...rows.map((r) => r.total));
+  assert.ok(spread > 20, `three defensible readings of this animal's trunk disagree by ${spread.toFixed(1)}°, which is the finding this mode exists for`);
+  const geom = await reading('geometry');
+  const geomText = await page.locator('.bend-reading[data-reading="geometry"]').textContent();
+  fs.writeFileSync(path.join(out, 'askeptosaurus-bend-readings.txt'),
+    [`span ${JSON.stringify(neck)}`,
+      ...rows.map((r) => `bone   ${r.base.padEnd(20)} vs ${r.tip.padEnd(20)} ${r.text}`),
+      `geometry  ${geom.before}° in plane, ${geom.beforeTotal}° in all`,
+      geomText.replace(/\s+/g, ' ').trim(),
+      `spread across the three trunk readings: ${spread.toFixed(1)}°`].join('\n') + '\n');
+
   assert.deepEqual(errors, [], 'no page errors');
   console.log('PASS: bend mode — a span placed on the neck, both readings named and measured, the');
   console.log('      references swapped and the answer with them, a 20° turn read back as 20°, the');
-  console.log('      export hashed in the page, the consumer accepting it and refusing a stale copy');
+  console.log('      export hashed in the page, the consumer accepting it and refusing a stale copy,');
+  console.log(`      and three defensible readings of this animal's trunk ${spread.toFixed(1)}° apart on one span`);
 } finally {
   await browser.close();
 }
