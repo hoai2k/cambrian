@@ -79,13 +79,40 @@ the local one `M_(i-1)⁻¹ ∘ A_i`; `t_i` is `d_i` slerped toward a target by 
 generation's own shape and `u` = 1 is dead straight, continuously, every joint sharing the work in
 proportion to how far it is bent. No angle is typed anywhere: the chain is the measurement.
 
-**The target is each chain's own first segment, never the trunk's tangent.** The obvious target —
-the direction the body runs in where the chain leaves it — makes the first local rotation a rigid
-swing of the whole chain, because the root's rotation is exactly the arc from its own direction to
-the target: 24.7° on this tail and 44.5° on this neck. Measured as skin, aiming the two chains at
-the trunk read **2.62x** on `skin-tears.mjs`; aiming each at its own first segment reads 1.51x.
-With its own first segment as the target the root rotation is identity at every value of `open`, so
-the tail leaves the body exactly where the generation put it and only the bend after that comes out.
+**A chain's own bend and its takeoff are two questions, and `uncurl` now answers them
+separately.** Opening a chain onto its own first segment removes the bend *along* it and leaves it
+pointing wherever the generation pointed it. Aiming it at the trunk instead makes the first local
+rotation a rigid swing of the whole chain, because the root's rotation is then exactly the arc from
+its own direction to the target: 24.7° on this tail and 54.6° on this front. Measured as skin,
+aiming the two chains at the trunk that way read **2.62x** on `skin-tears.mjs` against 1.51x for
+opening each onto its own first segment — so T3D-25 opened them and left both takeoffs alone.
+
+On the tail that is right and stays: a thalattosaur's tail sweeps, and the generation's own
+24.7° is character. **On the front it was the fault.** Opened onto its own first segment the head
+still left the trunk at 54.6° and finished **67.7°** off it, which from above is the right angle
+the owner saw, with the shoulder and the right pectoral carried round on the same swing. (67.7 is
+the honest figure and is not 44.5 + 34.1: the cervical chain's 34° of internal turn is an S —
++3.0° signed — so it barely deflects the head at all. Nearly all of the fault is takeoff, and it
+is larger than T3D-25 recorded because *what the takeoff is measured against* matters: 44.5° is
+against the `body`→`chest` chord, which on a curled trunk is itself 17.1° off the trunk's own run,
+and the measured axis' tangent at the shoulder is 42.8° off it.)
+
+**So the front's takeoff is corrected, and it is corrected by sharing it out.** `uncurl` takes a
+cumulative `share`, and applies `A^(share_i)` of the arc `A` at each joint of
+`NECKCHAIN` — chest, the four cervicals and the skull — so the chain turns onto the trunk's run
+over its own length instead of being swung there at its root. Equal per **joint**, not per unit of
+length: a skin is asked to fold at a joint, and weighting by segment length hands the skull 0.34 of
+the arc on its own, because the head is two and a half cervicals long. 54.6° over six joints is
+9.1° each, and composed with the opening the worst joint carries **17.2°**; the builder asserts no
+joint exceeds 25°, which is what a rigid swing would trip. The target is the trunk's own **run**,
+hip to shoulder — the long straight stretch between this body's two bends, and the only reading of
+"in line with the body" that is not itself a curve.
+
+The head comes to rest **4.2°** off that run, and holds a line rather than a ruler through the
+clips: `Sprint` 0.5–5.2°, `Swim` 1.9–6.2°, `Idle` 6.5–8.1°, the turns 3.3–15.1°, and `Coil` — which
+pulls the neck round on purpose — 27.8°. `measure` records the whole range per clip and asserts it,
+because the aim lives in the bind and a clip could quietly put the right angle back where no
+`heldShape` row would show it.
 
 **Seventy per cent of it is carried into the bind.** `loadCreature` in `src/render/creature.ts`
 divides a model by the widest horizontal side of its **bind** box and the actor's own length
@@ -95,9 +122,23 @@ over five phases of every clip — a swimming Askeptosaurus half as long again a
 simulation collides with — where the straight regeneration sits at 0.92 to 0.99. `carry_rest` moves
 the rest instead: the armature is posed to `carry`, the deformed positions are written back, and the
 bones are re-laid at the heads they were posed to with the same parallel rest orientation, so the
-bind is identity again and every clip still composes as a product of world-frame rotations. Only the
-tail is carried, so the head, the mouth, its anchors, the jaw cut and both paddle pairs stay exactly
-where they were measured; and the builder asserts the re-laid rest is still parallel, because a
+bind is identity again and every clip still composes as a product of world-frame rotations.
+
+The tail is carried at .70 and **the front's aim is carried whole** (`fcarry`), with its opening at
+.70 beside the tail's. An animal looks where it swims in every clip, so the aim is a fact about the
+body and not a dial: carried at anything less, the clips would have to hold the difference, which
+puts the fault back in the bind the renderer sizes by and in every portrait shot at rest. Only the
+*opening* — `level` in the held-shape table — is left for the clips.
+
+Carrying the front moves the head, and two things had to follow it. The **anchors** are points in
+the measured frame attached to `skull` and `jaw`, so `carry_rest` now hands back the per-bone map it
+bakes the skin through and the three anchors are placed through it — exactly what a weight-1 vertex
+on that bone does. And the **posterior cut plane** is no longer square to the file's axes:
+`auditCutAttachment` selected its rim by a coordinate on one axis and found *zero* vertices rather
+than failing, so the builder records the plane it actually cut on, carried, and the shared audit
+takes a `{point, normal, tolerance}` as well as a coordinate. The other four bodies that use it are
+untouched. The jaw cut itself, the mouth's own head frame and both paddle pairs' roots are still
+measured exactly where they were; the builder asserts the re-laid rest is still parallel, because a
 bone re-laid head-first keeps whatever roll Blender derived from the intermediate vector and a
 rolled rest turns every later yaw into a mixture, silently.
 
@@ -178,16 +219,57 @@ has **zero gap** at all 61 phases of all 24 clips on all three variants.
 
 | | Shipped (posed) | Twin | Backup (straight) |
 | --- | ---: | ---: | ---: |
-| `skin-tears.mjs`, worst skin | **1.34x** | 1.27x | 1.31x |
+| `skin-tears.mjs`, worst skin | **1.37x** | 1.30x | 1.31x |
 | Clips over 2x | 0 of 24 | 0 of 24 | 0 of 24 |
 
-1.34x is second on the roster, behind this animal's own other body at 1.31 and ahead of Shonisaurus
-at 1.44. The carry is most of why: with the whole straightening in the clips it read 1.51x.
+1.37x is still second on the roster, behind this animal's own other body at 1.31 and ahead of
+Shonisaurus at 1.44. The carry is most of why: with the whole straightening in the clips it read
+1.51x. **The three hundredths T3D-26 costs is the whole price of bringing the front into line** —
+against 2.62x for the same correction swung at the neck root, which is the measurement that says the
+sharing is doing the work rather than the aiming.
 
-`lag.mjs`: 70 rest-coincident cross-mesh pairs, cut plane 18, **0 open past 0.2 %**, worst 0.00 % of
-a body; lip 52, gape 1.3 %. `idle-bones.mjs`: every joint owns skin. `oral-shell-audit.mjs`:
-separate closed rigid palate and floor on authored, puppet and LOD. `throat-audit.mjs` and
-`hidden-parts.mjs --check` clean. `askeptosaurus-profile.json` records the paired envelope.
+`lag.mjs`: 74 rest-coincident cross-mesh pairs, cut plane 6, **0 open past 0.2 %**, worst 0.00 % of
+a body; lip 68, gape 0.9 %. That split moved with the front (it was 18/52 at a gape of 1.3 %),
+because `lag.mjs` divides the seam on a cardinal-snapped axis read off the neck and the neck has
+turned: twelve pairs that used to fall behind the hinge's station now fall ahead of it. Nothing
+opened — the same seam measured independently by `auditCutAttachment`, which selects on the cut
+plane itself, is **14 rim pairs at a worst gap of exactly 0** over 61 phases of all 24 clips (7 on
+the twin, 39 on the backup at 5.3e-5), and the lip's own worst parting went *down*. `idle-bones.mjs`:
+every joint owns skin. `oral-shell-audit.mjs`: separate closed rigid palate and floor on authored,
+puppet and LOD. `throat-audit.mjs` and `hidden-parts.mjs --check` clean.
+`askeptosaurus-profile.json` records the paired envelope. All 27 bodies still pass `lag.mjs --all`.
+
+`posedExtentOverBind` stays centred on the bind the renderer sizes by — `Idle` 0.94–0.97, `Swim`
+1.01–1.05, `Sprint` 1.03–1.06, `Dive` 1.01–1.02, `Rise` 0.97–0.98, `Grab` 0.96–0.98 — and the
+carried bind box measures 8.622 where it was 8.726, which is `modelLength` in `askeptosaurus.json`.
+
+## The two pectorals, measured
+
+The owner named the **right** pectoral, so the pair is measured rather than assumed and
+`validation.json` records it (`pectorals`, from `paddle_audit`): the skin each blade owns by
+dominant weight, how far its own root stands inside that skin, and — the one a still cannot
+show — how far the distal skin travels over the travel of the joint driving it, at five phases of
+every clip. That last is the Aphaneramma reading, where a forelimb cut onto the mandible's shell
+measured 0.45 against 1.04–1.11 on every other foot.
+
+| | owned | distal | root → nearest skin | polyline | median travel ratio | worst |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `foreL` | 867 | 155 | 0.021 | 0.229 | 1.159 | 1.035 |
+| `foreR` | 700 | 168 | 0.019 | 0.214 | 1.070 | 0.948 |
+| `hindL` | 685 | 108 | 0.020 | 0.210 | 1.120 | 0.972 |
+| `hindR` | 634 | 117 | 0.020 | 0.206 | 1.137 | 0.991 |
+
+**The two pectorals are rigged alike and follow their own joints alike**, and the right one is not
+mis-seated, short of weight or left behind: both roots sit about two hundredths inside their own
+skin, the distal blades own 155 and 168 vertices, and the travel ratios are 1.16 and 1.07 against
+1.12 and 1.14 for the hind pair. The right blade's cluster is genuinely the smaller of the two —
+613 thin-shell vertices against 814, and it sits 0.036 further forward along the axis — because the
+generation posed the two paddles differently, which is a fact about the pose and not about the rig.
+What was wrong with it is what the owner said was wrong with it: it hangs off the **shoulder**, the
+shoulder went round with the head, and the front fix carries it — `chest` takes 9.1° of the aim and
+both blades come round with it together. The builder asserts the pair's median ratios stay within
+a quarter of each other and that no blade falls below 0.75, so a one-sided blade cannot come back
+in silence.
 
 ## Source preservation
 
@@ -228,6 +310,12 @@ blender -b --python tools/triassic/creatures/askeptosaurus/render.py -- --decode
 blender -b --python tools/triassic/creatures/askeptosaurus/review-backup.py
 blender -b --python tools/triassic/creatures/askeptosaurus/review-swap.py -- --tag after
 python3 tools/triassic/creatures/askeptosaurus/swap-sheets.py
+# T3D-26's before and after, each body rendered from its own file by the same code. The `before`
+# body is the shipped GLB of the commit that precedes the fix, taken out of version control into
+# local/triassic-authoring/askeptosaurus/t25/askeptosaurus.glb:
+blender -b --python tools/triassic/creatures/askeptosaurus/review-swap.py -- --file local/triassic-authoring/askeptosaurus/t25/askeptosaurus.glb --tag t25
+blender -b --python tools/triassic/creatures/askeptosaurus/review-swap.py -- --tag t26
+python3 tools/triassic/creatures/askeptosaurus/front-sheets.py
 python3 tools/triassic/creatures/askeptosaurus/contact-sheets.py
 node tools/triassic/creatures/askeptosaurus/review-viewer.mjs   # with Vite on port 4179
 node tools/triassic/publish-portraits.mjs
