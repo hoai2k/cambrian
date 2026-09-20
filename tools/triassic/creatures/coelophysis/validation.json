@@ -10,22 +10,22 @@
   "remeshTriangles": 92060,
   "puppetBudget": 7000,
   "voxel": 0.0034,
-  "fullTriangles": 20950,
-  "puppetTriangles": 8176,
+  "fullTriangles": 21101,
+  "puppetTriangles": 8284,
   "parts": {
-    "authoredBody": 18743,
-    "authoredJaw": 1299,
-    "puppetBody": 6815,
-    "puppetJaw": 453,
-    "sharedOral": 908
+    "authoredBody": 18806,
+    "authoredJaw": 1351,
+    "puppetBody": 6851,
+    "puppetJaw": 489,
+    "sharedOral": 944
   },
   "bones": 35,
   "cervicals": 8,
   "caudals": 10,
   "clips": {
-    "Idle": 3,
+    "Idle": 3.0,
     "Swim": 1.6,
-    "Sprint": 1,
+    "Sprint": 1.0,
     "TurnLeft": 1.4,
     "TurnRight": 1.4,
     "Dive": 1.2,
@@ -35,18 +35,18 @@
     "Heavy": 0.9,
     "Hit": 0.5,
     "Death": 1.6,
-    "Guard": 1,
+    "Guard": 1.0,
     "Parry": 0.3,
     "Dodge": 0.4,
     "Eat": 1.4,
-    "Stagger": 1,
-    "Ability": 1,
-    "Grab": 1,
-    "Breath": 2,
+    "Stagger": 1.0,
+    "Ability": 1.0,
+    "Grab": 1.0,
+    "Breath": 2.0,
     "Growth": 1.4,
     "Crawl": 1.4,
     "Run": 0.58,
-    "Charge": 1,
+    "Charge": 1.0,
     "Lower": 1.5,
     "SnapLeft": 0.6,
     "SnapRight": 0.6,
@@ -71,9 +71,9 @@
     "TurnRight": 2.6995675923855084e-33,
     "Dive": 3.2994715834360624e-33,
     "Rise": 3.2994715834360624e-33,
-    "Attack": 0,
+    "Attack": 0.0,
     "Bite": 7.798751148973233e-33,
-    "Heavy": 0,
+    "Heavy": 0.0,
     "Hit": 2.9995195879107854e-33,
     "Death": 1.149999976158142,
     "Guard": 5.551115205843844e-18,
@@ -81,18 +81,18 @@
     "Dodge": 6.298990804004863e-33,
     "Eat": 8.326673015560919e-18,
     "Stagger": 2.9995195879107854e-33,
-    "Ability": 0,
+    "Ability": 0.0,
     "Grab": 1.0364520135730233e-17,
     "Breath": 2.0996637850059467e-33,
     "Growth": 3.8993755744866164e-33,
     "Crawl": 7.347880950074885e-18,
     "Run": 1.469576190014977e-17,
-    "Charge": 0,
+    "Charge": 0.0,
     "Lower": 0.30000001192092896,
     "SnapLeft": 8.248678958590156e-33,
     "SnapRight": 8.248678958590156e-33,
     "Retract": 0.30000001192092896,
-    "Retreat": 0
+    "Retreat": 0.0
   },
   "boundsAt13Phases": {
     "Idle": [
@@ -104,7 +104,7 @@
       [
         0.7150825262069702,
         2.4496564865112305,
-        1.5475881099700928
+        1.5714870691299438
       ]
     ],
     "Swim": [
@@ -116,7 +116,7 @@
       [
         0.94393390417099,
         2.387850761413574,
-        1.5580158233642578
+        1.5481528043746948
       ]
     ],
     "Sprint": [
@@ -128,19 +128,19 @@
       [
         1.2147061824798584,
         2.3373360633850098,
-        1.5581743717193604
+        1.5483916997909546
       ]
     ],
     "TurnLeft": [
       [
-        -0.8972339630126953,
+        -0.8972340822219849,
         -2.4485554695129395,
         -1.548592209815979
       ],
       [
         0.973312497138977,
         2.4496564865112305,
-        1.5371294021606445
+        1.5388845205307007
       ]
     ],
     "TurnRight": [
@@ -176,19 +176,19 @@
       [
         0.6871896386146545,
         2.5112485885620117,
-        1.8066245317459106
+        1.8066260814666748
       ]
     ],
     "Attack": [
       [
         -0.852084219455719,
-        -2.657573938369751,
+        -2.6575655937194824,
         -1.5313490629196167
       ],
       [
         0.6874184608459473,
         2.4496586322784424,
-        1.5316615104675293
+        1.538144588470459
       ]
     ],
     "Bite": [
@@ -206,13 +206,13 @@
     "Heavy": [
       [
         -0.852135181427002,
-        -2.782449245452881,
+        -2.806675434112549,
         -1.5860556364059448
       ],
       [
         0.6874182224273682,
         2.62123441696167,
-        1.695745825767517
+        1.6768494844436646
       ]
     ],
     "Hit": [
@@ -248,7 +248,7 @@
       [
         0.6813583970069885,
         2.4496564865112305,
-        1.3530678749084473
+        1.335683822631836
       ]
     ],
     "Parry": [
@@ -260,7 +260,7 @@
       [
         0.6534287929534912,
         2.4496607780456543,
-        1.5367666482925415
+        1.531363606452942
       ]
     ],
     "Dodge": [
@@ -272,13 +272,13 @@
       [
         1.3172029256820679,
         2.4496564865112305,
-        1.5335242748260498
+        1.5332359075546265
       ]
     ],
     "Eat": [
       [
         -0.8607646226882935,
-        -2.475188970565796,
+        -2.475186347961426,
         -1.686250925064087
       ],
       [
@@ -302,13 +302,13 @@
     "Ability": [
       [
         -0.8517045974731445,
-        -2.6366987228393555,
+        -2.636697769165039,
         -1.5521509647369385
       ],
       [
         0.684486448764801,
         2.450601816177368,
-        1.645203948020935
+        1.706321358680725
       ]
     ],
     "Grab": [
@@ -320,7 +320,7 @@
       [
         0.6951895356178284,
         2.4816393852233887,
-        1.627214789390564
+        1.6120681762695312
       ]
     ],
     "Breath": [
@@ -332,7 +332,7 @@
       [
         0.7208511829376221,
         2.493387460708618,
-        1.7192329168319702
+        1.7068936824798584
       ]
     ],
     "Growth": [
@@ -344,7 +344,7 @@
       [
         0.6534287929534912,
         2.4496593475341797,
-        1.7992278337478638
+        1.7926057577133179
       ]
     ],
     "Crawl": [
@@ -356,7 +356,7 @@
       [
         0.5871739983558655,
         2.44565486907959,
-        1.5273690223693848
+        1.5261480808258057
       ]
     ],
     "Run": [
@@ -368,7 +368,7 @@
       [
         0.5893062949180603,
         2.486147880554199,
-        1.8832714557647705
+        1.9059183597564697
       ]
     ],
     "Charge": [
@@ -380,13 +380,13 @@
       [
         0.6534287929534912,
         2.4715473651885986,
-        1.9108192920684814
+        1.9599909782409668
       ]
     ],
     "Lower": [
       [
         -0.8485220670700073,
-        -2.536712408065796,
+        -2.5367119312286377,
         -1.6183321475982666
       ],
       [
@@ -398,25 +398,25 @@
     "SnapLeft": [
       [
         -0.9578274488449097,
-        -3.040013313293457,
+        -3.0987327098846436,
         -1.5815237760543823
       ],
       [
-        0.7028682231903076,
+        0.7028661966323853,
         2.4193999767303467,
-        1.0029902458190918
+        1.0029903650283813
       ]
     ],
     "SnapRight": [
       [
-        -0.8263967037200928,
-        -2.9930529594421387,
+        -0.8263354301452637,
+        -3.077181339263916,
         -1.5815237760543823
       ],
       [
         0.837354302406311,
         2.4193999767303467,
-        1.002477765083313
+        1.0024778842926025
       ]
     ],
     "Retract": [
@@ -428,7 +428,7 @@
       [
         0.6909583806991577,
         2.4512529373168945,
-        1.582233190536499
+        1.5565484762191772
       ]
     ],
     "Retreat": [
@@ -440,20 +440,20 @@
       [
         1.4139034748077393,
         2.4889299869537354,
-        1.718234658241272
+        1.7080121040344238
       ]
     ]
   },
   "modelLength": 4.897110939025879,
   "rawLength": 0.9794221520423889,
-  "maximumEnvelopeDifference": 0.020056843757629395,
+  "maximumEnvelopeDifference": 0.17027902603149414,
   "envelopeTolerance": 0.19588443756103516,
-  "envelopeTolerancePercent": 4,
+  "envelopeTolerancePercent": 4.0,
   "surfaceDistanceMax": 0.23964205384254456,
-  "surfaceDistanceP95": 0.04257213976234174,
-  "surfaceDistanceP99": 0.15781850919127396,
+  "surfaceDistanceP95": 0.042550579644739704,
+  "surfaceDistanceP99": 0.1578041733801368,
   "surfaceOutliersOverThreePercent": 137,
-  "surfaceVertices": 10172,
+  "surfaceVertices": 10174,
   "seatingDepthRaw": {
     "fore_upper_L": 0.011975751258432865,
     "fore_upper_R": 0.011286224238574505,
@@ -487,13 +487,13 @@
   "jawHingeDepthAsFractionOfHeadRadius": 0.3115909749946572,
   "oralInteriorDepthRaw": 0.0012003843439742923,
   "oralSeatingCorrection": {
-    "Oral cavity lining": 0.02280637106597714,
+    "Oral cavity lining": 0.023151871316050152,
     "Upper tooth row": 0.012409905579224844,
     "Lower tooth row": 0.01381744039035736,
     "Seated jaw hinge tissue": 0.03921014786881546
   },
   "maxInfluences": 4,
-  "meanInfluences": 3.602805549097109,
+  "meanInfluences": 3.3082895966640304,
   "trunkYawCorrectionDegrees": -62.116,
   "unbending": {
     "applied": true,
@@ -528,7 +528,7 @@
       },
       "neck": {
         "arc": 0.3552,
-        "totalTurningDeg": 175,
+        "totalTurningDeg": 175.0,
         "meanCurvatureRadius": 0.1163,
         "sectionRadius": 0.031,
         "meanCurvatureRadiusOverSection": 3.76,
@@ -557,7 +557,7 @@
     }
   },
   "caudalChainStart": 0.07999999999999999,
-  "pelvisFractionOfTrunk": 0.33,
+  "pelvisFractionOfTrunk": 0.33000000000000007,
   "skullFractionOfNeck": 0.84,
   "mouth": {
     "method": "no modelled cavity on this head; the seam follows the head's own measured section at the painted mouth line's measured height, and the teeth are authored",
@@ -582,7 +582,7 @@
       ],
       [
         0.33450920499364534,
-        0.6021308755329526,
+        0.6021308755329525,
         0.30856593571421276
       ],
       [
@@ -629,7 +629,7 @@
     "proudPatches": [
       {
         "vertices": 16,
-        "proudMax": 0.0033197076991200447,
+        "proudMax": 0.0033196858130395412,
         "x": [
           0.47609516978263855,
           0.48971107602119446
@@ -639,7 +639,7 @@
       },
       {
         "vertices": 7,
-        "proudMax": 0.0038975421339273453,
+        "proudMax": 0.0038975407369434834,
         "x": [
           0.3571791648864746,
           0.388403058052063
@@ -649,7 +649,7 @@
       },
       {
         "vertices": 7,
-        "proudMax": 0.0033202364575117826,
+        "proudMax": 0.0033202420454472303,
         "x": [
           0.3507579267024994,
           0.36673301458358765
@@ -669,7 +669,7 @@
       },
       {
         "vertices": 6,
-        "proudMax": 0.003534656250849366,
+        "proudMax": 0.0035346345975995064,
         "x": [
           0.38988327980041504,
           0.4027263820171356
@@ -695,7 +695,7 @@
     "Charge": {
       "hindAmplitude": 1.3198190331459045,
       "foreAmplitude": 0.6599095165729523,
-      "hindOverFore": 2,
+      "hindOverFore": 2.0,
       "bodyRise": 0.2654769495129585
     }
   },
@@ -715,7 +715,7 @@
     "Lower->SnapRight": 1.4695761072969157e-18,
     "SnapLeft->Retract": 8.248678958590156e-33,
     "SnapRight->Retract": 8.248678958590156e-33,
-    "Retract->rest": 0,
+    "Retract->rest": 0.0,
     "Lower->rest": 0.30000001192092896
   },
   "limbSweep": {
@@ -723,33 +723,33 @@
       "fore_upper_L": {
         "sweptDeg": 5.2,
         "peakToPeakDeg": [
-          2,
+          2.0,
           1.3,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
         "sweptDeg": 5.2,
         "peakToPeakDeg": [
-          2,
+          2.0,
           1.3,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
         "sweptDeg": 5.2,
         "peakToPeakDeg": [
-          2,
+          2.0,
           1.3,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
         "sweptDeg": 5.2,
         "peakToPeakDeg": [
-          2,
+          2.0,
           1.3,
-          0
+          0.0
         ]
       }
     },
@@ -758,32 +758,32 @@
         "sweptDeg": 36.7,
         "peakToPeakDeg": [
           18.3,
-          0,
-          0
+          0.0,
+          0.0
         ]
       },
       "fore_upper_R": {
         "sweptDeg": 36.7,
         "peakToPeakDeg": [
           18.3,
-          0,
-          0
+          0.0,
+          0.0
         ]
       },
       "hind_upper_L": {
         "sweptDeg": 105.4,
         "peakToPeakDeg": [
           52.7,
-          0,
-          0
+          0.0,
+          0.0
         ]
       },
       "hind_upper_R": {
         "sweptDeg": 105.4,
         "peakToPeakDeg": [
           52.7,
-          0,
-          0
+          0.0,
+          0.0
         ]
       }
     },
@@ -792,32 +792,32 @@
         "sweptDeg": 49.2,
         "peakToPeakDeg": [
           24.6,
-          0,
-          0
+          0.0,
+          0.0
         ]
       },
       "fore_upper_R": {
         "sweptDeg": 49.2,
         "peakToPeakDeg": [
           24.6,
-          0,
-          0
+          0.0,
+          0.0
         ]
       },
       "hind_upper_L": {
         "sweptDeg": 141.5,
         "peakToPeakDeg": [
           70.8,
-          0,
-          0
+          0.0,
+          0.0
         ]
       },
       "hind_upper_R": {
         "sweptDeg": 141.5,
         "peakToPeakDeg": [
           70.8,
-          0,
-          0
+          0.0,
+          0.0
         ]
       }
     },
@@ -827,7 +827,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
@@ -835,7 +835,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -843,7 +843,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -851,7 +851,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       }
     },
@@ -861,7 +861,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
@@ -869,7 +869,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -877,7 +877,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -885,7 +885,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       }
     },
@@ -895,7 +895,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
@@ -903,7 +903,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -911,7 +911,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -919,7 +919,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       }
     },
@@ -929,7 +929,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
@@ -937,7 +937,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -945,7 +945,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -953,7 +953,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       }
     },
@@ -963,7 +963,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
@@ -971,7 +971,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -979,7 +979,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -987,7 +987,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       }
     },
@@ -997,7 +997,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
@@ -1005,7 +1005,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -1013,7 +1013,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -1021,7 +1021,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       }
     },
@@ -1031,7 +1031,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
@@ -1039,7 +1039,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -1047,7 +1047,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -1055,7 +1055,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       }
     },
@@ -1065,7 +1065,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
@@ -1073,7 +1073,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -1081,7 +1081,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -1089,7 +1089,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       }
     },
@@ -1099,7 +1099,7 @@
         "peakToPeakDeg": [
           10.3,
           9.2,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
@@ -1107,7 +1107,7 @@
         "peakToPeakDeg": [
           10.3,
           9.2,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -1115,7 +1115,7 @@
         "peakToPeakDeg": [
           10.3,
           9.2,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -1123,7 +1123,7 @@
         "peakToPeakDeg": [
           10.3,
           9.2,
-          0
+          0.0
         ]
       }
     },
@@ -1133,7 +1133,7 @@
         "peakToPeakDeg": [
           1.8,
           1.1,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
@@ -1141,7 +1141,7 @@
         "peakToPeakDeg": [
           1.8,
           1.1,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -1149,7 +1149,7 @@
         "peakToPeakDeg": [
           1.8,
           1.1,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -1157,7 +1157,7 @@
         "peakToPeakDeg": [
           1.8,
           1.1,
-          0
+          0.0
         ]
       }
     },
@@ -1167,7 +1167,7 @@
         "peakToPeakDeg": [
           1.5,
           1.3,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
@@ -1175,7 +1175,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -1183,7 +1183,7 @@
         "peakToPeakDeg": [
           1.5,
           1.3,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -1191,7 +1191,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       }
     },
@@ -1201,7 +1201,7 @@
         "peakToPeakDeg": [
           6.5,
           6.3,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
@@ -1209,7 +1209,7 @@
         "peakToPeakDeg": [
           6.5,
           6.3,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -1217,7 +1217,7 @@
         "peakToPeakDeg": [
           6.5,
           6.3,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -1225,7 +1225,7 @@
         "peakToPeakDeg": [
           6.5,
           6.3,
-          0
+          0.0
         ]
       }
     },
@@ -1235,7 +1235,7 @@
         "peakToPeakDeg": [
           2.7,
           1.7,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
@@ -1243,7 +1243,7 @@
         "peakToPeakDeg": [
           2.7,
           1.7,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -1251,7 +1251,7 @@
         "peakToPeakDeg": [
           2.7,
           1.7,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -1259,7 +1259,7 @@
         "peakToPeakDeg": [
           2.7,
           1.7,
-          0
+          0.0
         ]
       }
     },
@@ -1269,7 +1269,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
@@ -1277,7 +1277,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -1285,7 +1285,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -1293,7 +1293,7 @@
         "peakToPeakDeg": [
           1.5,
           1.4,
-          0
+          0.0
         ]
       }
     },
@@ -1303,7 +1303,7 @@
         "peakToPeakDeg": [
           10.3,
           1.4,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
@@ -1311,7 +1311,7 @@
         "peakToPeakDeg": [
           10.2,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -1319,7 +1319,7 @@
         "peakToPeakDeg": [
           13.7,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -1327,7 +1327,7 @@
         "peakToPeakDeg": [
           13.6,
           1.4,
-          0
+          0.0
         ]
       }
     },
@@ -1337,7 +1337,7 @@
         "peakToPeakDeg": [
           2.7,
           1.7,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
@@ -1345,7 +1345,7 @@
         "peakToPeakDeg": [
           2.7,
           1.7,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -1353,7 +1353,7 @@
         "peakToPeakDeg": [
           2.7,
           1.7,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -1361,41 +1361,41 @@
         "peakToPeakDeg": [
           2.7,
           1.7,
-          0
+          0.0
         ]
       }
     },
     "Breath": {
       "fore_upper_L": {
-        "sweptDeg": 9,
+        "sweptDeg": 9.0,
         "peakToPeakDeg": [
-          3,
+          3.0,
           2.9,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
         "sweptDeg": 9.1,
         "peakToPeakDeg": [
-          3,
+          3.0,
           2.8,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
-        "sweptDeg": 9,
+        "sweptDeg": 9.0,
         "peakToPeakDeg": [
-          3,
+          3.0,
           2.9,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
         "sweptDeg": 9.1,
         "peakToPeakDeg": [
-          3,
+          3.0,
           2.8,
-          0
+          0.0
         ]
       }
     },
@@ -1405,7 +1405,7 @@
         "peakToPeakDeg": [
           2.4,
           2.3,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
@@ -1413,7 +1413,7 @@
         "peakToPeakDeg": [
           2.4,
           2.3,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -1421,7 +1421,7 @@
         "peakToPeakDeg": [
           2.4,
           2.3,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -1429,7 +1429,7 @@
         "peakToPeakDeg": [
           2.4,
           2.3,
-          0
+          0.0
         ]
       }
     },
@@ -1439,7 +1439,7 @@
         "peakToPeakDeg": [
           14.4,
           2.3,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
@@ -1447,7 +1447,7 @@
         "peakToPeakDeg": [
           14.4,
           2.3,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -1455,7 +1455,7 @@
         "peakToPeakDeg": [
           41.2,
           2.3,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -1463,7 +1463,7 @@
         "peakToPeakDeg": [
           41.2,
           2.3,
-          0
+          0.0
         ]
       }
     },
@@ -1473,23 +1473,23 @@
         "peakToPeakDeg": [
           33.2,
           2.3,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
-        "sweptDeg": 66,
+        "sweptDeg": 66.0,
         "peakToPeakDeg": [
           32.9,
           2.2,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
         "sweptDeg": 146.1,
         "peakToPeakDeg": [
-          73,
+          73.0,
           2.2,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -1497,7 +1497,7 @@
         "peakToPeakDeg": [
           73.8,
           2.3,
-          0
+          0.0
         ]
       }
     },
@@ -1507,15 +1507,15 @@
         "peakToPeakDeg": [
           36.1,
           17.2,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
-        "sweptDeg": 228,
+        "sweptDeg": 228.0,
         "peakToPeakDeg": [
           34.9,
           17.2,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -1523,7 +1523,7 @@
         "peakToPeakDeg": [
           69.8,
           5.7,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -1531,7 +1531,7 @@
         "peakToPeakDeg": [
           72.2,
           5.7,
-          0
+          0.0
         ]
       }
     },
@@ -1541,15 +1541,15 @@
         "peakToPeakDeg": [
           10.7,
           1.4,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
         "sweptDeg": 13.4,
         "peakToPeakDeg": [
-          11,
+          11.0,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -1557,7 +1557,7 @@
         "peakToPeakDeg": [
           16.9,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -1565,25 +1565,25 @@
         "peakToPeakDeg": [
           16.6,
           1.4,
-          0
+          0.0
         ]
       }
     },
     "SnapLeft": {
       "fore_upper_L": {
-        "sweptDeg": 22,
+        "sweptDeg": 22.0,
         "peakToPeakDeg": [
           10.8,
           1.4,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
         "sweptDeg": 22.5,
         "peakToPeakDeg": [
-          11,
+          11.0,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -1591,7 +1591,7 @@
         "peakToPeakDeg": [
           13.4,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -1599,25 +1599,25 @@
         "peakToPeakDeg": [
           13.1,
           1.4,
-          0
+          0.0
         ]
       }
     },
     "SnapRight": {
       "fore_upper_L": {
-        "sweptDeg": 22,
+        "sweptDeg": 22.0,
         "peakToPeakDeg": [
           10.8,
           1.4,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
         "sweptDeg": 22.5,
         "peakToPeakDeg": [
-          11,
+          11.0,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -1625,7 +1625,7 @@
         "peakToPeakDeg": [
           13.4,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -1633,7 +1633,7 @@
         "peakToPeakDeg": [
           13.1,
           1.4,
-          0
+          0.0
         ]
       }
     },
@@ -1643,7 +1643,7 @@
         "peakToPeakDeg": [
           11.1,
           1.4,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
@@ -1651,23 +1651,23 @@
         "peakToPeakDeg": [
           10.9,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
-        "sweptDeg": 17,
+        "sweptDeg": 17.0,
         "peakToPeakDeg": [
           14.9,
           1.4,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
         "sweptDeg": 17.3,
         "peakToPeakDeg": [
-          15,
+          15.0,
           1.4,
-          0
+          0.0
         ]
       }
     },
@@ -1677,7 +1677,7 @@
         "peakToPeakDeg": [
           38.1,
           17.2,
-          0
+          0.0
         ]
       },
       "fore_upper_R": {
@@ -1685,7 +1685,7 @@
         "peakToPeakDeg": [
           37.8,
           17.2,
-          0
+          0.0
         ]
       },
       "hind_upper_L": {
@@ -1693,7 +1693,7 @@
         "peakToPeakDeg": [
           75.6,
           5.7,
-          0
+          0.0
         ]
       },
       "hind_upper_R": {
@@ -1701,7 +1701,7 @@
         "peakToPeakDeg": [
           76.3,
           5.7,
-          0
+          0.0
         ]
       }
     }
@@ -1908,29 +1908,5 @@
   "weightRelaxationPasses": 14,
   "normalizedWeights": true,
   "rootStable": true,
-  "noScaleChannels": true,
-  "skinTears": {
-    "tool": "tools/triassic/skin-tears.mjs",
-    "phasesPerClip": 17,
-    "clips": 29,
-    "edges": 33645,
-    "bodyLength": 4.897,
-    "skin": {
-      "worstRatio": 4.46,
-      "clip": "Sprint",
-      "bone": "body",
-      "grewFrom": 0.0296,
-      "grewTo": 0.1319,
-      "instancesOverTwice": 2648
-    },
-    "oralLining": {
-      "worstRatio": 9.26,
-      "clip": "SnapLeft",
-      "bone": "skull",
-      "grewFrom": 0.0179,
-      "grewTo": 0.1661,
-      "instancesOverTwice": 3598
-    },
-    "note": "The lining wall is built to stretch -- roof on the skull, floor on the jaw -- so its ratio at full gape says the mouth opened, not that anything tore. `skin` is the figure to compare against the shore batch's (Nothosaurus 2.98x, Tanystropheus 6.1x, Placodus 12.4x)."
-  }
+  "noScaleChannels": true
 }

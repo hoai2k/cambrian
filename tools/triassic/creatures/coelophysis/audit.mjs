@@ -15,6 +15,7 @@
  *   node tools/triassic/creatures/coelophysis/audit.mjs --package --decode
  */
 import fs from 'node:fs';
+import { auditCutAttachment } from '../_pipeline/cut-attachment.mjs';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import { NodeIO } from '@gltf-transform/core';
@@ -333,6 +334,12 @@ for (const suffix of ['', '.puppet']) {
 report.exactRigParity = true; report.exactAnimationParity = true; report.exactAnchorParity = true;
 report.normalizedWeights = true; report.cervicalChain = true;
 delete report.rig;
+// Verify the duplicate posterior mouth rim on both actual packaged meshes in every clip.
+const hingeX = JSON.parse(fs.readFileSync('tools/triassic/creatures/coelophysis/coelophysis-profile.json')).mouth.hingeX;
+report.posteriorJawAttachment = {};
+for (const suffix of ['', '.puppet']) {
+  report.posteriorJawAttachment[suffix || 'authored'] = await auditCutAttachment(base + suffix + '.glb', hingeX * 5);
+}
 fs.writeFileSync('tools/triassic/creatures/coelophysis/paired-audit.json', JSON.stringify(report, null, 2) + '\n');
 console.log(JSON.stringify({
   models: report.models, lodTriangleFraction: report.lodTriangleFraction,

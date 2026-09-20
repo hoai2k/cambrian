@@ -9,7 +9,9 @@ export async function auditCutAttachment(file, coordinate, axis=2) {
   const g=await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
   const meshes=[];g.scene.traverse(o=>{if(o.isSkinnedMesh)meshes.push(o)});
   const jaw=meshes.find(m=>/lower[ _]jaw/i.test(m.name+' '+m.parent?.name));
-  const body=meshes.find(m=>m!==jaw && !/lining|hinge|oral/i.test(m.name+' '+m.parent?.name));
+  // Node order is not anatomical: some exporters list the tooth rows first.
+  const body=meshes.filter(m=>m!==jaw && !/lining|hinge|oral|tooth|teeth/i.test(m.name+' '+m.parent?.name))
+    .sort((a,b)=>b.geometry.attributes.position.count-a.geometry.attributes.position.count)[0];
   assert(jaw&&body,'cut audit needs the body and lower jaw');
   const v=new THREE.Vector3(),w=new THREE.Vector3();
   const point=(m,i,p)=>m.getVertexPosition(i,p).applyMatrix4(m.matrixWorld);
