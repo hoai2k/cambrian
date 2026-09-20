@@ -7,6 +7,8 @@ from mathutils import Vector,Matrix,Quaternion
 from mathutils.bvhtree import BVHTree
 from mathutils.geometry import barycentric_transform
 from math import sin,cos,pi
+sys.path.insert(0,os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','_pipeline'))
+from tripo import jaw_junction                                                  # noqa: E402
 HERE=os.path.dirname(os.path.abspath(__file__)); ROOT=os.path.abspath(os.path.join(HERE,'../../../..'))
 LOCAL=os.path.join(ROOT,'local/triassic-authoring/nothosaurus'); OUT=os.path.join(ROOT,'public/assets/triassic/creatures'); os.makedirs(LOCAL,exist_ok=True);os.makedirs(OUT,exist_ok=True)
 RAW=os.path.join(HERE,'tripo-raw/nothosaurus.raw.glb'); ID='nothosaurus'
@@ -618,18 +620,23 @@ for n,(p,parent) in B.items():
  eb=arm.edit_bones.new(n);eb.head=tx(p);eb.tail=eb.head+Vector((0,.16,0))
  if parent:eb.parent=arm.edit_bones[parent]
 bpy.ops.object.mode_set(mode='OBJECT')
+# The mandible is skinned *into* the head rather than rigid against it: one field over both parts,
+# the throat under the hinge following the jaw and the shell ramping to full jaw over `band` from
+# the cut rim, so the two copies of every rim vertex carry the same weights and the cut cannot open
+# (`T.jaw_junction`; `tools/triassic/lag.mjs` measures the seam it closes).
+JUNCTION={}
 for o in [auth,puppet]:
- for n in B:o.vertex_groups.new(name=n)
- for v in o.data.vertices:
-  for n,w in weights(v.co).items():o.vertex_groups[n].add([v.index],w,'REPLACE')
- for v in o.data.vertices:v.co=tx(v.co)
- for p in o.data.polygons:p.use_smooth=True
- mod=o.modifiers.new('Shared articulated skeleton','ARMATURE');mod.object=rig;o.parent=rig
-for o in jawparts.values():
- g=o.vertex_groups.new(name='jaw');g.add(list(range(len(o.data.vertices))),1.,'REPLACE')
- for v in o.data.vertices:v.co=tx(v.co)
- for p in o.data.polygons:p.use_smooth=True
- mod=o.modifiers.new('Rigid lower jaw','ARMATURE');mod.object=rig;o.parent=rig
+ shell=jawparts[o.name]
+ for part in [o,shell]:
+  for n in B:part.vertex_groups.new(name=n)
+ body_w,shell_w,JUNCTION[o.name]=jaw_junction(o,shell,[weights(v.co) for v in o.data.vertices],B['jaw'][0],
+  rear=lambda p:abs(p.x-JAWCUT)<1e-5,upper_jaw=lambda p:p.x>JAWCUT and p.z>=seam(p.x,p.y)-1e-6,axis=(1.,0.,0.))
+ for part,field in [(o,body_w),(shell,shell_w)]:
+  for v in part.data.vertices:
+   for n,w in field[v.index].items():part.vertex_groups[n].add([v.index],w,'REPLACE')
+  for v in part.data.vertices:v.co=tx(v.co)
+  for p in part.data.polygons:p.use_smooth=True
+  mod=part.modifiers.new('Shared articulated skeleton' if part is o else 'Mandible into the head','ARMATURE');mod.object=rig;part.parent=rig
 # Interior oral floor and roof close the visible opening; both copies share exact rigid placement.
 # Each is a closed thin shell rigid to its own bone -- the palate to the skull, the floor to the jaw
 # -- laid along the turned head's own measured centreline either side of the fitted lip plane.
@@ -850,7 +857,7 @@ for o,suffix in [(auth,''),(puppet,'.puppet')]:
 shutil.copyfile(os.path.join(OUT,ID+'.puppet.glb'),os.path.join(OUT,ID+'.lod1.glb'))
 meta={'id':ID,'name':'Nothosaurus','species':'Nothosaurus giganteus','description':'Canonical Tripo body with its neck lengthened from the measured viewer stretch and unbent so the head faces straight forward, and a procedural volume twin resurfaced from the same mesh, sharing an articulated rowing, tail, six-joint cervical and jaw rig.','modelLength':round(MODEL_LENGTH,4),'lengthMeters':6,'locomotion':'Swim','clips':list(CLIPS),'looping':LOOPS,'anchors':[a['name']for a in anchors],'puppet':'nothosaurus.puppet.glb','notes':['The curved tail and asymmetric paddle stance are retained from the accepted Tripo volume.','The procedural twin resurfaces a 0.007-unit voxel occupancy field, relaxes it and reduces the new topology. It does not reuse source vertices or faces.','Same rest rig, inverse binds, sockets and all 21 action sample arrays are used for authored and puppet. LOD deliberately retains all clips.','The neck is lengthened by the measured stretch in neck-stretch-request.json, applied to the intake mesh before anything is derived from it, so the twin, the rig, the weights, the sockets and every clip follow it. Six cervical controls replace three; the albedo and UVs are the originals, so the neck pigment stretches with the neck.','The head faced about twenty degrees to the right as generated; the neck is unbent in the mesh before binding (each section carried rigidly from its measured frame onto a target axis of the same lengths) so the head faces straight forward, and the jaw cut is the plane fitted to the lip the generation modelled.','Original albedo retained with white COLOR_0; normal relief limited to 0.15 and skin set explicitly nonmetallic at roughness 0.7. Puppet pigment samples triangle-local UVs to avoid seam bleed. True jaw split and separate rigid palate, floor and hinge halves added; connected foot webbing retained.','Living colours, soft tissues and movements are artistic reconstruction. Ability performs the roster fang-trap clamp; Grab braces and tugs the held prey. Breath provides a separate in-place surface-breath/dive gesture. Locomotor translation remains engine-owned.']}
 open(os.path.join(OUT,ID+'.json'),'w').write(json.dumps(meta,indent=2))
-report={'sourceSha256':hashlib.sha256(open(RAW,'rb').read()).hexdigest(),'sourceTriangles':source_triangles,'removedFlakeVertices':removed,'fullTriangles':sum(len(p.vertices)-2 for p in auth.data.polygons)+sum(len(p.vertices)-2 for p in jawparts[auth.name].data.polygons)+sum(sum(len(p.vertices)-2 for p in o.data.polygons)for o in oralparts),'puppetTriangles':sum(len(p.vertices)-2 for p in puppet.data.polygons)+sum(len(p.vertices)-2 for p in jawparts[puppet.name].data.polygons)+sum(sum(len(p.vertices)-2 for p in o.data.polygons)for o in oralparts),'bones':len(B),'neckJoints':len(NECK),'neckStretch':neck_stretch,'neckUnbending':neck_turn,'hingeSeat':hinge_seat,'modelLength':MODEL_LENGTH,'clips':CLIPS,'loopSeams':seams,'boundsAt13Phases':bounds,'surfaceDistanceMax':max(distances),'surfaceDistanceP95':float(np.quantile(distances,.95)),'profileTolerance':.2,'normalizedWeights':True,'rootStable':True,'noScaleChannels':True}
+report={'sourceSha256':hashlib.sha256(open(RAW,'rb').read()).hexdigest(),'sourceTriangles':source_triangles,'removedFlakeVertices':removed,'fullTriangles':sum(len(p.vertices)-2 for p in auth.data.polygons)+sum(len(p.vertices)-2 for p in jawparts[auth.name].data.polygons)+sum(sum(len(p.vertices)-2 for p in o.data.polygons)for o in oralparts),'puppetTriangles':sum(len(p.vertices)-2 for p in puppet.data.polygons)+sum(len(p.vertices)-2 for p in jawparts[puppet.name].data.polygons)+sum(sum(len(p.vertices)-2 for p in o.data.polygons)for o in oralparts),'bones':len(B),'neckJoints':len(NECK),'neckStretch':neck_stretch,'neckUnbending':neck_turn,'hingeSeat':hinge_seat,'modelLength':MODEL_LENGTH,'clips':CLIPS,'loopSeams':seams,'boundsAt13Phases':bounds,'surfaceDistanceMax':max(distances),'surfaceDistanceP95':float(np.quantile(distances,.95)),'profileTolerance':.2,'normalizedWeights':True,'jawJunction':JUNCTION,'rootStable':True,'noScaleChannels':True}
 open(os.path.join(HERE,'validation.json'),'w').write(json.dumps(report,indent=2))
 # Save editable source with both renderable bodies. Export selection is the only difference.
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(LOCAL,'nothosaurus-paired.blend'))

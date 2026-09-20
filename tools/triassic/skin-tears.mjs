@@ -1,7 +1,8 @@
 /**
  * Skinning tears: edges stretched far past their rest length, swept over every clip of a body.
  *
- *   node tools/triassic/skin-tears.mjs <glb> [ratio]
+ *   node tools/triassic/skin-tears.mjs <glb>... [--ratio N] [--json <file>]
+ *   node tools/triassic/skin-tears.mjs --all [--ratio N] [--json <file>]     # every shipped body, mouth bones per body
  *
  * This exists because the paired audits could not see the defect it measures. They play 61 phases
  * of every clip through the real GLTFLoader and AnimationMixer and check where every skinned vertex
@@ -31,9 +32,28 @@ await MeshoptDecoder.ready;
 globalThis.self = globalThis;
 globalThis.createImageBitmap = async () => ({ width: 2048, height: 2048, close() {} });
 
-const file = process.argv[2];
-const THRESH = Number(process.argv[3] || 2);
+const args = process.argv.slice(2);
+const ALL = args.includes('--all');
+const jsonAt = args.indexOf('--json');
+const JSON_OUT = jsonAt >= 0 ? args[jsonAt + 1] : null;
+const ratioAt = args.indexOf('--ratio');
+const positional = args.filter((a, i) => !a.startsWith('--') && !(jsonAt >= 0 && i === jsonAt + 1) && !(ratioAt >= 0 && i === ratioAt + 1));
+if (!ALL && !positional[0]) { console.error('usage: node tools/triassic/skin-tears.mjs <glb>...|--all [--ratio N] [--json <file>]'); process.exit(2); }
+const THRESH = Number(ratioAt >= 0 ? args[ratioAt + 1] : 2);
 const PHASES = 17;
+/**
+ * The mouth's own bones, reported on their own. The body's worst skin edge is usually a paddle or
+ * a fluke, and a jaw that tears the cheek at 3x sits invisibly under a paddle at 5x; the jaw-to-head
+ * junction is the class of fault `T.jaw_junction` exists for, so the worst *skin* edge dominated by
+ * `jaw` and by `skull` is listed per body, with the clip it happens in.
+ */
+const MOUTH_BONES = ['jaw', 'skull'];
+const DIR = 'public/assets/triassic/creatures';
+const files = ALL
+  ? JSON.parse(fs.readFileSync('tools/triassic/shipped.json', 'utf8')).creatures.map((id) => `${DIR}/${id}.glb`)
+  : positional;
+const summary = [];
+for (const file of files) {
 
 const buf = fs.readFileSync(file);
 const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
@@ -110,6 +130,7 @@ const len = (P, i, j) => Math.hypot(P[j * 3] - P[i * 3], P[j * 3 + 1] - P[i * 3 
 const restLen = edges.map(([u, v]) => len(rest, u, v));
 
 const rows = [];
+const mouth = Object.fromEntries(MOUTH_BONES.map((b) => [b, { ratio: 1, clip: '-', grew: [0, 0] }]));
 for (const clip of gltf.animations) {
   let worst = 1, worstBone = '', torn = 0, grew = [0, 0];
   let skinWorst = 1, skinBone = '', skinGrew = [0, 0];
@@ -128,6 +149,7 @@ for (const clip of gltf.animations) {
       if (ratio > THRESH) { torn++; bones.set(edges[e][2], (bones.get(edges[e][2]) || 0) + 1); }
       if (ratio > worst) { worst = ratio; worstBone = edges[e][2]; grew = [r, posed]; }
       if (!edges[e][3] && ratio > skinWorst) { skinWorst = ratio; skinBone = edges[e][2]; skinGrew = [r, posed]; }
+      if (!edges[e][3] && mouth[edges[e][2]] && ratio > mouth[edges[e][2]].ratio) mouth[edges[e][2]] = { ratio, clip: clip.name, grew: [r, posed] };
     }
   }
   const top = [...bones.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4)
@@ -147,3 +169,8 @@ const allMax = Math.max(...rows.map((r) => r.worst));
 console.log(`${any} of ${rows.length} clips tear an edge past ${THRESH}x`);
 console.log(`worst SKIN ${skinMax.toFixed(2)}x · worst including the oral lining ${allMax.toFixed(2)}x` +
   (allMax > skinMax * 1.5 ? ' (the lining is a sac built to stretch; the skin figure is the one to judge)' : ''));
+console.log(`mouth skin: ${MOUTH_BONES.map((b) => `${b} ${mouth[b].ratio.toFixed(2)}x in ${mouth[b].clip} (${mouth[b].grew[0].toFixed(3)}->${mouth[b].grew[1].toFixed(3)})`).join(' · ')}`);
+summary.push({ file, skin: skinMax, all: allMax, tornClips: any, clips: rows.length, mouth,
+  worstClip: rows[0] ? { clip: rows[0].clip, bone: rows[0].skinBone } : null });
+}
+if (JSON_OUT) fs.writeFileSync(JSON_OUT, JSON.stringify(summary, null, 2) + '\n');
