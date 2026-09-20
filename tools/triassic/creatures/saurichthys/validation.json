@@ -91,97 +91,97 @@
       [
         -0.5161,
         -0.0064,
-        0.027,
+        0.0034,
         0.0038
       ],
       [
         -0.5054,
         -0.0055,
-        0.0265,
+        0.0055,
         0.0049
       ],
       [
         -0.4947,
         -0.0047,
-        0.0249,
+        0.0065,
         0.0053
       ],
       [
         -0.484,
         -0.0047,
-        0.0233,
+        0.0074,
         0.0056
       ],
       [
         -0.4734,
         -0.0052,
-        0.0226,
+        0.009,
         0.0061
       ],
       [
         -0.4627,
         -0.006,
-        0.0222,
+        0.0115,
         0.0064
       ],
       [
         -0.452,
         -0.0076,
-        0.0221,
+        0.0145,
         0.0061
       ],
       [
         -0.4413,
         -0.0089,
-        0.0186,
+        0.0143,
         0.0064
       ],
       [
         -0.4306,
         -0.0094,
-        0.019,
+        0.0175,
         0.0065
       ],
       [
         -0.4199,
         -0.0098,
-        0.0248,
+        0.0258,
         0.0062
       ],
       [
         -0.4093,
         -0.0102,
-        0.0143,
+        0.0194,
         0.0059
       ],
       [
         -0.3986,
         -0.0104,
-        0.0154,
+        0.023,
         0.0062
       ],
       [
         -0.3879,
         -0.0108,
-        0.0179,
+        0.0271,
         0.0063
       ],
       [
         -0.3772,
         -0.0116,
-        0.0197,
+        0.0257,
         0.0061
       ],
       [
         -0.3665,
         -0.0121,
-        0.0195,
+        0.019,
         0.0054
       ],
       [
         -0.3558,
         -0.0127,
-        0.0252,
+        0.0203,
         0.0045
       ]
     ],
@@ -204,10 +204,10 @@
       "note": "zero by construction. The head is sheared vertically by -seam(y), which carries the measured curve exactly onto the plane z = 0; the cut is taken there and the shear undone, so every vertex the cut adds lands on the measured line itself and every vertex that was already there returns to where it was."
     },
     "generationsOwnDentition": {
-      "oralZoneVertices": 945,
-      "standingProudOfTheirNeighbourhood": 45,
-      "maxProtrusionRaw": 0.00328,
-      "maxProtrusionOverMouthHalfDepth": 0.572,
+      "oralZoneVertices": 785,
+      "standingProudOfTheirNeighbourhood": 29,
+      "maxProtrusionRaw": 0.003,
+      "maxProtrusionOverMouthHalfDepth": 0.524,
       "authoredReplacement": false,
       "note": "kept as generated and weighted to the jaw they grow from; nothing is authored here",
       "verticesCarriedOntoTheMandible": 792
@@ -229,13 +229,186 @@
       "roofOnlyPlug": 625,
       "noPlug": 667
     },
-    "whatIsLeft": "the cut rim, one polygon thick and at a grazing angle, which a fold closes and a plug can only mask by standing outside the skin. The shipped body material is double-sided, so none of it is drawn at runtime."
+    "whatClosesItInstead": {
+      "hingeCapFaces": {
+        "Saurichthys authored body": 33,
+        "Saurichthys procedural volume twin": 37
+      },
+      "rimFoldVertices": {
+        "Saurichthys authored body": 99,
+        "Saurichthys procedural volume twin": 105
+      },
+      "rimFoldRaw": 0.00374,
+      "headSeamsSealed": {
+        "Saurichthys authored body": {
+          "faces": 12,
+          "refusedTooWide": 0
+        },
+        "Saurichthys procedural volume twin": {
+          "faces": 0,
+          "refusedTooWide": 0
+        }
+      },
+      "boundaryEdgesLeftOpen": {
+        "Saurichthys authored body": {
+          "onSeam": 127,
+          "otherOnHead": 105,
+          "behindHead": 4
+        },
+        "Saurichthys procedural volume twin": {
+          "onSeam": 108,
+          "otherOnHead": 11,
+          "behindHead": 0
+        }
+      },
+      "note": "the hinge cross-section is fanned shut with its own cut vertices (T.cap_cut) and the seam rim is folded in towards the mouth axis (T.rim_flange), running out before the snout where the two rims meet; the palate then closes the throat behind both. The shipped body material is double-sided, so none of it is drawn at runtime."
+    }
   },
-  "liningClearanceInsideSkinRaw": 0.00184,
+  "oralShells": {
+    "contract": "a palate rigid on skull and a floor rigid on jaw, each a closed shell (T.oral_shells), overlapping behind the hinge, no wall between them",
+    "palateVertices": 168,
+    "floorVertices": 168,
+    "rings": 24,
+    "ring": 14,
+    "backY": -0.32485,
+    "frontY": -0.52994,
+    "floorFrontY": -0.5278,
+    "mandibleTipY": -0.53421,
+    "lateralAxisAtStations": [
+      [
+        -0.3249,
+        0.0137
+      ],
+      [
+        -0.359,
+        0.0071
+      ],
+      [
+        -0.3932,
+        -0.0084
+      ],
+      [
+        -0.4274,
+        0.0008
+      ],
+      [
+        -0.4616,
+        0.0104
+      ],
+      [
+        -0.4958,
+        0.0187
+      ],
+      [
+        -0.5299,
+        0.0254
+      ]
+    ],
+    "palateAndFloorLinesAtStations": [
+      [
+        -0.3249,
+        -0.0127,
+        -0.0087,
+        -0.0167
+      ],
+      [
+        -0.359,
+        -0.0125,
+        -0.0082,
+        -0.0168
+      ],
+      [
+        -0.3932,
+        -0.0106,
+        -0.005,
+        -0.0162
+      ],
+      [
+        -0.4274,
+        -0.0095,
+        -0.0038,
+        -0.0153
+      ],
+      [
+        -0.4616,
+        -0.0062,
+        -0.0005,
+        -0.0119
+      ],
+      [
+        -0.4958,
+        -0.0048,
+        -0.0001,
+        -0.0095
+      ],
+      [
+        -0.5299,
+        -0.0064,
+        -0.003,
+        -0.0099
+      ]
+    ],
+    "builtAboutEachJawsOwnEdgeOfTheLumen": true,
+    "throatFraction": 0.35,
+    "mandibleNormalVoteAgainstTheIntakeSurface": {
+      "Saurichthys authored body lower jaw": 2377,
+      "Saurichthys procedural volume twin lower jaw": 409
+    },
+    "measuredRoomAtStations": [
+      [
+        -0.3249,
+        0.0445,
+        0.044,
+        0.0343
+      ],
+      [
+        -0.359,
+        0.0372,
+        0.0385,
+        0.0284
+      ],
+      [
+        -0.3932,
+        0.0,
+        0.0267,
+        0.0214
+      ],
+      [
+        -0.4274,
+        0.0,
+        0.0237,
+        0.0177
+      ],
+      [
+        -0.4616,
+        0.0,
+        0.0196,
+        0.0178
+      ],
+      [
+        -0.4958,
+        0.0,
+        0.0171,
+        0.0138
+      ],
+      [
+        -0.5299,
+        0.0,
+        0.0148,
+        0.0
+      ]
+    ],
+    "vertexDirectionsOpenToTheOutside": 0,
+    "verticesSeatedInsideTheSilhouette": {
+      "vertices": 174,
+      "maxPullRaw": 0.0367132093302389
+    }
+  },
+  "liningClearanceInsideSkinRaw": 0.00067,
   "scale": 4.67977,
   "bodyLength": 5.0,
-  "authoredTriangles": 21828,
-  "twinTriangles": 8206,
+  "authoredTriangles": 22078,
+  "twinTriangles": 8443,
   "twinRemeshTriangles": 54464,
   "twinDecimateRatio": 0.11934489011764526,
   "twinVerticesHeldBackFromRelaxation": 7923,
@@ -366,7 +539,7 @@
     ],
     "TurnLeft": [
       [
-        -0.8786860704421997,
+        -0.6877802610397339,
         -2.5243797302246094,
         -0.7414862513542175
       ],
@@ -498,7 +671,7 @@
     ],
     "Dodge": [
       [
-        -0.8745238184928894,
+        -0.8136264681816101,
         -2.521284580230713,
         -0.7233179211616516
       ],
@@ -608,12 +781,12 @@
   "weights": {
     "Saurichthys authored body": {
       "maxInfluences": 4,
-      "vertices": 9389,
+      "vertices": 9489,
       "verticesPerBone": {
         "body": 3450,
         "chest": 4375,
         "tail_00": 2618,
-        "skull": 4399,
+        "skull": 4499,
         "tail_04": 1079,
         "tail_05": 898,
         "tail_03": 1326,
@@ -636,7 +809,7 @@
     },
     "Saurichthys procedural volume twin": {
       "maxInfluences": 4,
-      "vertices": 3521,
+      "vertices": 3627,
       "verticesPerBone": {
         "anal": 343,
         "tail_05": 473,
@@ -650,10 +823,10 @@
         "dorsal": 161,
         "tail_00": 951,
         "body": 1182,
-        "chest": 1849,
+        "chest": 1852,
         "pelvic_R": 199,
         "pelvic_L": 215,
-        "skull": 1762,
+        "skull": 1868,
         "pec_upper_L": 358,
         "pec_upper_R": 303,
         "pec_mid_L": 227,
@@ -678,30 +851,30 @@
     {
       "fromBodyFraction": 0.0,
       "above": 131,
-      "below": 106,
+      "below": 129,
       "maxOutAbove": 0.0144,
       "maxOutBelow": 0.0064
     },
     {
       "fromBodyFraction": 0.05,
       "above": 183,
-      "below": 237,
+      "below": 253,
       "maxOutAbove": 0.0185,
       "maxOutBelow": 0.0082
     },
     {
       "fromBodyFraction": 0.1,
       "above": 125,
-      "below": 326,
+      "below": 340,
       "maxOutAbove": 0.0239,
       "maxOutBelow": 0.0106
     },
     {
       "fromBodyFraction": 0.15,
       "above": 217,
-      "below": 134,
+      "below": 237,
       "maxOutAbove": 0.0325,
-      "maxOutBelow": 0.0112
+      "maxOutBelow": 0.0127
     },
     {
       "fromBodyFraction": 0.2,
@@ -825,7 +998,7 @@
     "maximumEnvelopeDifference": 0.0723889097571373,
     "maximumEnvelopeDifferenceFractionOfBodyLength": 0.01447778195142746,
     "surfaceDistanceMax": 0.046958766877651215,
-    "surfaceDistanceP95": 0.024382821004837754,
+    "surfaceDistanceP95": 0.02435532007366419,
     "envelopeTolerance": 0.2
   },
   "anchors": {
@@ -858,10 +1031,10 @@
   "jawShutFromTheGenerationsPartedPose": {
     "closingRotationDegrees": 2.5,
     "mandibleVerticesMeasured": 1425,
-    "verticesInsideTheSkullSurface": 518,
-    "maxPenetrationUnits": 0.15814,
-    "maxPenetrationOverBodyLength": 0.03163,
-    "meanPenetrationOverBodyLength": 0.002242,
+    "verticesInsideTheSkullSurface": 419,
+    "maxPenetrationUnits": 0.13393,
+    "maxPenetrationOverBodyLength": 0.02679,
+    "meanPenetrationOverBodyLength": 0.001075,
     "note": "the mandible posed at the measured closing rotation, against the skull's own surface in the same pose. Anything above zero is the generation's two tooth rows, modelled apart, meeting for the first time."
   },
   "authoredVerticesFarthestFromTheTwin": [
@@ -944,45 +1117,100 @@
   "rootStable": true,
   "noScaleChannels": true,
   "gapeSolid": {
-    "tool": "/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- saurichthys Heavy@0.50 Attack@0.40 Bite@0.15",
-    "backdropTest": "r > 0.90, g < 0.20, b > 0.90",
-    "pixelsPerFrame": 378000,
-    "tolerance": 12,
-    "maxSeenThroughTheBody": 3,
-    "previously": {
-      "value": 17,
-      "backdropTest": "r > 0.75, g < 0.45, b > 0.75",
-      "why": "fourteen of those seventeen were this fish's own pale skin, which renders at about (0.78, 0.44, 0.76) under a magenta world and sat inside that window by one part in two hundred on green. The backdrop itself renders with green below 0.063 everywhere measured. A ray cast through each failing pixel found solid front-facing skin at every one, and five corrections to the geometry moved the count by nothing at all."
-    },
-    "note": "the tool counts pixels over the whole frame; what is left is three isolated pixels at the far edge of it where a surface one polygon thick loses its back face. The shipped body material is double-sided, so none of them arise at runtime at all -- the cull is the worst case a single-sided renderer would draw.",
+    "id": "saurichthys",
+    "backdrop": [
+      1.0,
+      0.0,
+      1.0,
+      1.0
+    ],
     "shots": [
       {
         "clip": "Heavy",
         "t": 0.5,
         "pixels": 378000,
-        "differingPixels": 6248,
-        "holesOpenedByCulling": 2,
-        "seenThroughTheBody": 0,
-        "backdropInBothPasses": 2
+        "differingPixels": 729,
+        "holesOpenedByCulling": 6,
+        "seenThroughTheBody": 1,
+        "backdropInBothPasses": 16,
+        "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Heavy-0.5-opened.png",
+        "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Heavy-0.5-solid.png",
+        "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Heavy-0.5-culled.png",
+        "openedPixelsAlsoOpenedBeforeThisPort": 6,
+        "openedPixelsNewSinceThisPort": 0,
+        "sharedPixelBox": [
+          518,
+          352,
+          543,
+          353
+        ]
       },
       {
         "clip": "Attack",
         "t": 0.4,
         "pixels": 378000,
-        "differingPixels": 6243,
-        "holesOpenedByCulling": 3,
-        "seenThroughTheBody": 0,
-        "backdropInBothPasses": 5
+        "differingPixels": 725,
+        "holesOpenedByCulling": 6,
+        "seenThroughTheBody": 1,
+        "backdropInBothPasses": 16,
+        "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Attack-0.4-opened.png",
+        "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Attack-0.4-solid.png",
+        "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Attack-0.4-culled.png",
+        "openedPixelsAlsoOpenedBeforeThisPort": 6,
+        "openedPixelsNewSinceThisPort": 0,
+        "sharedPixelBox": [
+          518,
+          352,
+          543,
+          353
+        ]
       },
       {
         "clip": "Bite",
         "t": 0.15,
         "pixels": 378000,
-        "differingPixels": 68149,
-        "holesOpenedByCulling": 6,
-        "seenThroughTheBody": 3,
-        "backdropInBothPasses": 1
+        "differingPixels": 2037,
+        "holesOpenedByCulling": 158,
+        "seenThroughTheBody": 2,
+        "backdropInBothPasses": 4,
+        "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Bite-0.15-opened.png",
+        "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Bite-0.15-solid.png",
+        "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Bite-0.15-culled.png",
+        "openedPixelsAlsoOpenedBeforeThisPort": 12,
+        "openedPixelsNewSinceThisPort": 146,
+        "sharedPixelBox": [
+          5,
+          155,
+          12,
+          158
+        ]
       }
-    ]
+    ],
+    "beforeThisPort": {
+      "note": "the one-sac Mouth_lining with no hinge plug, the shipped 15 September body, same shots",
+      "shots": [
+        {
+          "clip": "Heavy",
+          "t": 0.5,
+          "holesOpenedByCulling": 378,
+          "seenThroughTheBody": 373,
+          "backdropInBothPasses": 4
+        },
+        {
+          "clip": "Attack",
+          "t": 0.4,
+          "holesOpenedByCulling": 377,
+          "seenThroughTheBody": 372,
+          "backdropInBothPasses": 1
+        },
+        {
+          "clip": "Bite",
+          "t": 0.15,
+          "holesOpenedByCulling": 3404,
+          "seenThroughTheBody": 0,
+          "backdropInBothPasses": 1
+        }
+      ]
+    }
   }
 }
