@@ -653,79 +653,280 @@ def protrusions(o, y_front, floor=.0034):
     return co, out, groups
 
 
-def lining(name, rig, tx, seam, section, y_back, y_front, jaw_blend, material,
-           rings=24, ring=14, centre_x=None, power=2., fit=None):
-    """One **skinned** lining on the mouth's own measured section, wound inwards.
+def mouth_room(bvh, at, side, up, limit=.25, fallback=.02, cap=None):
+    """How much head there is round the mouth line at one station: half-width to the nearer side,
+    height to the roof, depth to the floor, measured by ray cast from the mouth's own axis.
 
-    Both worked examples shipped two separate closed tubes -- a palate rigid on the skull and a
-    floor rigid on the jaw -- and they part the moment the jaw swings, leaving a wedge at the back
-    of the mouth. The source material culls its backfaces, which is right for a closed shell and
-    wrong for one cut in half, so what showed through that wedge was the far side of the head. Here
-    the roof follows the skull, the floor follows the jaw and the wall between them stretches, so
-    no opening the clips reach can part it.
+    This is what `oral_shells` sizes a palate and a floor against. Two things about how it is cast.
 
-    `power` is the section's superellipse exponent, 2 for a plain ellipse. **A mouth's section is
-    not an ellipse**, and on a deep head the difference is a hole: an ellipse narrows towards its
-    poles, so at the height the mandible's rim reaches at full gape the lining is a fraction of the
-    width the mouth is, and the gape shows background down both sides of the jaw. Rhaeticosaurus
-    needed one -- an ellipse narrows towards its floor -- and the bodies built before this option
-    existed keep the ellipse they were measured with.
+    It is a cast rather than a normal-sign probe: `T.depth_probe` answers about the nearest surface,
+    and beside a modelled slit the nearest surface is the lumen's own wall rather than the skull.
 
-    `fit`, where a builder supplies it, corrects each ring vertex **on its own**: given the point
-    and its station it returns the point pulled back inside the skin. Shrinking a whole ring by one
-    factor instead couples its two axes, and on a deep head that is a hole -- a floor set deep
-    enough to sit inside the mandible rather than stipple against it took Rhaeticosaurus' *width*
-    down to 0.68 of the mouth's own, the far wall then stopped short of the mandible's rim, and the
-    gape showed background down the jaw line. A per-vertex fit gives the mouth's own section rather
-    than the largest ellipse that fits inside it.
+    And it is cast **inwards, from outside the animal**, not outwards from the mouth. Cast outwards
+    it answers about the lumen on every generation that models a real oral cavity -- the first thing
+    a ray up from the mouth axis meets is the roof of the modelled cavity, a few thousandths away,
+    and a palate sized to that is the tube all over again. Placodus is the case: 309 px of backdrop
+    through the mandible that widening the shells did not move by one, because what they were being
+    widened to was still the mouth. From outside, the first hit is the skin, which is the question.
+
+    Measure it on the head **before** the jaw is cut off, or the rays at the seam leave through the
+    cut.
     """
-    raw, verts, faces = [], [], []
-    # The lining rides the body's **measured** centreline, not the file's x = 0. Three of these
-    # four generations are posed, and on the narrowest of them the axis is further off the file's
-    # midline than the rostrum is wide -- a lining built on zero came out entirely outside the
-    # snout it was meant to be inside.
-    cxf = centre_x or (lambda _y: 0.)
-    for i in range(rings):
-        y = y_back + (y_front - y_back) * (i / (rings - 1))
-        w, h = section(y)
-        for j in range(ring):
-            th = j * TAU / ring
-            c, sn = math.cos(th), math.sin(th)
-            if power != 2.:
-                e = 2. / power
-                c = math.copysign(abs(c) ** e, c)
-                sn = math.copysign(abs(sn) ** e, sn)
-            p = Vector((cxf(y) + w * c, y, seam(y) + h * sn))
-            if fit is not None:
-                p = fit(p, y)
-            raw.append(p)
-            verts.append(tx(p))
-    for i in range(rings - 1):
-        for j in range(ring):
-            a = i * ring + j
-            b = i * ring + (j + 1) % ring
-            faces.append((a, b, b + ring, a + ring))
-    faces.append(tuple(reversed(range(ring))))
-    faces.append(tuple(range((rings - 1) * ring, rings * ring)))
+    def reach(d):
+        hit = bvh.ray_cast(at + d * limit, -d, limit)
+        return limit - (hit[0] - (at + d * limit)).length if hit[0] is not None else fallback
+    out = (min(reach(side), reach(-side)), reach(up), reach(-up))
+    # **A cast from outside meets the first surface on the line, and on a body whose flippers span
+    # wider than its head that surface is a flipper.** Rhaeticosaurus' do span further than it is
+    # long, and its palate came out through the top of its skull on a room measured through a
+    # paddle; Archelon's stood 0.0066 outside the head's own section and its builder said so. So the
+    # caller passes the head's own measured section as a `cap` and the cast may only ever narrow it.
+    return out if cap is None else tuple(min(a, b) for a, b in zip(out, cap))
+
+
+def _superellipse(th, power):
+    c, sn = math.cos(th), math.sin(th)
+    if power != 2.:
+        e = 2. / power
+        c = math.copysign(abs(c) ** e, c)
+        sn = math.copysign(abs(sn) ** e, sn)
+    return c, sn
+
+
+def oral_shells(seam, section, u_back, u_front, rings=24, ring=14, centre=None, power=2.,
+                fit=None, overlap=.16, throat=.18, swell=1.60, behind=0., axis='y',
+                point=None, room=None, fill=.90, shell_power=5., buried=.78):
+    """The mouth as **two independently closed surfaces**: a palate on the skull, a floor on the jaw.
+
+    This replaces one sac whose wall stretched between the two jaws. That sac was built to stop an
+    open gape showing the backdrop through the head, and it did -- but the wall it stretched *is* a
+    mouth webbed shut: on Cymbospondylus at `Heavy` it photographed as a flat pink triangle filling
+    the whole gape from hinge to snout, and a reviewer reading four bodies called it gum. It is not
+    anatomy. A mouth is a palate closing the skull's interior, a floor closing the mandible's, and
+    open space between them; being able to see daylight between the jaws of a gharial-snouted animal
+    is what an open mouth looks like, and `gape-solid.py` has always allowed it -- backdrop present
+    in **both** of its passes is honest gape, and only backdrop the cull *opens* is a hole.
+
+    So each half is closed on its own and nothing stretches anywhere:
+
+    - the **palate** is a closed shell whose visible face is its underside, a shallow dome hanging
+      just inside the upper lip, rigid on `skull`;
+    - the **floor** is a closed shell whose visible face is its top, rigid on `jaw`;
+    - they **overlap rather than join**. At the corner of the mouth the jaw's rotation is zero --
+      that is what a hinge is -- so an overlap there survives any gape, and the separation the
+      clips open grows forward of it exactly as the mouth does. `overlap` is that interpenetration
+      as a fraction of the local half-height, and it is invisible: at rest both shells are inside a
+      shut mouth, and where they part the near half hides the far one.
+    - behind the hinge the palate swells past the mouth's own section and the floor shrinks
+      inside it (`throat`, the fraction of the mouth's length over which that happens), so the
+      throat is a closed wall rather than a line of sight into the neck, and the floor's rear cap
+      is nested inside the palate rather than meeting it.
+
+    Both shells are closed manifolds and their normals are recalculated **outwards** by bmesh, so a
+    backface cull cannot take a face that is doing work: what a viewer sees of a closed solid is
+    always its front. The old sac had to be wound inwards and that winding was load-bearing.
+
+    `section` is the mouth's own measured half-width and half-height per station and is unchanged --
+    it is still what decides that the lining is never narrower than the mouth. `fit`, where a builder
+    supplies it, still corrects each vertex on its own.
+
+    `room` is how much head there is at the mouth line, per station, and every shipped builder
+    supplies one. `swell` is the fallback for a builder that does not: a guess at the head, opening
+    the rear rings past the measured lumen. Where the room is known the guess is worse than the
+    measurement and is not added to it.
+
+    Returns `(raw, faces, n_palate)`: raw points in the builder's own coordinates, quad faces over
+    the two shells, and how many of the points are the palate's.
+    """
+    # `rings` is the station count the one-sac callers pass, and it is **split** between the two
+    # shells rather than paid twice: the mouth costs what it always did. A stretching wall needed
+    # stations to bend smoothly between two bones; a rigid lid does not, and the twin has to stay
+    # under two fifths of the authored triangles with the oral parts counted in both.
+    rings = max(10, (rings + 1) // 2)
+    cf = centre or (lambda _u: 0.)
+    raw, faces = [], []
+    # `point` is for the heads whose mouth is measured on a **curved** frame rather than on a
+    # straight axis -- Keichousaurus' and Dinocephalosaurus' long necks, where the lumen follows the
+    # head's own centreline and `z` means distance along the head's normal. Everything else about
+    # the two shells is the same, which is the point of the hook.
+    place = point or (lambda u, lat, z: Vector((lat, u, z)) if axis == 'y' else Vector((u, lat, z)))
+
+    def half_heights(u):
+        """A mouth may be measured with one half-height or with two: a shark's palate sits almost on
+        the cut while its floor is the whole lumen deep, and forcing that into one number either
+        buries the roof in the skull or leaves the floor a sliver."""
+        m = section(u)
+        return (m[0], m[1], m[1]) if len(m) == 2 else (m[0], m[1], m[2])
+
+    def shell(is_floor):
+        base = len(raw)
+        # `behind` carries the palate back past the mouth, and it is **zero** by default. It was
+        # written before the room was measured, when the only way to reach the throat was to keep
+        # going; it never moved a gape count by one, and where the seam and the head's lateral axis
+        # are extrapolations -- which is all they can be behind the last measured station -- the
+        # room measured on them is nonsense and the palate comes out through the top of the skull.
+        # Atopodentatus put a flat pink slab over its own braincase that way, and its own section
+        # hull passed it, because a hull over sections is not the skin. What closes the throat is
+        # the rear cap at `u_back` itself, which `room` fills across the whole head.
+        lo = 0. if is_floor else -behind
+        for i in range(rings):
+            q = lo + (1. - lo) * (i / (rings - 1))
+            u = u_back + (u_front - u_back) * q
+            w, hu, hd = half_heights(u)
+            # **The throat blend is measured from the mouth's own back, not from wherever the
+            # palate starts.** Dividing by the extended range dilutes it: with the palate carried
+            # 0.30 of the mouth's length behind, the rear cap reached its full section 0.30 back and
+            # was only a third of the way down to the head's floor *at the hinge*, which is where
+            # the wedge between the two cut halves opens. `smooth` clamps, so this reads 1 behind
+            # the mouth and tapers over `throat` in front of it.
+            back = smooth((throat - q) / throat) if throat > 1e-9 else 0.
+            # **Each shell fills its own jaw, not the lumen.** The measured cavity of a shut mouth
+            # is much narrower than the head that holds it -- Placodus' is 0.042 half-wide in a head
+            # more than twice that -- and two shells drawn to the lumen alone leave a gap either
+            # side of them: a ray into the gape passes between palate and floor, misses both, and
+            # hits the inside of the far cheek. 309 px of that, where the one stretching sac had 36,
+            # because the sac's wall stood across exactly that line. `room` is how much head there
+            # is at the mouth line, measured by the builder; the palate takes the roof half of it
+            # and the floor the floor half, and between them they are the whole of the head's
+            # interior. That is what the reviewer asked for in so many words: a palate on each of
+            # the top and bottom jaws rather than a filling between them.
+            rw = ru = rd = 0.
+            if room is not None:
+                rw, ru, rd = room(u)
+                rw, ru, rd = rw * fill, ru * fill, rd * fill
+            # The measured room is a **bound, not a factor**: it is where the skin is, so the swell
+            # below may raise the lumen towards it and must never multiply it. Multiplying it sent
+            # a pink tube out of the top of Placodus' head at 1.6 x the distance to its own scalp.
+            if is_floor:
+                # Shrunk at the throat so its rear cap is strictly inside the palate's, never
+                # coincident with it: two surfaces in the same place fight rather than close.
+                up, dn, wid = hd * overlap, max(hd, rd * buried), max(w, rw) * (1. - .10 * back)
+            else:
+                # **The throat is the head's, not the mouth's.** A palate that stops at the lumen's
+                # own section leaves a lateral gap between its edge and the skin at the corner of
+                # the mouth, and a line of sight into that corner goes past it and hits the inside
+                # of the far cheek -- 18 px on Cymbospondylus, all of them in the dark wedge behind
+                # the last tooth. `swell` opens the rear rings past the measured lumen so the
+                # throat is a wall across the head rather than a tube down the middle of it; it is
+                # the flange-behind-the-hole the cephalopod linings are built with, for the same
+                # reason. Macrocnemus reached the same answer by hand before this was shared.
+                # `swell` is what opens the rear rings **when the room has not been measured**: it
+                # is a guess at the head, and where the head is known it is worse than the
+                # measurement and must not be added to it. Applied on top of a measured room it put
+                # a pink nub out through the top of Cymbospondylus' snout, because the lumen's own
+                # floored half-depth times 1.6 is more head than there is.
+                if room is not None:
+                    # **The far side of each shell is held short of the skin.** A shell's outer
+                    # half is buried: what has to reach the skin is its width, because that is what
+                    # a line of sight into the gape passes beside, and its mouth-facing surface,
+                    # because that is what the mouth is. The roof of a palate is seen by nothing,
+                    # and drawn to the same fraction of the measured room as the width it came out
+                    # through the top of Atopodentatus' braincase -- passed by that builder's own
+                    # section hull, because a hull over sections is not the skin. Held at `buried`
+                    # it moves no gape count on any body and cannot break a skull.
+                    up, dn, wid = max(hu, ru * buried), \
+                        max(hd * (overlap + (1. - overlap) * back), rd * back * buried), \
+                        max(w, rw)
+                else:
+                    s = 1. + (swell - 1.) * back
+                    up, dn, wid = hu * s, hd * (overlap + (1. - overlap) * back) * s, w * s
+            for j in range(ring):
+                th = j * TAU / ring
+                # **The half that faces the mouth is a squircle, not an ellipse.** An ellipse
+                # narrows towards its poles, so a little way off the mouth line the shell is a
+                # fraction of the width it has at the lip and the inner wall of the jaw shows in
+                # the band between them -- the same shape fault the one-sac form paid for at the
+                # mandible's rim, and on Placodus the difference between 90 px of backdrop and 11.
+                # The far half keeps the caller's exponent, because that half is hugging the head
+                # and a squircle there would push its corners out through the cheek.
+                # ...and it is the *shallow* half that may be a squircle. At the throat the palate
+                # swells to fill the head's own section, and a squircle whose two semi-axes are both
+                # the head's puts its diagonal corner 23 % outside the head -- which is what broke
+                # Cymbospondylus' cheek. So the exponent runs back to the caller's own over the
+                # throat blend: a lid beside the lip is square-sided, a plug inside the head is not.
+                mouth_facing = (math.sin(th) >= 0) if is_floor else (math.sin(th) < 0)
+                pw = shell_power + (power - shell_power) * back if mouth_facing else power
+                c, sn = _superellipse(th, pw)
+                p = place(u, cf(u) + wid * c, seam(u) + (up if sn >= 0 else dn) * sn)
+                if fit is not None:
+                    p = fit(p, u)
+                raw.append(p)
+        for i in range(rings - 1):
+            for j in range(ring):
+                a = base + i * ring + j
+                b = base + i * ring + (j + 1) % ring
+                faces.append((a, b, b + ring, a + ring))
+        faces.append(tuple(range(base, base + ring)))
+        faces.append(tuple(reversed(range(base + (rings - 1) * ring, base + rings * ring))))
+
+    shell(False)
+    n_palate = len(raw)
+    shell(True)
+    return raw, faces, n_palate
+
+
+def oral_object(name, tx, raw, faces, n_palate, material=None, rig=None, measured_room=False):
+    """One mesh object carrying both shells, each rigid on its own bone.
+
+    They are one object and not two because everything downstream -- `oralparts`, the paired audit,
+    the twin, the export -- counts oral parts, and because a palate and a floor that ship as one
+    mesh cannot be separated by a later edit. Rigid, not blended: a palate that took a share of the
+    jaw's rotation would be the stretching wall again in the weight field.
+    """
     me = bpy.data.meshes.new(name)
-    me.from_pydata(verts, [], faces)
+    me.from_pydata([tx(p) for p in raw], [], faces)
     me.update()
     o = bpy.data.objects.new(name, me)
     bpy.context.collection.objects.link(o)
     o.location = (0, 0, 0)
-    o.data.materials.append(material)
+    # A flag the builders' seating checks read. `depth()` is a nearest-surface probe, and a palate
+    # that fills the head out to the skin sits *outside the lumen's own wall* wherever a generation
+    # models a real oral cavity, so the probe reads it as broken skin -- Cymbospondylus at -0.0134
+    # against a -0.012 bound, unmoved by every correction to the shape, because it is not about the
+    # shape. `CLAUDE.md`: where a mouth is modelled, record the probe and assert against the head's
+    # own measured section instead. That section is `mouth_room`, and `oral_shells` holds every
+    # vertex inside `fill` of it by construction.
+    o['measuredRoom'] = bool(measured_room)
+    if material is not None:
+        o.data.materials.append(material)
+    # Outward, by measurement rather than by winding convention: a closed solid shows its front
+    # faces to everything outside it, so the cull shim `gape-solid.py` applies cannot open it.
+    bm = bmesh.new()
+    bm.from_mesh(o.data)
+    bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+    bm.to_mesh(o.data)
+    bm.free()
     for n in ('skull', 'jaw'):
         o.vertex_groups.new(name=n)
-    for idx, p in enumerate(raw):
-        g = jaw_blend(p)
-        o.vertex_groups['jaw'].add([idx], g, 'REPLACE')
-        o.vertex_groups['skull'].add([idx], 1 - g, 'REPLACE')
+    o.vertex_groups['skull'].add(list(range(n_palate)), 1., 'REPLACE')
+    o.vertex_groups['jaw'].add(list(range(n_palate, len(raw))), 1., 'REPLACE')
     for p in o.data.polygons:
         p.use_smooth = True
-    mod = o.modifiers.new('Oral membrane', 'ARMATURE')
-    mod.object = rig
-    o.parent = rig
-    return o, raw
+    if rig is not None:
+        mod = o.modifiers.new('Oral surfaces', 'ARMATURE')
+        mod.object = rig
+        o.parent = rig
+    return o
+
+
+def lining(name, rig, tx, seam, section, y_back, y_front, jaw_blend, material,
+           rings=24, ring=14, centre_x=None, power=2., fit=None, overlap=.16, throat=.18,
+           swell=1.60, behind=0., room=None, fill=.90, shell_power=5., buried=.78):
+    """A palate on the skull and a floor on the jaw -- see `oral_shells` for the whole argument.
+
+    The signature is the one the twelve builders on this kit already call, so that the change is one
+    implementation rather than twelve edits. `jaw_blend` is no longer read: which shell a point
+    belongs to is which side of the mouth line it is on, and each shell is rigid on one bone, so
+    there is no blend left to tune. The builders keep their blend functions because they are also
+    what several of them measure the mouth with.
+    """
+    raw, faces, n_palate = oral_shells(seam, section, y_back, y_front, rings=rings, ring=ring,
+                                       centre=centre_x, power=power, fit=fit,
+                                       overlap=overlap, throat=throat, swell=swell,
+                                       behind=behind, room=room, fill=fill,
+                                       shell_power=shell_power, buried=buried, axis='y')
+    return oral_object(name, tx, raw, faces, n_palate, material, rig,
+                       measured_room=room is not None), raw
 
 
 def crown_lining(name, rig, tx, rim, centre, axis, dn_axis, ds_axis, into_head,
@@ -1060,9 +1261,10 @@ def build_twin(auth, thickness, name, voxel, triangle_target, sample_albedo, bla
     mod = puppet.modifiers.new('Volume surface relaxation', 'SMOOTH')
     mod.factor = .45
     mod.iterations = 2
-    mod.vertex_group = group.name
+    group_name = group.name  # modifier_apply may invalidate the RNA group handle in Blender 5.2.0
+    mod.vertex_group = group_name
     bpy.ops.object.modifier_apply(modifier=mod.name)
-    puppet.vertex_groups.remove(puppet.vertex_groups[group.name])
+    puppet.vertex_groups.remove(puppet.vertex_groups[group_name])
     mod = puppet.modifiers.new('Twin topology budget', 'DECIMATE')
     mod.ratio = min(1., triangle_target / max(1, remesh_triangles))
     ratio = mod.ratio
