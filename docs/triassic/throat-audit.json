@@ -1,0 +1,1479 @@
+{
+  "schema": 1,
+  "phases": 25,
+  "method": "Three.js GLTFLoader/AnimationMixer; all shipped authored and puppet clips, 25 samples including clamped endpoints; skin and hidden oral surfaces recorded separately; mouth region selected by jaw/skull/neck/pouch influences. Strain flags require posed edge >1.5% body length and ratio >2. No automatic claim of intersection-free geometry.",
+  "models": [
+    {
+      "id": "askeptosaurus",
+      "variant": "authored",
+      "sha256": "29e62d2fa0b1ed824601db88bf575370f1429b88627e4a98216a2cb1cd206713",
+      "length": 8.621802464567306,
+      "meshes": [
+        {
+          "name": "Askeptosaurus_posed_body",
+          "hiddenOral": false,
+          "vertices": 11245,
+          "mixedJawSkullVertices": 0
+        },
+        {
+          "name": "Askeptosaurus_posed_body_lower_jaw",
+          "hiddenOral": false,
+          "vertices": 71,
+          "mixedJawSkullVertices": 13
+        },
+        {
+          "name": "Oral_cavity_lining",
+          "hiddenOral": true,
+          "vertices": 288,
+          "mixedJawSkullVertices": 0
+        }
+      ],
+      "clips": [
+        {
+          "name": "Ability",
+          "duration": 1.100000023841858,
+          "skin": {
+            "ratio": 1.1334696786175815,
+            "rest": 0.11908725421913291,
+            "posed": 0.1349817917672108,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              508,
+              1699
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1334696786175815,
+            "rest": 0.11908725421913291,
+            "posed": 0.1349817917672108,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              508,
+              1699
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Attack",
+          "duration": 0.8666666746139526,
+          "skin": {
+            "ratio": 1.161780291269031,
+            "rest": 0.11346612924134092,
+            "posed": 0.13182271267917456,
+            "phase": 0.4166666666666667,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              463,
+              9372
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.161780291269031,
+            "rest": 0.11346612924134092,
+            "posed": 0.13182271267917456,
+            "phase": 0.4166666666666667,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              463,
+              9372
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Bite",
+          "duration": 0.46666666865348816,
+          "skin": {
+            "ratio": 1.0404038177323807,
+            "rest": 0.1267484595084758,
+            "posed": 0.1318695811643163,
+            "phase": 0.125,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              10007,
+              3896
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0404038177323807,
+            "rest": 0.1267484595084758,
+            "posed": 0.1318695811643163,
+            "phase": 0.125,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              10007,
+              3896
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Breath",
+          "duration": 2.4000000953674316,
+          "skin": {
+            "ratio": 1.0165961306836249,
+            "rest": 0.13399041640289563,
+            "posed": 0.1362141388638714,
+            "phase": 1,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              7143,
+              10601
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0165961306836249,
+            "rest": 0.13399041640289563,
+            "posed": 0.1362141388638714,
+            "phase": 1,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              7143,
+              10601
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Coil",
+          "duration": 1.2999999523162842,
+          "skin": {
+            "ratio": 1.133502717061865,
+            "rest": 0.11908725421913291,
+            "posed": 0.1349857262248242,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              508,
+              1699
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.133502717061865,
+            "rest": 0.11908725421913291,
+            "posed": 0.1349857262248242,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              508,
+              1699
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Dash",
+          "duration": 0.6666666865348816,
+          "skin": {
+            "ratio": 1.1511240552508757,
+            "rest": 0.11346612924134092,
+            "posed": 0.1306135908259123,
+            "phase": 0.4166666666666667,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              463,
+              9372
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1511240552508757,
+            "rest": 0.11346612924134092,
+            "posed": 0.1306135908259123,
+            "phase": 0.4166666666666667,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              463,
+              9372
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Death",
+          "duration": 1.7000000476837158,
+          "skin": {
+            "ratio": 1.0640324537846317,
+            "rest": 0.15316737494363333,
+            "posed": 0.1629750578010249,
+            "phase": 0.8333333333333334,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              586,
+              10135
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0640324537846317,
+            "rest": 0.15316737494363333,
+            "posed": 0.1629750578010249,
+            "phase": 0.8333333333333334,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              586,
+              10135
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Dive",
+          "duration": 1.2999999523162842,
+          "skin": {
+            "ratio": 1.041897603470642,
+            "rest": 0.15059283679312052,
+            "posed": 0.1569023157545978,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              10007,
+              10947
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.041897603470642,
+            "rest": 0.15059283679312052,
+            "posed": 0.1569023157545978,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              10007,
+              10947
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Dodge",
+          "duration": 0.5333333611488342,
+          "skin": {
+            "ratio": 1.151315519929339,
+            "rest": 0.11346612924134092,
+            "posed": 0.130635315581864,
+            "phase": 0.4166666666666667,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              463,
+              9372
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.151315519929339,
+            "rest": 0.11346612924134092,
+            "posed": 0.130635315581864,
+            "phase": 0.4166666666666667,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              463,
+              9372
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Eat",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 1.0359373226085986,
+            "rest": 0.1267484595084758,
+            "posed": 0.13130345978797478,
+            "phase": 0.4166666666666667,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              10007,
+              3896
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0359373226085986,
+            "rest": 0.1267484595084758,
+            "posed": 0.13130345978797478,
+            "phase": 0.4166666666666667,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              10007,
+              3896
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Grab",
+          "duration": 1.100000023841858,
+          "skin": {
+            "ratio": 1.0345205905914399,
+            "rest": 0.1267484595084758,
+            "posed": 0.13112389118726359,
+            "phase": 0.25,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              10007,
+              3896
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0345205905914399,
+            "rest": 0.1267484595084758,
+            "posed": 0.13112389118726359,
+            "phase": 0.25,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              10007,
+              3896
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Growth",
+          "duration": 1.5,
+          "skin": {
+            "ratio": 1.026142583980169,
+            "rest": 0.1557515954900032,
+            "posed": 0.15982334465514592,
+            "phase": 0.4166666666666667,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              5035,
+              6344
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.026142583980169,
+            "rest": 0.1557515954900032,
+            "posed": 0.15982334465514592,
+            "phase": 0.4166666666666667,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              5035,
+              6344
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Guard",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 1.0470282896336163,
+            "rest": 0.1267484595084758,
+            "posed": 0.13270922277285507,
+            "phase": 0.625,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              10007,
+              3896
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0470282896336163,
+            "rest": 0.1267484595084758,
+            "posed": 0.13270922277285507,
+            "phase": 0.625,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              10007,
+              3896
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Heavy",
+          "duration": 1.1333333253860474,
+          "skin": {
+            "ratio": 1.143159425625716,
+            "rest": 0.11346612924134092,
+            "posed": 0.12970987513150456,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              463,
+              9372
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.143159425625716,
+            "rest": 0.11346612924134092,
+            "posed": 0.12970987513150456,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              463,
+              9372
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Hit",
+          "duration": 0.5333333611488342,
+          "skin": {
+            "ratio": 1.0540789206702115,
+            "rest": 0.1267484595084758,
+            "posed": 0.13360287939530616,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              10007,
+              3896
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0540789206702115,
+            "rest": 0.1267484595084758,
+            "posed": 0.13360287939530616,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              10007,
+              3896
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Idle",
+          "duration": 2.799999952316284,
+          "skin": {
+            "ratio": 1.0260935388915087,
+            "rest": 0.1267484595084758,
+            "posed": 0.13005577536609902,
+            "phase": 0.625,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              10007,
+              3896
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0260935388915087,
+            "rest": 0.1267484595084758,
+            "posed": 0.13005577536609902,
+            "phase": 0.625,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              10007,
+              3896
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Parry",
+          "duration": 0.4000000059604645,
+          "skin": {
+            "ratio": 1.1669912625269212,
+            "rest": 0.11346612924134092,
+            "posed": 0.13241398141739524,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              463,
+              9372
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1669912625269212,
+            "rest": 0.11346612924134092,
+            "posed": 0.13241398141739524,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              463,
+              9372
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Rise",
+          "duration": 1.2999999523162842,
+          "skin": {
+            "ratio": 1.0153698919031287,
+            "rest": 0.13399041640289563,
+            "posed": 0.13604983461906334,
+            "phase": 1,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              7143,
+              10601
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0153698919031287,
+            "rest": 0.13399041640289563,
+            "posed": 0.13604983461906334,
+            "phase": 1,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              7143,
+              10601
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Sprint",
+          "duration": 1.0666667222976685,
+          "skin": {
+            "ratio": 1.374783317457554,
+            "rest": 0.10918041752127705,
+            "posed": 0.15009941660130213,
+            "phase": 0.75,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              2533,
+              8849
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0642832814708958,
+            "rest": 0.13920128012244062,
+            "posed": 0.14814959519366047,
+            "phase": 0.8333333333333334,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              6129,
+              7674
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Stagger",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 1.0540789206702115,
+            "rest": 0.1267484595084758,
+            "posed": 0.13360287939530616,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              10007,
+              3896
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0540789206702115,
+            "rest": 0.1267484595084758,
+            "posed": 0.13360287939530616,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              10007,
+              3896
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Swim",
+          "duration": 1.7000000476837158,
+          "skin": {
+            "ratio": 1.2635452404725953,
+            "rest": 0.10918041752127705,
+            "posed": 0.13795439691182038,
+            "phase": 0.75,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              2533,
+              8849
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0419156769433275,
+            "rest": 0.13920128012244062,
+            "posed": 0.1450359960101505,
+            "phase": 0.8333333333333334,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              6129,
+              7674
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "TailWhip",
+          "duration": 1.2666666507720947,
+          "skin": {
+            "ratio": 1.143159425625716,
+            "rest": 0.11346612924134092,
+            "posed": 0.12970987513150456,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              463,
+              9372
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.143159425625716,
+            "rest": 0.11346612924134092,
+            "posed": 0.12970987513150456,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              463,
+              9372
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "TurnLeft",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 1.0303873601642748,
+            "rest": 0.14437120640547035,
+            "posed": 0.14875826625186422,
+            "phase": 0.4166666666666667,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              6124,
+              9012
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0271141946256954,
+            "rest": 0.1267484595084758,
+            "posed": 0.1301851419080957,
+            "phase": 1,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              10007,
+              3896
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "TurnRight",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 1.0417876754675879,
+            "rest": 0.13522730965396043,
+            "posed": 0.14087814458413514,
+            "phase": 1,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              9175,
+              10836
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0417876754675879,
+            "rest": 0.13522730965396043,
+            "posed": 0.14087814458413514,
+            "phase": 1,
+            "mesh": "Askeptosaurus_posed_body",
+            "vertices": [
+              9175,
+              10836
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        }
+      ],
+      "worstMouth": {
+        "ratio": 1.1669912625269212,
+        "rest": 0.11346612924134092,
+        "posed": 0.13241398141739524,
+        "phase": 0.5,
+        "mesh": "Askeptosaurus_posed_body",
+        "vertices": [
+          463,
+          9372
+        ],
+        "clip": "Parry"
+      }
+    },
+    {
+      "id": "askeptosaurus",
+      "variant": "puppet",
+      "sha256": "edde99529bec82a75b139b1e85e3a90bb3a60a2c2d627d079daffc38b31a7394",
+      "length": 8.622941850193927,
+      "meshes": [
+        {
+          "name": "Askeptosaurus_procedural_volume_twin",
+          "hiddenOral": false,
+          "vertices": 2906,
+          "mixedJawSkullVertices": 0
+        },
+        {
+          "name": "Askeptosaurus_procedural_volume_twin_lower_jaw",
+          "hiddenOral": false,
+          "vertices": 38,
+          "mixedJawSkullVertices": 7
+        },
+        {
+          "name": "Oral_cavity_lining",
+          "hiddenOral": true,
+          "vertices": 288,
+          "mixedJawSkullVertices": 0
+        }
+      ],
+      "clips": [
+        {
+          "name": "Ability",
+          "duration": 1.100000023841858,
+          "skin": {
+            "ratio": 1.1510508465593137,
+            "rest": 0.11384999336800747,
+            "posed": 0.13104713124701725,
+            "phase": 0.5416666666666666,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              490,
+              474
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.146891041728459,
+            "rest": 0.14260084417628732,
+            "posed": 0.16354763072869982,
+            "phase": 0.5416666666666666,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2675,
+              2684
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Attack",
+          "duration": 0.8666666746139526,
+          "skin": {
+            "ratio": 1.1410294794642821,
+            "rest": 0.12074196553467183,
+            "posed": 0.1377701420835209,
+            "phase": 0.4166666666666667,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2617,
+              2614
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1410294794642821,
+            "rest": 0.12074196553467183,
+            "posed": 0.1377701420835209,
+            "phase": 0.4166666666666667,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2617,
+              2614
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Bite",
+          "duration": 0.46666666865348816,
+          "skin": {
+            "ratio": 1.095230249998797,
+            "rest": 0.15717769289240946,
+            "posed": 0.17214576388078776,
+            "phase": 0.2916666666666667,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              696,
+              699
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0569560828095834,
+            "rest": 0.12246604907102786,
+            "posed": 0.12944123550327982,
+            "phase": 0.2916666666666667,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2084,
+              2062
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Breath",
+          "duration": 2.4000000953674316,
+          "skin": {
+            "ratio": 1.0618621009616633,
+            "rest": 0.12234620815403877,
+            "posed": 0.1299148016351406,
+            "phase": 1,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2258,
+              2270
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0259259830128913,
+            "rest": 0.1379030892779068,
+            "posed": 0.14147836242795103,
+            "phase": 0,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2689,
+              2670
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Coil",
+          "duration": 1.2999999523162842,
+          "skin": {
+            "ratio": 1.1509907760193525,
+            "rest": 0.11384999336800747,
+            "posed": 0.13104029221644106,
+            "phase": 0.5416666666666666,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              490,
+              474
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1468162420045969,
+            "rest": 0.14260084417628732,
+            "posed": 0.16353696422493294,
+            "phase": 0.5416666666666666,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2675,
+              2684
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Dash",
+          "duration": 0.6666666865348816,
+          "skin": {
+            "ratio": 1.12935215891784,
+            "rest": 0.11612176686015249,
+            "posed": 0.1311423681008673,
+            "phase": 0.4166666666666667,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2622,
+              2614
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.12935215891784,
+            "rest": 0.11612176686015249,
+            "posed": 0.1311423681008673,
+            "phase": 0.4166666666666667,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2622,
+              2614
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Death",
+          "duration": 1.7000000476837158,
+          "skin": {
+            "ratio": 1.1160295144279482,
+            "rest": 0.12435662532205602,
+            "posed": 0.13878566417407245,
+            "phase": 1,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              911,
+              892
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.088613168349812,
+            "rest": 0.14260084417628732,
+            "posed": 0.15523715678810596,
+            "phase": 0.75,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2675,
+              2684
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Dive",
+          "duration": 1.2999999523162842,
+          "skin": {
+            "ratio": 1.0633474984802642,
+            "rest": 0.12234620815403877,
+            "posed": 0.13009653438914281,
+            "phase": 1,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2258,
+              2270
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0504210076972047,
+            "rest": 0.12375633408747308,
+            "posed": 0.1299962531610754,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2696,
+              2698
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Dodge",
+          "duration": 0.5333333611488342,
+          "skin": {
+            "ratio": 1.1295294384171257,
+            "rest": 0.11612176686015249,
+            "posed": 0.13116295410955245,
+            "phase": 0.4166666666666667,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2622,
+              2614
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1295294384171257,
+            "rest": 0.11612176686015249,
+            "posed": 0.13116295410955245,
+            "phase": 0.4166666666666667,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2622,
+              2614
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Eat",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 1.0700714861088703,
+            "rest": 0.12110473114041373,
+            "posed": 0.1295907196262377,
+            "phase": 0.625,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2690,
+              2703
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0700714861088703,
+            "rest": 0.12110473114041373,
+            "posed": 0.1295907196262377,
+            "phase": 0.625,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2690,
+              2703
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Grab",
+          "duration": 1.100000023841858,
+          "skin": {
+            "ratio": 1.0506135647496682,
+            "rest": 0.12435662532205602,
+            "posed": 0.1306507574298441,
+            "phase": 0.3333333333333333,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              911,
+              892
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.037796766236135,
+            "rest": 0.13421088927661573,
+            "posed": 0.13928362688494778,
+            "phase": 0.20833333333333334,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2024,
+              2025
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Growth",
+          "duration": 1.5,
+          "skin": {
+            "ratio": 1.098414718023547,
+            "rest": 0.12234620815403877,
+            "posed": 0.13438687573076868,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2258,
+              2270
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0439407690549052,
+            "rest": 0.20456264964514542,
+            "posed": 0.21355128979046223,
+            "phase": 0.4583333333333333,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2038,
+              2033
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Guard",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 1.0752168183113398,
+            "rest": 0.12110473114041373,
+            "posed": 0.13021384369924588,
+            "phase": 0.625,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2690,
+              2703
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0752168183113398,
+            "rest": 0.12110473114041373,
+            "posed": 0.13021384369924588,
+            "phase": 0.625,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2690,
+              2703
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Heavy",
+          "duration": 1.1333333253860474,
+          "skin": {
+            "ratio": 1.12799609775575,
+            "rest": 0.11612176686015249,
+            "posed": 0.13098489988275497,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2622,
+              2614
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.12799609775575,
+            "rest": 0.11612176686015249,
+            "posed": 0.13098489988275497,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2622,
+              2614
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Hit",
+          "duration": 0.5333333611488342,
+          "skin": {
+            "ratio": 1.0940074833402282,
+            "rest": 0.12435662532205602,
+            "posed": 0.1360470787052662,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              911,
+              892
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.086077861271675,
+            "rest": 0.12110473114041373,
+            "posed": 0.13152916738686177,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2690,
+              2703
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Idle",
+          "duration": 2.799999952316284,
+          "skin": {
+            "ratio": 1.0854519641389924,
+            "rest": 0.12234620815403877,
+            "posed": 0.13280093194575937,
+            "phase": 0.75,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2258,
+              2270
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0335916467065602,
+            "rest": 0.20456264964514542,
+            "posed": 0.211434245901383,
+            "phase": 0.75,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2038,
+              2033
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Parry",
+          "duration": 0.4000000059604645,
+          "skin": {
+            "ratio": 1.1755682738856283,
+            "rest": 0.12435662532205602,
+            "posed": 0.14618970337609122,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              911,
+              892
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1706011730359325,
+            "rest": 0.11989206723021034,
+            "posed": 0.1403457945373871,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2032,
+              2028
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Rise",
+          "duration": 1.2999999523162842,
+          "skin": {
+            "ratio": 1.06150826634906,
+            "rest": 0.12234620815403877,
+            "posed": 0.1298715113119749,
+            "phase": 0,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2258,
+              2270
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.025156747384429,
+            "rest": 0.1379030892779068,
+            "posed": 0.14137228245840344,
+            "phase": 1,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2689,
+              2670
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Sprint",
+          "duration": 1.0666667222976685,
+          "skin": {
+            "ratio": 1.3014802853149439,
+            "rest": 0.11047477317975263,
+            "posed": 0.14378073931808816,
+            "phase": 0.75,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2254,
+              2259
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1167068502666733,
+            "rest": 0.11716622365120044,
+            "posed": 0.13084032457117264,
+            "phase": 0.75,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2038,
+              2094
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Stagger",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 1.0940074833402282,
+            "rest": 0.12435662532205602,
+            "posed": 0.1360470787052662,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              911,
+              892
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.086077861271675,
+            "rest": 0.12110473114041373,
+            "posed": 0.13152916738686177,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2690,
+              2703
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Swim",
+          "duration": 1.7000000476837158,
+          "skin": {
+            "ratio": 1.213956474036227,
+            "rest": 0.11047477317975263,
+            "posed": 0.13411156611924444,
+            "phase": 0.75,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2254,
+              2259
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0794603219659131,
+            "rest": 0.12090460578295237,
+            "posed": 0.13051172468562758,
+            "phase": 0.75,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2093,
+              2105
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "TailWhip",
+          "duration": 1.2666666507720947,
+          "skin": {
+            "ratio": 1.12799609775575,
+            "rest": 0.11612176686015249,
+            "posed": 0.13098489988275497,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2622,
+              2614
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.12799609775575,
+            "rest": 0.11612176686015249,
+            "posed": 0.13098489988275497,
+            "phase": 0.5,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2622,
+              2614
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "TurnLeft",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 1.0924918620046271,
+            "rest": 0.12234620815403877,
+            "posed": 0.1336622367554115,
+            "phase": 1,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2258,
+              2270
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0423666512678476,
+            "rest": 0.1379030892779068,
+            "posed": 0.1437455813701027,
+            "phase": 1,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2689,
+              2670
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "TurnRight",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 1.0458652520963607,
+            "rest": 0.14474476651189,
+            "posed": 0.1513835217175867,
+            "phase": 1,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2110,
+              2103
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0452827207182045,
+            "rest": 0.13421088927661573,
+            "posed": 0.14028832349307058,
+            "phase": 1,
+            "mesh": "Askeptosaurus_procedural_volume_twin",
+            "vertices": [
+              2024,
+              2025
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        }
+      ],
+      "worstMouth": {
+        "ratio": 1.1706011730359325,
+        "rest": 0.11989206723021034,
+        "posed": 0.1403457945373871,
+        "phase": 0.5,
+        "mesh": "Askeptosaurus_procedural_volume_twin",
+        "vertices": [
+          2032,
+          2028
+        ],
+        "clip": "Parry"
+      }
+    }
+  ]
+}

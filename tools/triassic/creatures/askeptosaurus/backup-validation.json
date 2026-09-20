@@ -173,7 +173,44 @@
       0.0,
       0.0,
       0.0
-    ]
+    ],
+    "front": {
+      "bones": [
+        "chest",
+        "neck_00",
+        "neck_01",
+        "neck_02",
+        "neck_03",
+        "skull"
+      ],
+      "trunkRunHipToShoulder": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "trunkRunVsBodyToChestDegrees": 0.0,
+      "trunkRunVsAxisTangentDegrees": 0.0,
+      "restTurnDegrees": 0.0,
+      "restTurnPerJointDegrees": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "restTurnSignedAboutZDegrees": 0.0,
+      "takeoffVsTrunkRunDegrees": 0.0,
+      "headVsTrunkRunDegreesUncorrected": 0.0,
+      "aimShare": [
+        0.1667,
+        0.3333,
+        0.5,
+        0.6667,
+        0.8333,
+        1.0
+      ],
+      "aimPerJointDegrees": 0.0
+    }
   },
   "bones": 33,
   "boneNames": [
@@ -317,6 +354,20 @@
   "tailFraction": 0.632327526807785,
   "mouth": {
     "hingeY": -0.3305371379852295,
+    "cutPlane": {
+      "point": [
+        0.0,
+        0.0,
+        1.983223
+      ],
+      "normal": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "tolerance": 0.01,
+      "frame": "glTF, +Y up"
+    },
     "lip": [
       {
         "y": -0.3935371379852295,
@@ -601,6 +652,10 @@
         1.0064,
         1.0144
       ],
+      "headVsTrunkRunDegrees": [
+        6.53,
+        6.6
+      ],
       "posedExtentOverBind": [
         0.9808,
         0.9872
@@ -637,6 +692,10 @@
       "tailArcOverChord": [
         1.0037,
         1.0205
+      ],
+      "headVsTrunkRunDegrees": [
+        4.22,
+        5.24
       ],
       "posedExtentOverBind": [
         0.9814,
@@ -675,6 +734,10 @@
         1.0074,
         1.0276
       ],
+      "headVsTrunkRunDegrees": [
+        1.39,
+        4.72
+      ],
       "posedExtentOverBind": [
         0.98,
         0.9869
@@ -711,6 +774,10 @@
       "tailArcOverChord": [
         1.0319,
         1.0918
+      ],
+      "headVsTrunkRunDegrees": [
+        6.06,
+        11.17
       ],
       "posedExtentOverBind": [
         0.8926,
@@ -749,6 +816,10 @@
         1.0319,
         1.0676
       ],
+      "headVsTrunkRunDegrees": [
+        5.39,
+        11.17
+      ],
       "posedExtentOverBind": [
         0.9253,
         0.9595
@@ -785,6 +856,10 @@
       "tailArcOverChord": [
         1.0033,
         1.0131
+      ],
+      "headVsTrunkRunDegrees": [
+        7.05,
+        12.84
       ],
       "posedExtentOverBind": [
         0.9828,
@@ -823,6 +898,10 @@
         1.0145,
         1.0241
       ],
+      "headVsTrunkRunDegrees": [
+        1.65,
+        7.0
+      ],
       "posedExtentOverBind": [
         0.9733,
         0.979
@@ -859,6 +938,10 @@
       "tailArcOverChord": [
         1.0021,
         1.0175
+      ],
+      "headVsTrunkRunDegrees": [
+        0.59,
+        10.81
       ],
       "posedExtentOverBind": [
         0.9846,
@@ -897,6 +980,10 @@
         1.002,
         1.0152
       ],
+      "headVsTrunkRunDegrees": [
+        1.48,
+        9.7
+      ],
       "posedExtentOverBind": [
         0.9846,
         0.9958
@@ -933,6 +1020,10 @@
       "tailArcOverChord": [
         1.0059,
         1.5984
+      ],
+      "headVsTrunkRunDegrees": [
+        6.53,
+        11.18
       ],
       "posedExtentOverBind": [
         0.6409,
@@ -971,6 +1062,10 @@
         1.0095,
         1.034
       ],
+      "headVsTrunkRunDegrees": [
+        6.53,
+        18.21
+      ],
       "posedExtentOverBind": [
         0.9491,
         0.9846
@@ -1007,6 +1102,10 @@
       "tailArcOverChord": [
         1.0095,
         1.0502
+      ],
+      "headVsTrunkRunDegrees": [
+        0.73,
+        6.53
       ],
       "posedExtentOverBind": [
         0.9412,
@@ -1045,6 +1144,10 @@
         1.0123,
         1.0216
       ],
+      "headVsTrunkRunDegrees": [
+        10.3,
+        10.34
+      ],
       "posedExtentOverBind": [
         0.9683,
         0.9758
@@ -1081,6 +1184,10 @@
       "tailArcOverChord": [
         1.0095,
         1.0305
+      ],
+      "headVsTrunkRunDegrees": [
+        6.53,
+        13.0
       ],
       "posedExtentOverBind": [
         0.952,
@@ -1119,6 +1226,10 @@
         1.002,
         1.0104
       ],
+      "headVsTrunkRunDegrees": [
+        1.87,
+        6.53
+      ],
       "posedExtentOverBind": [
         0.9846,
         0.9939
@@ -1155,6 +1266,10 @@
       "tailArcOverChord": [
         1.0078,
         1.0157
+      ],
+      "headVsTrunkRunDegrees": [
+        3.57,
+        5.29
       ],
       "posedExtentOverBind": [
         0.9816,
@@ -1193,6 +1308,10 @@
         1.0095,
         1.0341
       ],
+      "headVsTrunkRunDegrees": [
+        6.53,
+        18.21
+      ],
       "posedExtentOverBind": [
         0.9491,
         0.9846
@@ -1229,6 +1348,10 @@
       "tailArcOverChord": [
         1.0095,
         1.6526
+      ],
+      "headVsTrunkRunDegrees": [
+        6.53,
+        20.14
       ],
       "posedExtentOverBind": [
         0.5756,
@@ -1267,6 +1390,10 @@
         1.0062,
         1.0119
       ],
+      "headVsTrunkRunDegrees": [
+        1.58,
+        10.73
+      ],
       "posedExtentOverBind": [
         0.9808,
         0.987
@@ -1303,6 +1430,10 @@
       "tailArcOverChord": [
         1.0116,
         1.0213
+      ],
+      "headVsTrunkRunDegrees": [
+        1.35,
+        6.65
       ],
       "posedExtentOverBind": [
         0.976,
@@ -1341,6 +1472,10 @@
         1.0028,
         1.0076
       ],
+      "headVsTrunkRunDegrees": [
+        0.49,
+        3.77
+      ],
       "posedExtentOverBind": [
         0.9922,
         0.9951
@@ -1377,6 +1512,10 @@
       "tailArcOverChord": [
         1.0057,
         1.5984
+      ],
+      "headVsTrunkRunDegrees": [
+        6.53,
+        11.18
       ],
       "posedExtentOverBind": [
         0.641,
@@ -1415,6 +1554,10 @@
         1.0095,
         1.6503
       ],
+      "headVsTrunkRunDegrees": [
+        6.53,
+        20.18
+      ],
       "posedExtentOverBind": [
         0.5743,
         0.9846
@@ -1452,6 +1595,10 @@
         1.0021,
         1.0104
       ],
+      "headVsTrunkRunDegrees": [
+        1.86,
+        6.53
+      ],
       "posedExtentOverBind": [
         0.9846,
         0.9939
@@ -1480,6 +1627,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "mid": {
@@ -1498,6 +1646,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "end": {
@@ -1516,6 +1665,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       }
     },
@@ -1536,6 +1686,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.234
       },
       "mid": {
@@ -1554,6 +1705,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.234
       },
       "end": {
@@ -1572,6 +1724,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.234
       }
     },
@@ -1592,6 +1745,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.279
       },
       "mid": {
@@ -1610,6 +1764,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.279
       },
       "end": {
@@ -1628,6 +1783,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.279
       }
     },
@@ -1648,6 +1804,7 @@
         "trunkLeanTotalRadians": 0.468,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "mid": {
@@ -1666,6 +1823,7 @@
         "trunkLeanTotalRadians": 0.468,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "end": {
@@ -1684,6 +1842,7 @@
         "trunkLeanTotalRadians": 0.468,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       }
     },
@@ -1704,6 +1863,7 @@
         "trunkLeanTotalRadians": -0.468,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "mid": {
@@ -1722,6 +1882,7 @@
         "trunkLeanTotalRadians": -0.468,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "end": {
@@ -1740,6 +1901,7 @@
         "trunkLeanTotalRadians": -0.468,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       }
     },
@@ -1760,6 +1922,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "mid": {
@@ -1778,6 +1941,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "end": {
@@ -1796,6 +1960,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       }
     },
@@ -1816,6 +1981,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "mid": {
@@ -1834,6 +2000,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "end": {
@@ -1852,6 +2019,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       }
     },
@@ -1872,6 +2040,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "mid": {
@@ -1890,6 +2059,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.2757
       },
       "end": {
@@ -1908,6 +2078,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       }
     },
@@ -1928,6 +2099,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "mid": {
@@ -1946,6 +2118,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.2757
       },
       "end": {
@@ -1964,6 +2137,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       }
     },
@@ -1984,6 +2158,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "mid": {
@@ -2002,6 +2177,7 @@
         "trunkLeanTotalRadians": -0.1544,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": 0.09
       },
       "end": {
@@ -2020,6 +2196,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       }
     },
@@ -2040,6 +2217,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "mid": {
@@ -2058,6 +2236,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": 0.18
       },
       "end": {
@@ -2076,6 +2255,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       }
     },
@@ -2096,6 +2276,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "mid": {
@@ -2114,6 +2295,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.0121
       },
       "end": {
@@ -2132,6 +2314,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": 0.072
       }
     },
@@ -2152,6 +2335,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": 0.108
       },
       "mid": {
@@ -2170,6 +2354,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": 0.108
       },
       "end": {
@@ -2188,6 +2373,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": 0.108
       }
     },
@@ -2208,6 +2394,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "mid": {
@@ -2226,6 +2413,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": 0.144
       },
       "end": {
@@ -2244,6 +2432,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       }
     },
@@ -2264,6 +2453,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "mid": {
@@ -2282,6 +2472,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.288
       },
       "end": {
@@ -2300,6 +2491,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       }
     },
@@ -2320,6 +2512,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.072
       },
       "mid": {
@@ -2338,6 +2531,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.072
       },
       "end": {
@@ -2356,6 +2550,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.072
       }
     },
@@ -2376,6 +2571,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "mid": {
@@ -2394,6 +2590,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": 0.18
       },
       "end": {
@@ -2412,6 +2609,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       }
     },
@@ -2432,6 +2630,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "mid": {
@@ -2450,6 +2649,7 @@
         "trunkLeanTotalRadians": 0.4212,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": 0.144
       },
       "end": {
@@ -2468,6 +2668,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       }
     },
@@ -2488,6 +2689,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": 0.054
       },
       "mid": {
@@ -2506,6 +2708,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": 0.054
       },
       "end": {
@@ -2524,6 +2727,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": 0.054
       }
     },
@@ -2544,6 +2748,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "mid": {
@@ -2562,6 +2767,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "end": {
@@ -2580,6 +2786,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       }
     },
@@ -2600,6 +2807,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "mid": {
@@ -2618,6 +2826,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "end": {
@@ -2636,6 +2845,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       }
     },
@@ -2656,6 +2866,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "mid": {
@@ -2674,6 +2885,7 @@
         "trunkLeanTotalRadians": -0.1544,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": 0.09
       },
       "end": {
@@ -2692,6 +2904,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       }
     },
@@ -2712,6 +2925,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "mid": {
@@ -2730,6 +2944,7 @@
         "trunkLeanTotalRadians": 0.4212,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": 0.144
       },
       "end": {
@@ -2748,6 +2963,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       }
     },
@@ -2768,6 +2984,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       },
       "mid": {
@@ -2786,6 +3003,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.288
       },
       "end": {
@@ -2804,8 +3022,175 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.0,
         "neckStraightenedFraction": 0.0,
+        "frontAimedFraction": 0.0,
         "forePaddleSweepRadians": -0.18
       }
+    }
+  },
+  "pectorals": {
+    "foreL": {
+      "bones": [
+        "fore_upper_L",
+        "fore_mid_L",
+        "fore_tip_L"
+      ],
+      "ownedVertices": 880,
+      "ownedDistalVertices": 207,
+      "rootToNearestOwnedSkin": 0.01117,
+      "rootToMeanOwnedSkin": 0.101,
+      "polylineLength": 0.18372,
+      "radius": 0.03938,
+      "travelRatioPerClip": {
+        "Idle": 1.1427,
+        "Swim": 1.1495,
+        "Sprint": 1.1487,
+        "TurnLeft": 1.045,
+        "TurnRight": 1.1108,
+        "Dive": 1.1086,
+        "Rise": 1.0406,
+        "Attack": 1.217,
+        "Bite": 1.1537,
+        "Heavy": 1.1639,
+        "Hit": 1.1783,
+        "Death": 1.124,
+        "Guard": 1.1501,
+        "Parry": 1.1554,
+        "Dodge": 1.07,
+        "Eat": 1.151,
+        "Stagger": 1.1783,
+        "Ability": 1.1351,
+        "Grab": 1.1496,
+        "Breath": 1.0759,
+        "Growth": 1.1362,
+        "TailWhip": 1.1639,
+        "Coil": 1.1352,
+        "Dash": 1.7249
+      },
+      "travelRatioWorst": 1.0406,
+      "travelRatioMedian": 1.1491
+    },
+    "foreR": {
+      "bones": [
+        "fore_upper_R",
+        "fore_mid_R",
+        "fore_tip_R"
+      ],
+      "ownedVertices": 688,
+      "ownedDistalVertices": 101,
+      "rootToNearestOwnedSkin": 0.01644,
+      "rootToMeanOwnedSkin": 0.09067,
+      "polylineLength": 0.18083,
+      "radius": 0.03693,
+      "travelRatioPerClip": {
+        "Idle": 1.1537,
+        "Swim": 1.1582,
+        "Sprint": 1.1567,
+        "TurnLeft": 1.1336,
+        "TurnRight": 1.0679,
+        "Dive": 1.1329,
+        "Rise": 1.0812,
+        "Attack": 1.2348,
+        "Bite": 1.158,
+        "Heavy": 1.1746,
+        "Hit": 1.1897,
+        "Death": 1.1241,
+        "Guard": 1.1634,
+        "Parry": 1.1759,
+        "Dodge": 1.1437,
+        "Eat": 1.1567,
+        "Stagger": 1.1897,
+        "Ability": 1.1616,
+        "Grab": 1.1521,
+        "Breath": 1.1248,
+        "Growth": 1.1475,
+        "TailWhip": 1.1746,
+        "Coil": 1.1617,
+        "Dash": 1.4467
+      },
+      "travelRatioWorst": 1.0679,
+      "travelRatioMedian": 1.1574
+    },
+    "hindL": {
+      "bones": [
+        "hind_upper_L",
+        "hind_mid_L",
+        "hind_tip_L"
+      ],
+      "ownedVertices": 756,
+      "ownedDistalVertices": 132,
+      "rootToNearestOwnedSkin": 0.01595,
+      "rootToMeanOwnedSkin": 0.10068,
+      "polylineLength": 0.19088,
+      "radius": 0.04584,
+      "travelRatioPerClip": {
+        "Idle": 1.1444,
+        "Swim": 1.1547,
+        "Sprint": 1.1563,
+        "TurnLeft": 1.0731,
+        "TurnRight": 1.1185,
+        "Dive": 1.1262,
+        "Rise": 1.0921,
+        "Attack": 1.2291,
+        "Bite": 1.1382,
+        "Heavy": 1.1771,
+        "Hit": 1.1793,
+        "Death": 1.1093,
+        "Guard": 1.1528,
+        "Parry": 1.1969,
+        "Dodge": 1.087,
+        "Eat": 1.1539,
+        "Stagger": 1.1793,
+        "Ability": 1.0025,
+        "Grab": 1.1544,
+        "Breath": 1.117,
+        "Growth": 1.1541,
+        "TailWhip": 1.1771,
+        "Coil": 1.0009,
+        "Dash": 1.3605
+      },
+      "travelRatioWorst": 1.0009,
+      "travelRatioMedian": 1.1534
+    },
+    "hindR": {
+      "bones": [
+        "hind_upper_R",
+        "hind_mid_R",
+        "hind_tip_R"
+      ],
+      "ownedVertices": 797,
+      "ownedDistalVertices": 138,
+      "rootToNearestOwnedSkin": 0.01724,
+      "rootToMeanOwnedSkin": 0.09376,
+      "polylineLength": 0.18947,
+      "radius": 0.03357,
+      "travelRatioPerClip": {
+        "Idle": 1.1193,
+        "Swim": 1.1406,
+        "Sprint": 1.1419,
+        "TurnLeft": 1.115,
+        "TurnRight": 1.0634,
+        "Dive": 1.1001,
+        "Rise": 1.0786,
+        "Attack": 1.2133,
+        "Bite": 1.1388,
+        "Heavy": 1.1623,
+        "Hit": 1.1762,
+        "Death": 1.1405,
+        "Guard": 1.1374,
+        "Parry": 1.1452,
+        "Dodge": 1.1765,
+        "Eat": 1.1371,
+        "Stagger": 1.1762,
+        "Ability": 1.1236,
+        "Grab": 1.1359,
+        "Breath": 1.1055,
+        "Growth": 1.1384,
+        "TailWhip": 1.1623,
+        "Coil": 1.1237,
+        "Dash": 1.3742
+      },
+      "travelRatioWorst": 1.0634,
+      "travelRatioMedian": 1.1386
     }
   },
   "restingShape": {
@@ -2828,6 +3213,11 @@
     ],
     "tailUncurlAvailable": 0.0,
     "neckUncurlAvailable": 0.0,
+    "frontAimAvailable": 0.0,
+    "frontCarried": [
+      0.0,
+      0.0
+    ],
     "waveStep": 0.4,
     "waveVerticalShare": 0.26,
     "clipAmplitudes": {

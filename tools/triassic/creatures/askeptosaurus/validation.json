@@ -177,7 +177,44 @@
       16.05,
       18.5,
       18.96
-    ]
+    ],
+    "front": {
+      "bones": [
+        "chest",
+        "neck_00",
+        "neck_01",
+        "neck_02",
+        "neck_03",
+        "skull"
+      ],
+      "trunkRunHipToShoulder": [
+        -0.84704,
+        -0.49426,
+        0.1955
+      ],
+      "trunkRunVsBodyToChestDegrees": 17.13,
+      "trunkRunVsAxisTangentDegrees": 42.81,
+      "restTurnDegrees": 40.53,
+      "restTurnPerJointDegrees": [
+        6.4,
+        5.35,
+        12.84,
+        6.88,
+        9.05
+      ],
+      "restTurnSignedAboutZDegrees": 8.66,
+      "takeoffVsTrunkRunDegrees": 54.59,
+      "headVsTrunkRunDegreesUncorrected": 67.68,
+      "aimShare": [
+        0.1667,
+        0.3333,
+        0.5,
+        0.6667,
+        0.8333,
+        1.0
+      ],
+      "aimPerJointDegrees": 9.1
+    }
   },
   "bones": 33,
   "boneNames": [
@@ -321,6 +358,20 @@
   "tailFraction": 0.6064127412970436,
   "mouth": {
     "hingeY": 0.072,
+    "cutPlane": {
+      "point": [
+        -0.49334,
+        0.139549,
+        -0.492518
+      ],
+      "normal": [
+        0.8695,
+        -0.216178,
+        -0.444113
+      ],
+      "tolerance": 0.01,
+      "frame": "glTF, +Y up"
+    },
     "lip": [
       {
         "y": 0.001,
@@ -584,7 +635,7 @@
   "motion": {
     "Idle": {
       "tailChainYawSweptRadians": 0.5055816539097577,
-      "tailChainPitchSweptRadians": 0.1314500419612159,
+      "tailChainPitchSweptRadians": 0.1314500424268772,
       "tailRootSweptRadians": [
         0.007017248077318072,
         0.0,
@@ -595,7 +646,7 @@
         0.0,
         0.059994786977767944
       ],
-      "neckYawSweptRadians": 0.02879991289228201,
+      "neckYawSweptRadians": 0.028799917548894882,
       "foreLimbSweptRadians": [
         0.0,
         0.018000006675720215,
@@ -611,13 +662,17 @@
         1.0629,
         1.0968
       ],
-      "posedExtentOverBind": [
-        0.9363,
-        0.961
+      "headVsTrunkRunDegrees": [
+        6.45,
+        8.05
       ],
-      "tailTipTravel": 0.06444333475526934,
-      "skullTravel": 0.009120972426489305,
-      "forePaddleTravel": 0.007359086131062264
+      "posedExtentOverBind": [
+        0.9434,
+        0.9671
+      ],
+      "tailTipTravel": 0.06521995881526046,
+      "skullTravel": 0.011160908083550886,
+      "forePaddleTravel": 0.00713124290652802
     },
     "Swim": {
       "tailChainYawSweptRadians": 1.6339786881580949,
@@ -632,7 +687,7 @@
         0.0,
         0.19384036771953106
       ],
-      "neckYawSweptRadians": 0.09304902423173189,
+      "neckYawSweptRadians": 0.09304903418524191,
       "foreLimbSweptRadians": [
         0.0,
         0.05757267773151398,
@@ -648,13 +703,17 @@
         1.004,
         1.0521
       ],
-      "posedExtentOverBind": [
-        1.0022,
-        1.0469
+      "headVsTrunkRunDegrees": [
+        1.93,
+        6.16
       ],
-      "tailTipTravel": 0.19116267878460516,
-      "skullTravel": 0.0021512053793343302,
-      "forePaddleTravel": 0.006939951989488669
+      "posedExtentOverBind": [
+        1.0089,
+        1.0492
+      ],
+      "tailTipTravel": 0.1934664367165005,
+      "skullTravel": 0.0012060368899265903,
+      "forePaddleTravel": 0.007023587401006781
     },
     "Sprint": {
       "tailChainYawSweptRadians": 2.390332829672843,
@@ -669,7 +728,7 @@
         0.0,
         0.2830846607685089
       ],
-      "neckYawSweptRadians": 0.1358647421002388,
+      "neckYawSweptRadians": 0.13586475839838386,
       "foreLimbSweptRadians": [
         0.0,
         0.09359999862499535,
@@ -685,13 +744,17 @@
         1.0076,
         1.0265
       ],
-      "posedExtentOverBind": [
-        1.0336,
-        1.0601
+      "headVsTrunkRunDegrees": [
+        0.49,
+        5.16
       ],
-      "tailTipTravel": 0.2803930294048591,
-      "skullTravel": 0.0030744255868681283,
-      "forePaddleTravel": 0.010937776753386025
+      "posedExtentOverBind": [
+        1.0315,
+        1.0612
+      ],
+      "tailTipTravel": 0.2837721286777991,
+      "skullTravel": 0.0018397226935521933,
+      "forePaddleTravel": 0.01107001226251946
     },
     "TurnLeft": {
       "tailChainYawSweptRadians": 0.6653582690050825,
@@ -706,7 +769,7 @@
         0.0,
         0.03969840705394745
       ],
-      "neckYawSweptRadians": 0.12359371327329427,
+      "neckYawSweptRadians": 0.12359371595084667,
       "foreLimbSweptRadians": [
         0.0,
         0.014399997889995575,
@@ -722,13 +785,17 @@
         1.0117,
         1.0326
       ],
-      "posedExtentOverBind": [
-        1.0069,
-        1.0285
+      "headVsTrunkRunDegrees": [
+        8.52,
+        15.12
       ],
-      "tailTipTravel": 0.2811579669109766,
-      "skullTravel": 0.029110349261330548,
-      "forePaddleTravel": 0.024367833154868745
+      "posedExtentOverBind": [
+        1.0115,
+        1.0273
+      ],
+      "tailTipTravel": 0.28454628467189486,
+      "skullTravel": 0.0336205489491583,
+      "forePaddleTravel": 0.023604800373365604
     },
     "TurnRight": {
       "tailChainYawSweptRadians": 0.5553439874202013,
@@ -743,7 +810,7 @@
         0.0,
         0.0852084681391716
       ],
-      "neckYawSweptRadians": 0.15988105908036232,
+      "neckYawSweptRadians": 0.15988105739234015,
       "foreLimbSweptRadians": [
         0.0,
         0.014399997889995575,
@@ -759,16 +826,20 @@
         1.1386,
         1.2131
       ],
-      "posedExtentOverBind": [
-        0.8398,
-        0.8863
+      "headVsTrunkRunDegrees": [
+        3.25,
+        5.74
       ],
-      "tailTipTravel": 0.1677586704198362,
-      "skullTravel": 0.02905996051730325,
-      "forePaddleTravel": 0.022986371375594075
+      "posedExtentOverBind": [
+        0.8481,
+        0.8947
+      ],
+      "tailTipTravel": 0.16978037974138474,
+      "skullTravel": 0.03285156183683098,
+      "forePaddleTravel": 0.022215443641295494
     },
     "Dive": {
-      "tailChainYawSweptRadians": 0.5232227854139637,
+      "tailChainYawSweptRadians": 0.5232227816886734,
       "tailChainPitchSweptRadians": 0.13414897810434923,
       "tailRootSweptRadians": [
         0.007037245202809572,
@@ -780,7 +851,7 @@
         0.0,
         0.05925442464649677
       ],
-      "neckYawSweptRadians": 0.0297259638318792,
+      "neckYawSweptRadians": 0.029725947882980108,
       "foreLimbSweptRadians": [
         0.0,
         0.014376655220985413,
@@ -796,13 +867,17 @@
         1.0163,
         1.034
       ],
-      "posedExtentOverBind": [
-        1.0103,
-        1.0218
+      "headVsTrunkRunDegrees": [
+        3.86,
+        7.61
       ],
-      "tailTipTravel": 0.05631170058384646,
-      "skullTravel": 0.024188012308920016,
-      "forePaddleTravel": 0.006714425560544514
+      "posedExtentOverBind": [
+        1.0138,
+        1.0235
+      ],
+      "tailTipTravel": 0.0569903027329175,
+      "skullTravel": 0.02220646266423243,
+      "forePaddleTravel": 0.006404416022082622
     },
     "Rise": {
       "tailChainYawSweptRadians": 0.523222791031003,
@@ -817,7 +892,7 @@
         0.0,
         0.05925443023443222
       ],
-      "neckYawSweptRadians": 0.0297259563812986,
+      "neckYawSweptRadians": 0.029725948348641396,
       "foreLimbSweptRadians": [
         0.0,
         0.014376655220985413,
@@ -833,17 +908,21 @@
         1.0467,
         1.0776
       ],
-      "posedExtentOverBind": [
-        0.9596,
-        0.9791
+      "headVsTrunkRunDegrees": [
+        6.39,
+        8.18
       ],
-      "tailTipTravel": 0.057727910455995894,
-      "skullTravel": 0.02430872553992901,
-      "forePaddleTravel": 0.006891611361709215
+      "posedExtentOverBind": [
+        0.9653,
+        0.9831
+      ],
+      "tailTipTravel": 0.05842360659180693,
+      "skullTravel": 0.022462223922443847,
+      "forePaddleTravel": 0.006579482834948336
     },
     "Attack": {
       "tailChainYawSweptRadians": 2.483909610658884,
-      "tailChainPitchSweptRadians": 0.9320558668732701,
+      "tailChainPitchSweptRadians": 0.9320558966755925,
       "tailRootSweptRadians": [
         0.01154227601364255,
         0.0,
@@ -854,7 +933,7 @@
         0.9136790633201599,
         0.8100862205028534
       ],
-      "neckYawSweptRadians": 0.20611473929602653,
+      "neckYawSweptRadians": 0.2654505092650652,
       "foreLimbSweptRadians": [
         0.0,
         0.04925594478845596,
@@ -870,17 +949,21 @@
         1.0009,
         1.2155
       ],
-      "posedExtentOverBind": [
-        0.9483,
-        1.0336
+      "headVsTrunkRunDegrees": [
+        1.72,
+        10.77
       ],
-      "tailTipTravel": 0.4368938384044601,
-      "skullTravel": 0.03438235333442688,
-      "forePaddleTravel": 0.0321691430200695
+      "posedExtentOverBind": [
+        0.9549,
+        1.0314
+      ],
+      "tailTipTravel": 0.44215897518349473,
+      "skullTravel": 0.027195583969623394,
+      "forePaddleTravel": 0.032564951134891565
     },
     "Bite": {
-      "tailChainYawSweptRadians": 2.3706697854213417,
-      "tailChainPitchSweptRadians": 0.7671025985036977,
+      "tailChainYawSweptRadians": 2.3706697705201805,
+      "tailChainPitchSweptRadians": 0.7671024681185372,
       "tailRootSweptRadians": [
         0.011106287129223347,
         0.0,
@@ -891,7 +974,7 @@
         0.865307092666626,
         0.811680257320404
       ],
-      "neckYawSweptRadians": 0.19077401177491993,
+      "neckYawSweptRadians": 0.24485617876052856,
       "foreLimbSweptRadians": [
         0.0,
         0.07250404357910156,
@@ -907,17 +990,21 @@
         1.001,
         1.1881
       ],
-      "posedExtentOverBind": [
-        0.948,
-        1.0609
+      "headVsTrunkRunDegrees": [
+        2.1,
+        9.77
       ],
-      "tailTipTravel": 0.4277120631468358,
-      "skullTravel": 0.017817618283056905,
-      "forePaddleTravel": 0.015429244838844988
+      "posedExtentOverBind": [
+        0.9545,
+        1.0618
+      ],
+      "tailTipTravel": 0.43286654763838955,
+      "skullTravel": 0.012082936700012098,
+      "forePaddleTravel": 0.015624719353493959
     },
     "Heavy": {
-      "tailChainYawSweptRadians": 4.12646796554327,
-      "tailChainPitchSweptRadians": 0.2874937762026093,
+      "tailChainYawSweptRadians": 4.1264679953455925,
+      "tailChainPitchSweptRadians": 0.2874938008826575,
       "tailRootSweptRadians": [
         0.006141657941043377,
         0.0,
@@ -925,10 +1012,10 @@
       ],
       "tailTipSweptRadians": [
         0.11498818104155362,
-        0.3607405722141266,
-        0.7683679461479187
+        0.36074046790599823,
+        0.7683679759502411
       ],
-      "neckYawSweptRadians": 0.09566792845726013,
+      "neckYawSweptRadians": 0.0909181673778221,
       "foreLimbSweptRadians": [
         0.0,
         0.0868000015616417,
@@ -944,28 +1031,32 @@
         1.0068,
         1.4716
       ],
-      "posedExtentOverBind": [
-        0.7103,
-        0.9875
+      "headVsTrunkRunDegrees": [
+        5.78,
+        7.42
       ],
-      "tailTipTravel": 0.6811781805898682,
-      "skullTravel": 0.01900278118261563,
-      "forePaddleTravel": 0.01761864513757861
+      "posedExtentOverBind": [
+        0.7089,
+        1.0198
+      ],
+      "tailTipTravel": 0.68938726004481,
+      "skullTravel": 0.020615720504926,
+      "forePaddleTravel": 0.017532162331998353
     },
     "Hit": {
-      "tailChainYawSweptRadians": 0.7180471317842603,
-      "tailChainPitchSweptRadians": 0.5830471365261474,
+      "tailChainYawSweptRadians": 0.7180469008162618,
+      "tailChainPitchSweptRadians": 0.5830471951994696,
       "tailRootSweptRadians": [
         0.005073819775134325,
         0.0,
         0.028742240741848946
       ],
       "tailTipSweptRadians": [
-        0.2974693700671196,
-        0.27299344539642334,
-        0.12391957640647888
+        0.29746945947408676,
+        0.2729935348033905,
+        0.12391948699951172
       ],
-      "neckYawSweptRadians": 0.09333920886274427,
+      "neckYawSweptRadians": 0.11654955241829157,
       "foreLimbSweptRadians": [
         0.0,
         0.06940000504255295,
@@ -981,17 +1072,21 @@
         1.0786,
         1.1672
       ],
-      "posedExtentOverBind": [
-        0.8681,
-        0.9491
+      "headVsTrunkRunDegrees": [
+        7.23,
+        13.8
       ],
-      "tailTipTravel": 0.165069805005385,
-      "skullTravel": 0.05890075894700143,
-      "forePaddleTravel": 0.033100719974938686
+      "posedExtentOverBind": [
+        0.8684,
+        0.9557
+      ],
+      "tailTipTravel": 0.16705911522512926,
+      "skullTravel": 0.06275328518657267,
+      "forePaddleTravel": 0.031997558810818984
     },
     "Death": {
-      "tailChainYawSweptRadians": 0.6502074825111777,
-      "tailChainPitchSweptRadians": 0.4288346591638401,
+      "tailChainYawSweptRadians": 0.6502074676100165,
+      "tailChainPitchSweptRadians": 0.4288346307585016,
       "tailRootSweptRadians": [
         0.010334777645766735,
         0.0,
@@ -1002,7 +1097,7 @@
         0.2026173174381256,
         0.1791655421257019
       ],
-      "neckYawSweptRadians": 0.11723205086309463,
+      "neckYawSweptRadians": 0.14511251542717218,
       "foreLimbSweptRadians": [
         0.0,
         0.038600001484155655,
@@ -1018,13 +1113,17 @@
         1.0649,
         1.0948
       ],
-      "posedExtentOverBind": [
-        0.9248,
-        0.9524
+      "headVsTrunkRunDegrees": [
+        7.23,
+        11.7
       ],
-      "tailTipTravel": 0.7280841108670717,
-      "skullTravel": 0.07645027965748387,
-      "forePaddleTravel": 0.12098739960495417
+      "posedExtentOverBind": [
+        0.9228,
+        0.9557
+      ],
+      "tailTipTravel": 0.7368584676864692,
+      "skullTravel": 0.12987629677041435,
+      "forePaddleTravel": 0.11732272049819674
     },
     "Guard": {
       "tailChainYawSweptRadians": 0.45462778117507696,
@@ -1039,7 +1138,7 @@
         0.0,
         0.053963661193847656
       ],
-      "neckYawSweptRadians": 0.025910317432135344,
+      "neckYawSweptRadians": 0.02591031789779663,
       "foreLimbSweptRadians": [
         0.0,
         0.018000006675720215,
@@ -1055,17 +1154,21 @@
         1.1809,
         1.2404
       ],
-      "posedExtentOverBind": [
-        0.81,
-        0.8394
+      "headVsTrunkRunDegrees": [
+        9.89,
+        11.33
       ],
-      "tailTipTravel": 0.048174443039549784,
-      "skullTravel": 0.0006323575216705466,
-      "forePaddleTravel": 0.0022106784102154304
+      "posedExtentOverBind": [
+        0.8148,
+        0.8434
+      ],
+      "tailTipTravel": 0.04875503913690295,
+      "skullTravel": 0.00030247591207775503,
+      "forePaddleTravel": 0.0022373199501223625
     },
     "Parry": {
-      "tailChainYawSweptRadians": 0.9133775914087892,
-      "tailChainPitchSweptRadians": 0.8265289825867512,
+      "tailChainYawSweptRadians": 0.9133775979280472,
+      "tailChainPitchSweptRadians": 0.8265289751361706,
       "tailRootSweptRadians": [
         0.005532940849661827,
         0.0,
@@ -1076,7 +1179,7 @@
         0.3484516739845276,
         0.13935032486915588
       ],
-      "neckYawSweptRadians": 0.09330925566609949,
+      "neckYawSweptRadians": 0.1166538642719388,
       "foreLimbSweptRadians": [
         0.0,
         0.11479999870061874,
@@ -1092,17 +1195,21 @@
         1.0786,
         1.2168
       ],
-      "posedExtentOverBind": [
-        0.8072,
-        0.9491
+      "headVsTrunkRunDegrees": [
+        6.4,
+        7.61
       ],
-      "tailTipTravel": 0.07495173567136146,
-      "skullTravel": 0.027141745001528942,
-      "forePaddleTravel": 0.03225405988375267
+      "posedExtentOverBind": [
+        0.8016,
+        0.9557
+      ],
+      "tailTipTravel": 0.0758550011913719,
+      "skullTravel": 0.031224799051826107,
+      "forePaddleTravel": 0.032421578144909154
     },
     "Dodge": {
       "tailChainYawSweptRadians": 2.737965874373913,
-      "tailChainPitchSweptRadians": 0.36717868400592124,
+      "tailChainPitchSweptRadians": 0.36717877201590454,
       "tailRootSweptRadians": [
         0.009764967951923609,
         0.0,
@@ -1113,7 +1220,7 @@
         0.6542392373085022,
         0.7448813021183014
       ],
-      "neckYawSweptRadians": 0.1400510392850265,
+      "neckYawSweptRadians": 0.17639829125255346,
       "foreLimbSweptRadians": [
         0.0,
         0.05643382668495178,
@@ -1129,13 +1236,17 @@
         1.0036,
         1.0786
       ],
-      "posedExtentOverBind": [
-        0.9491,
-        1.0377
+      "headVsTrunkRunDegrees": [
+        1.38,
+        7.23
       ],
-      "tailTipTravel": 0.31376176596392696,
-      "skullTravel": 0.04986336597239559,
-      "forePaddleTravel": 0.05144305794078275
+      "posedExtentOverBind": [
+        0.9557,
+        1.0403
+      ],
+      "tailTipTravel": 0.31754300174391564,
+      "skullTravel": 0.057463793996314565,
+      "forePaddleTravel": 0.05106547013561599
     },
     "Eat": {
       "tailChainYawSweptRadians": 0.6062089237384498,
@@ -1150,7 +1261,7 @@
         0.0,
         0.0719078779220581
       ],
-      "neckYawSweptRadians": 0.0345554081723094,
+      "neckYawSweptRadians": 0.03455540910363197,
       "foreLimbSweptRadians": [
         0.0,
         0.017999999225139618,
@@ -1166,28 +1277,32 @@
         1.0805,
         1.1289
       ],
-      "posedExtentOverBind": [
-        0.9042,
-        0.9362
+      "headVsTrunkRunDegrees": [
+        8.71,
+        10.58
       ],
-      "tailTipTravel": 0.06786096156505879,
-      "skullTravel": 0.0022673961197008036,
-      "forePaddleTravel": 0.0027423112598614708
+      "posedExtentOverBind": [
+        0.9105,
+        0.9412
+      ],
+      "tailTipTravel": 0.06867877407049879,
+      "skullTravel": 0.0019563051449269825,
+      "forePaddleTravel": 0.002821851907244016
     },
     "Stagger": {
-      "tailChainYawSweptRadians": 0.7233952339738607,
-      "tailChainPitchSweptRadians": 0.5835539488252834,
+      "tailChainYawSweptRadians": 0.7233952563256025,
+      "tailChainPitchSweptRadians": 0.5835540251937346,
       "tailRootSweptRadians": [
         0.005077818408608437,
         0.0,
         0.02922835759818554
       ],
       "tailTipSweptRadians": [
-        0.2974693700671196,
-        0.27299344539642334,
-        0.1245841383934021
+        0.29746945947408676,
+        0.2729935348033905,
+        0.12458422780036926
       ],
-      "neckYawSweptRadians": 0.09397062135394663,
+      "neckYawSweptRadians": 0.11762936506420374,
       "foreLimbSweptRadians": [
         0.0,
         0.06940000504255295,
@@ -1203,28 +1318,32 @@
         1.0786,
         1.1675
       ],
-      "posedExtentOverBind": [
-        0.8681,
-        0.9491
+      "headVsTrunkRunDegrees": [
+        7.23,
+        13.87
       ],
-      "tailTipTravel": 0.2707501840275062,
-      "skullTravel": 0.09333577188900695,
-      "forePaddleTravel": 0.054943651325195624
+      "posedExtentOverBind": [
+        0.8684,
+        0.9557
+      ],
+      "tailTipTravel": 0.2740130740764269,
+      "skullTravel": 0.10063871834995063,
+      "forePaddleTravel": 0.05312000672176608
     },
     "Ability": {
-      "tailChainYawSweptRadians": 3.4352127927595575,
-      "tailChainPitchSweptRadians": 0.8341301064720028,
+      "tailChainYawSweptRadians": 3.4352127033525903,
+      "tailChainPitchSweptRadians": 0.8341302159024053,
       "tailRootSweptRadians": [
         0.005608739797025919,
         0.0,
         0.22841184136996162
       ],
       "tailTipSweptRadians": [
-        0.4582851007580757,
+        0.45828521996736526,
         0.3484516739845276,
-        0.16857604682445526
+        0.1685759574174881
       ],
-      "neckYawSweptRadians": 0.19606309946175315,
+      "neckYawSweptRadians": 0.22885618917644024,
       "foreLimbSweptRadians": [
         0.0,
         0.09669404476881027,
@@ -1240,17 +1359,21 @@
         1.0786,
         3.5881
       ],
-      "posedExtentOverBind": [
-        0.5629,
-        0.9491
+      "headVsTrunkRunDegrees": [
+        7.22,
+        27.85
       ],
-      "tailTipTravel": 0.6880847934599978,
-      "skullTravel": 0.06243713693523392,
-      "forePaddleTravel": 0.04631678601525329
+      "posedExtentOverBind": [
+        0.5613,
+        0.9557
+      ],
+      "tailTipTravel": 0.6963771066362827,
+      "skullTravel": 0.06388385951800259,
+      "forePaddleTravel": 0.04550382192038888
     },
     "Grab": {
-      "tailChainYawSweptRadians": 0.5722972962539643,
-      "tailChainPitchSweptRadians": 0.14879055641358718,
+      "tailChainYawSweptRadians": 0.5722972906660289,
+      "tailChainPitchSweptRadians": 0.14879055781057104,
       "tailRootSweptRadians": [
         0.007946758531033993,
         0.0,
@@ -1259,9 +1382,9 @@
       "tailTipSweptRadians": [
         0.01765284687280655,
         0.0,
-        0.06790827214717865
+        0.06790826469659805
       ],
-      "neckYawSweptRadians": 0.03257260052487254,
+      "neckYawSweptRadians": 0.032572610303759575,
       "foreLimbSweptRadians": [
         0.0,
         0.01797962188720703,
@@ -1277,17 +1400,21 @@
         1.0431,
         1.0751
       ],
-      "posedExtentOverBind": [
-        0.9592,
-        0.9816
+      "headVsTrunkRunDegrees": [
+        3.7,
+        6.84
       ],
-      "tailTipTravel": 0.06578575613528347,
-      "skullTravel": 0.007018017414735626,
-      "forePaddleTravel": 0.003320330172036336
+      "posedExtentOverBind": [
+        0.9617,
+        0.9827
+      ],
+      "tailTipTravel": 0.06657857084909999,
+      "skullTravel": 0.005370559674804899,
+      "forePaddleTravel": 0.0034679075340149613
     },
     "Breath": {
       "tailChainYawSweptRadians": 0.5238170677330345,
-      "tailChainPitchSweptRadians": 0.13433994145452743,
+      "tailChainPitchSweptRadians": 0.13433994238585,
       "tailRootSweptRadians": [
         0.00704536703415215,
         0.0,
@@ -1298,7 +1425,7 @@
         0.0,
         0.05925379693508148
       ],
-      "neckYawSweptRadians": 0.02978092629928142,
+      "neckYawSweptRadians": 0.02978093270212412,
       "foreLimbSweptRadians": [
         0.0,
         0.014399997889995575,
@@ -1314,13 +1441,17 @@
         1.0413,
         1.0702
       ],
-      "posedExtentOverBind": [
-        0.9683,
-        0.989
+      "headVsTrunkRunDegrees": [
+        6.3,
+        8.08
       ],
-      "tailTipTravel": 0.0572982861595612,
-      "skullTravel": 0.017186624646985636,
-      "forePaddleTravel": 0.004723705054645155
+      "posedExtentOverBind": [
+        0.9736,
+        0.9926
+      ],
+      "tailTipTravel": 0.05798880469267187,
+      "skullTravel": 0.015654257195749956,
+      "forePaddleTravel": 0.004521402737696703
     },
     "Growth": {
       "tailChainYawSweptRadians": 0.5235334621975198,
@@ -1335,7 +1466,7 @@
         0.0,
         0.05932083539664745
       ],
-      "neckYawSweptRadians": 0.029732951428741217,
+      "neckYawSweptRadians": 0.0297329630702734,
       "foreLimbSweptRadians": [
         0.0,
         0.014382459223270416,
@@ -1351,17 +1482,21 @@
         1.0229,
         1.0444
       ],
-      "posedExtentOverBind": [
-        1.0008,
-        1.0189
+      "headVsTrunkRunDegrees": [
+        2.96,
+        4.75
       ],
-      "tailTipTravel": 0.05779784354272727,
-      "skullTravel": 0.012421958152605826,
-      "forePaddleTravel": 0.0032999407685073367
+      "posedExtentOverBind": [
+        1.0066,
+        1.0246
+      ],
+      "tailTipTravel": 0.05849438243853101,
+      "skullTravel": 0.01077898642812894,
+      "forePaddleTravel": 0.0031998724475065477
     },
     "TailWhip": {
-      "tailChainYawSweptRadians": 4.149280339479446,
-      "tailChainPitchSweptRadians": 0.2877006273702136,
+      "tailChainYawSweptRadians": 4.149280101060867,
+      "tailChainPitchSweptRadians": 0.2877006175913266,
       "tailRootSweptRadians": [
         0.006153246620669961,
         0.0,
@@ -1369,10 +1504,10 @@
       ],
       "tailTipSweptRadians": [
         0.11508065648376942,
-        0.3607405722141266,
-        0.7685961425304413
+        0.36074046790599823,
+        0.7685962021350861
       ],
-      "neckYawSweptRadians": 0.09590200521051884,
+      "neckYawSweptRadians": 0.09125104744452983,
       "foreLimbSweptRadians": [
         0.0,
         0.0868000015616417,
@@ -1388,17 +1523,21 @@
         1.0061,
         1.4882
       ],
-      "posedExtentOverBind": [
-        0.7105,
-        0.9871
+      "headVsTrunkRunDegrees": [
+        5.77,
+        7.42
       ],
-      "tailTipTravel": 0.6816206832513728,
-      "skullTravel": 0.01899244907841901,
-      "forePaddleTravel": 0.017595592930258846
+      "posedExtentOverBind": [
+        0.7091,
+        1.0199
+      ],
+      "tailTipTravel": 0.6898350444974165,
+      "skullTravel": 0.020599308815699303,
+      "forePaddleTravel": 0.0175215299470528
     },
     "Coil": {
       "tailChainYawSweptRadians": 3.439427442383021,
-      "tailChainPitchSweptRadians": 0.8343919110047864,
+      "tailChainPitchSweptRadians": 0.8343919268372701,
       "tailRootSweptRadians": [
         0.005600524367764592,
         0.0,
@@ -1409,7 +1548,7 @@
         0.3484516739845276,
         0.16907726228237152
       ],
-      "neckYawSweptRadians": 0.19591896377096418,
+      "neckYawSweptRadians": 0.2286826795898378,
       "foreLimbSweptRadians": [
         0.0,
         0.09672413021326065,
@@ -1425,28 +1564,32 @@
         1.0786,
         3.5881
       ],
-      "posedExtentOverBind": [
-        0.5642,
-        0.9491
+      "headVsTrunkRunDegrees": [
+        7.23,
+        27.84
       ],
-      "tailTipTravel": 0.6880094314229301,
-      "skullTravel": 0.062449102521574526,
-      "forePaddleTravel": 0.04631463159945732
+      "posedExtentOverBind": [
+        0.5626,
+        0.9557
+      ],
+      "tailTipTravel": 0.6963008363883837,
+      "skullTravel": 0.06388385951800259,
+      "forePaddleTravel": 0.045501723336127745
     },
     "Dash": {
-      "tailChainYawSweptRadians": 2.7559836637228727,
-      "tailChainPitchSweptRadians": 0.3693957395371399,
+      "tailChainYawSweptRadians": 2.755983656272292,
+      "tailChainPitchSweptRadians": 0.36939581031765556,
       "tailRootSweptRadians": [
         0.009870547335594893,
         0.0,
         0.14812318980693817
       ],
       "tailTipSweptRadians": [
-        0.13460282608866692,
+        0.13460283167660236,
         0.6542392373085022,
         0.7407152354717255
       ],
-      "neckYawSweptRadians": 0.14030504215043038,
+      "neckYawSweptRadians": 0.1767963944002986,
       "foreLimbSweptRadians": [
         0.0,
         0.05811341106891632,
@@ -1462,15 +1605,19 @@
         1.0035,
         1.0786
       ],
-      "posedExtentOverBind": [
-        0.9491,
-        1.0377
+      "headVsTrunkRunDegrees": [
+        1.39,
+        7.23
       ],
-      "tailTipTravel": 0.2855884252264212,
-      "skullTravel": 0.03913956717133602,
-      "forePaddleTravel": 0.0389944189858814
+      "posedExtentOverBind": [
+        0.9557,
+        1.0403
+      ],
+      "tailTipTravel": 0.28903013587915494,
+      "skullTravel": 0.03683557243409463,
+      "forePaddleTravel": 0.039466757228930345
     },
-    "bindBoxMax": 8.7257
+    "bindBoxMax": 8.6218
   },
   "heldShape": {
     "Idle": {
@@ -1490,6 +1637,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "mid": {
@@ -1508,6 +1656,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "end": {
@@ -1526,6 +1675,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       }
     },
@@ -1546,6 +1696,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.78,
         "neckStraightenedFraction": 0.8,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.182
       },
       "mid": {
@@ -1564,6 +1715,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.78,
         "neckStraightenedFraction": 0.8,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.182
       },
       "end": {
@@ -1582,6 +1734,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.78,
         "neckStraightenedFraction": 0.8,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.182
       }
     },
@@ -1602,6 +1755,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.96,
         "neckStraightenedFraction": 0.95,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.217
       },
       "mid": {
@@ -1620,6 +1774,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.96,
         "neckStraightenedFraction": 0.95,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.217
       },
       "end": {
@@ -1638,6 +1793,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.96,
         "neckStraightenedFraction": 0.95,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.217
       }
     },
@@ -1658,6 +1814,7 @@
         "trunkLeanTotalRadians": 0.468,
         "tailStraightenedFraction": 0.6,
         "neckStraightenedFraction": 0.62,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "mid": {
@@ -1676,6 +1833,7 @@
         "trunkLeanTotalRadians": 0.468,
         "tailStraightenedFraction": 0.6,
         "neckStraightenedFraction": 0.62,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "end": {
@@ -1694,6 +1852,7 @@
         "trunkLeanTotalRadians": 0.468,
         "tailStraightenedFraction": 0.6,
         "neckStraightenedFraction": 0.62,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       }
     },
@@ -1714,6 +1873,7 @@
         "trunkLeanTotalRadians": -0.468,
         "tailStraightenedFraction": 0.6,
         "neckStraightenedFraction": 0.62,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "mid": {
@@ -1732,6 +1892,7 @@
         "trunkLeanTotalRadians": -0.468,
         "tailStraightenedFraction": 0.6,
         "neckStraightenedFraction": 0.62,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "end": {
@@ -1750,6 +1911,7 @@
         "trunkLeanTotalRadians": -0.468,
         "tailStraightenedFraction": 0.6,
         "neckStraightenedFraction": 0.62,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       }
     },
@@ -1770,6 +1932,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.72,
         "neckStraightenedFraction": 0.8,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "mid": {
@@ -1788,6 +1951,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.72,
         "neckStraightenedFraction": 0.8,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "end": {
@@ -1806,6 +1970,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.72,
         "neckStraightenedFraction": 0.8,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       }
     },
@@ -1826,6 +1991,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.58,
         "neckStraightenedFraction": 0.5,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "mid": {
@@ -1844,6 +2010,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.58,
         "neckStraightenedFraction": 0.5,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "end": {
@@ -1862,6 +2029,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.58,
         "neckStraightenedFraction": 0.5,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       }
     },
@@ -1882,6 +2050,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "mid": {
@@ -1900,6 +2069,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.9131,
         "neckStraightenedFraction": 0.8954,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.2144
       },
       "end": {
@@ -1918,6 +2088,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       }
     },
@@ -1938,6 +2109,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "mid": {
@@ -1956,6 +2128,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.9131,
         "neckStraightenedFraction": 0.8954,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.2144
       },
       "end": {
@@ -1974,6 +2147,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       }
     },
@@ -1994,6 +2168,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "mid": {
@@ -2012,6 +2187,7 @@
         "trunkLeanTotalRadians": 0.1544,
         "tailStraightenedFraction": 0.8,
         "neckStraightenedFraction": 0.72,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": 0.07
       },
       "end": {
@@ -2030,6 +2206,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       }
     },
@@ -2050,6 +2227,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "mid": {
@@ -2068,6 +2246,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.34,
         "neckStraightenedFraction": 0.3,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": 0.14
       },
       "end": {
@@ -2086,6 +2265,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       }
     },
@@ -2106,6 +2286,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "mid": {
@@ -2124,6 +2305,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.4501,
         "neckStraightenedFraction": 0.3301,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.0094
       },
       "end": {
@@ -2142,6 +2324,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.4,
         "neckStraightenedFraction": 0.22,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": 0.056
       }
     },
@@ -2162,6 +2345,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.3,
         "neckStraightenedFraction": 0.35,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": 0.084
       },
       "mid": {
@@ -2180,6 +2364,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.3,
         "neckStraightenedFraction": 0.35,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": 0.084
       },
       "end": {
@@ -2198,6 +2383,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.3,
         "neckStraightenedFraction": 0.35,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": 0.084
       }
     },
@@ -2218,6 +2404,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "mid": {
@@ -2236,6 +2423,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.26,
         "neckStraightenedFraction": 0.3,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": 0.112
       },
       "end": {
@@ -2254,6 +2442,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       }
     },
@@ -2274,6 +2463,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "mid": {
@@ -2292,6 +2482,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 1.0,
         "neckStraightenedFraction": 0.98,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.224
       },
       "end": {
@@ -2310,6 +2501,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       }
     },
@@ -2330,6 +2522,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.5,
         "neckStraightenedFraction": 0.25,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.056
       },
       "mid": {
@@ -2348,6 +2541,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.5,
         "neckStraightenedFraction": 0.25,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.056
       },
       "end": {
@@ -2366,6 +2560,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.5,
         "neckStraightenedFraction": 0.25,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.056
       }
     },
@@ -2386,6 +2581,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "mid": {
@@ -2404,6 +2600,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.34,
         "neckStraightenedFraction": 0.3,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": 0.14
       },
       "end": {
@@ -2422,6 +2619,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       }
     },
@@ -2442,6 +2640,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "mid": {
@@ -2460,6 +2659,7 @@
         "trunkLeanTotalRadians": -0.4212,
         "tailStraightenedFraction": 0.26,
         "neckStraightenedFraction": 0.3,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": 0.112
       },
       "end": {
@@ -2478,6 +2678,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       }
     },
@@ -2498,6 +2699,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.62,
         "neckStraightenedFraction": 0.7,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": 0.042
       },
       "mid": {
@@ -2516,6 +2718,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.62,
         "neckStraightenedFraction": 0.7,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": 0.042
       },
       "end": {
@@ -2534,6 +2737,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.62,
         "neckStraightenedFraction": 0.7,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": 0.042
       }
     },
@@ -2554,6 +2758,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.6,
         "neckStraightenedFraction": 0.5,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "mid": {
@@ -2572,6 +2777,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.6,
         "neckStraightenedFraction": 0.5,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "end": {
@@ -2590,6 +2796,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.6,
         "neckStraightenedFraction": 0.5,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       }
     },
@@ -2610,6 +2817,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.7,
         "neckStraightenedFraction": 0.7,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "mid": {
@@ -2628,6 +2836,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.7,
         "neckStraightenedFraction": 0.7,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "end": {
@@ -2646,6 +2855,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.7,
         "neckStraightenedFraction": 0.7,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       }
     },
@@ -2666,6 +2876,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "mid": {
@@ -2684,6 +2895,7 @@
         "trunkLeanTotalRadians": 0.1544,
         "tailStraightenedFraction": 0.8,
         "neckStraightenedFraction": 0.72,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": 0.07
       },
       "end": {
@@ -2702,6 +2914,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       }
     },
@@ -2722,6 +2935,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "mid": {
@@ -2740,6 +2954,7 @@
         "trunkLeanTotalRadians": -0.4212,
         "tailStraightenedFraction": 0.26,
         "neckStraightenedFraction": 0.3,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": 0.112
       },
       "end": {
@@ -2758,6 +2973,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       }
     },
@@ -2778,6 +2994,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       },
       "mid": {
@@ -2796,6 +3013,7 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 1.0,
         "neckStraightenedFraction": 0.98,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.224
       },
       "end": {
@@ -2814,8 +3032,175 @@
         "trunkLeanTotalRadians": 0.0,
         "tailStraightenedFraction": 0.55,
         "neckStraightenedFraction": 0.55,
+        "frontAimedFraction": 1.0,
         "forePaddleSweepRadians": -0.14
       }
+    }
+  },
+  "pectorals": {
+    "foreL": {
+      "bones": [
+        "fore_upper_L",
+        "fore_mid_L",
+        "fore_tip_L"
+      ],
+      "ownedVertices": 867,
+      "ownedDistalVertices": 155,
+      "rootToNearestOwnedSkin": 0.02139,
+      "rootToMeanOwnedSkin": 0.12395,
+      "polylineLength": 0.22934,
+      "radius": 0.06141,
+      "travelRatioPerClip": {
+        "Idle": 1.1452,
+        "Swim": 1.175,
+        "Sprint": 1.1734,
+        "TurnLeft": 1.0351,
+        "TurnRight": 1.0897,
+        "Dive": 1.1236,
+        "Rise": 1.0821,
+        "Attack": 1.2292,
+        "Bite": 1.1653,
+        "Heavy": 1.1983,
+        "Hit": 1.2018,
+        "Death": 1.0673,
+        "Guard": 1.1753,
+        "Parry": 1.1853,
+        "Dodge": 1.0441,
+        "Eat": 1.1612,
+        "Stagger": 1.2018,
+        "Ability": 1.1104,
+        "Grab": 1.1498,
+        "Breath": 1.1569,
+        "Growth": 1.1518,
+        "TailWhip": 1.1983,
+        "Coil": 1.1104,
+        "Dash": 1.2951
+      },
+      "travelRatioWorst": 1.0351,
+      "travelRatioMedian": 1.1591
+    },
+    "foreR": {
+      "bones": [
+        "fore_upper_R",
+        "fore_mid_R",
+        "fore_tip_R"
+      ],
+      "ownedVertices": 700,
+      "ownedDistalVertices": 168,
+      "rootToNearestOwnedSkin": 0.01919,
+      "rootToMeanOwnedSkin": 0.11667,
+      "polylineLength": 0.21383,
+      "radius": 0.0541,
+      "travelRatioPerClip": {
+        "Idle": 1.0654,
+        "Swim": 1.0944,
+        "Sprint": 1.0943,
+        "TurnLeft": 1.0383,
+        "TurnRight": 1.0052,
+        "Dive": 1.055,
+        "Rise": 1.0748,
+        "Attack": 1.0632,
+        "Bite": 0.9628,
+        "Heavy": 1.1243,
+        "Hit": 1.1718,
+        "Death": 1.061,
+        "Guard": 1.0989,
+        "Parry": 1.1032,
+        "Dodge": 1.0452,
+        "Eat": 1.0842,
+        "Stagger": 1.1718,
+        "Ability": 0.9481,
+        "Grab": 1.0924,
+        "Breath": 1.0802,
+        "Growth": 1.0504,
+        "TailWhip": 1.1243,
+        "Coil": 0.9481,
+        "Dash": 1.0484
+      },
+      "travelRatioWorst": 0.9481,
+      "travelRatioMedian": 1.0701
+    },
+    "hindL": {
+      "bones": [
+        "hind_upper_L",
+        "hind_mid_L",
+        "hind_tip_L"
+      ],
+      "ownedVertices": 685,
+      "ownedDistalVertices": 108,
+      "rootToNearestOwnedSkin": 0.02005,
+      "rootToMeanOwnedSkin": 0.11116,
+      "polylineLength": 0.20989,
+      "radius": 0.0493,
+      "travelRatioPerClip": {
+        "Idle": 1.0679,
+        "Swim": 1.1501,
+        "Sprint": 1.1524,
+        "TurnLeft": 1.0209,
+        "TurnRight": 1.0681,
+        "Dive": 1.0979,
+        "Rise": 1.0881,
+        "Attack": 1.1152,
+        "Bite": 1.1467,
+        "Heavy": 1.1689,
+        "Hit": 1.1718,
+        "Death": 0.9717,
+        "Guard": 1.1529,
+        "Parry": 1.1976,
+        "Dodge": 1.0004,
+        "Eat": 1.1489,
+        "Stagger": 1.1718,
+        "Ability": 1.0981,
+        "Grab": 1.1531,
+        "Breath": 1.1005,
+        "Growth": 1.125,
+        "TailWhip": 1.1689,
+        "Coil": 1.0981,
+        "Dash": 1.078
+      },
+      "travelRatioWorst": 0.9717,
+      "travelRatioMedian": 1.1201
+    },
+    "hindR": {
+      "bones": [
+        "hind_upper_R",
+        "hind_mid_R",
+        "hind_tip_R"
+      ],
+      "ownedVertices": 634,
+      "ownedDistalVertices": 117,
+      "rootToNearestOwnedSkin": 0.01966,
+      "rootToMeanOwnedSkin": 0.11514,
+      "polylineLength": 0.20561,
+      "radius": 0.05776,
+      "travelRatioPerClip": {
+        "Idle": 1.1288,
+        "Swim": 1.1595,
+        "Sprint": 1.1621,
+        "TurnLeft": 1.1208,
+        "TurnRight": 1.0456,
+        "Dive": 1.1395,
+        "Rise": 1.0688,
+        "Attack": 1.1351,
+        "Bite": 1.0269,
+        "Heavy": 1.2233,
+        "Hit": 1.2249,
+        "Death": 1.0755,
+        "Guard": 1.1523,
+        "Parry": 1.1654,
+        "Dodge": 1.0824,
+        "Eat": 1.1532,
+        "Stagger": 1.2249,
+        "Ability": 0.9913,
+        "Grab": 1.1504,
+        "Breath": 1.0839,
+        "Growth": 1.1748,
+        "TailWhip": 1.2233,
+        "Coil": 0.9925,
+        "Dash": 1.0623
+      },
+      "travelRatioWorst": 0.9913,
+      "travelRatioMedian": 1.1373
     }
   },
   "restingShape": {
@@ -2838,6 +3223,11 @@
     ],
     "tailUncurlAvailable": 1.0,
     "neckUncurlAvailable": 1.0,
+    "frontAimAvailable": 1.0,
+    "frontCarried": [
+      0.7,
+      1.0
+    ],
     "waveStep": 0.4,
     "waveVerticalShare": 0.26,
     "clipAmplitudes": {
@@ -2856,9 +3246,9 @@
       "name": "anchor_mouth",
       "bone": "jaw",
       "point": [
-        0.0052285208366811275,
-        0.053999997675418854,
-        -0.032582905143499374
+        -0.8244374394416809,
+        0.3142027258872986,
+        0.190053790807724
       ],
       "role": "mouth"
     },
@@ -2866,9 +3256,9 @@
       "name": "anchor_mouth_inside",
       "bone": "skull",
       "point": [
-        -0.06875841319561005,
-        0.34200000762939453,
-        -0.018923506140708923
+        -0.6067912578582764,
+        0.5095052123069763,
+        0.13445058465003967
       ],
       "role": "swallow"
     },
@@ -2876,9 +3266,9 @@
       "name": "anchor_attack_primary",
       "bone": "skull",
       "point": [
-        0.007326194085180759,
-        0.017999999225139618,
-        -0.020215090364217758
+        -0.8528971672058105,
+        0.2985943555831909,
+        0.21004848182201385
       ],
       "role": "attack"
     }
@@ -2901,10 +3291,27 @@
       "tail_08",
       "tail_09",
       "tail_10",
-      "tail_11"
+      "tail_11",
+      "chest",
+      "neck_00",
+      "neck_01",
+      "neck_02",
+      "neck_03",
+      "skull"
     ],
     "carriedFraction": 0.7,
-    "restTurnDegreesAfterCarry": 57.02
+    "restTurnDegreesAfterCarry": 57.02,
+    "carriedAimFraction": 1.0,
+    "carriedLevelFraction": 0.7,
+    "frontCarryPerJointDegrees": {
+      "chest": 9.1,
+      "neck_00": 13.57,
+      "neck_01": 12.84,
+      "neck_02": 17.19,
+      "neck_03": 7.07,
+      "skull": 11.67
+    },
+    "restHeadVsTrunkRunDegrees": 4.17
   },
   "twinRemeshTriangles": 199604,
   "twinDecimateRatio": 0.027554558590054512,
@@ -2912,9 +3319,9 @@
   "voxel": 0.0026,
   "bladeDilation": 0.001,
   "envelope": {
-    "maximumEnvelopeDifference": 0.1290886402130127,
-    "surfaceDistanceMax": 0.021005118265748024,
-    "surfaceDistanceP95": 0.008423837926238775,
+    "maximumEnvelopeDifference": 0.02797102928161621,
+    "surfaceDistanceMax": 0.022553667426109314,
+    "surfaceDistanceP95": 0.008823656104505062,
     "envelopeTolerance": 0.24
   }
 }
