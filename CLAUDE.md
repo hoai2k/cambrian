@@ -533,6 +533,20 @@ unless the user explicitly asks for a PR. Steps:
   interpenetrate when they are first brought together, the oral cavity Tripo modelled has to fold
   rather than be built, and closing is a large jaw rotation, so the pose the animal spends almost
   all its time in becomes the most deformed one.
+- **Ask what an oral part is doing by taking it out, before building anything in its place.** A
+  named mesh can be stripped from the unpacked packaged GLB and `gape-solid.py` run on what is left
+  in half a minute, with no rebuild; that is how Dinocephalosaurus' verdict was measured and it
+  separated two things a builder had taken for one. The one-sac lining there closed **nothing** —
+  0 px through the head shipped, 0–3 px with the sac gone — because what a plane cut through a
+  closed head leaves open is the head's cross-section at the hinge, and the seated hinge tissue
+  every jawed body carries was already filling it (98–113 px with that gone too). The verdicts, per
+  body and with the measurement behind each, are `docs/triassic/throat-repairs/oral-verdicts.md`,
+  and a body that carries no lining is a verdict rather than an omission: `oral-shell-audit.mjs`
+  reports it cleanly (every variant must agree, and the hidden oral parts it does carry are listed)
+  and `gape-crown.py` records itself moot on a crown with no mouth drawn, since a tool whose subject
+  has been removed must say so and not fail on an empty `max()`. Expect the throat audit to count
+  mixed `skull`/`jaw` vertices on a cephalopod's *body* — the lip band of the crown's own skin is
+  weighted to both on purpose — and on every hinge plug; neither is a lining.
 - **A beak inside an arm crown is a mouth, and almost nothing about a jawed head applies to it.**
   Neither cephalopod's generation models a mouth at all, and Placodus' method — cast head vertex
   normals back into the mesh and fit the hits — returns hundreds of them spread over the whole crown,

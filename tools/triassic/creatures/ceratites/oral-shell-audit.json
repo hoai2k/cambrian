@@ -1,0 +1,28 @@
+{
+  "id": "ceratites",
+  "verdict": "no oral lining: nothing to be mixed",
+  "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present. A body with no lining mesh is reported as such, with the hidden oral parts it does carry listed, and all three variants must agree.",
+  "models": [
+    {
+      "variant": "authored",
+      "sha256": "a5bec74e67e4965354eb32cae08e89d2d40897c1bc865116b1c4c8694402f793",
+      "meshes": [],
+      "otherOralMeshes": [],
+      "oralShells": "none"
+    },
+    {
+      "variant": ".puppet",
+      "sha256": "50c3e4257080bfe9d4205801f05f52999c26534888302bc8d3d31cd942c3a675",
+      "meshes": [],
+      "otherOralMeshes": [],
+      "oralShells": "none"
+    },
+    {
+      "variant": ".lod1",
+      "sha256": "50c3e4257080bfe9d4205801f05f52999c26534888302bc8d3d31cd942c3a675",
+      "meshes": [],
+      "otherOralMeshes": [],
+      "oralShells": "none"
+    }
+  ]
+}
