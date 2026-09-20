@@ -665,13 +665,26 @@ def mouth_section(y):
     return w, h
 
 
-# The jaw share is written over the built rings below, so the lining is constructed with a
-# placeholder here: the share wants each ring vertex's own height against its own section, which
-# is a measurement of the geometry rather than of the station it was asked for.
+# Size the separate palate and jaw floor from the intact head rather than the closed-mouth lumen.
+_room_cache = {}
+
+
+def mouth_room(_y):
+    k = round(_y, 5)
+    if k not in _room_cache:
+        _room_cache[k] = T.mouth_room(
+            bvh_auth, Vector((cx(_y), _y, seam(_y))), Vector((1, 0, 0)), Vector((0, 0, 1)),
+            limit=.20, fallback=.02,
+            cap=(head_half_width(_y),
+                 max(.002, head_half_depth(_y) - (seam(_y) - cz(_y))),
+                 max(.002, head_half_depth(_y) + (seam(_y) - cz(_y)))))
+    return _room_cache[k]
+
+
 lining, lining_raw = T.lining('Oral cavity lining', rig, tx, seam, mouth_section,
                               MOUTH_BACK, MOUTH_FRONT, (lambda _p: 0.), mouth_mat,
                               rings=26, ring=22, centre_x=cx, power=LINING_POWER,
-                              fit=None)
+                              fit=None, room=mouth_room)
 oralparts = [lining]
 mouth_cover = []
 for _y in np.linspace(MOUTH_FRONT + .004, MOUTH_BACK - .004, 12):
@@ -683,17 +696,10 @@ for _y in np.linspace(MOUTH_FRONT + .004, MOUTH_BACK - .004, 12):
         ('the oral lining is narrower than the mouth', y, w, mouth_half_width(y))
     assert h >= .0012, ('the oral lining is flat', y, h)
 
-# The lining's jaw share, applied after the fact so the weights can be measured from the built
-# rings rather than guessed from the section. **The changeover is above the lip, not at it**:
-# centred on the seam, the ring's equator takes half the jaw's rotation while the mandible's cut
-# rim takes all of it, and a wedge opens between them at full gape.
-lining_jaw = []
-for idx, p in enumerate(lining_raw):
-    _w, h = mouth_section(p.y)
-    t = T.smooth(.5 + 1.6 * ((seam(p.y) + .45 * h) - p.z) / max(h, 1e-6))
-    lining.vertex_groups['jaw'].add([idx], t, 'REPLACE')
-    lining.vertex_groups['skull'].add([idx], 1 - t, 'REPLACE')
-    lining_jaw.append(round(float(t), 3))
+# Read back the rigid ownership the shared helper applied: palate then floor.
+_jaw_group = lining.vertex_groups['jaw'].index
+lining_jaw = [round(next((g.weight for g in v.groups if g.group == _jaw_group), 0.), 3)
+              for v in lining.data.vertices]
 
 # The jaw hinge tissue: a seated envelope straddling the cut plane, because that corner is where
 # the mandible's rear rim, the throat and the lining all meet and the wedge between them is what

@@ -3,23 +3,23 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1996152,
-      "sha256": "225bf6c039aa8aa32422c3aa243f8782fe31d7f13825f0c4a0150c67a7b90064",
-      "triangles": 21320,
+      "bytes": 1993620,
+      "sha256": "06e4bb87049919a8ced28e13353680e3dbf108a19b85f0bd69df901d9a4c548d",
+      "triangles": 21316,
       "vertices": 12360
     },
     {
       "suffix": ".puppet",
-      "bytes": 839428,
-      "sha256": "a590a42eec29464dfe3026401d39c3faf54075aede84b8352311378f3600ef65",
-      "triangles": 7582,
+      "bytes": 836896,
+      "sha256": "4186f8f2f3d3924c1c06f65897aafb3de62762bde4b720bfde2001cff3f7a0fb",
+      "triangles": 7578,
       "vertices": 3909
     },
     {
       "suffix": ".lod1",
-      "bytes": 839428,
-      "sha256": "a590a42eec29464dfe3026401d39c3faf54075aede84b8352311378f3600ef65",
-      "triangles": 7582,
+      "bytes": 836896,
+      "sha256": "4186f8f2f3d3924c1c06f65897aafb3de62762bde4b720bfde2001cff3f7a0fb",
+      "triangles": 7578,
       "vertices": 3909
     }
   ],
@@ -188,7 +188,7 @@
       "sha256": "1062202d88e97112e9a2696ba391badf017fdbf76e837af5f197d7cb708447f1"
     }
   ],
-  "twinTriangleFraction": 0.3556285178236398,
+  "twinTriangleFraction": 0.355507599924939,
   "playback": [
     {
       "suffix": "",
@@ -215,7 +215,7 @@
           "clip": "Breath",
           "duration": 2.4000000953674316,
           "samples": 61,
-          "maxVertexTravel": 1.4416247100383388
+          "maxVertexTravel": 1.4227030085141454
         },
         {
           "clip": "Breathe",
@@ -340,7 +340,7 @@
           "clip": "Ability",
           "duration": 1.100000023841858,
           "samples": 61,
-          "maxVertexTravel": 2.3164519635703376
+          "maxVertexTravel": 2.3164519619605453
         },
         {
           "clip": "Attack",
@@ -358,7 +358,7 @@
           "clip": "Breath",
           "duration": 2.4000000953674316,
           "samples": 61,
-          "maxVertexTravel": 1.439249180486217
+          "maxVertexTravel": 1.4392491812298203
         },
         {
           "clip": "Breathe",
@@ -376,7 +376,7 @@
           "clip": "Dive",
           "duration": 1.399999976158142,
           "samples": 61,
-          "maxVertexTravel": 0.8549233166539572
+          "maxVertexTravel": 0.8549233151122788
         },
         {
           "clip": "Dodge",

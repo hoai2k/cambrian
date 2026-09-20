@@ -1,73 +1,35 @@
 {
-  "tool": "/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- coelophysis SnapRight@0.20 SnapLeft@0.20 Heavy@0.13 Ability@0.53 Bite@0.20 Eat@0.70 Attack@0.35",
-  "backdropTest": "r > 0.90, g < 0.20, b > 0.90",
-  "pixelsPerFrame": 378000,
-  "tolerance": 12,
-  "maxSeenThroughTheBody": 2505,
-  "note": "six of seven shots are clean. SnapRight is not, and it is a pre-existing defect this pass found rather than made: the body as shipped read 2,496 px on the same shot. The diagnosis is in the README.",
+  "id": "coelophysis",
+  "backdrop": [
+    1.0,
+    0.0,
+    1.0,
+    1.0
+  ],
   "shots": [
     {
-      "clip": "SnapRight",
-      "t": 0.2,
-      "pixels": 378000,
-      "differingPixels": 45748,
-      "holesOpenedByCulling": 2704,
-      "seenThroughTheBody": 2505,
-      "backdropInBothPasses": 1
-    },
-    {
-      "clip": "SnapLeft",
-      "t": 0.2,
-      "pixels": 378000,
-      "differingPixels": 41780,
-      "holesOpenedByCulling": 94,
-      "seenThroughTheBody": 0,
-      "backdropInBothPasses": 0
-    },
-    {
-      "clip": "Heavy",
-      "t": 0.13,
-      "pixels": 378000,
-      "differingPixels": 31708,
-      "holesOpenedByCulling": 90,
-      "seenThroughTheBody": 0,
-      "backdropInBothPasses": 0
-    },
-    {
-      "clip": "Ability",
-      "t": 0.53,
-      "pixels": 378000,
-      "differingPixels": 7708,
-      "holesOpenedByCulling": 882,
-      "seenThroughTheBody": 0,
-      "backdropInBothPasses": 0
-    },
-    {
       "clip": "Bite",
-      "t": 0.2,
+      "t": 0.25,
       "pixels": 378000,
-      "differingPixels": 34312,
-      "holesOpenedByCulling": 87,
+      "differingPixels": 2012,
+      "holesOpenedByCulling": 3,
       "seenThroughTheBody": 0,
-      "backdropInBothPasses": 0
+      "backdropInBothPasses": 4,
+      "markedImage": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/coelophysis/gape-solid/Bite-0.25-opened.png",
+      "solid": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/coelophysis/gape-solid/Bite-0.25-solid.png",
+      "culled": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/coelophysis/gape-solid/Bite-0.25-culled.png"
     },
     {
-      "clip": "Eat",
-      "t": 0.7,
+      "clip": "SnapRight",
+      "t": 0.24,
       "pixels": 378000,
-      "differingPixels": 18014,
-      "holesOpenedByCulling": 1378,
+      "differingPixels": 2232,
+      "holesOpenedByCulling": 0,
       "seenThroughTheBody": 0,
-      "backdropInBothPasses": 0
-    },
-    {
-      "clip": "Attack",
-      "t": 0.35,
-      "pixels": 378000,
-      "differingPixels": 4676,
-      "holesOpenedByCulling": 48,
-      "seenThroughTheBody": 0,
-      "backdropInBothPasses": 0
+      "backdropInBothPasses": 0,
+      "markedImage": null,
+      "solid": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/coelophysis/gape-solid/SnapRight-0.24-solid.png",
+      "culled": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/coelophysis/gape-solid/SnapRight-0.24-culled.png"
     }
   ]
 }

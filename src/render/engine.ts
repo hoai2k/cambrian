@@ -13,6 +13,7 @@ import type { Phase } from '../sim/daynight';
 import { BAND_COLOR, CALM_MARK, emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
 import { recordStep, recordingPhase } from '../app/debug-record';
 import { BIOME_NAMES, biomeAt, coverAt, groundHeight, nurseryAt, sampleHeight, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
+import { breathesAir, STRAND_BREATH, STRAND_LOW } from '../sim/beach';
 import { AssetQueue, type AssetProgress } from './assets';
 import { fillOf, ladderName } from '../sim/ladder';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
@@ -38,6 +39,12 @@ export interface PlayerHud {
   /** Sense is on: the band glyphs and the radar are drawn. */
   senseOn: boolean;
   hunted: number; hunterAngle: number | null; hunterName?: string; hunterState: 'none' | 'noticed' | 'hunting'; inCover: boolean; still: boolean;
+  /**
+   * Out of the water, on the shore (src/sim/beach.ts). `strandLeft` is a water-breather's minute
+   * out of the water, 1 down to 0, and is set only while it is ashore — the gauge is for the sand
+   * and nowhere else; `strandLow` is the last of it. An air-breather ashore carries neither.
+   */
+  ashore: boolean; strandLeft?: number; strandLow?: boolean;
   hint?: string; respawnIn: number; fade: number; state: string; modelReady: boolean; kills: number; eats: number; escapes: number; protect: boolean;
   /**
    * Co-op: seconds left for a team-mate to reach this downed player, and the downed team-mates
@@ -217,6 +224,29 @@ export const AIM_CLOSER = 0.42, AIM_SHOULDER = 0.75;
  * straight back and the drag would have been pointless.
  */
 const FOLLOW_RATE = 1.6, FOLLOW_HOLD = 1.2;
+/**
+ * The cursor's *height* nudges the camera's pitch, in mouse play.
+ *
+ * A mouse has one hand and two jobs — point at an animal, and look where you are going — and with
+ * the pointer free the second one only happened on a drag. So the top and bottom of the screen
+ * steer: carry the cursor up and the view tilts up with it, carry it down and it tilts down, and
+ * the middle `EDGE_DEAD` of the screen does nothing at all, which is the band a player aims in.
+ * That is the whole trade — the dead zone is what keeps pointing and looking from being the same
+ * gesture — so it is generous, and the push ramps in from its edge rather than starting at full
+ * rate, so there is no line the view jumps at.
+ *
+ * It is a *rate*, not a position: holding the cursor near the top keeps tilting, the way an
+ * edge-scroll does, because a screen's top edge is not a camera angle and cannot be mapped to one.
+ */
+const EDGE_DEAD = 0.38, EDGE_RATE = 0.85;
+/** Radians per second of pitch the cursor at `ndcY` is asking for. Positive tilts the view down. */
+export function edgePitch(ndcY: number): number {
+  const over = Math.abs(ndcY) - EDGE_DEAD;
+  if (over <= 0) return 0;
+  const k = Math.min(1, over / (1 - EDGE_DEAD));
+  // Squared, so the first part of the push past the dead zone is gentle and the corner is quick.
+  return -Math.sign(ndcY) * k * k * EDGE_RATE;
+}
 /** How much a body inside the near field outranks one the same apparent size further off. */
 const NEAR_RANK = 3;
 /** 1 at a full-width view, falling off for a narrow one; never less than a third of the shift. */
@@ -596,11 +626,18 @@ export class Engine {
             // `FOLLOW_HOLD` after a drag so a player who has just looked somewhere on purpose is
             // not immediately turned away from it.
             if (this.mouseLook && p) {
+              // The cursor's height is a second way of aiming the view, and it is *asking* for
+              // something just as a drag is — so it holds the follow off while it pushes, or the
+              // two would pull against each other and the pitch would sit wherever they balanced.
+              const edge = this.mouseFrame?.ndc && !this.mouseFrame.dragging ? edgePitch(this.mouseFrame.ndc.y) : 0;
+              if (edge !== 0) cs.pitch = clamp(cs.pitch + edge * dt, PITCH_UP, PITCH_DOWN);
               if (this.mouseFrame?.dragging || Math.abs(c.lookX) > 0.05 || Math.abs(c.lookY) > 0.05) cs.followHold = FOLLOW_HOLD;
               else cs.followHold = Math.max(0, cs.followHold - dt);
               if (cs.followHold === 0 && cs.climbHold === 0) {
                 cs.yaw = wrapAngle(cs.yaw + wrapAngle(p.yaw - cs.yaw) * (1 - Math.exp(-FOLLOW_RATE * dt)));
-                cs.pitch = damp(cs.pitch, 0.2, FOLLOW_RATE * 0.5, dt);
+                // The pitch only settles back while the cursor is in the dead zone: the follow is
+                // what a view does when nobody is asking, and the cursor up there is an ask.
+                if (edge === 0) cs.pitch = damp(cs.pitch, 0.2, FOLLOW_RATE * 0.5, dt);
               }
             }
           }
@@ -1018,7 +1055,10 @@ export class Engine {
     // faster up than down, because a cut to the sky and back is a flinch rather than a breath.
     cs.breathT = Math.max(0, cs.breathT - dt);
     const peek = cs.breathT <= 0 ? 0 : Math.sin(Math.min(1, cs.breathT / BREATH_PEEK) * Math.PI) ** 0.6;
-    const ceiling = p.airborne ? SURFACE_Y + 40 : (SURFACE_Y - 0.4) + peek * (L * 0.5 + 1.6);
+    // And the sand lifts it: a body wading up the beach takes the camera up out of the water with
+    // it, by its wade, which is continuous in where it stands, so the view comes up as the animal
+    // does rather than cutting to the sky when a rule says it is ashore.
+    const ceiling = p.airborne ? SURFACE_Y + 40 : (SURFACE_Y - 0.4) + Math.max(peek * (L * 0.5 + 1.6), p.wade * (L * 0.8 + 6));
     const fit = fitCameraArm(lookAt.y + L * 0.18, pitch, dist, L * CAMERA_CLOSE,
       (d) => { place(d); return sampleHeight(desired.x, desired.z) + CAMERA_SAND; },
       ceiling);
@@ -1565,6 +1605,8 @@ export class Engine {
         senseOn: p.senseMode,
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, kind: creature(lockA.creature).kind, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,
+        ashore: p.ashore, strandLeft: p.ashore && !breathesAir(p.creature) ? clamp(1 - p.strandT / STRAND_BREATH, 0, 1) : undefined,
+        strandLow: p.ashore && !breathesAir(p.creature) && STRAND_BREATH - p.strandT < STRAND_LOW,
         hunterState: p.hunted >= 0.5 ? 'hunting' : p.hunted > 0.2 ? 'noticed' : 'none', inCover: p.cover > 0.3, still: Math.hypot(p.vel.x, p.vel.y, p.vel.z) < 0.3,
         hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, (game.reviveWindow(p) || CORPSE_WINDOW) - (game.reviveWindow(p) ? 0 : p.respawnT)) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
         downedFor: game.reviveWindow(p), reviveProgress: game.reviveProgress(p), downedAllies: downed, spectating: spectate,

@@ -175,10 +175,22 @@ unless the user explicitly asks for a PR. Steps:
   `npm run mouse` holds the wiring. And with no second stick and no lock, nothing is steering the view frame to frame, so
   it steers itself: `FOLLOW_RATE` eases the camera round behind the body and back to the resting
   pitch, and `FOLLOW_HOLD` stands it aside after a drag so looking somewhere on purpose sticks.
-  The keyboard around it is the mouse's own layout: **A and D turn rather than strafe** — they move
-  the camera's yaw, which is what the right stick does, so turning *composes* with swimming instead
-  of replacing it (hold W, press D, and the body swims forward along a curve, because `mx`/`my` are
-  camera-relative and the camera is what turned) — W forward, X back, E or Q up, S or C down, R the
+  **The cursor's own height is the other half of the view.** Outside a dead zone either side of the
+  middle (`edgePitch` in `src/render/engine.ts`, `EDGE_DEAD`), the cursor tilts the camera — up in
+  the top of the screen, down in the bottom, squared past the edge so the first part of the push is
+  gentle and the corner is quick — which is how a player angles the view so what they are swimming
+  at arrives near the middle. The middle is left alone precisely because that is where the aiming
+  happens, and a push is an *ask* like a drag is: it holds the follow off while it lasts, or the
+  two would pull against each other and the pitch would sit wherever they balanced.
+  The keyboard around it is the mouse's own layout: **A and D turn the animal, and the animal turns
+  the camera** — they move the *body*, the stick's own sideways axis, not the view: a swimmer turns
+  into its travel (`turnRate` in `game.ts`) and the follow camera comes round behind it, so the
+  order is the one a player feels, animal first and view after. Driving the camera instead put the
+  view somewhere the body had not been yet and left it to catch up, which reads as steering a boat
+  by leaning; it also kept a creature's own agility out of the answer, and a Waptia whipping round
+  where a giant does not is a thing the camera cannot say. The arrow keys still move the view
+  itself. Turning composes with swimming (hold W, press D and the body swims forward along a
+  curve) — W forward, X back, E or Q up, S or C down, R the
   shield, Z camouflage, I sense, space to dash, Shift to sprint. Every attack has a key as well as a
   mouse button, because a hand already on the keys should not have to reach: J and F bite, G and K
   are the heavy. `npm run mouse` drives the whole of it in a real browser, where every part of it is something a headless test cannot vouch for. That harness
@@ -285,6 +297,29 @@ unless the user explicitly asks for a PR. Steps:
   (the renderer cannot know a dash fired until that step has run) and gives up that one frame of
   drift and no more. `npm run swim` closes the loop end to end — camera drift into the stick into
   the real cooldown — and measures the second dash's own rise against the first's.
+- **The shore is somewhere a body can end up, and what the sand does to it depends on what it
+  breathes** (`src/sim/beach.ts`, `docs/redesign/10-the-shore.md`, `npm run beach`, one process
+  per era). Two ways there and they are deliberately unequal: a *leap* lands wherever its arc comes
+  down, because nothing in the air is held by water — the shore wall in `resolveStatic` stands only
+  for a body swimming at it, and the Cambrian breaches now too, on the Devonian's own terms — and an
+  animal with legs *and* lungs (`amphibious` on its card: Tiktaalik, Acanthostega, Nothosaurus,
+  Placodus, Aphaneramma, Henodus, Cartorhynchus, Odontochelys) walks up through it, its swim
+  handing over to its walk along one ramp (`landSpeed`) and back the same way. **Nothing strands
+  itself by swimming**: beside the fixed wall a second one is measured in the body's own draught
+  (`WALL_WADE`), because the beach is a different slope in every era and on the Triassic's the
+  fixed wall stands on dry sand for a hatchling; a swimmer becomes `ashore` on exactly one frame,
+  the one its leap lands on, and both walls *ease* a body found inside them out at a bounded pace
+  rather than snapping it. `wade` (0..1, continuous in position) is what the walk ramp, the clip
+  handover and the camera's lift out of the water all read; `ashore` is the rule past `ASHORE_WADE`.
+  Ashore, a water-breather has `STRAND_BREATH` (a minute, the gauge shown only there — under water a
+  gill has nothing to count) and one move, the flop, which goes seaward whatever the stick says; an
+  air-breather has no clock, walks along the shore at `LAND_WALK` of its cruise and no further
+  inland than `LAND_REACH`, and a Triassic lung fills on the sand because the sand is the surface.
+  The flop's hop, twist and nose-up are the simulation's own (`pos.y`, `bank`, `pitch` through
+  `flopT`), so no clip is needed for it to read; the renderer throws the swim stroke on top. A
+  brainless body ashore is handed the seaward stick (`ashoreInput`). The land is bare in every era
+  by construction — `generateChunk` places nothing inland of `SHORE_WALL` — and the Triassic's
+  beach becomes dangerous when its shore animals are switched on, not before.
 - **A breach is a leap, not a launch.** The vertical a body carried through the surface used to be
   whatever it had, and a dash's launch speed is `L * 9.5 + 7` — so a five-unit animal that dashed
   straight up cleared a hundred units of air and a Cymbospondylus over a thousand. `breachSpeed` in
@@ -799,6 +834,12 @@ unless the user explicitly asks for a PR. Steps:
   no approaching one to ride it. A fed giant notices — the head comes round, which is the tell — and
   goes back to its route; how often one is hungry follows the hour and the water it is over
   (`appetiteAt`), which is where the rhythm of the day is set. `npm run hunt` covers both halves.
+- **Being eaten is the end of the chase.** The hunt warning — the arrow, the eye, the line — is a
+  reading of the *live* world, and `updateHunted` only ever runs on a body that can still act, so a
+  corpse kept whatever score it died holding and went on saying something was hunting it. It is
+  cleared where death is actually handled, in `kill` and `startSwallow` in `src/sim/combat.ts`
+  (a body in something's mouth has stopped being chased too), rather than by a guard in
+  `updateHunted` that nothing would reach. `npm run hunt` holds both.
 - A warning is about intent, never about size. The colour of a band marker and of a radar contact is
   red only for a body that is actually coming for you (`comingFor` in `src/sim/actors.ts`: hunting,
   fighting or seeing you off its ground — and for a steered body, aiming at you); everything else is

@@ -192,15 +192,19 @@ function updateDeadZoneEffects(g: Game, a: Actor, d: DevActor, dt: number) {
 function updateShore(g: Game, a: Actor, d: DevActor) {
   const def = creature(a.creature);
   const wall = SHORE_WALL + bodyRadius(a) * 3;
-  const beached = (def.shoreReach ?? 0) > 0 && shoreDistance(a.pos.x, a.pos.z) < wall;
-  if (beached !== d.beached && a.controller === 'player') g.events.push({ kind: 'beach', pos: { ...a.pos }, actor: a.id, player: a.player, strength: beached ? 1 : 0 });
+  // Two ways onto the sand: the limbed animals' old push past the wall, and the shared shore rule
+  // that any body may now be ashore by (src/sim/beach.ts), which announces itself.
+  const beached = ((def.shoreReach ?? 0) > 0 && shoreDistance(a.pos.x, a.pos.z) < wall) || a.ashore;
+  if (beached !== d.beached && a.controller === 'player' && !a.ashore) g.events.push({ kind: 'beach', pos: { ...a.pos }, actor: a.id, player: a.player, strength: beached ? 1 : 0 });
   d.beached = beached;
-  if (beached) {
-    // slow, out of the water, on the sand: the seabed here is above the game's ceiling clamp
+  if (beached) a.hunted = 0;
+  // Slow, out of the water, on the sand: the seabed here is above the game's ceiling clamp. Only
+  // where the shared shore rule is not already holding the body to the sand (any wade at all,
+  // src/sim/beach.ts): two pins at two heights would have the body jitter between them.
+  if (beached && a.wade === 0) {
     a.vel.x *= 0.9; a.vel.z *= 0.9;
     const floor = groundHeight(g.world, a.pos.x, a.pos.z, []) + lengthOf(a) * 0.12;
     if (a.pos.y < floor) { a.pos.y = floor; a.prevT.y = Math.max(a.prevT.y, floor - 0.5); }
-    a.hunted = 0;
   }
 }
 function updateShoal(g: Game, a: Actor, d: DevActor, dt: number) {

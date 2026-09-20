@@ -821,24 +821,30 @@ def mouth_section(y):
     return w, h
 
 
+_room_cache = {}
+
+
+def mouth_room(_y):
+    k = round(_y, 5)
+    if k not in _room_cache:
+        axis = lining_axis(_y)
+        _room_cache[k] = T.mouth_room(
+            bvh_auth, Vector((cx(_y), _y, axis)), Vector((1, 0, 0)), Vector((0, 0, 1)),
+            limit=.20, fallback=.02,
+            cap=(head_half_width(_y),
+                 max(.002, head_half_depth(_y) - (axis - cz(_y))),
+                 max(.002, head_half_depth(_y) + (axis - cz(_y)))))
+    return _room_cache[k]
+
+
 lining, lining_raw = T.lining('Oral cavity lining', rig, tx, lining_axis, mouth_section,
                               MOUTH_BACK, MOUTH_FRONT, (lambda _p: 0.), mouth_mat,
-                              rings=30, ring=24, centre_x=cx, power=LINING_POWER, fit=None)
+                              rings=30, ring=24, centre_x=cx, power=LINING_POWER, fit=None,
+                              room=mouth_room)
 oralparts = [lining]
-lining_jaw = []
-for idx, p in enumerate(lining_raw):
-    _w, h = mouth_section(p.y)
-    # **The floor may not take the jaw's whole rotation**, and this is the one place on the animal
-    # where that is forced rather than chosen. At the snout the closing rotation is *defined* as the
-    # one that carries the mandible's dorsal margin exactly onto the palate's ventral one, so a
-    # lining floor riding the jaw at weight 1 arrives exactly where its own roof already is: the
-    # tube is degenerate at the shut pose and rounding decides which side of the roof each vertex
-    # lands, which is a pink shard through the top of the snout. Held at 0.93 the floor arrives a
-    # fifth of the local gape below the roof and the sac closes instead of crossing.
-    t = min(.93, T.smooth(.5 + 1.6 * ((lining_axis(p.y) + .45 * h) - p.z) / max(h, 1e-6)))
-    lining.vertex_groups['jaw'].add([idx], t, 'REPLACE')
-    lining.vertex_groups['skull'].add([idx], 1 - t, 'REPLACE')
-    lining_jaw.append(round(float(t), 3))
+_jaw_group = lining.vertex_groups['jaw'].index
+lining_jaw = [round(next((g.weight for g in v.groups if g.group == _jaw_group), 0.), 3)
+              for v in lining.data.vertices]
 
 mouth_cover = []
 for _y in np.linspace(MOUTH_FRONT + .006, MOUTH_BACK - .006, 14):

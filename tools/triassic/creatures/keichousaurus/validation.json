@@ -13,11 +13,11 @@
   "remeshTriangles": 160548,
   "puppetBudget": 6600,
   "fullTriangles": 20120,
-  "puppetTriangles": 7588,
+  "puppetTriangles": 7590,
   "parts": {
     "authoredBody": 19060,
     "authoredJaw": 380,
-    "puppetBody": 6706,
+    "puppetBody": 6708,
     "puppetJaw": 202,
     "sharedOral": 680
   },
@@ -53,6 +53,7 @@
     "Sprint",
     "Guard",
     "Eat",
+    "Grab",
     "Shoal",
     "Breathe"
   ],
@@ -75,7 +76,7 @@
     "Eat": 1.4988011428009654e-17,
     "Stagger": 2.9995195879107854e-33,
     "Ability": 2.6995675923855084e-33,
-    "Grab": 4.499279198195186e-33,
+    "Grab": 1.7985613051867095e-17,
     "Breath": 6.898894795055417e-33,
     "Growth": 5.399135184771017e-33,
     "Shoal": 9.576737804880861e-17,
@@ -300,13 +301,13 @@
     ],
     "Grab": [
       [
-        -1.405949592590332,
+        -1.403321623802185,
         -2.5,
-        -1.1113532781600952
+        -1.1269326210021973
       ],
       [
-        1.41733980178833,
-        2.771174669265747,
+        1.406046748161316,
+        2.7716786861419678,
         1.1113532781600952
       ]
     ],
@@ -385,7 +386,7 @@
           -0.3376069664955139
         ],
         "max": [
-          0.7367257475852966,
+          0.7367258071899414,
           0.9919999837875366,
           0.6110764741897583
         ]
@@ -396,8 +397,8 @@
   ],
   "envelopeStationsOverToleranceCause": "the hindR paddle tip: the twin stops 0.009 raw (0.9 % of body length) short of the authored blade, so the one station that lands in that gap reads it as absent rather than displaced",
   "surfaceDistanceMax": 0.008423739112913609,
-  "surfaceDistanceP95": 0.0026757627376355203,
-  "surfaceDistanceP99": 0.003818080474156885,
+  "surfaceDistanceP95": 0.0026667760103009637,
+  "surfaceDistanceP99": 0.003814730134326961,
   "surfaceOutliersOver0p12": 0,
   "surfaceVertices": 9820,
   "seatingDepthRaw": {
@@ -413,7 +414,7 @@
     "neck_02": 0.013723681680858135
   },
   "maxInfluences": 4,
-  "meanInfluences": 2.0349321406539174,
+  "meanInfluences": 2.034852340195852,
   "limbSweepDegreesPerCycle": {
     "Idle": {
       "foreL": 6.2,
@@ -524,10 +525,10 @@
       "hindR": 5.3
     },
     "Grab": {
-      "foreL": 17.8,
-      "foreR": 18.4,
-      "hindL": 17.8,
-      "hindR": 17.3
+      "foreL": 18.2,
+      "foreR": 18.8,
+      "hindL": 18.1,
+      "hindR": 17.6
     },
     "Breath": {
       "foreL": 16.8,

@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-19",
+  "canonicalStatus": "approved-scenery",
+  "canonical": "canonical.png",
+  "canonicalSource": "../../voltzia.png",
+  "canonicalSha256": "940235fc1c25fd8492fd33f55766f3b3107592121a5e5387a4fcee5807d5c67f",
+  "input": "input.png",
+  "inputSha256": "940235fc1c25fd8492fd33f55766f3b3107592121a5e5387a4fcee5807d5c67f",
+  "turnaround": "turnaround.png",
+  "turnaroundSource": "../../voltzia-turnaround.png",
+  "turnaroundSha256": "36f68defdf9457f5e43f57fbec04e2cdba85517a30bd29bf59e90c8b3b1ce268",
+  "generator": "existing approved scenery canonical set",
+  "review": "Packaged without regeneration: the existing four-panel sheet already supplies multiple whole-tree views and a branch detail, so it is the lowest-drift Tripo input."
+}

@@ -1,4 +1,19 @@
 {
+  "materialCorrection": {
+    "authoredAlbedo": "original UV texture; white COLOR_0",
+    "normalStrength": 0.15,
+    "roughness": 0.7,
+    "puppetMaterialUnchanged": true
+  },
+  "authoredMandibleSeparation": {
+    "frontOwner": "jaw",
+    "upperLipOwner": "skull",
+    "rearHingeRawY": [
+      0.326,
+      0.36
+    ],
+    "trianglesPreserved": true
+  },
   "rawSHA256": "576114e5d8e4b3eabfd97148a515cc8f9f4567788478791a4441eb85606b6330",
   "closedRestJawAngleRadians": -0.155,
   "puppetLipContactFit": {
@@ -190,22 +205,9 @@
     "Eat",
     "Stagger",
     "Ability",
+    "Grab",
+    "Breath",
     "Growth"
   ],
-  "profileSections": 190,
-  "materialCorrection": {
-    "authoredAlbedo": "original UV texture; white COLOR_0",
-    "normalStrength": 0.15,
-    "roughness": 0.7,
-    "puppetMaterialUnchanged": true
-  },
-  "authoredMandibleSeparation": {
-    "frontOwner": "jaw",
-    "upperLipOwner": "skull",
-    "rearHingeRawY": [
-      0.326,
-      0.36
-    ],
-    "trianglesPreserved": true
-  }
+  "profileSections": 190
 }

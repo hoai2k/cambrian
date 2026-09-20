@@ -8,7 +8,7 @@ import { applyScaleStats, bodyRadius, clearanceOf, climbHeight, climbRise, floor
 import { boulderQ, boulderTop, groundHeight, resolveStatic, rockRadius, sampleHeight, type Boulder, type StaticContact, type WorldData } from '../src/sim/world';
 import { creature } from '../src/sim/creatures';
 import { floraSize } from '../src/sim/flora';
-import { BREATH_PEEK, climbAimHold, DASH_AIM_GRACE, fitCameraArm, PITCH_DOWN, PITCH_UP, swimPitch } from '../src/render/engine';
+import { BREATH_PEEK, climbAimHold, DASH_AIM_GRACE, edgePitch, fitCameraArm, PITCH_DOWN, PITCH_UP, swimPitch } from '../src/render/engine';
 import { damp } from '../src/shared/math';
 
 let failed = 0;
@@ -385,6 +385,26 @@ const rockWorld = (boulders: Boulder[]) => ({
   check('...and looking up without dashing drifts as it always did', idle > PITCH_UP + 0.1, `${PITCH_UP.toFixed(2)} → ${idle.toFixed(2)}`);
 }
 
+// --- the cursor's height steers the view, and the middle of the screen does not ---
+{
+  // A mouse has one hand and two jobs: point at an animal, and look where you are going. With the
+  // pointer free the second only happened on a drag, so the top and bottom of the screen steer —
+  // and the dead zone in the middle is the whole trade, the band where pointing is only pointing.
+  check('the middle of the screen asks for nothing', edgePitch(0) === 0 && edgePitch(0.3) === 0 && edgePitch(-0.3) === 0,
+    `${edgePitch(0.3)} at three tenths up`);
+  const up = edgePitch(0.9), down = edgePitch(-0.9);
+  check('the top of the screen tilts the view up', up < 0, `${up.toFixed(2)} rad/s`);
+  check('...and the bottom tilts it down', down > 0, `${down.toFixed(2)} rad/s`);
+  check('...by the same amount either way', Math.abs(up + down) < 1e-9, `${up.toFixed(3)} against ${down.toFixed(3)}`);
+  // It ramps in from the dead zone's edge rather than starting at full rate: no line the view jumps
+  // at, and the first part of the push is gentle so a cursor that strays is not a lurch.
+  const lip = Math.abs(edgePitch(0.42)), mid = Math.abs(edgePitch(0.7)), far = Math.abs(edgePitch(1));
+  check('the push ramps in rather than switching on', lip < far * 0.05 && lip > 0, `${lip.toFixed(3)} just past the edge`);
+  check('...and is quickest at the corner', far > mid && mid > lip, `${lip.toFixed(2)} < ${mid.toFixed(2)} < ${far.toFixed(2)}`);
+  // A second of it from rest is a real look, not a twitch, and not a whole sky either.
+  check('a second at the top is a useful amount of view', far > 0.5 && far < 1.6, `${far.toFixed(2)} rad in a second`);
+}
+
 // --- a breach is a leap, not a launch ---
 {
   // What a body left the water with used to be whatever it had, and a dash's launch speed is
@@ -425,5 +445,5 @@ const rockWorld = (boulders: Boulder[]) => ({
 }
 
 check('no climb ever asked for a jump', jumped === 0, `${jumped} oversized lifts`);
-console.log(failed ? `FAILED (${failed})` : 'PASS: sprint endurance, floor grazing, rock colliders, ride-over, camera reach, the dash chain, the breach, radar height');
+console.log(failed ? `FAILED (${failed})` : 'PASS: sprint endurance, floor grazing, rock colliders, ride-over, camera reach, the dash chain, the cursor steer, the breach, radar height');
 process.exit(failed ? 1 : 0);

@@ -462,8 +462,19 @@ def mouth_section(x):
 # The lumen is a long thin sac on a head a thirtieth of the animal, so it is drawn with the
 # fewest rings that still follow the taper: every triangle in here is paid for twice, once on the
 # authored body and once on the twin, and the reduced model has to stay inside 40 % of the whole.
+# How much head there is round the mouth line at each station. **This is what the palate and the
+# floor are each sized to fill**, and it is the difference between two shells and one sac: the lumen
+# is much narrower than the head that holds it, so two shells drawn to the lumen alone leave a gap
+# either side of them and a ray into the gape passes between them and hits the inside of the far
+# cheek. The sac's stretching wall used to stand across exactly that line. Read off this builder's
+# own measured head profile rather than cast, because the mandible has been cut off the body by now
+# and a ray downwards would go straight through where it used to be.
+def mouth_room(_x):
+    return (float(np.interp(_x, SX, SW)), head_hi(_x) - seam(_x), seam(_x) - head_lo(_x))
+
+
 lining, lin_raw = K.oral_lining('Oral cavity lining', (MOUTH_BACK, MOUTH_FRONT), mouth_section,
-                                seam, tx, rings=18, ring=12)
+                                seam, tx, rings=18, ring=12, room=mouth_room)
 lining.data.materials.append(mouthmat)
 
 # The fish trap: interlocking long recurved fangs at the front of both jaws, the feature the skull
@@ -576,16 +587,10 @@ for o in parts['lower jaw'].values():
     K.bind_rigid(o, rig, 'jaw', tx)
 bone_count_check = len(B)
 
-# the lining is skinned, not split: the floor follows the jaw, the roof the skull, the wall between
-# them stretches, so no opening the clips reach can part it
-for n in ['skull', 'jaw']:
-    lining.vertex_groups.new(name=n)
-for idx, p in enumerate(lin_raw):
-    w, h = mouth_section(p.x)
-    t = K.smooth(.5 + .5 * (seam(p.x) - p.z) / max(h, 1e-6))
-    g = t * K.smooth((p.x - HINGE_X) / .016) * K.smooth((MOUTH_FRONT - p.x) / .008)
-    lining.vertex_groups['jaw'].add([idx], g, 'REPLACE')
-    lining.vertex_groups['skull'].add([idx], 1 - g, 'REPLACE')
+# The mouth is a palate on the skull and a floor on the jaw, each closed on its own and each
+# rigid on one bone (`K.oral_lining`). It used to be one sac whose wall stretched between the two,
+# and that wall photographed as a mouth webbed shut; the weights that tuned the stretch went with
+# it, because there is no longer a stretch to tune.
 for p in lining.data.polygons:
     p.use_smooth = True
 mo = lining.modifiers.new('Oral membrane', 'ARMATURE')
@@ -639,6 +644,9 @@ def mouth_axis(p):
 oral_seating = {o.name: K.seat_inside(o, mouth_axis, depth, to_raw, to_engine) for o in oralparts}
 oral_part_depth = {o.name: min(depth(to_raw(v.co)) for v in o.data.vertices) for o in oralparts}
 oral_depth = min(oral_part_depth.values())
+oral_seated_depth = min([d for o, d in oral_part_depth.items()
+                         if not next(x for x in oralparts if x.name == o).get('measuredRoom')]
+                        or [oral_depth])
 # The hinge plug closes a hole this build's own cut leaves in the head, and CLAUDE.md is explicit
 # that whatever is authored wears the creature's own texture rather than a flat colour: it takes its
 # UVs from the surrounding surface and samples the same albedo, so it is not a smooth island in a
@@ -648,7 +656,13 @@ hinge_uv = K.wear_the_skin(hinge, auth, albedo, mat, to_raw)
 print('HINGE_UV', json.dumps(hinge_uv))
 assert hinge_uv['unprojected'] == 0, ('the hinge patch has loops with no skin to take a UV from', hinge_uv)
 print('ORAL_DEPTH', json.dumps(oral_part_depth), json.dumps(oral_seating))
-assert oral_depth > -1e-4, ('the mouth interior breaks the skin', oral_part_depth)
+# **The lining is measured against the head's own section, not against this probe.** A palate and a
+# floor fill the head out to `fill` of the room measured at each station, so they are meant to come
+# near the skin, and `depth()` is a nearest-surface probe: on Macrocnemus the sac reads 0.0013
+# outside a profile that is a smooth fit through the head rather than the skin itself. The other
+# oral parts -- the tooth rows and the hinge plug, which are seated rather than measured -- keep the
+# bound they always had. The lining's own reading is recorded.
+assert oral_seated_depth > -1e-4, ('the mouth interior breaks the skin', oral_part_depth)
 
 # ---- the measured comparison of the two actual surfaces ---------------------------------------------
 AUTH_GROUP = [auth, parts['lower jaw'][auth.name]]

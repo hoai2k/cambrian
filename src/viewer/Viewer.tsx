@@ -90,7 +90,7 @@ export function Viewer() {
    * in play — so the raw generation stands in at the head of the list, which is what the roster's
    * preview badge already says about it.
    */
-  type Stage = { id: string; label: string; model: string; kind: 'full' | 'reduced' | 'twin' | 'generated' | 'borrowed' | 'origpose' };
+  type Stage = { id: string; label: string; model: string; kind: 'full' | 'reduced' | 'twin' | 'generated' | 'borrowed' | 'origpose' | 'backup' };
   const stages = (c: ViewerSpecimen): Stage[] => {
     const own = !c.generated || !!c.inReview;
     const out: Stage[] = [];
@@ -102,6 +102,7 @@ export function Viewer() {
     // Where a builder moved the mesh before binding, the shipped body rests in a shape the
     // generation never held. Both are offered: the full model IS the base pose every clip is
     // authored from, and this is what Tripo made.
+    if (c.backup) out.push({ id: 'backup', label: 'Backup Model', model: c.backup, kind: 'backup' });
     if (c.origPose) out.push({ id: 'origpose', label: 'Original pose (no rig)', model: c.origPose, kind: 'origpose' });
     // An off-roster subject is in no sea, so there is no body it borrows to offer.
     if (!own && !c.offRoster) out.push({ id: 'borrowed', label: 'Borrowed body (in play)', model: c.model, kind: 'borrowed' });
@@ -343,7 +344,7 @@ export function Viewer() {
         {def.kindNote && <p className="specimen-description">{def.kindNote}</p>}
         {def.description && <p className="specimen-description">{def.description}</p>}
         {def.lengthMeters != null && <p className="specimen-scale">Representative length: {new Intl.NumberFormat('en', { maximumSignificantDigits: 3 }).format(def.lengthMeters)} m · views individually framed</p>}
-        {collection !== 'cambrian' && <p className="specimen-downloads">{!def.offRoster && <a href={`${ASSET_BASE}${def.model}`} download>Full model</a>}{def.lod && <a href={`${ASSET_BASE}${def.lod}`} download>Reduced model</a>}{def.puppet && <a href={`${ASSET_BASE}${def.puppet}`} download>Procedural twin</a>}{def.generated && <a href={`${ASSET_BASE}${def.generated}`} download>Generated mesh</a>}</p>}
+        {collection !== 'cambrian' && <p className="specimen-downloads">{!def.offRoster && <a href={`${ASSET_BASE}${def.model}`} download>Full model</a>}{def.lod && <a href={`${ASSET_BASE}${def.lod}`} download>Reduced model</a>}{def.puppet && <a href={`${ASSET_BASE}${def.puppet}`} download>Procedural twin</a>}{def.generated && <a href={`${ASSET_BASE}${def.generated}`} download>Generated mesh</a>}{def.backup && <a href={`${ASSET_BASE}${def.backup}`} download>Backup Model</a>}</p>}
         {choices.length > 1 && <label className="scheme-pick">
           <span>Model</span>
           <select aria-label="Which model" value={stage.id} disabled={loading} onChange={e => setStageId(e.target.value)}>

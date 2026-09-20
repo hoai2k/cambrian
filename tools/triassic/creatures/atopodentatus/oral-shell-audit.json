@@ -1,0 +1,57 @@
+{
+  "id": "atopodentatus",
+  "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present.",
+  "models": [
+    {
+      "variant": "authored",
+      "sha256": "12bcf40f3a1122a4932b34bc962b2cfde492414f2791d4bf1f8d2659a7726110",
+      "meshes": [
+        {
+          "name": "Oral cavity lining",
+          "vertices": 780,
+          "triangles": {
+            "skull": 776,
+            "jaw": 776
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ]
+    },
+    {
+      "variant": ".puppet",
+      "sha256": "e2b22b7e9e074a5b92d01dbf88dcffcd15a34bbceb52e3ddfec6ff37a6dd7f6b",
+      "meshes": [
+        {
+          "name": "Oral cavity lining",
+          "vertices": 780,
+          "triangles": {
+            "skull": 776,
+            "jaw": 776
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ]
+    },
+    {
+      "variant": ".lod1",
+      "sha256": "e2b22b7e9e074a5b92d01dbf88dcffcd15a34bbceb52e3ddfec6ff37a6dd7f6b",
+      "meshes": [
+        {
+          "name": "Oral cavity lining",
+          "vertices": 780,
+          "triangles": {
+            "skull": 776,
+            "jaw": 776
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ]
+    }
+  ]
+}

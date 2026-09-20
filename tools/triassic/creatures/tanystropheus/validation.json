@@ -13,14 +13,14 @@
   "remeshTriangles": 55356,
   "puppetBudget": 6800,
   "voxel": 0.004,
-  "fullTriangles": 20734,
-  "puppetTriangles": 8078,
+  "fullTriangles": 20778,
+  "puppetTriangles": 8122,
   "parts": {
     "authoredBody": 19298,
     "authoredJaw": 340,
     "puppetBody": 6843,
     "puppetJaw": 139,
-    "sharedOral": 1096
+    "sharedOral": 1140
   },
   "bones": 38,
   "cervicals": 13,
@@ -439,7 +439,7 @@
   "envelopeTolerance": 0.2063518524169922,
   "envelopeTolerancePercent": 4.0,
   "surfaceDistanceMax": 0.01551741175353527,
-  "surfaceDistanceP95": 0.005600249953567982,
+  "surfaceDistanceP95": 0.005600253026932478,
   "surfaceDistanceP99": 0.008932909332215787,
   "surfaceOutliersOverThreePercent": 0,
   "surfaceVertices": 9909,
@@ -455,9 +455,9 @@
   },
   "jawHingeHeadRadius": 0.014823216599745807,
   "jawHingeDepthAsFractionOfHeadRadius": 0.396273190169192,
-  "oralInteriorDepthRaw": 0.0012026210315525532,
+  "oralInteriorDepthRaw": 0.001202607061713934,
   "oralSeatingCorrection": {
-    "Oral cavity lining": 0.012665953640613343,
+    "Oral cavity lining": 0.016063149813855548,
     "Upper fish-trap fangs": 0.011212672502839707,
     "Lower fish-trap fangs": 0.011487492321087856,
     "Seated jaw hinge tissue": 0.019732917014479025

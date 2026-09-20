@@ -162,6 +162,13 @@ export interface Actor {
   climbTo: number;
   /** Out of the water: a leap in flight, gravity only, until the splash. */
   airborne: boolean;
+  /**
+   * The shore (src/sim/beach.ts). `wade` is how far out of the water the sand under this body
+   * puts it, 0 afloat to 1 with the sand at the waterline, continuous in position; `ashore` is the
+   * rule that follows from it, past `ASHORE_WADE`. `strandT` is how long a water-breather has been
+   * ashore, against `STRAND_BREATH`; `flopT` counts down through one flop, 0 between them.
+   */
+  wade: number; ashore: boolean; strandT: number; flopT: number;
   prev: { light: boolean; heavy: boolean; ability: boolean; dodge: boolean; guard: boolean; lock: boolean; sense: boolean; rise: boolean; burst: boolean; dash: boolean; aim: boolean };
   brain?: BrainState;
   respawnT: number; hatching: boolean;
