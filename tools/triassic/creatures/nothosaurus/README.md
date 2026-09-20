@@ -358,5 +358,14 @@ tissue had 146.
 
 Skin 2.98x before and after (`skin-tears.mjs`: Sprint on `fore_upper_R`, the same edge); every
 joint owns skin; the `Swim`/`Sprint` steady-head authoring is untouched.
+
+The `Walk` gait that landed on `main` the same day (`tools/creatures/motion/performances/nothosaurus.mjs`,
+applied with `apply.mjs` to the shipped authored file, not built here) was re-applied on top of the
+rebuilt file the way that tool is meant to be replayed, so the authored GLB carries 22 clips and the
+puppet and LOD the builder's 21, exactly as on `main`; `skin-tears.mjs` reads `Walk` at 2.99x on the
+rebuilt body against 3.10x on `main`'s. `material-audit.mjs` still passes; its position match now
+finds 9,312 of the source vertices where it found 11,542, because the turned neck and head are no
+longer where the stretch alone would put them — those carry their UVs unchanged by construction,
+the turn moves positions only.
 `docs/triassic/throat-repairs/nothosaurus-head-before.png` and `-after.png` are the same two
 cameras on the shipped file — from above, where the yaw shows, and from the animal's right.

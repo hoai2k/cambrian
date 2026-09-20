@@ -271,6 +271,8 @@ export interface GameStrings {
     readonly mute: string;
     readonly equivalentSizing: string;
     readonly equivalentSizingNote: string;
+    readonly shoreAnimals: string;
+    readonly shoreAnimalsNote: string;
     readonly footnote: string;
   };
 
@@ -400,6 +402,8 @@ export interface GameStrings {
       readonly beached: string;
       readonly heldUnder: string;
       readonly shoreReaching: string;
+      /** The warning before the warning: a shore animal has noticed this player holding still within its reach. */
+      readonly shoreWatching: string;
       readonly drowning: string;
       readonly outOfAir: string;
       readonly airRunningOut: string;
@@ -531,6 +535,7 @@ export interface GameStrings {
       /** Era hazards, raised whenever they are true rather than once. */
       readonly deadWater: string;
       readonly shoreFishing: string;
+      readonly shoreWatching: string;
     };
   };
 }
@@ -774,6 +779,8 @@ export const SHARED_STRINGS: GameStrings = {
     mute: 'Mute',
     equivalentSizing: 'Equivalent sizing',
     equivalentSizingNote: 'Give every animal the same size, instead of its own. Takes effect next match.',
+    shoreAnimals: 'Shore animals',
+    shoreAnimalsNote: 'Something stands at the water\'s edge now and then, and takes what holds still there. Off, the beach is empty. Takes effect next match.',
     footnote: 'Settings apply to every local player and are remembered on this device.',
   },
 
@@ -881,6 +888,7 @@ export const SHARED_STRINGS: GameStrings = {
       beached: 'ON THE SAND · nothing with gills can follow',
       heldUnder: 'HELD UNDER · nothing comes back until you are loose',
       shoreReaching: 'SOMETHING ON THE SHORE · it is reaching for you',
+      shoreWatching: 'SOMETHING ON THE SHORE · it is watching you',
       drowning: 'DROWNING · get to the surface',
       outOfAir: 'OUT OF AIR · nothing comes back until you breathe',
       airRunningOut: 'AIR RUNNING OUT · start for the surface',
@@ -980,6 +988,7 @@ export const SHARED_STRINGS: GameStrings = {
       shallows: 'You can push into water nothing with gills can follow you into.',
       deadWater: 'Dead water. Get out of it, or up to the surface if you can breathe.',
       shoreFishing: 'Something on the shore is fishing. Get deeper.',
+      shoreWatching: 'Something on the shore has noticed you holding still. Move.',
     },
   },
 };

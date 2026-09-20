@@ -649,6 +649,9 @@ export class Game implements AiWorld {
     return a;
   }
 
+  /** A body leaves the world: for an era whose scripted animals come and go (the Triassic's shore). */
+  despawn(a: Actor) { this.remove(a); }
+
   private remove(a: Actor) {
     const i = this.actors.indexOf(a);
     if (i >= 0) this.actors.splice(i, 1);
@@ -3252,6 +3255,8 @@ export class Game implements AiWorld {
     }
     if (nearest) out.push(nearest);
     for (const f of this.foodClusters(p, range)) out.push(f);
+    // The era's own contacts: the Triassic's occupied shore posts, each with its reach as the ring.
+    if (RULES?.radar) for (const b of RULES.radar(this, p, range)) out.push(b);
     // Landmarks are the other thing the radar is for in an endless sea: with the shore and your
     // nursery they are the only fixed points in it. Only within reach — a bearing, not a map.
     for (const m of this.world.landmarks) {

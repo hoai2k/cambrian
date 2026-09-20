@@ -1,0 +1,34 @@
+{
+  "id": "dinocephalosaurus",
+  "verdict": "no oral lining: nothing to be mixed",
+  "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present. A body with no lining mesh is reported as such, with the hidden oral parts it does carry listed, and all three variants must agree.",
+  "models": [
+    {
+      "variant": "authored",
+      "sha256": "01f8ac61a0e4d93130c2ac125d045459aff24a1e3e61da5ba8d414dedf3391db",
+      "meshes": [],
+      "otherOralMeshes": [
+        "Seated jaw hinge tissue"
+      ],
+      "oralShells": "none"
+    },
+    {
+      "variant": ".puppet",
+      "sha256": "b442c000a4b57ba927bf09ae7fa96efe7c2424dfe676cff03e776a858cbae27c",
+      "meshes": [],
+      "otherOralMeshes": [
+        "Seated jaw hinge tissue"
+      ],
+      "oralShells": "none"
+    },
+    {
+      "variant": ".lod1",
+      "sha256": "b442c000a4b57ba927bf09ae7fa96efe7c2424dfe676cff03e776a858cbae27c",
+      "meshes": [],
+      "otherOralMeshes": [
+        "Seated jaw hinge tissue"
+      ],
+      "oralShells": "none"
+    }
+  ]
+}
