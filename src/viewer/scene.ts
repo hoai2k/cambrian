@@ -249,7 +249,7 @@ export interface ViewerScene {
    * "inside" test is the document's own, handed in as a closure so the scene knows nothing about
    * how a bend is aimed.
    */
-  showBend(span: BendSpan | null, inSpan: ((x: number, y: number, z: number) => boolean) | null): void;
+  showBend(span: BendSpan | null, inSpan: ((x: number, y: number, z: number) => boolean) | null, warp?: WarpFn | null): void;
   /** Which of the bend span's handles is under the pointer, if any: canvas CSS pixels in. */
   bendPick(x: number, y: number): BendHandle | undefined;
   /**
@@ -996,7 +996,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     line.visible = true;
   }
 
-  function showBend(span: BendSpan | null, inSpan: ((x: number, y: number, z: number) => boolean) | null) {
+  function showBend(span: BendSpan | null, inSpan: ((x: number, y: number, z: number) => boolean) | null, warp?: WarpFn | null) {
     if (!span || !inSpan || !model || !sculptTarget) { bendGroup.visible = false; bendPoints.visible = false; return; }
     model.updateMatrixWorld();
     bendGroup.matrix.copy(model.matrixWorld);
@@ -1051,10 +1051,17 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     }
     const dst = (bendGeo.getAttribute('position') as THREE.BufferAttribute).array as Float32Array;
     const v = new THREE.Vector3();
+    // Which vertices the span carries is asked of where they *are* — the shipped positions — and
+    // each one is then drawn where the bend has *put* it. Lighting the unwarped positions instead
+    // leaves the overlay standing where the body was while the body swings out from under it, and
+    // a render of a straightened run then shows the mesh beside its own marks.
+    const moved: [number, number, number] = [0, 0, 0];
     let w = 0;
     for (const { root } of bendRootCache) for (let i = 0; i < root.length; i += 3) {
       if (!inSpan(root[i], root[i + 1], root[i + 2])) continue;
-      v.set(root[i], root[i + 1], root[i + 2]).applyMatrix4(model.matrixWorld);
+      if (warp) { warp(root[i], root[i + 1], root[i + 2], moved); v.set(moved[0], moved[1], moved[2]); }
+      else v.set(root[i], root[i + 1], root[i + 2]);
+      v.applyMatrix4(model.matrixWorld);
       dst[w++] = v.x; dst[w++] = v.y; dst[w++] = v.z;
     }
     (bendGeo.getAttribute('position') as THREE.BufferAttribute).needsUpdate = true;

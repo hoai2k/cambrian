@@ -86,7 +86,9 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
   /** The span on stage: the helpers, the traces, and every vertex the turn would carry, lit. */
   const show = useCallback((d: BendDoc) => {
     const b = bendBasis(d);
-    const t = traces(d, chunksRef.current);
+    // The traces are drawn where the bend has *put* the run they followed, for the same reason the
+    // lit vertices are: a trace laid on the unwarped body stands beside the body once it moves.
+    const t = traces(d, chunksRef.current, isIdentity(d) ? undefined : warp(d));
     const span = spanLength(d);
     const reach = Math.max(span * 0.45, d.bounds.height * 0.35, 1e-3);
     const dir = spanDirection(d);
@@ -94,12 +96,13 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
       const s = ((x - d.base[0]) * dir[0] + (y - d.base[1]) * dir[1] + (z - d.base[2]) * dir[2]) / span;
       return s > 0 && s < 1;
     };
+    const bent = isIdentity(d) ? null : warp(d);
     scene.showBend({
       base: d.base, tip: d.tip, forward: b.forward, axis: b.axis, reach,
       baseNormal: d.baseNormal, tipNormal: d.tipNormal,
       baseTrace: t.base?.points ?? [], tipTrace: t.tip?.points ?? [],
-    }, inSpan);
-    scene.applySculpt(isIdentity(d) ? null : warp(d), true);
+    }, inSpan, bent);
+    scene.applySculpt(bent, true);
   }, [scene]);
 
   // ---- measure once per body, or take up the session's document ----
@@ -267,9 +270,14 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
   const squeeze = doc ? pinch(doc, chunksRef.current) : 1;
   // How far apart the two planes are aimed now, and how far apart they were before the bend. The
   // first is what a straightened run reads (zero) and the second is the animal's own curve.
-  const apart = doc ? degrees(angleOf(doc.baseNormal, doc.tipNormal)) : 0;
-  const apartBefore = doc ? degrees(angleOf(doc.baseNormal, doc.tipRest)) : 0;
-  const twist = doc ? degrees(twistAngle(doc)) : 0;
+  // Full precision in the numbers themselves and rounded only where they are drawn: the data
+  // attributes are what a browser check reads back against the file, and a figure rounded twice —
+  // once to a tenth for the panel and once to a hundredth for the attribute — disagrees with the
+  // export by more than either rounding.
+  const apart = doc ? exact(angleOf(doc.baseNormal, doc.tipNormal)) : 0;
+  const apartBefore = doc ? exact(angleOf(doc.baseNormal, doc.tipRest)) : 0;
+  const twist = doc ? exact(twistAngle(doc)) : 0;
+  const turn = doc ? exact(totalTurn(doc)) : 0;
   /** Move an end of the span and re-measure the planes on the body, which is one act to a reviewer. */
   const placeEnd = (d: BendDoc, which: 'base' | 'tip', delta: Vec3) => seatPlanes(moveEnd(d, which, delta), chunksRef.current);
 
@@ -331,10 +339,10 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
           </div>
 
           <h3>The two planes</h3>
-          <div className="bend-readout" data-apart={apart.toFixed(2)} data-apart-before={apartBefore.toFixed(2)}>
+          <div className="bend-readout" data-apart={apart.toFixed(3)} data-apart-before={apartBefore.toFixed(3)} data-turn={turn.toFixed(3)}>
             <b className={edited ? 'changed' : undefined}>{apart.toFixed(1)}° apart</b>
             <small>
-              the animal’s own curve here is {apartBefore.toFixed(1)}° · the turn that closes the difference is {degrees(totalTurn(doc)).toFixed(1)}°
+              the animal’s own curve here is {apartBefore.toFixed(1)}° · the turn that closes the difference is {turn.toFixed(1)}°
               across a span {(spanLength(doc) / doc.bounds.length * 100).toFixed(1)}% of the body · inside squeezed to {squeeze.toFixed(2)}{squeeze < 0 ? ' — the bend has folded the body through itself' : ''}
               {twist > 1 ? ` · the hinge leans ${twist.toFixed(1)}° along the span, so that much of the aim is a twist` : ''}
             </small>
@@ -496,6 +504,8 @@ function Readout({ name, what, before, after, edited, residual }: {
 }
 
 const degrees = (r: number) => Math.round(r * 180 / Math.PI * 10) / 10;
+/** Degrees, unrounded: for a number that is written into the markup as well as drawn. */
+const exact = (r: number) => r * 180 / Math.PI;
 
 /** Where a plane's aim came from, in the panel's words. */
 const PLANE_NOTE: Record<BendDoc['planeSource']['base'], string> = {
