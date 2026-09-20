@@ -129,16 +129,19 @@ unless the user explicitly asks for a PR. Steps:
   lists (`npm run ancientseas:delivered` regenerates it from the folder) and draws a shipped
   stand-in or a named wash for the rest, so nothing asks the network for art that has not arrived.
   A game is its title *and* the animal arching over it: both carry the link and light together,
-  with the picture kept out of the keyboard's way so a game is one stop rather than two. A game
-  that is not out yet (`comingSoon` on its `GameLink`; the Triassic, for now) keeps its title, its
-  animal and its place on the plate and gives up the link, the lighting and the pointer, with a
-  *Coming soon* badge under the title — the plate is the trilogy, and a gap where the third game
-  goes says less than the third game does. `OPEN_GAMES` is what the pad and the arrow keys walk,
-  so nothing can steer into it. Its own page is untouched: this is what the trilogy page offers,
-  not whether the game runs, and `/triassic/` still opens by address. **That one line is the whole
-  switch**: deleting `comingSoon: true` opens the game in every sense at once, and both checks read
-  the flag rather than naming a game, so nothing else needs editing — which is checked by flipping
-  it, not by assertion. A game's title and the animal over it also grow together, by one amount
+  with the picture kept out of the keyboard's way so a game is one stop rather than two. All three
+  are open today, and the plate can close one again without closing a gap in itself: a game that is
+  not out yet (`comingSoon` on its `GameLink`; the Triassic carried it while the era was being
+  built) keeps its title, its animal and its place and gives up the link, the lighting and the
+  pointer, with a *Coming soon* badge under the title — the plate is the trilogy, and a gap where a
+  game goes says less than the game does. `OPEN_GAMES` is what the pad and the arrow keys walk, so
+  nothing can steer into a closed one, and its own page is untouched either way: this is what the
+  trilogy page offers, not whether the game runs, so a closed game still opens by address. **That
+  one line is the whole switch** in both directions: adding or deleting `comingSoon: true` closes
+  or opens a game in every sense at once, because everything — the components, `npm run
+  ancientseas` and the browser smoke, which reads link-or-address off the plate rather than naming
+  a game — is derived from the flag. Checked by flipping it, not by assertion.
+  A game's title and the animal over it also grow together, by one amount
   from one rule (`.as-slot-title.as-lit, .as-slot-animal.as-lit`), because they are one link: the
   growth was split across the lit state and a title-only hover once, and a pad then lifted the
   animal alone while a pointer lifted the two by different steps.
@@ -830,6 +833,34 @@ unless the user explicitly asks for a PR. Steps:
   `validation.json`, so "the limbs move" is a number rather than an impression. Attack clips are the
   same question asked of the weapon: a long neck, a tail or a pair of tentacles is what that animal
   attacks *with*, and a clip that leaves it hanging has not used the animal.
+- **A body straightened for the rig has to be given its shape back as pose, or it ships as a
+  stick.** Askeptosaurus' generation was regenerated straight because its over-curved tail could
+  not be rigged otherwise, which was right and stays; what nobody did afterwards was put the
+  animal's own curvature back into its *clips*, so the bind pose — a modelling pose — was what
+  every clip rode on and what every portrait was shot at, and the roster card was a needle with
+  four spines. A resting shape belongs in the clips and never in the bind (a warped bind shows at
+  rest and then flails, and the roster matrix's identity rest jaw and `lag.mjs`' jaw cut are both
+  measured against it): a dorsal arch through the trunk, a tail that falls away rather than
+  standing out straight behind, paddles set off the flank. **And it is posed per clip, not stamped
+  under all of them** — one resting curve used as a constant offset everywhere is the same mistake
+  one step along, because an idling animal holds itself differently from one turning, diving,
+  rising, feeding, bracing or dead, and on a body that is two thirds tail that difference has to
+  run through the whole length rather than being a tail waggle on a straight trunk. A turn is one
+  long C through trunk, neck and tail; an attack is the body gathering and then extending, since a
+  strike that moves the head on a still trunk is the same fault again. Three things make it cheap
+  to get wrong.
+  **The wave's phase step matters more than its amplitude**: twelve tail controls lagging by 0.62
+  rad each carry more than a whole wavelength on the tail and their contributions to the tip
+  *cancel* — the same amplitude that reads as a swimming animal at 0.40 moves the tail tip 1.1 % of
+  a body at 0.62, which is why an `Idle` can be raised fourfold and still look rigid. A
+  **portrait is shot at a frame, so which frame is the builder's to name**: `portrait_pose` on
+  `creature_render.run` defaults to the `('Idle', 0)` the whole roster was rendered at, and a posed
+  one is re-framed on the geometry the armature actually produced, because a long animal bent into
+  a curve projects to a fraction of its own bounding box. Record the swept angle and the tip travel
+  per clip in `validation.json` and assert a floor, so "it moves" is a number: `Idle` at 0.008 rad
+  is what a quarter of a degree of yaw looks like in a file nobody was measuring. Record the
+  **held shape** per clip beside it, and assert the clips' holds are actually different from each
+  other, or a table of per-clip poses is a claim rather than a fact.
 - Devonian specimens land in batches (`tools/devonian/shipped.json`). When one lands: run
   `node tools/update-asset-sizes.mjs` (refreshes `src/content/devonian/asset-sizes.json`), remove its
   entry from `DEVONIAN_STAND_INS` in `src/content/devonian/index.ts`, and run `npm run devonian`.

@@ -110,7 +110,7 @@ export const DEBUG_SELF: readonly DebugParam[] = [
   },
 ];
 
-/** Every game the index offers the parameters against, the not-yet-open one included: it opens by address. */
+/** Every game the index offers the parameters against, one the plate does not link to included: it opens by address. */
 export const DEBUG_GAMES: readonly GameLink[] = GAMES;
 
 /** The URL a parameter opens on one game, relative to the app root. */
