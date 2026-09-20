@@ -1,4 +1,9 @@
-/** Validate the actual packaged pair and the preserved-pose animated backup. */
+/** Validate the actual packaged pair and the animated backup body.
+ *
+ * Which generation is in front is `FRONT` in `build.py` and nothing here names it: the pair is
+ * whatever `askeptosaurus.glb`/`.puppet.glb` hold and the backup is whatever `.backup.glb` holds,
+ * so the swap is checked by the same code before and after it.
+ */
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import { NodeIO } from '@gltf-transform/core';
@@ -55,7 +60,7 @@ const backupJaw=CLIPS.map(clip=>{const rows=backupTrack(clip,['anchor_mouth'],60
  assert(Math.min(...angles)>-.005,`${clip}: backup jaw must not close through its snout`);
  if(['Idle','Swim','Sprint','Dive','Rise','TurnLeft','TurnRight','Dodge','Dash','Heavy','Ability'].includes(clip))assert(Math.max(...angles)<.001,`${clip}: backup mouth closed`);
  return {clip,minRadians:Math.min(...angles),maxOpenRadians:Math.max(...angles)};});
-report.backup={jaw:backupJaw,bytes:bytes.length,sha256:hash(bytes),restPose:'Preserved corrected generation; independent pose-matched skeleton',clips:[]};
+report.backup={jaw:backupJaw,bytes:bytes.length,sha256:hash(bytes),restPose:JSON.parse(fs.readFileSync(`${here}/backup-validation.json`,'utf8')).body+' body; its own axis, rest skeleton and resting constants',clips:[]};
 for(const clip of gltf.animations){
  mixer.stopAllAction();const a=mixer.clipAction(clip).reset().play();a.setLoop(THREE.LoopOnce,1);a.clampWhenFinished=true;const initial=[];let travel=0;
  for(let step=0;step<=60;step++){
