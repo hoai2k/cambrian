@@ -575,6 +575,7 @@
           "Dodge",
           "Eat",
           "FastStart",
+          "Flop",
           "Gape",
           "Grab",
           "Growth",
@@ -597,7 +598,8 @@
           "Sprint",
           "Guard",
           "Eat",
-          "Grab"
+          "Grab",
+          "Flop"
         ],
         "missingLoops": []
       },
@@ -1278,6 +1280,7 @@
           "Dive",
           "Dodge",
           "Eat",
+          "Flop",
           "Grab",
           "Growth",
           "Guard",
@@ -1299,7 +1302,8 @@
           "Sprint",
           "Guard",
           "Eat",
-          "Grab"
+          "Grab",
+          "Flop"
         ],
         "missingLoops": []
       },
@@ -1626,6 +1630,7 @@
           "Dive",
           "Dodge",
           "Eat",
+          "Flop",
           "Grab",
           "Growth",
           "Guard",
@@ -1650,7 +1655,8 @@
           "Guard",
           "Eat",
           "Grab",
-          "SpineBrace"
+          "SpineBrace",
+          "Flop"
         ],
         "missingLoops": []
       },
@@ -1868,6 +1874,7 @@
           "Hit",
           "Idle",
           "Parry",
+          "Peer",
           "Retreat",
           "Rise",
           "Run",
@@ -1887,7 +1894,8 @@
           "Eat",
           "Grab",
           "Crawl",
-          "Run"
+          "Run",
+          "Peer"
         ],
         "missingLoops": []
       },
@@ -2343,7 +2351,8 @@
           "Stagger",
           "Swim",
           "TurnLeft",
-          "TurnRight"
+          "TurnRight",
+          "Walk"
         ],
         "missing": [],
         "loops": [
@@ -2352,7 +2361,8 @@
           "Sprint",
           "Guard",
           "Eat",
-          "Grab"
+          "Grab",
+          "Walk"
         ],
         "missingLoops": []
       },
@@ -2914,6 +2924,7 @@
           "Dodge",
           "Eat",
           "FastStart",
+          "Flop",
           "Grab",
           "Growth",
           "Guard",
@@ -2937,7 +2948,8 @@
           "Guard",
           "Eat",
           "Grab",
-          "Hover"
+          "Hover",
+          "Flop"
         ],
         "missingLoops": []
       },

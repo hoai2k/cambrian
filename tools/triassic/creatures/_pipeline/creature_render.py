@@ -12,7 +12,16 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import review as R                                                        # noqa: E402
 
 
-def run(creature_id, phases, top_phases, mouth_phases, mouth_scale=1.3, mouth_lift=.25):
+def run(creature_id, phases, top_phases, mouth_phases, mouth_scale=1.3, mouth_lift=.25,
+        portrait_pose=('Idle', 0)):
+    """`portrait_pose` is the frame the roster cards are shot at, and it is the builder's to name.
+
+    It defaults to the bind-adjacent `('Idle', 0)` every shipped portrait in this roster was
+    rendered from, so naming nothing changes nothing. A body whose builder puts the animal's shape
+    into its clips rather than into its bind -- Askeptosaurus, straightened for the rig by T3D-01
+    and a needle at rest ever since -- has no readable pose at frame zero of anything, and says so
+    here instead of shipping a card of a stick.
+    """
     here = Path(__file__).resolve().parents[1] / creature_id
     root = Path(__file__).resolve().parents[4]
     out = root / 'public/assets/triassic/creatures'
@@ -65,19 +74,29 @@ def run(creature_id, phases, top_phases, mouth_phases, mouth_scale=1.3, mouth_li
 
     if '--portraits' in sys.argv:
         (here / 'portraits').mkdir(exist_ok=True)
-        pose('Idle', 0)
+        pose(*portrait_pose)
+        shot = THREEQ
+        if tuple(portrait_pose) != ('Idle', 0):
+            # The cameras above are framed on the body as it loads. A portrait shot from a posed
+            # frame is a different silhouette -- a body that arches and sweeps is shorter than its
+            # own bounding box and sits off the axis that box was measured on -- so re-frame on the
+            # geometry the armature has actually produced. Only a builder that asked for a pose
+            # pays for this: at the default the framing is the one every other body's shipped
+            # portraits were rendered with, byte for byte. Every portrait here is 4:3.
+            loc, target, scale = R.fit_ortho(THREEQ['loc'], centre, R.posed_points(), 4 / 3)
+            shot = dict(loc=loc, target=target, scale=scale)
         if twin:
             # The twin's portrait is the one portrait that lands in `public/`, beside the four
             # delivered bodies that already carry one. The authored body's roster cards do not:
             # until a human decides this animal ships, the placeholder cards cut from the canonical
             # pose stay where they are.
-            render(out / (creature_id + '.puppet.png'), 1200, 900, **THREEQ)
+            render(out / (creature_id + '.puppet.png'), 1200, 900, **shot)
         else:
             for name, w, h in ((creature_id + '.select.png', 1600, 1200),
                                (creature_id + '.card.png', 800, 600),
                                (creature_id + '.thumb.png', 256, 192),
                                (creature_id + '.png', 1200, 900)):
-                render(here / 'portraits' / name, w, h, **THREEQ)
+                render(here / 'portraits' / name, w, h, **shot)
         return
 
     for clip, t in phases:
