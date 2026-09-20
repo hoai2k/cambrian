@@ -304,6 +304,78 @@ def measured_centreline(o, thin_mask, stations=61, band=.012, smoothing=5):
             (lambda y: float(np.interp(y, ys, hw))), (lambda y: float(np.interp(y, ys, hd))), table)
 
 
+# ----------------------------------------------------- broad appendages and the trunk axis ----
+def appendage_excluded_centreline(o, drop_mask, stations=61, band=.014, smoothing=5,
+                                  low_quantile=.04, high_quantile=.96, min_samples=8):
+    """Measure a trunk axis after dropping known appendage vertices.
+
+    `measured_centreline` is deliberately the simple, right default for a fish or a body with
+    blade-thin fins.  It cannot identify a broad flipper or a sprawling leg: that flesh is thick
+    enough to enter the section sample and can pull a median outside the trunk.  Archelon,
+    Aphaneramma, Mystriosuchus and Mosasaurus each independently proved the same two-pass remedy:
+    use the ordinary pass to find appendages, discard vertices nearer an appendage polyline than
+    the rough axis, then take the middle of the retained section's robust range.
+
+    This helper is opt-in.  Keeping existing builders on `measured_centreline` preserves their
+    shipped output; a builder adopting it must record both passes and assert its final axis stays
+    inside the trunk.
+    """
+    co = np.array([v.co[:] for v in o.data.vertices])
+    if len(drop_mask) != len(co):
+        raise ValueError('appendage exclusion mask must match the mesh vertex count')
+    keep = ~np.asarray(drop_mask, dtype=bool)
+    ys = np.linspace(co[:, 1].min(), co[:, 1].max(), stations)
+    cxs, czs, hws, hds = [], [], [], []
+    for y in ys:
+        m = (np.abs(co[:, 1] - y) < band) & keep
+        if m.sum() < min_samples:
+            m = np.abs(co[:, 1] - y) < band
+        if m.sum() < 3:
+            cxs.append(cxs[-1] if cxs else 0.)
+            czs.append(czs[-1] if czs else 0.)
+            hws.append(hws[-1] if hws else 0.)
+            hds.append(hds[-1] if hds else 0.)
+            continue
+        q = co[m]
+        xa, xb = np.quantile(q[:, 0], low_quantile), np.quantile(q[:, 0], high_quantile)
+        za, zb = np.quantile(q[:, 2], low_quantile), np.quantile(q[:, 2], high_quantile)
+        cxs.append(float((xa + xb) / 2))
+        czs.append(float((za + zb) / 2))
+        hws.append(float((xb - xa) / 2))
+        hds.append(float((zb - za) / 2))
+    k = np.ones(smoothing) / smoothing
+    pad = smoothing // 2
+    smooth_values = lambda values: np.convolve(np.pad(np.array(values), pad, mode='edge'), k, mode='valid')
+    cxs, czs, hws, hds = (smooth_values(cxs), smooth_values(czs),
+                           smooth_values(hws), smooth_values(hds))
+    table = [{'y': float(y), 'cx': float(x), 'cz': float(z), 'halfWidth': float(w),
+              'halfDepth': float(d)} for y, x, z, w, d in zip(ys, cxs, czs, hws, hds)]
+    return ((lambda y: float(np.interp(y, ys, cxs))), (lambda y: float(np.interp(y, ys, czs))),
+            (lambda y: float(np.interp(y, ys, hws))), (lambda y: float(np.interp(y, ys, hds))), table)
+
+
+def appendage_vertex_mask(o, appendages, axis_x, axis_z, stations=61, samples=(0., .34, .68, 1.)):
+    """Return vertices closer to a rough appendage line than to the rough trunk axis.
+
+    `appendages` are thin-cluster records with `seat` and `reach` points.  The mask is shared by
+    the second axis pass and limb weighting, so the skinning decision and the measured trunk can
+    never disagree about which tissue belongs to a limb.
+    """
+    co = np.array([v.co[:] for v in o.data.vertices])
+    ys = np.linspace(co[:, 1].min(), co[:, 1].max(), stations)
+    axis, axis_length = polyline([Vector((axis_x(float(y)), float(y), axis_z(float(y)))) for y in ys])
+    lines = []
+    for appendage in appendages:
+        seat, reach = Vector(appendage['seat']), Vector(appendage['reach'])
+        lines.append(polyline([seat + (reach - seat) * t for t in samples]))
+    out = np.zeros(len(co), dtype=bool)
+    for i, p in enumerate(co):
+        point = Vector((float(p[0]), float(p[1]), float(p[2])))
+        trunk_distance = project(axis, axis_length, point)[0]
+        out[i] = any(project(line, length, point)[0] < trunk_distance for line, length in lines)
+    return out
+
+
 # ------------------------------------------------------------------------- the mouth ----
 def mouth_cavity(o, front_fraction=.34, gap=.030):
     """Placodus' measurement: every head vertex casts its own outward normal back into the mesh,
