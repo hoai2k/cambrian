@@ -346,7 +346,17 @@ export class CreatureView {
     if (animate) {
       // locomotion layer
       const held = a.state === 'ability' && a.abilityActive && ['collectorWake','pharyngealPump','planktonComb','whipSearch'].includes(def.ability);
+      // An era's own performance, for a body the shared state machine has nothing to say about:
+      // the Triassic's shore animals are pinned and brainless and would otherwise watch, telegraph
+      // and strike entirely in Idle. It names the clip the body should be *in*, and a change of
+      // name is what fires it; a model without that clip is left to the state machine below. A
+      // looping era clip (a walk down the beach, a watch at the edge) *is* the locomotion, so it
+      // is decided here, ahead of the shared machine, rather than fought with Idle every frame.
+      const era = RULES?.clip?.(a);
+      const eraName = era && this.has(era.name) ? era.name : undefined;
+      const eraLoop = !!(eraName && era?.loop);
       if (a.state === 'dead') { /* handled by one-shot */ }
+      else if (eraLoop) { this.playLoop(eraName!); this.loco?.setEffectiveTimeScale(1); }
       else if (a.state === 'eating' || a.holdT > 0) { this.playLoop((this.authoredFeeding && a.state !== 'eating' ? this.pick('Grab', 'Idle') : this.pick('Eat', 'Grab')) ?? (def.ground ? 'Crawl' : 'Swim')); this.loco?.setEffectiveTimeScale(this.has('Eat') ? 1 : 0.55); }
       else if (a.state === 'swallowed') { this.playLoop(this.pick('Stagger', 'Hit') ?? 'Idle'); this.loco?.setEffectiveTimeScale(0.8); }
       else if ((a.hideMode === 'burrowed' || ((a.state === 'guard' || a.state === 'parry') && ['anchor','enroll','shellUp','bristleFlare'].includes(def.ability))) && this.has('Ability')) { this.playLoop('Ability'); this.loco?.setEffectiveTimeScale(.55); }
@@ -369,14 +379,15 @@ export class CreatureView {
           // On the sand (src/sim/beach.ts). A walker plays its walking clip where it has one, at
           // the pace it is walking; one with no such clip swims slowly through the air, which is
           // what a paddle-limbed body dragging itself down a beach looks like. A stranded
-          // water-breather has no gait at all: each flop throws the swim stroke at the sand, hard,
-          // and between flops it lies still. No clip is authored for the flop yet — the twist and
-          // the hop are the simulation's own, so this is the stroke on top of them.
+          // water-breather has no gait at all: each flop is the body's own lash (an authored `Flop`,
+          // one FLOP_PERIOD long so the loop is the flop; the swim stroke thrown hard at the sand
+          // on a rig that has none) and between flops it lies still. The twist and the hop are
+          // the simulation's own, so the clip is only the lash on top of them.
           const gait = this.pick('Walk', 'Crawl');
           if (!breathesAir(a.creature)) {
-            const flop = a.flopT > 0;
-            this.playLoop(flop ? this.pick('Sprint', 'Swim') ?? 'Idle' : 'Idle');
-            this.loco?.setEffectiveTimeScale(flop ? 2.2 * rateScale : 0.6 * rateScale);
+            const flop = a.flopT > 0, authored = this.has('Flop');
+            this.playLoop(flop ? this.pick('Flop', 'Sprint', 'Swim') ?? 'Idle' : 'Idle');
+            this.loco?.setEffectiveTimeScale(flop ? (authored ? 1 : 2.2 * rateScale) : 0.6 * rateScale);
           } else if (gait) {
             const walking = speed > 0.2;
             this.playLoop(walking ? gait : 'Idle');
@@ -396,15 +407,12 @@ export class CreatureView {
           );
         }
       }
-      // An era's own performance, for a body the shared state machine has nothing to say about:
-      // the Triassic's shore animals are pinned and brainless and would otherwise watch, telegraph
-      // and strike entirely in Idle. It names the clip the body should be *in*, and a change of
-      // name is what fires it; a model without that clip is left to the state machine below.
-      const era = RULES?.clip?.(a);
-      const eraName = era && this.has(era.name) ? era.name : undefined;
+      // The era's one-shots (a telegraph, a strike, a gulp), fired on the change of name and timed
+      // to the phase; the loops were taken above.
       if (eraName !== this.eraClip) {
         this.eraClip = eraName;
-        if (eraName && era) this.playOnce(eraName, era.dur, false);
+        if (eraName && era && !era.loop) this.playOnce(eraName, era.dur, false);
+        else if (!eraName) this.oneShot?.fadeOut(0.15);
       }
       // one-shots
       const inAttack = a.state === 'attack' || a.state === 'grabbing' || a.state === 'pounce' || (a.state === 'ability' && !held);

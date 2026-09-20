@@ -25,13 +25,15 @@
     "Stagger",
     "Swim",
     "TurnLeft",
-    "TurnRight"
+    "TurnRight",
+    "Flop"
   ],
   "looping": [
     "Idle",
     "Swim",
     "Guard",
-    "Eat"
+    "Eat",
+    "Flop"
   ],
   "anchors": [
     "anchor_mouth",

@@ -1,4 +1,5 @@
 import { hasEquivalentSizing } from '../sim/creatures';
+import { RULES } from '../sim/era-rules';
 import { ACTIVE_ERA } from '../content';
 import { useEffect, useRef } from 'react';
 import type { HudSnapshot } from '../render/engine';
@@ -300,6 +301,12 @@ function SettingsPage({ settings, onSettings }: { settings: Settings; onSettings
         <label className="setting-row">
           <span>{t.equivalentSizing} <small>{t.equivalentSizingNote}</small></span>
           <input type="checkbox" checked={settings.equivalentSizing} onChange={(e) => onSettings({ ...settings, equivalentSizing: e.target.checked })} />
+        </label>
+      )}
+      {RULES?.settings?.shoreAnimals && (
+        <label className="setting-row">
+          <span>{t.shoreAnimals} <small>{t.shoreAnimalsNote}</small></span>
+          <input type="checkbox" checked={settings.shoreAnimals} onChange={(e) => onSettings({ ...settings, shoreAnimals: e.target.checked })} />
         </label>
       )}
       <p className="dim">{t.footnote}</p>

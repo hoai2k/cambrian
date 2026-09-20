@@ -30,7 +30,8 @@
     "Breath",
     "Growth",
     "FastStart",
-    "Gape"
+    "Gape",
+    "Flop"
   ],
   "looping": [
     "Idle",
@@ -38,7 +39,8 @@
     "Sprint",
     "Guard",
     "Eat",
-    "Grab"
+    "Grab",
+    "Flop"
   ],
   "anchors": [
     "anchor_mouth",
