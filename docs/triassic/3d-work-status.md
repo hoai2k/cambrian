@@ -17,6 +17,7 @@ Updated: 19 September 2026.
 | T3D-05 | **active** | `/root/roster_finish` | Make the shipped `Grab` clips loop for Henodus, Keichousaurus, Nothosaurus and Placodus, then rebuild the authored/puppet/LOD triplets and refresh paired audits. | The generated roster matrix reports no missing `Grab` loop; every rebuilt pair passes its audit. |
 | T3D-06 | **finished** | `/root/roster_finish` | Add Shonisaurus' required `Grab` and `Breath` clips, then create its first shared paired audit and review the new action playback. | Packaged GLBs now contain 21 contract clips with a 1.2-second looping `Grab`; neutral exporter scale/root channels are removed during package; the shared decoded paired audit proves exact rig, clips and anchors. |
 | T3D-07 | **unclaimed** | — | Render and publish the 13 still-missing Triassic roster portrait sets without changing creature bodies. | `node tools/triassic/publish-portraits.mjs --check` reports no missing sets. |
+| T3D-08 | **active** | `/root/roster_finish` | Port the current builders other than T3D-02's Ceratites, Henodus and Hupehsuchus to the restored separate palate/floor helper, preserving all later skinning and animation repairs. Rebuild and validate in small batches. | Each ported builder has separate rigid palate/floor geometry, refreshed paired audit and action validation; the final throat audit has no regressions. |
 
 ## Finished baseline
 
