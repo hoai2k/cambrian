@@ -623,13 +623,15 @@ unless the user explicitly asks for a PR. Steps:
   at full gape says only that the mouth opened — Hupehsuchus' 50x is the lining working, not a torn
   head. Two builders split it locally before it was split centrally; the tool now reports both and
   ranks on skin, matching those builders' own figures exactly. True era-wide skin picture:
-  Shonisaurus 1.44x, Keichousaurus 2.34x, Mosasaurus 2.54x, Cymbospondylus 2.48x, Rhaeticosaurus 2.81x, Macrocnemus
-  2.94x, Nothosaurus 2.98x, Tanystropheus 3.00x, Birgeria 3.46x, Saurichthys 3.61x, Cartorhynchus 3.72x,
-  Archelon 3.86x, Mixosaurus 3.62x, Aphaneramma 4.45x, Coelophysis 4.46x, Mystriosuchus 4.48x,
-  Henodus 4.81x, Hupehsuchus 5.79x, Hybodus 5.93x, Dinocephalosaurus 7.00x,
-  Helicoprion 11.68x, Placodus 12.36x. Placodus and Helicoprion are the outstanding repair work:
-  Coelophysis came down from 25.25x, Macrocnemus from 23.31x, Tanystropheus from 6.09x and
-  Cartorhynchus from 5.17x.
+  Askeptosaurus 1.10x, Shonisaurus 1.44x, Keichousaurus 2.34x, Cymbospondylus 2.48x, Mosasaurus 2.54x,
+  Rhaeticosaurus 2.81x, Nothosaurus 2.99x, Tanystropheus 3.00x, Macrocnemus 3.41x, Birgeria 3.46x,
+  Hupehsuchus 3.47x, Saurichthys 3.61x, Mixosaurus 3.62x, Cartorhynchus 3.72x, Archelon 3.86x,
+  Atopodentatus 3.90x, Helicoprion 4.21x, Aphaneramma 4.43x, Mystriosuchus 4.48x, Henodus 4.81x,
+  Odontochelys 5.12x, Hybodus 5.93x (its opercular crack), Dinocephalosaurus 7.00x, Coelophysis 7.74x
+  (SnapRight, skull/neck), Ceratites 7.73x, Placodus 12.36x. Placodus is the outstanding repair work:
+  Coelophysis came down from 25.25x, Macrocnemus from 23.31x, Helicoprion from 14.33x, Tanystropheus
+  from 6.09x and Cartorhynchus from 5.17x. `docs/triassic/jaw-skinning.md` is the per-body record of
+  the jaw cut and the mouth-region figures beside these.
 - **A skin weighting is three things, and the era has now paid for each of them separately.** The
   *relaxation* — diffusion over the mesh's own edge graph, coupled by inverse edge length, trimmed
   to four influences every pass, sliver runs welded into one weight set — is the one that stops a
