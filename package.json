@@ -90,12 +90,14 @@
     "controls": "esbuild tools/controls-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/controls-test.mjs --log-level=error && node node_modules/.cache/controls-test.mjs",
     "assets": "esbuild tools/assets-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/assets-test.mjs --log-level=error && node node_modules/.cache/assets-test.mjs",
     "audio": "esbuild tools/audio-mix-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/audio-mix-test.mjs --log-level=error && node node_modules/.cache/audio-mix-test.mjs",
-    "sim": "npm run -s world && npm run -s swim && npm run -s flora && npm run -s locomotion && npm run -s reactions && npm run -s grab && npm run -s fight && npm run -s feast && npm run -s paddle && npm run -s hunt && npm run -s respawn && npm run -s ecology && npm run -s environment && npm run -s corpse && npm run -s modes && npm run -s controls && npm run -s motion && npm run -s hiding && npm run -s sand && npm run -s sizing && npm run -s spatial && npm run -s record && npm run -s expansion && npm run -s beach",
+    "sim": "npm run -s world && npm run -s swim && npm run -s flora && npm run -s locomotion && npm run -s reactions && npm run -s grab && npm run -s fight && npm run -s feast && npm run -s paddle && npm run -s hunt && npm run -s respawn && npm run -s ecology && npm run -s environment && npm run -s corpse && npm run -s modes && npm run -s controls && npm run -s motion && npm run -s hiding && npm run -s sand && npm run -s tracks && npm run -s sizing && npm run -s spatial && npm run -s record && npm run -s expansion && npm run -s beach",
     "blender": "bash tools/blender-setup.sh",
     "triassic:review": "node tools/triassic/review-bodies.mjs",
-    "sim:gate": "npm run -s flora && npm run -s locomotion && npm run -s fight && npm run -s feast && npm run -s respawn && npm run -s corpse && npm run -s environment && npm run -s hunt && npm run -s motion && npm run -s hiding && npm run -s sand && npm run -s sizing && npm run -s spatial && npm run -s record && npm run -s beach",
+    "sim:gate": "npm run -s flora && npm run -s locomotion && npm run -s fight && npm run -s feast && npm run -s respawn && npm run -s corpse && npm run -s environment && npm run -s hunt && npm run -s motion && npm run -s hiding && npm run -s sand && npm run -s tracks && npm run -s sizing && npm run -s spatial && npm run -s record && npm run -s beach",
     "mouse": "node tools/mouse-play-browser.mjs",
-    "cursors": "esbuild tools/cursors-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/cursors-test.mjs --log-level=error && node node_modules/.cache/cursors-test.mjs"
+    "cursors": "esbuild tools/cursors-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/cursors-test.mjs --log-level=error && node node_modules/.cache/cursors-test.mjs",
+    "tracks": "esbuild tools/tracks-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/tracks-test.mjs --log-level=error && node node_modules/.cache/tracks-test.mjs",
+    "tracks:browser": "node tools/tracks-browser.mjs"
   },
   "dependencies": {
     "react": "^19.1.0",

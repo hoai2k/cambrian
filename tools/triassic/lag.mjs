@@ -189,11 +189,41 @@ for (const file of targets) {
       if (Math.hypot(rest[i * 3] - rest[j * 3], rest[i * 3 + 1] - rest[j * 3 + 1], rest[i * 3 + 2] - rest[j * 3 + 2]) < cell) pairs.push([i, j]);
     }
   }
-  // The body's long axis, head end positive: from the jaw's parent (the skull) back to the rig's
-  // trunk is not reliable on every rig, so take it from the skin's own extent through the hinge.
-  const axis = new THREE.Vector3(mx[0] - mn[0], mx[1] - mn[1], mx[2] - mn[2]);
+  // The axis the cut and the lip are separated along, head end positive. **It is the head's, not
+  // the body's.** The skin's own longest extent is the right reading on a body laid out straight
+  // and a meaningless one on a body that curls: Askeptosaurus' posed generation spreads furthest
+  // across X because its tail hooks back under its belly, while its head runs along Z, so every
+  // lip point projected to within a hundredth of the hinge's own station, the whole seam was taken
+  // for the cut, and the mouth opening read as 36 rim points open at 1.97 % of a body -- which was
+  // that body's gape, measured and then reported as a slot.
+  //
+  // What says it is the **neck**: the first ancestor of the skull far enough back to give a real
+  // baseline (a tenth of a body), and the line from it to the skull. That is the head's own line
+  // on a rig whose bones are the animal, it has the right sign by construction, and it is long
+  // enough not to be decided by a short cervical. The mouth's own two anchors were the obvious
+  // reading and are not reliable: Cartorhynchus' `anchor_mouth_inside` sits 0.048 *ahead* of its
+  // `anchor_mouth`, so front-minus-back there points at the tail. The result is snapped to a
+  // cardinal axis exactly as the extent was, and on every body whose head runs along its longest
+  // side it snaps to the same vector the extent gave: measured across the twenty-seven shipped
+  // bodies the two readings agree on twenty-six and differ only on Askeptosaurus, so nothing that
+  // was passing moves.
+  let axis, axisFrom;
+  if (skullK >= 0) {
+    let p = bones[skullK].parent, far = -1;
+    while (p) {
+      const pk = bones.indexOf(p);
+      if (pk >= 0 && head[pk].distanceTo(head[skullK]) >= L * 0.1) { far = pk; break; }
+      p = p.parent;
+    }
+    if (far >= 0) { axis = head[skullK].clone().sub(head[far]); axisFrom = `the neck (${bones[far].name} to skull)`; }
+  }
+  if (!axis) { axis = new THREE.Vector3(mx[0] - mn[0], mx[1] - mn[1], mx[2] - mn[2]); axisFrom = 'the skin extent'; }
+  const forward = axis.clone();
   { const c = [0, 1, 2].map((k) => Math.abs(axis.getComponent(k))); const kk = c.indexOf(Math.max(...c)); axis.set(0, 0, 0).setComponent(kk, 1); }
-  if (jawK >= 0 && skullK >= 0) {
+  // A neck points at the head and so carries its own sign; the extent does not, and takes the
+  // jaw's side of the body's middle as it always did.
+  if (axisFrom !== 'the skin extent') { if (forward.dot(axis) < 0) axis.negate(); }
+  else if (jawK >= 0 && skullK >= 0) {
     const centre = new THREE.Vector3((mn[0] + mx[0]) / 2, (mn[1] + mx[1]) / 2, (mn[2] + mx[2]) / 2);
     if (head[jawK].clone().sub(centre).dot(axis) < 0) axis.negate();
   }
@@ -379,7 +409,7 @@ for (const file of targets) {
   if (VERBOSE && cutWorst.pair) {
     const w = (i) => [...weightOf[i]].map(([b, x]) => `${bones[b].name} ${x.toFixed(3)}`).join(' ');
     const show = (i, j, label) => console.log(`  ${label} at rest (${[0, 1, 2].map((k) => rest[i * 3 + k].toFixed(3)).join(', ')}): ${skinned[meshOf[i]].name} {${w(i)}} against ${skinned[meshOf[j]].name} {${w(j)}}`);
-    console.log(`  axis (${axis.toArray().map((c) => c.toFixed(0)).join(', ')}), jaw head at (${head[jawK].toArray().map((c) => c.toFixed(3)).join(', ')}), hinge station ${head[jawK].dot(axis).toFixed(3)}, rim stations ${Math.min(...cut.map(([i]) => along(i))).toFixed(3)}..${Math.max(...cut.map(([i]) => along(i))).toFixed(3)}`);
+    console.log(`  axis (${axis.toArray().map((c) => c.toFixed(0)).join(', ')}) from ${axisFrom}, jaw head at (${head[jawK].toArray().map((c) => c.toFixed(3)).join(', ')}), hinge station ${head[jawK].dot(axis).toFixed(3)}, rim stations ${Math.min(...cut.map(([i]) => along(i))).toFixed(3)}..${Math.max(...cut.map(([i]) => along(i))).toFixed(3)}`);
     show(...cutWorst.pair, 'worst cut pair');
     const open = cut.filter(([i]) => cutOpen.has(i)).slice(0, 12);
     for (const [i, j] of open) if (i !== cutWorst.pair[0]) show(i, j, 'open cut pair');

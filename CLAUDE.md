@@ -383,6 +383,39 @@ unless the user explicitly asks for a PR. Steps:
   nothing left, and bounding is meant to be the land gait rather than a sprint. A hop once thrown
   always finishes, including the one that carries a body over the `ashore` threshold, or a body
   walking the line restarts a hop it never gets to take.
+- **A body on the beach leaves prints in it.** `Tracks` in `src/render/fx.ts`, laid by
+  `shoreTracks` in the engine: footprints where a walker's feet come down, a groove behind a body
+  hauling itself along on its belly, and a broad slap wherever a stranded flopper lands. They fill
+  in over `TRACK_LIFE`, about a minute, so a stretch of beach carries where you have just been and
+  not where you were ten minutes ago.
+  **The contacts are measured, never named.** Rig bones are whatever their builder called them —
+  three eras, a dozen kits and no agreement on `fore_foot_L` — so asking for the feet by name would
+  work on one animal and silently do nothing on the next. What a print is, is the part of the body
+  that is *on the sand*, so that is what is asked: the lowest few bones of the rig, and whether
+  each is within `touch` of the ground under it. On a walker standing on the beach those are its
+  feet, and when one lifts it stops being down; on a body lying in the sand they are its belly, and
+  a belly never lifts. One rule then covers both (`laysMark`): a contact marks when it comes down,
+  and again every `spacing` it travels while it stays down — so a planted foot prints once and a
+  belly draws a groove, with nothing anywhere that knows which animal it is looking at. Which of
+  the three marks a body leaves is its own card and not its era: legs and lungs walk, lungs without
+  legs haul, and no lungs at all is stranded and can only flop.
+  **The mark has no colour of its own.** Every other decal here has to be told what shade the floor
+  is (`Sand` carries a colour per grain for exactly that reason) and a print must not: the seabed is
+  a lit `MeshStandardMaterial` with the biome in its vertex colours and the beach blended over that
+  again, so a flat colour laid on top would be right in one era at one hour and pasted-on
+  everywhere else. A print is not a colour, it is a *depression* — the same sand, in shadow — so
+  the shader emits a multiplier and multiply-blends, and whatever the ground drew is what gets
+  darkened. Right shade, every biome, every time of day, for free.
+  **Sand only, and the shore only** (`printableSand`): a boulder stands proud of the seabed it sits
+  on and presses into nothing, sand out past the strand is under the sea, and past `LAND_REACH` is
+  not the shore. That last one is a distance and cannot be anything else — the land inland of the
+  beach is a flat plateau at *exactly* the height the beach tops out at, one unit over the
+  waterline, in all three eras, so nothing about the ground itself could tell them apart.
+  Presentation only, off `wade` and the drawn pose, so `src/sim` gains no event and stays
+  deterministic. `npm run tracks` holds the decisions and `node tools/tracks-browser.mjs` drives
+  the whole of it in a real browser — the body settled on the *ramp* at the water's edge rather
+  than up on the flat top, because the top is flat in every era and a run that stands there proves
+  nothing about a mark lying along a slope.
 - **The land is bare unless the era plants it.** `generateChunk` places nothing inland of
   `SHORE_WALL`, which is the Cambrian's and the Devonian's beach entire: sand, rock, and whatever
   the sea throws up. An era may declare a **shore fringe** (`environment.shoreFlora`) and the
