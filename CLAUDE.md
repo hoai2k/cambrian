@@ -1170,7 +1170,13 @@ unless the user explicitly asks for a PR. Steps:
   floor colour per grain, because a burrow in the shelf mosaic and one in the black basin must not
   shower the same beige. The *decision* — which of the three moments a body's move between two
   hiding states is, and what that owes — is `sandThrow`, which is pure and held by `npm run sand`;
-  the renderer keeps only the accumulator that turns a rate into whole grains.
+  the renderer keeps only the accumulator that turns a rate into whole grains, and
+  `node tools/sand-browser.mjs` drives the whole of it in a real browser against a preview build.
+  That harness is a worked example of the rule about this page's frame clock: the engine clamps
+  `dt` to 0.08 s and the software renderer draws about a frame a second, so a wall-clock second is
+  a twelfth of a second of particle life and a key held for a fraction of a second can fall
+  entirely *between* two frames and never be sampled. Hold presses for seconds, arm the watchers
+  before the press, and wait on the game's own state rather than on `waitForTimeout`.
 
 - All docs live in `docs/`. Design docs are in `docs/redesign/`. Image, glyph and prop
   needs go in `docs/image-requests.md` and move to `docs/image-requests-history.md` once
