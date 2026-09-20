@@ -1,10 +1,11 @@
 # Triassic throat repair audit — 19 September 2026
 
-Owner: `/root/throat_audit`, claim T3D-02. Work remains active.
+Owner: `/root/throat_audit`, claim T3D-02. The audit and priority repairs are finished;
+remaining custom-builder recovery is pending as T3D-12. Roster-wide oral recovery is not complete.
 
 The 15 September checkpoint described a pending palate/floor branch. The rule was merged, but
-its implementation (`worktree-agent-ab601ca5ebb512c9f`, through `395e3015`) was not. The shipped
-Hupehsuchus and Henodus still contain a closed oral sac, and Ceratites still has the invented
+its implementation (`worktree-agent-ab601ca5ebb512c9f`, through `395e3015`) was not. At the audit baseline,
+Hupehsuchus and Henodus contained a closed oral sac, and Ceratites had the invented
 peristome/beak. Runtime hides the named oral parts; it does not repair the cut body underneath.
 
 The restored shared helper closes the palate and floor separately and weights each rigidly to
@@ -93,3 +94,34 @@ files: each lining vertex has one unit skull or jaw weight, no triangle spans bo
 indexed edge belongs to exactly two faces, and both closed halves are present. Authored, puppet
 and LOD variants are all checked. This catches the old stretching-sac architecture directly;
 it does not substitute for a rendered check of the shells' fit inside the head.
+
+## Current delivered snapshot after shared-kit and ShoreKit recovery
+
+The [current SHA-bound sweep](final-audit.json) and [remaining inventory](final-audit-summary.json)
+cover **54 actual models, 27 species, 1,264 clip/model combinations and 31,600 poses**. This includes
+the newly shipped Askeptosaurus authored/puppet pair. Its optional backup and each LOD have separate
+delivery audits and are not counted twice in this animation sweep.
+
+The eleven shared-kit ports and three ShoreKit ports are delivered, in addition to the three
+priority repairs above. Exactly six custom builders still retain a named lining with mixed
+jaw/skull weights in **both** authored and puppet models:
+
+| Species | Mixed lining vertices per variant | Remaining bounded work |
+| --- | ---: | --- |
+| Dinocephalosaurus | 364 | Port its curved-head custom sac to measured rigid shells. |
+| Hybodus | 320 | Port the measured shark-mouth custom sac while retaining current fin/tail corrections. |
+| Keichousaurus | 132 | Port its custom sac while retaining the recently corrected Grab loop. |
+| Phragmoteuthis | 205 | Retire the invented crown hole/sac/beak, preserving the closed source crown and anchors. |
+| Placodus | 208 | Port its custom cavity sac while retaining current skinning and Grab loop. |
+| Saurichthys | 320 | Port its custom fish-mouth sac while retaining current fin/tail corrections. |
+
+Those six changes exist as candidate deltas on the preserved branch but have not been ported or
+rebuilt here. They are **pending T3D-12**, not hidden under the completed shared-kit claim, and no
+new repair batch has started. Oral meshes remain hidden in the runtime and by default in the viewer.
+The inventory is not a request for optional Tripo regenerations.
+
+The [ShoreKit record](shorekit.md) includes exact posterior attachment tests, selected strict gape
+views, fresh portraits, cap-regression correction and the exact-frame Coelophysis deformation
+review. That last review distinguishes a continuous stretched cervical edge from an opening;
+forced-visible authoring oral parts still need fit review before enabling them. No document here
+claims every posed surface or camera angle is intersection-free.
