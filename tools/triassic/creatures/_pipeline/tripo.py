@@ -695,7 +695,7 @@ def _superellipse(th, power):
 
 def oral_shells(seam, section, u_back, u_front, rings=24, ring=14, centre=None, power=2.,
                 fit=None, overlap=.16, throat=.18, swell=1.60, behind=0., axis='y',
-                point=None, room=None, fill=.90, shell_power=5., buried=.78):
+                point=None, room=None, fill=.90, shell_power=5., buried=.78, u_front_floor=None):
     """The mouth as **two independently closed surfaces**: a palate on the skull, a floor on the jaw.
 
     This replaces one sac whose wall stretched between the two jaws. That sac was built to stop an
@@ -735,6 +735,24 @@ def oral_shells(seam, section, u_back, u_front, rings=24, ring=14, centre=None, 
     the rear rings past the measured lumen. Where the room is known the guess is worse than the
     measurement and is not added to it.
 
+    `seam` and `room` may each be a **pair** of callables, `(palate, floor)`, and that too is for
+    the generations that arrived **gaping**. Built about the mouth line -- the mid-height of the
+    modelled cavity -- both shells hang in the open gape on such a body: Saurichthys' palate sat
+    0.011 below the underside of its own upper rostrum, in the water, because the room measured
+    from mid-gape and held short of the skin never reached the jaw the shell belongs to. Each
+    shell is built about *its own jaw's edge of the lumen*: the palate about the cavity's roof and
+    the floor about the cavity's floor, each with a room measured from there. On a generation whose
+    mouth is shut the two lines are the same line and one callable says so.
+
+    `u_front_floor` is where the **floor** ends when that is not where the palate ends, and it is
+    for the generations that arrived **gaping**. Both shells are built about the mouth line, and on
+    a body whose mandible hangs open in the bind pose the front of that line has no mandible under
+    it: the lower jaw's tip sits further back than the upper arch of the mouth. A floor carried to
+    the palate's front there ends in open water ahead of the jaw it is rigid on -- Hybodus' front
+    cap stood 0.002 of a body ahead of its mandible's tip, and no seating could pull it anywhere,
+    because the mouth's own axis was outside the animal at that station. So a builder that has
+    measured where its mandible actually ends passes that here; the palate keeps `u_front`.
+
     Returns `(raw, faces, n_palate)`: raw points in the builder's own coordinates, quad faces over
     the two shells, and how many of the points are the palate's.
     """
@@ -760,6 +778,8 @@ def oral_shells(seam, section, u_back, u_front, rings=24, ring=14, centre=None, 
 
     def shell(is_floor):
         base = len(raw)
+        seam_of = seam if callable(seam) else seam[1 if is_floor else 0]
+        room_of = room if (room is None or callable(room)) else room[1 if is_floor else 0]
         # `behind` carries the palate back past the mouth, and it is **zero** by default. It was
         # written before the room was measured, when the only way to reach the throat was to keep
         # going; it never moved a gape count by one, and where the seam and the head's lateral axis
@@ -769,9 +789,10 @@ def oral_shells(seam, section, u_back, u_front, rings=24, ring=14, centre=None, 
         # hull passed it, because a hull over sections is not the skin. What closes the throat is
         # the rear cap at `u_back` itself, which `room` fills across the whole head.
         lo = 0. if is_floor else -behind
+        front = u_front_floor if (is_floor and u_front_floor is not None) else u_front
         for i in range(rings):
             q = lo + (1. - lo) * (i / (rings - 1))
-            u = u_back + (u_front - u_back) * q
+            u = u_back + (front - u_back) * q
             w, hu, hd = half_heights(u)
             # **The throat blend is measured from the mouth's own back, not from wherever the
             # palate starts.** Dividing by the extended range dilutes it: with the palate carried
@@ -792,7 +813,7 @@ def oral_shells(seam, section, u_back, u_front, rings=24, ring=14, centre=None, 
             # the top and bottom jaws rather than a filling between them.
             rw = ru = rd = 0.
             if room is not None:
-                rw, ru, rd = room(u)
+                rw, ru, rd = room_of(u)
                 rw, ru, rd = rw * fill, ru * fill, rd * fill
             # The measured room is a **bound, not a factor**: it is where the skin is, so the swell
             # below may raise the lumen towards it and must never multiply it. Multiplying it sent
@@ -847,7 +868,7 @@ def oral_shells(seam, section, u_back, u_front, rings=24, ring=14, centre=None, 
                 mouth_facing = (math.sin(th) >= 0) if is_floor else (math.sin(th) < 0)
                 pw = shell_power + (power - shell_power) * back if mouth_facing else power
                 c, sn = _superellipse(th, pw)
-                p = place(u, cf(u) + wid * c, seam(u) + (up if sn >= 0 else dn) * sn)
+                p = place(u, cf(u) + wid * c, seam_of(u) + (up if sn >= 0 else dn) * sn)
                 if fit is not None:
                     p = fit(p, u)
                 raw.append(p)
@@ -911,7 +932,8 @@ def oral_object(name, tx, raw, faces, n_palate, material=None, rig=None, measure
 
 def lining(name, rig, tx, seam, section, y_back, y_front, jaw_blend, material,
            rings=24, ring=14, centre_x=None, power=2., fit=None, overlap=.16, throat=.18,
-           swell=1.60, behind=0., room=None, fill=.90, shell_power=5., buried=.78):
+           swell=1.60, behind=0., room=None, fill=.90, shell_power=5., buried=.78,
+           y_front_floor=None):
     """A palate on the skull and a floor on the jaw -- see `oral_shells` for the whole argument.
 
     The signature is the one the twelve builders on this kit already call, so that the change is one
@@ -924,7 +946,8 @@ def lining(name, rig, tx, seam, section, y_back, y_front, jaw_blend, material,
                                        centre=centre_x, power=power, fit=fit,
                                        overlap=overlap, throat=throat, swell=swell,
                                        behind=behind, room=room, fill=fill,
-                                       shell_power=shell_power, buried=buried, axis='y')
+                                       shell_power=shell_power, buried=buried, axis='y',
+                                       u_front_floor=y_front_floor)
     return oral_object(name, tx, raw, faces, n_palate, material, rig,
                        measured_room=room is not None), raw
 
@@ -1127,6 +1150,12 @@ def cap_cut(obj, near, outward):
 
     No new shape is invented: every vertex of the fan but its hub is one the cut already made, and
     the hub is their mean. `CLAUDE.md` is explicit that closing a hole is always fair game.
+
+    And the cap wears the skin it closes: a new vertex in bmesh starts every layer at zero, so a hub
+    with no UV and a black vertex colour drew Placodus' mandible cap as a black slab at the front of
+    every open mouth. The hub copies its vertex layers from the rim and takes the mean of the rim's
+    UVs, and each fan loop keeps its own rim vertex's UV, so the fill is the skin's own albedo
+    across the section rather than a hole with a different colour.
     """
     bm = bmesh.new()
     bm.from_mesh(obj.data)
@@ -1140,19 +1169,38 @@ def cap_cut(obj, near, outward):
         for v in e.verts:
             if v not in verts:
                 verts.append(v)
+    uv_layer = bm.loops.layers.uv.active
+    rim_uv = {}
+    if uv_layer is not None:
+        for v in verts:
+            loops = [l for l in v.link_loops]
+            if loops:
+                rim_uv[v] = sum((l[uv_layer].uv for l in loops), Vector((0., 0.))) / len(loops)
     hub = bm.verts.new(sum((v.co for v in verts), Vector()) / len(verts))
+    for layers in (bm.verts.layers.float_color, bm.verts.layers.color):
+        for layer in layers.values():
+            hub[layer] = verts[0][layer]
+    hub_uv = (sum(rim_uv.values(), Vector((0., 0.))) / len(rim_uv)) if rim_uv else None
     made = []
     for e in sel:
         try:
-            made.append(bm.faces.new((e.verts[0], e.verts[1], hub)))
+            f = bm.faces.new((e.verts[0], e.verts[1], hub))
         except ValueError:
-            pass
+            continue
+        made.append(f)
+        if uv_layer is not None:
+            for l in f.loops:
+                l[uv_layer].uv = hub_uv if l.vert is hub else rim_uv.get(l.vert, hub_uv)
     # The run is an arc, not a loop: its two ends are the corners of the mouth, and the fan leaves
     # one triangle between them. Those are the vertices the run touches only once.
     ends = [v for v in verts if sum(1 for e in sel if v in e.verts) == 1]
     if len(ends) == 2:
         try:
-            made.append(bm.faces.new((ends[0], ends[1], hub)))
+            f = bm.faces.new((ends[0], ends[1], hub))
+            made.append(f)
+            if uv_layer is not None:
+                for l in f.loops:
+                    l[uv_layer].uv = hub_uv if l.vert is hub else rim_uv.get(l.vert, hub_uv)
         except ValueError:
             pass
     for f in made:
@@ -1166,7 +1214,7 @@ def cap_cut(obj, near, outward):
     return len(made)
 
 
-def rim_flange(obj, axis_of, amount):
+def rim_flange(obj, axis_of, amount, select=None):
     """Fold the open rim of a cut mouth inwards, so the lip is not one polygon thick.
 
     **A rim with no thickness is a hole to anything looking along it.** Where the mouth is cut, both
@@ -1183,11 +1231,18 @@ def rim_flange(obj, axis_of, amount):
     "closing a hole is simple and is always fair game" case in `CLAUDE.md`, not a shape invented for
     the animal: every vertex of it comes from the generation's own rim.
 
+    `select(a, b)`, given a boundary edge's two vertex positions, says whether that edge is the
+    mouth's. A generation is not always closed everywhere else: Hybodus and Saurichthys carry
+    open opercular seams and fin-base seams (some 3,800 boundary edges on each authored body), and
+    folded without a selector every one of them grew a flap pointed at the mouth. Where a builder
+    knows its cut is the only boundary it may leave this out.
+
     Returns the number of vertices added.
     """
     bm = bmesh.new()
     bm.from_mesh(obj.data)
-    border = [e for e in bm.edges if len(e.link_faces) == 1]
+    border = [e for e in bm.edges if len(e.link_faces) == 1
+              and (select is None or select(e.verts[0].co, e.verts[1].co))]
     if not border:
         bm.free()
         return 0
@@ -1203,6 +1258,62 @@ def rim_flange(obj, axis_of, amount):
     obj.data.update()
     bm.free()
     return len(added)
+
+
+def seal_seams(obj, is_mouth, within, max_span):
+    """Close the generation's own open seams -- not the mouth's rim -- with their own vertices.
+
+    A generation is not always a closed shell: Hybodus and Saurichthys each carry some 3,800
+    boundary edges besides the mouth cut, and on both the ones behind the corner of the mouth are
+    the opercular seams, open slits into a hollow head. Under a single-sided pass a line of sight
+    through one meets a single back-facing skin surface and the backdrop beyond it, which is what
+    `gape-solid.py` counts, and it was the whole of what was left on both fish once the mouth was
+    closed: 371 px on Saurichthys with the sac and 371 with the shells, in the same places. Folding
+    every boundary edge as a lip (`rim_flange` with no selector) half-closed them by accident and
+    hid the fact.
+
+    So they are filled: `holes_fill` over every boundary edge that is not the mouth's, each new
+    face taking its vertices' own UVs so the strip wears the skin either side of it. Only seams
+    `within` (a predicate on a position -- the head, for these two) and no wider than `max_span`
+    are kept, so a fin-base seam or the mouth cannot be sealed by mistake. Closing a hole with the
+    vertices the generation already has is the case `CLAUDE.md` calls always fair game.
+
+    Returns `(faces_made, loops_sealed, faces_refused)`.
+    """
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    uv_layer = bm.loops.layers.uv.active
+    sel = [e for e in bm.edges if len(e.link_faces) == 1 and not is_mouth(e.verts[0].co, e.verts[1].co)
+           and within(e.verts[0].co) and within(e.verts[1].co)]
+    if not sel:
+        bm.free()
+        return 0, 0, 0
+    rim_uv = {}
+    if uv_layer is not None:
+        for e in sel:
+            for v in e.verts:
+                if v not in rim_uv and v.link_loops:
+                    rim_uv[v] = sum((l[uv_layer].uv for l in v.link_loops), Vector((0., 0.))) / len(v.link_loops)
+    made = bmesh.ops.holes_fill(bm, edges=sel, sides=0)['faces']
+    kept, refused = [], []
+    for fc in made:
+        co = [v.co for v in fc.verts]
+        span = max(max(c[i] for c in co) - min(c[i] for c in co) for i in range(3))
+        (kept if span <= max_span else refused).append(fc)
+    if refused:
+        bmesh.ops.delete(bm, geom=refused, context='FACES_ONLY')
+    if uv_layer is not None:
+        for fc in kept:
+            for l in fc.loops:
+                if l.vert in rim_uv:
+                    l[uv_layer].uv = rim_uv[l.vert]
+    for fc in kept:
+        fc.smooth = True
+    bm.normal_update()
+    bm.to_mesh(obj.data)
+    obj.data.update()
+    bm.free()
+    return len(kept), len(set(id(fc) for fc in kept)), len(refused)
 
 
 def inward_material(name, colour, roughness=.62):

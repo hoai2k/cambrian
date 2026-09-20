@@ -1,0 +1,57 @@
+{
+  "id": "placodus",
+  "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present.",
+  "models": [
+    {
+      "variant": "authored",
+      "sha256": "56c8fc5b4cf0df8902a08fa5a6b4ad43749f20e722678ed01b33fb528130e0c1",
+      "meshes": [
+        {
+          "name": "Oral cavity lining",
+          "vertices": 308,
+          "triangles": {
+            "skull": 304,
+            "jaw": 304
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ]
+    },
+    {
+      "variant": ".puppet",
+      "sha256": "dfa2a3408ba659f83f81f32598435671c93d5532b6f401fd2df9d284fcacb650",
+      "meshes": [
+        {
+          "name": "Oral cavity lining",
+          "vertices": 308,
+          "triangles": {
+            "skull": 304,
+            "jaw": 304
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ]
+    },
+    {
+      "variant": ".lod1",
+      "sha256": "dfa2a3408ba659f83f81f32598435671c93d5532b6f401fd2df9d284fcacb650",
+      "meshes": [
+        {
+          "name": "Oral cavity lining",
+          "vertices": 308,
+          "triangles": {
+            "skull": 304,
+            "jaw": 304
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ]
+    }
+  ]
+}
