@@ -23,7 +23,15 @@ unless the user explicitly asks for a PR. Steps:
   not be modified in place; new animation clips are added, never replaced. The one sanctioned way
   to re-author a clip is `tools/creatures/motion/apply.mjs`, which keeps the shipped clip in the
   file as `replaced/<Name>` (shown under *Replaced* in the viewer) and is re-runnable on top of
-  whatever else lands in the GLB; the performance is code in `performances/<id>.mjs`.
+  whatever else lands in the GLB; the performance is code in `performances/<id>.mjs`. It works on
+  all three eras' folders now, and a clip a rig never had is simply added — which is how the shore's
+  gaits landed without Blender: `tools/creatures/motion/gaits.mjs` authors `Flop` (a stranded
+  fish's lash, one `FLOP_PERIOD` long so the loop *is* the flop), `Walk` (a sprawling
+  lateral-sequence walk, lent to lobe fins, palms and paddles alike) and the lurkers' `Fish`/`Peer`,
+  and each rig's file names its own bones. A new clip has no shipped source to carry, so it must
+  close its loop on every bone. After a run: the era JSON's `clips`/`looping` by hand,
+  `node tools/update-asset-sizes.mjs`, and the era's own check. Onychodus' performance file is stale
+  against its rebuilt rig (`whorlL`) and fails to apply at all, so it carries no `Flop`.
 - Any change to a creature's model, colours or textures must go through
   `docs/creature-intake.md`: re-render, `npm run cards`, `npm run lods`, and
   `npm run check` must pass. The check flags stale images automatically.
@@ -244,13 +252,26 @@ unless the user explicitly asks for a PR. Steps:
   `breathing: 'air'` is a gauge *and* a stamina economy (`AIR_MAX`, five minutes, in
   `src/sim/triassic/state.ts`), armour has a facing (`armourFacing`), the sea floor sinks
   by biome (`environment.floorDepth` → `depthProfile` in `src/sim/world.ts`; the other eras leave
-  it out and keep their flat floor), and shore animals (`shore: true`, never pickable) are brainless actors pinned on
-  the beach by `src/sim/triassic/shore.ts` that telegraph and strike into the water. **They are off
-  (`SHORE_ANIMALS` in that file) and the beach is empty**: the behaviour they are meant to have is
-  designed and not built (`docs/triassic/06-shore-visitors.md`), and a hazard a player is supposed
-  to learn should arrive finished rather than as a partial version that teaches the wrong lesson.
-  The cycle that *is* built stays intact and checked — `setShoreAnimals(true)` is how the suite runs
-  it — so turning them on is one line. A `shore: true` creature is also never an ambient swimmer:
+  it out and keep their flat floor), and shore animals (`shore: true`, never pickable) are brainless,
+  scripted actors on the beach (`src/sim/triassic/shore.ts`, built to
+  `docs/triassic/06-shore-visitors.md`). **They are off by default and `Settings → Shore animals`
+  turns them on** (`RULES.settings.shoreAnimals`, read once when a match starts, because `src/sim`
+  replays from its inputs; `forceOccupancy` is for the tests only). What they take is **what
+  lingers**: a body still within a post's reach — under `STILL_SPEED` of its own cruise, at the
+  surface or on the sand — for `STILL_TIME_LURKER`/`STILL_TIME_RUNNER`; a swimmer passing at its own
+  pace is never touched, which is what makes the shore a trap rather than a fence. The boom takes a
+  snack whole (`startSwallow`, the camera following it), bites and shoves prey, and never lowers for
+  anything bigger; a rung III bite on the neck while it is out still severs it and clears the bank
+  for the match. The runners (Macrocnemus, Coelophysis) are not in the world between excursions —
+  `away` is a timer on the post — and appear `INLAND_OFF` up the beach, run down, peer for a window,
+  commit to a **straight** dash at where the victim was (never homing: moving on the commit is the
+  escape), bite or miss, and run back out of the world; under two seconds in the water, killable
+  there. Banks come and go on `occupied(k, seed, t)` — windows of `OCCUPANCY_WINDOW` with a per-post
+  phase offset — and a lurker arrives and leaves by *walking* the beach, never by teleport. The
+  performance is one clock with the mechanic (`shoreClip`: `Fish`/`Breathe` for the watch, `Peer`
+  for the runner's look, `Lower`, the snaps, `Drag` for the gulp, `Charge`, `Retreat`, `Run` and
+  `Crawl` as *loops* for the moves — the era clip hook now carries `loop`, and a looping era clip is
+  the body's locomotion rather than a fight with Idle). A `shore: true` creature is also never an ambient swimmer:
   the sea is populated from `WILD`/`WILD_IDS` (the roster minus the shore animals) rather than from
   `CREATURES`, because the ambient draw took the whole roster and the Triassic was spawning
   hatchling Tanystropheus in open water with ordinary brains — walking animals swimming about
@@ -1070,6 +1091,31 @@ unless the user explicitly asks for a PR. Steps:
   `tripo-raw/`, and it refuses a rigged body by name), importing the viewer's own `warp()` so the
   file is what was previewed and reading the result back to prove it. `docs/viewer-stretch.md` is
   the whole of it; Blender work it implies goes in `docs/triassic/builder-requests.md`.
+- The viewer's **mouth editor** (`&mode=mouth`, the *Mouth* button) is the human answer to the
+  mouth rule above: every builder finds the mouth by a measurement that has been fooled at least
+  once, and this lets a person aim the cut by eye and hand it over as numbers. The document is a
+  **cut plane and a hinge** — six numbers on the body's frame (`src/viewer/mouth/mouth.ts`, pure):
+  how far back from the nose the hinge sits, the line's height and its seat across the head, and
+  pitch, yaw and roll — composed in that order so each angle reads as its own view's angle when
+  the other two are zero, and exported as basis vectors as well, so no consumer recomposes them.
+  The mandible is everything **below the plane and ahead of the hinge**; the second half-space is
+  what stops the cut running back through the neck, and it is also the editor's honest limit — a
+  paddle tucked forward under the snout falls inside it, as Aphaneramma's did in a builder's own
+  cut, and the count says so rather than the tool hiding it. Three handles on the orbit view
+  (hinge moves the cut in the camera's plane, front aims the line, side tips it), right-drag
+  orbits as in mark mode, every mandible vertex is lit with the same overlay mark mode uses — a
+  vertex-colour tint was the obvious alternative and would have broken the recolour hook, which
+  reads COLOR_0 as its mask. The first guess follows the stretcher's precedence: a rigged body's
+  `jaw` bone *is* its hinge and `anchor_mouth` sets the pitch, a socket alone sets the height, a
+  raw generation gets the head's own section a head's worth back, and the panel says which. It
+  works on **whatever body is on stage**, the raw generation above all, and the export names the
+  exact file by a **sha256 measured in the page** (`crypto.subtle` over the bytes the browser has;
+  a manifest's hash or `null` where it cannot) with `appliesTo` saying whether that was the
+  generation, its preview, the built body or the twin. `fromExport` is the one reader and refuses
+  a file whose hash or vertex count no longer matches, `npm run triassic:mouth -- <file>` is the
+  consumer that hashes the GLB on disk and re-counts the cut over the real mesh, `npm run mouth`
+  and `node tools/mouth-browser.mjs` check it, and `docs/viewer-mouth.md` is the schema and the
+  workflow, exact use and guidance both.
 - A bare `?debug` on the site root (`/?debug`) opens the index of every one of these tools —
   `src/ancientseas/DebugIndex.tsx`, data in `src/ancientseas/debug-index.ts`, mounted by
   `src/ancientseas/main.tsx` the way `Root.tsx` mounts the state editor. It is the trilogy page's

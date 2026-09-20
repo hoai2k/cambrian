@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/props/tripo-raw/encrinus-litter/encrinus-litter.raw.glb",
+    "bytes": 1517724,
+    "sha256": "36401b81525434b87ff1f482d44d45afe183cabb15f3e086f39e8daa3969c598"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 12213,
+    "faces": 19928,
+    "triangles": 19928,
+    "connected_components": 172,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.5,
+      -0.484043,
+      -0.058476
+    ],
+    "max_xyz": [
+      0.5,
+      0.484043,
+      0.058476
+    ],
+    "center_xyz": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "size_xyz": [
+      1.0,
+      0.968086,
+      0.116953
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_65136235-2e2f-4ad8-8a7e-7377b920c3f3",
+      "mesh": "tripo_mesh_65136235-2e2f-4ad8-8a7e-7377b920c3f3",
+      "vertices": 12213,
+      "edges": 31969,
+      "faces": 19928,
+      "triangles": 19928,
+      "connected_components": 172,
+      "material_slots": [
+        "tripo_material_65136235-2e2f-4ad8-8a7e-7377b920c3f3"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_65136235-2e2f-4ad8-8a7e-7377b920c3f3",
+      "image_textures": [
+        "Color_65136235-2e2f-4ad8-8a7e-7377b920c3f3",
+        "NormalGL_65136235-2e2f-4ad8-8a7e-7377b920c3f3",
+        "ORM_65136235-2e2f-4ad8-8a7e-7377b920c3f3"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_65136235-2e2f-4ad8-8a7e-7377b920c3f3",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_65136235-2e2f-4ad8-8a7e-7377b920c3f3",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_65136235-2e2f-4ad8-8a7e-7377b920c3f3",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/props/tripo-raw/encrinus-litter/review/side.png",
+    "top": "tools/triassic/props/tripo-raw/encrinus-litter/review/top.png",
+    "three-quarter": "tools/triassic/props/tripo-raw/encrinus-litter/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-publish/local/triassic-authoring/props/encrinus-litter/encrinus-litter.preview.glb",
+    "triangle_limit": 5000,
+    "triangles_before": 19928,
+    "triangles_after": 4925,
+    "bytes": 1054244,
+    "sha256": "1eccb61cc0c2d718409f277e9f674f7646622539b07ebe62440e38d158134de4"
+  }
+}

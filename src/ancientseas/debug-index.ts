@@ -59,6 +59,10 @@ export const DEBUG_PAGES: readonly DebugPage[] = [
         name: 'Stretch', query: 'specimen=triassic:dinocephalosaurus&mode=stretch',
         blurb: 'Lengthen a run of a body between two cuts: the fault a profile table cannot reach, a neck that is simply the wrong length. On a raw generation it is an edit; on a built body it is a measurement for that animal’s builder.',
       },
+      {
+        name: 'Mouth', query: 'specimen=triassic:placodus&mode=mouth',
+        blurb: 'Aim the mouth cut by hand — how far back the hinge goes, where the mouth line sits, and its pitch, yaw and roll — with every vertex the jaw would carry lit on the body. Exports the hinge and the plane in the model’s own frame, hashed to the exact file, for exact use by a builder or as guidance for its author.',
+      },
     ],
   },
   {

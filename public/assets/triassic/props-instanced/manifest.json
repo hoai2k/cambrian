@@ -1,5 +1,5 @@
 {
-  "stage": "initial Blender-authored scenery library; not placed in runtime",
+  "stage": "shipped instanced scenery library; canonical-reviewed Tripo sources are reduced and baked to vertex pigment",
   "units": "game units, authored at requested scale-1 proportions",
   "assets": [
     {
@@ -100,7 +100,7 @@
       "source": "tools/triassic/props/sources/triassic-mud-ripple-1.blend",
       "triangles": 712,
       "dimensionsXYZ": [
-        2.0,
+        2,
         0.183995,
         1.7
       ],
@@ -122,7 +122,7 @@
       "source": "tools/triassic/props/sources/triassic-mud-ripple-2.blend",
       "triangles": 712,
       "dimensionsXYZ": [
-        2.0,
+        2,
         0.184,
         1.7
       ],
@@ -133,6 +133,181 @@
       "vertexColours": true,
       "sha256": "d69fa04ba418c104497a005fadfaa23e659bd2c5aab012f12f073675d758e144",
       "bytes": 16900
+    },
+    {
+      "id": "triassic-encrinus-litter",
+      "family": "encrinus-litter",
+      "variant": 1,
+      "status": "final",
+      "path": "assets/triassic/props-instanced/triassic-encrinus-litter.glb",
+      "portrait": "assets/triassic/props-instanced/triassic-encrinus-litter.png",
+      "source": "tools/triassic/props/sources/triassic-encrinus-litter.blend",
+      "rawSource": "tools/triassic/props/tripo-raw/encrinus-litter/encrinus-litter.raw.glb",
+      "triangles": 2997,
+      "triangleLimit": 3000,
+      "dimensionsXYZ": [
+        0.6,
+        0.070901,
+        0.579908
+      ],
+      "pivot": "base centre",
+      "static": true,
+      "meshCount": 1,
+      "materialCount": 1,
+      "vertexColours": true,
+      "textureBakedToVertexColours": true,
+      "sha256": "ea097db35e453a8a124ec1af551f0d5a2e4fbd572f81e27adfa0453350893bef",
+      "bytes": 112020
+    },
+    {
+      "id": "triassic-daonella-bed",
+      "family": "daonella-bed",
+      "variant": 1,
+      "status": "final",
+      "path": "assets/triassic/props-instanced/triassic-daonella-bed.glb",
+      "portrait": "assets/triassic/props-instanced/triassic-daonella-bed.png",
+      "source": "tools/triassic/props/sources/triassic-daonella-bed.blend",
+      "rawSource": "tools/triassic/props/tripo-raw/daonella-bed/daonella-bed.raw.glb",
+      "triangles": 3500,
+      "triangleLimit": 3500,
+      "dimensionsXYZ": [
+        1.2,
+        0.215978,
+        1.187211
+      ],
+      "pivot": "base centre",
+      "static": true,
+      "meshCount": 1,
+      "materialCount": 1,
+      "vertexColours": true,
+      "textureBakedToVertexColours": true,
+      "sha256": "37553952fe80f909c6b53e465fdfc931e9c9a16941ca48566ba8b9bb4f9b37f9",
+      "bytes": 139152
+    },
+    {
+      "id": "triassic-brachiopod-cluster",
+      "family": "brachiopod-cluster",
+      "variant": 1,
+      "status": "final",
+      "path": "assets/triassic/props-instanced/triassic-brachiopod-cluster.glb",
+      "portrait": "assets/triassic/props-instanced/triassic-brachiopod-cluster.png",
+      "source": "tools/triassic/props/sources/triassic-brachiopod-cluster.blend",
+      "rawSource": "tools/triassic/props/tripo-raw/brachiopod-cluster/brachiopod-cluster.raw.glb",
+      "triangles": 3424,
+      "triangleLimit": 3500,
+      "dimensionsXYZ": [
+        0.287183,
+        0.145441,
+        0.3
+      ],
+      "pivot": "base centre",
+      "static": true,
+      "meshCount": 1,
+      "materialCount": 1,
+      "vertexColours": true,
+      "textureBakedToVertexColours": true,
+      "sha256": "f3c54aa462f7fa9c6f25fd45d49f0a88438bfc6ca7358c03091a8ed5d9244d8b",
+      "bytes": 127324
+    },
+    {
+      "id": "triassic-cidaris",
+      "family": "cidaris",
+      "variant": 1,
+      "status": "final",
+      "path": "assets/triassic/props-instanced/triassic-cidaris.glb",
+      "portrait": "assets/triassic/props-instanced/triassic-cidaris.png",
+      "source": "tools/triassic/props/sources/triassic-cidaris.blend",
+      "rawSource": "tools/triassic/props/tripo-raw/cidaris/cidaris.raw.glb",
+      "triangles": 4943,
+      "triangleLimit": 5000,
+      "dimensionsXYZ": [
+        0.29992,
+        0.257894,
+        0.3
+      ],
+      "pivot": "base centre",
+      "static": true,
+      "meshCount": 1,
+      "materialCount": 1,
+      "vertexColours": true,
+      "textureBakedToVertexColours": true,
+      "sha256": "80d2e6f713dae7bffd717998faf7930a8a654c6da3747192b1400d4db3835ac9",
+      "bytes": 242744
+    },
+    {
+      "id": "triassic-neocalamites",
+      "family": "neocalamites",
+      "variant": 1,
+      "status": "final",
+      "path": "assets/triassic/props-instanced/triassic-neocalamites.glb",
+      "portrait": "assets/triassic/props-instanced/triassic-neocalamites.png",
+      "source": "tools/triassic/props/sources/triassic-neocalamites.blend",
+      "rawSource": "tools/triassic/props/tripo-raw/neocalamites/neocalamites.raw.glb",
+      "triangles": 6000,
+      "triangleLimit": 6000,
+      "dimensionsXYZ": [
+        0.866111,
+        3,
+        1.940734
+      ],
+      "pivot": "base centre",
+      "static": true,
+      "meshCount": 1,
+      "materialCount": 1,
+      "vertexColours": true,
+      "textureBakedToVertexColours": true,
+      "sha256": "994857a525f258bf15d45744434924c2f71f38b00e482c14d5fe8957cb27db7a",
+      "bytes": 288024
+    },
+    {
+      "id": "triassic-pleuromeia",
+      "family": "pleuromeia",
+      "variant": 1,
+      "status": "final",
+      "path": "assets/triassic/props-instanced/triassic-pleuromeia.glb",
+      "portrait": "assets/triassic/props-instanced/triassic-pleuromeia.png",
+      "source": "tools/triassic/props/sources/triassic-pleuromeia.blend",
+      "rawSource": "tools/triassic/props/tripo-raw/pleuromeia/pleuromeia.raw.glb",
+      "triangles": 6000,
+      "triangleLimit": 6000,
+      "dimensionsXYZ": [
+        1.812953,
+        2,
+        1.957659
+      ],
+      "pivot": "base centre",
+      "static": true,
+      "meshCount": 1,
+      "materialCount": 1,
+      "vertexColours": true,
+      "textureBakedToVertexColours": true,
+      "sha256": "ce7b83d872064521af138ce672d241f85bf72b02649f2a022a976d210591e03f",
+      "bytes": 231472
+    },
+    {
+      "id": "triassic-bjuvia",
+      "family": "bjuvia",
+      "variant": 1,
+      "status": "final",
+      "path": "assets/triassic/props-instanced/triassic-bjuvia.glb",
+      "portrait": "assets/triassic/props-instanced/triassic-bjuvia.png",
+      "source": "tools/triassic/props/sources/triassic-bjuvia.blend",
+      "rawSource": "tools/triassic/props/tripo-raw/bjuvia/bjuvia.raw.glb",
+      "triangles": 5999,
+      "triangleLimit": 6000,
+      "dimensionsXYZ": [
+        1.902588,
+        1.5,
+        1.94878
+      ],
+      "pivot": "base centre",
+      "static": true,
+      "meshCount": 1,
+      "materialCount": 1,
+      "vertexColours": true,
+      "textureBakedToVertexColours": true,
+      "sha256": "c81ab1b9edaed945239a095c06c9a6b95baf775a7d15217c249dce36b10b3ad7",
+      "bytes": 224324
     }
   ]
 }

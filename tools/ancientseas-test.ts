@@ -331,7 +331,7 @@ for (const page of DEBUG_PAGES) for (const mode of page.modes ?? []) {
 }
 // A viewer mode that names a specimen must name one that exists, or the link opens on the wrong animal.
 const viewerModes = DEBUG_PAGES.find((p) => p.id === 'viewer')?.modes ?? [];
-ok(viewerModes.length === 3, 'the viewer offers its three editors');
+ok(viewerModes.length === 4, 'the viewer offers its four editors');
 // Checked against the era rosters rather than the viewer's own catalogue: that module imports
 // assetPaths, which reads ACTIVE_ERA at module top, and this page must never pull an era in.
 const ROSTERS: Record<string, readonly { id: string }[]> = { cambrian: CAMBRIAN.creatures, devonian: DEVONIAN.creatures, triassic: TRIASSIC.creatures };

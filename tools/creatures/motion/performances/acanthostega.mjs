@@ -4,6 +4,7 @@
  */
 import { UP, DOWN } from '../lib.mjs';
 import { wave, beatPhase } from '../common.mjs';
+import { walkClip } from '../gaits.mjs';
 
 const TAIL = ['tail0', 'tail1', 'tail2', 'tail3', 'tail4', 'tail5'];
 const SIDES = [['L', 1], ['R', -1]];
@@ -37,3 +38,6 @@ export const clips = [
     },
   },
 ];
+
+// The walk (src/sim/beach.ts): a sprawling tetrapod walk on eight-fingered palms.
+clips.push(walkClip({ limbs: [[['upperForeL','lowerForeL','palmForeL'], 1], [['upperForeR','lowerForeR','palmForeR'], -1], [['upperHindL','lowerHindL','palmHindL'], 1], [['upperHindR','lowerHindR','palmHindR'], -1]], tail: ['tail0','tail1','tail2','tail3','tail4','tail5'], body: 'body', duration: 1.4, reach: 0.38, lift: 0.3, fold: 0.35, tailAmp: 0.09 }));

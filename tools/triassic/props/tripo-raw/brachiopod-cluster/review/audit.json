@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/props/tripo-raw/brachiopod-cluster/brachiopod-cluster.raw.glb",
+    "bytes": 1364808,
+    "sha256": "b38ed6179bef7808e23ec0c970f6a3d2d13009bf9719325cf15bce665e99628c"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 11960,
+    "faces": 19840,
+    "triangles": 19840,
+    "connected_components": 90,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.479127,
+      -0.5,
+      -0.238154
+    ],
+    "max_xyz": [
+      0.479127,
+      0.5,
+      0.238154
+    ],
+    "center_xyz": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "size_xyz": [
+      0.958255,
+      1.0,
+      0.476309
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_e253afcc-b3ef-49e2-84a1-b52fa63cb12b",
+      "mesh": "tripo_mesh_e253afcc-b3ef-49e2-84a1-b52fa63cb12b",
+      "vertices": 11960,
+      "edges": 31710,
+      "faces": 19840,
+      "triangles": 19840,
+      "connected_components": 90,
+      "material_slots": [
+        "tripo_material_e253afcc-b3ef-49e2-84a1-b52fa63cb12b"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_e253afcc-b3ef-49e2-84a1-b52fa63cb12b",
+      "image_textures": [
+        "Color_e253afcc-b3ef-49e2-84a1-b52fa63cb12b",
+        "NormalGL_e253afcc-b3ef-49e2-84a1-b52fa63cb12b",
+        "ORM_e253afcc-b3ef-49e2-84a1-b52fa63cb12b"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_e253afcc-b3ef-49e2-84a1-b52fa63cb12b",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_e253afcc-b3ef-49e2-84a1-b52fa63cb12b",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_e253afcc-b3ef-49e2-84a1-b52fa63cb12b",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/props/tripo-raw/brachiopod-cluster/review/side.png",
+    "top": "tools/triassic/props/tripo-raw/brachiopod-cluster/review/top.png",
+    "three-quarter": "tools/triassic/props/tripo-raw/brachiopod-cluster/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-publish/local/triassic-authoring/props/brachiopod-cluster/brachiopod-cluster.preview.glb",
+    "triangle_limit": 5000,
+    "triangles_before": 19840,
+    "triangles_after": 4924,
+    "bytes": 909532,
+    "sha256": "889064034fdfb37c1b0a356b45345f25ec73a9ccde54faeefe0b6914ba0e30ce"
+  }
+}

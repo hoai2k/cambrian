@@ -508,6 +508,7 @@ function EraStatus({ era, alive, ashore }: { era: EraHud; alive: boolean; ashore
     : era.beached && !ashore ? W.beached
     : era.heldUnder ? W.heldUnder
     : (era.shoreWarn ?? 0) > 0 ? W.shoreReaching
+    : (era.shoreWatch ?? 0) > 0 ? W.shoreWatching
     : era.drowning ? W.drowning
     : era.air && !era.atSurface && (era.airLeft ?? 1) <= 0 ? W.outOfAir
     : era.airLow ? W.airRunningOut : '';
