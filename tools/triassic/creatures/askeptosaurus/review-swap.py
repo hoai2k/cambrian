@@ -42,8 +42,12 @@ def shot(name,clip,t,view,w=760,h=570):
  render(out/('%s-%s-%s-%s-%s.png'%(tag,name,clip,t,view)),w,h,loc=loc,target=target,scale=scale,
         roll=math.pi/2 if view=='top' else 0.)
 
+# Dorsal and three-quarter, not dorsal and lateral. This animal folds in the **horizontal** plane,
+# so a camera on the file's own lateral axis looks straight across the curve and the body overlaps
+# itself: twelve held shapes came out as twelve near-identical stubby arches. The curve is what
+# these sheets are about, so the second view is one that can see it.
 for clip in HOLDS:
- for view in ('side','top'):shot('hold',clip,0,view)
+ for view in ('threeq','top'):shot('hold',clip,0,view)
 for clip,t in RANGE:
  for view in ('top','side'):shot('range',clip,t,view)
 for clip,t in STRIP:shot('strip',clip,t,'threeq')

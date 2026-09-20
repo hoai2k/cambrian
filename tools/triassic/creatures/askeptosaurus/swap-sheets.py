@@ -60,9 +60,9 @@ tile([[('%s (%s)' % (c, v), 'after-hold-%s-0-%s.png' % (c, v)) for c in HOLDS[i:
      'askeptosaurus-swap-holds-top.png',
      title='Askeptosaurus T3D-25 - the twelve held shapes, dorsal, on the promoted posed body')
 tile([[('%s (%s)' % (c, v), 'after-hold-%s-0-%s.png' % (c, v)) for c in HOLDS[i:i + 4]]
-      for v in ('side',) for i in (0, 4, 8)],
-     'askeptosaurus-swap-holds-side.png',
-     title='Askeptosaurus T3D-25 - the twelve held shapes, lateral, on the promoted posed body')
+      for v in ('threeq',) for i in (0, 4, 8)],
+     'askeptosaurus-swap-holds-threequarter.png',
+     title='Askeptosaurus T3D-25 - the twelve held shapes, three-quarter, on the promoted posed body')
 tile([[('before  %s %ss' % (c, t), 'before-posed-range-%s-%s-top.png' % (c, t)) for c, t in RANGE],
       [('after  %s %ss' % (c, t), 'after-range-%s-%s-top.png' % (c, t)) for c, t in RANGE]],
      'askeptosaurus-swap-range.png',
