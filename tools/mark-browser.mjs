@@ -35,7 +35,7 @@ try {
   await page.goto(`${base}/viewer/?specimen=${encodeURIComponent(key)}`, { waitUntil: 'networkidle', timeout: 120000 });
   await loaded();
   // The animal opens on its own generated mesh, which is the body the region is about.
-  assert.match(await page.locator('.clips').getAttribute('data-loaded-model'), /atopodentatus\.preview\.glb$/,
+  assert.match(await page.locator('.clips').getAttribute('data-loaded-model'), /atopodentatus(\.preview)?\.glb$/,
     'the generated mesh is the body on stage');
 
   await page.getByRole('button', { name: 'Mark region' }).click();
@@ -83,12 +83,17 @@ try {
   const json = JSON.parse(fs.readFileSync(file, 'utf8'));
   assert.equal(json.schema, 'mesh-region/1');
   assert.equal(json.id, 'atopodentatus');
-  assert.match(json.model, /atopodentatus\.preview\.glb$/);
+  assert.match(json.model, /atopodentatus(\.preview)?\.glb$/);
   assert.match(json.sha256, /^[0-9a-f]{64}$/, 'the export names the hash of the file it was marked on');
   assert.equal(json.note, 'browser drive: a stroke across the flank');
   assert.equal(json.markedCount, erased, 'the file carries what the panel said was marked');
-  assert.equal(json.meshes.length, 1, 'the preview body is one mesh');
-  assert.deepEqual(json.vertices, json.meshes[0].vertices, 'a single-mesh body also answers at the top level');
+  assert.equal(json.meshes.length, 1, 'one stroke across the flank lands on one mesh');
+  // A raw generation is one mesh and answers at the top level too; a shipped body carries its
+  // oral shells and eyes as meshes of their own, and there the per-mesh addressing is the only
+  // honest answer. Which case this is, the file itself says.
+  const singleMesh = json.meshes[0].vertexCount === json.vertexCount;
+  if (singleMesh) assert.deepEqual(json.vertices, json.meshes[0].vertices, 'a single-mesh body also answers at the top level');
+  else assert.equal(json.vertices, undefined, 'a multi-mesh body leaves the top-level shortcut out');
   const indices = json.meshes[0].vertices;
   assert.ok(indices.every((v, i) => Number.isInteger(v) && v >= 0 && v < json.meshes[0].vertexCount && (i === 0 || v > indices[i - 1])),
     'the indices are real indices into the mesh, in order and without repeats');

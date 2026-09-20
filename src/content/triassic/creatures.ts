@@ -351,7 +351,7 @@ export const TRIASSIC_CREATURES: readonly CreatureDef[] = [
     kind: 'Ammonoid', kindNote: 'A coiled chambered shell with the saw-toothed suture that names the Triassic ammonoids, ribbed and knobbed, buoyant on its gas chambers. Sized up to the playable floor.',
     locality: 'Middle Triassic · Muschelkalk',
     tagline: 'Hold to rise, let go to sink, jet backwards and hope.',
-    role: 'The buoyant snack', ground: false, adultLength: 1.41, rung: 1, breathing: 'gill', shell: true, armour: 0.8, armourFacing: 'all', diet: 'scavenger', grasp: true,
+    role: 'The buoyant snack', ground: false, adultLength: 1.41, rung: 1, breathing: 'gill', shell: true, armour: 0.8, armourFacing: 'all', diet: 'scavenger', grasp: true, conformArms: true,
     speed: 1.6, burst: 2.65, agility: 3, turnRate: 5, glide: 0.35,
     hp: 50, poise: 40, stamina: 110, defense: 0.10, sense: 9,
     color: '#d6c8a6', accent: '#8a3a24',

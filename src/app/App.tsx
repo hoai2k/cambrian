@@ -8,6 +8,7 @@ import type { Quality } from '../render/sea';
 import { PLAYABLE_IDS as CREATURE_IDS, PLAYABLE as CREATURES, creature, setEquivalentSizing, type CreatureId } from '../sim/creatures';
 import { MODE_IDS, type Mode, type PlayerSetup } from '../sim/types';
 import { clampMark } from '../sim/ladder';
+import { RULES } from '../sim/era-rules';
 import { emptyCodex, hasNewFinds, loadCodex, mergeCodex, recordFinds, type Codex } from './codex';
 import { Hud } from './Hud';
 import { LoadingScreen, useSlow } from './Loading';
@@ -39,7 +40,7 @@ export type DialogKind = null | 'help' | 'settings';
  * input to almost everything in the simulation, and `src/sim` has to replay the same way from the
  * same inputs.
  */
-export interface Settings { quality: Quality; lookSpeed: number; invertY: boolean; volume: number; muted: boolean; music: boolean; equivalentSizing: boolean; }
+export interface Settings { quality: Quality; lookSpeed: number; invertY: boolean; volume: number; muted: boolean; music: boolean; equivalentSizing: boolean; shoreAnimals: boolean; }
 
 /** The active era's modes, in its order; the first is the default selection. */
 /**
@@ -57,8 +58,8 @@ const startScale = (v: Visitor) => (v.standing ? undefined : v.scale);
 const MODES: Mode[] = ACTIVE_ERA.modes.map((m) => m.id);
 const SETTINGS_KEY = ACTIVE_ERA.copy.settingsKey;
 const defaultSettings = (): Settings => {
-  try { const s = localStorage.getItem(SETTINGS_KEY); if (s) return { ...{ quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false }, ...JSON.parse(s) }; } catch { /* ignore */ }
-  return { quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false };
+  try { const s = localStorage.getItem(SETTINGS_KEY); if (s) return { ...{ quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false, shoreAnimals: false }, ...JSON.parse(s) }; } catch { /* ignore */ }
+  return { quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false, shoreAnimals: false };
 };
 
 /**
@@ -266,7 +267,7 @@ export function App() {
     engineRef.current?.setQuality(settings.quality);
     engineRef.current?.setLook(settings.lookSpeed, settings.invertY);
     // Not mid-match: the running simulation is already built around the lengths it started with.
-    if (screenRef.current !== 'playing') setEquivalentSizing(settings.equivalentSizing);
+    if (screenRef.current !== 'playing') { setEquivalentSizing(settings.equivalentSizing); RULES?.settings?.shoreAnimals?.(settings.shoreAnimals); }
     audio.setVolume(settings.volume); audio.setMuted(settings.muted); audio.setMusic(settings.music);
     try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch { /* ignore */ }
   }, [settings]);
@@ -376,6 +377,7 @@ export function App() {
     clearFresh();
     // Fixed for the length of the match, whatever the settings panel does while it runs.
     setEquivalentSizing(settingsRef.current.equivalentSizing);
+    RULES?.settings?.shoreAnimals?.(settingsRef.current.shoreAnimals);
     engineRef.current.startMatch(modeRef.current, withCarry(ps));
     setPausedBoth(false);
     go('playing');

@@ -32,6 +32,13 @@ export const TRIASSIC_SCENERY: InstancedScenery = {
     'triassic-salt-crust-2': { path: path('triassic-salt-crust-2'), material: 'rock' },
     'triassic-mud-ripple-1': { path: path('triassic-mud-ripple-1'), material: 'rock' },
     'triassic-mud-ripple-2': { path: path('triassic-mud-ripple-2'), material: 'rock' },
+    'triassic-encrinus-litter': { path: path('triassic-encrinus-litter'), material: 'rock' },
+    'triassic-daonella-bed': { path: path('triassic-daonella-bed'), material: 'rock' },
+    'triassic-brachiopod-cluster': { path: path('triassic-brachiopod-cluster'), material: 'rock' },
+    'triassic-cidaris': { path: path('triassic-cidaris'), material: 'sponge' },
+    'triassic-neocalamites': { path: path('triassic-neocalamites'), material: 'algae', sway: true, bend: true, doubleSided: true },
+    'triassic-pleuromeia': { path: path('triassic-pleuromeia'), material: 'algae', sway: true, bend: true, doubleSided: true },
+    'triassic-bjuvia': { path: path('triassic-bjuvia'), material: 'algae', sway: true, bend: true, doubleSided: true },
     'blade-spire': { path: shared('blade-spire'), material: 'rock' },
     'talus-shard': { path: shared('talus-shard'), material: 'rock' },
     'pebble-cluster': { path: shared('pebble-cluster'), material: 'rock' },
@@ -40,6 +47,13 @@ export const TRIASSIC_SCENERY: InstancedScenery = {
     stromatolite: ['triassic-stromatolite-1', 'triassic-stromatolite-2'],
     saltCrust: ['triassic-salt-crust-1', 'triassic-salt-crust-2'],
     mudRipple: ['triassic-mud-ripple-1', 'triassic-mud-ripple-2'],
+    encrinusLitter: 'triassic-encrinus-litter',
+    daonellaBed: 'triassic-daonella-bed',
+    brachiopodCluster: 'triassic-brachiopod-cluster',
+    cidaris: 'triassic-cidaris',
+    neocalamites: 'triassic-neocalamites',
+    pleuromeia: 'triassic-pleuromeia',
+    bjuvia: 'triassic-bjuvia',
     // Everything else keeps the procedural silhouette `src/render/sea.ts` builds until its own
     // model is authored. Do not point a Triassic kind at a Devonian mesh here: the stand-in the
     // game plays with is chosen in environment.ts, and a wrong genus placed by the thousand is

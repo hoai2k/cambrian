@@ -4,6 +4,7 @@
  */
 import { UP, DOWN } from '../lib.mjs';
 import { wave, beatPhase } from '../common.mjs';
+import { walkClip } from '../gaits.mjs';
 
 const TAIL = ['tail0', 'tail1', 'tail2', 'tail3', 'tail4', 'tail5'];
 const SIDES = [['L', 1], ['R', -1]];
@@ -34,3 +35,6 @@ export const clips = [
     },
   },
 ];
+
+// The walk (src/sim/beach.ts): up the beach on its elbows, the lobe fins planting and drawing back, the tail sweeping against them.
+clips.push(walkClip({ limbs: [[['pectoralL','elbowL','distalL'], 1], [['pectoralR','elbowR','distalR'], -1], [['pelvicL','pelvicDistalL'], 1], [['pelvicR','pelvicDistalR'], -1]], tail: ['tail0','tail1','tail2','tail3','tail4','tail5'], body: 'body', duration: 1.6, reach: 0.3, lift: 0.22, fold: 0.28, tailAmp: 0.08 }));

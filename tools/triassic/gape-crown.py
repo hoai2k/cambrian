@@ -179,6 +179,22 @@ def render_pass(culled, shots, marker=False):
     return files
 
 
+# **A crown with no mouth drawn in it is nothing for this tool to judge.** Both cephalopods now keep
+# the closed crown the generation delivered -- no peristome cut, no lining, no beak -- so there is no
+# oral material to paint the marker with and no lining to size the frame off, and the verdict this
+# tool gives ("backdrop opened where the mouth is drawn") has no subject. `gape-solid.py` still runs
+# on the closed crown and is what proves it whole. Say so and stop, rather than fail on an empty
+# `max()`: the record has to say the tool was moot, not that it crashed.
+scene_setup()
+if not any(o.type == 'MESH' and 'lining' in o.name.lower() for o in bpy.context.scene.objects):
+    report = {'id': ID, 'moot': True, 'shots': [{'clip': c, 't': t} for c, t in SHOTS],
+              'reason': 'no oral lining, beak or peristome on this body: the crown is the closed '
+                        'surface the generation delivered, so there is nothing drawn where a mouth '
+                        'would be for this tool to judge; gape-solid.py is the check that applies'}
+    (OUT / 'gape-crown.json').write_text(json.dumps(report, indent=2))
+    print('GAPE_CROWN_MOOT', json.dumps(report))
+    sys.exit(0)
+
 solid = render_pass(False, SHOTS)
 culled = render_pass(True, SHOTS)
 marked = render_pass(False, SHOTS, marker=True)
@@ -194,9 +210,15 @@ for (clip, t, fa), (_, _, fb), (_, _, fc) in zip(solid, culled, marked):
     w, h = a.size
     n = w * h
 
+    # The same window as gape-solid.py's `BG`, and for the same reason: the loose `r > .5, g < .3,
+    # b > .5` this file first carried admitted a lit oral lining (Rhaeticosaurus) and pale skin
+    # (Saurichthys), and the backdrop itself never renders above 0.063 on green. Tightening can only
+    # lower a count, so the 4 px and 8 px the two crowns measured under the old window stand as
+    # upper bounds. Both cephalopods now ship without any mouth geometry, so the verdict here is
+    # about the crown's own silhouette rather than a beak.
     def bg(px, i):
         r, g, bl = px[i * 4], px[i * 4 + 1], px[i * 4 + 2]
-        return r > .5 and g < .3 and bl > .5
+        return r > .90 and g < .20 and bl > .90
 
     def is_mouth(i):
         r, g, bl = pc[i * 4], pc[i * 4 + 1], pc[i * 4 + 2]

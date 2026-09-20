@@ -4,6 +4,7 @@
  */
 import { UP, DOWN } from '../lib.mjs';
 import { wave, beatPhase } from '../common.mjs';
+import { flopClip } from '../gaits.mjs';
 
 const TAIL = ['tail_base', 'tail_mid', 'tail_tip'];
 
@@ -28,3 +29,6 @@ export const clips = [
     },
   },
 ];
+
+// The flop (src/sim/beach.ts): a short stiff tail on a very heavy front, so the lash is small and the fins do the work.
+clips.push(flopClip({ tail: ['tail_base','tail_mid','tail_tip'], pectorals: ['pectoral_L','pectoral_R'], skull: 'head', jaw: 'jaw', amp: 0.22 }));
