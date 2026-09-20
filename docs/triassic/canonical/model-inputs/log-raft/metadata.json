@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-19",
+  "canonicalStatus": "approved-scenery",
+  "canonical": "canonical.png",
+  "canonicalSource": "../../log-raft.png",
+  "canonicalSha256": "3f7e099df677490d8cc237e05c4a1468c92c40837b0f6dd368fddef291549354",
+  "input": "input.png",
+  "inputSha256": "3f7e099df677490d8cc237e05c4a1468c92c40837b0f6dd368fddef291549354",
+  "turnaround": "turnaround.png",
+  "turnaroundSource": "../../log-raft-turnaround.png",
+  "turnaroundSha256": "bdc02ca7f1e2f9781c980946c01371d2cdf5e4940530e157da5b3a8913dccc36",
+  "generator": "existing approved scenery canonical set",
+  "review": "Packaged without regeneration: the existing four-panel sheet already supplies side, top, three-quarter, and end views, so it is the lowest-drift Tripo input."
+}

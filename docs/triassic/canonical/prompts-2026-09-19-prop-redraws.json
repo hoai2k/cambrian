@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-19",
+  "tool": "builtin image_gen.imagegen",
+  "purpose": "Seven Tier 2 plant and prop canonical redraws from the current human review notes; candidates only until human greenlight.",
+  "externalInputs": [],
+  "subjects": {
+    "bjuvia": {
+      "status": "candidate-awaiting-human-greenlight",
+      "candidate": "bjuvia-candidate02.png",
+      "original": "bjuvia.png",
+      "reviewerNote": "Stand the plant in the ground with no exposed roots and replace pinnate fronds with Bjuvia's simple entire strap leaves.",
+      "prompt": "Edit the supplied canonical Bjuvia image into a scientifically plausible Triassic game-prop reference. Preserve the clean square studio-reference rendering style, neutral pale gray background, realistic materials, centered single organism, soft even lighting, and overall 1.5-unit squat proportion. Correct two specific faults: the plant must stand naturally in the ground with no exposed roots, and Bjuvia leaves must be simple and entire broad strap-shaped blades with one central midrib, never pinnate or divided into leaflets.",
+      "generatedSource": "/Users/hoai/.codex/generated_images/01a09ac3-37dc-7381-ad26-8d5c8cd87ad6/exec-986884ad-1448-4f49-9c0c-596c11f1df4f.png",
+      "sha256": "b3458f46f173eb283786a33587ec704c633749a081c2c97ba7bc7561037f4903",
+      "dimensions": [1254, 1254],
+      "visualReview": "No free roots; the short trunk meets a sandy ground patch. Leaves are broad, undivided blades with a single visible midrib."
+    },
+    "brachiopod-cluster": {
+      "status": "candidate-awaiting-human-greenlight",
+      "candidate": "brachiopod-cluster-candidate02.png",
+      "original": "brachiopod-cluster.png",
+      "reviewerNote": "Replace the fossil nodule with six to ten living Coenothyris on a thin hard-ground crust.",
+      "prompt": "Edit the supplied Coenothyris cluster into a living Triassic sea-floor prop: six to ten pale biconvex brachiopods attached close together on a very thin hard-ground crust flush with pale carbonate sand. Shells are the bulk; no fossil matrix, boulder, slab, or plinth.",
+      "generatedSource": "/Users/hoai/.codex/generated_images/01a09ac3-37dc-7381-ad26-8d5c8cd87ad6/exec-bdff6015-4119-42a5-a5e9-8bfa09e4cf4e.png",
+      "sha256": "2d2d32c1865259bc442fd9b883ee7d103a3ef3e77fd59dfb0ac17e8df5123b41",
+      "dimensions": [1254, 1254],
+      "visualReview": "Nine living shells dominate the low cluster and sit directly on pale sediment; no rounded rock matrix remains."
+    },
+    "cidaris": {
+      "status": "candidate-awaiting-human-greenlight",
+      "candidate": "cidaris-candidate02.png",
+      "original": "cidaris.png",
+      "reviewerNote": "Keep the accepted cidaroid but rest it on the reef floor rather than suspending it in space.",
+      "prompt": "Edit the supplied cidaroid into an in-situ benthic prop. Preserve its test and stout club spines; place the oral surface down on pale sediment, test just clear on short ventral spines, and direct the long club spines mainly upward and outward. Show unambiguous substrate contact.",
+      "generatedSource": "/Users/hoai/.codex/generated_images/01a09ac3-37dc-7381-ad26-8d5c8cd87ad6/exec-1bb594bf-c81d-4054-bbf4-80dbf6cce365.png",
+      "sha256": "9432a3e7f8be51753167e025f94886ba3bd52158eb4b364d9a65b3aa997d3d92",
+      "dimensions": [1254, 1254],
+      "visualReview": "The test rests on short ventral spines with sediment and contact shadow visible beneath; long primary spines point upward and outward."
+    },
+    "daonella-bed": {
+      "status": "candidate-awaiting-human-greenlight",
+      "candidate": "daonella-bed-candidate02.png",
+      "original": "daonella-bed.png",
+      "reviewerNote": "Replace the dark quarried fossil slab with a flat living shell bed fading into pale carbonate sand.",
+      "prompt": "Edit the supplied Daonella slab into a living shell bed: a roughly circular very low patch of thin near-circular finely ribbed valves loose and overlapping at shallow angles on pale carbonate sand, some half-buried and tilted. No dark shale, fossil matrix, cut slab, base, rim, or plinth.",
+      "generatedSource": "/Users/hoai/.codex/generated_images/01a09ac3-37dc-7381-ad26-8d5c8cd87ad6/exec-3c9fc94d-d96a-47c0-8ed7-bf712abce34c.png",
+      "sha256": "8f56e088abb0cd67fd0f65a4b3dc2b65123ab4482f7bdde8c40688eeb8a9d6db",
+      "dimensions": [1254, 1254],
+      "visualReview": "Loose pale valves overlap directly on sand and the circular patch fades into the surrounding seabed without a raised edge."
+    },
+    "encrinus-litter": {
+      "status": "candidate-awaiting-human-greenlight",
+      "candidate": "encrinus-litter-candidate02.png",
+      "original": "encrinus-litter.png",
+      "reviewerNote": "Replace the deep rubble heap with a sparse single-layer decal scatter.",
+      "prompt": "Edit the supplied Encrinus litter into a flat single-layer seafloor scatter: ten to twenty loose columnals plus two or three short stem lengths lying flat and separated on pale sediment, with ample bare ground. No unrelated rubble, stacking, heap, mound, cairn, slab, or container edge.",
+      "generatedSource": "/Users/hoai/.codex/generated_images/01a09ac3-37dc-7381-ad26-8d5c8cd87ad6/exec-9c4a39ca-3aa5-475d-b9d4-09998a8e0469.png",
+      "sha256": "d5bd2d224621a8e21ba51dbf6c312bb91cf07c341becdb55c050e61f91099ada",
+      "dimensions": [1254, 1254],
+      "visualReview": "A sparse single layer of columnals and three short stems lies flat with abundant bare sediment; the former mound and rubble are gone."
+    },
+    "neocalamites": {
+      "status": "candidate-awaiting-human-greenlight",
+      "candidate": "neocalamites-candidate02.png",
+      "original": "neocalamites.png",
+      "reviewerNote": "Keep the accepted horsetail clump but plant it at a ground line with no exposed rhizome or roots.",
+      "prompt": "Edit the supplied Neocalamites into an in-ground plant prop. Preserve the jointed clump, nodes, whorls, and 3-unit proportion; show stems emerging from pale sandy substrate with only slight basal swelling and litter, absolutely no exposed rhizome, roots, or root ball.",
+      "generatedSource": "/Users/hoai/.codex/generated_images/01a09ac3-37dc-7381-ad26-8d5c8cd87ad6/exec-c4f1da9e-6248-420d-a166-988c7f1d6e8d.png",
+      "sha256": "aeb118eefea76e33e606136ee328c28fdcdfdf048912a76431870314c999a947",
+      "dimensions": [1254, 1254],
+      "visualReview": "All stems emerge from sediment at a clear ground line; only basal sheaths and litter remain, with no exposed root system."
+    },
+    "pleuromeia": {
+      "status": "candidate-awaiting-human-greenlight",
+      "candidate": "pleuromeia-candidate02.png",
+      "original": "pleuromeia.png",
+      "reviewerNote": "Keep the accepted trunk, scars, crown, and cone but bury the rhizomorph and remove all free roots.",
+      "prompt": "Edit the supplied Pleuromeia into an in-ground shore-plant prop. Preserve the unbranched scarred trunk, strap-leaf crown, terminal cone, and 2-unit proportion; bury the rhizomorph at a pale sandy ground line and show no exposed spreading roots or root ball.",
+      "generatedSource": "/Users/hoai/.codex/generated_images/01a09ac3-37dc-7381-ad26-8d5c8cd87ad6/exec-4d371a2e-9f24-4406-90ea-0eeb4eb08b0d.png",
+      "sha256": "cdfb2b15f59ade1b43c5e3ce037906aaf4729258fe21dc5112a120c0f21a3e83",
+      "dimensions": [1254, 1254],
+      "visualReview": "The scarred trunk emerges directly from sediment; the rhizomorph and entire root mass are buried while the accepted crown and cone remain."
+    }
+  }
+}
