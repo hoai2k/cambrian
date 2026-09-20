@@ -30,7 +30,10 @@ export type FloraKind = 'vauxia' | 'sac' | 'choia' | 'thalli' | 'tuft' | 'cushio
   // Triassic substrate: the microbial domes of the gypsum flats, the gypsum crust plates beside
   // them, and the laminated mud floor of the black basin. Ground cover rather than growth — they
   // are flora only in the sense that the chunk scatters them and the floor collides with them.
-  | 'stromatolite' | 'saltCrust' | 'mudRipple';
+  | 'stromatolite' | 'saltCrust' | 'mudRipple'
+  // Triassic plants and bottom fauna delivered from the canonical-image/Tripo prop pass.
+  | 'encrinusLitter' | 'daonellaBed' | 'brachiopodCluster' | 'cidaris'
+  | 'neocalamites' | 'pleuromeia' | 'bjuvia';
 /** Driftwood only washes out this far from the shore. */
 export const LOG_SHORE_RANGE = 120;
 

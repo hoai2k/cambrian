@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/props/tripo-raw/daonella-bed/daonella-bed.raw.glb",
+    "bytes": 1534380,
+    "sha256": "445ed5227569adb5e5778656edc8de80f8e5e0355b05df2e7472135877e7df95"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 13179,
+    "faces": 19844,
+    "triangles": 19844,
+    "connected_components": 211,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.5,
+      -0.493829,
+      -0.08343
+    ],
+    "max_xyz": [
+      0.5,
+      0.493829,
+      0.08343
+    ],
+    "center_xyz": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "size_xyz": [
+      1.0,
+      0.987658,
+      0.16686
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_55679608-293e-4fb4-9acf-bd712cac9982",
+      "mesh": "tripo_mesh_55679608-293e-4fb4-9acf-bd712cac9982",
+      "vertices": 13179,
+      "edges": 32812,
+      "faces": 19844,
+      "triangles": 19844,
+      "connected_components": 211,
+      "material_slots": [
+        "tripo_material_55679608-293e-4fb4-9acf-bd712cac9982"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_55679608-293e-4fb4-9acf-bd712cac9982",
+      "image_textures": [
+        "Color_55679608-293e-4fb4-9acf-bd712cac9982",
+        "NormalGL_55679608-293e-4fb4-9acf-bd712cac9982",
+        "ORM_55679608-293e-4fb4-9acf-bd712cac9982"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_55679608-293e-4fb4-9acf-bd712cac9982",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_55679608-293e-4fb4-9acf-bd712cac9982",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_55679608-293e-4fb4-9acf-bd712cac9982",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/props/tripo-raw/daonella-bed/review/side.png",
+    "top": "tools/triassic/props/tripo-raw/daonella-bed/review/top.png",
+    "three-quarter": "tools/triassic/props/tripo-raw/daonella-bed/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-publish/local/triassic-authoring/props/daonella-bed/daonella-bed.preview.glb",
+    "triangle_limit": 6000,
+    "triangles_before": 19844,
+    "triangles_after": 5910,
+    "bytes": 1087496,
+    "sha256": "5c038c0fa7f66048b32a5881b002e1267cdc0fb6d8e735f7d21b5db31e8b82a6"
+  }
+}

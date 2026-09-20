@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/props/tripo-raw/bjuvia/bjuvia.raw.glb",
+    "bytes": 1621880,
+    "sha256": "304a45f33a4ecdbf81ff2ce014733c9358241e8e7567570d76f9442e6e5351f3"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 13458,
+    "faces": 19832,
+    "triangles": 19832,
+    "connected_components": 343,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.488373,
+      -0.5,
+      -0.38309
+    ],
+    "max_xyz": [
+      0.488373,
+      0.5,
+      0.38309
+    ],
+    "center_xyz": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "size_xyz": [
+      0.976746,
+      1.0,
+      0.76618
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_9f7bf125-5318-4e4a-ad99-11354189f005",
+      "mesh": "tripo_mesh_9f7bf125-5318-4e4a-ad99-11354189f005",
+      "vertices": 13458,
+      "edges": 32947,
+      "faces": 19832,
+      "triangles": 19832,
+      "connected_components": 343,
+      "material_slots": [
+        "tripo_material_9f7bf125-5318-4e4a-ad99-11354189f005"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_9f7bf125-5318-4e4a-ad99-11354189f005",
+      "image_textures": [
+        "Color_9f7bf125-5318-4e4a-ad99-11354189f005",
+        "NormalGL_9f7bf125-5318-4e4a-ad99-11354189f005",
+        "ORM_9f7bf125-5318-4e4a-ad99-11354189f005"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_9f7bf125-5318-4e4a-ad99-11354189f005",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_9f7bf125-5318-4e4a-ad99-11354189f005",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_9f7bf125-5318-4e4a-ad99-11354189f005",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/props/tripo-raw/bjuvia/review/side.png",
+    "top": "tools/triassic/props/tripo-raw/bjuvia/review/top.png",
+    "three-quarter": "tools/triassic/props/tripo-raw/bjuvia/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-publish/local/triassic-authoring/props/bjuvia/bjuvia.preview.glb",
+    "triangle_limit": 6000,
+    "triangles_before": 19832,
+    "triangles_after": 5909,
+    "bytes": 1173520,
+    "sha256": "336e6b516d447d9fad71b38508c6c758b183086879b22a41512f624eaa295571"
+  }
+}
