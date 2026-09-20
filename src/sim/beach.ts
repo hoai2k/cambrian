@@ -235,7 +235,7 @@ export function stepBeach(ctx: BeachContext, a: Actor, input: InputFrame, dt: nu
       const h = heading(a.yaw);
       a.dodgeDir = flat > 1e-3 ? { x: d.x / flat, y: 0, z: d.z / flat } : { x: h.x, y: 0, z: h.z };
     }
-    ctx.events.push({ kind: 'beach', pos: { ...a.pos }, actor: a.id, player: a.player, strength: lungs ? 0.6 : 0.4 });
+    ctx.events.push({ kind: lungs ? 'beach' : 'flop', pos: { ...a.pos }, actor: a.id, player: a.player, strength: lungs ? 0.6 : 0.4 });
   }
   if (a.flopT > 0) {
     const L = lengthOf(a);
