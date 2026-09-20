@@ -34,63 +34,200 @@ def at(P,cum,s):
 def smoothpulse(t,a,b,c,d):
  return T.smooth((t-a)/(b-a))*(1-T.smooth((t-c)/(d-c)))
 
+# The resting shape (T3D-24). T3D-01 regenerated this animal **straight** so that its
+# over-curved tail could be rigged at all, and that straight bind pose stays: it is what every
+# clip is authored from, what the roster matrix proves, and what `lag.mjs` measures the jaw cut
+# against. What was missing is that nothing ever put the animal's *shape* back, so the body read
+# as a needle -- in every clip and, because portraits are shot at the bind, on the roster card.
+# The shape belongs in the **clips**, never in the bind: every clip here re-specifies each joint
+# on every frame, so a warped bind pose would show at rest and then flail.
+#
+# A gentle dorsal arch through the shoulders and neck, the head levelled again at the skull, a
+# tail that falls away and bows instead of standing out straight behind, and paddles held off the
+# flank rather than flush with it. The magnitudes are what a thalattosaur would hold in water,
+# not the pose the generation was drawn in -- `review/backup.jpg` bends 1.81x along itself.
+#
+# The preserved backup gets none of this and none of the raised amplitudes: its own geometry is
+# still the curved generation, its skeleton is pose-matched to that curve, and its performance is
+# a preserved artefact, and `askeptosaurus.backup.glb` did not move for this change.
+REST_CHEST=.050                     # shoulders lift, the head end swings down
+REST_NECK=.038                      # per cervical control, four of them
+REST_SKULL=-.088                    # and the skull levels off again, so the snout is not diving
+REST_TAIL_FALL=.040                 # per tail control: the tail hangs away instead of standing out
+REST_TAIL_BOW=.042                  # a standing lateral bow, easing out again at the tip
+REST_LEAN=.045                      # a lateral lean, per trunk and cervical control
+# The wave's phase step is the lever the amplitude is not. Each tail control lags the one in front
+# of it by `WAVE_STEP`, so twelve of them carry `12*WAVE_STEP` radians of wave: at the .62 a first
+# pass reached for, that is more than a whole wavelength on the tail and the joints' contributions
+# to the tip **cancel** -- the same amplitude that reads as a swimming animal at .40 moves the tail
+# tip 1.1 % of a body at .62. Tune this against `motion` in `validation.json`, never by eye.
+WAVE_STEP=.40
+WAVE_VERT=.26                       # the dorsoventral share of the lateral wave, a quarter beat behind
+REST_FORE=(-.18,.12)                # paddles: (swept back along the flank, blade held off the body)
+REST_HIND=(-.14,.09)
+
+# **Every clip is posed for what that clip is doing.** One resting curve stamped under all
+# twenty-four as a constant offset is the same mistake as no curve at all, one step along: an
+# idling animal holds itself differently from one turning, diving, rising, feeding, bracing or
+# dead, and on a body that is two thirds tail that difference has to run through the whole length
+# rather than being a tail waggle on a straight trunk. So a clip names a **held shape** and the
+# wave rides on that.
+#
+# The numbers are multipliers on the resting constants above, so `Idle` is the shape everything
+# else is a departure from and each row reads as what it changes:
+#   arch   the dorsal arch through the chest and the four cervicals
+#   head   the skull's own levelling (negative lifts the snout out of the neck's dip)
+#   fall   how far the tail hangs away behind
+#   bow    the standing lateral bow through the middle of the tail; negative bows the other way
+#   lean   a lateral lean through trunk, neck and tail -- a turn is one long C, signed
+#   pitch  the body's attitude in the water, radians, nose-down positive
+#   sweep  the paddles along the flank; **negative brings them forward**, which is a brace
+#   lift   the blades off the body
+BASE=dict(arch=1.,head=1.,fall=1.,bow=1.,lean=0.,pitch=0.,sweep=1.,lift=1.)
+HOLD={
+ 'Idle':{},                                                          # the hold everything is measured from
+ 'Swim':dict(arch=.80,fall=.80,bow=.50,sweep=1.30,lift=.70),         # travelling: straighter, paddles laid back
+ 'Sprint':dict(arch=.55,fall=.60,bow=.20,sweep=1.55,lift=.50,pitch=-.02),
+ 'Guard':dict(arch=1.50,head=1.40,fall=1.30,bow=1.30,sweep=-.60,lift=1.55),   # gathered over a humped shoulder
+ 'Eat':dict(arch=.45,head=1.90,fall=1.25,bow=.80,pitch=.10,sweep=.40,lift=1.20),  # reaching down over the food
+ 'Grab':dict(arch=1.20,head=1.55,fall=1.15,bow=.60,sweep=-.30,lift=1.35),     # braced, neck level, tail stiff
+ 'TurnLeft':dict(lean=1.,arch=.90,bow=1.60,fall=.85),                # one long C through the whole animal
+ 'TurnRight':dict(lean=-1.,arch=.90,bow=-1.60,fall=.85),
+ 'Dive':dict(arch=1.35,head=1.70,fall=.30,pitch=.10,lift=1.30),      # nose down, tail carried high behind
+ 'Rise':dict(arch=.30,head=-.70,fall=1.50,pitch=-.10,lift=.70),      # and its mirror
+ 'Breath':dict(arch=.40,head=-.40,fall=1.30,pitch=-.06,lift=.80),
+ 'Growth':dict(arch=.50,head=.40,fall=.70,bow=.40,pitch=-.03),       # the body lengthening out
+}
+# Shapes a clip passes *through*. An attack is the body gathering and then extending -- a strike
+# that moves the head on a still trunk is the fault this file was opened for, one clip along.
+GATHER=dict(arch=1.60,head=1.40,fall=1.40,bow=1.50,sweep=-.80,lift=1.50)
+EXTEND=dict(arch=.35,head=.50,fall=.45,bow=.25,sweep=1.60,lift=.60,pitch=.02)
+BRACE=dict(arch=1.40,fall=1.25,bow=1.40,sweep=-.50,lift=1.40)        # set against the tail's own swing
+RECOIL=dict(arch=1.70,head=.30,fall=1.60,bow=1.50,sweep=-1.00,lift=1.55,pitch=-.05)
+STREAK=dict(arch=.35,head=.50,fall=.35,bow=.10,sweep=1.60,lift=.40)  # everything laid in along the axis
+SLACK=dict(arch=.15,head=.20,fall=2.20,bow=.60,sweep=-.40,lift=.20,pitch=.06)
+
+def mix(a,b,u):
+ """Toward the named shape by `u`. `b` names only what it changes; the rest of `a` stands."""
+ return {k:a[k]+(b.get(k,a[k])-a[k])*u for k in a}
+
+def holdfor(clip,t,e,strike,whip,coil,relax):
+ """The held shape this clip is in at this phase. Static for the loops, moving for the acts."""
+ h=dict(BASE);h.update(HOLD.get(clip,{}))
+ if clip in ('Attack','Bite'):
+  h=mix(h,GATHER,smoothpulse(t,0,.14,.18,.34));h=mix(h,EXTEND,strike)
+ if clip in ('Heavy','TailWhip'):h=mix(h,BRACE,e);h['lean']-=1.1*whip
+ if clip in ('Ability','Coil'):h=mix(h,GATHER,coil);h['lean']+=.9*coil
+ if clip in ('Hit','Stagger'):h=mix(h,RECOIL,e)
+ if clip in ('Dodge','Dash'):h=mix(h,STREAK,e)
+ if clip=='Parry':h=mix(h,GATHER,e)
+ if clip=='Death':h=mix(h,SLACK,relax)
+ return h
+
+def restpose(pb,h):
+ """Lay the held shape on the rig. Applied after `reset()` on every frame of every clip."""
+ pb['body'].rotation_euler.x=h['pitch']
+ pb['chest'].rotation_euler.x=REST_CHEST*h['arch'];pb['chest'].rotation_euler.z=REST_LEAN*h['lean']
+ for n in NECK:
+  pb[n].rotation_euler.x=REST_NECK*h['arch'];pb[n].rotation_euler.z=REST_LEAN*h['lean']*.70
+ pb['skull'].rotation_euler.x=REST_SKULL*h['head']
+ for i,n in enumerate(TAIL):
+  u=i/11.
+  pb[n].rotation_euler.x=-REST_TAIL_FALL*(.45+.55*u)*h['fall']
+  pb[n].rotation_euler.z=REST_TAIL_BOW*math.sin(math.pi*min(1.,u*1.15))*h['bow']+REST_LEAN*h['lean']*.55
+ for kind,(sweep,lift) in (('fore',REST_FORE),('hind',REST_HIND)):
+  for side,sg in (('L',-1),('R',1)):
+   pb[kind+'_upper_'+side].rotation_euler.z=sg*sweep*h['sweep']
+   pb[kind+'_upper_'+side].rotation_euler.y=sg*lift*h['lift']
+   pb[kind+'_mid_'+side].rotation_euler.z=sg*sweep*h['sweep']*.45
+   pb[kind+'_tip_'+side].rotation_euler.z=sg*sweep*h['sweep']*.30
+
+def heldshape(h):
+ """The held shape as the absolute radians a reviewer can read, beside the multipliers."""
+ return {**{k:round(v,4) for k,v in h.items()},
+ 'trunkArchTotalRadians':round(REST_CHEST*h['arch']+REST_NECK*len(NECK)*h['arch']+REST_SKULL*h['head'],4),
+ 'tailFallTotalRadians':round(sum(-REST_TAIL_FALL*(.45+.55*i/11.)*h['fall'] for i in range(12)),4),
+ 'trunkLeanTotalRadians':round(REST_LEAN*h['lean']*(1+.70*len(NECK))+REST_LEAN*h['lean']*.55*12,4),
+ 'forePaddleSweepRadians':round(REST_FORE[0]*h['sweep'],4)}
+
 def animate(rig,backup=False):
- scene=bpy.context.scene;scene.render.fps=30;rig.animation_data_create();seams={}
+ scene=bpy.context.scene;scene.render.fps=30;rig.animation_data_create();seams={};holds={}
  for p in rig.pose.bones:p.rotation_mode='XYZ'
  def reset():
   for p in rig.pose.bones:p.rotation_euler=(0,0,0);p.location=(0,0,0);p.scale=(1,1,1)
  for clip,duration in CLIPS.items():
   action=bpy.data.actions.new(clip);action.use_fake_user=True;rig.animation_data.action=action
-  end=round(duration*30);first=None
+  end=round(duration*30);first=None;shapes={}
   for f in range(end+1):
    t=f/end;p=math.tau*t;reset();pb=rig.pose.bones;e=math.sin(math.pi*t)**2
+   strike=smoothpulse(t,.10,.30,.42,.80);relax=T.smooth(t/.8)
+   whip=-.18*smoothpulse(t,.05,.22,.27,.43)+.30*smoothpulse(t,.28,.42,.50,.80)
+   coil=smoothpulse(t,.03,.32,.54,.96)
+   if not backup:
+    h=holdfor(clip,t,e,strike,whip,coil,relax);restpose(pb,h)
+    if f in (0,end//2,end):shapes[{0:'start',end//2:'mid',end:'end'}[f]]=heldshape(h)
    # One traveling wave down the long tail. The head counter-steers, keeping the jaw steady.
-   amp={'Idle':.008,'Swim':.075,'Sprint':.12,'Guard':.016,'Eat':.022,'Grab':.022}.get(clip,.035*e)
-   if backup:amp*=.7
-   for i,n in enumerate(TAIL):pb[n].rotation_euler.z=amp*(.30+.70*i/11)*math.sin(p-i*.50)
-   pb['body'].rotation_euler.z=amp*.08*math.sin(p+.8)
-   pb['chest'].rotation_euler.z=-amp*.08*math.sin(p+.8)
-   jaw=0.;strike=smoothpulse(t,.10,.30,.42,.80)
+   # An anguilliform body's travel grows toward the tip rather than rising linearly from a third
+   # of it, and the tail does not stay in one plane: a smaller dorsoventral component a quarter
+   # beat behind the lateral one carries the tip round a flattened ellipse. Lateral is what a
+   # thalattosaur swims with and stays the larger of the two by about four to one.
+   if backup:
+    amp=.7*{'Idle':.008,'Swim':.075,'Sprint':.12,'Guard':.016,'Eat':.022,'Grab':.022}.get(clip,.035*e)
+    for i,n in enumerate(TAIL):pb[n].rotation_euler.z=amp*(.30+.70*i/11)*math.sin(p-i*.50)
+   else:
+    # `Idle` used to carry .008 rad here -- a quarter of a degree -- so an idling animal in water
+    # was a rigid rod. Nothing on this list is below a degree of travel at the tail root now.
+    amp={'Idle':.030,'Swim':.097,'Sprint':.142,'Guard':.027,'Eat':.036,'Grab':.034}.get(clip,.050*e)
+    for i,n in enumerate(TAIL):
+     grow=.45+.55*(i/11.)**1.2
+     pb[n].rotation_euler.z+=amp*grow*math.sin(p-i*WAVE_STEP)
+     pb[n].rotation_euler.x+=WAVE_VERT*amp*grow*math.sin(p-i*WAVE_STEP-1.15)
+    for i,n in enumerate(NECK):pb[n].rotation_euler.z+=-amp*.12*math.sin(p+.9)
+    if clip=='Idle':
+     # A hovering animal is never still: it tips and rolls slowly in the water around the beat.
+     pb['body'].rotation_euler.x+=.016*math.sin(p)
+     pb['body'].rotation_euler.y+=.026*math.sin(p+2.1)
+   pb['body'].rotation_euler.z+=amp*.08*math.sin(p+.8)
+   pb['chest'].rotation_euler.z+=-amp*.08*math.sin(p+.8)
+   jaw=0.
    if clip in ('Attack','Bite'):
     jaw=(.26 if clip=='Bite' else .29)*smoothpulse(t,.08,.28,.36,.62)
     pb['body'].location.y=SCALE*(.012*smoothpulse(t,0,.15,.20,.36)-(.036 if clip=='Attack' else .010)*strike)
-    for i,n in enumerate(NECK):pb[n].rotation_euler.x=-.022*strike
+    for i,n in enumerate(NECK):pb[n].rotation_euler.x+=-.022*strike
    if clip in ('Heavy','TailWhip'):
-    whip=-.18*smoothpulse(t,.05,.22,.27,.43)+.30*smoothpulse(t,.28,.42,.50,.80)
     for i,n in enumerate(TAIL):pb[n].rotation_euler.z+=whip*(.50+.50*i/11)
-    pb['body'].rotation_euler.z=-.22*whip;pb['chest'].rotation_euler.z=.16*whip
+    pb['body'].rotation_euler.z+=-.22*whip;pb['chest'].rotation_euler.z+=.16*whip
    if clip in ('Ability','Coil'):
-    coil=smoothpulse(t,.03,.32,.54,.96)
     for i,n in enumerate(TAIL):pb[n].rotation_euler.z+=.20*coil
-    for n in NECK:pb[n].rotation_euler.z=-.065*coil
-    pb['body'].rotation_euler.z=.38*coil;pb['chest'].rotation_euler.z=-.18*coil
+    for n in NECK:pb[n].rotation_euler.z+=-.065*coil
+    pb['body'].rotation_euler.z+=.38*coil;pb['chest'].rotation_euler.z+=-.18*coil
    if clip in ('TurnLeft','TurnRight'):
     sg=1 if clip=='TurnLeft' else -1
-    pb['body'].rotation_euler.z=sg*.15*e;pb['body'].rotation_euler.y=sg*.10*e
+    pb['body'].rotation_euler.z+=sg*.15*e;pb['body'].rotation_euler.y+=sg*.10*e
     for i,n in enumerate(TAIL):pb[n].rotation_euler.z+=sg*.035*e
     for n in NECK:pb[n].rotation_euler.z-=sg*.035*e
    if clip in ('Dive','Rise','Breath'):
     sg=1 if clip=='Dive' else -1
-    pb['body'].rotation_euler.x=sg*(.12 if clip!='Breath' else .08)*e
-    for n in NECK:pb[n].rotation_euler.x=sg*.025*e
+    pb['body'].rotation_euler.x+=sg*(.12 if clip!='Breath' else .08)*e
+    for n in NECK:pb[n].rotation_euler.x+=sg*.025*e
    if clip in ('Dodge','Dash'):
     pb['body'].location.y=-SCALE*.055*strike
-    pb['body'].rotation_euler.y=(.30 if clip=='Dodge' else .025)*e
+    pb['body'].rotation_euler.y+=(.30 if clip=='Dodge' else .025)*e
     for i,n in enumerate(TAIL):pb[n].rotation_euler.z+=.10*e*math.sin(p*2-i*.55)
    if clip in ('Hit','Stagger'):
-    pb['body'].rotation_euler.z=(.16 if clip=='Hit' else .26)*e*math.sin(p*2)
-    pb['body'].rotation_euler.x=.12*e*math.sin(p*3)
+    pb['body'].rotation_euler.z+=(.16 if clip=='Hit' else .26)*e*math.sin(p*2)
+    pb['body'].rotation_euler.x+=.12*e*math.sin(p*3)
    if clip=='Death':
-    relax=T.smooth(t/.8);pb['body'].rotation_euler.y=1.15*relax;pb['body'].rotation_euler.x=.1*relax;jaw=.10*relax
-    for n in TAIL:pb[n].rotation_euler.z=.04*relax
-   if clip=='Parry':pb['body'].rotation_euler.z=.17*e;pb['chest'].rotation_euler.z=-.13*e
-   if clip=='Eat':jaw=.13*(.5-.5*math.cos(p*2));pb['chest'].rotation_euler.x=.015*math.sin(p)
+    pb['body'].rotation_euler.y+=1.15*relax;pb['body'].rotation_euler.x+=.1*relax;jaw=.10*relax
+    for n in TAIL:pb[n].rotation_euler.z+=.04*relax
+   if clip=='Parry':pb['body'].rotation_euler.z+=.17*e;pb['chest'].rotation_euler.z+=-.13*e
+   if clip=='Eat':jaw=.13*(.5-.5*math.cos(p*2));pb['chest'].rotation_euler.x+=.015*math.sin(p)
    if clip=='Grab':
-    jaw=.12+.018*math.sin(p);pb['chest'].rotation_euler.x=.025*math.sin(p)
-    for n in NECK:pb[n].rotation_euler.x=.014*math.sin(p)
+    jaw=.12+.018*math.sin(p);pb['chest'].rotation_euler.x+=.025*math.sin(p)
+    for n in NECK:pb[n].rotation_euler.x+=.014*math.sin(p)
    if clip=='Growth':
-    pb['body'].rotation_euler.x=-.05*e
-    for n in NECK:pb[n].rotation_euler.x=-.03*e
+    pb['body'].rotation_euler.x+=-.05*e
+    for n in NECK:pb[n].rotation_euler.x+=-.03*e
    pb['jaw'].rotation_euler.x=jaw
    for kind in ('fore','hind'):
     for side,sg in [('L',-1),('R',1)]:
@@ -103,10 +240,10 @@ def animate(rig,backup=False):
      if clip=='Parry':stroke+=.28*e
      if clip=='Growth':stroke-=.16*e
      if clip=='Death':stroke=.23*T.smooth(t/.8)
-     pb[n].rotation_euler.z=sg*stroke
-     pb[n].rotation_euler.y=sg*.18*stroke
-     pb[kind+'_mid_'+side].rotation_euler.z=sg*.24*stroke
-     pb[kind+'_tip_'+side].rotation_euler.y=sg*.30*stroke
+     pb[n].rotation_euler.z+=sg*stroke
+     pb[n].rotation_euler.y+=sg*.18*stroke
+     pb[kind+'_mid_'+side].rotation_euler.z+=sg*.24*stroke
+     pb[kind+'_tip_'+side].rotation_euler.y+=sg*.30*stroke
    # The curled backup has less safe bend range than the new straight body.
    if backup and clip in ('Heavy','TailWhip','Ability','Coil'):
     for q in pb:q.rotation_euler=tuple(v*.28 for v in q.rotation_euler)
@@ -116,10 +253,59 @@ def animate(rig,backup=False):
    for q in pb:
     if q.name!='root':q.keyframe_insert('rotation_euler',frame=f)
     if q.name=='body':q.keyframe_insert('location',frame=f)
+  holds[clip]=shapes
   rig.animation_data.action=None
  for name in LOOPS:assert seams[name]<1e-6,(name,seams[name])
+ if not backup:
+  # The held shapes must actually differ, clip by clip -- that is the whole point of the table.
+  key=lambda c:json.dumps(holds[c]['start'],sort_keys=True)
+  named=['Idle','Swim','Sprint','Guard','Eat','Grab','TurnLeft','TurnRight','Dive','Rise']
+  assert len({key(c) for c in named})==len(named),[c for c in named]
+  for c in ('Attack','Bite','Heavy','Ability','Hit','Dodge','Death','Parry'):
+   assert holds[c]['start']!=holds[c]['mid'],(c,'an act must move through its shape')
  reset();scene.frame_set(0)
- return seams
+ return seams,holds
+
+def measure(rig,backup=False):
+ """"It moves" as a number, read back off the keyed actions rather than off the formulas.
+
+ The swept angle is a joint's own peak-to-peak rotation over the clip -- the same figure the
+ limbed swimmers record at their limb roots -- and the travel is how far a point at the far end
+ of a joint actually gets, in body lengths. `Idle` at .008 rad of yaw was the fault this file was
+ opened for, so the floors below are asserted rather than reported.
+ """
+ scene=bpy.context.scene;out={};tips=('tail_11','skull','fore_upper_L')
+ for clip in CLIPS:
+  action=bpy.data.actions[clip];rig.animation_data.action=action
+  if getattr(action,'slots',None):rig.animation_data.action_slot=action.slots[0]
+  end=round(CLIPS[clip]*30);rot={};pos={n:[] for n in tips}
+  for f in range(end+1):
+   scene.frame_set(f);bpy.context.view_layer.update()
+   for q in rig.pose.bones:rot.setdefault(q.name,[]).append(tuple(q.rotation_euler))
+   for n in tips:pos[n].append(np.array(rig.pose.bones[n].tail[:]))
+  swept=lambda n:[float(max(r[k] for r in rot[n])-min(r[k] for r in rot[n])) for k in range(3)]
+  travel=lambda n:float(max(np.linalg.norm(a-b) for a in pos[n] for b in pos[n]))/SCALE
+  out[clip]={'tailChainYawSweptRadians':float(sum(swept(n)[2] for n in TAIL)),
+  'tailChainPitchSweptRadians':float(sum(swept(n)[0] for n in TAIL)),
+  'tailRootSweptRadians':swept('tail_00'),'tailTipSweptRadians':swept('tail_11'),
+  'neckYawSweptRadians':float(sum(swept(n)[2] for n in NECK)),
+  'foreLimbSweptRadians':swept('fore_upper_L'),'hindLimbSweptRadians':swept('hind_upper_L'),
+  'jawSweptRadians':swept('jaw')[0],
+  'tailTipTravel':travel('tail_11'),'skullTravel':travel('skull'),'forePaddleTravel':travel('fore_upper_L')}
+ # Clearing the action does **not** clear the pose, and the rig has just been stepped through
+ # twenty-four clips: left posed, the mesh the exporter evaluates for normals is the posed one
+ # and the split-vertex count comes out different from an untouched build. Put it back at rest.
+ rig.animation_data.action=None
+ for q in rig.pose.bones:q.rotation_euler=(0,0,0);q.location=(0,0,0);q.scale=(1,1,1)
+ scene.frame_set(0);bpy.context.view_layer.update()
+ if not backup:
+  for clip,row in out.items():
+   assert row['tailTipTravel']>.04,(clip,row['tailTipTravel'])
+   assert row['tailChainYawSweptRadians']>.12,(clip,row['tailChainYawSweptRadians'])
+  assert out['Idle']['tailTipTravel']>.04,out['Idle']['tailTipTravel']
+  assert out['Swim']['tailTipTravel']>.12,out['Swim']['tailTipTravel']
+  assert out['Sprint']['tailTipTravel']>out['Swim']['tailTipTravel'],'Sprint must out-travel Swim'
+ return out
 
 def backup_axis(o):
  # The old source's geometric double sweep ends on a forepaddle, not its snout. The true snout
@@ -277,7 +463,7 @@ def build(backup=False):
  'anchor_mouth_inside':('skull',(cx(hinge-.015),hinge-.015,seam(hinge-.015)),'swallow'),
  'anchor_attack_primary':('skull',(cx(front+.002),front+.002,seam(front+.002)),'attack')}
  anchors=[{'name':n,'bone':b,'point':list(tx(p)),'role':r} for n,(b,p,r) in anchorpts.items()]
- seams=animate(rig,backup);sockets=T.make_sockets(rig,anchors)
+ seams,holds=animate(rig,backup);motion=measure(rig,backup);sockets=T.make_sockets(rig,anchors)
  tri=lambda o:sum(len(p.vertices)-2 for p in o.data.polygons)
  reports=[]
  for idx,group in enumerate(groups):
@@ -290,7 +476,7 @@ def build(backup=False):
  report={'id':ID,'backup':backup,'intake':intake,'sourceAlbedoSha256':albedo_sha,'frame':frame,'bones':len(B),'boneNames':list(B),
  'limbs':{k:{'points':[list(p) for p in v['P']],'radius':v['radius']} for k,v in limb_defs.items()},
  'hipFraction':hip/AC[-1],'tailFraction':1-hip/AC[-1],'mouth':{'hingeY':hinge,'lip':lip,'throatCaps':caps,'maxGapeRadians':.29},
- 'models':reports,'clips':CLIPS,'looping':LOOPS,'loopSeams':seams,'anchors':anchors,'maxInfluences':4,'rootStable':True,'noScaleChannels':True,**twin_report}
+ 'models':reports,'clips':CLIPS,'looping':LOOPS,'loopSeams':seams,'motion':motion,'heldShape':holds,'restingShape':({} if backup else {'appliesTo':'clips only; the bind pose is unchanged','note':'unit values; every clip scales them by its own row in heldShape','chestArchRadians':REST_CHEST,'neckArchRadiansPerJoint':REST_NECK,'neckJoints':len(NECK),'skullLevellingRadians':REST_SKULL,'tailFallRadiansPerJoint':REST_TAIL_FALL,'tailBowRadians':REST_TAIL_BOW,'leanRadiansPerJoint':REST_LEAN,'foreLimbSetRadians':list(REST_FORE),'hindLimbSetRadians':list(REST_HIND),'waveStep':WAVE_STEP,'waveVerticalShare':WAVE_VERT}),'anchors':anchors,'maxInfluences':4,'rootStable':True,'noScaleChannels':True,**twin_report}
  if not backup:
   shutil.copyfile(OUT/(ID+'.puppet.glb'),OUT/(ID+'.lod1.glb'))
   profile,worst=T.paired_profile(groups[0],groups[1],(Y0+.01)*SCALE,(Y1-.01)*SCALE,.04*SCALE)

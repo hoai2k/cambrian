@@ -140,4 +140,14 @@ See [the build and validation record](../../tools/triassic/creatures/askeptosaur
 [paired audit](../../tools/triassic/creatures/askeptosaurus/paired-audit.json), and
 [review images](../../tools/triassic/creatures/askeptosaurus/review/).
 
+## Pose follow-up · 20 September 2026 (T3D-24)
+
+The straight regeneration was the right call and stands. What it left behind is that the straight
+*modelling* pose became the pose the animal was seen in: every clip rode on it and every portrait
+was shot at it, so the roster card was a needle with four spines and `Idle` carried a quarter of a
+degree of tail yaw. The animal's curvature is now authored as **pose, in the clips**, the bind is
+untouched, the clip amplitudes and the wave's phase step are re-tuned and measured into
+`validation.json`, and the cards are shot from a posed frame. See the builder's README and
+`docs/triassic/3d-work-status.md` T3D-24.
+
 The preceding September 15 analysis is retained as the historical diagnosis, not current work.
