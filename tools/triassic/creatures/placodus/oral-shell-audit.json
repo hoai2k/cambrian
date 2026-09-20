@@ -1,10 +1,11 @@
 {
   "id": "placodus",
-  "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present.",
+  "verdict": "separate closed rigid palate/floor",
+  "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present. A body with no lining mesh is reported as such, with the hidden oral parts it does carry listed, and all three variants must agree.",
   "models": [
     {
       "variant": "authored",
-      "sha256": "56c8fc5b4cf0df8902a08fa5a6b4ad43749f20e722678ed01b33fb528130e0c1",
+      "sha256": "dd7a75f9ddc2cb1547ba935d1e3a255eebe31a3b1de13d630bb383291a98e874",
       "meshes": [
         {
           "name": "Oral cavity lining",
@@ -17,11 +18,13 @@
           "mixedVertices": 0,
           "bridgingTriangles": 0
         }
-      ]
+      ],
+      "otherOralMeshes": [],
+      "oralShells": "separate palate and floor"
     },
     {
       "variant": ".puppet",
-      "sha256": "dfa2a3408ba659f83f81f32598435671c93d5532b6f401fd2df9d284fcacb650",
+      "sha256": "70a2056adec7a3db56f1a45fcb2ef35d44c2d4039a5d918bc0d4994d14e69ff9",
       "meshes": [
         {
           "name": "Oral cavity lining",
@@ -34,11 +37,13 @@
           "mixedVertices": 0,
           "bridgingTriangles": 0
         }
-      ]
+      ],
+      "otherOralMeshes": [],
+      "oralShells": "separate palate and floor"
     },
     {
       "variant": ".lod1",
-      "sha256": "dfa2a3408ba659f83f81f32598435671c93d5532b6f401fd2df9d284fcacb650",
+      "sha256": "70a2056adec7a3db56f1a45fcb2ef35d44c2d4039a5d918bc0d4994d14e69ff9",
       "meshes": [
         {
           "name": "Oral cavity lining",
@@ -51,7 +56,9 @@
           "mixedVertices": 0,
           "bridgingTriangles": 0
         }
-      ]
+      ],
+      "otherOralMeshes": [],
+      "oralShells": "separate palate and floor"
     }
   ]
 }
