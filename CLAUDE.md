@@ -43,6 +43,25 @@ unless the user explicitly asks for a PR. Steps:
   as median ones — so a seated root follows the flank when the tail bends. Cheirolepis V2 shipped
   every fin root at or outside the surface (pectoral +0.07, pelvic +0.31, dorsal and anal trailing
   bases +0.17/+0.26) and read as fins floating beside the body; the reference's mottling hid it.
+- **A paddle's root is a band and a depth, never the one vertex nearest the axis.** `T.thin_clusters`
+  reports a blade's `seat` as the single thin-shell vertex with the smallest radial distance from
+  the centreline, and which vertex that is on a broad base is decided by a few thousandths: on
+  Cartorhynchus it was the trailing corner of the left paddle and the leading corner of the right,
+  0.105 of a body apart on a pair whose clusters mirror to 0.03. `T.seat` then walks a root inwards
+  "until it is 0.016 inside the skin", and the depth it reads is whatever surface is nearest — the
+  blade's own thick base on one side, the flank on the other — so the two roots also ended at
+  different depths (x −0.075 against 0.046). Everything downstream inherited it: the right polyline
+  started in the chest, its 99th-percentile radius grew to reach a blade it no longer ran through,
+  and the right blade's rigid-fit residual in `Sprint` was 3.2 % of L against the left's 2.2 % on
+  identical swept angles. Seat a paired limb from the cluster's innermost *band* in the trunk's
+  **section** metric (Cheirolepis' `depth()`) and carry it a fixed fraction of the section in
+  (`E_BAND`/`E_SEAT` in Cartorhynchus' builder), then check the margin. And the depth is a lever:
+  the stroke is angles at the root, a root nearer the flank is a shorter arm and a smaller stroke,
+  and the paired audit's "paddles out-travel the tail" bar was set on whatever depth the old walk
+  happened to give — seat to a fraction, not to the margin. Skin 3.72x → 2.98x on that change alone.
+  A measurement is also of a *file*: T3D-17 measured Cartorhynchus' gape leak (29–51 px at the
+  commissure) on the file from before T3D-15's jaw junction landed two hours later, which closed
+  it (0 px on all six opening clips); a sweep should name the commit or hash it measured.
 - The creature builders are Blender 5.2 Python and the version is not a detail: the glTF
   exporter's `export_vertex_color='NAME'` is a 5.x option that 4.x does not have at all, so a 4.x
   Blender will sculpt, shade and rig a creature and then fail on the export. `npm run blender`

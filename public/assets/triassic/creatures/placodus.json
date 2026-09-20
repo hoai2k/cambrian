@@ -57,7 +57,7 @@
     "The ventral gastral basket is a separate rigid part on its own unanimated bone, as the design asks; the skin it is cut from is put on the trunk bone at the seam so the cut cannot open.",
     "Same rest rig, inverse binds, sockets and all 25 action sample arrays for authored body and puppet. The LOD keeps every clip.",
     "Original albedo retained with white COLOR_0; normal relief limited to 0.15 and skin explicitly nonmetallic at roughness 0.7. Puppet pigment samples triangle-local UVs to avoid seam bleed.",
-    "Swim and Sprint are tail-driven: a travelling wave down the trunk and tail with the limbs folded back and only steering. Crawl is the bottom-walk punt - a short shove from both pairs, a long float, then the reach for the next contact.",
+    "Swim is tail-driven, as the research reads this ballasted bottom-walker: a travelling wave down the trunk and tail with the short limbs trailing and only steering. Sprint, the burst, paddles over that same tail wave - the webbed feet row from stretched forward to swept back, hind pair a third of a beat behind - because a limbed swimmer's dash has to paddle and a burst on webbed feet is a stroke. Crawl is the bottom-walk punt - a short shove from both pairs, a long float, then the reach for the next contact.",
     "Living colours, soft tissues and movements are artistic reconstruction. Ability is the roster crush bite at its 0.9 s duration; CrushBite is the longer feeding version, Pry the incisors levering a shell, Breathe the settled surface loop. Locomotor translation remains engine-owned."
   ]
 }
