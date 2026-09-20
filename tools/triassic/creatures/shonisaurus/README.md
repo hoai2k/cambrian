@@ -22,7 +22,7 @@ The puppet is rebuilt from measured profiles rather than decimation. Interior ra
 
 The thin projection beneath the snout in the three-quarter hero is the far right pectoral flipper seen edge-on. A visibility isolation in `chin-projection-review.jpg` confirms that hiding only `Puppet pectoral R` removes it; the isolated mouth underside has no hanging geometry.
 
-The mouth has a hinged lower jaw, upper palate, mandibular floor, throat and cheeks, with separate upper and lower tooth rows. The original lip rims and small source tooth forms remain. The seated eye globes have dark pupils and muted bronze irises. Soft tissue, pigment and motion are artistic/inferred features of this reconstruction.
+The mouth has a hinged lower jaw and no authored geometry inside it (see the 20 September note below): the original lip rims and small source tooth forms are what is drawn. The seated eye globes have dark pupils and muted bronze irises, placed where the albedo paints the eyes. Soft tissue, pigment and motion are artistic/inferred features of this reconstruction.
 
 ## Rig and performance
 
@@ -73,6 +73,49 @@ The triangular starbursts came from interpolating the source albedo through vert
 `packaged-mouth-review.jpg` is rendered from the decoded shipped GLBs, with backface transparency explicitly enforcing the skin's single-sided culling. It includes both sides in closed Idle and open Heavy, plus Bite/Eat closeups locally. Root independently reviewed the live viewer with its normal single-sided display: authored Idle at 0.5 seconds and Heavy at exactly 0.35 seconds, zoomed flank plus side and frontal mouth. No disappearing or inverted lip triangles were seen; the oral interior remained present and the pigmentation was smooth without the previous starbursts.
 
 Source lip/teeth irregularity and the inferred oral meshes remain visible at extreme close range; this work does not claim a new oral anatomy reconstruction. The external inversion regression is resolved. The earlier source, bad closed baseline, and controlled material frames remain under `local/triassic-authoring/shonisaurus/lip-material-fix/`.
+
+## No oral geometry, and the eyes seated where they are painted — 20 September 2026
+
+The owner's two notes on this animal were that the eyes should move slightly forward and slightly
+up, and that it needs no mouth geometry added. Both are now in `build.py`.
+
+**No oral geometry.** The palate, floor, throat-and-cheeks tube and two rows of conical teeth that
+used to be authored inside the mouth are gone. They were invented shape inside a Tripo body whose
+mouth is closed at rest, and the mouth rule's first question is whether a mouth needs filling at
+all: this one does not. `tools/triassic/gape-solid.py` at full gape (Heavy@0.35, Bite@0.3,
+Attack@0.5), against a saturated backdrop with every backface culled, counts **4 px** of backdrop
+seen through the body with the old oral parts present and **6 px** without them, against a
+tolerance of 12; the other two shots are 0 both ways. What did change is the count of backdrop
+pixels the cull *opens* that are not enclosed by the silhouette — 129 to 1,863 on Heavy — which is
+the roof of the open mouth seen from above the lip line: its normals face down into the mouth, so
+from above-and-side a single-sided renderer culls it and the top of the skull behind it. The
+runtime already showed exactly that, because `Oral palate` was the one part the oral classifier
+hid in the game, so nothing a player sees has got worse; the floor, throat and teeth the game *was*
+drawing were the mouthful the rule is about. `package-audit.mjs` now refuses any node, mesh or
+material `src/shared/oral-geometry.ts` would match, and `validation.json` records
+`oralGeometry: "none"`. `anchor_mouth`, `anchor_mouth_inside` and `anchor_attack_primary` are
+unchanged, and so are all 21 clips: the paired audit reports exact rig, clip and socket parity.
+
+**The eyes.** The globes were typed at raw (±0.0512, 0.337, 0.014). The albedo paints the eye
+elsewhere: the darkest patch of each flank *above* the lip line — the lip is darker still, and the
+first read of this albedo found the mouth — sits at (−0.0498, 0.3417, 0.0237) and
+(0.0466, 0.3460, 0.0235), so the globes were 0.011 and 0.014 raw behind and below their own
+sockets. Each globe is now placed at the nearest skin point to its painted centre, inset
+`EYE_INSET` = 0.0025 under the skin along the area-averaged skin normal, with the iris and pupil
+facing that normal; the seat follows the surface rather than the old seat's x. The move is
+**+2.1 % / +4.1 % of head length forward and +5.3 % / +5.2 % up** (left / right), and 1.5 % / 3.3 %
+inboard because the head narrows there. Seat before and after, from `build-report.json` and
+`validation.json` (`eyes`): centre-to-skin −0.0027 / −0.0021 raw (inside) before, −0.0022 / −0.0022
+after; fraction of the globe's surface under the skin 67 % / 59 % before, 77 % / 81 % after;
+`deformation-validation.json` samples the globe's volume inside the head as well. Distance from the
+globe centre to the painted centre: 0.0108 / 0.0139 before, 0.0017 / 0.0022 after. Both moves are
+bounded by assertions in the builder (forward and up by 0.002–0.012 raw, centre 0.0015–0.004 inside
+the skin, at least half the surface under it), so a redelivered albedo that puts the eye somewhere
+else fails the build rather than moving the eye somewhere odd.
+`docs/triassic/throat-repairs/shonisaurus-eyes-before.png` and `-after.png` are the same two
+cameras on the shipped file before and after (`tools/triassic/head-views.py`).
+
+Skin: 1.44x before and after (`skin-tears.mjs`, 0 of 21 clips past 2x); every joint owns skin.
 
 ## Reproduction
 

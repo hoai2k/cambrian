@@ -125,3 +125,13 @@ views, fresh portraits, cap-regression correction and the exact-frame Coelophysi
 review. That last review distinguishes a continuous stretched cervical edge from an opening;
 forced-visible authoring oral parts still need fit review before enabling them. No document here
 claims every posed surface or camera angle is intersection-free.
+
+## Oral verdicts — T3D-14, 20 September 2026
+
+Per animal, the decision the mouth rule asks for first — whether the mouth needs filling at all —
+with the measurement behind it. Both rows are strict-cull counts from `tools/triassic/gape-solid.py`
+(backdrop seen *through* the body at full gape with every backface culled; tolerance 12).
+
+| Species | Verdict | Before → after | Evidence |
+| --- | --- | --- | --- |
+| Shonisaurus | **neither** — no oral geometry | 4 px → 6 px (Heavy@0.35; Bite, Attack 0 → 0) | The closed generation shows no backdrop through its gape, so the authored palate, floor, throat tube and tooth rows were removed and `package-audit.mjs` now refuses anything the runtime classifier would match. The cull *opens* 1,863 px on Heavy that are not enclosed by the silhouette — the roof of the open mouth seen from above the lip line, which the game already showed because `Oral palate` was the one part it hid — so nothing a player sees got worse. `validation.json` records `oralGeometry: "none"`; skin 1.44x unchanged; anchors and all 21 clips unchanged. [eyes before](shonisaurus-eyes-before.png) / [after](shonisaurus-eyes-after.png). |

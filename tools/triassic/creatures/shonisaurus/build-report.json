@@ -24,6 +24,100 @@
     "adjustedVertices": 23,
     "maximumRawLengthDisplacement": 0.0011560130119323726
   },
+  "oralGeometry": "none",
+  "eyes": {
+    "inset": 0.0025,
+    "headLengthRaw": 0.196,
+    "method": "painted centre = darkness-weighted centroid of the darkest 8% of flank vertices above the lip line; globe centre = nearest skin point to it, inset along the area-averaged skin normal; seat = signed distance of the centre to the skin (negative inside) and the fraction of the globe surface under the skin",
+    "L": {
+      "painted": [
+        -0.04983,
+        0.34168,
+        0.02368
+      ],
+      "paintedRegionVertices": 101,
+      "paintedDarkVertices": 9,
+      "skinNormal": [
+        -0.891,
+        0.43,
+        -0.144
+      ],
+      "before": {
+        "centre": [
+          -0.0512,
+          0.337,
+          0.014
+        ],
+        "centreToSkin": -0.00272,
+        "surfaceFractionInside": 0.667
+      },
+      "after": {
+        "centre": [
+          -0.0483,
+          0.34113,
+          0.02429
+        ],
+        "centreToSkin": -0.00224,
+        "surfaceFractionInside": 0.774
+      },
+      "move": [
+        0.0029,
+        0.00413,
+        0.01029
+      ],
+      "movePercentOfHeadLength": [
+        1.48,
+        2.11,
+        5.25
+      ],
+      "centreToPaintedBefore": 0.01084,
+      "centreToPaintedAfter": 0.00174
+    },
+    "R": {
+      "painted": [
+        0.04663,
+        0.34598,
+        0.02351
+      ],
+      "paintedRegionVertices": 123,
+      "paintedDarkVertices": 10,
+      "skinNormal": [
+        0.838,
+        0.465,
+        -0.286
+      ],
+      "before": {
+        "centre": [
+          0.0512,
+          0.337,
+          0.014
+        ],
+        "centreToSkin": -0.00209,
+        "surfaceFractionInside": 0.59
+      },
+      "after": {
+        "centre": [
+          0.04475,
+          0.34502,
+          0.02426
+        ],
+        "centreToSkin": -0.00223,
+        "surfaceFractionInside": 0.806
+      },
+      "move": [
+        -0.00645,
+        0.00802,
+        0.01026
+      ],
+      "movePercentOfHeadLength": [
+        -3.29,
+        4.09,
+        5.23
+      ],
+      "centreToPaintedBefore": 0.01386,
+      "centreToPaintedAfter": 0.00224
+    }
+  },
   "closedSurfaceWinding": {
     "Puppet measured trunk": {
       "signedVolumeBefore": -2.928754114746648,
@@ -63,16 +157,6 @@
     "Puppet pelvic R": {
       "signedVolumeBefore": 0.019419103293470113,
       "signedVolumeAfter": 0.019419103293470113,
-      "outward": true
-    },
-    "Upper teeth": {
-      "signedVolumeBefore": -2.1665154433771954e-05,
-      "signedVolumeAfter": 2.1665154433772672e-05,
-      "outward": true
-    },
-    "Lower teeth": {
-      "signedVolumeBefore": 2.1567704413195727e-05,
-      "signedVolumeAfter": 2.1567704413195727e-05,
       "outward": true
     }
   },
@@ -129,21 +213,6 @@
       "triangles": 356,
       "maxInfluences": 3
     },
-    "Oral palate": {
-      "vertices": 162,
-      "triangles": 272,
-      "maxInfluences": 1
-    },
-    "Oral floor": {
-      "vertices": 162,
-      "triangles": 272,
-      "maxInfluences": 1
-    },
-    "Oral throat and cheeks": {
-      "vertices": 84,
-      "triangles": 154,
-      "maxInfluences": 2
-    },
     "Eye globe L": {
       "vertices": 182,
       "triangles": 360,
@@ -172,16 +241,6 @@
     "Eye pupil R": {
       "vertices": 182,
       "triangles": 360,
-      "maxInfluences": 1
-    },
-    "Upper teeth": {
-      "vertices": 238,
-      "triangles": 340,
-      "maxInfluences": 1
-    },
-    "Lower teeth": {
-      "vertices": 238,
-      "triangles": 340,
       "maxInfluences": 1
     }
   },
