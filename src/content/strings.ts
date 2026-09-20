@@ -607,7 +607,7 @@ export const SHARED_STRINGS: GameStrings = {
   title: {
     pressStart: 'PRESS START',
     screenLabel: 'Press start',
-    padsConnected: (count) => `${count} controller${count > 1 ? 's' : ''} connected · any button · others join on the next screen`,
+    padsConnected: (count) => `${count} controller${count > 1 ? 's' : ''} connected · any button`,
     noPads: 'Press any key or click to play on mouse and keyboard · or connect a controller',
     trilogyEyebrow: 'PART OF',
     trilogyNavLabel: 'The trilogy',
@@ -631,7 +631,7 @@ export const SHARED_STRINGS: GameStrings = {
     randomName: 'Random',
     randomTitle: 'Random · pick a creature for me',
     visitorsName: 'Visitors',
-    visitorsTitle: 'Visitors · animals from outside this sea — standing guests, and any you have taken to the top elsewhere',
+    visitorsTitle: 'Visitors · animals from another time — apex creatures can visit here',
     crew: {
       keyboard1: 'Keyboard 1',
       keyboard2: 'Keyboard 2',
