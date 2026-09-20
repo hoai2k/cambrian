@@ -277,13 +277,16 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, canvas, 
             ? <Readout name="Bone chain" what={`${refLabel(doc.refs.base)}${refMoves(doc, doc.refs.base) ? ' (moves with the bend)' : ''} against ${refLabel(doc.refs.tip)}${refMoves(doc, doc.refs.tip) ? ' (moves with the bend)' : ''}`}
               before={readings.bones.before} after={readings.bones.after} edited={edited} />
             : <p className="hint bend-no-rig">No rig on this body, so there is only the geometry's answer. On a built one the bone chain's answer sits beside it, because those are the two that disagree.</p>}
+          {/* Both read the reading as it stands *now* — `after`, which is `before` on a span with no
+              turn on it yet. Aiming or straightening off the un-turned reading would take the turn
+              already dialled in off twice. */}
           <div className="sculpt-actions">
-            <button className="ghost" onClick={() => readings.geometry.before && step(aimAxisAt(doc, readings.geometry.before))}
-              disabled={!readings.geometry.before} title="Turn the bend plane onto the plane the measured turn actually lies in">
+            <button className="ghost" onClick={() => readings.geometry.after && step(aimAxisAt(doc, readings.geometry.after))}
+              disabled={!readings.geometry.after} title="Turn the bend plane onto the plane the measured turn actually lies in">
               Aim the plane
             </button>
-            <button className="ghost" onClick={() => readings.geometry.before && step(turnToTarget(doc, readings.geometry.before, 0))}
-              disabled={!readings.geometry.before} title="Turn the span so the geometry reading comes out at zero">
+            <button className="ghost" onClick={() => readings.geometry.after && step(turnToTarget(doc, readings.geometry.after, 0))}
+              disabled={!readings.geometry.after} title="Turn the span so the geometry reading comes out at zero">
               Straighten it
             </button>
             <button className="ghost" onClick={() => step(resetTurn(doc))} disabled={!edited}>No turn</button>
