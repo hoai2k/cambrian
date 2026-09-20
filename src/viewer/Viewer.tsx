@@ -484,6 +484,18 @@ export function Viewer() {
         </div>}
         {!loading && !clips.length && <p className="hint">Static specimen</p>}
         <div className="clip-grid">
+          {/* The rig at rest is the neutral pose: jaw shut, body straight, limbs where the builder
+              bound them, which is the shape every clip here is authored from. It is a pose rather
+              than a clip, so it is offered beside them as one — the way to see what the animations
+              start from, and to check that a body whose generation arrived bent or gaping was
+              actually unbent and shut before binding rather than posed that way by its Idle. */}
+          {!loading && clips.length > 0 && (
+            <button className={`clip clip-base ${active === '' ? 'active' : ''}`} aria-pressed={active === ''}
+              title="The rig at rest: the neutral pose every clip is authored from"
+              onClick={() => sceneRef.current?.setRestPose(true)}>
+              Base pose
+            </button>
+          )}
           {clips.filter((n) => !isReplaced(n)).map((name) => {
             // A clip queued for rework is flagged on its own button rather than on the creature:
             // the body is finished, this motion is not, and that is what a viewer wants to know.
