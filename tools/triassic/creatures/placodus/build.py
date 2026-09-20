@@ -654,7 +654,7 @@ def reset():
  for q in rig.pose.bones:q.rotation_euler=(0,0,0);q.location=(0,0,0);q.scale=(1,1,1)
 AMP={'Idle':.30,'Swim':1.,'Sprint':1.45,'Crawl':1.,'Pry':.5,'Eat':.25,'Guard':.14,'Breathe':.35,
      'Breath':.6,'Dodge':1.1,'Ability':.3,'Grab':.3,'CrushBite':.35,'Growth':.4}
-seams={};bounds={}
+seams={};bounds={};sweep={}
 for clip,duration in CLIPS.items():
  a=bpy.data.actions.new(clip);a.use_fake_user=True;rig.animation_data.action=a;last=round(duration*30);first=None
  for f in range(last+1):
@@ -701,6 +701,37 @@ for clip,duration in CLIPS.items():
    for key,(pts,names) in LIMBS.items():
     s=1 if key.endswith('L') else -1;hind=key.startswith('hind')
     up,lo,pad=pb[names[0]],pb[names[1]],pb[names[2]]
+    if clip=='Sprint':
+     # **The dash paddles; the cruise does not.** Swim is the research's reading of this animal --
+     # a ballasted bottom-walker that sculls slowly on its laterally flattened tail with its
+     # short, unmodified limbs trailing (docs/research/triassic-swimming.json, Neenan) -- and it
+     # keeps the trailing limbs below. Sprint is the burst, and a burst on webbed feet is a stroke:
+     # the roster's own rule (CLAUDE.md, "a limbed swimmer's dash has to paddle") measured this
+     # clip at 35 degrees swept per cycle at the limb roots against 120-580 on every paddler in the
+     # era, with the feet hanging under the body while the tail did the work, which is the fish
+     # with legs attached. So the tail keeps its whole amplitude and the limbs row over it: from
+     # stretched forward to swept back along the flank on the power half, feathered and folded on
+     # the recovery, both sides together and the hind pair a third of a beat behind the fore, as
+     # the same animal's Crawl shoves. The root's range is held inside what Crawl and Pry already
+     # ask of this skin (0.78 back, 0.40 forward), because the paddle skin is the era's worst at
+     # 12.36x on Pry and a wider arc would tear it further. `limbSweepDegrees` in validation.json
+     # is the number; the paired audit still requires the tail tip to out-travel the paddles.
+     ph=p-(1.25 if hind else 0.)
+     power=sin(ph)                      # +1 at mid power stroke, -1 at mid recovery
+     rec=max(0.,-power)                 # the recovery half, for the feathering
+     up.rotation_euler.x=.22+.58*power
+     up.rotation_euler.y=s*(-.24+.12*power)
+     up.rotation_euler.z=s*(.06+.22*power)
+     lo.rotation_euler.x=-.26+.36*sin(ph-.55)
+     lo.rotation_euler.y=s*.08*sin(ph-.40)
+     # The foot's own flex is kept small. The tear on this skin is the paddle's edge against the
+     # lower limb (`fore_paddle_L`, an edge 0.034 of a body at rest): Sprint read 9.42x on it with
+     # the limbs trailing, 11.51x with this stroke and the foot flexing 0.28 either way, 11.33x at
+     # 0.16 -- so the cost is the root's arc and not the foot's, and the root's arc is the stroke.
+     # Pry, at 12.36x on the same edge, stays the body's worst.
+     pad.rotation_euler.x=.04+.16*sin(ph-1.0)-.06*rec
+     pad.rotation_euler.y=s*.10*sin(ph-.9)
+     continue
     up.rotation_euler.x=(.42 if hind else .60)+.075*amp*sin(p-(1.1 if hind else .7))
     up.rotation_euler.y=s*(-.22 if hind else -.30)
     up.rotation_euler.z=s*(.10+.055*amp*sin(p-(1.3 if hind else .9)))
@@ -811,6 +842,13 @@ for clip,duration in CLIPS.items():
     if clip=='Growth':up.rotation_euler.y-=s*.22*e
     if clip=='Breathe':up.rotation_euler.x=.22+.10*sin(p+(pi if hind else 0));up.rotation_euler.y=s*(-.14)
     if clip=='Breath':up.rotation_euler.x+=.26*e;up.rotation_euler.y+=s*(-.12*e)
+  # The total angle each limb root turns through over the clip, summed frame to frame off its own
+  # rotation, so "the limbs move" is a number beside the clip rather than an impression.
+  for key,(pts,names) in LIMBS.items():
+   q=pb[names[0]].rotation_euler.to_quaternion()
+   sw=sweep.setdefault(clip,{}).setdefault(names[0],{'total':0.,'prev':None})
+   if sw['prev'] is not None:sw['total']+=2*math.acos(min(1.,abs(q.dot(sw['prev']))))
+   sw['prev']=q
   state=np.array([tuple(q.rotation_euler)+tuple(q.location) for q in pb])
   if f==0:first=state.copy()
   if f==last:seams[clip]=float(abs(state-first).max())
@@ -880,7 +918,7 @@ meta={'id':ID,'name':'Placodus','species':'Placodus gigas',
   'The ventral gastral basket is a separate rigid part on its own unanimated bone, as the design asks; the skin it is cut from is put on the trunk bone at the seam so the cut cannot open.',
   'Same rest rig, inverse binds, sockets and all 25 action sample arrays for authored body and puppet. The LOD keeps every clip.',
   'Original albedo retained with white COLOR_0; normal relief limited to 0.15 and skin explicitly nonmetallic at roughness 0.7. Puppet pigment samples triangle-local UVs to avoid seam bleed.',
-  'Swim and Sprint are tail-driven: a travelling wave down the trunk and tail with the limbs folded back and only steering. Crawl is the bottom-walk punt - a short shove from both pairs, a long float, then the reach for the next contact.',
+  'Swim is tail-driven, as the research reads this ballasted bottom-walker: a travelling wave down the trunk and tail with the short limbs trailing and only steering. Sprint, the burst, paddles over that same tail wave - the webbed feet row from stretched forward to swept back, hind pair a third of a beat behind - because a limbed swimmer\'s dash has to paddle and a burst on webbed feet is a stroke. Crawl is the bottom-walk punt - a short shove from both pairs, a long float, then the reach for the next contact.',
   'Living colours, soft tissues and movements are artistic reconstruction. Ability is the roster crush bite at its 0.9 s duration; CrushBite is the longer feeding version, Pry the incisors levering a shell, Breathe the settled surface loop. Locomotor translation remains engine-owned.']}
 open(os.path.join(OUT,ID+'.json'),'w').write(json.dumps(meta,indent=2))
 report={'sourceSha256':hashlib.sha256(open(RAW,'rb').read()).hexdigest(),
@@ -909,6 +947,18 @@ report={'sourceSha256':hashlib.sha256(open(RAW,'rb').read()).hexdigest(),
    'vertexDirectionsOpenToTheOutside':_open_directions,'verticesSeatedInsideTheSilhouette':SEATED},
   'hingeTissue':hinge_report},
  'tailStraightening':straightening,
+ # T3D-22. Total swept angle at each limb root per clip (sum of frame-to-frame rotation, closed
+ # loops), and the decision it records: the cruise is the research's tail scull with the limbs
+ # trailing, the burst paddles. See the Sprint block in the performance loop.
+ 'limbSweepDegrees':{c:{n:round(math.degrees(v['total']),1) for n,v in d.items()} for c,d in sweep.items()},
+ 'locomotionDecision':{
+  'swim':'tail scull, limbs trailing -- the research reading of Placodus (docs/research/triassic-swimming.json: '
+         '"negatively buoyant benthic bottom-walker with a slow tail scull"; Neenan: laterally flattened tail, short '
+         'relatively unmodified limbs with probably webbed feet). Kept at its authored ~24 degrees swept per cycle.',
+  'sprint':'paddles, >= 120 degrees swept per cycle at every limb root, over the unchanged tail wave -- the era rule '
+           'that a limbed swimmer\'s dash has to paddle; the burst is where webbed feet earn their keep, as in this '
+           'animal\'s own Crawl punt. Root range held inside what Crawl/Pry already ask of the skin (12.36x on Pry).',
+  'crawl':'the bottom-walk punt, unchanged.'},
  'normalizedWeights':True,'rootStable':True,'armourBoneUnanimated':True,'noScaleChannels':True}
 # The gape proof is a render, so it cannot run inside the builder; its result is kept beside this
 # file as `gape-solid.json` and folded in here so a rebuild cannot silently drop it. It measures the

@@ -206,11 +206,23 @@ Death, Guard, Parry, Dodge, Eat, Stagger, Ability, Grab, Breath, Growth plus thi
 **Crawl, Pry, CrushBite and Breathe**. Idle, Swim, Sprint, Guard, Eat, Crawl, Pry and Breathe loop
 exactly. Root motion and scale animation are absent, and so is any channel on the armour bone.
 
-**Swim and Sprint are tail-driven.** A travelling wave runs down the seven caudal joints — each
-joint's authored yaw peaks 0.074–0.083 of a cycle after the one in front of it — while the limbs
-fold back against the flanks and only steer. The tail tip sweeps 1.223 units (Sprint 1.713) against
-0.150 (0.217) of skull travel, a ratio of 8.2 (7.9); the fore paddles' lateral travel is a quarter of
-the tip's. This is not a paddler that happens to be in water.
+**Swim is tail-driven; Sprint paddles over the same tail.** A travelling wave runs down the seven
+caudal joints — each joint's authored yaw peaks 0.074–0.083 of a cycle after the one in front of
+it — and in `Swim` the limbs trail and only steer, which is the research's reading of a ballasted
+bottom-walker with a laterally flattened tail and short, unmodified, probably webbed feet
+(`docs/research/triassic-swimming.json`: "a slow tail scull"). The tail tip sweeps 1.223 units
+(Sprint 1.713) against 0.150 (0.217) of skull travel, a ratio of 8.2 (7.9). `Sprint` is the burst,
+and the era's rule is that a limbed swimmer's dash has to paddle: measured at the limb roots the
+shipped Sprint swept **35°** per cycle where every paddler in the roster sweeps 120–580°, with the
+feet hanging under the body while the tail worked (T3D-22). So the stroke was authored over the
+unchanged tail wave — from stretched forward to swept back along the flank on the power half,
+feathered on the recovery, both sides together and the hind pair a third of a beat behind, as the
+same animal's `Crawl` shoves — and now sweeps **155° at every limb root** (`Swim` stays at 24°);
+`validation.json` records the number per clip under `limbSweepDegrees` and the decision under
+`locomotionDecision`. The paired audit still requires the tail tip to out-travel the paddles. The
+root's arc is held inside what `Crawl` and `Pry` already ask of this skin: `Sprint`'s worst edge
+went from 9.42× to 11.33× (`fore_paddle_L`, the same edge `Pry` tears to 12.36×, which stays the
+body's worst).
 
 **Crawl is a bounding punt, not a lizard's trudge.** At near-neutral buoyancy the animal shoves once
 and springs. The fore pair is rearmost at phase 0.083 and the hind pair at 0.233; the body rises

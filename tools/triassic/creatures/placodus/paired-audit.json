@@ -2,22 +2,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 2122380,
-      "sha256": "417a3f2e7578aafd94fee2ff1f95dd529034800832f6a9f58d33f0d11b0987c6",
+      "bytes": 2122312,
+      "sha256": "d941fbc745c480da93eba682e8ad38160643d4dd141fca9333448cb8efcabdbd",
       "triangles": 22119,
       "vertices": 13641
     },
     {
       "suffix": ".puppet",
-      "bytes": 789264,
-      "sha256": "56496f516fa5f225a8ec98ff21706acb242f5814fa9a5c2a23daf790b0099418",
+      "bytes": 789192,
+      "sha256": "d51f4671a47e2353c61a1b516897a578771789045bf85f3d3f3fd547818ebcd8",
       "triangles": 8314,
       "vertices": 4362
     },
     {
       "suffix": ".lod1",
-      "bytes": 789264,
-      "sha256": "56496f516fa5f225a8ec98ff21706acb242f5814fa9a5c2a23daf790b0099418",
+      "bytes": 789192,
+      "sha256": "d51f4671a47e2353c61a1b516897a578771789045bf85f3d3f3fd547818ebcd8",
       "triangles": 8314,
       "vertices": 4362
     }
@@ -173,7 +173,7 @@
     },
     {
       "name": "Sprint",
-      "sha256": "3511d3ec2514e592f4a47ce0b9a4dab78d17a31c6cc4dd184fd1b9d43a858e05"
+      "sha256": "8df78eacd52c0592a3521635eca126574ed0516b980c5a280f9d96827bc5af2a"
     },
     {
       "name": "Stagger",
@@ -525,7 +525,7 @@
       "clip": "Sprint",
       "tailTipLateral": 1.7128538517902605,
       "skullLateral": 0.21735449202442908,
-      "forePaddleLateral": 0.43991289449499305,
+      "forePaddleLateral": 0.7331397276570409,
       "caudalPhaseLags": [
         0.25,
         0.33333332505491076,

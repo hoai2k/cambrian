@@ -109,12 +109,12 @@
     ],
     "Sprint": [
       [
-        -1.764531135559082,
+        -1.8949241638183594,
         -2.499870777130127,
-        -0.9827960133552551
+        -1.1027395725250244
       ],
       [
-        1.736859917640686,
+        1.9026581048965454,
         3.063953399658203,
         0.939275324344635
       ]
@@ -1246,6 +1246,163 @@
     "caudalStations": 14,
     "applied": true
   },
+  "limbSweepDegrees": {
+    "Idle": {
+      "fore_upper_L": 15.1,
+      "fore_upper_R": 15.0,
+      "hind_upper_L": 15.2,
+      "hind_upper_R": 15.3
+    },
+    "Swim": {
+      "fore_upper_L": 24.2,
+      "fore_upper_R": 24.2,
+      "hind_upper_L": 23.6,
+      "hind_upper_R": 23.6
+    },
+    "Sprint": {
+      "fore_upper_L": 155.4,
+      "fore_upper_R": 155.4,
+      "hind_upper_L": 155.3,
+      "hind_upper_R": 155.3
+    },
+    "TurnLeft": {
+      "fore_upper_L": 42.7,
+      "fore_upper_R": 28.7,
+      "hind_upper_L": 37.8,
+      "hind_upper_R": 21.1
+    },
+    "TurnRight": {
+      "fore_upper_L": 29.2,
+      "fore_upper_R": 43.6,
+      "hind_upper_L": 20.4,
+      "hind_upper_R": 36.9
+    },
+    "Dive": {
+      "fore_upper_L": 45.8,
+      "fore_upper_R": 45.0,
+      "hind_upper_L": 9.6,
+      "hind_upper_R": 9.6
+    },
+    "Rise": {
+      "fore_upper_L": 45.5,
+      "fore_upper_R": 46.2,
+      "hind_upper_L": 9.6,
+      "hind_upper_R": 9.6
+    },
+    "Attack": {
+      "fore_upper_L": 48.5,
+      "fore_upper_R": 47.9,
+      "hind_upper_L": 53.7,
+      "hind_upper_R": 54.2
+    },
+    "Bite": {
+      "fore_upper_L": 9.4,
+      "fore_upper_R": 9.5,
+      "hind_upper_L": 9.5,
+      "hind_upper_R": 9.6
+    },
+    "Heavy": {
+      "fore_upper_L": 48.7,
+      "fore_upper_R": 48.0,
+      "hind_upper_L": 53.2,
+      "hind_upper_R": 53.7
+    },
+    "Hit": {
+      "fore_upper_L": 9.4,
+      "fore_upper_R": 9.4,
+      "hind_upper_L": 9.5,
+      "hind_upper_R": 9.5
+    },
+    "Death": {
+      "fore_upper_L": 17.6,
+      "fore_upper_R": 17.6,
+      "hind_upper_L": 17.7,
+      "hind_upper_R": 17.7
+    },
+    "Guard": {
+      "fore_upper_L": 6.6,
+      "fore_upper_R": 6.6,
+      "hind_upper_L": 6.6,
+      "hind_upper_R": 6.6
+    },
+    "Parry": {
+      "fore_upper_L": 9.3,
+      "fore_upper_R": 9.4,
+      "hind_upper_L": 9.4,
+      "hind_upper_R": 9.5
+    },
+    "Dodge": {
+      "fore_upper_L": 79.3,
+      "fore_upper_R": 63.3,
+      "hind_upper_L": 62.2,
+      "hind_upper_R": 37.8
+    },
+    "Eat": {
+      "fore_upper_L": 12.5,
+      "fore_upper_R": 12.6,
+      "hind_upper_L": 12.7,
+      "hind_upper_R": 12.7
+    },
+    "Stagger": {
+      "fore_upper_L": 9.4,
+      "fore_upper_R": 9.5,
+      "hind_upper_L": 9.5,
+      "hind_upper_R": 9.6
+    },
+    "Ability": {
+      "fore_upper_L": 11.3,
+      "fore_upper_R": 11.4,
+      "hind_upper_L": 11.5,
+      "hind_upper_R": 11.5
+    },
+    "Grab": {
+      "fore_upper_L": 39.5,
+      "fore_upper_R": 40.7,
+      "hind_upper_L": 39.8,
+      "hind_upper_R": 38.5
+    },
+    "Breath": {
+      "fore_upper_L": 35.0,
+      "fore_upper_R": 37.3,
+      "hind_upper_L": 45.5,
+      "hind_upper_R": 43.8
+    },
+    "Growth": {
+      "fore_upper_L": 21.5,
+      "fore_upper_R": 21.6,
+      "hind_upper_L": 37.7,
+      "hind_upper_R": 37.7
+    },
+    "Crawl": {
+      "fore_upper_L": 107.1,
+      "fore_upper_R": 107.1,
+      "hind_upper_L": 146.7,
+      "hind_upper_R": 146.7
+    },
+    "Pry": {
+      "fore_upper_L": 66.3,
+      "fore_upper_R": 67.4,
+      "hind_upper_L": 31.1,
+      "hind_upper_R": 29.8
+    },
+    "CrushBite": {
+      "fore_upper_L": 23.9,
+      "fore_upper_R": 24.9,
+      "hind_upper_L": 13.4,
+      "hind_upper_R": 13.5
+    },
+    "Breathe": {
+      "fore_upper_L": 24.5,
+      "fore_upper_R": 24.6,
+      "hind_upper_L": 24.4,
+      "hind_upper_R": 24.6
+    }
+  },
+  "locomotionDecision": {
+    "swim": "tail scull, limbs trailing -- the research reading of Placodus (docs/research/triassic-swimming.json: \"negatively buoyant benthic bottom-walker with a slow tail scull\"; Neenan: laterally flattened tail, short relatively unmodified limbs with probably webbed feet). Kept at its authored ~24 degrees swept per cycle.",
+    "sprint": "paddles, >= 120 degrees swept per cycle at every limb root, over the unchanged tail wave -- the era rule that a limbed swimmer's dash has to paddle; the burst is where webbed feet earn their keep, as in this animal's own Crawl punt. Root range held inside what Crawl/Pry already ask of the skin (12.36x on Pry).",
+    "crawl": "the bottom-walk punt, unchanged."
+  },
   "normalizedWeights": true,
   "rootStable": true,
   "armourBoneUnanimated": true,
@@ -1260,67 +1417,89 @@
     ],
     "shots": [
       {
-        "clip": "CrushBite",
-        "t": 0.25,
+        "clip": "Ability",
+        "t": 0.14,
         "pixels": 378000,
-        "differingPixels": 2021,
-        "holesOpenedByCulling": 10,
-        "seenThroughTheBody": 10,
-        "backdropInBothPasses": 418,
-        "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/CrushBite-0.25-opened.png",
-        "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/CrushBite-0.25-solid.png",
-        "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/CrushBite-0.25-culled.png"
+        "differingPixels": 1753,
+        "holesOpenedByCulling": 11,
+        "seenThroughTheBody": 11,
+        "backdropInBothPasses": 130,
+        "markedImage": "triassic-authoring/placodus/gape-solid/Ability-0.14-opened.png",
+        "solid": "triassic-authoring/placodus/gape-solid/Ability-0.14-solid.png",
+        "culled": "triassic-authoring/placodus/gape-solid/Ability-0.14-culled.png"
+      },
+      {
+        "clip": "Attack",
+        "t": 0.13,
+        "pixels": 378000,
+        "differingPixels": 1937,
+        "holesOpenedByCulling": 13,
+        "seenThroughTheBody": 13,
+        "backdropInBothPasses": 694,
+        "markedImage": "triassic-authoring/placodus/gape-solid/Attack-0.13-opened.png",
+        "solid": "triassic-authoring/placodus/gape-solid/Attack-0.13-solid.png",
+        "culled": "triassic-authoring/placodus/gape-solid/Attack-0.13-culled.png"
       },
       {
         "clip": "Bite",
-        "t": 0.25,
+        "t": 0.23,
         "pixels": 378000,
-        "differingPixels": 2099,
+        "differingPixels": 1984,
+        "holesOpenedByCulling": 11,
+        "seenThroughTheBody": 6,
+        "backdropInBothPasses": 8,
+        "markedImage": "triassic-authoring/placodus/gape-solid/Bite-0.23-opened.png",
+        "solid": "triassic-authoring/placodus/gape-solid/Bite-0.23-solid.png",
+        "culled": "triassic-authoring/placodus/gape-solid/Bite-0.23-culled.png"
+      },
+      {
+        "clip": "CrushBite",
+        "t": 0.26,
+        "pixels": 378000,
+        "differingPixels": 1819,
+        "holesOpenedByCulling": 13,
+        "seenThroughTheBody": 13,
+        "backdropInBothPasses": 392,
+        "markedImage": "triassic-authoring/placodus/gape-solid/CrushBite-0.26-opened.png",
+        "solid": "triassic-authoring/placodus/gape-solid/CrushBite-0.26-solid.png",
+        "culled": "triassic-authoring/placodus/gape-solid/CrushBite-0.26-culled.png"
+      },
+      {
+        "clip": "Eat",
+        "t": 0.4,
+        "pixels": 378000,
+        "differingPixels": 1733,
         "holesOpenedByCulling": 10,
         "seenThroughTheBody": 10,
-        "backdropInBothPasses": 571,
-        "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Bite-0.25-opened.png",
-        "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Bite-0.25-solid.png",
-        "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Bite-0.25-culled.png"
+        "backdropInBothPasses": 164,
+        "markedImage": "triassic-authoring/placodus/gape-solid/Eat-0.4-opened.png",
+        "solid": "triassic-authoring/placodus/gape-solid/Eat-0.4-solid.png",
+        "culled": "triassic-authoring/placodus/gape-solid/Eat-0.4-culled.png"
       },
       {
         "clip": "Heavy",
-        "t": 0.15,
+        "t": 0.14,
         "pixels": 378000,
-        "differingPixels": 2118,
-        "holesOpenedByCulling": 12,
+        "differingPixels": 1913,
+        "holesOpenedByCulling": 18,
         "seenThroughTheBody": 0,
-        "backdropInBothPasses": 2,
-        "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Heavy-0.15-opened.png",
-        "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Heavy-0.15-solid.png",
-        "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Heavy-0.15-culled.png"
+        "backdropInBothPasses": 3,
+        "markedImage": "triassic-authoring/placodus/gape-solid/Heavy-0.14-opened.png",
+        "solid": "triassic-authoring/placodus/gape-solid/Heavy-0.14-solid.png",
+        "culled": "triassic-authoring/placodus/gape-solid/Heavy-0.14-culled.png"
+      },
+      {
+        "clip": "Pry",
+        "t": 1.93,
+        "pixels": 378000,
+        "differingPixels": 1403,
+        "holesOpenedByCulling": 0,
+        "seenThroughTheBody": 0,
+        "backdropInBothPasses": 0,
+        "markedImage": null,
+        "solid": "triassic-authoring/placodus/gape-solid/Pry-1.93-solid.png",
+        "culled": "triassic-authoring/placodus/gape-solid/Pry-1.93-culled.png"
       }
-    ],
-    "beforeThisPort": {
-      "note": "the one-sac Oral_cavity_lining and the blended Seated jaw hinge tissue, same shots",
-      "shots": [
-        {
-          "clip": "CrushBite",
-          "t": 0.25,
-          "holesOpenedByCulling": 66,
-          "seenThroughTheBody": 0,
-          "backdropInBothPasses": 6
-        },
-        {
-          "clip": "Bite",
-          "t": 0.25,
-          "holesOpenedByCulling": 62,
-          "seenThroughTheBody": 0,
-          "backdropInBothPasses": 17
-        },
-        {
-          "clip": "Heavy",
-          "t": 0.15,
-          "holesOpenedByCulling": 66,
-          "seenThroughTheBody": 0,
-          "backdropInBothPasses": 0
-        }
-      ]
-    }
+    ]
   }
 }

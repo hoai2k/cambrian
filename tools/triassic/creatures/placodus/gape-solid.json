@@ -8,66 +8,88 @@
   ],
   "shots": [
     {
-      "clip": "CrushBite",
-      "t": 0.25,
+      "clip": "Ability",
+      "t": 0.14,
       "pixels": 378000,
-      "differingPixels": 2021,
-      "holesOpenedByCulling": 10,
-      "seenThroughTheBody": 10,
-      "backdropInBothPasses": 418,
-      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/CrushBite-0.25-opened.png",
-      "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/CrushBite-0.25-solid.png",
-      "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/CrushBite-0.25-culled.png"
+      "differingPixels": 1753,
+      "holesOpenedByCulling": 11,
+      "seenThroughTheBody": 11,
+      "backdropInBothPasses": 130,
+      "markedImage": "triassic-authoring/placodus/gape-solid/Ability-0.14-opened.png",
+      "solid": "triassic-authoring/placodus/gape-solid/Ability-0.14-solid.png",
+      "culled": "triassic-authoring/placodus/gape-solid/Ability-0.14-culled.png"
+    },
+    {
+      "clip": "Attack",
+      "t": 0.13,
+      "pixels": 378000,
+      "differingPixels": 1937,
+      "holesOpenedByCulling": 13,
+      "seenThroughTheBody": 13,
+      "backdropInBothPasses": 694,
+      "markedImage": "triassic-authoring/placodus/gape-solid/Attack-0.13-opened.png",
+      "solid": "triassic-authoring/placodus/gape-solid/Attack-0.13-solid.png",
+      "culled": "triassic-authoring/placodus/gape-solid/Attack-0.13-culled.png"
     },
     {
       "clip": "Bite",
-      "t": 0.25,
+      "t": 0.23,
       "pixels": 378000,
-      "differingPixels": 2099,
+      "differingPixels": 1984,
+      "holesOpenedByCulling": 11,
+      "seenThroughTheBody": 6,
+      "backdropInBothPasses": 8,
+      "markedImage": "triassic-authoring/placodus/gape-solid/Bite-0.23-opened.png",
+      "solid": "triassic-authoring/placodus/gape-solid/Bite-0.23-solid.png",
+      "culled": "triassic-authoring/placodus/gape-solid/Bite-0.23-culled.png"
+    },
+    {
+      "clip": "CrushBite",
+      "t": 0.26,
+      "pixels": 378000,
+      "differingPixels": 1819,
+      "holesOpenedByCulling": 13,
+      "seenThroughTheBody": 13,
+      "backdropInBothPasses": 392,
+      "markedImage": "triassic-authoring/placodus/gape-solid/CrushBite-0.26-opened.png",
+      "solid": "triassic-authoring/placodus/gape-solid/CrushBite-0.26-solid.png",
+      "culled": "triassic-authoring/placodus/gape-solid/CrushBite-0.26-culled.png"
+    },
+    {
+      "clip": "Eat",
+      "t": 0.4,
+      "pixels": 378000,
+      "differingPixels": 1733,
       "holesOpenedByCulling": 10,
       "seenThroughTheBody": 10,
-      "backdropInBothPasses": 571,
-      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Bite-0.25-opened.png",
-      "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Bite-0.25-solid.png",
-      "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Bite-0.25-culled.png"
+      "backdropInBothPasses": 164,
+      "markedImage": "triassic-authoring/placodus/gape-solid/Eat-0.4-opened.png",
+      "solid": "triassic-authoring/placodus/gape-solid/Eat-0.4-solid.png",
+      "culled": "triassic-authoring/placodus/gape-solid/Eat-0.4-culled.png"
     },
     {
       "clip": "Heavy",
-      "t": 0.15,
+      "t": 0.14,
       "pixels": 378000,
-      "differingPixels": 2118,
-      "holesOpenedByCulling": 12,
+      "differingPixels": 1913,
+      "holesOpenedByCulling": 18,
       "seenThroughTheBody": 0,
-      "backdropInBothPasses": 2,
-      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Heavy-0.15-opened.png",
-      "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Heavy-0.15-solid.png",
-      "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Heavy-0.15-culled.png"
+      "backdropInBothPasses": 3,
+      "markedImage": "triassic-authoring/placodus/gape-solid/Heavy-0.14-opened.png",
+      "solid": "triassic-authoring/placodus/gape-solid/Heavy-0.14-solid.png",
+      "culled": "triassic-authoring/placodus/gape-solid/Heavy-0.14-culled.png"
+    },
+    {
+      "clip": "Pry",
+      "t": 1.93,
+      "pixels": 378000,
+      "differingPixels": 1403,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0,
+      "markedImage": null,
+      "solid": "triassic-authoring/placodus/gape-solid/Pry-1.93-solid.png",
+      "culled": "triassic-authoring/placodus/gape-solid/Pry-1.93-culled.png"
     }
-  ],
-  "beforeThisPort": {
-    "note": "the one-sac Oral_cavity_lining and the blended Seated jaw hinge tissue, same shots",
-    "shots": [
-      {
-        "clip": "CrushBite",
-        "t": 0.25,
-        "holesOpenedByCulling": 66,
-        "seenThroughTheBody": 0,
-        "backdropInBothPasses": 6
-      },
-      {
-        "clip": "Bite",
-        "t": 0.25,
-        "holesOpenedByCulling": 62,
-        "seenThroughTheBody": 0,
-        "backdropInBothPasses": 17
-      },
-      {
-        "clip": "Heavy",
-        "t": 0.15,
-        "holesOpenedByCulling": 66,
-        "seenThroughTheBody": 0,
-        "backdropInBothPasses": 0
-      }
-    ]
-  }
+  ]
 }
