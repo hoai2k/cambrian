@@ -50,6 +50,23 @@ delivers: measured reach 0.383 against 0.235 from the axis.
 
 **Read this one with care.** The ratio is the axis's curvature radius over the body's *own* section radius, and this animal is 0.42 of a body length deep and 0.59 across at mid-trunk — the stoutest of the four by a long way. A ratio below 1 does not mean the centreline is coiled; it means the centreline wanders on a scale finer than the body is thick, which on a blunt body is measurement noise rather than pose. The absolute number is the useful one: the measured centreline's lateral range is 0.046 of a body length and its vertical range 0.142, against Cymbospondylus' 0.036 and 0.067. There is nothing here to unbend.
 
+**Where a paddle's root is seated (T3D-18).** `thin_clusters` reports each blade's `seat` as the one
+thin-shell vertex nearest the axis, and on this pair that was the trailing corner of the left blade
+and the leading corner of the right — 0.105 of a body apart along the animal on clusters that mirror
+to 0.03 — after which `T.seat`'s walk "until 0.016 inside the skin" stopped at a different depth on
+each side. The right chain started up in the chest, measured a radius of 0.102 against 0.081 to
+reach a blade it no longer ran through, took 1,388 vertices against 1,131, and its blade's rigid-fit
+residual in `Sprint` was 3.2 % of L against the left's 2.2 % on identical swept angles. The root is
+now the mean of the cluster's innermost band measured in the trunk's **section** metric (Cheirolepis'
+`depth()`: the ellipse of the measured half width and half depth at the station), `E_BAND` = 0.20 of
+that metric deep, carried in along its own radial line to `E_SEAT` = 0.30 of the section, and then
+never nearer the skin than the seating margin. The base bands mirror 0.038 L and the seated roots
+0.057 (the right base does sit 0.024 L further forward — the pose); `validation.json` keeps both
+readings under `limbSeats` and the blades' rigid-fit residuals under `foreBladeRigidity`: `Sprint`
+chain 2.41 / 2.55 % (13 phases; 2.36 / 2.46 re-measured at 33), per bone 1.19/1.22, 0.76/0.82,
+0.34/0.34. Skin 3.72x → **2.98x** (`Haul`). The depth is a lever — the stroke is authored as angles
+at the root — which is why the roots go a fixed way *into* the trunk rather than to the margin.
+
 Paired-limb asymmetry, as the mean distance between each limb's joints and its mirrored
 partner's, over body length:
 
