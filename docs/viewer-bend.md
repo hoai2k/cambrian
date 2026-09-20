@@ -271,7 +271,7 @@ mean; the span is two points and may run anywhere.
 
 ```json
 {
-  "schema": "bend-span/1",
+  "schema": "bend-span/2",
   "id": "askeptosaurus",
   "model": "assets/triassic/creatures/askeptosaurus.glb",
   "sha256": "29e62d2f…", "sha256Source": "measured",
