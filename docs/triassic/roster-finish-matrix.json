@@ -41,10 +41,8 @@
   },
   "summary": {
     "shippedBodies": 26,
-    "contractMet": 25,
-    "repairNeeded": [
-      "henodus"
-    ]
+    "contractMet": 26,
+    "repairNeeded": []
   },
   "rows": [
     {
@@ -1301,13 +1299,12 @@
           "Sprint",
           "Guard",
           "Eat",
+          "Grab",
           "Crawl",
           "Graze",
           "Breathe"
         ],
-        "missingLoops": [
-          "Grab"
-        ]
+        "missingLoops": []
       },
       "anchors": {
         "required": [
@@ -1332,7 +1329,7 @@
         "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
       },
       "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
-      "state": "repair-needed"
+      "state": "contract-met"
     },
     {
       "id": "hupehsuchus",
