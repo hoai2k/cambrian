@@ -129,16 +129,19 @@ unless the user explicitly asks for a PR. Steps:
   lists (`npm run ancientseas:delivered` regenerates it from the folder) and draws a shipped
   stand-in or a named wash for the rest, so nothing asks the network for art that has not arrived.
   A game is its title *and* the animal arching over it: both carry the link and light together,
-  with the picture kept out of the keyboard's way so a game is one stop rather than two. A game
-  that is not out yet (`comingSoon` on its `GameLink`; the Triassic, for now) keeps its title, its
-  animal and its place on the plate and gives up the link, the lighting and the pointer, with a
-  *Coming soon* badge under the title — the plate is the trilogy, and a gap where the third game
-  goes says less than the third game does. `OPEN_GAMES` is what the pad and the arrow keys walk,
-  so nothing can steer into it. Its own page is untouched: this is what the trilogy page offers,
-  not whether the game runs, and `/triassic/` still opens by address. **That one line is the whole
-  switch**: deleting `comingSoon: true` opens the game in every sense at once, and both checks read
-  the flag rather than naming a game, so nothing else needs editing — which is checked by flipping
-  it, not by assertion. A game's title and the animal over it also grow together, by one amount
+  with the picture kept out of the keyboard's way so a game is one stop rather than two. All three
+  are open today, and the plate can close one again without closing a gap in itself: a game that is
+  not out yet (`comingSoon` on its `GameLink`; the Triassic carried it while the era was being
+  built) keeps its title, its animal and its place and gives up the link, the lighting and the
+  pointer, with a *Coming soon* badge under the title — the plate is the trilogy, and a gap where a
+  game goes says less than the game does. `OPEN_GAMES` is what the pad and the arrow keys walk, so
+  nothing can steer into a closed one, and its own page is untouched either way: this is what the
+  trilogy page offers, not whether the game runs, so a closed game still opens by address. **That
+  one line is the whole switch** in both directions: adding or deleting `comingSoon: true` closes
+  or opens a game in every sense at once, because everything — the components, `npm run
+  ancientseas` and the browser smoke, which reads link-or-address off the plate rather than naming
+  a game — is derived from the flag. Checked by flipping it, not by assertion.
+  A game's title and the animal over it also grow together, by one amount
   from one rule (`.as-slot-title.as-lit, .as-slot-animal.as-lit`), because they are one link: the
   growth was split across the lit state and a title-only hover once, and a pad then lifted the
   animal alone while a pointer lifted the two by different steps.

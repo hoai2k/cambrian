@@ -352,9 +352,10 @@ for (const param of DEBUG_PARAMS) {
   ok(source.includes(`'${name}'`), `${param.name} names the parameter ${param.reads} reads`);
   ok(source.includes(`'${value}'`), `...and the value it checks for (${value})`);
 }
-// Every game gets every parameter, the not-yet-open one included: /triassic/ opens by address.
+// Every game gets every parameter, a game the plate does not link to included: it opens by
+// address. Derived from the flag rather than naming a game, so it holds whichever games are open.
 eq(DEBUG_GAMES.map((g) => g.id), GAMES.map((g) => g.id), 'the index offers every game, coming-soon or not');
-ok(DEBUG_GAMES.some((g) => g.comingSoon), 'including the one the plate does not link to');
+for (const g of GAMES.filter((g) => g.comingSoon)) ok(DEBUG_GAMES.includes(g), `including ${g.title}, which the plate does not link to`);
 for (const game of DEBUG_GAMES) {
   ok(existsSync(`${game.path}index.html`), `${game.title} has an entry page for the parameters to open`);
   for (const param of DEBUG_PARAMS) ok(paramHref(game, param) === `${game.path}?${param.query}`, `${game.title} ?${param.query}`);
