@@ -15,6 +15,7 @@ import { schemeForCreature } from '../shared/palettes';
 import { creature, type CreatureId } from '../sim/creatures';
 import { lengthOf } from '../sim/actors';
 import { bellPhase, bellTilt } from '../sim/locomotion';
+import { ASHORE_WADE, breathesAir, LAND_WALK_LEGS } from '../sim/beach';
 import { RULES } from '../sim/era-rules';
 import type { Actor } from '../sim/types';
 import { appBase } from '../shared/base';
@@ -338,6 +339,9 @@ export class CreatureView {
     // Crawlers carry their vertical motion in `hopVel` (hop and paddle), not in `vel.y`.
     const paddling = def.ground && !a.grounded && a.state !== 'dead';
     const vy = def.ground ? (paddling ? a.hopVel : 0) : a.vel.y;
+    // Out of the water, on the sand: the swim hands over to the walk at the same point the rules
+    // call the body ashore, so what is drawn and what is ruled agree.
+    const onLand = a.wade >= ASHORE_WADE && !a.airborne && a.state !== 'dead';
 
     if (animate) {
       // locomotion layer
@@ -359,14 +363,38 @@ export class CreatureView {
         // swimmer is materially above cruise; older rigs without Sprint keep the Swim fallback.
         const canSprint = moving && !def.ground && this.has('Sprint');
         this.sprinting = canSprint && speed > cruise * (this.sprinting ? 1.1 : 1.2);
-        if (this.bell(a)) { /* a bell picks its own clip and its own place in it */ }
-        else this.playLoop(moving ? (def.ground ? 'Crawl' : this.sprinting ? 'Sprint' : 'Swim') : 'Idle');
         // smaller creatures beat faster
         const rateScale = 1 / Math.pow(Math.max(a.scale, 0.1), 0.35);
-        const beat = Math.max(speed, paddling ? cruise * 0.85 : 0);
-        if (!this.bellPulsing) this.loco?.setEffectiveTimeScale(
-          moving ? this.sprinting ? clamp(rateScale, 0.8, 1.35) : clamp((beat / cruise) * rateScale, 0.5, 2.6) : 0.75 * rateScale,
-        );
+        if (onLand) {
+          // On the sand (src/sim/beach.ts). A walker plays its walking clip where it has one, at
+          // the pace it is walking; one with no such clip swims slowly through the air, which is
+          // what a paddle-limbed body dragging itself down a beach looks like. A stranded
+          // water-breather has no gait at all: each flop throws the swim stroke at the sand, hard,
+          // and between flops it lies still. No clip is authored for the flop yet — the twist and
+          // the hop are the simulation's own, so this is the stroke on top of them.
+          const gait = this.pick('Walk', 'Crawl');
+          if (!breathesAir(a.creature)) {
+            const flop = a.flopT > 0;
+            this.playLoop(flop ? this.pick('Sprint', 'Swim') ?? 'Idle' : 'Idle');
+            this.loco?.setEffectiveTimeScale(flop ? 2.2 * rateScale : 0.6 * rateScale);
+          } else if (gait) {
+            const walking = speed > 0.2;
+            this.playLoop(walking ? gait : 'Idle');
+            this.loco?.setEffectiveTimeScale(walking ? clamp((speed / Math.max(cruise * LAND_WALK_LEGS, 0.1)) * rateScale, 0.5, 1.8) : 0.75 * rateScale);
+          } else {
+            const walking = speed > 0.2;
+            this.playLoop(walking ? 'Swim' : 'Idle');
+            this.loco?.setEffectiveTimeScale(walking ? 0.6 * rateScale : 0.75 * rateScale);
+          }
+        }
+        else if (this.bell(a)) { /* a bell picks its own clip and its own place in it */ }
+        else {
+          this.playLoop(moving ? (def.ground ? 'Crawl' : this.sprinting ? 'Sprint' : 'Swim') : 'Idle');
+          const beat = Math.max(speed, paddling ? cruise * 0.85 : 0);
+          if (!this.bellPulsing) this.loco?.setEffectiveTimeScale(
+            moving ? this.sprinting ? clamp(rateScale, 0.8, 1.35) : clamp((beat / cruise) * rateScale, 0.5, 2.6) : 0.75 * rateScale,
+          );
+        }
       }
       // An era's own performance, for a body the shared state machine has nothing to say about:
       // the Triassic's shore animals are pinned and brainless and would otherwise watch, telegraph
@@ -450,7 +478,7 @@ export class CreatureView {
       // zero. The bend then compounds on its own result, and since a frozen clock makes it a
       // constant rather than a wave, a paused animal screws slowly round its own axis. There is no
       // wave to add to a still frame anyway, so the pose simply holds.
-      if (dt > 0 && this.spine.length > 3 && def.proceduralUndulation !== false && !def.ground && a.state !== 'dead') {
+      if (dt > 0 && this.spine.length > 3 && def.proceduralUndulation !== false && !def.ground && !onLand && a.state !== 'dead') {
         const amp = clamp(speed / Math.max(cruise, 0.1), 0, 1.6) * 0.045 + Math.abs(a.bank) * 0.02;
         const freq = 5.5 / Math.pow(Math.max(a.scale, 0.1), 0.35);
         // Local-space bend: each spine bone yaws slightly about its own up axis. Cheaper than

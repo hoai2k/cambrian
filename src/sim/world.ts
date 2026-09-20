@@ -83,6 +83,11 @@ export const CHUNK = 64;
 export const SIM_RADIUS = 192;
 /** Distance from the waterline where the water gets too shallow to swim: the shore is a wall here. */
 export const SHORE_WALL = 5;
+/**
+ * How far inland (negative `shoreDistance`) a body that is allowed onto the shore may go. The
+ * beach is a strip, not a country: past this the same wall stands, facing the other way.
+ */
+export const LAND_REACH = 36;
 /** Nurseries sit this far off the shore, spaced this far apart along it. Nursery 0 is at the origin. */
 export const NURSERY_OFF = 88;
 export const NURSERY_SPACING = 260;
@@ -829,14 +834,21 @@ export interface StaticContact {
  * - **A wall.** Anything standing higher than that above you blocks, and nothing else happens.
  *
  * A landmark's raised span (`floor`) is none of these: it is something you swim under.
+ *
+ * The shore wall is for a body swimming at it. A `reach` of Infinity is a body the water does not
+ * hold — in the air, on the sand, or walking up out of it (src/sim/beach.ts) — and for it the
+ * only wall is `LAND_REACH` inland. `ease` bounds how far one call may shove the body back: the
+ * default is the whole way, which is what a wall is; a caller with a `dt` passes what the body
+ * could have moved this step, so a body that is *found* inside the wall (it walked back down the
+ * beach into water it cannot wade) is eased out rather than teleported.
  */
-export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scratch: Boulder[], reach = 0, glide = 0, climb = 0, out?: StaticContact): boolean {
+export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scratch: Boulder[], reach = 0, glide = 0, climb = 0, out?: StaticContact, ease = Infinity): boolean {
   let hit = false;
   if (out) { out.hit = false; out.climbTo = -Infinity; out.wallTop = -Infinity; }
   // The shore is the one wall in the sea. Push straight back along -z; the coast wanders gently
   // enough that the local normal is close to that. `reach` lets a limbed body push that far past it.
-  const s = shoreDistance(pos.x, pos.z), wall = Math.max(radius, SHORE_WALL + radius * 3 - reach);
-  if (s < wall) { pos.z -= wall - s; hit = true; }
+  const s = shoreDistance(pos.x, pos.z), wall = reach === Infinity ? -LAND_REACH : Math.max(radius, SHORE_WALL + radius * 3 - reach);
+  if (s < wall) { pos.z -= Math.min(wall - s, ease); hit = true; }
   for (const b of world.boulderHash.query(pos.x, pos.z, radius + 8, scratch)) {
     if (pos.y > b.height + radius * 0.5) continue;
     if (b.floor !== undefined && pos.y < b.floor - radius * 0.5) continue;   // pass under a raised span

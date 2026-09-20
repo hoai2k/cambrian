@@ -16,6 +16,7 @@ import { emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type 
 import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, RISE_RATE, sampleCurrent, sampleHeight, shoreDistance, shoreZ, type StaticContact, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 import { areaProfile, bandScale, drawBand, headroom, PASSER_BY } from './population';
 import { columnY, DIP_CHANCE, DRIFT_CURRENT, driftRise, flipLaunch, FLIP_STAMINA, PULSE_CYCLE, pulseRefilling, pulseThrust, punting, rowWalkCurrent } from './locomotion';
+import { amphibious, ASHORE_WADE, ashoreInput, breathesAir, landSpeed, stepBeach, wadeAt, WALL_EASE, WALL_WADE, type BeachContext } from './beach';
 
 export interface PlayerProgress {
   prompts: Prompt[];
@@ -472,6 +473,7 @@ export class Game implements AiWorld {
   private stepIndex = 0;
   private schoolCount = 0;
   private hitCtx: HitContext;
+  private beachCtx: BeachContext;
   setups: PlayerSetup[];
 
   constructor(mode: Mode, setups: PlayerSetup[], seed = 5052026) {
@@ -483,6 +485,7 @@ export class Game implements AiWorld {
     const nursery = nurseryAt(0);
     this.world.loadAround(nursery);
     this.hitCtx = { events: this.events, byId: (id) => this.idMap.get(id), time: 0, rng: this.rng, armour: RULES ? (att, vic, dir) => RULES!.armour(att, vic, dir) : undefined };
+    this.beachCtx = { events: this.events, hitCtx: this.hitCtx };
     // One turn as the giant each. A single human plays the mode exactly as it was before.
     this.huntTurns = mode === 'hunted' ? Math.max(1, setups.length) : 1;
     this.huntScore = setups.map(() => 0);
@@ -872,7 +875,8 @@ export class Game implements AiWorld {
     for (const a of this.actors) {
       if (a.state === 'dead') { this.updateCorpse(a, dt); continue; }
       if (a.state === 'swallowed') { this.updateSwallowed(a, dt); continue; }
-      const input = a.controller === 'player' ? (inputs.get(a.player) ?? emptyInput()) : a.brain ? think(this, a, dt) : emptyInput();
+      // Nothing with a brain plans to be on the sand, so a body that is has one idea: the sea.
+      const input = a.controller === 'player' ? (inputs.get(a.player) ?? emptyInput()) : ashoreInput(a, a.brain ? think(this, a, dt) : emptyInput());
       this.updateActor(a, input, dt);
     }
     this.resolveActorOverlap();
@@ -1044,6 +1048,7 @@ export class Game implements AiWorld {
     this.world.loadAround(at);
     a.pos = this.spawnPoint(at, a.creature, a.scale, a.player);
     a.vel = v3(); a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0; a.eatBites = 0;
+    a.airborne = false; a.wade = 0; a.ashore = false; a.strandT = 0; a.flopT = 0;
     stopHiding(a); a.camoStrength = 0; a.hideCd = 0; a.emergenceHeavy = false; a.spawnProtect = RULES?.spawnProtect(a) ?? 3.5; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.swallowedBy = -1; a.bank = 0; a.pitch = 0; a.climbTo = -Infinity; a.climbPush = 0; this.clearRide(a);
     a.yaw = Math.PI;
     this.beginHatch(a);
@@ -1208,7 +1213,7 @@ export class Game implements AiWorld {
     // sprint or a dash takes the camera's aim, which is the push that gets a bottom-dweller off
     // the bottom along the line it chose rather than only ever straight up by the button.
     const shoving = input.burst > 0.1 || input.dash || a.state === 'dodge';
-    const flatOnFloor = def.ground && a.grounded && !shoving;
+    const flatOnFloor = (def.ground && a.grounded && !shoving) || a.ashore;
     let dir: Vec3 = v3();
     let mag = 0;
     const locked = a.lockTarget >= 0 ? this.idMap.get(a.lockTarget) : undefined;
@@ -1238,7 +1243,7 @@ export class Game implements AiWorld {
     // the button. Off the floor the camera's pitch steers it like any swimmer's, which is what
     // makes the water somewhere it can go rather than only somewhere it can bob. Height is bought
     // with stamina below, so an empty bar keeps the level and the descent and loses only the climb.
-    if (def.ground && (flatOnFloor || (dir.y > 0 && a.stamina <= 0))) dir.y = 0;
+    if ((def.ground && (flatOnFloor || (dir.y > 0 && a.stamina <= 0))) || a.ashore) dir.y = 0;
 
     // Cooldowns, healing, hiding and the stamina bar: everything that ticks whether or not the
     // animal does anything this frame. It settles what the rest of the frame can afford. The
@@ -1251,19 +1256,20 @@ export class Game implements AiWorld {
     const burstMult = controllable && (bursting || freeBurst) ? (1 + (def.burst - 1) * (freeBurst ? 1.25 : burstIn) * (a.controller === 'swarm' ? 0.55 : giantish ? 0.35 : 1)) : 1;
     const baseCruise = def.speed * sf * slowMult * (a.controller === 'swarm' ? 0.62 : giantish ? 0.55 : 1) * (paddling ? PADDLE_SPEED : 1);
     const sw = RULES && controllable ? RULES.swim(this, a, dir, mag, baseCruise, burstIn > 0.1 && !a.prev.burst) : undefined;
-    const cruise = baseCruise * (sw?.speed ?? 1);
+    // The shore slows a walker to its walk over the wade and takes a stranded swimmer's swim away (src/sim/beach.ts).
+    const cruise = baseCruise * (sw?.speed ?? 1) * landSpeed(a);
     // What this body is asking for, whatever its state lets it do about it. Everything below takes
     // the wish away again for a body that is staggered, grabbed or mid-lunge; the tug of war needs
     // the wish itself, from both ends of a grip.
     a.drive = mag > 0
       ? { x: dir.x * mag * cruise, y: dir.y * mag * cruise, z: dir.z * mag * cruise }
       : v3();
-    if (!def.ground) a.drive.y += input.rise ? RISE_RATE * sf : input.sink ? -RISE_RATE * sf : 0;
+    if (!def.ground && !a.ashore) a.drive.y += input.rise ? RISE_RATE * sf : input.sink ? -RISE_RATE * sf : 0;
     const cur = sampleCurrent(v3(), a.pos.x, a.pos.y, a.pos.z, this.time);
     // A drifter on a neutral stick gives up steering and takes the whole current; a walking body
     // down on the floor holds station against it. Everything else feels the usual fraction.
     const drifting = !!def.drift && mag < 0.08 && !input.rise && !input.sink;
-    const curK = drifting ? DRIFT_CURRENT : rowWalkCurrent(a, a.grounded) ?? (def.ground ? 0.08 : 0.55);
+    const curK = (drifting ? DRIFT_CURRENT : rowWalkCurrent(a, a.grounded) ?? (def.ground ? 0.08 : 0.55)) * (1 - a.wade);   // there is no current on the sand
     let desired: Vec3 = v3(cur.x * curK, cur.y * curK, cur.z * curK);
     if (drifting) desired.y += driftRise(this.time) * sf;   // up through the night, down through the day
     // A shelled jetter's funnel is what makes it fast and what makes rising and sinking free, but
@@ -1294,7 +1300,7 @@ export class Game implements AiWorld {
       desired.y += dir.y * mag * cruise * (emptyClimb && dir.y <= 0 ? 1 : burstMult) * pulse;
       desired.z += dir.z * mag * cruise * along * pulse;
     }
-    if (controllable && !def.ground) {
+    if (controllable && !def.ground && !a.ashore) {
       const hover = jets ? 1.6 : 1;
       const base = RISE_RATE * sf * hover;
       // What the rise and sink buttons are worth here, and anything the body does for itself: an
@@ -1438,6 +1444,10 @@ export class Game implements AiWorld {
     else if (a.aiming && a.controller === 'player' && (a.state === 'free' || a.state === 'guard')) targetYaw = hv > 0.35 ? yawOf(facing) : input.camYaw;
     else if (locked && isAlive(locked) && (a.state === 'free' || a.state === 'guard' || a.state === 'attack')) targetYaw = yawOf(sub(locked.pos, a.pos));
     else if (a.rideHost >= 0) targetYaw = this.idMap.get(a.rideHost)?.yaw ?? a.yaw;   // clinging: lie along the host
+    // On the sand a walker faces where it is asked to go, however slowly it is going: a walk is
+    // under the speed at which a swimmer's heading follows its travel, and a body that never
+    // turned would sidle down the beach. A flop turns itself (src/sim/beach.ts).
+    else if (a.wade > 0 && !a.airborne && a.flopT <= 0 && a.state !== 'grabbed' && Math.hypot(a.drive.x, a.drive.z) > 1e-3) targetYaw = yawOf(a.drive);
     // A body with no front never turns to travel: a brittle star rows with whichever arm is
     // leading and a ctenophore's combs beat any way at all, so the stick moves them without
     // pointing them. Aiming still does, which is the branch above.
@@ -1449,8 +1459,12 @@ export class Game implements AiWorld {
     a.yaw = wrapAngle(a.yaw + turn * dt);
     const turnRate = wrapAngle(a.yaw - prevYaw) / Math.max(dt, 1e-4);
     if (a.state === 'ability' && def.ability === 'spineIntercept') a.yaw = yawOf(a.dodgeDir);
-    a.bank = damp(a.bank, def.ground ? 0 : clamp(-turnRate * 0.16, -0.7, 0.7), 4, dt);
-    if (def.ground) {
+    // On the sand a body lies along the slope like a crawler does, and a flop holds the twist and
+    // the nose-up the beach rules gave it (src/sim/beach.ts).
+    const flopping = a.flopT > 0, onLand = a.wade > 0 && !a.airborne;
+    if (!flopping) a.bank = damp(a.bank, def.ground || onLand ? 0 : clamp(-turnRate * 0.16, -0.7, 0.7), 4, dt);
+    if (flopping) { /* set by the flop */ }
+    else if (def.ground || onLand) {
       const ahead = groundHeight(this.world, a.pos.x + Math.sin(a.yaw) * L * 0.4, a.pos.z + Math.cos(a.yaw) * L * 0.4, this.scratchBoulders);
       const behind = groundHeight(this.world, a.pos.x - Math.sin(a.yaw) * L * 0.4, a.pos.z - Math.cos(a.yaw) * L * 0.4, this.scratchBoulders);
       a.pitch = damp(a.pitch, -Math.atan2(ahead - behind, L * 0.8), 8, dt);
@@ -1625,7 +1639,24 @@ export class Game implements AiWorld {
     // top is clear, at the pace the body would swim up. Only what stands more than two bodies above
     // you stops you.
     const contact = this.contact, floraHit = this.floraContact;
-    const hitWall = resolveStatic(this.world, a.pos, bodyRadius(a), this.scratchBoulders, RULES?.shoreReach(a) ?? 0, glideOver(a), climbHeight(a), contact);
+    // The shore, first: how far out of the water the sand here puts this body (src/sim/beach.ts).
+    // Measured on the sand rather than on a rock top, because a rock is something you sit on and
+    // not a shore, and only in the shore band, the one place the sand comes near the surface. A
+    // crawler keeps exactly its old paths — the paddling clamp below still holds it in the sea.
+    a.wade = !def.ground && !def.shore && shoreDistance(a.pos.x, a.pos.z) < 48 ? wadeAt(a, sampleHeight(a.pos.x, a.pos.z)) : 0;
+    // The wall stands for a body swimming at it and for nothing else: a leap is not held by the
+    // water, a body on the sand is past it, and a walker goes up through it. Wading is not enough
+    // — a small body's wade begins seaward of its wall, and a swimmer that could wade up the beach
+    // would strand itself by swimming, which is the one way onto the sand this is not meant to
+    // be. So a stranded body that has flopped back to where it is no longer ashore meets the wall
+    // again from the inside, and the wall eases it out at the pace it could have moved rather than
+    // snapping it: the water taking it back.
+    const held = !a.airborne && !a.ashore && !amphibious(a.creature);
+    const ease = Math.max(WALL_EASE * dt, len3(a.vel) * dt * 1.5);
+    const hitWall = resolveStatic(this.world, a.pos, bodyRadius(a), this.scratchBoulders, held ? RULES?.shoreReach(a) ?? 0 : Infinity, glideOver(a), climbHeight(a), contact, ease);
+    // And the same wall in the body's own draught: the water holds a swimmer where it can still
+    // swim, whatever the fixed wall's distance means on this era's beach (`WALL_WADE`).
+    if (held && a.wade > WALL_WADE) { a.pos.z -= ease; }
     if (hitWall && !def.ground) { a.vel.x *= 0.6; a.vel.z *= 0.6; }
     // Plants: swarm snacks are numerous and tiny, so they take turns on alternate steps.
     floraHit.blocked = false; floraHit.headOn = false; floraHit.top = -Infinity;
@@ -1661,8 +1692,20 @@ export class Game implements AiWorld {
     } else {
       // Riding the floor: a swimmer skims the sand and is carried up and over rocks rather than
       // stopped by them, so the climb reads as a swim rather than a step.
-      if (a.pos.y < floor) { a.pos.y = floor; if (a.vel.y < 0) a.vel.y *= -0.2; }
       const ceiling = swimCeiling(a);
+      if (a.pos.y < floor) {
+        const fell = a.vel.y;
+        a.pos.y = floor; if (a.vel.y < 0) a.vel.y *= -0.2;
+        // A leap that comes down on the sand lands there: the beach, not the splash.
+        if (a.airborne && floor > ceiling) {
+          a.airborne = false; a.vel.y = 0; a.vel.x *= 0.35; a.vel.z *= 0.35;
+          // Far enough up the beach and it is ashore from this frame — the one way a swimmer
+          // gets there (src/sim/beach.ts); short of that it is in the shallows and the water
+          // takes it back.
+          if (a.wade >= ASHORE_WADE) a.ashore = true;
+          this.events.push({ kind: 'beach', pos: { ...a.pos }, actor: a.id, player: a.player, strength: clamp(-fell / 9, 0.5, 1.5) });
+        }
+      }
       if (a.airborne) {
         // back through the surface: the splash, and the water takes most of the fall out of it
         if (a.pos.y <= ceiling && a.vel.y < 0) {
@@ -1681,14 +1724,24 @@ export class Game implements AiWorld {
         // but `free` shut out the one move most likely to launch a fish clear of the water.
         const sp = len3(a.vel);
         const launching = a.state === 'free' || a.state === 'dodge';
-        if (RULES?.canBreach(a) && isAlive(a) && a.vel.y > BREACH_MIN_RISE * sf && sp > def.speed * sf * 0.85 && launching) {
+        // The Cambrian has no rules object and never breached; it does now, on the Devonian's own
+        // terms (a free-swimming body, not a shell, not hidden), because the shore is somewhere a
+        // leap can land in every era and nothing else in that sea can reach it.
+        const may = RULES ? RULES.canBreach(a) : !def.shell && !def.drift && def.swimStyle !== 'pulse' && a.hideMode === 'none';
+        if (may && isAlive(a) && a.vel.y > BREACH_MIN_RISE * sf && sp > def.speed * sf * 0.85 && launching) {
           a.airborne = true;
           // What it leaves the water with is capped to a leap of about its own length; what it was
           // *travelling* at is what the splash is sized on, so a hard breach still reads as one.
           a.vel.y = Math.min(a.vel.y, breachSpeed(lengthOf(a)));
           this.events.push({ kind: 'breach', pos: { x: a.pos.x, y: SURFACE_Y, z: a.pos.z }, actor: a.id, player: a.player, strength: clamp(sp / 12, 0.4, 1.5) });
-        } else { a.pos.y = ceiling; if (a.vel.y > 0) a.vel.y = 0; }
+        } else {
+          // The ceiling, unless the sand is higher: in water too shallow to be under, the body
+          // sits on the sand with its back out of the water rather than being pressed into the
+          // beach, and the shore rules take it from there (src/sim/beach.ts).
+          a.pos.y = Math.min(a.pos.y, Math.max(ceiling, floor)); if (a.vel.y > 0) a.vel.y = 0;
+        }
       }
+      stepBeach(this.beachCtx, a, input, dt, floor, controllable, mag);
     }
 
     // Riding: the grip wins over swimming. Pinned after the collision so the host carries the rider
@@ -1765,7 +1818,8 @@ export class Game implements AiWorld {
       // A dash that is mostly climb is on the same terms as a sprint that is: it costs what is
       // left of it after the relief, and an empty bar does not refuse it — the body just goes up
       // rather than along (see `startDash`). There is always a way back to the surface.
-      else if (justDash && (a.stamina >= 10 || freeClimb) && (a.exhausted === 0 || freeClimb) && a.dashCd === 0 && !a.dashUsed) {
+      // Not on the sand: a stranded body's dash is its flop, and a walker has no water to dash through.
+      else if (justDash && !a.ashore && (a.stamina >= 10 || freeClimb) && (a.exhausted === 0 || freeClimb) && a.dashCd === 0 && !a.dashUsed) {
         a.dashUsed = true;
         this.startDash(a, def, mag > 0.3 ? dir : vscale(heading(a.yaw), jets || def.tailFlip ? -1 : 1), L, sf, relief);
       }
@@ -3521,6 +3575,12 @@ export class Game implements AiWorld {
   hintFor(i: number): string | undefined {
     const p = this.players[i]; const pr = this.progress[i];
     if (!p || !pr || this.mode === 'reef') return undefined;
+    // The shore is every era's, so its hint comes before the era's own.
+    if (p.ashore && isAlive(p)) {
+      return !breathesAir(p.creature) ? 'Out of the water. {swim} toward the sea to flop back in. You have a minute.'
+        : amphibious(p.creature) ? 'On the shore. The sea is behind you; walk back in when you like.'
+        : 'On the shore. Walk back down to the water.';
+    }
     if (RULES) return RULES.hint(this, i);
     const f = pr.flags;
     if (!isAlive(p)) return undefined;
