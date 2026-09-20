@@ -242,11 +242,13 @@ for (const file of targets) {
     // and anything within a few hundredths ahead of the hinge took the seam's cut through the
     // generation's own oral cavity, where the floor parts from the roof at the back of the mouth
     // (Cymbospondylus, 12 midline points at 1 %) -- a hole into the throat, which is the mouth
-    // rule's business and not the junction's. A hair of tolerance covers meshopt's quantisation.
+    // rule's business and not the junction's. A hair of tolerance covers meshopt's quantisation:
+    // half a thousandth of a body, because at two thousandths it took Placodus' lip points a
+    // hundredth ahead of its cut plane (10 points "open" at 0.5 %, skull 1 against jaw 0.6).
     // ... and the shore kit seats its jaw bone *behind* the plane it cuts at (Coelophysis,
     // Macrocnemus, Tanystropheus), so the station is the hinge's or the rim's own rearmost point,
     // whichever is further forward.
-    const hingeStation = Math.max(head[jawK].dot(axis), Math.min(...stations)) + L * 0.002;
+    const hingeStation = Math.max(head[jawK].dot(axis), Math.min(...stations)) + L * 0.0005;
     const isCut = (n) => stations[n] <= hingeStation;
     void transverse; void rearEnd;
     cut = pairs.filter((pr, n) => isCut(n));

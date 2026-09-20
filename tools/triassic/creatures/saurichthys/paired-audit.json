@@ -2,22 +2,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1796060,
-      "sha256": "cf910d8e3b84404794b738d6ce7d393cde0b140d3dd78f536b4b0bb161c6c5e7",
+      "bytes": 1804304,
+      "sha256": "30f85d7010132839cd18f4db858949398a8b730551b19a6db1f05c28d3241dcc",
       "triangles": 22078,
       "vertices": 13491
     },
     {
       "suffix": ".puppet",
-      "bytes": 1311040,
-      "sha256": "df27ae75517b5015a5ade570f172cbb23b6b89d6a7ed549b5e191304d10acac0",
+      "bytes": 1313156,
+      "sha256": "6586493b2676765cdd01cd1b20fb45a3c3f2caa606d482335164008b64b8fbb3",
       "triangles": 8443,
       "vertices": 4288
     },
     {
       "suffix": ".lod1",
-      "bytes": 1311040,
-      "sha256": "df27ae75517b5015a5ade570f172cbb23b6b89d6a7ed549b5e191304d10acac0",
+      "bytes": 1313156,
+      "sha256": "6586493b2676765cdd01cd1b20fb45a3c3f2caa606d482335164008b64b8fbb3",
       "triangles": 8443,
       "vertices": 4288
     }
@@ -694,20 +694,20 @@
       "clip": "Death",
       "grewFrom": 0.023875433930215025,
       "grewTo": 0.08611216413657156,
-      "edgesOver2x": 30
+      "edgesOver2x": 67
+    },
+    "Saurichthys_authored_body_lower_jaw": {
+      "worstRatio": 1.6903137757726165,
+      "clip": "Bite",
+      "grewFrom": 0.05976912480373811,
+      "grewTo": 0.10102857502163132,
+      "edgesOver2x": 0
     },
     "Mouth_lining": {
       "worstRatio": 1.0000001371674654,
       "clip": "Death",
       "grewFrom": 0.14312763394758551,
       "grewTo": 0.1431276535800403,
-      "edgesOver2x": 0
-    },
-    "Saurichthys_authored_body_lower_jaw": {
-      "worstRatio": 1.000000069159676,
-      "clip": "Death",
-      "grewFrom": 0.0760494021250193,
-      "grewTo": 0.0760494073845713,
       "edgesOver2x": 0
     }
   },

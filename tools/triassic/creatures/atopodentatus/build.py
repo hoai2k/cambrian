@@ -586,7 +586,13 @@ for o in (auth, puppet):
     # cut cannot open (`T.jaw_junction`; `tools/triassic/lag.mjs` measures the seam it closes).
     body_w, shell_w, JUNCTION[o.name] = T.jaw_junction(
         o, shell, relaxed, B['jaw'][0], rear=lambda p: abs(p.y - HINGE_Y) < 1e-5,
-        upper_jaw=lambda p: p.y < HINGE_Y and p.z >= seam(p.y) - 1e-6, axis=(0., -1., 0.))
+        upper_jaw=lambda p: p.y < HINGE_Y and p.z >= seam(p.y) - 1e-6, axis=(0., -1., 0.),
+        # A lighter throat share here: this head's `Heavy` pulls the neck back a third of a body
+        # while the jaw opens, and at a full share the gradient of jaw weight across the throat
+        # behind the corner of the mouth tore `neck_02` skin 4.31x where the body had read 3.90x
+        # (its own jaw's edge in the same clip). At 0.6 the rim still closes and the shell's short
+        # band carries the rest of the ramp where a point barely moves.
+        throat=.6)
     counts, owners = [], {}
     for part, field in ((o, body_w), (shell, shell_w)):
         for v in part.data.vertices:

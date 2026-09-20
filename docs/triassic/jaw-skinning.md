@@ -130,11 +130,106 @@ worst cut-pair separation over every clip; *jaw lag* its lag figure with `follow
 brackets; the three skin columns are `skin-tears.mjs` — the body's worst skin edge and the worst
 edge dominated by `jaw` and by `skull`.
 
-<!-- TABLE -->
+| Body | Repaired | Jaw cut opens, before → after | Jaw lag (follows in Bite) before → after | Skin worst before → after | `jaw` skin before → after | `skull` skin before → after |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| aphaneramma | yes | 1.65 % → 0.00 % | 1.05 (1.00) → 1.05 (0.99) | 4.43x → 4.43x | 2.82x → 4.02x | 2.02x → 2.02x |
+| archelon | yes | 0.24 % → 0.00 % | 1.01 (1.00) → 1.01 (1.00) | 3.86x → 3.86x | 1.19x → 1.44x | 1.26x → 1.26x |
+| askeptosaurus | no | 0.00 % → 0.00 % | 1.00 (1.02) → 1.00 (1.02) | 1.10x → 1.10x | 1.00x → 1.00x | 1.01x → 1.01x |
+| atopodentatus | yes | 0.26 % → 0.00 % | 1.12 (1.00) → 1.12 (1.00) | 3.90x → 3.90x | 3.90x → 3.90x | 1.62x → 1.62x |
+| birgeria | yes | 0.07 % → 0.00 % | 1.00 (0.99) → 1.00 (0.99) | 3.46x → 3.46x | 1.45x → 1.80x | 1.31x → 1.31x |
+| cartorhynchus | yes | 2.02 % → 0.00 % | 1.04 (1.00) → 1.04 (1.00) | 3.72x → 3.72x | 1.00x → 1.46x | 1.27x → 1.29x |
+| ceratites | no | no shell → no shell | 1.03 (nan) → 1.03 (nan) | 7.73x → 7.73x | 1.36x → 1.36x | 1.61x → 1.61x |
+| coelophysis | no | 0.01 % → 0.01 % | 0.99 (0.99) → 0.99 (0.99) | 7.74x → 7.74x | 3.56x → 3.56x | 7.74x → 7.74x |
+| cymbospondylus | yes | 1.14 % → 0.01 % | 1.03 (1.00) → 1.03 (1.00) | 2.48x → 2.48x | 1.00x → 1.15x | 1.15x → 1.15x |
+| dinocephalosaurus | yes | 0.67 % → 0.01 % | 1.01 (1.00) → 1.01 (1.00) | 7.00x → 7.00x | 1.00x → 1.00x | 1.00x → 1.00x |
+| helicoprion | no | no shell → no shell | 1.01 (0.99) → 1.01 (0.99) | 14.33x → 14.33x | 3.76x → 3.76x | 4.21x → 4.21x |
+| henodus | yes | 0.00 % → 0.00 % | 1.02 (1.00) → 1.02 (1.00) | 4.81x → 4.81x | 1.04x → 1.21x | 1.22x → 1.22x |
+| hupehsuchus | no | 0.00 % → 0.00 % | 0.93 (0.98) → 0.93 (0.98) | 3.47x → 3.47x | 2.70x → 2.70x | 2.81x → 2.81x |
+| hybodus | yes | 6.05 % → 0.00 % | 1.10 (1.00) → 1.10 (1.00) | 5.93x → 5.93x | 1.00x → 2.55x | 5.93x → 5.93x |
+| keichousaurus | yes | 0.54 % → 0.33 % | 0.99 (1.00) → 0.99 (1.00) | 2.34x → 2.34x | 1.00x → 1.14x | 1.07x → 1.08x |
+| macrocnemus | no | 0.00 % → 0.00 % | 1.01 (1.02) → 1.01 (1.02) | 3.41x → 3.41x | 2.39x → 2.39x | 3.41x → 3.41x |
+| mixosaurus | yes | 1.64 % → 0.00 % | 1.01 (1.00) → 1.02 (1.00) | 3.62x → 3.62x | 1.00x → 1.88x | 1.65x → 1.81x |
+| mosasaurus | yes | 0.04 % → 0.00 % | 1.00 (1.00) → 1.00 (1.00) | 2.54x → 2.54x | 1.45x → 1.83x | 1.28x → 1.28x |
+| mystriosuchus | yes | 1.80 % → 0.00 % | 0.99 (1.00) → 0.98 (1.00) | 4.48x → 4.48x | 1.66x → 2.21x | 1.33x → 1.33x |
+| nothosaurus | yes | 2.19 % → 0.28 % | 1.02 (1.00) → 1.02 (0.96) | 2.99x → 2.99x | 1.00x → 1.05x | 1.00x → 1.00x |
+| odontochelys | yes | 0.28 % → 0.00 % | 1.01 (0.99) → 1.02 (0.98) | 5.12x → 5.12x | 1.41x → 1.56x | 1.18x → 1.18x |
+| phragmoteuthis | no | no shell → no shell | 1.01 (1.00) → 1.01 (1.00) | 5.37x → 5.37x | 1.42x → 1.42x | 1.34x → 1.34x |
+| placodus | yes | 1.72 % → 0.00 % | 1.07 (1.00) → 1.07 (1.04) | 12.36x → 12.36x | 1.00x → 1.79x | 1.14x → 1.49x |
+| rhaeticosaurus | yes | 0.22 % → 0.00 % | 1.02 (1.00) → 1.02 (0.99) | 2.81x → 2.81x | 1.40x → 1.52x | 1.26x → 1.26x |
+| saurichthys | yes | 3.51 % → 0.03 % | 1.04 (1.00) → 1.04 (1.00) | 3.61x → 3.61x | 1.00x → 3.00x | 1.12x → 3.16x |
+| shonisaurus | no | 0.00 % → 0.00 % | 1.05 (0.98) → 1.05 (0.98) | 1.44x → 1.44x | 1.00x → 1.00x | 1.00x → 1.00x |
+| tanystropheus | yes | 0.44 % → 0.00 % | 1.00 (1.00) → 1.00 (1.00) | 3.00x → 3.00x | 1.00x → 1.00x | 1.01x → 1.01x |
+
+Read the `jaw` column with the repair in mind: a rigid shell reads 1.00x on its own edges by
+construction, and the junction *is* a stretch — the short band from the rim to full jaw is where
+the shell agrees with the body, so the jaw-dominated edges there now read 1.1–3.2x at full gape
+(Hybodus 2.55x, Saurichthys 3.00x, Aphaneramma 4.02x on the edges the tucked forelimb shares with
+the throat). None of it reaches the body's own worst figure, which is the bar the task set and is
+unchanged on every repaired body; where the first build did push it up (Saurichthys 5.61x,
+Aphaneramma 4.57x, Atopodentatus 4.31x) the cause was found and the figure brought back exactly.
+The `skull` column moves on three bodies (Saurichthys 1.12 → 3.16x at the rim it shares with the
+rostrum's tooth roots, Placodus 1.14 → 1.49x, Mixosaurus 1.65 → 1.81x), the throat behind the
+hinge following the jaw, and on none of them past the body's figure.
 
 ## Per body
 
-<!-- PERBODY -->
+Every repaired body was rebuilt as its full authored/puppet/LOD triplet, packaged with its own
+`audit.mjs --package --decode` (exact rig, clip and anchor parity between the authored body and
+its twin on every one), and measured on the packaged files. Where a builder appends a gait with
+`tools/creatures/motion/apply.mjs` (Nothosaurus `Walk`, Hybodus and Saurichthys `Flop`) that
+tool was re-run on the rebuilt body and the clip re-listed in the creature's json. Renders are
+`throat-repairs/<id>-jaw-before.png` / `-after.png`, both at the clip and phase `lag.mjs` named
+as the worst before the repair.
+
+- **Hybodus** (the owner's example): 6.05 → 0.00 %, 99 rim points closed. The rim is labelled,
+  not planar — the mandible is the faces whose surface grows below the mouth line, in a window
+  that runs 0.04 of a body *behind* the hinge — so `rear` is every shared vertex from a hair ahead
+  of the hinge back that the seam cut did not make, at `band` and `back` in raw units
+  (0.0178, 0.0711). Skin 5.93x unchanged (`Shake`, the recorded opercular crack); the jaw's own
+  edge goes 1.00x → 2.55x in `Heavy`, which is the shear strip at the rim doing the closing.
+  `Flop` re-applied. Before, the render showed a serrated tear the length of the rim with the
+  throat exposed behind it; after, the throat is continuous under the mandible.
+- **Saurichthys** (the owner's other example): 3.51 → 0.03 %. Same kit and predicate as Hybodus.
+  The first port took every shared vertex in the rear half of the mandible, which included the
+  label boundary round the interlocking tooth roots forward of the hinge, and pinned the mandible
+  to the upper tooth row at 5.61x; with the predicate at the hinge the skin is back to exactly
+  3.61x. `Flop` re-applied.
+- **Nothosaurus**: 2.19 → 0.28 % (one corner point of 89). Plane cut at `JAWCUT`, throat follows
+  under the fitted lip plane. Skin 2.98x unchanged, the T3D-14 bound. `Walk` re-applied. The
+  before render is the clearest of the set: a pale wedge open under the corner at `Heavy`.
+- **Cartorhynchus**: 2.02 → 0.00 %. Skin 3.72x unchanged. The notch under the corner of the mouth
+  at `Heavy` is gone.
+- **Mystriosuchus**: 1.80 → 0.00 %. Skin 4.48x unchanged. Its right forelimb is tucked under the
+  snout; the limb term keeps the throat share off it.
+- **Placodus**: 1.72 → 0.00 % (303 rim points; the hinge plane at `HINGE_X`, the front cut behind
+  the chisels left to part). Skin 12.36x unchanged (`Pry`, a paddle). Built after the merge of
+  T3D-17, so the triplet carries `Upper crushing teeth`; `hidden-parts.mjs --check` passes on it.
+- **Aphaneramma**: 1.65 → 0.00 %. The first build read 4.57x on `jaw` in `Ability`, the throat
+  share reaching the right forelimb tucked under the snout; with the share scaled by the vertex's
+  non-limb weight it is back to exactly 4.43x.
+- **Mixosaurus**: 1.64 → 0.00 %. The worked example for `band` (0.05 bowed the mandible; 0.015
+  does not) and for `rear` (the front cut under the overhanging snout must part). Skin 3.62x
+  unchanged, torn clips past 2x down from 9 to 4.
+- **Cymbospondylus**: 1.14 → 0.03 %. Skin 2.48x unchanged. Rebuilt a second time on the final
+  helper (its first build preceded the limb term by a minute; the figures did not move).
+- **Dinocephalosaurus**: 0.67 → 0.01 %. Head-frame planes (`HINGE_A` along `HEAD_DIR`). Skin
+  7.00x unchanged. Its builder imports the helper directly, as Nothosaurus' does.
+- **Keichousaurus**: 0.54 → 0.33 % (3 corner points of 38). Skin 2.34x unchanged; the slot
+  under the corner at `Bite` is closed in the render.
+- **Tanystropheus**: 0.44 → 0.00 % (31 of 45 points were open at `Severed`). Through
+  `K.jaw_junction` on the shore kit, with `K.relax_weights` run first and the parts bound by hand
+  since `K.bind` relaxes and writes in one go. Skin 3.00x unchanged.
+- **Odontochelys** 0.28 → 0.00 %, **Atopodentatus** 0.26 → 0.00 % (see below), **Archelon**
+  0.24 → 0.01 %, **Rhaeticosaurus** 0.22 → 0.00 %, **Birgeria** 0.07 → 0.00 %, **Mosasaurus**
+  0.04 → 0.00 %, **Henodus** 0.00 → 0.00 % (its 0.018 blend already closed the rim; now the
+  throat follows too). Skin figures unchanged on all seven.
+- **Atopodentatus** is the one body whose skin figure moved: 3.90x → 4.31x on the first
+  rebuild, on `neck_02` in `Heavy` — that clip pulls the neck back a third of a body while the
+  jaw opens, and at a full throat share the gradient of jaw weight across the throat behind the
+  corner tore the neck skin harder than its own jaw edge had. Rebuilt with `throat=.6` the cut
+  is still closed (0.00 %, 80 rim points) and the skin is back to exactly 3.90x, so the throat
+  share is a builder parameter rather than a constant — a neck that swings while the jaw opens
+  wants less of the jaw in it.
 
 ## What was not repaired, and why
 
@@ -166,4 +261,17 @@ edge dominated by `jaw` and by `skull`.
 
 ## Verification
 
-<!-- VERIFY -->
+- `node tools/triassic/lag.mjs --all`: every jaw cut closed or open only at corner points under
+  the threshold; no limb joint lags. It runs in `npm run triassic` after `idle-bones.mjs`.
+- `node tools/triassic/skin-tears.mjs --all --json`: no rebuilt body's skin figure above its
+  pre-repair figure (the table); Saurichthys and Aphaneramma came back to theirs exactly once their
+  first-build faults were corrected.
+- `node tools/triassic/idle-bones.mjs --all`: every joint owns skin on every body.
+- `node tools/triassic/oral-shell-audit.mjs <id>`: separate closed rigid palate/floor (or none, by
+  verdict) on authored, puppet and LOD of every rebuilt body — the shells are untouched by the
+  junction, which writes weights only.
+- `node tools/triassic/hidden-parts.mjs --check`: nothing the game hides is named as anatomy
+  (Placodus' rename carried through its rebuild).
+- Each body's `audit.mjs --package --decode`: exact rig, clip and anchor parity.
+- Portraits re-rendered from the packaged files and `publish-portraits.mjs --check` current;
+  `node tools/update-asset-sizes.mjs` run; `npx tsc --noEmit`, `npm run build`, `npm run triassic`.

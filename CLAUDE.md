@@ -714,8 +714,8 @@ unless the user explicitly asks for a PR. Steps:
   edge test sees it.** Every jawed Triassic body cuts its lower jaw off as a separate object, and
   every one of them then weighted that shell to `jaw` at 1 against a body on the skull: the two
   copies of each rim vertex parted by the rim's depth under the hinge times the gape angle — 6 % of
-  a body on Hybodus, 3–4 % on Mystriosuchus, Saurichthys and Coelophysis' corner, 2 % on Nothosaurus
-  and Cartorhynchus — a slot under the corner of the mouth that `skin-tears.mjs` cannot measure
+  a body on Hybodus, 3.5 % on Saurichthys, 2 % on Nothosaurus, Cartorhynchus, Mystriosuchus and
+  Placodus, eleven bodies past half a percent — a slot under the corner of the mouth that `skin-tears.mjs` cannot measure
   because no edge crosses a seam between two shells, `idle-bones.mjs` cannot because both parts
   own plenty, and the paired audits cannot because the twin has the same slot.
   `tools/triassic/lag.mjs` (in `npm run triassic`) measures it as the worst separation over every
@@ -733,8 +733,12 @@ unless the user explicitly asks for a PR. Steps:
   0.04 of a body *behind* the hinge, so a window ahead of the hinge found 30 of 109 rim points with
   a negative depth and closed nothing. The corner of the mouth is one vertex on both the lip and
   the cut, so a point or two parting there by the gape times its short radius is the lip; a cut
-  that opens opens along its length, which is what the tool fails on. Record and renders:
-  `docs/triassic/jaw-skinning.md`.
+  that opens opens along its length, which is what the tool fails on. And the throat share is
+  scaled by what a vertex is *not* a limb's, and is a builder parameter: Aphaneramma's tucked
+  forelimb took half of itself from the jaw at 4.6x until the limb term, and Atopodentatus'
+  `Heavy` pulls the neck back a third of a body while the jaw opens, so a full share tore the
+  neck behind the corner harder than the jaw's own edge (3.90x → 4.31x) and that body runs at
+  0.6. Record and renders: `docs/triassic/jaw-skinning.md`.
 - **A containment test written on `np.interp` cannot fail outside its own table**, because
   `np.interp` clamps rather than refusing. Hybodus' and Saurichthys' hinge plugs were "fitted" by
   asking whether each vertex was inside `head_half_width(y)` and between `head_z(y)` — both

@@ -1,10 +1,11 @@
 {
   "id": "cartorhynchus",
-  "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present.",
+  "verdict": "separate closed rigid palate/floor",
+  "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present. A body with no lining mesh is reported as such, with the hidden oral parts it does carry listed, and all three variants must agree.",
   "models": [
     {
       "variant": "authored",
-      "sha256": "6b3f284d51185f1160b4fb0665dff85ea17b20c86c864432704b84cf2731e44e",
+      "sha256": "015a24e011734423f0334cc608a229b6f96e580bde137410d1639f8dec44da78",
       "meshes": [
         {
           "name": "Oral cavity lining",
@@ -17,11 +18,15 @@
           "mixedVertices": 0,
           "bridgingTriangles": 0
         }
-      ]
+      ],
+      "otherOralMeshes": [
+        "Seated jaw hinge tissue"
+      ],
+      "oralShells": "separate palate and floor"
     },
     {
       "variant": ".puppet",
-      "sha256": "af4d5464b137a5b787b0d3d22eddcfd4bfd78bbbe427d776b200aa3ccbd320b3",
+      "sha256": "9796b64edc0c821f04ae7f61d37483f7970b70a26f07e3cafa2301b6c826e3cc",
       "meshes": [
         {
           "name": "Oral cavity lining",
@@ -34,11 +39,15 @@
           "mixedVertices": 0,
           "bridgingTriangles": 0
         }
-      ]
+      ],
+      "otherOralMeshes": [
+        "Seated jaw hinge tissue"
+      ],
+      "oralShells": "separate palate and floor"
     },
     {
       "variant": ".lod1",
-      "sha256": "af4d5464b137a5b787b0d3d22eddcfd4bfd78bbbe427d776b200aa3ccbd320b3",
+      "sha256": "9796b64edc0c821f04ae7f61d37483f7970b70a26f07e3cafa2301b6c826e3cc",
       "meshes": [
         {
           "name": "Oral cavity lining",
@@ -51,7 +60,11 @@
           "mixedVertices": 0,
           "bridgingTriangles": 0
         }
-      ]
+      ],
+      "otherOralMeshes": [
+        "Seated jaw hinge tissue"
+      ],
+      "oralShells": "separate palate and floor"
     }
   ]
 }

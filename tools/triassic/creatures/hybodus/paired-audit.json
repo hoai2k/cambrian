@@ -2,22 +2,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1836388,
-      "sha256": "503be12faf6874c7c3d7d7d41baa04fcff135e48173e35ebfec24bacbbece839",
+      "bytes": 1842816,
+      "sha256": "a65bebb98227753917ddb71d304d6b718f7516c1e2112776e4820c6e67f407e6",
       "triangles": 22161,
       "vertices": 13223
     },
     {
       "suffix": ".puppet",
-      "bytes": 1314436,
-      "sha256": "9ffb07b87f379a8d833aa917408ce5d2eb9eb280b3a923235a6322a906cf9ab4",
+      "bytes": 1315816,
+      "sha256": "d246d2fb636fc204270d51220c0bbbaf0ebee873de07505747e5d6aca854e41e",
       "triangles": 7984,
       "vertices": 4027
     },
     {
       "suffix": ".lod1",
-      "bytes": 1314436,
-      "sha256": "9ffb07b87f379a8d833aa917408ce5d2eb9eb280b3a923235a6322a906cf9ab4",
+      "bytes": 1315816,
+      "sha256": "d246d2fb636fc204270d51220c0bbbaf0ebee873de07505747e5d6aca854e41e",
       "triangles": 7984,
       "vertices": 4027
     }
@@ -693,20 +693,20 @@
       "clip": "Shake",
       "grewFrom": 0.016669982290208534,
       "grewTo": 0.0988521860391917,
-      "edgesOver2x": 843
+      "edgesOver2x": 4065
+    },
+    "Hybodus_authored_body_lower_jaw": {
+      "worstRatio": 2.212816260269062,
+      "clip": "Heavy",
+      "grewFrom": 0.03437330026514221,
+      "grewTo": 0.07606179774581753,
+      "edgesOver2x": 1
     },
     "Mouth_lining": {
       "worstRatio": 1.0000000936849536,
       "clip": "Death",
       "grewFrom": 0.14635740410127462,
       "grewTo": 0.14635741781276124,
-      "edgesOver2x": 0
-    },
-    "Hybodus_authored_body_lower_jaw": {
-      "worstRatio": 1.0000000718917703,
-      "clip": "Death",
-      "grewFrom": 0.16966633682256144,
-      "grewTo": 0.16966634902017474,
       "edgesOver2x": 0
     }
   },
