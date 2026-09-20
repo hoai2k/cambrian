@@ -1056,6 +1056,31 @@ unless the user explicitly asks for a PR. Steps:
   `tripo-raw/`, and it refuses a rigged body by name), importing the viewer's own `warp()` so the
   file is what was previewed and reading the result back to prove it. `docs/viewer-stretch.md` is
   the whole of it; Blender work it implies goes in `docs/triassic/builder-requests.md`.
+- The viewer's **mouth editor** (`&mode=mouth`, the *Mouth* button) is the human answer to the
+  mouth rule above: every builder finds the mouth by a measurement that has been fooled at least
+  once, and this lets a person aim the cut by eye and hand it over as numbers. The document is a
+  **cut plane and a hinge** — six numbers on the body's frame (`src/viewer/mouth/mouth.ts`, pure):
+  how far back from the nose the hinge sits, the line's height and its seat across the head, and
+  pitch, yaw and roll — composed in that order so each angle reads as its own view's angle when
+  the other two are zero, and exported as basis vectors as well, so no consumer recomposes them.
+  The mandible is everything **below the plane and ahead of the hinge**; the second half-space is
+  what stops the cut running back through the neck, and it is also the editor's honest limit — a
+  paddle tucked forward under the snout falls inside it, as Aphaneramma's did in a builder's own
+  cut, and the count says so rather than the tool hiding it. Three handles on the orbit view
+  (hinge moves the cut in the camera's plane, front aims the line, side tips it), right-drag
+  orbits as in mark mode, every mandible vertex is lit with the same overlay mark mode uses — a
+  vertex-colour tint was the obvious alternative and would have broken the recolour hook, which
+  reads COLOR_0 as its mask. The first guess follows the stretcher's precedence: a rigged body's
+  `jaw` bone *is* its hinge and `anchor_mouth` sets the pitch, a socket alone sets the height, a
+  raw generation gets the head's own section a head's worth back, and the panel says which. It
+  works on **whatever body is on stage**, the raw generation above all, and the export names the
+  exact file by a **sha256 measured in the page** (`crypto.subtle` over the bytes the browser has;
+  a manifest's hash or `null` where it cannot) with `appliesTo` saying whether that was the
+  generation, its preview, the built body or the twin. `fromExport` is the one reader and refuses
+  a file whose hash or vertex count no longer matches, `npm run triassic:mouth -- <file>` is the
+  consumer that hashes the GLB on disk and re-counts the cut over the real mesh, `npm run mouth`
+  and `node tools/mouth-browser.mjs` check it, and `docs/viewer-mouth.md` is the schema and the
+  workflow, exact use and guidance both.
 - A bare `?debug` on the site root (`/?debug`) opens the index of every one of these tools —
   `src/ancientseas/DebugIndex.tsx`, data in `src/ancientseas/debug-index.ts`, mounted by
   `src/ancientseas/main.tsx` the way `Root.tsx` mounts the state editor. It is the trilogy page's
