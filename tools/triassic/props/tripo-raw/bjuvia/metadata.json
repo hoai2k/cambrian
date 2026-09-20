@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "name": "bjuvia",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "input": {
+      "pbr": true,
+      "file": {
+        "type": "jpeg",
+        "object": {
+          "key": "tcli_2f16803761ed4cf0af45a11555b61c60/20260920/9f7bf125-5318-4e4a-ad99-11354189f005/image.jpeg",
+          "bucket": "tripo-data"
+        }
+      },
+      "texture": true,
+      "export_uv": true,
+      "face_limit": 20000,
+      "model_version": "v3.1-20260211",
+      "geometry_quality": "standard",
+      "enable_image_autofix": false
+    },
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    },
+    "task_id": "9f7bf125-5318-4e4a-ad99-11354189f005",
+    "created_at": "2026-09-20T02:58:40.583270Z",
+    "completed_at": "2026-09-20T03:00:33.457796Z",
+    "credits_consumed": 30
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/bjuvia/input.png",
+    "sha256": "1b05cbcd2dc68e07d6dcc2fd55e8bed09cbd0d2f8f4283402c0dbad4bbd44914",
+    "bytes": 5163093
+  },
+  "artifact": {
+    "path": "tools/triassic/props/tripo-raw/bjuvia/bjuvia.raw.glb",
+    "bytes": 1621880,
+    "sha256": "304a45f33a4ecdbf81ff2ce014733c9358241e8e7567570d76f9442e6e5351f3",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-20T03:00:44.486Z"
+}

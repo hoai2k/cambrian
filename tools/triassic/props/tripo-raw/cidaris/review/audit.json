@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/props/tripo-raw/cidaris/cidaris.raw.glb",
+    "bytes": 2232564,
+    "sha256": "fb92bb660046ebf9a43451dab3c2949cffa4690fa67ae144e9eefe57576b86d2"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 16240,
+    "faces": 19060,
+    "triangles": 19060,
+    "connected_components": 999,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.499363,
+      -0.5,
+      -0.431603
+    ],
+    "max_xyz": [
+      0.499363,
+      0.5,
+      0.431603
+    ],
+    "center_xyz": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "size_xyz": [
+      0.998726,
+      1.0,
+      0.863205
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_55006fbf-55f2-4627-9795-980993ac9824",
+      "mesh": "tripo_mesh_55006fbf-55f2-4627-9795-980993ac9824",
+      "vertices": 16240,
+      "edges": 34301,
+      "faces": 19060,
+      "triangles": 19060,
+      "connected_components": 999,
+      "material_slots": [
+        "tripo_material_55006fbf-55f2-4627-9795-980993ac9824"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_55006fbf-55f2-4627-9795-980993ac9824",
+      "image_textures": [
+        "Color_55006fbf-55f2-4627-9795-980993ac9824",
+        "NormalGL_55006fbf-55f2-4627-9795-980993ac9824",
+        "ORM_55006fbf-55f2-4627-9795-980993ac9824"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_55006fbf-55f2-4627-9795-980993ac9824",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_55006fbf-55f2-4627-9795-980993ac9824",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_55006fbf-55f2-4627-9795-980993ac9824",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/props/tripo-raw/cidaris/review/side.png",
+    "top": "tools/triassic/props/tripo-raw/cidaris/review/top.png",
+    "three-quarter": "tools/triassic/props/tripo-raw/cidaris/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-publish/local/triassic-authoring/props/cidaris/cidaris.preview.glb",
+    "triangle_limit": 5000,
+    "triangles_before": 19060,
+    "triangles_after": 4925,
+    "bytes": 1722448,
+    "sha256": "e249b7cc928b9988adc441dfeb51bb6492f66e9c24ebc655021c4540a6ed950d"
+  }
+}

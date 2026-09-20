@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "name": "cidaris",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "input": {
+      "pbr": true,
+      "file": {
+        "type": "jpeg",
+        "object": {
+          "key": "tcli_2f16803761ed4cf0af45a11555b61c60/20260920/55006fbf-55f2-4627-9795-980993ac9824/image.jpeg",
+          "bucket": "tripo-data"
+        }
+      },
+      "texture": true,
+      "export_uv": true,
+      "face_limit": 20000,
+      "model_version": "v3.1-20260211",
+      "geometry_quality": "standard",
+      "enable_image_autofix": false
+    },
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    },
+    "task_id": "55006fbf-55f2-4627-9795-980993ac9824",
+    "created_at": "2026-09-20T02:56:31.070157Z",
+    "completed_at": "2026-09-20T02:58:20.721640Z",
+    "credits_consumed": 30
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/cidaris/input.png",
+    "sha256": "904995dc87e2b7660bff129de5d34408643fb501aa96d518f16ae9d735a49ab1",
+    "bytes": 5861475
+  },
+  "artifact": {
+    "path": "tools/triassic/props/tripo-raw/cidaris/cidaris.raw.glb",
+    "bytes": 2232564,
+    "sha256": "fb92bb660046ebf9a43451dab3c2949cffa4690fa67ae144e9eefe57576b86d2",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-20T02:58:35.688Z"
+}
