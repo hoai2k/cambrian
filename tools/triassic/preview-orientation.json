@@ -11,7 +11,5 @@
     "tools/triassic/preview-bodies.mjs deletes the whole preview entry the day the real body ships.",
     "A yaw here that turns out wrong costs a preview that faces the wrong way, never a shipped asset."
   ],
-  "yaw": {
-    "askeptosaurus": 0
-  }
+  "yaw": {}
 }

@@ -1,4 +1,5 @@
 import { Game } from '../src/sim/game';
+import { kill, startSwallow } from '../src/sim/combat';
 import { emptyInput, type InputFrame } from '../src/sim/types';
 import { applyScaleStats, bandOf, isAlive, lengthOf } from '../src/sim/actors';
 import { dist } from '../src/shared/math';
@@ -156,6 +157,29 @@ for (const [creatureId, mode, scale] of [['waptia', 'rise', 0.25], ['anomalocari
   rival.brain.goal = 'fight'; rival.brain.target = p.id;
   check('a neighbour picking a fight is a warning at any size', comingFor(rival, p) && bandOf(p, rival) === 'rival',
     `band ${bandOf(p, rival)}`);
+}
+
+// --- being eaten is the end of the chase ---
+{
+  // The warning used to keep the last score it had, because the scan only ever *raises* `best` and
+  // nothing hunts a corpse. So the arrow, the eye and the line stayed up over a dead body, saying
+  // a thing that had stopped being true at the moment it stopped mattering. The hunt is written
+  // straight onto the body here rather than staged with a predator: what is under test is that a
+  // body which is no longer alive reports no hunt, whatever it was reporting a moment earlier.
+  const g = new Game('reef', [{ creature: 'opabinia', device: 'keyboard', ready: true }], 5);
+  const p = g.players[0]; g.skipHatch(); p.spawnProtect = 0;
+  const m = new Map([[0, { ...emptyInput() } as InputFrame]]);
+  p.hunted = 0.9; p.hunterId = 7; p.wasHunted = true;
+  kill(g.hitCtx, p);
+  for (let i = 0; i < 4; i++) { g.step(1 / 60, m); g.events.length = 0; }
+  check('being eaten ends the hunt', p.hunted === 0 && p.hunterId < 0 && !p.wasHunted, `${p.hunted.toFixed(2)} from ${p.hunterId}`);
+  // Swallowed is the same answer before the body is even dead: it is in something's mouth.
+  const g2 = new Game('reef', [{ creature: 'opabinia', device: 'keyboard', ready: true }], 5);
+  const q = g2.players[0]; g2.skipHatch(); q.spawnProtect = 0;
+  const eater = g2.spawn('anomalocaris', 'ambient', { x: q.pos.x + 2, y: q.pos.y, z: q.pos.z }, 2);
+  q.hunted = 0.9; q.hunterId = 7; q.wasHunted = true;
+  startSwallow(g2.hitCtx, eater, q);
+  check('...and so does being swallowed', q.hunted === 0 && q.hunterId < 0, `${q.hunted.toFixed(2)}`);
 }
 
 console.log(failed ? `\n${failed} FAILED` : '\nall hunt tests passed'); process.exit(failed ? 1 : 0);

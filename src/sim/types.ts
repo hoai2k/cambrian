@@ -1,8 +1,10 @@
 import type { Vec3 } from '../shared/math';
 import type { CreatureId, MoveDef } from './creatures';
+import { TEXT } from '../shared/text';
 
 export type Tier = 0 | 1 | 2 | 3 | 4;
-export const TIER_NAMES = ['Larva', 'Juvenile', 'Adult', 'Giant', 'Apex'] as const;
+/** The rungs of the Cambrian ladder, as the HUD names them (`TEXT.sim.ladder.tiers`). */
+export const TIER_NAMES: readonly string[] = TEXT.sim.ladder.tiers;
 /**
  * The rungs' scales, as multiples of the creature's adult length. Ask `tierScale` in
  * src/sim/tiers.ts rather than indexing this: with equivalent sizing on the two rungs below Adult

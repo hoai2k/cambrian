@@ -1,9 +1,1 @@
-[
-  {
-    "id": "askeptosaurus",
-    "status": "pending",
-    "scope": "initial-model",
-    "model": true,
-    "reason": "A replacement is actively being built from a new straight neutral canonical because the first Tripo generation curves back across itself and cannot use the shared axial rigging pipeline. The current generation remains available as the viewer's Backup Model while the replacement receives the shared rig, dynamic clips, anchors, LOD and paired-body validation. Coordination state: docs/triassic/3d-work-status.md."
-  }
-]
+[]

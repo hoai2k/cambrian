@@ -40,8 +40,8 @@
     ]
   },
   "summary": {
-    "shippedBodies": 26,
-    "contractMet": 26,
+    "shippedBodies": 27,
+    "contractMet": 27,
     "repairNeeded": []
   },
   "rows": [
@@ -249,6 +249,122 @@
           "Eat",
           "Grab",
           "Breathe"
+        ],
+        "missingLoops": []
+      },
+      "anchors": {
+        "required": [
+          "anchor_mouth",
+          "anchor_mouth_inside",
+          "anchor_attack_primary"
+        ],
+        "actual": [
+          "anchor_attack_primary",
+          "anchor_mouth",
+          "anchor_mouth_inside"
+        ],
+        "missing": []
+      },
+      "pairedParity": {
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
+        "rawAnimationSignaturesDifferByBufferLayout": true
+      },
+      "skinning": {
+        "skinnedAttributesPresent": true,
+        "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
+      },
+      "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
+      "state": "contract-met"
+    },
+    {
+      "id": "askeptosaurus",
+      "models": {
+        "authored": "askeptosaurus.glb",
+        "puppet": "askeptosaurus.puppet.glb",
+        "lod1": "askeptosaurus.lod1.glb"
+      },
+      "basePose": {
+        "jawNode": true,
+        "closedRestJaw": true,
+        "evidence": "packaged jaw node has identity bind rotation"
+      },
+      "mouthClosure": {
+        "nonActionClips": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Guard",
+          "Grab"
+        ],
+        "status": "bind-pose-proven; clip playback requires visual throat audit"
+      },
+      "dynamicMotion": {
+        "attack": true,
+        "dash": true
+      },
+      "clips": {
+        "required": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "TurnLeft",
+          "TurnRight",
+          "Dive",
+          "Rise",
+          "Attack",
+          "Bite",
+          "Heavy",
+          "Hit",
+          "Death",
+          "Guard",
+          "Parry",
+          "Dodge",
+          "Eat",
+          "Stagger",
+          "Ability",
+          "Grab",
+          "Breath",
+          "Growth"
+        ],
+        "actual": [
+          "Ability",
+          "Attack",
+          "Bite",
+          "Breath",
+          "Coil",
+          "Dash",
+          "Death",
+          "Dive",
+          "Dodge",
+          "Eat",
+          "Grab",
+          "Growth",
+          "Guard",
+          "Heavy",
+          "Hit",
+          "Idle",
+          "Parry",
+          "Rise",
+          "Sprint",
+          "Stagger",
+          "Swim",
+          "TailWhip",
+          "TurnLeft",
+          "TurnRight"
+        ],
+        "missing": [],
+        "loops": [
+          "Idle",
+          "Swim",
+          "Sprint",
+          "Guard",
+          "Eat",
+          "Grab"
         ],
         "missingLoops": []
       },

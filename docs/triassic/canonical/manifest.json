@@ -76,11 +76,16 @@
       "deliveredAt": "2026-09-15"
     },
     "askeptosaurus": {
-      "canonical": "greenlit",
+      "canonical": "delivered",
       "turnaround": "not-started",
       "decidedAt": "2026-09-19",
       "regenerationAuthorizedBy": "User requested corrected canonical images and Tripo regeneration, 19 September 2026",
-      "previousCanonical": "model-inputs/askeptosaurus/backup-2026-09-19/original-canonical.png"
+      "previousCanonical": "model-inputs/askeptosaurus/backup-2026-09-19/original-canonical.png",
+      "greenlitAt": "2026-09-19",
+      "deliveredAt": "2026-09-20",
+      "bodyApproved": true,
+      "bodyApprovalBasis": "Owner explicitly requested completed game integration and backup preservation; agent visually reviewed final decoded GLBs and browser playback, paired/skin/throat audits passed. No separate human visual signoff claimed.",
+      "bodyReviewEvidence": "tools/triassic/creatures/askeptosaurus/README.md"
     },
     "placodus": {
       "canonical": "delivered",

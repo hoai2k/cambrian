@@ -1188,7 +1188,7 @@ def build_armature(bones, tx, name, rigname):
     return rig
 
 
-def bind(obj, rig, bones, weightfn, tx, influences, passes=4, hold=.45):
+def bind(obj, rig, bones, weightfn, tx, influences, passes=4, hold=.45, pin=None):
     """Weight, relax over the surface, carry into engine space and bind.
 
     The relaxation is not a polish step, it is the load-bearing half. `weightfn` is a stack of
@@ -1206,7 +1206,7 @@ def bind(obj, rig, bones, weightfn, tx, influences, passes=4, hold=.45):
     relaxed = relax_weights(obj, [weightfn(v.co) for v in obj.data.vertices],
                             passes=passes, hold=hold)
     for v in obj.data.vertices:
-        w = relaxed[v.index]
+        w = pin(v.co, relaxed[v.index]) if pin else relaxed[v.index]
         influences.append(len(w))
         for n, val in w.items():
             obj.vertex_groups[n].add([v.index], val, 'REPLACE')

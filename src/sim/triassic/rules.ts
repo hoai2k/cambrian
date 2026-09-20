@@ -1,3 +1,4 @@
+import { TEXT } from '../../shared/text';
 import { clamp, distXZ, heading, type Vec3 } from '../../shared/math';
 import { makeBrain } from '../ai';
 import type { EraHud, EraRules } from '../era-rules';
@@ -30,7 +31,8 @@ import { AIR_LOW, AIR_MAX, triActor, triState } from './state';
  * - **Armour with a facing**, the pod, heat on the flats and cold in
  *   the deep, a held animal's lost air, and the specials in ./specials.ts.
  */
-const RUNG_NAMES_TRI = ['', 'Floor', 'Shelf', 'Hunters', 'Giants'] as const;
+/** The rungs of this era's ladder (`TEXT.sim.ladder.rungs`). */
+const RUNG_NAMES_TRI: readonly string[] = TEXT.sim.ladder.rungs;
 /** The stamina left, under water, at which the body starts to sound winded — a quarter bar. */
 const WINDED_BELOW = 0.25;
 /** How often the winded heartbeat sounds at a quarter bar, closing to a shade under two seconds when the bar is gone. */
@@ -496,16 +498,17 @@ export const TRIASSIC_RULES: EraRules = {
   hint(g, i) {
     const p = g.players[i]; if (!p || !isAlive(p)) return undefined;
     const t = triActor(g, p), def = creature(p.creature), rung = rungOf(p);
-    if (t.shoreWarn > 0) return 'Something on the shore is fishing. Get deeper.';
-    if (t.shoreWatch > 0) return 'Something on the shore has noticed you holding still. Move.';
+    const H = TEXT.sim.hints;
+    if (t.shoreWarn > 0) return H.shoreFishing;
+    if (t.shoreWatch > 0) return H.shoreWatching;
     // These no longer mention air, for two reasons. It is not what the era is about — it went back
     // to the sea, it does not merely breathe — and the two that did say so had been made wrong by
     // the gauge: effort costs stamina, which comes back normally on a full chest, so "air is what
     // effort costs" and "every fight ends at the surface" both stopped being true. The gauge itself
     // teaches the mechanic where it belongs, on the bar, and flashes for its last minute.
-    if (g.time < 12) return rung === 1 ? 'Feed, hide, moult. Everything out there is bigger than you are today.' : rung === 2 ? 'Feed and grow. The deep is busier than the shallows, and everything in it is bigger.' : rung === 3 ? 'Hunt the shelf. Five stages between you and Prime.' : 'Stay fed. The deep is yours; the flats are closed to you.';
-    if (def.shell && g.time < 40) return 'Your funnel makes rise and sink free, and no direction is slow. Block withdraws into the shell.';
-    if (def.sink && g.time < 40) return 'You settle when you stop. The floor is where you feed.';
+    if (g.time < 12) return H.opening[Math.min(rung, H.opening.length) - 1] ?? H.opening[H.opening.length - 1];
+    if (def.shell && g.time < 40) return H.shell;
+    if (def.sink && g.time < 40) return H.sink;
     return undefined;
   },
 };

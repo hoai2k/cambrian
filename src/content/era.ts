@@ -4,6 +4,7 @@ import type { Biome, FloraKind } from '../sim/world';
 import type { Mode } from '../sim/types';
 import type { Slot, Scheme } from '../shared/palettes';
 import type { PortraitRecord } from '../shared/portrait-match';
+import type { StringOverrides } from './strings';
 
 /** Plain data only: safe to import from the deterministic simulation and Node tooling. */
 /** A selectable mode and the copy the selection screen shows for it. */
@@ -74,6 +75,13 @@ export interface EraDefinition {
   readonly id: string;
   readonly title: string;
   readonly copy: EraCopy;
+  /**
+   * What this game says differently from the other two: its loading lines, its onboarding hints,
+   * the help-page sentences that name its own animals. Laid over `SHARED_STRINGS` by
+   * `src/shared/text.ts`, so an era lists only what it says for itself. Absent, it says exactly
+   * what the shared table says.
+   */
+  readonly strings?: StringOverrides;
   /** The modes this era offers, in selection order. The simulation's win checks are keyed by id. */
   readonly modes: readonly ModeInfo[];
   readonly creatures: readonly CreatureDef[];

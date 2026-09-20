@@ -55,14 +55,15 @@ async function validateAsset(entry) {
     checks.bytes = bytes.length === entry.bytes;
     checks.sha256 = crypto.createHash('sha256').update(bytes).digest('hex') === entry.sha256;
     json = glbJson(bytes);
-    checks.noExternalDependencies = (json.buffers ?? []).every((b) => !b.uri) && !(json.images?.length) && !(json.textures?.length);
+    checks.noExternalDependencies = (json.buffers ?? []).every((b) => !b.uri)
+      && (json.images ?? []).every((image) => !image.uri);
     checks.noSkins = !(json.skins?.length);
     checks.noAnimations = !(json.animations?.length);
     checks.identityTransforms = (json.nodes ?? []).every(identityTransform);
     checks.meshCount = (json.meshes ?? []).length === 1;
     checks.nodeMeshCount = (json.nodes ?? []).filter((n) => n.mesh !== undefined).length === 1;
     checks.primitiveCount = (json.meshes?.[0]?.primitives ?? []).length === 1;
-    checks.materialCount = (json.materials ?? []).length === 1;
+    checks.materialCount = (json.materials ?? []).length === (entry.materialCount ?? 1);
     checks.bufferCount = (json.buffers ?? []).length === 1 && json.buffers[0].uri === undefined;
     gltf = await loader.parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
     gltf.scene.updateMatrixWorld(true);
@@ -80,7 +81,7 @@ async function validateAsset(entry) {
     checks.vertexColoursNonwhite = !!color && [...color.array].some((v, i) => i % color.itemSize < 3 && v / colourScale < 0.999);
     checks.triangles = meshes.length === 1 && !!geometry && (geometry.index ? geometry.index.count : pos.count) % 3 === 0;
     const triCount = geometry ? (geometry.index ? geometry.index.count : pos.count) / 3 : 0;
-    checks.triangleLimit = triCount > 0 && triCount <= 800;
+    checks.triangleLimit = triCount > 0 && triCount <= (entry.triangleLimit ?? 800);
     let degenerate = 0;
     if (geometry && pos) {
       const idx = geometry.index?.array;

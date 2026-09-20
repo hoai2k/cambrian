@@ -169,3 +169,128 @@ export class Splash {
   }
   dispose() { this.geo.dispose(); (this.points.material as THREE.Material).dispose(); this.ringGeo.dispose(); for (const r of this.rings) (r.mesh.material as THREE.Material).dispose(); }
 }
+
+
+
+/**
+ * Which of the three states a body is in with respect to the seabed. A renderer reads this off the
+ * actor's own `hideMode`; nothing in `src/sim` knows this module exists.
+ */
+export type BurrowPhase = 'none' | 'descending' | 'burrowed';
+
+/** One shower of sand: either a count thrown at once, or a rate for as long as the state lasts. */
+export interface SandThrow {
+  /** Grains thrown in one go. Zero on a continuous shower. */
+  readonly grains: number;
+  /** Grains per second while the state holds. Zero on a one-off. */
+  readonly perSecond: number;
+  readonly spread: number;
+  readonly speed: number;
+  readonly up: number;
+  readonly size: number;
+  readonly life: number;
+}
+
+/**
+ * What a body owes the sand for moving between two hiding states, given its length.
+ *
+ * Three moments are worth drawing and the rest are not:
+ *
+ *  - **going down** (`descending`) is a *rate* — the animal is working itself under and throwing
+ *    sand the whole time, so a shower runs for as long as that lasts;
+ *  - **covered** (`descending` → `burrowed`) is one throw, the floor closing over it;
+ *  - **coming up** (out of either) is one harder throw, because the sand that settled has to be
+ *    pushed out of the way, and because the surfacing is the half a player most needs to see.
+ *
+ * Staying buried owes nothing: a still animal under the sand is not moving any.
+ *
+ * Pure, so `npm run sand` can hold the mapping without a WebGL context — the renderer keeps only
+ * the accumulator that turns `perSecond` into whole grains.
+ */
+export function sandThrow(was: BurrowPhase, now: BurrowPhase, L: number): SandThrow | null {
+  const body = Math.max(0.3, L);
+  if (now === 'none') {
+    if (was === 'none') return null;
+    return { grains: Math.round(55 + body * 18), perSecond: 0, spread: body * 0.6, speed: body * 1.4 + 1.6, up: body * 1.3 + 1.4, size: 0.045 + body * 0.03, life: 1.5 };
+  }
+  if (now === 'burrowed') {
+    if (was === 'burrowed') return null;                       // settled under the sand: nothing moves
+    return { grains: Math.round(40 + body * 14), perSecond: 0, spread: body * 0.7, speed: body * 1.1 + 1.2, up: body * 0.8 + 0.8, size: 0.04 + body * 0.025, life: 1.3 };
+  }
+  return { grains: 0, perSecond: 55, spread: body * 0.55, speed: body * 0.5 + 0.5, up: body * 0.35 + 0.35, size: 0.03 + body * 0.02, life: 0.9 };
+}
+
+/**
+ * Sand kicked up by a body working its way into the seabed, and thrown clear again when it comes
+ * back out. Coarser and heavier than the silt cloud the simulation already leaves behind: silt is
+ * the haze that hangs there and hides the animal, this is the grains — they fly, lose their speed
+ * to the water within a few tenths of a second, and fall back to the floor.
+ *
+ * Presentation only, and per-grain coloured, because the sand is the biome's: a burrow in the
+ * shelf mosaic and one in the black basin must not shower the same beige. The colour is taken at
+ * the moment a grain is emitted rather than held as a uniform, so two animals digging in two
+ * biomes in one frame each throw their own floor.
+ */
+export class Sand {
+  readonly points: THREE.Points;
+  private pos: Float32Array; private vel: Float32Array; private life: Float32Array; private size: Float32Array;
+  private col: Float32Array; private span: Float32Array;
+  private geo: THREE.BufferGeometry; private cursor = 0;
+  constructor(private max = 700) {
+    this.pos = new Float32Array(max * 3); this.vel = new Float32Array(max * 3); this.col = new Float32Array(max * 3);
+    this.life = new Float32Array(max); this.size = new Float32Array(max); this.span = new Float32Array(max);
+    this.geo = new THREE.BufferGeometry();
+    this.geo.setAttribute('position', new THREE.BufferAttribute(this.pos, 3).setUsage(THREE.DynamicDrawUsage));
+    this.geo.setAttribute('aColor', new THREE.BufferAttribute(this.col, 3).setUsage(THREE.DynamicDrawUsage));
+    this.geo.setAttribute('aLife', new THREE.BufferAttribute(this.life, 1).setUsage(THREE.DynamicDrawUsage));
+    this.geo.setAttribute('aSpan', new THREE.BufferAttribute(this.span, 1).setUsage(THREE.DynamicDrawUsage));
+    this.geo.setAttribute('aSize', new THREE.BufferAttribute(this.size, 1).setUsage(THREE.DynamicDrawUsage));
+    const mat = new THREE.ShaderMaterial({
+      // Normal blending, not additive: a grain of sand is an opaque speck that hides the water
+      // behind it, where a bubble is a highlight. Additive sand reads as sparks. No fog chunk —
+      // the shower only ever draws within `SAND_RANGE`, which is well inside it.
+      transparent: true, depthWrite: false,
+      vertexShader: `attribute float aLife;attribute float aSize;attribute float aSpan;attribute vec3 aColor;varying float vA;varying vec3 vC;
+void main(){vec4 mv=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mv;gl_PointSize=clamp(aSize*360./max(1.,-mv.z),0.,14.)*step(0.001,aLife);vC=aColor;vA=clamp(aLife/max(0.001,aSpan),0.,1.);}`,
+      fragmentShader: `varying float vA;varying vec3 vC;void main(){float r=length(gl_PointCoord-.5)*2.;float d=smoothstep(1.,.25,r);gl_FragColor=vec4(vC,d*vA*.85);}`,
+    });
+    this.points = new THREE.Points(this.geo, mat);
+    this.points.frustumCulled = false; this.points.name = 'sand';
+  }
+  /**
+   * `n` grains around `p`, thrown outward at `speed` with `up` of lift on top of it. `spread` is
+   * the ball they start in — a body length or so, so the shower surrounds the animal rather than
+   * coming out of a point.
+   */
+  emit(p: { x: number; y: number; z: number }, color: { r: number; g: number; b: number }, n: number, spread: number, speed: number, up: number, size = 0.07, life = 1.1) {
+    for (let i = 0; i < n; i++) {
+      const k = this.cursor; this.cursor = (this.cursor + 1) % this.max;
+      const a = Math.random() * 6.283, rr = Math.sqrt(Math.random()) * spread;
+      this.pos[k * 3] = p.x + Math.cos(a) * rr; this.pos[k * 3 + 1] = p.y + (Math.random() - 0.3) * spread * 0.5; this.pos[k * 3 + 2] = p.z + Math.sin(a) * rr;
+      const out = speed * (0.4 + Math.random() * 0.8);
+      this.vel[k * 3] = Math.cos(a) * out; this.vel[k * 3 + 1] = up * (0.3 + Math.random()); this.vel[k * 3 + 2] = Math.sin(a) * out;
+      // A grain's shade wanders either side of the floor's, so a shower is grains and not a decal.
+      const t = 0.8 + Math.random() * 0.4;
+      this.col[k * 3] = Math.min(1, color.r * t); this.col[k * 3 + 1] = Math.min(1, color.g * t); this.col[k * 3 + 2] = Math.min(1, color.b * t);
+      const l = life * (0.6 + Math.random() * 0.7);
+      this.life[k] = l; this.span[k] = l; this.size[k] = size * (0.5 + Math.random());
+    }
+  }
+  update(dt: number) {
+    for (let k = 0; k < this.max; k++) {
+      if (this.life[k] <= 0) continue;
+      this.life[k] -= dt;
+      this.pos[k * 3] += this.vel[k * 3] * dt; this.pos[k * 3 + 1] += this.vel[k * 3 + 1] * dt; this.pos[k * 3 + 2] += this.vel[k * 3 + 2] * dt;
+      // Water takes the throw out of a grain quickly, and then it falls at its own slow rate.
+      const drag = Math.exp(-3.4 * dt);
+      this.vel[k * 3] *= drag; this.vel[k * 3 + 2] *= drag;
+      this.vel[k * 3 + 1] = this.vel[k * 3 + 1] * drag - 1.6 * dt;
+    }
+    (this.geo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
+    (this.geo.attributes.aColor as THREE.BufferAttribute).needsUpdate = true;
+    (this.geo.attributes.aLife as THREE.BufferAttribute).needsUpdate = true;
+    (this.geo.attributes.aSpan as THREE.BufferAttribute).needsUpdate = true;
+    (this.geo.attributes.aSize as THREE.BufferAttribute).needsUpdate = true;
+  }
+  dispose() { this.geo.dispose(); (this.points.material as THREE.Material).dispose(); }
+}

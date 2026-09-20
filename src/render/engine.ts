@@ -18,13 +18,15 @@ import { AssetQueue, type AssetProgress } from './assets';
 import { fillOf, ladderName } from '../sim/ladder';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
 import { Edges } from '../shared/edges';
+import { SAND_COLORS } from '../shared/environment-colors';
 import { Attachments } from './attachments';
-import { Bubbles, Impacts, Silt, Splash } from './fx';
+import { Bubbles, Impacts, Sand, sandThrow, Silt, Splash, type BurrowPhase } from './fx';
 import { Eggs } from './eggs';
 import { Mouthfuls } from './carcass';
 import { createSea, type Quality, type SeaEnvironment } from './sea';
 import { RULES, type EraHud } from '../sim/era-rules';
 import { key as controlKey, schemeForDevice, type Scheme } from '../shared/controls';
+import { TEXT } from '../shared/text';
 
 export interface Rect { x: number; y: number; w: number; h: number; }
 export interface PlayerHud {
@@ -113,6 +115,24 @@ export interface EngineCallbacks {
 }
 
 export const PLAYER_COLORS = ['#61f2d5', '#ffb457', '#c7a3ff', '#ff86a4'];
+
+/**
+ * How far from the camera a burrow still throws sand. Past this the grains are a pixel inside the
+ * fog, so the work of emitting them buys nothing.
+ */
+const SAND_RANGE = 70;
+const SAND_SWATCH = new THREE.Color();
+const SAND_CACHE = new Map<Biome, THREE.Color>();
+/**
+ * The floor's own colour where a body is digging. A burrow in the shelf mosaic and one in the
+ * black basin must not shower the same beige, and the biome under the animal is what decides.
+ */
+function sandColorAt(x: number, z: number): THREE.Color {
+  const b = biomeAt(x, z);
+  let c = SAND_CACHE.get(b);
+  if (!c) { c = new THREE.Color(SAND_COLORS[b]); SAND_CACHE.set(b, c); }
+  return SAND_SWATCH.copy(c);
+}
 
 interface CamState { showBoard: boolean; hatchShot: number; breathT: number; rideBlend: number; yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; climbHold: number; followHold: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
 /** Per-player teleport menu state: opened with D-pad down, steered with the D-pad or stick, A confirms, B closes. */
@@ -224,6 +244,29 @@ export const AIM_CLOSER = 0.42, AIM_SHOULDER = 0.75;
  * straight back and the drag would have been pointless.
  */
 const FOLLOW_RATE = 1.6, FOLLOW_HOLD = 1.2;
+/**
+ * The cursor's *height* nudges the camera's pitch, in mouse play.
+ *
+ * A mouse has one hand and two jobs — point at an animal, and look where you are going — and with
+ * the pointer free the second one only happened on a drag. So the top and bottom of the screen
+ * steer: carry the cursor up and the view tilts up with it, carry it down and it tilts down, and
+ * the middle `EDGE_DEAD` of the screen does nothing at all, which is the band a player aims in.
+ * That is the whole trade — the dead zone is what keeps pointing and looking from being the same
+ * gesture — so it is generous, and the push ramps in from its edge rather than starting at full
+ * rate, so there is no line the view jumps at.
+ *
+ * It is a *rate*, not a position: holding the cursor near the top keeps tilting, the way an
+ * edge-scroll does, because a screen's top edge is not a camera angle and cannot be mapped to one.
+ */
+const EDGE_DEAD = 0.38, EDGE_RATE = 0.85;
+/** Radians per second of pitch the cursor at `ndcY` is asking for. Positive tilts the view down. */
+export function edgePitch(ndcY: number): number {
+  const over = Math.abs(ndcY) - EDGE_DEAD;
+  if (over <= 0) return 0;
+  const k = Math.min(1, over / (1 - EDGE_DEAD));
+  // Squared, so the first part of the push past the dead zone is gentle and the corner is quick.
+  return -Math.sign(ndcY) * k * k * EDGE_RATE;
+}
 /** How much a body inside the near field outranks one the same apparent size further off. */
 const NEAR_RANK = 3;
 /** 1 at a full-width view, falling off for a narrow one; never less than a third of the shift. */
@@ -317,6 +360,7 @@ export class Engine {
   private impacts = new Impacts();
   private splash = new Splash(SURFACE_Y);
   private silt = new Silt();
+  private sand = new Sand();
   private eggs = new Eggs();
   private keyboard = new KeyboardInput();
   private mouse = new MousePlay();
@@ -384,7 +428,7 @@ export class Engine {
     this.mouse.attach(container);
     // Nothing to lose: without pointer lock there is no lock to be taken away.
     this.mouse.onLost = null;
-    this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.splash.group, this.mouthfuls.group, this.eggs.group);
+    this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.sand.points, this.splash.group, this.mouthfuls.group, this.eggs.group);
     (window as any).__cambrian = this;
     this.resize = new ResizeObserver(() => this.onResize());
     this.resize.observe(container);
@@ -603,11 +647,18 @@ export class Engine {
             // `FOLLOW_HOLD` after a drag so a player who has just looked somewhere on purpose is
             // not immediately turned away from it.
             if (this.mouseLook && p) {
+              // The cursor's height is a second way of aiming the view, and it is *asking* for
+              // something just as a drag is — so it holds the follow off while it pushes, or the
+              // two would pull against each other and the pitch would sit wherever they balanced.
+              const edge = this.mouseFrame?.ndc && !this.mouseFrame.dragging ? edgePitch(this.mouseFrame.ndc.y) : 0;
+              if (edge !== 0) cs.pitch = clamp(cs.pitch + edge * dt, PITCH_UP, PITCH_DOWN);
               if (this.mouseFrame?.dragging || Math.abs(c.lookX) > 0.05 || Math.abs(c.lookY) > 0.05) cs.followHold = FOLLOW_HOLD;
               else cs.followHold = Math.max(0, cs.followHold - dt);
               if (cs.followHold === 0 && cs.climbHold === 0) {
                 cs.yaw = wrapAngle(cs.yaw + wrapAngle(p.yaw - cs.yaw) * (1 - Math.exp(-FOLLOW_RATE * dt)));
-                cs.pitch = damp(cs.pitch, 0.2, FOLLOW_RATE * 0.5, dt);
+                // The pitch only settles back while the cursor is in the dead zone: the follow is
+                // what a view does when nobody is asking, and the cursor up there is an ask.
+                if (edge === 0) cs.pitch = damp(cs.pitch, 0.2, FOLLOW_RATE * 0.5, dt);
               }
             }
           }
@@ -678,7 +729,8 @@ export class Engine {
 
     // Views
     this.syncViews(game, camPositions, dt);
-    this.bubbles.update(dt); this.sparkles.update(dt); this.splash.update(dt); this.mouthfuls.update(dt);
+    this.burrowSand(game, dt);
+    this.bubbles.update(dt); this.sparkles.update(dt); this.splash.update(dt); this.mouthfuls.update(dt); this.sand.update(dt);
     this.eggs.update(game.actors, dt);
     this.impacts.update(dt, focus);
     this.silt.sync(game.silt, this.time);
@@ -1156,6 +1208,52 @@ export class Engine {
   }
 
   /**
+   * Sand around a body going into the seabed, and again as it comes back out.
+   *
+   * The simulation already leaves a silt cloud at the moment a burrower is covered — that is the
+   * haze that hides it, and it is part of the rules. This is the other half, and it is purely a
+   * look: the grains the animal actually displaces. A steady shower while it works itself down,
+   * one throw as the floor closes over it, and a harder one thrown clear when it surfaces, so
+   * both ends of the act are seen rather than only the disappearing.
+   *
+   * Renderer-side, off the actors' own `hideMode`, because nothing here is a rule: `src/sim` keeps
+   * its determinism and gains no event. What it costs is one map of the bodies that are currently
+   * in the floor, which on any roster is a handful.
+   */
+  private burrowSand(game: Game, dt: number) {
+    for (const a of game.actors) {
+      const was = this.burrowing.get(a.id) ?? 'none';
+      const now = a.hideMode === 'descending' || a.hideMode === 'burrowed' ? a.hideMode : 'none';
+      if (was === 'none' && now === 'none') continue;
+      if (now === 'none') { this.burrowing.delete(a.id); this.sandOwed.delete(a.id); }
+      else this.burrowing.set(a.id, now);
+      // Only what somebody could be looking at: a shower behind the fog is frames spent on nothing.
+      const dx = a.pos.x - this.lastFocus.x, dz = a.pos.z - this.lastFocus.z;
+      if (dx * dx + dz * dz > SAND_RANGE * SAND_RANGE) continue;
+      const L = lengthOf(a);
+      // The floor is where the sand is, so the shower is seated there rather than on a body that
+      // has already sunk half its length past it.
+      const at = { x: a.pos.x, y: Math.min(a.pos.y + L * 0.1, sampleHeight(a.pos.x, a.pos.z) + L * 0.3), z: a.pos.z };
+      const col = sandColorAt(a.pos.x, a.pos.z);
+      const th = sandThrow(was, now, L);
+      if (!th) continue;
+      if (th.perSecond === 0) { this.sand.emit(at, col, th.grains, th.spread, th.speed, th.up, th.size, th.life); this.sandOwed.delete(a.id); continue; }
+      // A rate rather than a count per frame, so the shower is the same shower at any frame rate
+      // and a slow frame does not round it away.
+      const owed = (this.sandOwed.get(a.id) ?? 0) + th.perSecond * dt;
+      const n = Math.floor(owed);
+      this.sandOwed.set(a.id, owed - n);
+      if (n > 0) this.sand.emit(at, col, n, th.spread, th.speed, th.up, th.size, th.life);
+    }
+    // Bodies that left the sea while in the floor: the map is only ever a few entries deep.
+    for (const id of this.burrowing.keys()) if (!game.byId(id)) { this.burrowing.delete(id); this.sandOwed.delete(id); }
+  }
+  /** Which bodies are in the seabed, so both the going in and the coming up are seen. */
+  private burrowing = new Map<number, Exclude<BurrowPhase, 'none'>>();
+  /** Fractional grains carried between frames, so a trickle is a rate and not a per-frame count. */
+  private sandOwed = new Map<number, number>();
+
+  /**
    * Lungs leak when they work. A bag of air inside a body under water shows every time the body
    * spends itself: what a bimodal animal lets go of the mouth is the effort it just made, so the
    * bubbles are the stamina bar draining, seen from outside. A sprint streams them, a dash coughs a
@@ -1523,7 +1621,7 @@ export class Engine {
       }
       const tele = cs?.tele.open && !cs.tele.swap.open
         ? { options: [...game.teleportOptions(i).map((o) => ({ label: o.label, detail: o.detail, distance: o.distance, dest: o.dest })),
-                      { label: 'Change creature', detail: 'Swap bodies · each keeps what it has grown', distance: 0, dest: 'home' as TeleportDest }],
+                      { label: TEXT.hud.teleport.changeCreature, detail: TEXT.hud.teleport.changeCreatureDetail, distance: 0, dest: 'home' as TeleportDest }],
             index: cs.tele.index, cooldown: p.teleportCd }
         : undefined;
       let swap: PlayerHud['swap'];
@@ -1554,9 +1652,9 @@ export class Engine {
       // their seat, anything else by its species.
       const killerId = p.swallowedBy >= 0 ? p.swallowedBy : p.killer;
       const killer = killerId >= 0 ? game.byId(killerId) : undefined;
-      const nameOf = (a: Actor | undefined) => (a ? (a.player >= 0 ? `P${a.player + 1}` : creature(a.creature).name) : undefined);
+      const nameOf = (a: Actor | undefined) => (a ? (a.player >= 0 ? TEXT.common.playerChip(a.player + 1) : creature(a.creature).name) : undefined);
       const watched = this.spectatorTarget(game, i);
-      const spectate = watched ? { index: watched.player, name: `P${watched.player + 1}`, color: PLAYER_COLORS[watched.player % 4], creature: watched.creature } : undefined;
+      const spectate = watched ? { index: watched.player, name: TEXT.common.playerChip(watched.player + 1), color: PLAYER_COLORS[watched.player % 4], creature: watched.creature } : undefined;
       let aim: PlayerHud['aim'];
       // On a mouse the *cursor* is the crosshair (`src/shared/cursors.ts`), so the reticle is off:
       // two crosshairs on one screen, one of them nailed to the middle, is worse than either alone.
@@ -1571,7 +1669,7 @@ export class Engine {
         hp: p.hp, hpMax: p.hpMax, stamina: p.stamina, staminaMax: p.staminaMax, exhausted: p.exhausted > 0,
         tier: p.tier, tierName: era ? `${era.stage} · ${era.rungName}` : TIER_NAMES[p.tier], // The ring means the same thing in both eras: how close the next moult is, full when it lands.
         progress: era ? era.stageProgress : p.tier >= 4 ? 1 : clamp(p.nutrition / TIER_NEED[p.tier], 0, 1), scale: p.scale,
-        abilityName: p.hideMode === 'descending' ? 'Sinking to burrow' : p.hideMode === 'burrowed' ? `Buried · ${controlKey('ability', scheme)} emerge` : p.hideMode === 'camouflage' ? `Camo: ${p.camoLabel}` : RULES?.ySpecial(p.creature)?.name ?? hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : RULES?.ySpecial(p.creature) ? 1 - clamp(p.abilityCd / Math.max(1, creature(p.creature).abilityCooldown), 0, 1) : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none' || (p.state === 'ability' && !!RULES?.ySpecial(p.creature)), abilityUnlocked: true,
+        abilityName: p.hideMode === 'descending' ? TEXT.sim.hide.sinking : p.hideMode === 'burrowed' ? TEXT.sim.hide.buried(controlKey('ability', scheme)) : p.hideMode === 'camouflage' ? TEXT.sim.hide.camouflaged(p.camoLabel) : RULES?.ySpecial(p.creature)?.name ?? hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : RULES?.ySpecial(p.creature) ? 1 - clamp(p.abilityCd / Math.max(1, creature(p.creature).abilityCooldown), 0, 1) : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none' || (p.state === 'ability' && !!RULES?.ySpecial(p.creature)), abilityUnlocked: true,
         senseOn: p.senseMode,
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, kind: creature(lockA.creature).kind, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,
@@ -1614,7 +1712,7 @@ export class Engine {
     this.assets.dispose();
     this.clearMatch();
     this.sea?.dispose();
-    this.bubbles.dispose(); this.splash.dispose(); this.sparkles.dispose(); this.impacts.dispose(); this.silt.dispose();
+    this.bubbles.dispose(); this.splash.dispose(); this.sparkles.dispose(); this.impacts.dispose(); this.silt.dispose(); this.sand.dispose();
     this.shieldGeo.dispose();
     this.mouthfuls.dispose(); this.eggs.dispose();
     this.renderer.dispose();

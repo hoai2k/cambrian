@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-19",
+  "tool": "builtin image_gen.imagegen",
+  "task": "T3D-10A",
+  "purpose": "Corrected prop canonical candidates and ground-free Tripo inputs; agent visual QA only, no human approval inferred.",
+  "deliveryResolutionNote": "Built-in ImageGen returned 1254-square images despite 2048 prompts. Native outputs are preserved; input.png and candidate03 delivery files are deterministic Lanczos resamples to 2048 square, with no claim of native 2K detail.",
+  "subjects": {
+    "brachiopod-cluster": {
+      "original": "originals/2026-09-19-prop-candidate02/brachiopod-cluster-candidate02.png",
+      "canonical": "brachiopod-cluster-candidate03.png",
+      "input": "model-inputs/brachiopod-cluster/input.png",
+      "selectedAttempt": 1,
+      "attempts": [
+        {
+          "prompt": "Use case: precise-object-edit. Edit target: supplied candidate02 Coenothyris brachiopod cluster. Create a scientifically corrected single prop reference and Tripo input, square 2048 by 2048 pixels. Retain the overall small cluster of nine cream/tan closed shells, realistic studio rendering, soft even lighting and elevated three-quarter camera. Correct every shell: Coenothyris are smooth oval to rounded biconvex lampshells with a short stout incurved beak and a small pedicle foramen; their surfaces have only subtle concentric growth lines, NO radial ribbing, NO strong median keel, NO scallop-fan outline. Make their upper and lower valves meet at the shell margin, not at a central face seam. Shells touch lightly at their bases to form a finite low cluster but each outline remains legible. Remove ALL sand, sediment, rock, rubble, ground texture and ground plane; no hardground slab or display plinth. Show the complete cluster isolated against a uniform light gray background, all shells fully contained with generous margins on every side. Nothing cropped. Do not invent free trailing pedicles or roots; attachment points remain hidden underneath. No text, labels, diagrams or multiple views.",
+          "generatedSource": "/Users/hoai/.codex/generated_images/01a0bc9a-3065-73d0-bfcf-0aaff745e6d1/exec-f04a5bf6-5edc-40c3-8eae-c718789a1726.png",
+          "native": "native/brachiopod-cluster-attempt1.png",
+          "sha256": "cb2f84d9ac7b36a20c1867bd2e7bf36f5d2fcaa4ad370f75c9541614a809232d",
+          "dimensions": [
+            1254,
+            1254
+          ]
+        }
+      ],
+      "inputSha256": "96acf3f1cf0e88155a92e810d22edcd7a09406631e2851814ef5cee291709509",
+      "originalSha256": "2d2d32c1865259bc442fd9b883ee7d103a3ef3e77fd59dfb0ac17e8df5123b41"
+    },
+    "daonella-bed": {
+      "original": "originals/2026-09-19-prop-candidate02/daonella-bed-candidate02.png",
+      "canonical": "daonella-bed-candidate03.png",
+      "input": "model-inputs/daonella-bed/input.png",
+      "selectedAttempt": 2,
+      "attempts": [
+        {
+          "prompt": "Use case: precise-object-edit. Edit target: supplied candidate02 Daonella bed. Create a scientifically corrected single shallow shell-pavement prop and Tripo input, square 2048 by 2048 pixels. Keep pale cream mineral shell material and realistic neutral studio rendering. Replace the existing narrow triangular scallop fans with dense overlapping paper-thin Daonella valves: broad subcircular to oval outlines, wider than tall, very low convexity, long nearly straight dorsal hinge spanning much of shell width, tiny off-center beak on dorsal edge, no large scallop ears. Delicate closely spaced flat-topped radial ribs, not deep corrugated fan ridges. Show 25-35 pale valves densely overlapping in one shallow irregular roughly circular patch; only one to two thin layers, clearly separated shell edges, no mound. Use a high three-quarter view, close to plan view, showing entire finite patch with 10 percent margins. Remove every trace of sand, sediment, stone matrix, cut slab, terrain, background floor and base: this is ONLY an aggregate of shells isolated on uniform light gray background. All edges complete, no clipping, no text, no labels, no multiple views.",
+          "generatedSource": "/Users/hoai/.codex/generated_images/01a0bc9a-3065-73d0-bfcf-0aaff745e6d1/exec-6acdfcc5-2dfd-4e2b-906a-e9462f19e3d1.png",
+          "native": "native/daonella-bed-attempt1.png",
+          "sha256": "d10dc5266bc59c1665312343a7e59b232599aa0f2932b2a437483bd6e5ad4213",
+          "dimensions": [
+            1254,
+            1254
+          ]
+        },
+        {
+          "prompt": "Use case: precise-object-edit. Preserve the shells of this Daonella patch, their broad low-convexity oval outlines and extended dorsal hinges, fine radial ribbing and dense shallow overlap. Correct ONLY the background and framing: replace all alpha transparency, black areas, white/red/yellow fringes and broad cast shadows with a perfectly clean opaque neutral LIGHT GRAY studio background. Do not retain any colored fringe. Zoom out so the whole shell patch occupies only 75 percent of image width and height, with at least 12 percent margin on all sides. This is a finite shallow aggregate of ONLY shells; remove any remaining sand grains, sediment, matrix or sandy patch visible between shells. Where there are gaps, show the same plain light gray background or a clearly identifiable lower shell, not sand. No underlying plate, slab, rocks, ground plane, rim or terrain. Final image must be opaque RGB-looking, NOT transparent, square 2048 by 2048. No text, no multiple panels.",
+          "generatedSource": "/Users/hoai/.codex/generated_images/01a0bc9a-3065-73d0-bfcf-0aaff745e6d1/exec-2877e55f-e686-4471-b998-12dd7126e19b.png",
+          "native": "native/daonella-bed-attempt2.png",
+          "sha256": "bef4a80d0b21f66b11979e031958e08bb876ce79e0d78a050556a21a505049c5",
+          "dimensions": [
+            1254,
+            1254
+          ]
+        }
+      ],
+      "inputSha256": "e6496436db41180f323227938647c18f4c2762cead7a371f50cae55a058bd18c",
+      "originalSha256": "8f56e088abb0cd67fd0f65a4b3dc2b65123ab4482f7bdde8c40688eeb8a9d6db"
+    },
+    "cidaris": {
+      "original": "originals/2026-09-19-prop-candidate02/cidaris-candidate02.png",
+      "canonical": "cidaris-candidate03.png",
+      "input": "model-inputs/cidaris/input.png",
+      "selectedAttempt": 2,
+      "attempts": [
+        {
+          "prompt": "Use case: precise-object-edit. Edit target: supplied candidate02 club-spined Triassic cidaroid. Create one anatomically corrected isolated game prop reference and Tripo input, square 2048 by 2048 pixels. Retain the low rounded test, ochre-brown stout blunt club-shaped primary spines projecting outward and upward, cream and muted olive test coloration, and oral-side-down resting posture. Correct the exposed test surface: exactly five narrow ambulacral zones alternating with five broad interambulacral areas; each interambulacral area consists of two orderly columns of plates, each plate bears a raised rounded primary tubercle seating a large club spine. Ambulacral pores are tiny paired pores restricted to the narrow bands. Eliminate the current broad rows of giant crater-like holes or washer-shaped plates. This is a living cidaroid with small secondary spines and skin among the big primary spines, not a perforated fossil shell. Keep enough visible test surface to read the orderly anatomy but do not exaggerate tiny pores into geometry. Short lower spines define the natural contact plane. Remove ALL sediment, gravel, sand, rocks, ground plane and shadow slab. Full organism in elevated three-quarter view on uniform light gray background; generous margin around every spine tip, complete underside contact silhouette, nothing cropped. No text or multiple views.",
+          "generatedSource": "/Users/hoai/.codex/generated_images/01a0bc9a-3065-73d0-bfcf-0aaff745e6d1/exec-cfd8625d-bbf8-4ce1-904f-86f8c39ac3e7.png",
+          "native": "native/cidaris-attempt1.png",
+          "sha256": "3eb68ca0f386c6fb186e718ce0bb09117ad74c7ae263cd5a838a5c4101b9c1af",
+          "dimensions": [
+            1254,
+            1254
+          ]
+        },
+        {
+          "prompt": "Use case: precise-object-edit. Correct this failed cidaroid anatomical edit. Keep the organism silhouette, club spines, pose, lighting and colors. Completely ERASE the two conspicuous vertical cream rows of oval perforated washer-like plates visible on the front of the round test (and every analogous band around its back). Replace these erroneous broad cream bands with VERY NARROW subdued olive bands only one-fifth their current width, finely dotted with tiny paired pores and covered with minute short secondary spines. NO cream oval washers, NO large holes, NO circular craters anywhere on the test. Expand the neighboring primary-spine-bearing areas into the vacated space; arrange their raised spine-bearing tubercles in orderly adjacent columns. The fine ambulacral pore bands are subtle inconspicuous anatomy, not the main ornament. Living cidaroid appearance with secondary spines clothing the test, not a bare fossil test. Preserve all club spines. Zoom out slightly so every spine and the entire test has 8 percent clear margins. Opaque light gray background, no alpha transparency, no substrate or floor, 2048-square single specimen studio reference.",
+          "generatedSource": "/Users/hoai/.codex/generated_images/01a0bc9a-3065-73d0-bfcf-0aaff745e6d1/exec-88b525b9-d14d-4b76-9c72-5207a36265ac.png",
+          "native": "native/cidaris-attempt2.png",
+          "sha256": "c9bca7e268a7966fec7e36b05d3b0da6ed2e62cffbc3f7a4cb9b624746f56a1a",
+          "dimensions": [
+            1254,
+            1254
+          ]
+        }
+      ],
+      "inputSha256": "904995dc87e2b7660bff129de5d34408643fb501aa96d518f16ae9d735a49ab1",
+      "originalSha256": "9432a3e7f8be51753167e025f94886ba3bd52158eb4b364d9a65b3aa997d3d92"
+    },
+    "encrinus-litter": {
+      "original": "originals/2026-09-19-prop-candidate02/encrinus-litter-candidate02.png",
+      "canonical": "encrinus-litter-candidate03.png",
+      "input": "model-inputs/encrinus-litter/input.png",
+      "selectedAttempt": 3,
+      "attempts": [
+        {
+          "prompt": "Use case: precise-object-edit. Edit target: supplied candidate02 Encrinus liliiformis stem litter. Create one scientifically corrected flat scatter prop reference and Tripo input, square 2048 by 2048 pixels. Preserve the pale ivory/tan calcite material and the general sparse arrangement of twelve loose circular columnals and three short articulated stem segments lying horizontally, all in one shallow layer. Make the loose discs and the segment end faces anatomically consistent: solid calcitic circular columnals, a small to moderate circular central lumen, fine short radial crenulation on their articular rims, faint petaloidal perilumen permitted. No decorative star engravings, no starfish embossing, no giant hollow jagged tubes, no organic flesh. The three short stems are stacks of the SAME discs, each of modest length and visible segmentation, with intact flat terminal articular faces and the same-sized circular axial lumen as the loose columnals. All objects lie at one shared base plane, some slight natural tilts, spaced irregularly but a compact finite scatter. Remove ALL sand, dirt, terrain, rubble, floor, slab and display base. Isolate only the columnals and stems against uniform light gray with ample margin all around. High three-quarter view, nearly plan-view, all objects fully visible. No labels, text or multiple views.",
+          "generatedSource": "/Users/hoai/.codex/generated_images/01a0bc9a-3065-73d0-bfcf-0aaff745e6d1/exec-274cf1a7-f8a1-4186-913b-906c0b767666.png",
+          "native": "native/encrinus-litter-attempt1.png",
+          "sha256": "b654cf72b0f713b8f208bfc645475621ef9c750af199c726b6b37a93d265bb97",
+          "dimensions": [
+            1254,
+            1254
+          ]
+        },
+        {
+          "prompt": "Use case: precise-object-edit. Preserve the corrected Encrinus columnals and articulated stem segments in this image: same circular discs with circular central lumina, same fine radial articular ridges, same pale calcite material, same three horizontal stems built of identical discs, same count and arrangement. Correct ONLY the background and framing. Completely remove all alpha transparency, black regions and red/yellow/white edge artifacts, and erase the broad dark drop shadows. Replace with a clean OPAQUE uniform light gray studio background throughout all gaps and outside the objects. No ground plane or terrain, no sand or rocks, no plate or slab. Zoom out 10 percent so every object has at least 8 percent clear border margin. Show full separated objects on one common basal plane, soft neutral lighting, no cast-shadow blobs. No text, no multiple panels. Deliver a square 2048 by 2048 opaque image, not a transparent PNG.",
+          "generatedSource": "/Users/hoai/.codex/generated_images/01a0bc9a-3065-73d0-bfcf-0aaff745e6d1/exec-e7dd5163-1e9e-4846-a65b-0ec4d66f1506.png",
+          "native": "native/encrinus-litter-attempt2.png",
+          "sha256": "d7b9e425770009d491907e73c0b451b51cb469cfc98ea8ada4a01674306a7693",
+          "dimensions": [
+            1254,
+            1254
+          ]
+        },
+        {
+          "prompt": "Use case: precise-object-edit. This is Encrinus crinoid stem debris. Keep exact arrangement, count, ivory material, dimensions, camera, clean opaque gray background, and circular holes. Correct ONLY the articular end-face ornament on EVERY loose disc and EVERY stem end. ERASE the ornamental branching flowers, starfish patterns, leaf-shaped veins and star engravings. Make each face mostly FLAT SMOOTH ivory calcite from the edge of its circular central lumen to near the perimeter. Only in a NARROW outer annulus add many SHORT FINE STRAIGHT radial ridges like fine gear teeth, all pointing directly toward the center. These are simple radial articulation striae, not petals. No large star shape, no flower pattern, no branching veins, no carving. Keep the cylindrical outer profile and central circular axial holes. Keep full silhouettes and clear border margin. Do not add sand, slab, floor texture or text. Square 2048 image with opaque uniform light gray background.",
+          "generatedSource": "/Users/hoai/.codex/generated_images/01a0bc9a-3065-73d0-bfcf-0aaff745e6d1/exec-209e27ef-17e3-4f8e-95c0-fbbdb8d76d0e.png",
+          "native": "native/encrinus-litter-attempt3.png",
+          "sha256": "bd22ccc14731dfcc926cc820d4e9c6ed57ea9134282672227e94b3b5984f7989",
+          "dimensions": [
+            1254,
+            1254
+          ]
+        }
+      ],
+      "inputSha256": "67d8d76f6a970da9e6ecace40287ed9f290cb5d3ec7ce3c7b2fedba7a07613e0",
+      "originalSha256": "d5bd2d224621a8e21ba51dbf6c312bb91cf07c341becdb55c050e61f91099ada"
+    },
+    "neocalamites": {
+      "original": "originals/2026-09-19-prop-candidate02/neocalamites-candidate02.png",
+      "canonical": "neocalamites-candidate03.png",
+      "input": "model-inputs/neocalamites/input.png",
+      "selectedAttempt": 1,
+      "attempts": [
+        {
+          "prompt": "Use case: precise-object-edit. Edit target: supplied candidate02 Neocalamites clump. Preserve the six jointed green stems, their relative heights, black-brown swollen nodal bands, narrow free leaves in nodal whorls, basal sheaths, natural slight stem bends and overall botanical identity. Correct framing so the COMPLETE highest shoot tip is visible with at least 8 percent blank space above it; retain full width and base with generous margins. Create a single ground-free Tripo reference, square 2048 by 2048 pixels, realistic neutral studio lighting. Remove ALL sand, terrain, soil, scattered litter and exposed root/rhizome filaments. The stems end cleanly at their shared natural ground-contact level, basal sheaths retained, no root ball, no underground roots, no connecting ground slab. Uniform light gray background. Keep leaves individually separated and clearly visible, not fused into a bush. No additional stems, no different plant species, no text, no labels, no multiple views. Output must have an opaque neutral light-gray studio background, not alpha transparency.",
+          "generatedSource": "/Users/hoai/.codex/generated_images/01a0bc9a-3065-73d0-bfcf-0aaff745e6d1/exec-c1fc2313-e612-4b8c-ae42-b154a74d1686.png",
+          "native": "native/neocalamites-attempt1.png",
+          "sha256": "d482c49f8729a4e15ddd0ecb8e40ec1d2b5e1cef953f61cfe30ce0fcede98a52",
+          "dimensions": [
+            1254,
+            1254
+          ]
+        }
+      ],
+      "inputSha256": "ea3a6d91ca305030f8a4b48f7b130338da49098427a422da2c70d5b9264d7f63",
+      "originalSha256": "aeb118eefea76e33e606136ee328c28fdcdfdf048912a76431870314c999a947"
+    },
+    "bjuvia": {
+      "original": "originals/2026-09-19-prop-candidate02/bjuvia-candidate02.png",
+      "canonical": "bjuvia-candidate02.png",
+      "input": "model-inputs/bjuvia/input.png",
+      "selectedAttempt": 1,
+      "attempts": [
+        {
+          "prompt": "Use case: background-extraction. Edit target: supplied approved candidate02 Bjuvia design. Preserve the entire plant exactly in overall form: squat short brown trunk with leaf scars, broad undivided entire green leaves in the same rosette arrangement, individual central midribs, smooth leaf margins, same proportions, materials, camera and neutral lighting. Create a ground-free single-object Tripo input, square 2048 by 2048 pixels. Remove ALL sand, stones, soil, litter, ground shadow patch and terrain. Trunk terminates at the existing natural ground-contact level with a clean flat base; do not expose or invent roots. Isolate the complete plant on a uniform light gray background. Expand framing as needed for at least 6 percent clear margin beyond every leaf tip and trunk base. No cropping, no leaflets or pinnate fronds, no base/plinth, no text, no multiple views. Output must have an opaque neutral light-gray studio background, not alpha transparency.",
+          "generatedSource": "/Users/hoai/.codex/generated_images/01a0bc9a-3065-73d0-bfcf-0aaff745e6d1/exec-de463783-c2f4-452a-8af3-2f0a92820488.png",
+          "native": "native/bjuvia-attempt1.png",
+          "sha256": "6fa6f0afd7c567c4c599b92dff9347109c04c68fd6b5c7c2e1e55bdc4e5f20cf",
+          "dimensions": [
+            1254,
+            1254
+          ]
+        }
+      ],
+      "inputSha256": "1b05cbcd2dc68e07d6dcc2fd55e8bed09cbd0d2f8f4283402c0dbad4bbd44914",
+      "originalSha256": "b3458f46f173eb283786a33587ec704c633749a081c2c97ba7bc7561037f4903"
+    },
+    "pleuromeia": {
+      "original": "originals/2026-09-19-prop-candidate02/pleuromeia-candidate02.png",
+      "canonical": "pleuromeia-candidate02.png",
+      "input": "model-inputs/pleuromeia/input.png",
+      "selectedAttempt": 1,
+      "attempts": [
+        {
+          "prompt": "Use case: background-extraction. Edit target: supplied approved candidate02 Pleuromeia design. Preserve the entire organism in form: one unbranched scarred trunk, a dense crown of narrow strap leaves, ONE tall terminal cone, existing proportions and leaf arrangement, natural colors, camera and realistic neutral studio lighting. Create a ground-free single-object Tripo input, square 2048 by 2048 pixels. Remove ALL sand, stones, soil, litter, surrounding terrain and the low sandy mound. End the stem at the original ground-contact level with a clean flat base, retaining only the above-ground stem. Do not expose or invent rhizomorphs, roots, a root ball or a ground slab. Isolate the whole plant on uniform light gray; all leaf tips, cone tip and base must fit with at least 7 percent clear margins. No cropping, no added branches or cones, no text, no labels, no multiple views. Output must have an opaque neutral light-gray studio background, not alpha transparency.",
+          "generatedSource": "/Users/hoai/.codex/generated_images/01a0bc9a-3065-73d0-bfcf-0aaff745e6d1/exec-dbb35383-3644-43b4-bbdd-4eb9fa200cad.png",
+          "native": "native/pleuromeia-attempt1.png",
+          "sha256": "8c6c1b63d84500eea43cc43259ca2f652def96abcf6974df822966b82832c4b8",
+          "dimensions": [
+            1254,
+            1254
+          ]
+        }
+      ],
+      "inputSha256": "8117bd19884b3ec53d6dabffb1afc73452a66f2a4a18e33268fc75456fd64fa2",
+      "originalSha256": "cdfb2b15f59ade1b43c5e3ce037906aaf4729258fe21dc5112a120c0f21a3e83"
+    }
+  },
+  "downstreamApproval": {
+    "reviewer": "/root",
+    "method": "Visual contact-sheet review of all seven final input images",
+    "scope": "Approved for Tripo submission",
+    "note": "Complete silhouettes, neutral background, no substrate slab, and revised morphology reads correctly.",
+    "humanApprovalClaimed": false
+  }
+}

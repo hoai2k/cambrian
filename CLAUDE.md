@@ -183,10 +183,22 @@ unless the user explicitly asks for a PR. Steps:
   `npm run mouse` holds the wiring. And with no second stick and no lock, nothing is steering the view frame to frame, so
   it steers itself: `FOLLOW_RATE` eases the camera round behind the body and back to the resting
   pitch, and `FOLLOW_HOLD` stands it aside after a drag so looking somewhere on purpose sticks.
-  The keyboard around it is the mouse's own layout: **A and D turn rather than strafe** — they move
-  the camera's yaw, which is what the right stick does, so turning *composes* with swimming instead
-  of replacing it (hold W, press D, and the body swims forward along a curve, because `mx`/`my` are
-  camera-relative and the camera is what turned) — W forward, X back, E or Q up, S or C down, R the
+  **The cursor's own height is the other half of the view.** Outside a dead zone either side of the
+  middle (`edgePitch` in `src/render/engine.ts`, `EDGE_DEAD`), the cursor tilts the camera — up in
+  the top of the screen, down in the bottom, squared past the edge so the first part of the push is
+  gentle and the corner is quick — which is how a player angles the view so what they are swimming
+  at arrives near the middle. The middle is left alone precisely because that is where the aiming
+  happens, and a push is an *ask* like a drag is: it holds the follow off while it lasts, or the
+  two would pull against each other and the pitch would sit wherever they balanced.
+  The keyboard around it is the mouse's own layout: **A and D turn the animal, and the animal turns
+  the camera** — they move the *body*, the stick's own sideways axis, not the view: a swimmer turns
+  into its travel (`turnRate` in `game.ts`) and the follow camera comes round behind it, so the
+  order is the one a player feels, animal first and view after. Driving the camera instead put the
+  view somewhere the body had not been yet and left it to catch up, which reads as steering a boat
+  by leaning; it also kept a creature's own agility out of the answer, and a Waptia whipping round
+  where a giant does not is a thing the camera cannot say. The arrow keys still move the view
+  itself. Turning composes with swimming (hold W, press D and the body swims forward along a
+  curve) — W forward, X back, E or Q up, S or C down, R the
   shield, Z camouflage, I sense, space to dash, Shift to sprint. Every attack has a key as well as a
   mouse button, because a hand already on the keys should not have to reach: J and F bite, G and K
   are the heavy. `npm run mouse` drives the whole of it in a real browser, where every part of it is something a headless test cannot vouch for. That harness
@@ -843,6 +855,12 @@ unless the user explicitly asks for a PR. Steps:
   no approaching one to ride it. A fed giant notices — the head comes round, which is the tell — and
   goes back to its route; how often one is hungry follows the hour and the water it is over
   (`appetiteAt`), which is where the rhythm of the day is set. `npm run hunt` covers both halves.
+- **Being eaten is the end of the chase.** The hunt warning — the arrow, the eye, the line — is a
+  reading of the *live* world, and `updateHunted` only ever runs on a body that can still act, so a
+  corpse kept whatever score it died holding and went on saying something was hunting it. It is
+  cleared where death is actually handled, in `kill` and `startSwallow` in `src/sim/combat.ts`
+  (a body in something's mouth has stopped being chased too), rather than by a guard in
+  `updateHunted` that nothing would reach. `npm run hunt` holds both.
 - A warning is about intent, never about size. The colour of a band marker and of a radar contact is
   red only for a body that is actually coming for you (`comingFor` in `src/sim/actors.ts`: hunting,
   fighting or seeing you off its ground — and for a steered body, aiming at you); everything else is
@@ -1059,6 +1077,31 @@ unless the user explicitly asks for a PR. Steps:
   `tripo-raw/`, and it refuses a rigged body by name), importing the viewer's own `warp()` so the
   file is what was previewed and reading the result back to prove it. `docs/viewer-stretch.md` is
   the whole of it; Blender work it implies goes in `docs/triassic/builder-requests.md`.
+- The viewer's **mouth editor** (`&mode=mouth`, the *Mouth* button) is the human answer to the
+  mouth rule above: every builder finds the mouth by a measurement that has been fooled at least
+  once, and this lets a person aim the cut by eye and hand it over as numbers. The document is a
+  **cut plane and a hinge** — six numbers on the body's frame (`src/viewer/mouth/mouth.ts`, pure):
+  how far back from the nose the hinge sits, the line's height and its seat across the head, and
+  pitch, yaw and roll — composed in that order so each angle reads as its own view's angle when
+  the other two are zero, and exported as basis vectors as well, so no consumer recomposes them.
+  The mandible is everything **below the plane and ahead of the hinge**; the second half-space is
+  what stops the cut running back through the neck, and it is also the editor's honest limit — a
+  paddle tucked forward under the snout falls inside it, as Aphaneramma's did in a builder's own
+  cut, and the count says so rather than the tool hiding it. Three handles on the orbit view
+  (hinge moves the cut in the camera's plane, front aims the line, side tips it), right-drag
+  orbits as in mark mode, every mandible vertex is lit with the same overlay mark mode uses — a
+  vertex-colour tint was the obvious alternative and would have broken the recolour hook, which
+  reads COLOR_0 as its mask. The first guess follows the stretcher's precedence: a rigged body's
+  `jaw` bone *is* its hinge and `anchor_mouth` sets the pitch, a socket alone sets the height, a
+  raw generation gets the head's own section a head's worth back, and the panel says which. It
+  works on **whatever body is on stage**, the raw generation above all, and the export names the
+  exact file by a **sha256 measured in the page** (`crypto.subtle` over the bytes the browser has;
+  a manifest's hash or `null` where it cannot) with `appliesTo` saying whether that was the
+  generation, its preview, the built body or the twin. `fromExport` is the one reader and refuses
+  a file whose hash or vertex count no longer matches, `npm run triassic:mouth -- <file>` is the
+  consumer that hashes the GLB on disk and re-counts the cut over the real mesh, `npm run mouth`
+  and `node tools/mouth-browser.mjs` check it, and `docs/viewer-mouth.md` is the schema and the
+  workflow, exact use and guidance both.
 - A bare `?debug` on the site root (`/?debug`) opens the index of every one of these tools —
   `src/ancientseas/DebugIndex.tsx`, data in `src/ancientseas/debug-index.ts`, mounted by
   `src/ancientseas/main.tsx` the way `Root.tsx` mounts the state editor. It is the trilogy page's
@@ -1180,6 +1223,48 @@ unless the user explicitly asks for a PR. Steps:
   page it opens): a network that blocks the counter makes the browser log a console error, and
   these tools fail on console errors — one blocked counter would otherwise fail a check about
   creature meshes.
+- **Every word the games say is config.** `src/content/strings.ts` is the shared table — the shell,
+  the HUD, the menus, the help page, the settings panel, the feedback form — and
+  `src/content/<era>/strings.ts` is what one game says for itself, laid over it by
+  `src/shared/text.ts` (`TEXT`). The trilogy page has its own, `src/ancientseas/strings.ts`, and it
+  must stay separate: that page is no game's, reads `ACTIVE_ERA` nowhere, and importing `TEXT`
+  would pull a roster into the entry bundle. A component asks the table and never spells a sentence
+  out, which is what makes the messaging editable without reading the code that draws it and makes
+  a second language a second table. Keys are named for **where the player sees the words** —
+  `pause.`, `results.`, `hud.grip.`, `select.crew.` — never for what they mean, and a line with a
+  number or a name in it is a *function* of that value rather than a string with a placeholder, so
+  the argument is typed and a translator can put it where the sentence needs it. An era overrides
+  only what it says differently; `mergeStrings` walks plain objects and treats a function or an
+  array as one whole value, so replacing the loading facts means *that era's* facts rather than its
+  facts interleaved with the Cambrian's — which is what those lines were before, shared and about
+  Hallucigenia in all three games. Button names are the one exception and stay in
+  `src/shared/controls.ts`: that is the binding table, what the key *is* rather than what the game
+  *says*, and `src/input/input.ts` and both diagrams read the same rows. `npm run eras` holds the split: an era
+  may only *override* a key the shared table already has (a key it invents is a key nothing reads,
+  which is how a renamed string quietly stops being drawn), every leaf of the merged table has to be
+  a string, a function or a list of strings, and no two eras may show the same loading line.
+- Nothing in a menu describes how to work the menu. The pause and results choices used to carry a
+  line under them naming the D-pad and the confirm button; the cursor already answers left, right,
+  up and down by where the buttons actually are (`src/app/spatial-nav.ts`), so the line was
+  explaining something that needs no explaining and naming one input device out of four while doing
+  it. The `pick` action went with it, since nothing else asked for its name.
+- A burrower shows the sand it is moving. `Sand` in `src/render/fx.ts` and `burrowSand` in
+  `src/render/engine.ts`: a steady shower while a body works itself down, one throw as the floor
+  closes over it, and a harder one thrown clear as it surfaces — so both ends of the act are seen
+  rather than only the disappearing. Presentation only, off the actors' own `hideMode`, so `src/sim`
+  keeps its determinism and gains no event; the silt cloud it already pushes on burial is the
+  *rule* (that is what hides the animal) and stays where it is. The grains take the biome's own
+  floor colour per grain, because a burrow in the shelf mosaic and one in the black basin must not
+  shower the same beige. The *decision* — which of the three moments a body's move between two
+  hiding states is, and what that owes — is `sandThrow`, which is pure and held by `npm run sand`;
+  the renderer keeps only the accumulator that turns a rate into whole grains, and
+  `node tools/sand-browser.mjs` drives the whole of it in a real browser against a preview build.
+  That harness is a worked example of the rule about this page's frame clock: the engine clamps
+  `dt` to 0.08 s and the software renderer draws about a frame a second, so a wall-clock second is
+  a twelfth of a second of particle life and a key held for a fraction of a second can fall
+  entirely *between* two frames and never be sampled. Hold presses for seconds, arm the watchers
+  before the press, and wait on the game's own state rather than on `waitForTimeout`.
+
 - All docs live in `docs/`. Design docs are in `docs/redesign/`. Image, glyph and prop
   needs go in `docs/image-requests.md` and move to `docs/image-requests-history.md` once
   delivered and integrated; sound and music needs go in `docs/audio-requests.md`.

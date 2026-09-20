@@ -442,11 +442,13 @@ for o in [auth, puppet]:
 # backfacing, and no oral geometry anywhere near it. A hinge envelope is an ellipsoid and fills the
 # middle of a section while leaving its corners; this fills the section itself, out of vertices the
 # cut already made. See `K.cap_cut`, which was written for this and had never been wired to a body.
+# Select the posterior head plane, not the entire half-space behind it: a tiny
+# unrelated source boundary on a foot must never be fanned to this throat's hub.
 CAP = {}
 for _o, _out in ((auth, Vector((1, 0, 0))), (puppet, Vector((1, 0, 0))),
                  (parts['lower jaw'][auth.name], Vector((-1, 0, 0))),
                  (parts['lower jaw'][puppet.name], Vector((-1, 0, 0)))):
-    CAP[_o.name] = K.cap_cut(_o, (lambda c: c.x < HINGE_X + .004), _out)
+    CAP[_o.name] = K.cap_cut(_o, (lambda c: abs(c.x - HINGE_X) < 1e-5 and on_head(c, .070)), _out)
 print('CAP', json.dumps(CAP))
 assert all(v > 2 for v in CAP.values()), ('the cut left no section to cap', CAP)
 
@@ -582,12 +584,62 @@ def weights(p):
     return K.skin_weights(p, AXIAL, LIMB_FITS, extra=trunk_pullback)
 
 
+# Keep the measured skull surface with its rigid palate. Axial relaxation is useful on
+# the neck but must not flex the skull through an independently rigid oral shell.
+# The spatial gate follows the measured head axis so it cannot claim a raised hand.
+def skull_share(q):
+    axial = K.smooth((q.x - (MOUTH_BACK - .031)) / .025)
+    radial = K.smooth((.070 - K.project(HP, HCUM, Vector(q))[0]) / .015)
+    upper = K.smooth((q.z - seam(q.x) + .010) / .010)
+    return axial * radial * upper
+
+
+def mouth_skin_weights(q, current):
+    share = skull_share(q)
+    w = {n: v * (1 - share) for n, v in current.items()}
+    w['skull'] = w.get('skull', 0.) + share
+    top = sorted(w.items(), key=lambda item: -item[1])[:4]
+    total = sum(v for _, v in top)
+    return {n: v / total for n, v in top if v > 1e-8}
+
+
+def body_mouth_pin(q, relaxed):
+    # The duplicate posterior cut vertices use exactly the same field on both
+    # pieces. Independent diffusion otherwise opens this seam under neck turns.
+    if abs(q.x - HINGE_X) < 1e-5 and q.z <= seam(q.x) + 1e-5:
+        relaxed = weights(q)
+    w = mouth_skin_weights(q, relaxed)
+    # The final cervical controls the short collar behind the cranium. Its fitted
+    # centre is close to the skull centre, so a rigid-skull constraint would otherwise
+    # leave it owning no direct skin. Assign the anatomical collar explicitly; this
+    # window ends behind the palate and does not reintroduce skull flexion.
+    collar = (K.smooth((q.x - (MOUTH_BACK - .060)) / .025)
+              * K.smooth((MOUTH_BACK - .005 - q.x) / .025)
+              * K.smooth((.070 - K.project(HP, HCUM, Vector(q))[0]) / .015))
+    if collar > 0:
+        w = {n: v * (1 - collar) for n, v in w.items()}
+        w['neck_07'] = w.get('neck_07', 0.) + collar
+        top = sorted(w.items(), key=lambda item: -item[1])[:4]
+        total = sum(v for _, v in top)
+        w = {n: v / total for n, v in top if v > 1e-8}
+    return w
+
+
+def mandible_weights(q):
+    blend = K.smooth((q.x - HINGE_X) / .022)
+    w = {n: v * (1 - blend) for n, v in mouth_skin_weights(q, weights(q)).items()}
+    w['jaw'] = w.get('jaw', 0.) + blend
+    top = sorted(w.items(), key=lambda item: -item[1])[:4]
+    total = sum(v for _, v in top)
+    return {n: v / total for n, v in top if v > 1e-8}
+
 rig = K.build_armature(B, tx, 'Coelophysis shared skeleton', 'Coelophysis_Rig')
 influences = []
 for o in [auth, puppet]:
-    K.bind(o, rig, B, weights, tx, influences, passes=RELAX_PASSES)
+    K.bind(o, rig, B, weights, tx, influences, passes=RELAX_PASSES, pin=body_mouth_pin)
 for o in parts['lower jaw'].values():
-    K.bind_rigid(o, rig, 'jaw', tx)
+    K.bind(o, rig, B, mandible_weights, tx, influences, passes=0,
+           pin=lambda q, _: mandible_weights(q))
 # The mouth is a palate on the skull and a floor on the jaw, each closed on its own and each
 # rigid on one bone (`K.oral_lining`). It used to be one sac whose wall stretched between the two,
 # and that wall photographed as a mouth webbed shut; the weights that tuned the stretch went with

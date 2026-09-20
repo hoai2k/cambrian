@@ -520,10 +520,12 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
     const big = g.spawn('cymbospondylus', 'bot', { ...spot }, 1);
     big.spawnProtect = 0;
     let loweredForBig = false;
-    for (let i = 0; i < 60 * 8; i++) { big.pos = { ...spot }; big.vel = { x: 0, y: 0, z: 0 }; big.holdT = 1; park({ ...spot, y: SURFACE_Y - 14 }); tick(g); if (boom.target === big.id) loweredForBig = true; }
+    for (let i = 0; i < 60 * 8; i++) { big.pos = { ...spot }; big.vel = { x: 0, y: 0, z: 0 }; big.holdT = 1; park(far); tick(g); if (boom.target === big.id) loweredForBig = true; }
     ok(!loweredForBig && isAlive(big) && big.hp === big.hpMax, 'a giant holding still under it is left alone');
     (g as unknown as { despawn(a: typeof big): void }).despawn(big);
     // One that stops for less than the wait and moves on is not struck.
+    boom.phase = 'watch'; boom.t = 0; boom.target = -1; boom.still.clear();
+    p.hp = p.hpMax; p.state = 'free'; p.hatching = false;
     park(spot);
     for (let i = 0; i < 60 * 2; i++) { park(spot); tick(g); }
     ok(boom.phase === 'watch', 'two seconds still is not yet enough');
@@ -768,7 +770,16 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
     ok(!shippedIds.has(id), `${id} has shipped, so it must not keep an estimated yaw`);
     ok(manifest.some((r) => r.id === id), `${id} has a yaw estimate and a published body to use it`);
   }
-  ok(manifest.length > 0, `the viewer offers ${manifest.length} generated bodies`);
+  ok(manifest.length > 0 || TRIASSIC.creatures.every(c => shippedIds.has(c.id)), 'no generated previews remain only once every roster creature has shipped');
+  const backups = JSON.parse(fs.readFileSync('src/content/triassic/backup-models.json', 'utf8')) as { id: string; model: string }[];
+  ok(backups.some(row => row.id === 'askeptosaurus'), 'Askeptosaurus retains its animated backup');
+  for (const row of backups) {
+    ok(shippedIds.has(row.id), `${row.id}: backup accompanies a shipped replacement`);
+    ok(fs.existsSync(`public/${row.model}`), `${row.id}: backup is published`);
+    const buf = fs.readFileSync(`public/${row.model}`);
+    const gltf = JSON.parse(buf.toString('utf8', 20, 20 + buf.readUInt32LE(12)));
+    ok(gltf.skins?.length > 0 && gltf.animations?.length === 24, `${row.id}: backup retains a rig and the full 24-clip action set`);
+  }
 }
 
 // ---- the viewer's scenery catalogue ----
