@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ViewerSpecimen } from '../catalogue';
-import { ASSET_BASE, rootFramePositions, type MouthHandle, type ViewerScene } from '../scene';
+import { rootFramePositions, type MouthHandle, type ViewerScene } from '../scene';
+import { useMeasuredHash } from '../file-hash';
 import { History } from '../sculpt/history';
 import { NumberField } from '../stretch/StretchEditor';
 import {
@@ -59,7 +60,6 @@ export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas,
   const [error, setError] = useState('');
   const [note, setNote] = useState('');
   const [hover, setHover] = useState<MouthHandle | null>(null);
-  const [measured, setMeasured] = useState<string | null | undefined>(undefined);
   const [historyTick, setHistoryTick] = useState(0);
   const historyRef = useRef<History<MouthDoc> | null>(null);
   const chunksRef = useRef<Float32Array[]>([]);
@@ -101,23 +101,8 @@ export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas,
     };
   }, [scene, key, show, canvas, specimen, model]);
 
-  // ---- the hash of the file on stage, measured rather than trusted ----
-  // The manifest's hash covers only the bodies it lists; the file is in the browser's cache by
-  // now, so hashing it costs one read. `crypto.subtle` needs a secure context, which a plain
-  // http deployment is not — there the manifest's answer, or none, is what the export carries.
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        if (!globalThis.crypto?.subtle) { if (!cancelled) setMeasured(null); return; }
-        const bytes = await (await fetch(`${ASSET_BASE}${model}`)).arrayBuffer();
-        const digest = await crypto.subtle.digest('SHA-256', bytes);
-        const hex = [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
-        if (!cancelled) setMeasured(hex);
-      } catch { if (!cancelled) setMeasured(null); }
-    })();
-    return () => { cancelled = true; };
-  }, [model]);
+  // ---- the hash of the file on stage, measured rather than trusted (`file-hash.ts`) ----
+  const measured = useMeasuredHash(model);
 
   // ---- every document change reaches the scene and the session store ----
   const noteRef = useRef(note); noteRef.current = note;

@@ -4,6 +4,7 @@ import type { MarkTarget, ViewerScene } from '../scene';
 import { History } from '../sculpt/history';
 import { brushHits, buildRegion, cloneMarks, describeMarked, emptyMarks, markedCount, paintInto, totalVertices, type Marks } from './region';
 import { getRegion, regionKey, setRegion } from './store';
+import { useMeasuredHash } from '../file-hash';
 
 /**
  * Mark mode: paint the geometry that should not be there, and export it.
@@ -35,7 +36,10 @@ interface Props {
 /** Brush radius as a share of the body's own radius: a hatchling and a shonisaur want the same grip. */
 const BRUSH_MIN = 0.01, BRUSH_MAX = 0.3, BRUSH_DEFAULT = 0.06;
 
-export function MarkEditor({ scene, specimen, model, sha256, canvas, onExit }: Props) {
+export function MarkEditor({ scene, specimen, model, sha256: manifestSha, canvas, onExit }: Props) {
+  // Measured off the file on stage; the manifest's hash is the fallback where it cannot be.
+  const measured = useMeasuredHash(model);
+  const sha256 = measured ?? manifestSha;
   const [target, setTarget] = useState<MarkTarget | null>(null);
   const [error, setError] = useState('');
   const [marked, setMarked] = useState(0);
@@ -255,8 +259,11 @@ export function MarkEditor({ scene, specimen, model, sha256, canvas, onExit }: P
           <textarea rows={2} value={note} placeholder="the three ventral fins" onChange={(e) => setNote(e.target.value)} />
         </label>
         {!sha256 && <p className="hint">
-          This body has no hash in <code>preview-bodies.json</code>, so the export cannot say which
-          file it was marked on beyond its path. The cutting script will ask to be told so.
+          {measured === undefined ? 'Hashing the file on stage…' : <>
+            This file could not be hashed here (a plain http page cannot) and has no hash in
+            <code>preview-bodies.json</code>, so the export cannot say which file it was marked on
+            beyond its path. The cutting script will ask to be told so.
+          </>}
         </p>}
         <div className="sculpt-foot">
           <button className="ghost primary" onClick={exportRegion} disabled={!marked}>Export region{marked ? ` (${marked.toLocaleString('en')})` : ''}</button>
