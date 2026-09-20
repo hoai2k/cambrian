@@ -41,12 +41,9 @@
   },
   "summary": {
     "shippedBodies": 26,
-    "contractMet": 21,
+    "contractMet": 24,
     "repairNeeded": [
       "henodus",
-      "keichousaurus",
-      "nothosaurus",
-      "placodus",
       "shonisaurus"
     ]
   },
@@ -1656,12 +1653,11 @@
           "Sprint",
           "Guard",
           "Eat",
+          "Grab",
           "Shoal",
           "Breathe"
         ],
-        "missingLoops": [
-          "Grab"
-        ]
+        "missingLoops": []
       },
       "anchors": {
         "required": [
@@ -1686,7 +1682,7 @@
         "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
       },
       "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
-      "state": "repair-needed"
+      "state": "contract-met"
     },
     {
       "id": "macrocnemus",
@@ -2243,11 +2239,10 @@
           "Swim",
           "Sprint",
           "Guard",
-          "Eat"
-        ],
-        "missingLoops": [
+          "Eat",
           "Grab"
-        ]
+        ],
+        "missingLoops": []
       },
       "anchors": {
         "required": [
@@ -2272,7 +2267,7 @@
         "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
       },
       "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
-      "state": "repair-needed"
+      "state": "contract-met"
     },
     {
       "id": "odontochelys",
@@ -2594,13 +2589,12 @@
           "Sprint",
           "Guard",
           "Eat",
+          "Grab",
           "Crawl",
           "Pry",
           "Breathe"
         ],
-        "missingLoops": [
-          "Grab"
-        ]
+        "missingLoops": []
       },
       "anchors": {
         "required": [
@@ -2625,7 +2619,7 @@
         "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
       },
       "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
-      "state": "repair-needed"
+      "state": "contract-met"
     },
     {
       "id": "rhaeticosaurus",
