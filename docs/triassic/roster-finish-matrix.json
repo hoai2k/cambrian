@@ -41,10 +41,9 @@
   },
   "summary": {
     "shippedBodies": 26,
-    "contractMet": 24,
+    "contractMet": 25,
     "repairNeeded": [
-      "henodus",
-      "shonisaurus"
+      "henodus"
     ]
   },
   "rows": [
@@ -2912,10 +2911,12 @@
           "Ability",
           "Attack",
           "Bite",
+          "Breath",
           "Death",
           "Dive",
           "Dodge",
           "Eat",
+          "Grab",
           "Growth",
           "Guard",
           "Heavy",
@@ -2929,20 +2930,16 @@
           "TurnLeft",
           "TurnRight"
         ],
-        "missing": [
-          "Grab",
-          "Breath"
-        ],
+        "missing": [],
         "loops": [
           "Idle",
           "Swim",
           "Sprint",
           "Guard",
-          "Eat"
-        ],
-        "missingLoops": [
+          "Eat",
           "Grab"
-        ]
+        ],
+        "missingLoops": []
       },
       "anchors": {
         "required": [
@@ -2958,8 +2955,8 @@
         "missing": []
       },
       "pairedParity": {
-        "exact": false,
-        "evidence": "missing decoded paired audit",
+        "exact": true,
+        "evidence": "decoded packaged paired-audit.json",
         "rawAnimationSignaturesDifferByBufferLayout": true
       },
       "skinning": {
@@ -2967,7 +2964,7 @@
         "numericWeightAudit": "npm run triassic / paired-audit validates normalized weights"
       },
       "centrelineAndLimbRoots": "source-reviewed; see status follow-up policy",
-      "state": "repair-needed"
+      "state": "contract-met"
     },
     {
       "id": "tanystropheus",

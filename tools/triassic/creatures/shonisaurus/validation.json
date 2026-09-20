@@ -37,6 +37,12 @@
         "seam": 0
       },
       {
+        "name": "Breath",
+        "duration": 2.4000000953674316,
+        "dynamicChannels": 20,
+        "seam": 0
+      },
+      {
         "name": "Death",
         "duration": 2.4000000953674316,
         "dynamicChannels": 19,
@@ -59,6 +65,12 @@
         "duration": 2.4000000953674316,
         "dynamicChannels": 20,
         "seam": 3.673940061447136e-18
+      },
+      {
+        "name": "Grab",
+        "duration": 1.2000000476837158,
+        "dynamicChannels": 19,
+        "seam": 3.469446951953614e-18
       },
       {
         "name": "Growth",
@@ -183,8 +195,8 @@
         }
       }
     ],
-    "bytes": 7381764,
-    "sha256": "f4a1cc71bfb9920026a51467d5da83c74527be8c7d82c30974f1e15a7473c2f5"
+    "bytes": 7375132,
+    "sha256": "282bbb8cde2e84ccda1d7a057125556caa52055db49d8ebb8f0453d58d57acb1"
   },
   "puppet": {
     "closedSurfaceWinding": [
@@ -252,6 +264,12 @@
         "seam": 0
       },
       {
+        "name": "Breath",
+        "duration": 2.4000000953674316,
+        "dynamicChannels": 20,
+        "seam": 0
+      },
+      {
         "name": "Death",
         "duration": 2.4000000953674316,
         "dynamicChannels": 19,
@@ -274,6 +292,12 @@
         "duration": 2.4000000953674316,
         "dynamicChannels": 20,
         "seam": 3.673940061447136e-18
+      },
+      {
+        "name": "Grab",
+        "duration": 1.2000000476837158,
+        "dynamicChannels": 19,
+        "seam": 3.469446951953614e-18
       },
       {
         "name": "Growth",
@@ -398,7 +422,7 @@
         }
       }
     ],
-    "bytes": 572216,
-    "sha256": "013710ef4131b066caf2fd9f77686bde299f60a05dd7f8132415031945950d9f"
+    "bytes": 586068,
+    "sha256": "c64bfefcef54636bd71f58b8c9da0b8ee62f34b79e8a3cbec8c104aac688f2be"
   }
 }
