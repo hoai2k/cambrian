@@ -170,50 +170,60 @@ for ob,keep_jaw in [(source,False),(jaw_mesh,True)]:
  bm.to_mesh(ob.data);bm.free();ob.data.update()
 source['region']='authored_upper';authored=[source,jaw_mesh]
 
-# Palate, floor, throat and lateral buccal walls are anatomical meshes with exact
-# skull/jaw ownership. They overlap the imported lip rims inside the mouth.
+# No oral geometry. A palate, a floor, a throat-and-cheeks tube and two rows of conical teeth used
+# to be authored here, and all of it was invented shape inside a Tripo body whose mouth is closed
+# at rest and whose full gape, rendered against a saturated backdrop with every backface culled
+# (tools/triassic/gape-solid.py), shows 4 px of backdrop through the body with nothing in it,
+# against a tolerance of 12. A mouth that does not show through needs its anchors and nothing else,
+# so this animal ships none; what is drawn inside the gape is the generation's own lip rims and
+# tooth forms, and package-audit.mjs refuses any mesh or material the runtime's oral classifier
+# would match.
 def solidmat(name,color):
  m=bpy.data.materials.new(name);m.use_nodes=True;b=m.node_tree.nodes.get('Principled BSDF');b.inputs['Base Color'].default_value=(*color,1);b.inputs['Roughness'].default_value=.58;return m
-oralmat=solidmat('Oral underside',(.075,.028,.031))
-oral=[]
-for part,zbase in [('palate',.003),('floor',-.011)]:
- verts=[];faces=[]
- for j,y in enumerate(np.linspace(.326,.478,18)):
-  w=float(np.interp(y,[.326,.36,.42,.492],[.042,.027,.016,.005]))*.83
-  for k in range(9):
-   t=k/8*2-1;z=zbase+(.010 if part=='palate'else -.010)*(1-t*t)+(.006*(y-.326)/.166);verts.append((t*w,y,z))
- for j in range(17):
-  for k in range(8):a=j*9+k;faces.append((a,a+1,a+10,a+9))
- o=mesh('Oral '+part,verts,faces,False);o.data.materials.append(oralmat);o['region']=part;oral.append(o)
-verts=[];faces=[]
-for j,y in enumerate(np.linspace(.321,.367,7)):
- w=float(np.interp(y,[.321,.367],[.042,.025]))*.84
- for k in range(12):
-  th=2*pi*k/12;verts.append((w*cos(th),y,-.005+.013*sin(th)))
-for j in range(6):
- for k in range(12):a=j*12+k;b=j*12+(k+1)%12;faces.append((a,b,b+12,a+12))
-faces.append(tuple(reversed(range(12))))
-o=mesh('Oral throat and cheeks',verts,faces,False);o.data.materials.append(oralmat);o['region']='throat';oral.append(o)
-# Seated ocular globes and inset pupils are shared anatomical parts. Measured dark
-# eye feature center: (+/-0.049, 0.343, 0.021), center inset by 0.003 length.
+features=[]
+# Seated ocular globes with inset irises and pupils, shared by both bodies. The globe is placed
+# where the albedo paints the eye rather than at a typed coordinate: the painted eye is the
+# darkest patch of each flank *above* the lip line -- the lip is darker still, which is why the
+# search starts a lip's width above `is_mandible`'s line, and why the first read of this albedo
+# found the mouth -- and the globe's centre is set EYE_INSET under the skin at that spot, along
+# the skin's own (area-averaged) normal, so the seat follows the surface: the globe neither floats
+# off the flank nor sinks into it, and the iris and pupil face that normal. The pair had been
+# authored 0.012 raw behind and below the painted centre; the move is a few percent of the head's
+# length forward and up, measured here, bounded by the assertions and written to build-report.json.
+EYE_INSET=.0025;EYE_SCALE=(.006,.0075,.0075);IRIS=(.0048,(.0018,.0052,.0052));PUPIL=(.0062,(.0009,.0026,.0026))
+HEAD_LEN=.498-.302;EYE_BEFORE={-1:(-.0512,.337,.014),1:(.0512,.337,.014)}
+lum=.2126*vertex_colors[:,0]+.7152*vertex_colors[:,1]+.0722*vertex_colors[:,2]
+face_normals=np.array([p.normal[:]for p in source.data.polygons]);face_centres=np.array([p.center[:]for p in source.data.polygons]);face_areas=np.array([p.area for p in source.data.polygons])
+def painted_eye(sign):
+ lip=np.interp(points[:,1],[.305,.33,.37,.395,.5],[-.027,-.017,-.005,-.0015,-.0015])
+ m=(points[:,1]>.30)&(points[:,1]<.38)&(sign*points[:,0]>.03)&(sign*points[:,0]<.075)&(points[:,2]>lip+.02)&(points[:,2]<.045)
+ q=points[m];l=lum[m];thr=float(np.quantile(l,.08));dark=q[l<=thr];w=(thr-l[l<=thr])+1e-6
+ return (dark*w[:,None]).sum(0)/w.sum(),int(m.sum()),int(len(dark))
+def skin_normal(p):
+ near=np.linalg.norm(face_centres-np.asarray(p),axis=1)<.008;n=(face_normals[near]*face_areas[near][:,None]).sum(0);return Vector(n).normalized()
+def eye_seat(centre):
+ c=Vector(centre);loc,nor,idx,dist=bvh.find_nearest(c);signed=dist*(1 if (c-loc).dot(nor)>0 else -1);inside=0;n=0
+ for i in range(24):
+  for j in range(12):
+   th=2*pi*i/24;ph=pi*(j+.5)/12;p=c+Vector((EYE_SCALE[0]*sin(ph)*cos(th),EYE_SCALE[1]*sin(ph)*sin(th),EYE_SCALE[2]*cos(ph)))
+   l2,n2,_,_=bvh.find_nearest(p);n+=1;inside+=(p-l2).dot(n2)<0
+ return {'centre':[round(float(v),5)for v in c],'centreToSkin':round(float(signed),5),'surfaceFractionInside':round(inside/n,3)}
 eye_mat=solidmat('Eyes dark globe',(.018,.023,.02));iris_mat=solidmat('Eyes bronze iris',(.065,.059,.034));pupil_mat=solidmat('Eyes black pupil',(.003,.004,.004))
+eye_report={'inset':EYE_INSET,'headLengthRaw':HEAD_LEN,'method':'painted centre = darkness-weighted centroid of the darkest 8% of flank vertices above the lip line; globe centre = nearest skin point to it, inset along the area-averaged skin normal; seat = signed distance of the centre to the skin (negative inside) and the fraction of the globe surface under the skin'}
 for sign in [-1,1]:
- for kind,loc,scale,material in [('globe',(sign*.0512,.337,.014),(.006,.0075,.0075),eye_mat),('iris',(sign*.056,.337,.014),(.0018,.0052,.0052),iris_mat),('pupil',(sign*.0574,.337,.014),(.0009,.0026,.0026),pupil_mat)]:
-  bpy.ops.mesh.primitive_uv_sphere_add(segments=20,ring_count=10,location=loc);o=bpy.context.object;o.name='Eye '+kind+(' L'if sign<0 else' R');o.scale=scale;bpy.ops.object.transform_apply(location=True,rotation=True,scale=True);o.data.materials.append(material);o['region']='upper';oral.append(o)
-# Small conical teeth lie inside the existing rim and follow upper/lower owners.
-tooth_mat=solidmat('Teeth accent',(.53,.49,.34))
-for upper in [True,False]:
- verts=[];faces=[]
- for sign in [-1,1]:
-  for j,y in enumerate(np.linspace(.381,.482,17)):
-   width=float(np.interp(y,[.381,.42,.482],[.024,.017,.007]))*.83
-   z=(.006+.011*(y-.381)/.101)if upper else(-.010+.003*(y-.381)/.101)
-   rad=.0012*(1-.35*j/17);height=.0038*(1-.30*j/17);start=len(verts)
-   for k in range(6):th=2*pi*k/6;verts.append((sign*width+rad*cos(th),float(y)+rad*sin(th),z))
-   verts.append((sign*width,float(y),z+(-height if upper else height)))
-   for k in range(6):faces.append((start+k,start+(k+1)%6,start+6))
-   faces.append(tuple(start+k for k in reversed(range(6))))
- o=mesh('Upper teeth'if upper else'Lower teeth',verts,faces,False);o.data.materials.append(tooth_mat);o['region']='palate'if upper else'floor';oral.append(o)
+ painted,region_n,dark_n=painted_eye(sign);skin,_,_,_=bvh.find_nearest(Vector(painted));n=skin_normal(skin)
+ if n.x*sign<0:n=-n
+ centre=skin-n*EYE_INSET;before=Vector(EYE_BEFORE[sign]);move=centre-before
+ assert .002<move.y<.012 and .002<move.z<.012,('the eye is meant to move slightly forward and up',sign,list(move))
+ R=Vector((sign,0,0)).rotation_difference(n).to_matrix()
+ for kind,offset,scale,material in [('globe',0,EYE_SCALE,eye_mat),('iris',IRIS[0],IRIS[1],iris_mat),('pupil',PUPIL[0],PUPIL[1],pupil_mat)]:
+  bpy.ops.mesh.primitive_uv_sphere_add(segments=20,ring_count=10,location=(0,0,0));o=bpy.context.object;o.name='Eye '+kind+(' L'if sign<0 else' R');o.scale=scale;bpy.ops.object.transform_apply(location=True,rotation=True,scale=True)
+  for v in o.data.vertices:v.co=centre+R@v.co+n*offset
+  o.data.materials.append(material);o['region']='upper';features.append(o)
+ after=eye_seat(centre)
+ assert -.004<after['centreToSkin']<-.0015 and after['surfaceFractionInside']>=.5,('the eye must stay seated in the skin',sign,after)
+ eye_report['L'if sign<0 else'R']={'painted':[round(float(v),5)for v in painted],'paintedRegionVertices':region_n,'paintedDarkVertices':dark_n,'skinNormal':[round(float(v),3)for v in n],'before':eye_seat(before),'after':after,'move':[round(float(v),5)for v in move],'movePercentOfHeadLength':[round(float(v)/HEAD_LEN*100,2)for v in move],'centreToPaintedBefore':round((before-Vector(painted)).length,5),'centreToPaintedAfter':round((centre-Vector(painted)).length,5)}
+print('SHONISAURUS_EYES',json.dumps(eye_report),flush=True)
 # One armature is created from the puppet stations and reused for BOTH exports.
 B={}
 def bone(n,p,parent):B[n]={'head':list(vworld(p)),'tail':list(vworld(p)+Vector((0,.18,0))),'parent':parent}
@@ -240,11 +250,9 @@ def axial(y):
  return blend({'spine5':1},{'caudal':1},ramp(-y,.415,.46))
 def weights(p,region=''):
  x,y,z=p;a=axial(y);side='L'if x<0 else'R';x=abs(x)
- if region in ['palate','upper']or(region=='authored_upper'and y>.305):return {'skull':1}
+ if region=='upper'or(region=='authored_upper'and y>.305):return {'skull':1}
  if region=='lower':return blend(axial(y),{'jaw':1},ramp(y,.315,.35))
- if region=='floor':return {'jaw':1}
  if region=='mandible':return blend({'skull':1},{'jaw':1},ramp(y,.326,.360))
- if region=='throat':return blend({'skull':1},{'jaw':1},ramp(-z,-.005,.016))
  if y>.305:
   line=float(np.interp(y,[.305,.33,.37,.395,.5],[-.027,-.017,-.005,-.0015,-.0015]))
   jaw=ramp(y,.305,.356)*(1-ramp(z,line-.003,line+.003))
@@ -266,7 +274,7 @@ def close_rest(p,weight=1.):
  seated=jaw_pivot+rest_closure@(p-jaw_pivot)
  yr=-p.y/S;seated.z+=S*.0045*math.exp(-((yr-.395)/.050)**2)
  return p.lerp(seated,weight)
-allmesh=authored+puppets+oral
+allmesh=authored+puppets+features
 weight_report={}
 for o in allmesh:
  for n in B:o.vertex_groups.new(name=n)
@@ -293,7 +301,7 @@ for v in lower.data.vertices:
 # parameter handedness; two-sided Blender preview concealed inward winding,
 # but the exported skin intentionally uses single-sided rendering in Three.js.
 winding_report={}
-for o in puppets+[o for o in oral if o.name in ['Upper teeth','Lower teeth']]:
+for o in puppets:
  bm=bmesh.new();bm.from_mesh(o.data);before=bm.calc_volume(signed=True)
  bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces))
  if bm.calc_volume(signed=True)<0:bmesh.ops.reverse_faces(bm,faces=list(bm.faces))
@@ -325,11 +333,11 @@ def export(obs,path):
  for o in obs+[rig]:o.select_set(True)
  bpy.context.view_layer.objects.active=rig
  bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_animations=True,export_animation_mode='ACTIONS',export_force_sampling=True,export_frame_range=False,export_skins=True,export_normals=True,export_tangents=True,export_texcoords=True,export_materials='EXPORT',export_vertex_color='NAME',export_vertex_color_name='Color',export_all_vertex_colors=False,export_yup=True,export_extras=True,export_morph=False)
-export(authored+oral,LOCAL/'shonisaurus.full.uncompressed.glb');export(puppets+oral,LOCAL/'shonisaurus.puppet.uncompressed.glb')
+export(authored+features,LOCAL/'shonisaurus.full.uncompressed.glb');export(puppets+features,LOCAL/'shonisaurus.puppet.uncompressed.glb')
 # Authoring file carries both geometries; collection visibility is set by review.py.
 bpy.ops.wm.save_as_mainfile(filepath=str(LOCAL/'shonisaurus.shared-rig.blend'))
-meta={'id':'shonisaurus','name':'Shonisaurus','species':'Shonisaurus popularis','provenance':'Late Triassic · Berlin-Ichthyosaur, Nevada','description':'Deep-bodied shastasaurid with long paired flippers, slender rostrum and lateral tail propulsion. Authored Tripo body and measured procedural volume puppet share the exact armature and actions.','lengthMeters':14,'modelLength':6,'locomotion':'Swim','clips':list(CLIPS),'looping':list(LOOPS),'anchors':[a['name']for a in anchors],'sources':['docs/triassic/canonical/shonisaurus.png','tools/triassic/creatures/shonisaurus/tripo-raw/shonisaurus.raw.glb'],'notes':['Authored skin retains source UV albedo with white COLOR_0 and restrained normal strength 0.15; procedural skin uses measured source pigment.','Procedural geometry is rebuilt from measured radial/spanning sections, not mesh decimation.','Bind geometry has a sealed mouth; only Bite, Attack, Heavy and Eat open it.','Shared clips are applied verbatim to the authored and procedural exports. Oral articulation and swimming performance are inferred soft-tissue behaviour.']}
+meta={'id':'shonisaurus','name':'Shonisaurus','species':'Shonisaurus popularis','provenance':'Late Triassic · Berlin-Ichthyosaur, Nevada','description':'Deep-bodied shastasaurid with long paired flippers, slender rostrum and lateral tail propulsion. Authored Tripo body and measured procedural volume puppet share the exact armature and actions.','lengthMeters':14,'modelLength':6,'locomotion':'Swim','clips':list(CLIPS),'looping':list(LOOPS),'anchors':[a['name']for a in anchors],'sources':['docs/triassic/canonical/shonisaurus.png','tools/triassic/creatures/shonisaurus/tripo-raw/shonisaurus.raw.glb'],'notes':['Authored skin retains source UV albedo with white COLOR_0 and restrained normal strength 0.15; procedural skin uses measured source pigment.','Procedural geometry is rebuilt from measured radial/spanning sections, not mesh decimation.','Bind geometry has a sealed mouth; only Bite, Attack, Heavy and Eat open it.','No authored oral geometry: the closed generation shows no backdrop through its gape, so the mouth is its anchors and the lip rims and tooth forms the generation drew. The eye globes sit where the albedo paints the eyes, seated 0.0025 raw under the skin along its normal.','Shared clips are applied verbatim to the authored and procedural exports. Oral articulation and swimming performance are inferred soft-tissue behaviour.']}
 existing=json.loads((OUT/'shonisaurus.json').read_text())if(OUT/'shonisaurus.json').exists()else{}
 meta={**existing,**meta}
 (OUT/'shonisaurus.json').write_text(json.dumps(meta,indent=2)+'\n')
-(HERE/'build-report.json').write_text(json.dumps({'materialCorrection':{'authoredAlbedo':'original UV texture; white COLOR_0','normalStrength':.15,'roughness':.7,'puppetMaterialUnchanged':True},'authoredMandibleSeparation':{'frontOwner':'jaw','upperLipOwner':'skull','rearHingeRawY':[.326,.360],'trianglesPreserved':True},'rawSHA256':hashlib.sha256(RAW.read_bytes()).hexdigest(),'closedRestJawAngleRadians':CLOSED_REST_ANGLE,'puppetLipContactFit':{'vertices':puppet_lip_seated,'maximumModelDisplacement':puppet_lip_max},'chinSurgery':{'adjustedVertices':chin_count,'maximumRawLengthDisplacement':chin_max},'closedSurfaceWinding':winding_report,'rawVertices':len(points),'rawTriangles':raw_triangles,'meshes':weight_report,'bones':len(B),'clips':list(CLIPS),'profileSections':len(profile)},indent=2)+'\n')
+(HERE/'build-report.json').write_text(json.dumps({'materialCorrection':{'authoredAlbedo':'original UV texture; white COLOR_0','normalStrength':.15,'roughness':.7,'puppetMaterialUnchanged':True},'authoredMandibleSeparation':{'frontOwner':'jaw','upperLipOwner':'skull','rearHingeRawY':[.326,.360],'trianglesPreserved':True},'rawSHA256':hashlib.sha256(RAW.read_bytes()).hexdigest(),'closedRestJawAngleRadians':CLOSED_REST_ANGLE,'puppetLipContactFit':{'vertices':puppet_lip_seated,'maximumModelDisplacement':puppet_lip_max},'chinSurgery':{'adjustedVertices':chin_count,'maximumRawLengthDisplacement':chin_max},'oralGeometry':'none','eyes':eye_report,'closedSurfaceWinding':winding_report,'rawVertices':len(points),'rawTriangles':raw_triangles,'meshes':weight_report,'bones':len(B),'clips':list(CLIPS),'profileSections':len(profile)},indent=2)+'\n')

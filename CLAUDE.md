@@ -723,6 +723,26 @@ unless the user explicitly asks for a PR. Steps:
   table — with a second parity test against the lining sac, because a modelled open mouth is an
   invagination and a point in the lumen is outside the solid by construction.
 
+- **On a generation that arrived gaping, a mouth built about the mouth line is built in the water.**
+  The shared shells (`T.oral_shells`) put the palate and the floor about one `seam` -- the mid-height
+  of the modelled cavity -- and on a body whose jaws are parted in the bind pose that line runs
+  through open gape: Saurichthys' palate hung 0.011 below the underside of its own upper rostrum,
+  and no room measured from mid-gape and held short of the skin ever reached the jaw it belonged to.
+  The helper now takes `seam` and `room` as a **pair** `(palate, floor)` and a separate
+  `u_front_floor`, and the two fish build each shell about *its own jaw's edge of the lumen*, cast
+  from the mouth's axis (`jaw_face` in their builders), with the floor ending where there is
+  mandible under the axis rather than at the mouth's front -- a gaping mandible's rami reach the
+  front while its symphysis has swung back. Three more things those two ports paid for, each once:
+  the mouth's **lateral centre is measured** (`cx`), because the unbent rostrum runs 0.02-0.035 off
+  the midline and a lining on x = 0 stood beside it; `T.mouth_room`'s **fallback is a positive
+  number**, so a cast that misses reads as room where there is open water and cannot be used to ask
+  whether a jaw is there (cast the ray yourself); and a bmesh vertex **starts every layer at zero**,
+  so `T.cap_cut`'s hub drew as a black slab until it copied the rim's UVs and vertex colour. The
+  containment test those builders assert is the one from the `np.interp` lesson above, asked per
+  shell: rays from every shell vertex to either side and up and down against the closed intake
+  surface, with the exceptions a gaping mouth needs written out -- a point the measured cavity
+  contains may look out through the parted lips, and a point pressed within 0.003 of a body against
+  its own jaw's surface is under its own jaw.
 - **A limbed swimmer's dash has to paddle.** The Triassic's reptiles and amphibians did not scull
   along on a tail beat, and a Sprint clip that waggles the limbs while the body does the work reads
   as a fish with legs attached. The stroke runs from the limb stretched forward to flush with the
@@ -781,6 +801,21 @@ unless the user explicitly asks for a PR. Steps:
 - Nothosaurus now holds its head still in its authored `Swim` and `Sprint` clips. The earlier
   renderer-side `steadyHead` counter-rotation was removed when those clips were corrected; do not
   reintroduce a runtime pose patch for motion that belongs in the reproducible Blender builder.
+- **A jaw cut follows the lip the generation modelled, and the plane may tilt across the head.**
+  Nothosaurus' head arrived yawed 20° to its right and its cut was a horizontal plane at a typed
+  height, 0.005 raw under the modelled lip on one flank and on it on the other. The first instinct —
+  measure the head's roll and roll the head so a flat cut fits — asks two features that disagree:
+  the countershading boundary reads 13–15° of roll on this head and the modelled slit reads 4°,
+  because the pale zone's upper edge sits above the lip on the left flank (Keichousaurus' lesson
+  again, seen from the other side). So the cut is a plane fitted to the slit hits on *both* flanks,
+  `z = a + b·x + c·y`, which carries the lip's pitch and its tilt across the head, and nobody rolls
+  the head to meet it; the yaw is the pose and is unbent in the mesh before binding (Dinocephalosaurus'
+  rigid carry, with the frames built on the vertical so a yaw carries no incidental roll). Two
+  smaller things from the same builder: a hinge envelope is seated by **ray parity against the
+  closed intake, taken before the jaw cut opens it** — asked after the cut it says every vertex is
+  outside — and it is built with `from_pydata` like the shells, because a bisected primitive left
+  the exporter splitting the cap's vertices: 148 open edges to `oral-shell-audit.mjs` on a mesh
+  Blender itself called closed.
 - A body may shape itself to what it is on: `conformArms` bends a radial rig's arms onto the ground
   under them, or around a creature it is holding, after the mixer has written the pose
   (`src/render/conform.ts`, `npm run conform`). Presentation only, and asked for by name rather than

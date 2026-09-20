@@ -8,11 +8,11 @@ and pale gastral panel; its hooked tail is straightened by a measured intake cor
 
 | Delivery | Triangles | Packaged bytes |
 | --- | ---: | ---: |
-| `placodus.glb` — authored Tripo body | 21,701 | 2,111,872 |
-| `placodus.puppet.glb` — procedural twin | 8,446 | 793,848 |
-| `placodus.lod1.glb` — identical puppet alias | 8,446 | 793,848 |
+| `placodus.glb` — authored Tripo body | 22,119 | 2,117,264 |
+| `placodus.puppet.glb` — procedural twin | 8,314 | 787,388 |
+| `placodus.lod1.glb` — identical puppet alias | 8,314 | 787,388 |
 
-The reduced model is **38.9 %** of the authored triangles, inside the contract's 40 %. Files are in
+The reduced model is **37.6 %** of the authored triangles, inside the contract's 40 %. Files are in
 `public/assets/triassic/creatures/`, with studio, 1600 × 1200 transparent select, card and thumbnail
 portraits and metadata. Meshopt packaging preserves mesh attributes and animation sample values
 exactly; textures are embedded. The model is **5.577 engine authoring units** long, faces +Z in glTF
@@ -29,8 +29,8 @@ The preserved source is `tools/triassic/creatures/placodus/tripo-raw/placodus.ra
 Intake welds coincident texture-seam vertices (11,515 loose-UV vertices collapse to 9,578; eighteen
 degenerate triangles go with them) and finds a **single** connected component, so no detached flake
 is removed. A true separate lower-jaw shell is cut along the **measured** mouth line and rigidly
-skinned to its hinge, with a lined oral cavity and a seated hinge envelope closing the interior
-(below). The design's
+skinned to its hinge, with the cut's own cross-sections capped, its rims folded, and a palate and
+a floor closing the two halves of the mouth separately (below). The design's
 **ventral armour as a separate rigid part** is the gastral basket: a flat-sided superellipse
 footprint measured off the pale plated panel in the source albedo (raw x −0.12…0.25, half-width
 0.135, below z −0.045) cut out as its own object on its own `gastralia` bone, which is a child of
@@ -105,24 +105,53 @@ for one that has been cut in half, so unlined did not mean dark, it meant seeing
 far side of the head. (Nothosaurus culls the same way and does not show it because its lining runs
 almost the whole length of a long narrow snout. It is the reach, not the culling.)
 
-There is now one **closed lining** on the cavity's own measured section — 22 stations by 14, from
-0.022 behind the hinge to 0.004 past the mandible's front, at 95 % of the measured half-width and
-half-depth — and it is *skinned* rather than split: the floor follows the jaw, the roof follows the
-skull, and the wall between them stretches, so no opening the clips reach can part it. It is wound
-**inwards** and is the one material here that culls, because what an open mouth shows is the far
-wall of the lumen and the near wall has to be got out of the way; the crushing bosses sit inside it
-and are seen. The skin does the opposite — `Placodus body pigmentation` is now double-sided, as the
-backstop under the lining rather than in place of it. The hinge envelope was enlarged to cover the
-jaw's own rear face, the square the cut leaves at x = 0.420 from the seam down to the chin, which
-swings into view the moment the mouth opens; the old one reached only to z −0.048 and left the
-lower half of it bare.
+What replaced the ribbons was one **closed sac** on the cavity's own measured section, *skinned*
+rather than split — the floor following the jaw, the roof the skull, and the wall between them
+stretching so no opening could part it. It could not part, and it was still wrong: the wall
+photographed as a mouth webbed shut, and this animal is where that form was written. It is now the
+era's contract (`T.oral_shells`, shared with every body on the kit): a **palate** rigid on the
+skull and a **floor** rigid on the jaw, each a closed shell of its own, each filling its own jaw's
+interior out to the head's *measured room* — cast inwards from outside on the closed intake surface
+(`T.mouth_room`), never a nearest-surface probe, which beside this modelled slit answers about the
+lumen's own wall — and overlapping rather than joining behind the hinge, where the jaw's rotation
+is zero. There is no wall between them to stretch, and `tools/triassic/oral-shell-audit.mjs` reads
+the packaged files to prove it: one unit bone weight per vertex, no triangle bridging the jaws,
+every edge shared by two faces, both closed halves present, on the authored body, the twin and the
+LOD. The shells run 22 stations by 14 from 0.022 behind the hinge to 0.002 *inside* the mandible's
+front (the sac ran 0.004 past it, and its front cap then stood in the open water between the
+chisels and the mandible), and every shell vertex is seated inside the head's silhouette by rays
+that cannot clamp — from the point, to either side and up and down, each must meet the intake
+surface, a point the measured cavity itself contains passing by being in the mouth. Thirteen were
+pulled in, the furthest by 0.0117 raw. The crushing bosses still sit between the two.
 
-Measured on the same frame from the same camera, the gape at `CrushBite` 0.25 s went from **20.4 %
-see-through to 0.2 %**. See [the before/after sheet](mouth-fix-sheet.jpg). It reads *dark* in those
-renders rather than pink: CYCLES path-traces, and almost no light reaches the inside of a closed
-sac through a 0.02-unit gape, so what closed the hole is nearly black in a review shot even at the
-lightened colour. The engine lights a surface by ambient without occluding it, so in play it will
-not be. The measurement, not the shot, is what says the hole is gone.
+**There is no hinge envelope any more.** The sphere that stood behind the hinge was blended half to
+the jaw and half to the skull — the stretching-wall fault in another shape — and its `depth()`
+seating test could not be trusted beside a modelled mouth. What it stood in for, the jaw's own rear
+face at x = 0.420 and the skull's open section behind it, is closed with the cut's own vertices:
+`T.cap_cut` fans each run of a cross-section to its centroid (64 faces at the hinge and 36 at the
+mandible's front on each half of the authored body), wearing the rim's UVs and vertex colour. And
+both halves of the cut get a lip: `T.rim_flange` folds the seam's rim in towards the mouth line by
+0.0035 raw (150 skull and 125 jaw vertices on the authored body), because a boundary edge is one
+polygon thick and at a grazing angle *is* the silhouette. The skin stays double-sided as the
+backstop under all of it.
+
+The proof is the shared tool, `tools/triassic/gape-solid.py`, at `CrushBite@0.25 Bite@0.25
+Heavy@0.15`: the body rendered at full gape against a saturated backdrop with and without a
+backface-cull shim, and the backdrop the cull *opens* inside the silhouette counted.
+
+| shot | before this port (sac + blended hinge envelope) | now (palate, floor, caps, folded rims) |
+| --- | ---: | ---: |
+| `CrushBite` @ 0.25 | 0 | 10 |
+| `Bite` @ 0.25 | 0 | 10 |
+| `Heavy` @ 0.15 | 0 | 0 |
+
+Tolerance is 12. The ten pixels are the silhouette of the mandible's front cap at its corner, where
+a surface one polygon thick loses its back face at a grazing angle; the marked images beside
+`gape-solid.json` put every one of them on that edge and none in the mouth. The shipped body
+material is double-sided, so none of them arise at runtime. The honest gape — backdrop present in
+*both* passes, between the chisels and the mandible's front — is 418 and 571 px in the two bite
+shots, and the sac had 0: a mouth webbed shut has no daylight in it, which is the whole point.
+`before-after` plates: `docs/triassic/throat-repairs/placodus-CrushBite-before.png` and `-after.png`.
 
 CYCLES ignores `use_backface_culling`, so `render.py` and `mouth-views.py` emulate it (backfacing
 shading points go transparent). Without that a review render shows the near wall the runtime throws
@@ -153,7 +182,8 @@ restrained normal relief (0.15) and explicitly nonmetallic skin at roughness 0.7
 | Measured mouth seam vs. the shipped straight ramp | 0.0060 raw max | 0.54 % of body | now on the curve |
 | Measured chisels on the jaw side of the cut | 0 of 3 | was 2 of 3 | 0 |
 | Lining section against the measured cavity | 95 % wide, 95 % deep | — | ≥ 90 % / 85 % |
-| Gape see-through, `CrushBite` 0.25 s, side view | 0.2 % of the aperture | was 20.4 % | — |
+| Backdrop opened by a backface cull, worst of three gape shots | 10 px | was 0 with the sac; tolerance 12 | strict-cull render |
+| Oral shell vertices with an open direction to the outside | 0 of 308 | — | 0 |
 
 The 71 authored vertices (0.68 % of 10,393) further than 0.15 from the twin are all the floor of the
 source's own lip crease at raw x ≈ 0.42, a fold finer than one voxel: the twin is smooth and very
@@ -209,8 +239,12 @@ plays **61 phases of every clip on both models** through the Three.js GLTFLoader
 evaluating actual skinned vertices, and runs the Swim/Sprint and Crawl gait assertions above over 121
 phases. The Blender build additionally checks every vertex of both bodies at 13 phases of all 25
 clips, and the loop seams close to 1e-17. The build also asserts, from its own measurements, that no
-measured tooth falls on the jaw side of the cut and that the lining carries at least 90 % of the
-mouth's measured width and 85 % of its depth at every station the cavity was measured at.
+measured tooth falls on the jaw side of the cut, that the lining carries at least 90 % of the
+mouth's measured width and 85 % of its depth at every station the cavity was measured at, that
+every cut cross-section capped and every cut half had a rim to fold, and that no oral shell vertex
+has an open direction to the outside. `node tools/triassic/oral-shell-audit.mjs placodus` proves the
+separate rigid shells in the packaged files, and `gape-solid.json` (folded into `validation.json`)
+carries the strict-cull counts.
 
 `delivery-files.json` records the size, hash and pixel dimensions of every delivered file.
 

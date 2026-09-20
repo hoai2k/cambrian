@@ -13,11 +13,11 @@ also the runtime LOD.
 
 | Delivery | Triangles | Vertices | Packaged bytes |
 | --- | ---: | ---: | ---: |
-| `hybodus.glb` — worked Tripo body | 22,335 | 13,307 | 1,843,828 |
-| `hybodus.puppet.glb` — procedural twin | 8,194 | 4,186 | 1,323,784 |
-| `hybodus.lod1.glb` — byte-identical twin alias | 8,194 | 4,186 | 1,323,784 |
+| `hybodus.glb` — worked Tripo body | 22,161 | 13,223 | 1,836,388 |
+| `hybodus.puppet.glb` — procedural twin | 7,984 | 4,027 | 1,314,436 |
+| `hybodus.lod1.glb` — byte-identical twin alias | 7,984 | 4,027 | 1,314,436 |
 
-The reduced model is **36.7 %** of the authored triangles, inside the contract's 40 %. The model is
+The reduced model is **36.0 %** of the authored triangles, inside the contract's 40 %. The model is
 5.000 engine authoring units long, faces +Z in glTF and uses +Y up; the research registry
 (`docs/research/triassic-swimming.json`) gives the animal 2 m.
 
@@ -137,40 +137,65 @@ snout. The labels are looked up by **position**, never by index: the bisect adds
 deletes faces, so a post-cut index means nothing to an array built before it, and read by the wrong
 index the mandible's weight scatters at random through the head.
 
-### The lining, and proving the gape is not a hole
+### The mouth's interior, and proving the gape is not a hole
 
-One lining, not two tubes. The roof follows the skull, the floor follows the jaw and the wall
-between them stretches, so no opening the clips reach can part it; it is wound inwards and culls,
-with the skin double-sided behind it as the backstop. It is the one authored surface on this body
-and it is the simple kind — a closed tube that fills a hole — and it **wears the creature's own
-texture**: every ring vertex takes its UVs from the nearest point on the intake surface and the
-material is a copy of the body's own, so it is not a flat-shaded island in a pored hide.
+**A palate and a floor, not one sac.** What stood here was one lining on the mouth's own measured
+section, *skinned* so its roof followed the skull, its floor the jaw and the wall between them
+stretched. It could not part, and it was still wrong: it photographed as a mouth webbed shut, and
+the black cavity in every strict-cull render was its own inward-wound near wall. It is now the
+era's contract, imported from `_pipeline/tripo.py` rather than copied — `T.oral_shells`: a
+**palate** rigid on `skull` and a **floor** rigid on `jaw`, each a closed shell wound outwards, each
+filling its own jaw's interior to a room cast inwards from outside on the closed intake surface,
+overlapping behind the hinge where the jaw's rotation is zero and joined nowhere.
+`tools/triassic/oral-shell-audit.mjs` reads the packaged files and proves it: one unit bone weight
+per vertex, no triangle bridging the jaws, every edge shared by two faces, both closed halves on the
+authored body, the twin and the LOD; `throat-audit.mjs` reports 0 mixed jaw/skull vertices in the
+lining (320 of its 336 were mixed before).
 
-Getting it right took five measured corrections, each found by the number rather than by eye:
+Four things about this generation had to be measured before that contract fitted it, and each is
+recorded in `validation.json` under `oralShells`:
 
-- **Wound the wrong way**, the near wall survived the cull and the far wall did not: 7.4 %
-  see-through at Attack's widest, against 0.3 % the other way round.
-- **Cut to the head's own section** it was far thicker than the modelled mouth and stood proud of
-  the lip with the jaw shut — a pale bulge along the closed mouth in every frame. Depth now follows
-  the slit.
-- **Cut to the slit's own width** it was narrower than the cut, and the jaw's cut edge and the
-  skull's separate right across the head: at full gape the corners of the mouth opened onto nothing,
-  9.0 % of the aperture. Width now follows the cut, flush to it.
-- **The mandible was an open shell.** A cut part is open along the seam and its inside faces away
-  from anyone looking into the gape, so under a single-sided draw the open mouth showed straight out
-  through the bottom of the jaw. Filling the cut's own boundary loop closed it: no new shape, no new
-  vertices, the ring's own UVs.
-- **The wedge at the pivot** is closed by one blunt plug seated inside the head at the hinge, rigid
-  on the skull. Split half and half with the jaw it sheared with every degree the joint turned and
-  read as the worst tear on the animal at 48.9×; rigid it cannot tear at all. It is also *fitted*
-  rather than sized: shaped like the head's own section at the pivot rather than like a ball, and
-  then pulled in vertex by vertex until every one of them is inside the head's silhouette, which
-  took 1,606 inward steps and leaves 0.0040 raw of clearance. Sized only to close the wedge it
-  came out nearly as big as the head and stood out of the snout as a pale ball in every
-  three-quarter review render, on the twin as well as the authored body, and invisible in the tight
-  mouth cameras that were being used to judge it. Scaled down *as a whole* until it fitted, it
-  shrank to a third of the head and stopped covering the wedge; pulled in only where it actually
-  breaks the surface, it fills the head everywhere it can and can show nowhere.
+- **It arrived gaping, so each shell is built about its own jaw's edge of the lumen.** Built about
+  the mouth line — the mid-height of the modelled cavity — both shells hang in open water on a body
+  whose jaws are parted in the bind pose. The palate is built about the roof of the mouth and the
+  floor about the top of the mandible, each read as the **largest empty interval** on the vertical
+  line through the mouth's own axis (not the first surface a cast finds — at the front of the mouth
+  the cavity's median sits inside the lower jaw and a cast from there called the lower jaw's top
+  the roof), never further than 0.0015 of a body from the jaw's actual surface, and each with a
+  room measured from *that* line with its width taken in the jaw's flesh. The floor ends where
+  there is mandible under the axis (`floorFrontY` −0.5413 against the mouth's front −0.544): a
+  gaping mandible's rami reach the front while its symphysis has swung back, and a floor carried to
+  the palate's front ended in the water ahead of the jaw it is rigid on.
+- **The mouth's lateral centre is measured** (`lateralAxisAtStations`), 0.004–0.015 raw off the
+  midline here; a lining on x = 0 is where the first build stood beside the jaws.
+- **Every shell vertex is seated inside the head's silhouette** by rays that cannot clamp — from
+  the point, to either side and up and down against the closed intake surface, with the two
+  exceptions a gaping mouth needs written out: a point the measured gape contains may look out
+  through the parted lips, and a palate point may look down through the gape at nothing. 125
+  vertices were pulled in, the furthest by 0.069 raw (the throat bowl's corners). This replaces
+  the old `np.interp` clearance, which is recorded but no longer the thing asserted.
+- **The throat is half the mouth's length** (`throatFraction` 0.50, kit default 0.18) and the
+  shells fill 97 % of the measured room: with the jaw at its widest the mandible swings clear of the
+  corner of the mouth, and a line of sight entering under it met nothing until the inside of the
+  far cheek — every one of the 613 pixels a first port left at `Bite` was one back-facing body
+  surface and nothing else, traced pixel by pixel. A bowl over the rear half of the mouth is what
+  stands across that line; when the jaw shuts the floor rises into it unseen.
+
+**Three more faults were in the cut itself, and none of them was the lining's.** The hinge
+cross-section the plane cut leaves through the skull was open — the back wall of the mouth was
+simply absent — and is now capped with its own cut vertices (`T.cap_cut`, over the rear band of the
+window rather than the plane alone, because this body's mandible is labelled by the surface each
+vertex grows from and the window's rear edge does not lie on the plane; 17 faces on the authored
+body). The seam's rim is folded in by 0.0035 raw (`T.rim_flange`, 88 vertices, running out before
+the snout where the two rims meet), because a boundary edge is one polygon thick and at a grazing
+angle *is* the silhouette. And **the mandible's normals were inward**: `holes_fill` had closed the
+cut boundary as the earlier note says, but the `recalc_face_normals` after it chose one consistent
+sense for a shell it could not close, and on this body that sense was inward — 1,330 of 1,641 faces
+pointed into the jaw in the shipped file (measured on `main`'s GLB), so a single-sided pass drew the
+lower jaw transparent and the black sac showed through it from every side. The part's faces are
+now put to a vote against the intake surface's normals and flipped when the vote is against them
+(`mandibleNormalVoteAgainstTheIntakeSurface`: −1292 on the authored body, +212 on the twin, which
+was already right).
 
 The proof is the shared tool, not one of my own:
 
@@ -178,21 +203,27 @@ The proof is the shared tool, not one of my own:
 blender -b --python tools/triassic/gape-solid.py -- hybodus Heavy@0.50 Attack@0.43 Bite@0.17
 ```
 
-It renders at full gape against a saturated magenta backdrop twice, once with every backface culled
-and once without, and counts backdrop pixels enclosed by the silhouette. **1 pixel of 378,000**
-at the worst of the three shots (tolerance 12) — `PASS`. The trap it exists to avoid is comparing a
-gape render against the plain background, which measures the backdrop and passes whatever the mesh
-does; the comparison here is between the two passes.
-
-| shot | differing pixels | opened by culling | seen through the body |
+| shot | seen through the body, before this port | now | of which coincide with pixels the shipped body already opened |
 | --- | ---: | ---: | ---: |
-| `Heavy` @ 0.50 | 114 | 0 | **0** |
-| `Attack` @ 0.43 | 99 | 0 | 0 |
-| `Bite` @ 0.17 | 25,153 | 35 | 1 |
+| `Heavy` @ 0.50 | 498 | **346** | 343 |
+| `Attack` @ 0.43 | 667 | **517** | 497 |
+| `Bite` @ 0.17 | 222 | **6** | — |
 
-`Bite` differs from the other two because it is the widest gape of the three and the culled pass
-throws away the whole near wall of the lining, which is 25,000 pixels of difference and none of it a
-hole: the 35 pixels the cull *opens* are along the lip, and one of them is enclosed by the body.
+`Bite` is the widest gape of the three and is where the mouth is judged: 6 px, the silhouette's own
+antialiasing where the mandible is one polygon thick, against a tolerance of 12. **The tool still
+fails this body at `Heavy` and `Attack`, and what it fails on is not the mouth.** The remaining
+pixels are one vertical strip behind the corner of the mouth (x 523–546 in the 700-wide frame in
+both shots), within a pixel of the strip the shipped body opened before anything here was touched;
+a ray cast through each of them meets **one back-facing skin surface and no front face**, exiting
+under the throat 0.06 of a body *behind* the hinge, further back than anything in the mouth
+reaches. That is an open seam of the generation itself — the first opercular slit into a hollow
+head — and it was there under the sac too, hidden in the side view by the sac's wall and the
+inward mandible. Saurichthys' equivalent seams sealed as closed loops (`T.seal_seams`, 12 faces
+there); on this body 178 boundary edges on the head are not loops and the sealer closes 8. Filling
+a non-manifold crack is inventing geometry across it, so it is recorded as a generation defect
+rather than modelled over, and the shipped body material is double-sided so none of it arises at
+runtime. `gape-solid.json` beside this file carries all of it, with the pixel classification, and
+the builder folds it into `validation.json`.
 
 ---
 

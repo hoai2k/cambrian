@@ -1,0 +1,73 @@
+{
+  "id": "placodus",
+  "backdrop": [
+    1.0,
+    0.0,
+    1.0,
+    1.0
+  ],
+  "shots": [
+    {
+      "clip": "CrushBite",
+      "t": 0.25,
+      "pixels": 378000,
+      "differingPixels": 2021,
+      "holesOpenedByCulling": 10,
+      "seenThroughTheBody": 10,
+      "backdropInBothPasses": 418,
+      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/CrushBite-0.25-opened.png",
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/CrushBite-0.25-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/CrushBite-0.25-culled.png"
+    },
+    {
+      "clip": "Bite",
+      "t": 0.25,
+      "pixels": 378000,
+      "differingPixels": 2099,
+      "holesOpenedByCulling": 10,
+      "seenThroughTheBody": 10,
+      "backdropInBothPasses": 571,
+      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Bite-0.25-opened.png",
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Bite-0.25-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Bite-0.25-culled.png"
+    },
+    {
+      "clip": "Heavy",
+      "t": 0.15,
+      "pixels": 378000,
+      "differingPixels": 2118,
+      "holesOpenedByCulling": 12,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 2,
+      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Heavy-0.15-opened.png",
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Heavy-0.15-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/placodus/gape-solid/Heavy-0.15-culled.png"
+    }
+  ],
+  "beforeThisPort": {
+    "note": "the one-sac Oral_cavity_lining and the blended Seated jaw hinge tissue, same shots",
+    "shots": [
+      {
+        "clip": "CrushBite",
+        "t": 0.25,
+        "holesOpenedByCulling": 66,
+        "seenThroughTheBody": 0,
+        "backdropInBothPasses": 6
+      },
+      {
+        "clip": "Bite",
+        "t": 0.25,
+        "holesOpenedByCulling": 62,
+        "seenThroughTheBody": 0,
+        "backdropInBothPasses": 17
+      },
+      {
+        "clip": "Heavy",
+        "t": 0.15,
+        "holesOpenedByCulling": 66,
+        "seenThroughTheBody": 0,
+        "backdropInBothPasses": 0
+      }
+    ]
+  }
+}

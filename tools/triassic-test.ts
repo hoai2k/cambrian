@@ -788,9 +788,9 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
 // viewer. This ties the catalogue to the manifest the builder writes.
 {
   const manifest = JSON.parse(fs.readFileSync('public/assets/triassic/props-instanced/manifest.json', 'utf8')) as
-    { assets: { id: string; path: string; portrait: string }[] };
+    { assets: { id: string; path: string; portrait: string; status?: string }[] };
   const specimens = JSON.parse(fs.readFileSync('src/content/triassic/specimens.json', 'utf8')) as
-    { id: string; category: string; model: string; image: string; lod?: string; looping: string[]; modelNote?: string }[];
+    { id: string; category: string; model: string; image: string; lod?: string; looping: string[]; modelStatus?: string; modelNote?: string }[];
   const props = new Map(specimens.filter((s) => s.category === 'prop').map((s) => [s.id, s]));
   ok(props.size === manifest.assets.length, `every authored prop is in the viewer catalogue (${props.size} of ${manifest.assets.length})`);
   for (const a of manifest.assets) {
@@ -803,7 +803,11 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
     // A static prop must not offer a detail switch or an animation list it cannot honour.
     ok(row.lod === undefined, `${a.id} declares no reduced model`);
     ok(row.looping.length === 0, `${a.id} declares no looping clips`);
-    ok(!!row.modelNote, `${a.id} says why it carries the preview badge`);
+    // A preview carries a reason on its badge; a prop reviewed from its canonical and shipped final
+    // carries no badge, so a reason there would be a note about nothing. The manifest's `status`
+    // and the catalogue's `modelStatus` have to agree about which it is.
+    ok((a.status === 'final') === (row.modelStatus === 'final'), `${a.id}: manifest and catalogue agree it is ${a.status}`);
+    if (row.modelStatus !== 'final') ok(!!row.modelNote, `${a.id} says why it carries the preview badge`);
   }
 }
 

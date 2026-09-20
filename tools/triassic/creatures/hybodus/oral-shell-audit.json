@@ -1,0 +1,57 @@
+{
+  "id": "hybodus",
+  "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present.",
+  "models": [
+    {
+      "variant": "authored",
+      "sha256": "503be12faf6874c7c3d7d7d41baa04fcff135e48173e35ebfec24bacbbece839",
+      "meshes": [
+        {
+          "name": "Mouth lining",
+          "vertices": 336,
+          "triangles": {
+            "skull": 332,
+            "jaw": 332
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ]
+    },
+    {
+      "variant": ".puppet",
+      "sha256": "9ffb07b87f379a8d833aa917408ce5d2eb9eb280b3a923235a6322a906cf9ab4",
+      "meshes": [
+        {
+          "name": "Mouth lining",
+          "vertices": 336,
+          "triangles": {
+            "skull": 332,
+            "jaw": 332
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ]
+    },
+    {
+      "variant": ".lod1",
+      "sha256": "9ffb07b87f379a8d833aa917408ce5d2eb9eb280b3a923235a6322a906cf9ab4",
+      "meshes": [
+        {
+          "name": "Mouth lining",
+          "vertices": 336,
+          "triangles": {
+            "skull": 332,
+            "jaw": 332
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ]
+    }
+  ]
+}
