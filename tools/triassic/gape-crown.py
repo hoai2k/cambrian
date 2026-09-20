@@ -179,6 +179,22 @@ def render_pass(culled, shots, marker=False):
     return files
 
 
+# **A crown with no mouth drawn in it is nothing for this tool to judge.** Both cephalopods now keep
+# the closed crown the generation delivered -- no peristome cut, no lining, no beak -- so there is no
+# oral material to paint the marker with and no lining to size the frame off, and the verdict this
+# tool gives ("backdrop opened where the mouth is drawn") has no subject. `gape-solid.py` still runs
+# on the closed crown and is what proves it whole. Say so and stop, rather than fail on an empty
+# `max()`: the record has to say the tool was moot, not that it crashed.
+scene_setup()
+if not any(o.type == 'MESH' and 'lining' in o.name.lower() for o in bpy.context.scene.objects):
+    report = {'id': ID, 'moot': True, 'shots': [{'clip': c, 't': t} for c, t in SHOTS],
+              'reason': 'no oral lining, beak or peristome on this body: the crown is the closed '
+                        'surface the generation delivered, so there is nothing drawn where a mouth '
+                        'would be for this tool to judge; gape-solid.py is the check that applies'}
+    (OUT / 'gape-crown.json').write_text(json.dumps(report, indent=2))
+    print('GAPE_CROWN_MOOT', json.dumps(report))
+    sys.exit(0)
+
 solid = render_pass(False, SHOTS)
 culled = render_pass(True, SHOTS)
 marked = render_pass(False, SHOTS, marker=True)

@@ -1,0 +1,28 @@
+{
+  "id": "phragmoteuthis",
+  "verdict": "no oral lining: nothing to be mixed",
+  "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present. A body with no lining mesh is reported as such, with the hidden oral parts it does carry listed, and all three variants must agree.",
+  "models": [
+    {
+      "variant": "authored",
+      "sha256": "7d28584147bf6d083df87e2e72836882769da4dd0f2d87c9b5af9f5e31fd1498",
+      "meshes": [],
+      "otherOralMeshes": [],
+      "oralShells": "none"
+    },
+    {
+      "variant": ".puppet",
+      "sha256": "3387271181bad876c297d4dfe594a7a77716211f98e7b5ffa8ab8aed7797974a",
+      "meshes": [],
+      "otherOralMeshes": [],
+      "oralShells": "none"
+    },
+    {
+      "variant": ".lod1",
+      "sha256": "3387271181bad876c297d4dfe594a7a77716211f98e7b5ffa8ab8aed7797974a",
+      "meshes": [],
+      "otherOralMeshes": [],
+      "oralShells": "none"
+    }
+  ]
+}

@@ -1,5 +1,13 @@
 # Phragmoteuthis
 
+> **Current repair, 20 September 2026 (T3D-12B):** the invented crown opening — the peristome cut,
+> the sewn oral lining and the two authored mandibles — is removed, and the crown is the closed
+> surface the generation delivered, exactly as Ceratites' has been since T3D-02a. The three mouth
+> and attack anchors on the crown axis are the whole of the mouth. The jet bones, the mantle
+> squeeze audit and the twelve-arm count are untouched. `gape-crown.py` is moot on this body and
+> says so. The mouth section below describes what is now shipped; the older reconstruction it
+> replaces is kept under it as history.
+
 The era's second cephalopod. It shares an arm crown, a beak and a hyponome with Ceratites and almost
 nothing else: where the ammonoid is a rigid house with a soft animal leaning out of it, this is soft
 all the way through with one stiff plate buried in its back, and the two bodies needed opposite
@@ -16,7 +24,8 @@ node tools/triassic/creatures/phragmoteuthis/audit.mjs --package --decode
 node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/phragmoteuthis.glb
 node tools/triassic/idle-bones.mjs public/assets/triassic/creatures/phragmoteuthis.glb
 /opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- phragmoteuthis Bite@0.22 Attack@0.4 Eat@0.37
-/opt/blender/blender -b --factory-startup --python tools/triassic/gape-crown.py -- phragmoteuthis Bite@0.22 Attack@0.4 Eat@0.37
+/opt/blender/blender -b --factory-startup --python tools/triassic/gape-crown.py -- phragmoteuthis Bite@0.22 Attack@0.4 Eat@0.37   # moot: no mouth drawn
+node tools/triassic/oral-shell-audit.mjs phragmoteuthis
 /opt/blender/blender -b --factory-startup --python tools/triassic/creatures/phragmoteuthis/render.py -- --decoded --twin --portraits
 node tools/triassic/review-bodies.mjs
 ```
@@ -92,25 +101,50 @@ that has stopped rather than a body pivoting about its own middle.
 
 ## The mouth
 
-As on Ceratites the generation models none at all, and `T.mouth_cavity` returns 499 hits spread over
-the crown — neighbouring arms across the gaps, not a lip opposite. So the peristome is authored on the
-crown's own axis (the mean direction of the twelve appendages), with one closed skinned lining sewn to
-the skin's cut rim and flanged behind it, and two keeled mandibles on `skull` and `jaw`.
+**There is no mouth modelled on this animal, and that is the verdict.** The generation models none
+— `T.mouth_cavity` returns 499 hits spread over the crown, neighbouring arms across the gaps rather
+than a lip opposite — and a beak inside an arm crown faces down the crown's own axis inside a
+thicket of arms, where the player never sees it. Everything that used to be built here (a hole cut
+in the crown, a sac sewn to its rim, two mandibles behind it) was geometry invented to close a hole
+the builder had itself cut, so it is retired and the crown stays the closed surface it was
+delivered as ([before](../../../../docs/triassic/throat-repairs/phragmoteuthis-Attack-before.png),
+[after](../../../../docs/triassic/throat-repairs/phragmoteuthis-Attack-after.png), both straight
+down the crown axis at `Attack`'s reach). What the game needs there — `anchor_mouth`,
+`anchor_mouth_inside` and `anchor_attack_primary` — are bones and cost no geometry, and they are
+still placed off the crown-axis measurement below, which is why `cut_peristome` survives in the
+builder uncalled. `skull` and `jaw` survive too: the lip band of the crown's own skin is weighted to
+them, so they are joints that own skin and the clips that hold them still hold the animal.
+
+Measured on the rebuilt body: `gape-solid.py` 0 px through the body at `Bite@0.22`, `Attack@0.4` and
+`Eat@0.37`, the two passes differing by at most one pixel, because a closed crown gives the cull
+shim nothing to open; `gape-crown.py` **moot** — it frames off the lining and masks on the oral
+materials, and there are none, so it now records that and exits rather than failing on an empty
+`max()`. `oral-shell-audit.mjs` reports no oral lining on authored, puppet or LOD. The skin figure
+is unchanged at 5.37× (`Guard`, the funnel); the clips whose worst edge sat at the crown moved both
+ways by a fraction because closing the hole changed the mesh graph the weight relaxation runs over
+(`TurnRight` 5.06× → 2.79×, `Dive` 4.19× → 2.11×, `TurnLeft` 1.71× → 2.57×), and every joint still
+owns skin.
+
+### The mouth as it was built before (historical)
+
+The peristome was authored on the crown's own axis (the mean direction of the twelve appendages),
+with one closed skinned lining sewn to the skin's cut rim and flanged behind it, and two keeled
+mandibles on `skull` and `jaw`.
 
 The crown's dome is found by casting **from inside the head outwards**, where Ceratites casts the other
 way. That difference is the animal: an ammonoid's crown dome faces open water, and this crown's
 appendages converge on the axis in front of the head, so a ray coming in from outside lands on an arm
 and calls it the mouth — which is how a first build got a peristome with 0.022 of head behind it.
 
-Proof, tolerance 12 px: `gape-solid.py` **2 px** through the body; `gape-crown.py` **8 px** where the
-mouth is drawn.
+Proof at the time, tolerance 12 px: `gape-solid.py` **2 px** through the body; `gape-crown.py`
+**8 px** where the mouth was drawn — the sewn sac's own rim, which no longer exists.
 
 ## Anchors
 
 | Socket | Bone | Role | Why |
 | --- | --- | --- | --- |
-| `anchor_mouth` | `jaw` | mouth | the lower mandible's edge |
-| `anchor_mouth_inside` | `skull` | swallow | inside the lining, behind the beak |
+| `anchor_mouth` | `jaw` | mouth | where the lower mandible's edge would be, on the crown axis |
+| `anchor_mouth_inside` | `skull` | swallow | 0.55 of the measured head room back along the crown axis |
 | `anchor_attack_primary` | longer tentacle's tip | attack | **not the beak.** `heavy: 'Hook latch'` is the tentacle pair shooting out and hooking; the beak only ever gets what they bring back. Carries that tentacle's whole chain for IK. |
 | `anchor_grasp` | other tentacle's tip | grasp | what `attachments.ts` reads to decide where a held animal rides |
 
