@@ -116,6 +116,18 @@ because a fringe that hid the shore animals would spoil them and the beach both.
 - The HUD: the strand gauge (a water-breather's minute, only while ashore) and a status line
   under the ring for every era — *OUT OF THE WATER · flop back to the sea* or *ON THE SHORE · the
   sea is behind you* — plus the era hint.
+- **Prints in the sand.** Wherever a player's body touches the beach it leaves a mark, and the
+  three bodies leave three: *footprints* where a walker's feet come down, a *groove* behind one
+  hauling itself along on its belly, and a broad *slap* wherever a stranded flopper lands. They
+  fill in over about a minute, so a beach carries where you have just been.
+  The contacts are measured rather than named — the lowest few bones of the rig, and whether each
+  is within reach of the ground under it — so a walker's feet and a stranded body's flank are found
+  by the same test on any rig in any era. A mark is laid where a contact comes down and again every
+  spacing it travels while it stays down, which is one print per plant and a continuous groove
+  behind a belly. Sand only: a boulder presses into nothing, the sea floor is not the shore, and
+  neither is the flat land behind the beach.
+  It is a *depression*, not a colour: the shader darkens whatever the ground drew rather than
+  painting over it, so a print is the same sand in shadow in every biome and at every hour.
 
 ## Since
 
@@ -128,6 +140,7 @@ because a fringe that hid the shore animals would spoil them and the beach both.
 - **The Triassic shore animals** are built and switchable (`docs/triassic/06-shore-visitors.md`,
   `Settings → Shore animals`): they take what lingers at the edge of the water *or on the sand*.
 - **The bound** is the dash ashore, and is what makes a beach worth walking on at all.
+- **Prints** are left wherever a body touches the sand, and fill in over about a minute.
 - **The Triassic's shore fringe** is planted: three land plants in three bands off the waterline.
 - **`Settings → Shore animals` is live** — turned on mid-match the banks fill from the next step,
   turned off every body on the beach leaves.

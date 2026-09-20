@@ -6,21 +6,21 @@ import { distanceAtten, hugeLength } from '../audio/mix';
 import { applyMouse, emptyControls, gamepads, KeyboardInput, MousePlay, readGamepad, rumble, type RawControls } from '../input/input';
 import { cursorFor, cursorState } from '../shared/cursors';
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
-import { bandOf, comingFor, isAlive, isHidden, lengthOf } from '../sim/actors';
+import { bandOf, comingFor, floorClearance, isAlive, isHidden, lengthOf } from '../sim/actors';
 import { creature, type CreatureId } from '../sim/creatures';
 import { CORPSE_WINDOW, DEATH_FADE, Game, radarRange as radarReach, type GripHud, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
 import type { Phase } from '../sim/daynight';
 import { BAND_COLOR, CALM_MARK, emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
 import { recordStep, recordingPhase } from '../app/debug-record';
-import { BIOME_NAMES, biomeAt, coverAt, groundHeight, nurseryAt, sampleHeight, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
-import { breathesAir, STRAND_BREATH, STRAND_LOW } from '../sim/beach';
+import { BIOME_NAMES, biomeAt, coverAt, groundHeight, LAND_REACH, nurseryAt, sampleHeight, shoreDistance, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
+import { amphibious, breathesAir, STRAND_BREATH, STRAND_LOW } from '../sim/beach';
 import { AssetQueue, type AssetProgress } from './assets';
 import { fillOf, ladderName } from '../sim/ladder';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
 import { Edges } from '../shared/edges';
 import { SAND_COLORS } from '../shared/environment-colors';
 import { Attachments } from './attachments';
-import { Bubbles, Impacts, Sand, sandThrow, Silt, Splash, type BurrowPhase } from './fx';
+import { Bubbles, Impacts, laysMark, printableSand, Sand, sandThrow, Silt, Splash, trackGait, Tracks, type BurrowPhase } from './fx';
 import { Eggs } from './eggs';
 import { Mouthfuls } from './carcass';
 import { createSea, type Quality, type SeaEnvironment } from './sea';
@@ -121,6 +121,10 @@ export const PLAYER_COLORS = ['#61f2d5', '#ffb457', '#c7a3ff', '#ff86a4'];
  * fog, so the work of emitting them buys nothing.
  */
 const SAND_RANGE = 70;
+/** How far a print is lifted off the sand it is pressed into, so it draws rather than z-fights. */
+const TRACK_LIFT = 0.02;
+/** The step the sand's own gradient is measured over, to lie a print along the beach's slope. */
+const TRACK_SLOPE = 0.35;
 const SAND_SWATCH = new THREE.Color();
 const SAND_CACHE = new Map<Biome, THREE.Color>();
 /**
@@ -361,6 +365,7 @@ export class Engine {
   private splash = new Splash(SURFACE_Y);
   private silt = new Silt();
   private sand = new Sand();
+  private tracks = new Tracks();
   private eggs = new Eggs();
   private keyboard = new KeyboardInput();
   private mouse = new MousePlay();
@@ -428,7 +433,7 @@ export class Engine {
     this.mouse.attach(container);
     // Nothing to lose: without pointer lock there is no lock to be taken away.
     this.mouse.onLost = null;
-    this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.sand.points, this.splash.group, this.mouthfuls.group, this.eggs.group);
+    this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.sand.points, this.tracks.mesh, this.splash.group, this.mouthfuls.group, this.eggs.group);
     (window as any).__cambrian = this;
     this.resize = new ResizeObserver(() => this.onResize());
     this.resize.observe(container);
@@ -542,6 +547,7 @@ export class Engine {
   private clearMatch() {
     for (const v of this.views.values()) v.dispose();
     this.views.clear(); this.attachments.clear();
+    this.tracks.clear(); this.printed.clear();
     this.eggs.dispose();
     this.cams = [];
     this.game = undefined;
@@ -730,7 +736,8 @@ export class Engine {
     // Views
     this.syncViews(game, camPositions, dt);
     this.burrowSand(game, dt);
-    this.bubbles.update(dt); this.sparkles.update(dt); this.splash.update(dt); this.mouthfuls.update(dt); this.sand.update(dt);
+    this.shoreTracks(game);
+    this.bubbles.update(dt); this.sparkles.update(dt); this.splash.update(dt); this.mouthfuls.update(dt); this.sand.update(dt); this.tracks.update(dt);
     this.eggs.update(game.actors, dt);
     this.impacts.update(dt, focus);
     this.silt.sync(game.silt, this.time);
@@ -1263,6 +1270,88 @@ export class Engine {
   private sandOwed = new Map<number, number>();
 
   /**
+   * Prints in the sand, wherever a player's body actually touches the shore.
+   *
+   * **The contacts are measured, never named.** A rig's bones are whatever its builder called them
+   * — three eras, a dozen kits and no agreement on `fore_foot_L` — so asking for the feet by name
+   * would work on one animal and silently do nothing on the next. What a print is, is the part of
+   * the body that is *on the sand*, so that is what is asked: the lowest few bones of the rig, and
+   * whether each is within `touch` of the ground under it. On a walker standing on the beach the
+   * lowest bones are its feet, and when one lifts it stops being down; on a body lying in the sand
+   * they are its belly, and the belly never lifts. The same test gives footprints for the one and
+   * a drag for the other with nothing in it that knows which animal it is looking at.
+   *
+   * `laysMark` then decides, and one rule covers both: a contact marks when it comes down, and
+   * again every `spacing` it travels while it stays down. A planted foot does not travel, so it
+   * prints once; a belly does nothing else, so it draws a groove.
+   *
+   * Presentation only. Nothing here is a rule and `src/sim` gains no event — it is read off `wade`
+   * and the drawn pose, like the burrow's sand above it. Players only, because these are the marks
+   * the player is being shown that they made.
+   */
+  private shoreTracks(game: Game) {
+    for (const a of game.players) {
+      const gait = isAlive(a) ? trackGait({
+        legs: amphibious(a.creature), lungs: breathesAir(a.creature),
+        wade: a.wade, length: lengthOf(a), clearance: floorClearance(a),
+      }) : null;
+      const view = gait ? this.views.get(a.id) : undefined;
+      if (!gait || !view) { this.printed.delete(a.id); continue; }
+      const bones = view.anchors.bones;
+      if (!bones.length) continue;
+      // The lowest `contacts` bones, by world height. Their matrices are last frame's until the
+      // renderer walks the scene, and a print has to land where the foot is *now*.
+      const n = Math.min(gait.contacts, this.lowY.length);
+      let have = 0;
+      for (const b of bones) {
+        b.updateWorldMatrix(true, false);
+        const e = b.matrixWorld.elements, y = e[13];
+        if (have === n && y >= this.lowY[have - 1]) continue;
+        let i = have < n ? have++ : n - 1;
+        for (; i > 0 && this.lowY[i - 1] > y; i--) {
+          this.lowY[i] = this.lowY[i - 1]; this.lowX[i] = this.lowX[i - 1]; this.lowZ[i] = this.lowZ[i - 1]; this.lowName[i] = this.lowName[i - 1];
+        }
+        this.lowY[i] = y; this.lowX[i] = e[12]; this.lowZ[i] = e[14]; this.lowName[i] = b.name || `bone${b.id}`;
+      }
+      let st = this.printed.get(a.id);
+      if (!st) { st = new Map(); this.printed.set(a.id, st); }
+      this.printSeen.clear();
+      for (let i = 0; i < have; i++) {
+        const x = this.lowX[i], y = this.lowY[i], z = this.lowZ[i], name = this.lowName[i];
+        this.printSeen.add(name);
+        const sand = sampleHeight(x, z);
+        let c = st.get(name);
+        if (!c) { c = { down: false, mx: x, mz: z }; st.set(name, c); }
+        if (y - sand > gait.touch) { c.down = false; continue; }   // this part is off the sand
+        const lay = laysMark(gait, c.down, Math.hypot(x - c.mx, z - c.mz));
+        c.down = true;
+        if (!lay) continue;
+        c.mx = x; c.mz = z;
+        // Sand only, and the shore only. A boulder stands proud of the seabed it sits on and
+        // presses into nothing, out past the strand the sand is under the sea, and past
+        // `LAND_REACH` is not the shore; `printableSand` answers all three.
+        if (!printableSand({
+          sand, ground: groundHeight(game.world, x, z, this.scratchBoulders), surfaceY: SURFACE_Y,
+          inland: -shoreDistance(x, z), reach: LAND_REACH,
+        })) continue;
+        const h = TRACK_SLOPE;
+        const dhdx = (sampleHeight(x + h, z) - sampleHeight(x - h, z)) / (2 * h);
+        const dhdz = (sampleHeight(x, z + h) - sampleHeight(x, z - h)) / (2 * h);
+        this.tracks.lay(x, sand + TRACK_LIFT, z, dhdx, dhdz, a.yaw, gait);
+      }
+      // A rig whose lowest bones have changed leaves the old ones behind; the map is a handful.
+      for (const name of st.keys()) if (!this.printSeen.has(name)) st.delete(name);
+    }
+    for (const id of this.printed.keys()) if (!game.byId(id)) this.printed.delete(id);
+  }
+  /** Per player, per contact: was it down last frame, and where did it last leave a mark. */
+  private printed = new Map<number, Map<string, { down: boolean; mx: number; mz: number }>>();
+  private printSeen = new Set<string>();
+  /** The lowest bones of one rig this frame, kept as plain numbers so a frame allocates nothing. */
+  private lowX = new Float64Array(6); private lowY = new Float64Array(6); private lowZ = new Float64Array(6);
+  private lowName: string[] = new Array(6).fill('');
+
+  /**
    * Lungs leak when they work. A bag of air inside a body under water shows every time the body
    * spends itself: what a bimodal animal lets go of the mouth is the effort it just made, so the
    * bubbles are the stamina bar draining, seen from outside. A sprint streams them, a dash coughs a
@@ -1721,7 +1810,7 @@ export class Engine {
     this.assets.dispose();
     this.clearMatch();
     this.sea?.dispose();
-    this.bubbles.dispose(); this.splash.dispose(); this.sparkles.dispose(); this.impacts.dispose(); this.silt.dispose(); this.sand.dispose();
+    this.bubbles.dispose(); this.splash.dispose(); this.sparkles.dispose(); this.impacts.dispose(); this.silt.dispose(); this.sand.dispose(); this.tracks.dispose();
     this.shieldGeo.dispose();
     this.mouthfuls.dispose(); this.eggs.dispose();
     this.renderer.dispose();
