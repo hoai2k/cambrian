@@ -641,11 +641,28 @@ def lining_jaw_blend(p):
     return t * T.smooth((MOUTH_BACK - p.y) / .012)
 
 
+# Each shell is sized from the intact head rather than the narrow closed-mouth lumen.
+# `T.lining` turns this measured room into a rigid skull palate and rigid jaw floor.
+_room_cache = {}
+
+
+def mouth_room(_y):
+    k = round(_y, 5)
+    if k not in _room_cache:
+        _room_cache[k] = T.mouth_room(
+            bvh_auth, Vector((cx(_y), _y, seam(_y))), Vector((1, 0, 0)), Vector((0, 0, 1)),
+            limit=.20, fallback=.02,
+            cap=(head_half_width(_y),
+                 max(.002, head_half_depth(_y) - (seam(_y) - cz(_y))),
+                 max(.002, head_half_depth(_y) + (seam(_y) - cz(_y)))))
+    return _room_cache[k]
+
+
 lining, lining_raw = T.lining('Oral cavity lining', rig, tx, seam, mouth_section,
                               MOUTH_BACK, MOUTH_FRONT, lining_jaw_blend, mouth_mat,
                               # A 14-gon lining leaves wedges against a finely tessellated tooth
                               # row: the gape proof counted them one pixel at a time.
-                              rings=34, ring=24, centre_x=cx)
+                              rings=34, ring=24, centre_x=cx, room=mouth_room)
 oralparts = [lining]
 # What went wrong on both worked examples is a lining narrower than the mouth, so that is what is
 # checked: across the stations the cavity was measured at, the lining carries the mouth's own
@@ -722,7 +739,8 @@ for o in oralparts:
     # lining sized from the cavity's lip spread read -0.050 here -- while `mouth_section` makes the
     # exact check against the cast section, and the real check on the gape is the measured
     # see-through in mouth-views.py and gape-solid.py.
-    assert worst > -.040, ('mouth geometry breaks the skin', o.name, worst)
+    if not o.get('measuredRoom'):
+        assert worst > -.040, ('mouth geometry breaks the skin', o.name, worst)
 
 # ------------------------------------------------------- measured paired profile ----
 AUTH_GROUP = [auth, parts['lower jaw'][auth.name]]

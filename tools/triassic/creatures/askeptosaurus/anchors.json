@@ -1,0 +1,34 @@
+{
+  "askeptosaurus": [
+    {
+      "name": "anchor_mouth",
+      "bone": "jaw",
+      "point": [
+        0.0050102719105780125,
+        -2.313222885131836,
+        -0.03590543568134308
+      ],
+      "role": "mouth"
+    },
+    {
+      "name": "anchor_mouth_inside",
+      "bone": "skull",
+      "point": [
+        0.0013236316153779626,
+        -2.0732226371765137,
+        -0.034066829830408096
+      ],
+      "role": "swallow"
+    },
+    {
+      "name": "anchor_attack_primary",
+      "bone": "skull",
+      "point": [
+        0.003549946006387472,
+        -2.3492226600646973,
+        -0.017370443791151047
+      ],
+      "role": "attack"
+    }
+  ]
+}

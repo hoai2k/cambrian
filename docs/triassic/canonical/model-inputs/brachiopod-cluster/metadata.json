@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-19",
+  "task": "T3D-10A",
+  "canonicalStatus": "agent-reviewed-candidate",
+  "humanApprovalClaimed": false,
+  "canonical": "canonical.png",
+  "canonicalSource": "../../brachiopod-cluster-candidate03.png",
+  "canonicalSha256": "96acf3f1cf0e88155a92e810d22edcd7a09406631e2851814ef5cee291709509",
+  "input": "input.png",
+  "inputSha256": "96acf3f1cf0e88155a92e810d22edcd7a09406631e2851814ef5cee291709509",
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "nativeInput": "../../prop-inputs-2026-09-19/native/brachiopod-cluster-attempt1.png",
+  "nativeDimensions": [
+    1254,
+    1254
+  ],
+  "resolutionProcessing": "Lanczos3 resampling from the native 1254-square ImageGen output; not native 2048 detail.",
+  "original": "../../originals/2026-09-19-prop-candidate02/brachiopod-cluster-candidate02.png",
+  "originalSha256": "2d2d32c1865259bc442fd9b883ee7d103a3ef3e77fd59dfb0ac17e8df5123b41",
+  "generator": "builtin image_gen.imagegen",
+  "inputPrompt": "Use case: precise-object-edit. Edit target: supplied candidate02 Coenothyris brachiopod cluster. Create a scientifically corrected single prop reference and Tripo input, square 2048 by 2048 pixels. Retain the overall small cluster of nine cream/tan closed shells, realistic studio rendering, soft even lighting and elevated three-quarter camera. Correct every shell: Coenothyris are smooth oval to rounded biconvex lampshells with a short stout incurved beak and a small pedicle foramen; their surfaces have only subtle concentric growth lines, NO radial ribbing, NO strong median keel, NO scallop-fan outline. Make their upper and lower valves meet at the shell margin, not at a central face seam. Shells touch lightly at their bases to form a finite low cluster but each outline remains legible. Remove ALL sand, sediment, rock, rubble, ground texture and ground plane; no hardground slab or display plinth. Show the complete cluster isolated against a uniform light gray background, all shells fully contained with generous margins on every side. Nothing cropped. Do not invent free trailing pedicles or roots; attachment points remain hidden underneath. No text, labels, diagrams or multiple views.",
+  "provenance": "../../prop-inputs-2026-09-19/provenance.json",
+  "review": {
+    "verdict": "pass",
+    "evidence": "Nine rounded biconvex lampshells now have smooth surfaces with subtle concentric growth lines and stout beaks; former radial ribs and sharp median keels removed. No sand or matrix.",
+    "risk": "Some shells overlap in projection; verify distinct shell volumes and margin seams rather than fused bulbs. Underside attachments are not established by this view."
+  },
+  "tripoSubmitted": false,
+  "downstreamApproval": {
+    "reviewer": "/root",
+    "method": "Visual contact-sheet review of all seven final input images",
+    "scope": "Approved for Tripo submission",
+    "note": "Complete silhouettes, neutral background, no substrate slab, and revised morphology reads correctly.",
+    "humanApprovalClaimed": false
+  }
+}

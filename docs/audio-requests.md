@@ -10,6 +10,14 @@ size budget, a description of the sound, and the code that will consume it.
 
 ## Open
 
+- **The flop — 1 file.** `public/assets/sfx/flop.mp3`, ~0.5 s, mono, -20 LUFS,
+  under 20 KB. A stranded animal throwing itself down the beach at the sea
+  (`src/sim/beach.ts`): a wet slap on sand with grit in it, smaller than the
+  landing, heard from the animal itself rather than from under water. One hop
+  every 0.8 s while the player asks for it, so it wants no tail. Shared between
+  the eras. Nothing is played for a flop until it lands; the landing itself
+  plays the delivered `devonian/beach`, which the shared table now borrows.
+
 - **Sprint bed — 1 file.** `public/assets/sfx/sprint-loop.mp3`, 3–5 s, seamless
   loop, mono, -26 LUFS, under 60 KB. The wash of water over a body driving hard:
   broadband, no transient, nothing that reads as a repeating swoosh when it comes

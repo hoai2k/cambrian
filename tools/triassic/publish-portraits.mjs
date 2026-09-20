@@ -25,7 +25,17 @@ const shipped = JSON.parse(fs.readFileSync('tools/triassic/shipped.json', 'utf8'
 const copied = [], unrendered = [], stale = [];
 for (const id of shipped) {
   const dir = path.join(SRC, id, 'portraits');
-  if (!fs.existsSync(dir)) { unrendered.push(id); continue; }
+  // Some older, purpose-built renderers write their five model renders straight to `public/`
+  // (rather than into the generic source `portraits/` staging directory). They are valid delivered
+  // renders too: require the complete authored quartet and puppet view before treating that path as
+  // published, so a stray placeholder or incomplete legacy pass cannot hide a missing portrait.
+  const directNames = [`${id}.select.png`, `${id}.card.png`, `${id}.thumb.png`, `${id}.png`,
+                       `${id}.puppet.png`];
+  const directComplete = directNames.every((name) => fs.existsSync(path.join(OUT, name)));
+  if (!fs.existsSync(dir)) {
+    if (!directComplete) unrendered.push(id);
+    continue;
+  }
   for (const name of fs.readdirSync(dir).filter((f) => f.endsWith('.png'))) {
     const from = path.join(dir, name), to = path.join(OUT, name);
     const src = fs.readFileSync(from);

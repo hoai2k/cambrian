@@ -8,6 +8,7 @@
  *   node tools/triassic/creatures/henodus/audit.mjs --package --decode
  */
 import fs from 'node:fs';
+import { auditCutAttachment } from '../_pipeline/cut-attachment.mjs';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import { NodeIO } from '@gltf-transform/core';
@@ -18,7 +19,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 await Promise.all([MeshoptDecoder.ready, MeshoptEncoder.ready]);
 const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({ 'meshopt.decoder': MeshoptDecoder, 'meshopt.encoder': MeshoptEncoder });
 const base = 'public/assets/triassic/creatures/henodus';
-const LOOPS = ['Idle', 'Swim', 'Sprint', 'Guard', 'Eat', 'Crawl', 'Graze', 'Breathe'];
+const LOOPS = ['Idle', 'Swim', 'Sprint', 'Guard', 'Eat', 'Grab', 'Crawl', 'Graze', 'Breathe'];
 const CLIPS = 24, JOINTS = 25, SOCKETS = 3;
 const hash = x => crypto.createHash('sha256').update(x).digest('hex');
 const data = a => a ? Array.from(a.getArray()) : null;
@@ -156,6 +157,11 @@ for (const suffix of ['', '.puppet']) {
 }
 report.exactRigParity = true; report.exactAnimationParity = true; report.exactAnchorParity = true; report.normalizedWeights = true;
 report.rigidCarapaceNeverAnimated = true; delete report.rig;
+report.posteriorJawAttachment = {};
+for (const suffix of ['', '.puppet']) {
+  report.posteriorJawAttachment[suffix || 'authored'] = await auditCutAttachment(
+    `${base}${suffix}.glb`, .437 * 5);
+}
 fs.writeFileSync('tools/triassic/creatures/henodus/paired-audit.json', JSON.stringify(report, null, 2) + '\n');
 console.log(JSON.stringify({
   models: report.models, lodTriangleFraction: report.lodTriangleFraction, clips: report.clipSignatures.length,

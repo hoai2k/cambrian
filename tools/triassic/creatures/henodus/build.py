@@ -13,7 +13,7 @@ against a 0.25 depth, its mouth is the front 0.04 of the body rather than a long
 one thing Placodus does not have at all is a fused dorsal shell, which is a rigid part here in the
 same sense that Placodus' gastral basket is.
 """
-import bpy, bmesh, math, json, os, struct, hashlib, shutil
+import bpy, bmesh, math, json, os, sys, struct, hashlib, shutil
 import numpy as np
 from mathutils import Vector, Matrix, Quaternion
 from mathutils.bvhtree import BVHTree
@@ -21,6 +21,8 @@ from mathutils.geometry import barycentric_transform
 from math import sin, cos, pi
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.abspath(os.path.join(HERE, '../../../..'))
+sys.path.insert(0, os.path.join(ROOT, 'tools/triassic/creatures/_pipeline'))
+import tripo as T                                                              # noqa: E402
 LOCAL = os.path.join(ROOT, 'local/triassic-authoring/henodus'); OUT = os.path.join(ROOT, 'public/assets/triassic/creatures')
 os.makedirs(LOCAL, exist_ok=True); os.makedirs(OUT, exist_ok=True)
 RAW = os.path.join(HERE, 'tripo-raw/henodus.raw.glb'); ID = 'henodus'; SCALE = 5
@@ -34,7 +36,7 @@ CLIPS = {'Idle': 2.4, 'Swim': 2.0, 'Sprint': 1.3, 'TurnLeft': 1.6, 'TurnRight': 
          'Attack': 1., 'Bite': .5, 'Heavy': 1.1, 'Hit': .6, 'Death': 1.6, 'Guard': 1., 'Parry': .4, 'Dodge': .5,
          'Eat': 1.6, 'Stagger': 1.2, 'Ability': .9, 'Grab': 1.2, 'Breath': 2.4, 'Growth': 1.5,
          'Crawl': 2., 'Graze': 2.4, 'Breathe': 3.}
-LOOPS = ['Idle', 'Swim', 'Sprint', 'Guard', 'Eat', 'Crawl', 'Graze', 'Breathe']
+LOOPS = ['Idle', 'Swim', 'Sprint', 'Guard', 'Eat', 'Grab', 'Crawl', 'Graze', 'Breathe']
 
 bpy.ops.object.select_all(action='SELECT'); bpy.ops.object.delete(use_global=False)
 for a in list(bpy.data.actions): bpy.data.actions.remove(a)
@@ -473,10 +475,21 @@ assert .12 < jaw_depth < .55, ('the mandible is a sliver or the seam is above th
 JAW_FRONT_X = float(max(v.co.x for v in auth.data.vertices)) + .01     # the whole beak swings
 
 
-def is_jaw(c): return c.x > HINGE_X and c.z < seam(c.x) - 1e-7
+def cut_height(c):
+    # The upper fringe hangs outboard of the narrow inner mandible. Descend
+    # below it at the sides; disconnected tooth tips are returned to the skull
+    # by split() rather than allowed to follow the lower jaw.
+    front = smooth((c.x - .450) / .015)
+    inner_width = float(np.interp(c.x, MX, WIDE)) * .60
+    outside = smooth((abs(c.y) - inner_width) / .016)
+    return seam(c.x) - front * (float(np.interp(c.x, MX, TALL)) * .72 + outside * .038)
+
+
+def is_jaw(c): return c.x > HINGE_X and c.z < cut_height(c) - 1e-7
 
 
 parts = {}
+jaw_split = {}
 
 
 def bisect_mouth(o):
@@ -488,14 +501,14 @@ def bisect_mouth(o):
     bm = bmesh.new(); bm.from_mesh(o.data)
     bmesh.ops.bisect_plane(bm, geom=list(bm.verts) + list(bm.edges) + list(bm.faces), dist=1e-7,
                            plane_co=(HINGE_X, 0, 0), plane_no=(1, 0, 0), clear_inner=False, clear_outer=False)
-    for v in bm.verts: v.co.z -= seam(v.co.x)
+    for v in bm.verts: v.co.z -= cut_height(v.co)
     head = [f for f in bm.faces if f.calc_center_median().x > HINGE_X - .03]
     verts = set(); edges = set()
     for f in head:
         verts.update(f.verts); edges.update(f.edges)
     bmesh.ops.bisect_plane(bm, geom=list(verts) + list(edges) + head, dist=1e-7,
                            plane_co=(0, 0, 0), plane_no=(0, 0, 1), clear_inner=False, clear_outer=False)
-    for v in bm.verts: v.co.z += seam(v.co.x)
+    for v in bm.verts: v.co.z += cut_height(v.co)
     bm.to_mesh(o.data); bm.free()
 
 
@@ -504,7 +517,32 @@ def split(o, label, test, mouth=False):
     part = o.copy(); part.data = o.data.copy(); part.name = o.name + ' ' + label; bpy.context.collection.objects.link(part)
     for target, keep in [(o, False), (part, True)]:
         bm = bmesh.new(); bm.from_mesh(target.data)
-        discard = [f for f in bm.faces if test(f.calc_center_median()) != keep]
+        selected = {f for f in bm.faces if test(f.calc_center_median())}
+        if mouth:
+            # A hanging upper tooth crosses the height of the mouth seam but
+            # its tip is a separate component below that seam. Only the lower
+            # jaw's connected sheet reaches the posterior hinge. Keep the other
+            # pieces with their upper roots rather than cutting teeth in half.
+            unseen = set(selected); components = []
+            while unseen:
+                seed = unseen.pop(); component = {seed}; stack = [seed]
+                while stack:
+                    f = stack.pop()
+                    for e in f.edges:
+                        for other in e.link_faces:
+                            if other in unseen:
+                                unseen.remove(other); component.add(other); stack.append(other)
+                components.append(component)
+            hinged = [c for c in components if any(
+                abs(v.co.x - HINGE_X) < 1e-5 for f in c for v in f.verts)]
+            assert hinged, 'no lower-jaw sheet reaches the hinge'
+            retained = max(hinged, key=len)
+            if not keep:
+                jaw_split[o.name] = {'candidateComponents': len(components),
+                    'lowerJawFaces': len(retained),
+                    'upperFringeFacesRetained': len(selected) - len(retained)}
+            selected = retained
+        discard = [f for f in bm.faces if (f in selected) != keep]
         bmesh.ops.delete(bm, geom=discard, context='FACES')
         loose = [v for v in bm.verts if not v.link_faces]
         if loose: bmesh.ops.delete(bm, geom=loose, context='VERTS')
@@ -515,6 +553,8 @@ def split(o, label, test, mouth=False):
 
 for o in [auth, puppet]:
     split(o, 'lower jaw', is_jaw, mouth=True)
+    T.cap_cut(o, lambda p: abs(p.x - HINGE_X) < 1e-5, Vector((1, 0, 0)))
+    T.cap_cut(parts['lower jaw'][o.name], lambda p: abs(p.x - HINGE_X) < 1e-5, Vector((-1, 0, 0)))
 
 arm = bpy.data.armatures.new('Henodus shared skeleton'); rig = bpy.data.objects.new('Henodus_Rig', arm)
 bpy.context.collection.objects.link(rig); bpy.context.view_layer.objects.active = rig; rig.select_set(True)
@@ -534,19 +574,28 @@ for o in [auth, puppet]:
     for p in o.data.polygons: p.use_smooth = True
     mod = o.modifiers.new('Shared articulated skeleton', 'ARMATURE'); mod.object = rig; o.parent = rig
 for o in parts['lower jaw'].values():
-    g = o.vertex_groups.new(name='jaw'); g.add(list(range(len(o.data.vertices))), 1., 'REPLACE')
-    for v in o.data.vertices: v.co = tx(v.co)
+    for n in B: o.vertex_groups.new(name=n)
+    for v in o.data.vertices:
+        # Share the body's weight field at the posterior cut, then become a
+        # rigid mandible forward of the short soft attachment.
+        blend = smooth((v.co.x - HINGE_X) / .018)
+        w = {n: val * (1 - blend) for n, val in weights(v.co).items()}
+        w['jaw'] = w.get('jaw', 0.) + blend
+        top = sorted(w.items(), key=lambda item: -item[1])[:4]
+        total = sum(val for _, val in top)
+        for n, val in top:
+            if val > 1e-8: o.vertex_groups[n].add([v.index], val / total, 'REPLACE')
+        v.co = tx(v.co)
     for p in o.data.polygons: p.use_smooth = True
     mo = o.modifiers.new('Rigid lower jaw', 'ARMATURE'); mo.object = rig; o.parent = rig
 
-# ---- mouth interior: one closed skinned lining -------------------------------------------------
-# The lining faces *inwards*: what an open mouth shows is the far wall of the lumen, and the near
-# wall has to be got out of the way, so this one material is the one thing here that culls its
-# backfaces. The skin does the opposite, because a cut shell is no longer closed.
+# ---- mouth interior: separate rigid palate and floor ---------------------------------------------
 #
-# It is ONE lining, not a floor and a palate: two separate tubes look identical at rest and part
-# the moment the jaw swings, which is how Placodus came to open onto transparency. The floor
-# follows the jaw, the roof follows the skull, and the wall between them stretches.
+# A palate rigid on the skull and a floor rigid on the jaw, each closed on its own and each filling
+# its own jaw's interior out to the head's measured room, overlapping rather than joining at the
+# corner of the mouth where the jaw's rotation is zero (`T.oral_shells`). One sac whose wall
+# stretched between the two bones stood here; the wall could not part, which is what it was written
+# for, and it still photographs as a mouth webbed shut.
 mouthmat = bpy.data.materials.new('Henodus mouth interior'); mouthmat.use_nodes = True
 mouthmat.use_backface_culling = True
 mbs = mouthmat.node_tree.nodes.get('Principled BSDF')
@@ -566,30 +615,33 @@ def mouth_section(x):
     return w, h
 
 
+# How much head there is round the mouth line at each station: what the palate and the floor are
+# each sized to fill. Two shells drawn to the lumen alone leave a gap either side of them, and a ray
+# into the gape passes between them and hits the inside of the far cheek -- the line the sac's
+# stretching wall used to stand across. Cast inwards on the closed intake surface (`inside`, built
+# before the jaw is cut off): this generation models a real slit, so a ray cast *outwards* from the
+# mouth axis would stop on the lumen's own wall and measure the mouth all over again.
+_room_cache = {}
+
+
+def mouth_room(x):
+    k = round(x, 5)
+    if k not in _room_cache:
+        _room_cache[k] = T.mouth_room(inside, Vector((x, 0, seam(x))), Vector((0, 1, 0)),
+                                      Vector((0, 0, 1)), limit=.20, fallback=.02)
+    return _room_cache[k]
+
+
 LINING_RINGS, LINING_RING = 20, 14
-lin_raw = []; verts = []; faces = []
-for i in range(LINING_RINGS):
-    x = MOUTH_BACK + (MOUTH_FRONT - MOUTH_BACK) * (i / (LINING_RINGS - 1)); w, h = mouth_section(x)
-    for j in range(LINING_RING):
-        th = j * 2 * pi / LINING_RING; p = Vector((x, w * cos(th), seam(x) + h * sin(th)))
-        lin_raw.append(p); verts.append(tx(p))
-for i in range(LINING_RINGS - 1):
-    for j in range(LINING_RING):
-        a = i * LINING_RING + j; b = i * LINING_RING + (j + 1) % LINING_RING
-        faces.append((a, a + LINING_RING, b + LINING_RING, b))
-faces.append(tuple(range(LINING_RING)))
-faces.append(tuple(reversed(range((LINING_RINGS - 1) * LINING_RING, LINING_RINGS * LINING_RING))))
-me = bpy.data.meshes.new('Oral cavity lining'); me.from_pydata(verts, [], faces); me.update()
-lining = bpy.data.objects.new('Oral cavity lining', me); bpy.context.collection.objects.link(lining)
-lining.location = (0, 0, 0); lining.data.materials.append(mouthmat)
-for n in ['skull', 'jaw']: lining.vertex_groups.new(name=n)
-for idx, p in enumerate(lin_raw):
-    w, h = mouth_section(p.x)
-    t = smooth(.5 + .5 * (seam(p.x) - p.z) / max(h, 1e-6))
-    g = t * smooth((p.x - HINGE_X) / .012) * smooth((MOUTH_FRONT - p.x) / .010)
-    lining.vertex_groups['jaw'].add([idx], g, 'REPLACE'); lining.vertex_groups['skull'].add([idx], 1 - g, 'REPLACE')
-for p in lining.data.polygons: p.use_smooth = True
-mo = lining.modifiers.new('Oral membrane', 'ARMATURE'); mo.object = rig; lining.parent = rig
+# A palate rigid on the skull and a floor rigid on the jaw, each closed on its own, overlapping at
+# the corner of the mouth where the jaw's rotation is zero: `T.oral_shells`, shared with the era.
+# What stood here was one sac whose wall stretched between the two bones. The wall could not part,
+# which is what it was written for, and it was still wrong: it photographs as a mouth webbed shut.
+lin_raw, faces, n_palate = T.oral_shells(seam, mouth_section, MOUTH_BACK, MOUTH_FRONT,
+                                         rings=LINING_RINGS, ring=LINING_RING, axis='x',
+                                         room=mouth_room)
+lining = T.oral_object('Oral cavity lining', tx, lin_raw, faces, n_palate, mouthmat, rig,
+                       measured_room=True)
 oralparts.append(lining)
 # Recorded, not asserted, and Placodus says why: a point in the lumen is OUTSIDE the closed shell,
 # because the shell folds in through the modelled slit, so a nearest-surface depth on a lining
@@ -1005,14 +1057,14 @@ report = {'sourceSha256': hashlib.sha256(open(RAW, 'rb').read()).hexdigest(),
           'limbSweepDegreesPerCycle': limb_sweep,
           'curvature': curvature, 'pairedLimbAsymmetry': asymmetry,
           'mouth': {'method': 'the modelled oral cavity, found by casting each head vertex normal back into the mesh over %.3f raw units; the seam is the mid height of that cavity per station and the lining is its measured section' % MOUTH_GAP,
-                    'cavityVertices': int(len(CAV)), 'hingeX': HINGE_X, 'jawFrontX': JAW_FRONT_X,
+                    'cutTopology': jaw_split, 'cavityVertices': int(len(CAV)), 'hingeX': HINGE_X, 'jawFrontX': JAW_FRONT_X,
                     'seam': [[round(float(a), 5), round(float(b), 5)] for a, b in zip(MX, MID)],
                     'cavityHalfWidth': [[round(float(a), 5), round(float(b), 5)] for a, b in zip(MX, WIDE)],
                     'cavityHalfHeight': [[round(float(a), 5), round(float(b), 5)] for a, b in zip(MX, TALL)],
                     'mandibleDepthOverHeadDepthAtHinge': round(float(jaw_depth), 3),
                     'liningInset': LINING_INSET, 'liningCoverage': mouth_cover, 'liningRings': LINING_RINGS,
                     'liningRing': LINING_RING, 'liningBackX': MOUTH_BACK, 'liningFrontX': MOUTH_FRONT, 'liningNearestSurfaceDepthRaw': round(float(lining_depth), 5),
-                    'skinDoubleSided': True, 'liningCullsBackfaces': True, 'oneClosedLining': True},
+                    'skinDoubleSided': True, 'liningCullsBackfaces': True, 'oneClosedLining': False, 'separateRigidOralShells': True},
           'forkedTail': fork,
           'normalizedWeights': True, 'rootStable': True, 'noScaleChannels': True}
 # The two checks that cannot run inside the build -- the edge-stretch sweep over every clip of the
@@ -1020,7 +1072,8 @@ report = {'sourceSha256': hashlib.sha256(open(RAW, 'rb').read()).hexdigest(),
 # in qa.json beside this file, so a rebuild carries them into the validation record rather than
 # dropping them on the floor.
 _qa = os.path.join(HERE, 'qa.json')
-report['postBuildQA'] = json.load(open(_qa)) if os.path.exists(_qa) else None
+report['historicalQA'] = {'status': 'not revalidated after this rebuild',
+    'results': json.load(open(_qa))} if os.path.exists(_qa) else None
 open(os.path.join(HERE, 'validation.json'), 'w').write(json.dumps(report, indent=2))
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(LOCAL, 'henodus-paired.blend'))
 print('HENODUS_REPORT', json.dumps({k: v for k, v in report.items() if k != 'boundsAt13Phases'}))

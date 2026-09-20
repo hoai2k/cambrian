@@ -18,6 +18,20 @@ const numDigest=a=>hash(Buffer.from(new Float64Array(arr(a)).buffer));
 function skeleton(doc){const skin=doc.getRoot().listSkins()[0];return {joints:skin.listJoints().map(n=>({name:n.getName(),parent:n.getParentNode()?.getName(),translation:n.getTranslation(),rotation:n.getRotation(),scale:n.getScale()})),inverseBind:numDigest(skin.getInverseBindMatrices())};}
 function geometry(doc){return doc.getRoot().listMeshes().map(m=>({name:m.getName(),primitives:m.listPrimitives().map(p=>({triangles:(p.getIndices()?.getCount()??p.getAttribute('POSITION').getCount())/3,attributes:p.listSemantics().sort().map(s=>[s,numDigest(p.getAttribute(s))])}))}));}
 function clips(doc){return doc.getRoot().listAnimations().map(a=>({name:a.getName(),channels:a.listChannels().map(c=>({node:c.getTargetNode().getName(),path:c.getTargetPath(),input:numDigest(c.getSampler().getInput()),output:numDigest(c.getSampler().getOutput())})).sort((a,b)=>(a.node+a.path).localeCompare(b.node+b.path))})).sort((a,b)=>a.name.localeCompare(b.name));}
+function removeNeutralExportNoise(doc){
+ for(const action of doc.getRoot().listAnimations())for(const channel of [...action.listChannels()]){
+  const values=arr(channel.getSampler().getOutput());
+  if(channel.getTargetPath()==='scale'){
+   assert(values.every(value=>Math.abs(value-1)<1e-5),`${action.getName()}: non-neutral scale channel`);channel.dispose();continue;
+  }
+  if(channel.getTargetNode().getName()==='root'){
+   const size=channel.getSampler().getOutput().getElementSize();
+   const rest=values.slice(0,size);
+   assert(values.every((value,index)=>Math.abs(value-rest[index%size])<1e-5),`${action.getName()}: root motion`);
+   channel.dispose();
+  }
+ }
+}
 function check(doc,label){
  const root=doc.getRoot(), animations=root.listAnimations(),names=animations.map(a=>a.getName());assert.deepEqual([...names].sort(),[...meta.clips].sort());
  const signatures=new Set();let weights=0,tris=0;const winding=[];
@@ -50,7 +64,7 @@ function check(doc,label){
 }
 const results={},docs={};
 for(const [src,suffix]of [['full',''],['puppet','.puppet']]){
- const doc=await io.read(`${base}/shonisaurus.${src}.uncompressed.glb`),before={skeleton:skeleton(doc),clips:clips(doc),geometry:geometry(doc)};
+ const doc=await io.read(`${base}/shonisaurus.${src}.uncompressed.glb`);removeNeutralExportNoise(doc);const before={skeleton:skeleton(doc),clips:clips(doc),geometry:geometry(doc)};
  doc.createExtension(EXTMeshoptCompression).setRequired(true).setEncoderOptions({method:EXTMeshoptCompression.EncoderMethod.QUANTIZE});
  const bytes=appendAnchors(Buffer.from(await io.writeBinary(doc)),anchors).bytes;assert(bytes.length<25*1024*1024);
  const file=`${out}/shonisaurus${suffix}.glb`;fs.writeFileSync(file,bytes);const decoded=await io.read(file);assert.deepEqual(skeleton(decoded),before.skeleton);assert.deepEqual(clips(decoded),before.clips);assert.deepEqual(geometry(decoded),before.geometry);docs[src]=decoded;results[src]={...check(decoded,src),bytes:bytes.length,sha256:hash(bytes)};

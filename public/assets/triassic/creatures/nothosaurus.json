@@ -34,7 +34,8 @@
     "Swim",
     "Sprint",
     "Guard",
-    "Eat"
+    "Eat",
+    "Grab"
   ],
   "anchors": [
     "anchor_mouth",

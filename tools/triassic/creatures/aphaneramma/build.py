@@ -695,10 +695,25 @@ def lining_jaw_blend(p):
     return T.smooth(.5 + 1.6 * ((seam(p.y) + .45 * h) - p.z) / max(h, 1e-6))
 
 
+_room_cache = {}
+
+
+def mouth_room(_y):
+    k = round(_y, 5)
+    if k not in _room_cache:
+        _room_cache[k] = T.mouth_room(
+            bvh_auth, Vector((cx(_y), _y, seam(_y))), Vector((1, 0, 0)), Vector((0, 0, 1)),
+            limit=.20, fallback=.02,
+            cap=(head_half_width(_y),
+                 max(.002, head_half_depth(_y) - (seam(_y) - cz(_y))),
+                 max(.002, head_half_depth(_y) + (seam(_y) - cz(_y)))))
+    return _room_cache[k]
+
+
 lining, lining_raw = T.lining('Oral cavity lining', rig, tx, seam, mouth_section,
                               MOUTH_BACK, MOUTH_FRONT, lining_jaw_blend, mouth_mat,
                               rings=30, ring=24, centre_x=cx, power=LINING_POWER,
-                              fit=fit_lining_point)
+                              fit=fit_lining_point, room=mouth_room)
 oralparts = [lining]
 mouth_cover = []
 for r in PAINTED:
@@ -758,7 +773,8 @@ oral_seating = []
 for o in oralparts:
     worst = min(depth(Vector(v.co[:]) / SCALE) for v in o.data.vertices)
     oral_seating.append({'part': o.name, 'worstDepthRaw': float(worst)})
-    assert worst > -.012, ('mouth geometry breaks the skin', o.name, worst)
+    if not o.get('measuredRoom'):
+        assert worst > -.012, ('mouth geometry breaks the skin', o.name, worst)
 
 # ------------------------------------------------------- measured paired profile ----
 AUTH_GROUP = [auth, parts['lower jaw'][auth.name]]

@@ -112,6 +112,13 @@ export interface CreatureDef {
   breathing?: 'gill' | 'bimodal' | 'air';
   /** How far past the shore wall this creature may push (world units). 0 for swimmers. */
   shoreReach?: number;
+  /**
+   * Legs and lungs: walks up out of the water onto the shore and back in (src/sim/beach.ts). The
+   * shore wall does not stand for it, its swim hands over to its walk as the water shallows, and
+   * on the sand it plays its walking clip where it has one. Without this a body reaches the sand
+   * only by leaping onto it — and then walks back if it breathes air, or flops if it does not.
+   */
+  amphibious?: boolean;
   /** Chambered shell: backward jet sprint, free buoyancy, withdraw on block. */
   shell?: boolean;
   /** Arthropod that must moult to reach the next stage, leaving an exuvia. */

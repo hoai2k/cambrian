@@ -202,5 +202,34 @@
    "Pivot at the base centre where the prop meets the ground; authored at the design's scale-1 size, which the game then scales per instance.",
    "Built by tools/triassic/props/build.py from triassic-mud-ripple-2.blend."
   ]
+ },
+ {
+  "id": "askeptosaurus",
+  "name": "Askeptosaurus procedural twin",
+  "species": "Askeptosaurus italicus",
+  "category": "creature",
+  "modelStatus": "final",
+  "provenance": "Middle Triassic · Monte San Giorgio",
+  "description": "Measured volume resurfacing of the regenerated Askeptosaurus, sharing its exact 33-joint rig, 24 clips, anchors and inverse binds.",
+  "model": "assets/triassic/creatures/askeptosaurus.puppet.glb",
+  "lod": "assets/triassic/creatures/askeptosaurus.puppet.glb",
+  "image": "assets/triassic/creatures/askeptosaurus.thumb.png",
+  "lengthMeters": 2.5,
+  "looping": [
+   "Idle",
+   "Swim",
+   "Sprint",
+   "Guard",
+   "Eat",
+   "Grab"
+  ],
+  "sources": [
+   "tools/triassic/creatures/askeptosaurus/tripo-regenerated-2026-09-19/askeptosaurus.raw.glb",
+   "docs/triassic/canonical/askeptosaurus.png"
+  ],
+  "notes": [
+   "Rebuilt voxel topology; no source faces reused.",
+   "The twin is also the byte-identical LOD1."
+  ]
  }
 ]

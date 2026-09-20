@@ -297,6 +297,29 @@ unless the user explicitly asks for a PR. Steps:
   (the renderer cannot know a dash fired until that step has run) and gives up that one frame of
   drift and no more. `npm run swim` closes the loop end to end — camera drift into the stick into
   the real cooldown — and measures the second dash's own rise against the first's.
+- **The shore is somewhere a body can end up, and what the sand does to it depends on what it
+  breathes** (`src/sim/beach.ts`, `docs/redesign/10-the-shore.md`, `npm run beach`, one process
+  per era). Two ways there and they are deliberately unequal: a *leap* lands wherever its arc comes
+  down, because nothing in the air is held by water — the shore wall in `resolveStatic` stands only
+  for a body swimming at it, and the Cambrian breaches now too, on the Devonian's own terms — and an
+  animal with legs *and* lungs (`amphibious` on its card: Tiktaalik, Acanthostega, Nothosaurus,
+  Placodus, Aphaneramma, Henodus, Cartorhynchus, Odontochelys) walks up through it, its swim
+  handing over to its walk along one ramp (`landSpeed`) and back the same way. **Nothing strands
+  itself by swimming**: beside the fixed wall a second one is measured in the body's own draught
+  (`WALL_WADE`), because the beach is a different slope in every era and on the Triassic's the
+  fixed wall stands on dry sand for a hatchling; a swimmer becomes `ashore` on exactly one frame,
+  the one its leap lands on, and both walls *ease* a body found inside them out at a bounded pace
+  rather than snapping it. `wade` (0..1, continuous in position) is what the walk ramp, the clip
+  handover and the camera's lift out of the water all read; `ashore` is the rule past `ASHORE_WADE`.
+  Ashore, a water-breather has `STRAND_BREATH` (a minute, the gauge shown only there — under water a
+  gill has nothing to count) and one move, the flop, which goes seaward whatever the stick says; an
+  air-breather has no clock, walks along the shore at `LAND_WALK` of its cruise and no further
+  inland than `LAND_REACH`, and a Triassic lung fills on the sand because the sand is the surface.
+  The flop's hop, twist and nose-up are the simulation's own (`pos.y`, `bank`, `pitch` through
+  `flopT`), so no clip is needed for it to read; the renderer throws the swim stroke on top. A
+  brainless body ashore is handed the seaward stick (`ashoreInput`). The land is bare in every era
+  by construction — `generateChunk` places nothing inland of `SHORE_WALL` — and the Triassic's
+  beach becomes dangerous when its shore animals are switched on, not before.
 - **A breach is a leap, not a launch.** The vertical a body carried through the surface used to be
   whatever it had, and a dash's launch speed is `L * 9.5 + 7` — so a five-unit animal that dashed
   straight up cleared a hundred units of air and a Cymbospondylus over a thousand. `breachSpeed` in
