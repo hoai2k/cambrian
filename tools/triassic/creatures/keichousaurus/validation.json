@@ -12,14 +12,14 @@
   "intakeRotationDegAboutZ": -90,
   "remeshTriangles": 160548,
   "puppetBudget": 6600,
-  "fullTriangles": 20120,
-  "puppetTriangles": 7590,
+  "fullTriangles": 20156,
+  "puppetTriangles": 7624,
   "parts": {
     "authoredBody": 19060,
     "authoredJaw": 380,
-    "puppetBody": 6708,
+    "puppetBody": 6706,
     "puppetJaw": 202,
-    "sharedOral": 680
+    "sharedOral": 716
   },
   "bones": 27,
   "clips": {
@@ -386,7 +386,7 @@
           -0.3376069664955139
         ],
         "max": [
-          0.7367258071899414,
+          0.7367257475852966,
           0.9919999837875366,
           0.6110764741897583
         ]
@@ -397,8 +397,8 @@
   ],
   "envelopeStationsOverToleranceCause": "the hindR paddle tip: the twin stops 0.009 raw (0.9 % of body length) short of the authored blade, so the one station that lands in that gap reads it as absent rather than displaced",
   "surfaceDistanceMax": 0.008423739112913609,
-  "surfaceDistanceP95": 0.0026667760103009637,
-  "surfaceDistanceP99": 0.003814730134326961,
+  "surfaceDistanceP95": 0.0026757627376355203,
+  "surfaceDistanceP99": 0.003818080474156885,
   "surfaceOutliersOver0p12": 0,
   "surfaceVertices": 9820,
   "seatingDepthRaw": {
@@ -414,7 +414,7 @@
     "neck_02": 0.013723681680858135
   },
   "maxInfluences": 4,
-  "meanInfluences": 2.034852340195852,
+  "meanInfluences": 2.0349321406539174,
   "limbSweepDegreesPerCycle": {
     "Idle": {
       "foreL": 6.2,
@@ -684,10 +684,14 @@
     "liningSideShareOfMeasuredReach": 0.78,
     "liningRoofShareOfMeasuredReach": 0.55,
     "liningFloorShareOfMeasuredReach": 0.72,
-    "liningNearestSurfaceDepthRaw": 0.00119,
+    "liningNearestSurfaceDepthRaw": 0.00097,
+    "liningRoomShareFilled": 0.84,
+    "palateVertices": 100,
+    "floorVertices": 100,
     "skinDoubleSided": true,
     "liningCullsBackfaces": true,
-    "oneClosedLining": true
+    "oneClosedLining": false,
+    "separatePalateAndFloor": "a palate rigid on skull and a floor rigid on jaw, each a closed shell (T.oral_shells); no vertex blends the two bones"
   },
   "normalizedWeights": true,
   "rootStable": true,
@@ -695,27 +699,64 @@
   "postBuildQA": {
     "skinTears": {
       "tool": "node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/keichousaurus.glb",
-      "worstEdgeStretch": 6.57,
-      "worstClip": "Bite",
-      "worstBone": "skull",
+      "worstEdgeStretch": 2.34,
+      "worstClip": "Sprint",
+      "worstBone": "chest",
       "worstEdgeFromTo": [
-        0.023,
-        0.148
+        0.046,
+        0.107
       ],
-      "clipsOverTwoTimes": 9,
+      "clipsOverTwoTimes": 2,
       "worstOutsideTheOralLining": 2.34,
       "worstOutsideTheOralLiningClip": "Sprint",
       "worstOutsideTheOralLiningBone": "chest",
       "reference": "Nothosaurus 2.98x clean, Tanystropheus 6.1x, Placodus 12.4x, Coelophysis 25.3x",
-      "note": "Two numbers, because they are two different things. The skin proper -- trunk, neck, tail, all four limbs -- peaks at 2.34x in Sprint, which is cleaner than Nothosaurus, the era's reference body. Every figure above that is the oral lining and the jaw/skull weights it carries, doing what the lining is for: its wall stretches between a roof on the skull and a floor on the jaw as the mouth opens, and on a head whose jaw is 12 % of the body length that stretch is real. It was 15.05x when the lining's front cap pinched to a knot of thousandth-of-a-body edges, and coarsening the ring from 14 points to 10 and holding a floor under the taper took it to 6.57x; a finer ring only makes each wall edge shorter and its ratio larger without changing how far the mandible actually travels."
+      "note": "One number now rather than two. The skin proper -- trunk, neck, tail, all four limbs -- peaks at 2.34x in Sprint, exactly as it did with the one-sac lining, because nothing about the skinning changed. The lining used to be the body's worst deformer at 6.57x and that was its wall doing what a stretching wall does; a palate rigid on the skull and a floor rigid on the jaw stretch nothing, so the figure including the oral parts is the skin figure. Nine clips tore an edge past 2x before; two do now, and both are the paddle row."
     },
     "gapeSolid": {
       "tool": "/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- keichousaurus Bite@0.25 Heavy@0.1 Attack@0.1 Eat@0.4 Ability@0.1",
       "verdict": "PASS",
-      "maxSeenThroughTheBody": 11,
+      "maxSeenThroughTheBody": 0,
       "ofPixels": 378000,
       "tolerance": 12,
-      "note": "Three separate leaks were closed to get here, and each named a different mistake in the lining. The mandible's tip swung out from under a lining whose front was pinned 100 % to the skull -- the floor of the mouth at the front IS the tip of the mandible, so the jaw's share now runs to the front cap. The mouth opened onto the backfacing inside of the lower jaw, because a lining drawn as a symmetric tube about its own lip line has a floor where a real mouth has a deep one and a shallow palate. And the last of it was at the commissure, where the lining's reach is now measured by ray from each seam station rather than taken as a fraction of the head's mean radius."
+      "note": "Measured on the committed sac body and on this build at the same five shots and the same backdrop test. Nothing is seen through the body in either; the palate/floor pair opens fewer silhouette pixels than the sac did (55-62 against 76-84), which is the shells' rear caps filling the corner of the mouth the sac's wall used to stand across. The 11 px the README quoted for the sac was measured at the older, looser backdrop window and went to 0 when the window was measured against the backdrop itself (CLAUDE.md). The three leaks the note below describes were closed on the sac and stayed closed on the shells: the floor runs to the front cap on the jaw, the two shells are sized on the measured room (0.84 of it), and the commissure is covered by the palate's rear rings.",
+      "backdropTest": "r > .90, g < .20, b > .90",
+      "before": {
+        "oneSacLining": {
+          "seenThroughTheBody": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "openedByCulling": [
+            79,
+            83,
+            84,
+            83,
+            76
+          ]
+        }
+      },
+      "after": {
+        "separatePalateAndFloor": {
+          "seenThroughTheBody": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "openedByCulling": [
+            59,
+            59,
+            62,
+            61,
+            55
+          ]
+        }
+      }
     }
   }
 }
