@@ -66,3 +66,24 @@ rigid palate/floor shells replace the sac, and Grab is correctly declared and ch
 [after from below](henodus-Bite-below-after.png) show the intact upper fringe and inner mandible.
 Historical gape figures are explicitly separated from current export validation. Paired assets,
 rigs, clips, anchors and attachment checks pass; portraits are refreshed.
+
+## Full roster diagnostic snapshot
+
+The [baseline sweep](baseline-audit.json) evaluates 52 actual delivered models (authored and puppet
+for all 26 shipped species), 1,212 clip/model combinations and 30,300 sampled poses. The
+[summary](audit-summary.json) records each SHA-256 and the [priority repair sweep](priority-repair-audit.json)
+records the three repaired pairs. Hupehsuchus' worst mouth-region edge ratio fell from 5.81× to
+3.17× authored and 4.70× to 2.93× puppet; its rear cut attachment is exactly coincident separately.
+Henodus' unchanged 4.84×/5.17× maxima come from broader skinning candidates, not proof that its
+repaired posterior seam still separates.
+
+Twenty-three baseline species had a named lining with mixed jaw/skull weights. Nothosaurus
+already used separate palate/floor meshes; Shonisaurus already had authored oral parts;
+Helicoprion had no named legacy lining. After the three priority repairs, twenty legacy lining
+species still require the separately tracked shared-kit/ShoreKit recovery. These measurements
+confirm that the old claim of a completed roster-wide palate conversion was stale.
+
+The earlier skinning-repair batch is present on main. High strain candidates in Placodus,
+Helicoprion and Dinocephalosaurus still merit targeted visual review; this numerical report does
+not classify all strain as a throat tear or mark unseen intersections as fixed. Askeptosaurus
+was not a shipped authored/puppet pair at baseline and is covered by its separate regeneration.
