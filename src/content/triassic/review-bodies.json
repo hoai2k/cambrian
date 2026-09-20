@@ -1,5 +1,14 @@
 [
   {
+    "id": "askeptosaurus.origpose",
+    "model": "assets/triassic/creatures/askeptosaurus.origpose.glb",
+    "puppet": null,
+    "lod": null,
+    "bytes": 1637620,
+    "sha256": "8348549043848ee2c71f109968b41a1d4f7fd3215cd1b65a916c32bad71f9a2c",
+    "clips": []
+  },
+  {
     "id": "coelophysis.origpose",
     "model": "assets/triassic/creatures/coelophysis.origpose.glb",
     "puppet": null,
