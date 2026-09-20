@@ -198,3 +198,51 @@ recorded here so nobody reads the disagreement as an oversight.
 
 See [the build and validation record](../../tools/triassic/creatures/askeptosaurus/README.md) and
 `docs/triassic/verification/askeptosaurus-swap-*.png`.
+
+## The front · 20 September 2026 (T3D-26)
+
+The owner's reading of the swapped body: *"his head area and right fin are currently at a 90deg
+angle to his left."* Seen from above that is exactly what it was, and the cause was recorded in
+`validation.json` from the day of the swap without anybody reading it that way.
+
+`uncurl` opens a chain onto **its own first segment**, which removes the bend *along* the chain and
+leaves its **takeoff** — the angle it leaves the body at — exactly where the generation put it.
+T3D-25 chose that deliberately and had a measurement for it: aiming a chain at the trunk instead
+makes the whole correction one rigid rotation at the chain's root and read 2.62x on
+`skin-tears.mjs` against 1.51x. On the tail that choice is right and stays — a thalattosaur's tail
+sweeps, and its 24.7° takeoff is character. On the **front** it was the fault: opened onto its own
+first segment the head still left the trunk at 54.6° and finished **67.7°** off it.
+
+Two corrections to the arithmetic that was assumed before this was measured. The 67.7° is not
+44.5 + 34.1: the cervical chain's 34° of internal turn is an **S**, +3.0° signed, so opening it
+barely moves the head at all and nearly the whole fault is takeoff. And the takeoff is larger than
+44.5° once it is measured against the right thing — 44.5° is against the `body`→`chest` chord,
+which on a trunk this curled is itself 17.1° off the trunk's own run, and the measured axis'
+tangent at the shoulder is 42.8° off it. The trunk's **run**, hip to shoulder, is the long straight
+stretch between this body's two bends and is the only reading of "in line with the body" that is
+not itself a curve.
+
+The fix is the era's own lesson about distributing a correction. `uncurl` takes a cumulative
+`share` and applies that fraction of the takeoff arc at **each** joint of the chest, the four
+cervicals and the skull — 9.1° a joint, 17.2° at the worst once it is composed with the opening —
+so the front turns onto the trunk over its own length instead of being swung there at the shoulder.
+Equal per joint rather than per unit of length, because a skin folds at a joint. The aim is carried
+**whole** into the bind (an animal looks where it swims in every clip, so it is a fact about the
+body rather than a dial the clips play with) and only the opening is left per clip. Head against
+the trunk's run: **67.7° → 4.2° at rest**, 0.5–5.2° in `Sprint`, 6.5–8.1° in `Idle`, 27.8° at the
+peak of `Coil`, which pulls the neck round on purpose. The builder asserts all of it, so the right
+angle cannot come back in a clip where no `heldShape` row would show it.
+
+The **right pectoral** the owner named is rigged like its mirror and follows its own joint like its
+mirror — 1.07 against 1.16 median skin-travel-over-joint-travel, roots both about two hundredths
+inside their own skin, distal blades owning 168 and 155 vertices. It hangs off the shoulder, the
+shoulder went round with the head, and the front fix carries it: `chest` takes 9.1° of the aim and
+both blades come round together. The right blade's cluster is genuinely the smaller and sits 0.036
+further forward, which is the generation's own pose and not the rig's doing. The whole pair is now
+measured into `validation.json` every build.
+
+Skin 1.34x → **1.37x**, still second on the roster. The surface, UVs, albedo, proportions, the
+tail's straightening and its signed coil are untouched, and the straight regeneration is
+byte-identical. Renders: `docs/triassic/verification/askeptosaurus-front-*.png` — dorsal above all,
+and one frame looked at down the trunk's own run, where the fault stops being an angle to judge and
+becomes the head standing beside the body instead of on the end of it.

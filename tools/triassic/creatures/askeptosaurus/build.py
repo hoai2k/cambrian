@@ -32,6 +32,10 @@ CLIPS={'Idle':2.8,'Swim':1.7,'Sprint':1.05,'TurnLeft':1.2,'TurnRight':1.2,'Dive'
 LOOPS=['Idle','Swim','Sprint','Guard','Eat','Grab']
 TAIL=['tail_%02d'%i for i in range(12)]
 NECK=['neck_%02d'%i for i in range(4)]
+# The chain the head rides, root first. It starts at the **shoulder**, not at the first cervical:
+# the angle the front leaves the trunk at is a property of the chest joint as much as of the neck,
+# and a correction that six joints share is a correction no one joint has to tear its skin over.
+NECKCHAIN=['chest']+NECK+['skull']
 
 # ---------------------------------------------------------------- the two bodies, and the swap ---
 POSED='posed'          # the preserved generation: curved, organic, and shipped since T3D-25
@@ -70,6 +74,7 @@ REST={
   hind=(-.14,.09),
   uncurl=0.,       # nothing to open out: this body was generated straight
   level=0.,carry=0.,
+  aim=0.,fcarry=(0.,0.),  # and nothing to aim: its front already leaves the trunk along the trunk
   step=.40,        # the wave's phase step -- see below
   vert=.26,        # the dorsoventral share of the lateral wave, a quarter beat behind
   amp={'Idle':.030,'Swim':.097,'Sprint':.142,'Guard':.027,'Eat':.036,'Grab':.034},act=.050),
@@ -89,6 +94,21 @@ REST={
   # holds more of its curve than a swimming one, which is the character this body was promoted
   # for -- and further carries only push every clip under the bind instead of centring them.
   carry=.70,
+  # **The front is aimed as well as opened, and the two are not the same dial** (T3D-26). Opening
+  # the cervical chain removes its own internal bend and leaves it pointing wherever the
+  # generation pointed it -- 54.7 degrees off the trunk's own run, which is the right angle the
+  # head and the shoulder with the right pectoral on it read at from above. `aim` is that
+  # correction, shared out over `NECKCHAIN`'s six joints by `uncurl`, and it is a **fact about the
+  # body rather than a performance**: an animal looks where it swims in every clip, so it is held
+  # at 1 everywhere and carried whole into the bind (`fcarry`'s second element), and only the
+  # opening -- `level` in the held-shape table -- is left for the clips to play with. Carry the aim
+  # at anything less than 1 and the clips have to hold the difference, which puts the fault back in
+  # the bind the renderer sizes by and in every portrait shot at rest.
+  aim=1.,
+  # (level, aim) carried into the bind. The level is carried a little straighter than `Idle` asks
+  # for, exactly as the tail's .70 is, so the clips centre on the bind instead of all straightening
+  # away from it.
+  fcarry=(.70,1.),
   step=.40,vert=.26,
   amp={'Idle':.030,'Swim':.097,'Sprint':.142,'Guard':.027,'Eat':.036,'Grab':.034},act=.050),
 }
@@ -165,8 +185,8 @@ def holdfor(clip,t,e,strike,whip,coil,relax,hook=1.):
  if clip=='Death':h=mix(h,SLACK,relax)
  return h
 
-def uncurl(dirs,target,u,u0=0.):
- """Local rotations that open a measured chain out toward one direction by `u`.
+def uncurl(dirs,target,u,u0=0.,share=None,a=0.,a0=0.):
+ """Local rotations that open a measured chain out by `u` and aim it at `target` by `a`.
 
  This is the whole of the promoted body's straightening, and it is **pose, not mesh**. The verdict
  measured this tail at 8.84 mean curvature over section -- Dinocephalosaurus' tail, which
@@ -178,20 +198,43 @@ def uncurl(dirs,target,u,u0=0.):
  head + Y, roll 0), so a pose bone's local frame is the armature's and the accumulated rotation
  down a chain is the product of the locals. Asking segment `i` to point at `t_i` therefore makes
  the accumulated rotation the minimal arc `A_i` from `d_i` to `t_i`, and the local one
- `M_(i-1)^-1 @ A_i`. `t_i` is `d_i` slerped toward `target` by `u`, so `u` = 0 is the generation's
- own shape untouched and `u` = 1 is dead straight, continuously, with every joint sharing the work
- in proportion to how far it is bent. No angle here is typed: the chain is the measurement.
+ `M_(i-1)^-1 @ A_i`. No angle here is typed: the chain is the measurement.
 
- `u0` is where the **rest** already stands, because part of the straightening is carried into the
- bind (see `carry_rest`) and the clips must not do it twice. `dirs` stays the generation's own
+ **The two halves of `t_i` are different questions and are kept apart.** A measured chain carries
+ an *internal curve* -- how much it bends along its own length -- and a *takeoff*, which is the
+ angle it leaves the body at. `u` opens the first: `d_i` slerped toward the chain's **own first
+ segment**, so at `u` = 1 the chain is a straight line lying in the direction the generation
+ pointed it, and the rotation at the root is identity at every `u`. `a` corrects the second, and
+ the way it corrects it is the whole of T3D-26: the arc `A` from the chain's own first segment
+ onto `target` is applied as `A^(share_i * a)`, a **share of it per joint**, so the chain turns
+ onto the target over its whole length instead of being swung there at its root.
+
+ That distinction is not stylistic. Aiming the base segment straight at the trunk makes the first
+ local rotation the entire arc -- 54.7 degrees at this front's root -- and T3D-25 measured that at
+ **2.62x** on `skin-tears.mjs` against 1.51x for no aim at all. Spread linearly over the chest,
+ four cervicals and the skull the same correction is about nine degrees a joint, and the head ends
+ up on the trunk's line with the neck holding a gentle arc rather than a kink at the shoulder.
+ `share` is cumulative and ends at 1, so the **last** segment reaches the target exactly; passing
+ `share=None` (the tail, whose takeoff is its own and stays) leaves this half switched off and the
+ call is then exactly what it always was.
+
+ `u0`/`a0` are where the **rest** already stands, because part of the straightening is carried into
+ the bind (see `carry_rest`) and the clips must not do it twice. `dirs` stays the generation's own
  chain whatever the rest is, so every `u` in the held-shape table keeps its one meaning -- how
  much of the generation's curve is out -- and a clip asking for less than `u0` curls back toward
  the generation rather than being unable to.
  """
- aim=lambda v:d.rotation_difference(d.slerp(target,v).normalized()) if v>1e-9 else Quaternion()
+ own=dirs[0].copy()
+ A=own.rotation_difference(target)
+ axis,angle=(A.axis,A.angle) if A.angle>1e-9 else (Vector((0,0,1)),0.)
+ w=[0.]*len(dirs) if share is None else list(share)
+ def aim(i,d,v,s):
+  base=d.slerp(own,v).normalized() if v>1e-9 else d
+  q=Quaternion(axis,angle*w[i]*s) if angle>1e-9 and abs(w[i]*s)>1e-9 else Quaternion()
+  return d.rotation_difference((q@base).normalized())
  out=[];M=Quaternion()
- for d in dirs:
-  W=aim(u)@aim(u0).inverted()
+ for i,d in enumerate(dirs):
+  W=aim(i,d,u,a)@aim(i,d,u0,a0).inverted()
   out.append((M.inverted()@W).to_euler('XYZ'));M=W
  return out
 
@@ -224,6 +267,14 @@ def carry_rest(rig,objects,names,rots):
  for p in rig.pose.bones:p.rotation_mode='XYZ'
  for n,e in zip(names,rots):rig.pose.bones[n].rotation_euler=e
  bpy.context.view_layer.update()
+ # **Whatever the carry moves, it moves the anchors with it.** The three anchors are points in the
+ # *measured* frame attached to `skull` and `jaw`, and carrying the front moves both of those
+ # bones, so a point left where it was measured would sit behind the animal's nose in the file
+ # that ships. This is the affine map the skin itself is about to be baked through, per bone, and
+ # applying it to a rest-space point is exactly what a weight-1 vertex on that bone does. With the
+ # tail alone carried (the shipped build before T3D-26, and the `--backup` path) every map on the
+ # front is the identity and nothing moves.
+ carried_by={p.name:(p.matrix@rig.data.bones[p.name].matrix_local.inverted()) for p in rig.pose.bones}
  deps=bpy.context.evaluated_depsgraph_get()
  baked={}
  for o in objects:
@@ -253,7 +304,7 @@ def carry_rest(rig,objects,names,rots):
  worst=max(max(abs(rig.data.bones[n].matrix_local.to_3x3()[i][j]-(1. if i==j else 0.))
   for i in range(3) for j in range(3)) for n in rig.data.bones.keys())
  assert worst<1e-5,('the carried rest is not parallel',worst)
- return {'carriedSkinTravelMax':round(moved,5),'carriedRestFrameError':round(worst,9),
+ return carried_by,{'carriedSkinTravelMax':round(moved,5),'carriedRestFrameError':round(worst,9),
   'carriedBones':[n for n in names]}
 
 def chain_dirs(pts):
@@ -269,10 +320,16 @@ def restpose(pb,h,r,tailchain,neckchain):
   for n,e in zip(TAIL,uncurl(tailchain[0],tailchain[1],r['uncurl']*h['open'],r['carry'])):
    pb[n].rotation_euler=e
  if r['level']>0:
-  for n,e in zip(NECK+['skull'],uncurl(neckchain[0],neckchain[1],r['level']*h['level'])):
+  # `neckchain` is (directions, target, share). The aim is the same in every clip and is already
+  # in the bind, so what varies here is only how far the chain's own bend is opened.
+  lv0,am0=r['fcarry']
+  for n,e in zip(NECKCHAIN,uncurl(neckchain[0],neckchain[1],r['level']*h['level'],lv0,
+   neckchain[2],r['aim'],r['aim']*am0)):
    pb[n].rotation_euler=e
  pb['body'].rotation_euler.x=h['pitch']
- pb['chest'].rotation_euler.x=r['chest']*h['arch'];pb['chest'].rotation_euler.z=r['lean']*h['lean']
+ # `+=`, because the front chain above has just written this bone: the shoulder is the root joint
+ # of the aim and an assignment here would throw its share away.
+ pb['chest'].rotation_euler.x+=r['chest']*h['arch'];pb['chest'].rotation_euler.z+=r['lean']*h['lean']
  for n in NECK:
   pb[n].rotation_euler.x+=r['neck']*h['arch'];pb[n].rotation_euler.z+=r['lean']*h['lean']*.70
  pb['skull'].rotation_euler.x+=r['skull']*h['head']
@@ -296,6 +353,7 @@ def heldshape(h,r):
  'trunkLeanTotalRadians':round(r['lean']*h['lean']*(1+.70*len(NECK))+r['lean']*h['lean']*.55*12,4),
  'tailStraightenedFraction':round(r['uncurl']*h['open'],4),
  'neckStraightenedFraction':round(r['level']*h['level'],4),
+ 'frontAimedFraction':round(r['aim'],4),
  'forePaddleSweepRadians':round(r['fore'][0]*h['sweep'],4)}
 
 def animate(rig,body,front,tailchain,neckchain,hook):
@@ -406,7 +464,58 @@ def animate(rig,body,front,tailchain,neckchain,hook):
  reset();scene.frame_set(0)
  return seams,holds
 
-def measure(rig,body,front,shape):
+def paddle_audit(rig,obj,limb_defs,phases=5):
+ """The four paddles measured against each other, on the skin rather than on the bone table.
+
+ The owner named the **right pectoral** by itself, and the three ways a blade can be wrong are
+ different measurements: it can own too little skin (a root seated at the wrong depth, or a cut
+ that put it on another bone's shell), it can stand outside the skin it drives, or it can simply
+ be left behind -- its skin travelling a fraction of what its own joint travels, which is how
+ Aphaneramma's tucked forelimb read at 0.45 against 1.04-1.11 on every other foot. Only the last
+ of those is visible in motion, and neither `skin-tears.mjs` nor `idle-bones.mjs` can see it.
+
+ Owned means "this bone holds the largest share of this vertex", which is what a viewer sees
+ follow it. The travel ratio is the owned skin's centroid excursion over the excursion of the
+ joint driving it, sampled at `phases` frames of every clip.
+ """
+ scene=bpy.context.scene
+ owner={}
+ for v in obj.data.vertices:
+  g=max(v.groups,key=lambda w:w.weight,default=None)
+  if g is not None:owner.setdefault(obj.vertex_groups[g.group].name,[]).append(v.index)
+ out={}
+ for key,item in limb_defs.items():
+  names=item['names'];idx=[i for n in names for i in owner.get(n,[])]
+  distal=[i for i in owner.get(names[-1],[])]
+  co=np.array([obj.data.vertices[i].co[:] for i in idx]) if idx else np.zeros((0,3))
+  root=Vector(rig.data.bones[names[0]].head_local[:])
+  out[key]={'bones':names,'ownedVertices':len(idx),'ownedDistalVertices':len(distal),
+   'rootToNearestOwnedSkin':round(float(np.linalg.norm(co-np.array(root[:]),axis=1).min())/SCALE,5) if len(co) else None,
+   'rootToMeanOwnedSkin':round(float(np.linalg.norm(co-np.array(root[:]),axis=1).mean())/SCALE,5) if len(co) else None,
+   'polylineLength':round(item['cum'][-1],5),'radius':round(item['radius'],5)}
+  ratios={}
+  for clip in CLIPS:
+   action=bpy.data.actions[clip];rig.animation_data.action=action
+   if getattr(action,'slots',None):rig.animation_data.action_slot=action.slots[0]
+   end=round(CLIPS[clip]*30);cents=[];joints=[]
+   for f in [round(end*k/(phases-1)) for k in range(phases)]:
+    scene.frame_set(f);bpy.context.view_layer.update()
+    deps=bpy.context.evaluated_depsgraph_get();ev=obj.evaluated_get(deps)
+    P=np.array([ev.data.vertices[i].co[:] for i in distal])
+    cents.append(P.mean(axis=0));joints.append(np.array(rig.pose.bones[names[-1]].head[:]))
+   sk=max(float(np.linalg.norm(a-b)) for a in cents for b in cents)
+   jt=max(float(np.linalg.norm(a-b)) for a in joints for b in joints)
+   ratios[clip]=round(sk/jt,4) if jt>1e-4 else None
+  moving={c:r for c,r in ratios.items() if r is not None}
+  out[key]['travelRatioPerClip']=ratios
+  out[key]['travelRatioWorst']=round(min(moving.values()),4)
+  out[key]['travelRatioMedian']=round(float(np.median(list(moving.values()))),4)
+ rig.animation_data.action=None
+ for q in rig.pose.bones:q.rotation_euler=(0,0,0);q.location=(0,0,0);q.scale=(1,1,1)
+ scene.frame_set(0);bpy.context.view_layer.update()
+ return out
+
+def measure(rig,body,front,shape,headref):
  """"It moves" as a number, read back off the keyed actions rather than off the formulas.
 
  The swept angle is a joint's own peak-to-peak rotation over the clip -- the same figure the
@@ -443,12 +552,21 @@ def measure(rig,body,front,shape):
  for clip in CLIPS:
   action=bpy.data.actions[clip];rig.animation_data.action=action
   if getattr(action,'slots',None):rig.animation_data.action_slot=action.slots[0]
-  end=round(CLIPS[clip]*30);rot={};pos={n:[] for n in tips};folds=[];spans=[]
+  end=round(CLIPS[clip]*30);rot={};pos={n:[] for n in tips};folds=[];spans=[];aims=[]
   for f in range(end+1):
    scene.frame_set(f);bpy.context.view_layer.update()
    for q in rig.pose.bones:rot.setdefault(q.name,[]).append(tuple(q.rotation_euler))
    for n in tips:pos[n].append(np.array(rig.pose.bones[n].tail[:]))
    if f%max(1,end//4)==0 or f==end:spans.append(span())
+   # Where the head is pointing against the trunk's own run, every frame. This is the number
+   # T3D-26 exists for, and it is asked of the pose the clip actually produces rather than of the
+   # table that produced it: the aim is in the bind, but `lean`, the coil's neck yaw and the
+   # turns' counter-steer all move the head on top of it, and a clip that quietly put the right
+   # angle back would be invisible in `heldShape`.
+   sk=Vector(rig.pose.bones['skull'].head[:])
+   hd=((rig.pose.bones['skull'].matrix@rig.data.bones['skull'].matrix_local.inverted()@headref)-sk)
+   tr=Vector(rig.pose.bones['chest'].head[:])-Vector(rig.pose.bones['tail_00'].head[:])
+   aims.append(math.degrees(hd.angle(tr)) if hd.length>1e-6 and tr.length>1e-6 else 0.)
    chain=[Vector(rig.pose.bones[n].head[:]) for n in TAIL]+[Vector(rig.pose.bones['tail_11'].head[:])+
     (Vector(rig.pose.bones['tail_11'].head[:])-Vector(rig.pose.bones['tail_10'].head[:]))]
    arc=sum((chain[i+1]-chain[i]).length for i in range(len(chain)-1))
@@ -462,6 +580,7 @@ def measure(rig,body,front,shape):
   'foreLimbSweptRadians':swept('fore_upper_L'),'hindLimbSweptRadians':swept('hind_upper_L'),
   'jawSweptRadians':swept('jaw')[0],
   'tailArcOverChord':[round(float(min(folds)),4),round(float(max(folds)),4)],
+  'headVsTrunkRunDegrees':[round(float(min(aims)),2),round(float(max(aims)),2)],
   'posedExtentOverBind':[round(min(spans)/bind,4),round(max(spans)/bind,4)],
   'tailTipTravel':travel('tail_11'),'skullTravel':travel('skull'),'forePaddleTravel':travel('fore_upper_L')}
  out['bindBoxMax']=round(bind,4)
@@ -484,6 +603,17 @@ def measure(rig,body,front,shape):
   for c in ('Idle','Swim','Sprint','Dive','Rise','Grab'):
    lo,hi=out[c]['posedExtentOverBind']
    assert .90<lo and hi<1.10,(c,'drawn length departs from the bind the renderer sizes by',lo,hi)
+  if REST[body]['aim']>0:
+   # **The fault T3D-26 answers must not be able to come back in a clip.** The animal looks where
+   # it swims: the locomotion clips hold the head within a gentle lean of the trunk's own run, and
+   # the whole set -- the coil, which deliberately pulls the neck round, included -- stays far
+   # inside the 67.7 degrees the uncorrected body stood at and the right angle it read as.
+   for c in ('Idle','Swim','Sprint','Dive','Rise','Grab','Breath','Growth','TurnLeft','TurnRight'):
+    assert out[c]['headVsTrunkRunDegrees'][1]<22.,(c,out[c]['headVsTrunkRunDegrees'])
+   worst=max((out[c]['headVsTrunkRunDegrees'][1],c) for c in CLIPS)
+   assert worst[0]<40.,worst
+   # And it has to still be an animal rather than a ruler: the head is never nailed to the axis.
+   assert out['Idle']['headVsTrunkRunDegrees'][1]>1.5,out['Idle']['headVsTrunkRunDegrees']
   if REST[body]['uncurl']>0:
    # The point of the promotion, as numbers. The generation's own tail chain measures 1.66 arc
    # over chord and 180 degrees of turn: `Sprint` has to lay that out nearly flat, `Idle` has to
@@ -620,35 +750,73 @@ def build(body):
  bone('skull',at(AP,AC,skull_arc),NECK[-1]);bone('jaw',(cx(hinge),hinge,seam(hinge)),'skull')
  tailstations=np.linspace(hip,AC[-1]-.008,13)
  for i,n in enumerate(TAIL):bone(n,at(AP,AC,float(tailstations[i])),'body' if i==0 else TAIL[i-1])
- # The two chains the resting shape opens out, measured off the bone table itself. The tail is
- # asked to lie along the trunk's own tangent at the hip and the neck along its own at the
- # shoulder, so "straight" is this animal's line and not a world axis.
+ # The two chains the resting shape opens out, measured off the bone table itself. "Straight" is
+ # this animal's own line in both of them and never a world axis.
+ snout=at(AP,AC,0.)
  tailpts=[B[n][0] for n in TAIL]+[at(AP,AC,float(tailstations[12]))]
- neckpts=[B[n][0] for n in NECK]+[B['skull'][0],at(AP,AC,0.)]
+ neckpts=[B['chest'][0]]+[B[n][0] for n in NECK]+[B['skull'][0],snout]
  tail_d=chain_dirs(tailpts);neck_d=chain_dirs(neckpts)
- # **A chain is straightened onto its own first segment, never onto the trunk's tangent.** The
- # obvious target -- the direction the body is running in where the chain leaves it -- makes the
- # first rotation of the chain a rigid swing of the whole of it, because the local rotation at the
- # root is exactly the arc from the root's own direction to the target: on this tail that is 24.7
- # degrees and on this neck 44.5, applied at the hip and at the first cervical, so the animal did
- # not uncurl, it threw its tail sideways and swung its head. Measured as skin, aiming the two
- # chains at the trunk read **2.62x** on `skin-tears.mjs`; aiming each at its own first segment
- # reads **1.51x**. Taking the chain's own first direction makes the root rotation
- # identity at every value of `open`: the tail leaves the body exactly where the generation put
- # it, and only the bend after that comes out.
+ # **A chain's own bend is opened onto its own first segment, and its takeoff is a separate
+ # question with a separate answer.** Straightening a chain onto the trunk's direction makes the
+ # first rotation a rigid swing of the whole of it, because the local rotation at the root is
+ # exactly the arc from the root's own direction to the target: 24.7 degrees on this tail and
+ # 54.7 on this front. Applied at one joint the animal does not uncurl, it throws its tail
+ # sideways and swings its head, and T3D-25 measured that at **2.62x** on `skin-tears.mjs`
+ # against 1.51x for opening each chain onto its own first segment and leaving the takeoff alone.
+ #
+ # Leaving it alone is what T3D-26 is about, because on the front it is the larger half and it is
+ # the fault: opened onto its own first segment the head still left the trunk at 54.7 degrees and
+ # finished 67.7 degrees off it, which from above is the right angle the owner saw, with the
+ # shoulder and the right pectoral carried round on the same swing. So the front's takeoff **is**
+ # corrected, and it is corrected by `uncurl`'s `share` -- a sixth of the arc at each of the
+ # chest, the four cervicals and the skull -- so the chain turns onto the trunk over its own
+ # length. The tail passes no share and so keeps the takeoff the generation gave it, which is
+ # character rather than fault: a thalattosaur's tail sweeps.
  tailchain=(tail_d,tail_d[0].copy())
- neckchain=(neck_d,neck_d[0].copy())
+ # The trunk's own run, hip to shoulder. This body bends twice, and that chord is the long
+ # straight stretch between the two bends -- what "in line with the body" can only mean here. The
+ # two other readings available disagree with it and with each other, so both are recorded rather
+ # than one of them being picked silently: `body`->`chest` is a chord across the curled front half
+ # of the trunk and lies 17.1 degrees off, and the measured axis' own tangent at the shoulder is
+ # one station of a line that wanders three times this animal's girth and lies 42.8 degrees off.
+ trunk=(B['chest'][0]-B['tail_00'][0]).normalized()
+ # A share per joint, equal and cumulative, ending at 1 so the last segment reaches the target
+ # exactly. Equal per *joint* rather than per unit length because a skin is asked to fold at a
+ # joint: weighting by segment length instead hands the skull 0.34 of the arc, since the head is
+ # two and a half cervicals long, and measures a larger residual at the snout besides.
+ neck_share=[(i+1)/len(neck_d) for i in range(len(neck_d))]
+ neckchain=(neck_d,trunk,neck_share)
  # Which way this body's own tail curls, as the signed total of its joint turns about the rig's
  # dorsoventral axis. It signs the coil and the tail strike (see `holdfor`). A body generated
  # straight has no answer and takes +1, which is the direction those clips have always gone.
  signed=sum(math.copysign(tail_d[i].angle(tail_d[i+1]),tail_d[i].cross(tail_d[i+1]).z) for i in range(len(tail_d)-1))
  hook=1. if math.degrees(abs(signed))<5. else math.copysign(1.,signed)
- axis_report.update({'tailRestTurnDegrees':chain_bend(tail_d),'neckRestTurnDegrees':chain_bend(neck_d),
+ deg=lambda a,b:round(math.degrees(a.angle(b)),2)
+ bodychest=(B['chest'][0]-B['body'][0]).normalized()
+ axistan=(at(AP,AC,max(0.,shoulder-.03))-at(AP,AC,shoulder+.03)).normalized()
+ cerv=chain_dirs([B[n][0] for n in NECK]+[B['skull'][0],snout])   # the cervicals alone, as T3D-25 read them
+ aimarc=neck_d[0].rotation_difference(trunk)
+ axis_report.update({'tailRestTurnDegrees':chain_bend(tail_d),'neckRestTurnDegrees':chain_bend(cerv),
   'tailHookSignedDegrees':round(math.degrees(signed),2),'tailHookSign':hook,
   'tailTakeoffVsTrunkDegrees':round(math.degrees(tail_d[0].angle((B['tail_00'][0]-B['body'][0]).normalized())),2),
-  'neckTakeoffVsTrunkDegrees':round(math.degrees(neck_d[0].angle((B['chest'][0]-B['body'][0]).normalized())),2),
+  'neckTakeoffVsTrunkDegrees':deg(cerv[0],bodychest),
   'tailRestArcOverChord':round(sum((tailpts[i+1]-tailpts[i]).length for i in range(12))/(tailpts[-1]-tailpts[0]).length,4),
-  'tailRestTurnPerJointDegrees':[round(math.degrees(tail_d[i].angle(tail_d[i+1])),2) for i in range(11)]})
+  'tailRestTurnPerJointDegrees':[round(math.degrees(tail_d[i].angle(tail_d[i+1])),2) for i in range(11)],
+  # T3D-26. The cervical readings above are kept exactly as T3D-25 recorded them so the two are
+  # comparable; everything below is the chain that is actually corrected, measured against the
+  # trunk's own run rather than against a chord across a curled trunk.
+  'front':{'bones':NECKCHAIN,
+   'trunkRunHipToShoulder':[round(v,5) for v in trunk],
+   'trunkRunVsBodyToChestDegrees':deg(trunk,bodychest),
+   'trunkRunVsAxisTangentDegrees':deg(trunk,axistan),
+   'restTurnDegrees':chain_bend(neck_d),
+   'restTurnPerJointDegrees':[deg(neck_d[i],neck_d[i+1]) for i in range(len(neck_d)-1)],
+   'restTurnSignedAboutZDegrees':round(sum(math.copysign(math.degrees(neck_d[i].angle(neck_d[i+1])),
+    neck_d[i].cross(neck_d[i+1]).z) for i in range(len(neck_d)-1)),2),
+   'takeoffVsTrunkRunDegrees':deg(neck_d[0],trunk),
+   'headVsTrunkRunDegreesUncorrected':deg(neck_d[-1],trunk),
+   'aimShare':[round(s,4) for s in neck_share],
+   'aimPerJointDegrees':round(math.degrees(aimarc.angle)/len(neck_d),2)}})
  limb_defs={}
  for kind,cs in [('fore',fore),('hind',hind)]:
   # Signs are relative to the local body's tangent, essential for the curled posed body.
@@ -730,21 +898,69 @@ def build(body):
   groups.append([o,jaw,lining])
  # Carry the rest before the clips are authored, so every clip is measured from the bind that
  # ships and `measure` reads the arc over chord the renderer will actually size the body by.
- carry_report={}
- if REST[body]['carry']>0:
+ carry_report={};carried_by={};headref=tx(snout)
+ if REST[body]['carry']>0 or REST[body]['aim']>0:
   carried=list({o.name:o for g in groups for o in g}.values())
-  carry_report=carry_rest(rig,carried,TAIL,uncurl(tail_d,tailchain[1],REST[body]['carry']))
+  names=list(TAIL);rots=list(uncurl(tail_d,tailchain[1],REST[body]['carry']))
+  if REST[body]['aim']>0:
+   # The aim is carried whole and the opening is carried to `fcarry[0]`, so the bind pose is the
+   # animal looking where it swims. Nothing about that is a performance for a clip to hold.
+   lv0,am0=REST[body]['fcarry']
+   frontrots=uncurl(neck_d,trunk,lv0,0.,neck_share,REST[body]['aim']*am0,0.)
+   names+=NECKCHAIN;rots+=list(frontrots)
+  carried_by,carry_report=carry_rest(rig,carried,names,rots)
   carry_report['carriedFraction']=REST[body]['carry']
   P2=np.array([v.co[:] for o in groups[0] for v in o.data.vertices])/SCALE
   Y0,Y1=float(P2[:,1].min()),float(P2[:,1].max())
   cd=chain_dirs([Vector(rig.pose.bones[n].head[:]) for n in TAIL]+
    [Vector(rig.pose.bones['tail_11'].head[:])*2-Vector(rig.pose.bones['tail_10'].head[:])])
   carry_report['restTurnDegreesAfterCarry']=chain_bend(cd)
+  if REST[body]['aim']>0:
+   headref=carried_by['skull']@tx(snout)
+   hd=(headref-Vector(rig.pose.bones['skull'].head[:])).normalized()
+   tr=(Vector(rig.pose.bones['chest'].head[:])-Vector(rig.pose.bones['tail_00'].head[:])).normalized()
+   perjoint=[round(math.degrees(e.to_quaternion().angle),2) for e in frontrots]
+   carry_report.update({'carriedAimFraction':REST[body]['aim']*REST[body]['fcarry'][1],
+    'carriedLevelFraction':REST[body]['fcarry'][0],
+    'frontCarryPerJointDegrees':dict(zip(NECKCHAIN,perjoint)),
+    'restHeadVsTrunkRunDegrees':round(math.degrees(hd.angle(tr)),2)})
+   # **The correction is distributed or it is not a correction.** A rigid swing at the neck root
+   # is the fix T3D-25 measured at 2.62x skin and rejected, and it would show here as one joint
+   # holding most of the arc. Nothing may exceed a quarter turn.
+   assert max(perjoint)<25.,('the front carry is concentrated at one joint',carry_report['frontCarryPerJointDegrees'])
+   # And the head has to end up on the trunk's line. Not *on* it -- some residual is the animal --
+   # but nowhere near the right angle it left it at.
+   assert carry_report['restHeadVsTrunkRunDegrees']<12.,carry_report['restHeadVsTrunkRunDegrees']
+ # **The posterior cut is no longer square to the file's axes, because the bind has moved since
+ # the jaw was cut.** The carry rotates the whole head, so the plane `bisect_on_curve` cut on --
+ # raw y = hinge -- arrives in the shipped file tilted, and `auditCutAttachment`'s axis test
+ # selects nothing at all rather than failing. The builder is the only thing that knows where that
+ # plane went, so it says: the same rigid map the rim's own skin was baked through, applied to the
+ # plane. With nothing carried (the straight body) this is the identity and the plane is the axis
+ # test it always was.
+ cutp=Vector((0,hinge*SCALE,0));cutn=Vector((0,1,0))
+ if 'skull' in carried_by:
+  cutp=carried_by['skull']@cutp;cutn=(carried_by['skull'].to_3x3()@cutn).normalized()
+ gltf=lambda v:[round(v.x,6),round(v.z,6),round(-v.y,6)]
+ cut_plane={'point':gltf(cutp),'normal':gltf(cutn),'tolerance':.01,'frame':'glTF, +Y up'}
+ place=lambda b,p:list((carried_by[b]@tx(p)) if b in carried_by else tx(p))
  anchorpts={'anchor_mouth':('jaw',(cx(front_y+.008),front_y+.008,seam(front_y+.008)-.002),'mouth'),
  'anchor_mouth_inside':('skull',(cx(hinge-.015),hinge-.015,seam(hinge-.015)),'swallow'),
  'anchor_attack_primary':('skull',(cx(front_y+.002),front_y+.002,seam(front_y+.002)),'attack')}
- anchors=[{'name':n,'bone':b,'point':list(tx(p)),'role':r} for n,(b,p,r) in anchorpts.items()]
- seams,holds=animate(rig,body,front,tailchain,neckchain,hook);motion=measure(rig,body,front,groups[0]);sockets=T.make_sockets(rig,anchors)
+ anchors=[{'name':n,'bone':b,'point':place(b,p),'role':r} for n,(b,p,r) in anchorpts.items()]
+ seams,holds=animate(rig,body,front,tailchain,neckchain,hook)
+ motion=measure(rig,body,front,groups[0],headref);sockets=T.make_sockets(rig,anchors)
+ paddles=paddle_audit(rig,groups[0][0],limb_defs)
+ if front:
+  # The owner named the **right** pectoral, so the pair is measured rather than assumed: the skin
+  # each blade owns, how far its own joint stands inside that skin, and how far that skin travels
+  # over the joint's own travel in every clip. A blade left behind reads as a low travel ratio on
+  # one side (Aphaneramma's tucked forelimb measured 0.45 against 1.04-1.11 elsewhere).
+  for k in ('foreL','foreR','hindL','hindR'):
+   assert paddles[k]['ownedVertices']>120,(k,paddles[k]['ownedVertices'])
+   assert .75<paddles[k]['travelRatioWorst'],(k,paddles[k]['travelRatioWorst'])
+  ratio=paddles['foreR']['travelRatioMedian']/paddles['foreL']['travelRatioMedian']
+  assert .80<ratio<1.25,('the two pectorals do not follow their own joints alike',ratio)
  tri=lambda o:sum(len(p.vertices)-2 for p in o.data.polygons)
  reports=[]
  for idx,group in enumerate(groups):
@@ -758,15 +974,17 @@ def build(body):
  'inFront':front,'backup':not front,'intake':intake,'sourceAlbedoSha256':albedo_sha,'frame':frame,
  'axis':axis_report,'bones':len(B),'boneNames':list(B),
  'limbs':{k:{'points':[list(p) for p in v['P']],'radius':v['radius']} for k,v in limb_defs.items()},
- 'hipFraction':hip/AC[-1],'tailFraction':1-hip/AC[-1],'mouth':{'hingeY':hinge,'lip':lip,'throatCaps':caps,'maxGapeRadians':.29},
+ 'hipFraction':hip/AC[-1],'tailFraction':1-hip/AC[-1],'mouth':{'hingeY':hinge,'cutPlane':cut_plane,'lip':lip,'throatCaps':caps,'maxGapeRadians':.29},
  'models':reports,'clips':CLIPS,'looping':LOOPS,'loopSeams':seams,'motion':motion,'heldShape':holds,
- 'restingShape':{'appliesTo':'clips only; the bind pose is unchanged',
+ 'pectorals':paddles,
+ 'restingShape':{'appliesTo':'the clips, over a bind carried by `carry` and `fcarry` and nothing else',
   'note':'unit values; every clip scales them by its own row in heldShape',
   'chestArchRadians':REST[body]['chest'],'neckArchRadiansPerJoint':REST[body]['neck'],'neckJoints':len(NECK),
   'skullLevellingRadians':REST[body]['skull'],'tailFallRadiansPerJoint':REST[body]['fall'],
   'tailBowRadians':REST[body]['bow'],'leanRadiansPerJoint':REST[body]['lean'],
   'foreLimbSetRadians':list(REST[body]['fore']),'hindLimbSetRadians':list(REST[body]['hind']),
   'tailUncurlAvailable':REST[body]['uncurl'],'neckUncurlAvailable':REST[body]['level'],
+  'frontAimAvailable':REST[body]['aim'],'frontCarried':list(REST[body]['fcarry']),
   'waveStep':REST[body]['step'],'waveVerticalShare':REST[body]['vert'],
   'clipAmplitudes':REST[body]['amp'],'actAmplitude':REST[body]['act'],
   'bendRangeLimit':1.},

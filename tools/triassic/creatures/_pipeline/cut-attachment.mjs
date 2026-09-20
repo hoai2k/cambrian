@@ -4,7 +4,23 @@ import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'meshoptimizer';
-export async function auditCutAttachment(file, coordinate, axis=2) {
+/** `where` is the posterior cut, and it comes in two forms.
+ *
+ * A number is a coordinate on `axis`, which is what a body whose bind pose is the pose the jaw was
+ * cut in can say: the rim lies on a plane square to the file's own axes. A body whose **bind has
+ * been carried** since the cut cannot -- Askeptosaurus' front is straightened into its rest, which
+ * rotates its whole head, so its rim is a plane with a general normal and an axis test selects no
+ * vertices at all rather than failing. Such a builder records `{point, normal, tolerance}` in glTF
+ * coordinates and the tolerance is loose on purpose: the rim's own vertices sit within a thousandth
+ * of the plane, and the pairs that are *not* the posterior cut are the lip, which on this body is
+ * a quarter of a unit away. There is nothing in between to catch.
+ */
+function onCut(v, where, axis) {
+  if (typeof where === 'number') return Math.abs(v.getComponent(axis) - where) <= 1e-4;
+  const [px, py, pz] = where.point, [nx, ny, nz] = where.normal;
+  return Math.abs((v.x - px) * nx + (v.y - py) * ny + (v.z - pz) * nz) <= (where.tolerance ?? 1e-4);
+}
+export async function auditCutAttachment(file, where, axis=2) {
   const bytes=fs.readFileSync(file);
   const g=await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
   const meshes=[];g.scene.traverse(o=>{if(o.isSkinnedMesh)meshes.push(o)});
@@ -18,7 +34,7 @@ export async function auditCutAttachment(file, coordinate, axis=2) {
   g.scene.updateMatrixWorld(true);meshes.forEach(m=>m.skeleton.update());
   const a=body.geometry.attributes.position,b=jaw.geometry.attributes.position,pairs=[];
   for(let i=0;i<a.count;i++){
-    point(body,i,v);if(Math.abs(v.getComponent(axis)-coordinate)>1e-4)continue;
+    point(body,i,v);if(!onCut(v,where,axis))continue;
     for(let j=0;j<b.count;j++){
       point(jaw,j,w);if(v.distanceTo(w)<1e-5){pairs.push([i,j]);break}
     }
