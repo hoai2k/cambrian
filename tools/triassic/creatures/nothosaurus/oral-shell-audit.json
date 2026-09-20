@@ -1,0 +1,90 @@
+{
+  "id": "nothosaurus",
+  "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present.",
+  "models": [
+    {
+      "variant": "authored",
+      "sha256": "3e1195f16efaab11a5c369df0ce1d17e0f8d2c5ddcec2421ff7f29bd9a240ae0",
+      "meshes": [
+        {
+          "name": "Nothosaurus oral lining",
+          "vertices": 432,
+          "triangles": {
+            "skull": 428,
+            "jaw": 428
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        },
+        {
+          "name": "Nothosaurus oral lining",
+          "vertices": 290,
+          "triangles": {
+            "skull": 286,
+            "jaw": 286
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ]
+    },
+    {
+      "variant": ".puppet",
+      "sha256": "88b7da5b58dc71bd0de189bf63841e1abc6b1493d1fbe17cc0e085ac120d5e63",
+      "meshes": [
+        {
+          "name": "Nothosaurus oral lining",
+          "vertices": 432,
+          "triangles": {
+            "skull": 428,
+            "jaw": 428
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        },
+        {
+          "name": "Nothosaurus oral lining",
+          "vertices": 290,
+          "triangles": {
+            "skull": 286,
+            "jaw": 286
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ]
+    },
+    {
+      "variant": ".lod1",
+      "sha256": "88b7da5b58dc71bd0de189bf63841e1abc6b1493d1fbe17cc0e085ac120d5e63",
+      "meshes": [
+        {
+          "name": "Nothosaurus oral lining",
+          "vertices": 432,
+          "triangles": {
+            "skull": 428,
+            "jaw": 428
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        },
+        {
+          "name": "Nothosaurus oral lining",
+          "vertices": 290,
+          "triangles": {
+            "skull": 286,
+            "jaw": 286
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ]
+    }
+  ]
+}

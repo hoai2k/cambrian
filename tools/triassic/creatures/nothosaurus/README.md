@@ -1,6 +1,6 @@
 # Nothosaurus — paired authored body and procedural volume puppet
 
-The delivered Tripo body and procedural puppet preserve the canonical model's curved tail, asymmetric spread feet, deep torso and elevated snout. Both use one 30-joint skeleton, the same three mouth/attack sockets, and **21 byte-for-byte equivalent decoded animation performances**. The puppet is also the runtime LOD, with all actions retained so either model can perform the same gameplay.
+The delivered Tripo body and procedural puppet preserve the canonical model's curved tail, asymmetric spread feet, deep torso and elevated snout, with the head turned to face straight forward (see the 20 September note at the end). Both use one 30-joint skeleton, the same three mouth/attack sockets, and **21 byte-for-byte equivalent decoded animation performances**. The puppet is also the runtime LOD, with all actions retained so either model can perform the same gameplay.
 
 | Delivery | Triangles | Packaged bytes |
 | --- | ---: | ---: |
@@ -16,7 +16,7 @@ The preserved source is `tools/triassic/creatures/nothosaurus/tripo-raw/nothosau
 
 The twin is a procedural **volume resurfacing**, rather than a generic anatomical substitute or a decimation of the authored faces. Blender regenerates topology from a 0.007 raw-unit voxel occupancy field, relaxes that surface twice, and reduces the new topology to the puppet budget. Source vertices and faces are not reused. This preserves the asymmetric tail sweep and individual paddle silhouettes that a symmetrical ellipsoid proxy would lose. Puppet pigment is sampled through each nearest source triangle’s interpolated UV. The authored body retains the full embedded original albedo with white vertex colors, restrained normal relief (0.15) and explicitly nonmetallic skin at roughness 0.7.
 
-Intake welds coincident texture-seam vertices and removes ten collapsed triangles; the detached-flake threshold removed no vertices. It then closes the five hairline slivers the welded mesh still carries and authors the webbing between the digits of all four paddles — see *The webbing* below. A true, separate lower-jaw shell is cut along the mouth seam and rigidly skinned to its hinge. Curved oral floor, palate and seated hinge tissue close the interior and prevent a stretched membrane across the open gape. The source's fine surface and tooth detail remains limited by the Tripo reconstruction.
+Intake welds coincident texture-seam vertices and removes ten collapsed triangles; the detached-flake threshold removed no vertices. It then closes the five hairline slivers the welded mesh still carries and authors the webbing between the digits of all four paddles — see *The webbing* below. A true, separate lower-jaw shell is cut along a plane fitted to the lip the generation modelled and rigidly skinned to its hinge. Closed rigid palate and floor shells and two rigid hinge halves, joined as one hidden `Nothosaurus oral lining`, close the interior without a wall stretched between the jaws. The source's fine surface and tooth detail remains limited by the Tripo reconstruction.
 
 `nothosaurus-profile.json` records **21 exact plane-intersection envelopes** of both actual meshes, spaced over the built body's own axial extent rather than a typed range. Maximum width/dorsal/ventral envelope difference is **0.13596 units (2.59% of body length)**; the tolerance is 0.2 units (4%). The two rows over 0.12 are the fore- and hind-paddle stations, where the voxel resurfacing rounds the webbed digits. The grid-free measure is the one to read for pair agreement: nearest puppet-surface distance over authored body vertices has maximum **0.11904 (2.26%)** and 95th percentile **0.01621 (0.31%)**. The webbing moved both a little — the envelope figure down from 0.13856 as the twin now has a paddle to round rather than five separate digits, and the 95th percentile up from 0.01018, because the membrane is a thin sheet and the twin's 0.007 voxel thickens it. The joint and socket coordinates are shared, so their parity error is zero. These are generated measurements, not a claimed new human anatomical sign-off.
 
@@ -298,3 +298,65 @@ the region becomes 0.699 — and bent through `TurnLeft` the neck's silhouette i
 no faceting and no polygonal edge. Interpolating vertices in would have added resolution and
 nothing else: it cannot invent scales or cervical anatomy, and neither can the stretch. For those,
 the pose.
+
+## The head, turned to face straight forward — 20 September 2026
+
+The owner's note: *rotate Nothosaurus' head pose to face straight forward (which will also help
+align his mouth cut better)*. Done in `build.py`, in the mesh before binding, and never as a
+runtime patch or a keyed offset — the rig, the twin, the weights, the jaw cut, the oral shells, the
+sockets and all 21 clips are generated downstream of the turned mesh and follow it by themselves.
+
+**Where the head was.** Measured on the stretched intake in the builder's raw frame (x snoutward,
+y left, z up): the head's own axis — a line through the section midpoints of everything ahead of
+the skull joint — ran **20.35° to the animal's right** (yaw −20.35°) and 1.3° down. The frame's
+sign is the builder's typed constant and the mesh is asked to agree before anything moves: the
+snout stands 0.145 ahead of the skull joint and tapers to under 0.7 of the head's rear half-width,
+which a neck does not. The neck's centreline, walked from the shoulder (x 0.29) to the skull joint
+(0.406) in twelve stations, leaves the shoulder at −11.8° and arrives at the head at −32.4°; the
+head sits 12° back from its own neck's end tangent, and that angle is the generation's and is kept.
+
+**How it was turned.** Dinocephalosaurus' carry: each neck section is carried rigidly from its
+measured frame onto a target axis of the same segment lengths (arc 0.152 raw), whose yaw eases
+from the root's own to the value that leaves the head, carried whole by the last frame, along +x.
+The frames are built on the vertical rather than parallel-transported, so a yaw carries no
+incidental roll. A vertex within 0.06 raw of the centreline is carried whole, one beyond 0.13 not
+at all, with a smooth edge between, so the shoulders and the paddle roots stay exactly where they
+were: 1,276 vertices carried, 833 rigid with the head, largest move 0.071 raw (the snout tip).
+After: head yaw **−0.29°**, pitch −0.97°; the builder asserts |yaw| < 1.5°. The animal is 5.336
+engine units long now against 5.256 (the neck no longer curves sideways), which the runtime reads
+off the box either way. `validation.json` carries all of it under `neckUnbending` (`applied: true`,
+so `base-poses.mjs` publishes the untouched generation as `nothosaurus.origpose.glb` beside the
+body for comparison; the neck stretch is marked `applied` there too, which it always was).
+
+**The cut, fitted to the lip.** The old seam was a horizontal plane at a typed height. Read
+against the lip the generation modelled — each head vertex's normal cast back into the mesh and
+the hits within a lip's depth kept, Placodus' method, 180 hits on this head — it sat on average
+**0.0027 raw below the lip, 0.0048 on the left flank and 0.0011 on the right** (rms 0.0127): the
+cut ran through the lower lip on one side and along it on the other. On the turned head one plane
+is fitted through all the hits (188, none dropped by the 2.5-rms pass), `z = a + b·x + c·y`, and
+that is the cut and the seam of the oral shells: pitch −4.6°, tilt across the head 3.9°, mean
+residual per flank **+0.0009 left / −0.0009 right** (rms 0.012 either side — the hits' own
+scatter, which the old figure also carried). The countershading boundary is measured beside it
+because it is what an albedo read finds first: it reads 13° of roll on this head where the slit
+reads 4°, since the pale zone's upper edge sits above the lip on the left flank, so it is recorded
+and not followed, and the head is not rolled.
+
+**The mouth inside.** The palate and floor are as they were — separate closed thin shells, rigid
+to skull and jaw — laid along the turned head's measured centreline either side of the fitted
+plane. The hinge tissue, which was one ellipsoid with weights blended between the two bones (a
+wall stretched between the jaws in miniature) and stood proud of the throat at the mouth corner,
+is two rigid halves cut at the lip plane 0.004 either side of it, each capped and closed, seated
+on the head's own section at the cut (radii 0.022 × 0.019 × 0.025 raw, measured) and proved inside
+the closed intake by ray parity — 290 of 290 vertices, no shrink needed. The four are joined into
+one mesh, `Nothosaurus oral lining`, so the runtime classifier hides it as one thing (it used to
+draw `Oral floor`, whose name matched nothing) and `oral-shell-audit.mjs` proves the contract on
+the packaged files: one unit weight per vertex, no triangle bridging the bones, every edge shared
+by two faces, both halves present. Strict-cull gape (`gape-solid.py`, Bite@0.25 / Heavy@0.3 /
+Attack@0.25): **53 / 43 / 47 px** of backdrop seen through the body before, **1 / 0 / 0 after**,
+against a tolerance of 12; `throat-audit.mjs` reports 0 mixed skull/jaw vertices where the old hinge
+tissue had 146.
+
+Skin 2.98x before and after (`skin-tears.mjs`: Sprint on `fore_upper_R`, the same edge); every
+joint owns skin; the `Swim`/`Sprint` steady-head authoring is untouched.
+`docs/triassic/throat-repairs/nothosaurus-head-before.png` and `-after.png` are the same two
+cameras on the shipped file — from above, where the yaw shows, and from the animal's right.

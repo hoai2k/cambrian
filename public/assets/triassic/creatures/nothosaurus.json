@@ -2,8 +2,8 @@
   "id": "nothosaurus",
   "name": "Nothosaurus",
   "species": "Nothosaurus giganteus",
-  "description": "Canonical Tripo body with its neck lengthened from the measured viewer stretch, and a procedural volume twin resurfaced from the same mesh, sharing an articulated rowing, tail, six-joint cervical and jaw rig.",
-  "modelLength": 5.2561,
+  "description": "Canonical Tripo body with its neck lengthened from the measured viewer stretch and unbent so the head faces straight forward, and a procedural volume twin resurfaced from the same mesh, sharing an articulated rowing, tail, six-joint cervical and jaw rig.",
+  "modelLength": 5.3357,
   "lengthMeters": 6,
   "locomotion": "Swim",
   "clips": [
@@ -48,7 +48,8 @@
     "The procedural twin resurfaces a 0.007-unit voxel occupancy field, relaxes it and reduces the new topology. It does not reuse source vertices or faces.",
     "Same rest rig, inverse binds, sockets and all 21 action sample arrays are used for authored and puppet. LOD deliberately retains all clips.",
     "The neck is lengthened by the measured stretch in neck-stretch-request.json, applied to the intake mesh before anything is derived from it, so the twin, the rig, the weights, the sockets and every clip follow it. Six cervical controls replace three; the albedo and UVs are the originals, so the neck pigment stretches with the neck.",
-    "Original albedo retained with white COLOR_0; normal relief limited to 0.15 and skin set explicitly nonmetallic at roughness 0.7. Puppet pigment samples triangle-local UVs to avoid seam bleed. True jaw split and internal oral surfaces added; connected foot webbing retained.",
+    "The head faced about twenty degrees to the right as generated; the neck is unbent in the mesh before binding (each section carried rigidly from its measured frame onto a target axis of the same lengths) so the head faces straight forward, and the jaw cut is the plane fitted to the lip the generation modelled.",
+    "Original albedo retained with white COLOR_0; normal relief limited to 0.15 and skin set explicitly nonmetallic at roughness 0.7. Puppet pigment samples triangle-local UVs to avoid seam bleed. True jaw split and separate rigid palate, floor and hinge halves added; connected foot webbing retained.",
     "Living colours, soft tissues and movements are artistic reconstruction. Ability performs the roster fang-trap clamp; Grab braces and tugs the held prey. Breath provides a separate in-place surface-breath/dive gesture. Locomotor translation remains engine-owned."
   ]
 }
