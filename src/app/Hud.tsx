@@ -140,9 +140,19 @@ function SensePanel({ p }: { p: PlayerHud }) {
               <i style={{ width: `${p.era.airLeft * 100}%` }} />
             </div>
           )}
+          {/* A water-breather's minute on the sand: the same thin bar, drawn only while it is out of
+              the water, because under water a gill has nothing to count (src/sim/beach.ts). */}
+          {p.strandLeft != null && (
+            <div className={`bar air strand ${p.strandLow ? 'low' : ''}`}
+                 role="img"
+                 aria-label={`Out of the water ${Math.round(p.strandLeft * 100)}%${p.strandLow ? ', get back in' : ''}`}>
+              <i style={{ width: `${p.strandLeft * 100}%` }} />
+            </div>
+          )}
         </div>
       </div>
-      {p.era && <EraStatus era={p.era} alive={p.alive} />}
+      {p.ashore && p.alive && <ShoreStatus stranded={p.strandLeft != null} low={!!p.strandLow} />}
+      {p.era && <EraStatus era={p.era} alive={p.alive} ashore={p.ashore} />}
       {p.aim && (
         <div className={`aim ${p.aim.hasTarget ? 'on-target' : ''} ${p.aim.inRange ? 'in-range' : ''} ${p.aim.ready ? '' : 'cooling'}`} style={{ color: p.aim.color }}>
           <i /><i /><i /><i /><b />
@@ -481,15 +491,21 @@ function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
 
 const RUNG_NUMERALS = ['', 'I', 'II', 'III', 'IV'];
 
+/** Every era's shore, said the same way: what the sand is doing to this body and the way off it. */
+function ShoreStatus({ stranded, low }: { stranded: boolean; low: boolean }) {
+  const warn = stranded ? (low ? 'OUT OF THE WATER · flop back in now' : 'OUT OF THE WATER · flop back to the sea') : 'ON THE SHORE · the sea is behind you';
+  return <div className="era-status"><div className={`era-warn ${stranded ? 'danger' : ''}`}>{warn}</div></div>;
+}
+
 /**
  * The era's own standing readouts: the Dominant countdown, dead-zone and beaching warnings, and
  * the last few standing sources as a fading ticker under the ring.
  */
-function EraStatus({ era, alive }: { era: EraHud; alive: boolean }) {
+function EraStatus({ era, alive, ashore }: { era: EraHud; alive: boolean; ashore: boolean }) {
   if (!alive) return null;
   const W = COPY.warnings;
   const warn = era.inDeadZone ? (era.bimodal ? W.deadWaterBimodal : W.deadWater)
-    : era.beached ? W.beached
+    : era.beached && !ashore ? W.beached
     : era.heldUnder ? W.heldUnder
     : (era.shoreWarn ?? 0) > 0 ? W.shoreReaching
     : era.drowning ? W.drowning

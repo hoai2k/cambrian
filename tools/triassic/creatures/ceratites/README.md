@@ -1,5 +1,12 @@
 # Ceratites
 
+> **Current repair, 19 September 2026:** The shell is now selected by its measured coil
+> envelope, independently of skin weights, and that region is rigid in both delivered bodies.
+> The audit sweeps every clip and rejects any head/arm influence in that region. The invented
+> peristome, beak and oral sac have been removed; the intact source crown and gameplay anchors
+> remain. The older mouth reconstruction description below is historical and superseded.
+> Current measurements are in `paired-audit.json`; portraits are published in the game.
+
 The era's first coiled cephalopod, and the first Triassic body with no skull, no spine and no paired
 limbs. Almost nothing the fourteen vertebrate builders established transferred without being
 re-derived, and what follows is what was measured rather than what was assumed.

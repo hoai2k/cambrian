@@ -127,7 +127,7 @@ Deliver per subject, in this order, the same way the creatures went:
 | --- | --- | --- |
 | The 14 original B2 canonical subjects: `encrinus`, `encrinus-litter`, `diplopora`, `thecosmilia`, `calcisponge`, `placunopsis-mound`, `daonella-bed`, `brachiopod-cluster`, `cidaris`, `reef-block`, `neocalamites`, `pleuromeia`, `bjuvia`, `shore-boulder` | **Delivered as first-pass canonicals; awaiting human greenlight in the viewer.** | **Not requested.** The approved canonical plus builder parameters is sufficient. |
 | The 3 built B2 kinds: `stromatolite`, `salt-crust`, `mud-ripple` | Not requested retroactively. | Not requested retroactively. |
-| The 4 Tier 1 scenery: `log-raft`, `coral-head`, `sponge-mound`, `voltzia` | **Delivered** (A3), though approved through `scenery-prompts.json` rather than the viewer, and only as side and top. | **Requested — none exists.** These go through Tripo, so they need the same four-view sheet the creatures get; A3's three views predate the `model-inputs/` mechanism. |
+| The 4 Tier 1 scenery: `log-raft`, `coral-head`, `sponge-mound`, `voltzia` | **Delivered** (A3), approved through `scenery-prompts.json` rather than the viewer. | **Delivered 19 September 2026.** The already-authored four-panel turnarounds are packaged with canonical and single-image inputs under `canonical/model-inputs/`; no regeneration was needed, avoiding visual drift from the approved scenery. |
 
 `ceratite-drift` stays blocked on the `ceratites` model as B2 says: it is that shell reused, so it
 takes the animal's canonical pose and needs no pose of its own — only the half-buried placement

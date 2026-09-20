@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-19",
+  "task": "T3D-10A",
+  "canonicalStatus": "approved-design-ground-free-derivative",
+  "humanApprovalClaimed": false,
+  "canonical": "canonical.png",
+  "canonicalSource": "../../bjuvia-candidate02.png",
+  "canonicalSha256": "b3458f46f173eb283786a33587ec704c633749a081c2c97ba7bc7561037f4903",
+  "input": "input.png",
+  "inputSha256": "1b05cbcd2dc68e07d6dcc2fd55e8bed09cbd0d2f8f4283402c0dbad4bbd44914",
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "nativeInput": "../../prop-inputs-2026-09-19/native/bjuvia-attempt1.png",
+  "nativeDimensions": [
+    1254,
+    1254
+  ],
+  "resolutionProcessing": "Lanczos3 resampling from the native 1254-square ImageGen output; not native 2048 detail.",
+  "original": "../../originals/2026-09-19-prop-candidate02/bjuvia-candidate02.png",
+  "originalSha256": "b3458f46f173eb283786a33587ec704c633749a081c2c97ba7bc7561037f4903",
+  "generator": "builtin image_gen.imagegen",
+  "inputPrompt": "Use case: background-extraction. Edit target: supplied approved candidate02 Bjuvia design. Preserve the entire plant exactly in overall form: squat short brown trunk with leaf scars, broad undivided entire green leaves in the same rosette arrangement, individual central midribs, smooth leaf margins, same proportions, materials, camera and neutral lighting. Create a ground-free single-object Tripo input, square 2048 by 2048 pixels. Remove ALL sand, stones, soil, litter, ground shadow patch and terrain. Trunk terminates at the existing natural ground-contact level with a clean flat base; do not expose or invent roots. Isolate the complete plant on a uniform light gray background. Expand framing as needed for at least 6 percent clear margin beyond every leaf tip and trunk base. No cropping, no leaflets or pinnate fronds, no base/plinth, no text, no multiple views. Output must have an opaque neutral light-gray studio background, not alpha transparency.",
+  "provenance": "../../prop-inputs-2026-09-19/provenance.json",
+  "review": {
+    "verdict": "pass",
+    "evidence": "Entire broad undivided leaves, central midribs and short scarred trunk retained; all leaf tips and base visible; no soil or exposed roots.",
+    "risk": "Thin overlapping leaves may fuse in inferred 3D. Keep broad blade silhouettes and avoid converting trunk fibres into topology."
+  },
+  "tripoSubmitted": false,
+  "downstreamApproval": {
+    "reviewer": "/root",
+    "method": "Visual contact-sheet review of all seven final input images",
+    "scope": "Approved for Tripo submission",
+    "note": "Complete silhouettes, neutral background, no substrate slab, and revised morphology reads correctly.",
+    "humanApprovalClaimed": false
+  }
+}

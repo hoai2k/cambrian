@@ -36,7 +36,7 @@ CLIPS = {'Idle': 2.4, 'Swim': 1.6, 'Sprint': 1.0, 'TurnLeft': 1.4, 'TurnRight': 
          'Attack': 1., 'Bite': .5, 'Heavy': 1.1, 'Hit': .6, 'Death': 1.6, 'Guard': 1., 'Parry': .4, 'Dodge': .5,
          'Eat': 1.6, 'Stagger': 1.2, 'Ability': .9, 'Grab': 1.2, 'Breath': 2.4, 'Growth': 1.5,
          'Shoal': 1.4, 'Breathe': 3.}
-LOOPS = ['Idle', 'Swim', 'Sprint', 'Guard', 'Eat', 'Shoal', 'Breathe']
+LOOPS = ['Idle', 'Swim', 'Sprint', 'Guard', 'Eat', 'Grab', 'Shoal', 'Breathe']
 
 bpy.ops.object.select_all(action='SELECT'); bpy.ops.object.delete(use_global=False)
 for a in list(bpy.data.actions): bpy.data.actions.remove(a)

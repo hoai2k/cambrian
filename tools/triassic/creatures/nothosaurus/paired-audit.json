@@ -2,24 +2,24 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1993448,
-      "sha256": "49a50b0f8dd6ffb657893d62d19b7472290394dfdc93c3713b7b3f3765c6d10b",
+      "bytes": 1993004,
+      "sha256": "b9147ec25196467603d02bf91e9db7e331e25e01165be16b7233c778b56e5f8d",
       "triangles": 28712,
       "vertices": 16610
     },
     {
       "suffix": ".puppet",
-      "bytes": 747388,
-      "sha256": "6712840284e75fef1b553f74c48ddc3e611bb3bafd3744dbf0d2836fd1dcd7b6",
-      "triangles": 9366,
-      "vertices": 4831
+      "bytes": 747220,
+      "sha256": "0c9f96f5185d5034023197da35ec36dfca7597fdd1b5226a5f97a7d03918224a",
+      "triangles": 9370,
+      "vertices": 4834
     },
     {
       "suffix": ".lod1",
-      "bytes": 747388,
-      "sha256": "6712840284e75fef1b553f74c48ddc3e611bb3bafd3744dbf0d2836fd1dcd7b6",
-      "triangles": 9366,
-      "vertices": 4831
+      "bytes": 747220,
+      "sha256": "0c9f96f5185d5034023197da35ec36dfca7597fdd1b5226a5f97a7d03918224a",
+      "triangles": 9370,
+      "vertices": 4834
     }
   ],
   "sockets": [
@@ -121,11 +121,11 @@
     },
     {
       "name": "Eat",
-      "sha256": "da4781e6361021abe85b5231b3ca7a1c1450a42704ed2617ac56812c12989f27"
+      "sha256": "5d31fad94699620463bac8f9bb9ba849a23014c62b0563c697cc3fa4e52ddcf8"
     },
     {
       "name": "Grab",
-      "sha256": "e0e1ad78d27971322610d69b4e2c7c0ffeff93edf702904a986b556414981330"
+      "sha256": "9465b6351192d049614fef29e23437d947015b0a4301ff421f9e638d88855cf6"
     },
     {
       "name": "Growth",
@@ -133,7 +133,7 @@
     },
     {
       "name": "Guard",
-      "sha256": "655ec63dfd72ff0b05d0255b15b790cf0f2bf2c8283f0903eb2f0ff3214df4c4"
+      "sha256": "8a9da8dc43e6eaff35822cd15205f8476ee15b5e13820232f137c95321092f1b"
     },
     {
       "name": "Heavy",
@@ -145,7 +145,7 @@
     },
     {
       "name": "Idle",
-      "sha256": "9d8b2dbda53871d0e9f93272028c2f731cecdb8a35e204bdb416f2e9832b75f2"
+      "sha256": "ccb24551d45af52a4beb276fa46b40839d4854b3cad0434921958995697c7e4c"
     },
     {
       "name": "Parry",
@@ -157,7 +157,7 @@
     },
     {
       "name": "Sprint",
-      "sha256": "e3b68a4d49f1cc29dce3e3038edf31facee60925ef572786881ba3dc19c3b98c"
+      "sha256": "d0af06ce41504efc46008ac3d7ee5a1f1c30a482986eaa6c90e3f753b9854d67"
     },
     {
       "name": "Stagger",
@@ -165,7 +165,7 @@
     },
     {
       "name": "Swim",
-      "sha256": "0bac93127b000d767b5c47c241854cca466b61d0e686f5832fbf6379ee469304"
+      "sha256": "f040d80250b160476016b61a14c39cff49b097a5fc58594082cc800038aa07b6"
     },
     {
       "name": "TurnLeft",
@@ -184,13 +184,13 @@
           "clip": "Ability",
           "duration": 1,
           "samples": 61,
-          "maxVertexTravel": 0.30261906417900775
+          "maxVertexTravel": 0.30261906556950385
         },
         {
           "clip": "Attack",
           "duration": 1,
           "samples": 61,
-          "maxVertexTravel": 0.5946698167387895
+          "maxVertexTravel": 0.5946698091505654
         },
         {
           "clip": "Bite",
@@ -220,7 +220,7 @@
           "clip": "Dodge",
           "duration": 0.5,
           "samples": 61,
-          "maxVertexTravel": 1.3625707694608873
+          "maxVertexTravel": 1.3625707694711524
         },
         {
           "clip": "Eat",
@@ -232,25 +232,25 @@
           "clip": "Grab",
           "duration": 1.2000000476837158,
           "samples": 61,
-          "maxVertexTravel": 0.47365652709286715
+          "maxVertexTravel": 0.48746019825462183
         },
         {
           "clip": "Growth",
           "duration": 1.5,
           "samples": 61,
-          "maxVertexTravel": 0.36801683057972734
+          "maxVertexTravel": 0.368016822523361
         },
         {
           "clip": "Guard",
           "duration": 1,
           "samples": 61,
-          "maxVertexTravel": 0.4353510352570897
+          "maxVertexTravel": 0.43535103819409604
         },
         {
           "clip": "Heavy",
           "duration": 1.100000023841858,
           "samples": 61,
-          "maxVertexTravel": 0.7580456453762443
+          "maxVertexTravel": 0.7580456453707158
         },
         {
           "clip": "Hit",
@@ -315,13 +315,13 @@
           "clip": "Ability",
           "duration": 1,
           "samples": 61,
-          "maxVertexTravel": 0.3032089030659808
+          "maxVertexTravel": 0.30320890512812315
         },
         {
           "clip": "Attack",
           "duration": 1,
           "samples": 61,
-          "maxVertexTravel": 0.5908259331617608
+          "maxVertexTravel": 0.5907907576432072
         },
         {
           "clip": "Bite",
@@ -333,7 +333,7 @@
           "clip": "Breath",
           "duration": 2.4000000953674316,
           "samples": 61,
-          "maxVertexTravel": 1.1029475144119791
+          "maxVertexTravel": 1.1029476012153325
         },
         {
           "clip": "Death",
@@ -351,7 +351,7 @@
           "clip": "Dodge",
           "duration": 0.5,
           "samples": 61,
-          "maxVertexTravel": 1.349580718579659
+          "maxVertexTravel": 1.3493474467226136
         },
         {
           "clip": "Eat",
@@ -363,13 +363,13 @@
           "clip": "Grab",
           "duration": 1.2000000476837158,
           "samples": 61,
-          "maxVertexTravel": 0.4791813988685276
+          "maxVertexTravel": 0.49323291437438693
         },
         {
           "clip": "Growth",
           "duration": 1.5,
           "samples": 61,
-          "maxVertexTravel": 0.36624798249297313
+          "maxVertexTravel": 0.36587166498642226
         },
         {
           "clip": "Guard",
@@ -429,7 +429,7 @@
           "clip": "TurnLeft",
           "duration": 1.600000023841858,
           "samples": 61,
-          "maxVertexTravel": 0.8907347436831977
+          "maxVertexTravel": 0.8907347363248925
         },
         {
           "clip": "TurnRight",

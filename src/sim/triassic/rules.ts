@@ -488,7 +488,7 @@ export const TRIASSIC_RULES: EraRules = {
       bimodal: def.breathing === 'bimodal', air: def.breathing === 'air', atSurface: t.atSurface, shoreWarn: t.shoreWarn, heldUnder: def.breathing === 'air' && p.grabbedBy >= 0,
       airLeft: def.breathing === 'air' ? clamp(t.air / AIR_MAX, 0, 1) : undefined,
       airLow: def.breathing === 'air' && t.air < AIR_LOW, drowning: t.drownT > 0,
-      beached: false, primeT: d.primeT, inDeadZone: false, deadZones: [],
+      beached: p.ashore, primeT: d.primeT, inDeadZone: false, deadZones: [],
     };
   },
 

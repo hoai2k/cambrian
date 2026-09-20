@@ -39,7 +39,7 @@ const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies(
 
 /** Every id with an authored body on disk, shipped or not. `<id>.preview.glb` is not one of these. */
 const built = fs.readdirSync(DIR)
-  .filter(f => f.endsWith('.glb') && !f.includes('.preview.') && !f.includes('.puppet.') && !f.includes('.lod'))
+  .filter(f => f.endsWith('.glb') && !f.includes('.preview.') && !f.includes('.puppet.') && !f.includes('.backup.') && !f.includes('.lod'))
   .map(f => f.replace(/\.glb$/, ''))
   .sort();
 

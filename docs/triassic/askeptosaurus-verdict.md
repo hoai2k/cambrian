@@ -1,4 +1,4 @@
-# Askeptosaurus: what is actually wrong with it, measured
+# Askeptosaurus: original diagnosis and completed regeneration
 
 *15 September 2026. Reproduce with `local/askepto.py`, `local/askepto2.py`, `local/askepto3.py` and
 `local/askcurv.py` — each is a Blender or plain-Python script that prints its numbers.*
@@ -117,3 +117,27 @@ Two routes out, and the recommendation is the first:
 
 What is **not** recommended is building it on the shared kit as it stands. That is what was tried
 once, and the numbers above say why it could not have worked.
+
+## Regeneration delivered · 19–20 September 2026
+
+The owner's selected straight-pose route is complete. The updated canonical and single Tripo
+input produced a textured body for 30 credits; its measured neutral-axis tail fraction is 0.6323.
+The authored model and independent volume twin now ship with one exact 33-joint rig, 24 dynamic
+clips, three anchors, LOD and fresh portraits. The game uses the replacement. The viewer offers
+**Model: Backup Model**, preserving the original corrected surface on a pose-matched animated rig.
+
+The earlier source files and canonical images remain preserved. The old sources had zero skins
+and zero clips; the backup adds the complete action set rather than claiming preexisting animation.
+Its curved rest pose differs from the replacement, and its coil/whip range is limited to prevent
+skin stretching. The reconstruction does not force the old surface onto a straight axis.
+
+All 24 clips pass dynamic playback and skin checks. Full/twin rig, clips and anchors match exactly.
+The posterior throat attachment has zero gap at 61 phases of every clip for full, twin and backup.
+Real Chrome viewer swaps load all three bodies with 24 actions and no page errors. The game build,
+typecheck, 442 Triassic checks and asset check pass. T3D-01 is finished.
+
+See [the build and validation record](../../tools/triassic/creatures/askeptosaurus/README.md),
+[paired audit](../../tools/triassic/creatures/askeptosaurus/paired-audit.json), and
+[review images](../../tools/triassic/creatures/askeptosaurus/review/).
+
+The preceding September 15 analysis is retained as the historical diagnosis, not current work.

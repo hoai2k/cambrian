@@ -13,6 +13,7 @@ import type { Phase } from '../sim/daynight';
 import { BAND_COLOR, CALM_MARK, emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
 import { recordStep, recordingPhase } from '../app/debug-record';
 import { BIOME_NAMES, biomeAt, coverAt, groundHeight, nurseryAt, sampleHeight, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
+import { breathesAir, STRAND_BREATH, STRAND_LOW } from '../sim/beach';
 import { AssetQueue, type AssetProgress } from './assets';
 import { fillOf, ladderName } from '../sim/ladder';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
@@ -40,6 +41,12 @@ export interface PlayerHud {
   /** Sense is on: the band glyphs and the radar are drawn. */
   senseOn: boolean;
   hunted: number; hunterAngle: number | null; hunterName?: string; hunterState: 'none' | 'noticed' | 'hunting'; inCover: boolean; still: boolean;
+  /**
+   * Out of the water, on the shore (src/sim/beach.ts). `strandLeft` is a water-breather's minute
+   * out of the water, 1 down to 0, and is set only while it is ashore — the gauge is for the sand
+   * and nowhere else; `strandLow` is the last of it. An air-breather ashore carries neither.
+   */
+  ashore: boolean; strandLeft?: number; strandLow?: boolean;
   hint?: string; respawnIn: number; fade: number; state: string; modelReady: boolean; kills: number; eats: number; escapes: number; protect: boolean;
   /**
    * Co-op: seconds left for a team-mate to reach this downed player, and the downed team-mates
@@ -1040,7 +1047,10 @@ export class Engine {
     // faster up than down, because a cut to the sky and back is a flinch rather than a breath.
     cs.breathT = Math.max(0, cs.breathT - dt);
     const peek = cs.breathT <= 0 ? 0 : Math.sin(Math.min(1, cs.breathT / BREATH_PEEK) * Math.PI) ** 0.6;
-    const ceiling = p.airborne ? SURFACE_Y + 40 : (SURFACE_Y - 0.4) + peek * (L * 0.5 + 1.6);
+    // And the sand lifts it: a body wading up the beach takes the camera up out of the water with
+    // it, by its wade, which is continuous in where it stands, so the view comes up as the animal
+    // does rather than cutting to the sky when a rule says it is ashore.
+    const ceiling = p.airborne ? SURFACE_Y + 40 : (SURFACE_Y - 0.4) + Math.max(peek * (L * 0.5 + 1.6), p.wade * (L * 0.8 + 6));
     const fit = fitCameraArm(lookAt.y + L * 0.18, pitch, dist, L * CAMERA_CLOSE,
       (d) => { place(d); return sampleHeight(desired.x, desired.z) + CAMERA_SAND; },
       ceiling);
@@ -1633,6 +1643,8 @@ export class Engine {
         senseOn: p.senseMode,
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, kind: creature(lockA.creature).kind, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,
+        ashore: p.ashore, strandLeft: p.ashore && !breathesAir(p.creature) ? clamp(1 - p.strandT / STRAND_BREATH, 0, 1) : undefined,
+        strandLow: p.ashore && !breathesAir(p.creature) && STRAND_BREATH - p.strandT < STRAND_LOW,
         hunterState: p.hunted >= 0.5 ? 'hunting' : p.hunted > 0.2 ? 'noticed' : 'none', inCover: p.cover > 0.3, still: Math.hypot(p.vel.x, p.vel.y, p.vel.z) < 0.3,
         hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, (game.reviveWindow(p) || CORPSE_WINDOW) - (game.reviveWindow(p) ? 0 : p.respawnT)) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
         downedFor: game.reviveWindow(p), reviveProgress: game.reviveProgress(p), downedAllies: downed, spectating: spectate,

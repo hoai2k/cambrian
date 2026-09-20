@@ -55,15 +55,11 @@ All requested page artwork, including the second-pass Tiktaalik replacement, is 
 integrated. The completed briefs and notes about withdrawn cutouts are recorded in
 [image-requests-history.md](image-requests-history.md).
 
-**Open, and not blocking anything: a Triassic wordmark at the other two's weight.** The interface
-draws a derived mark per game (`logo-header.webp`, from `npm run logos`), which puts the three on
-one palette, one tonal balance and one lettering height — the delivered Triassic mark is a thin
-gold rim around a black face and read dark and thin beside the others at pick-screen size, mean
-ink luminance 55 against 107 and 98. What a treatment cannot change is the lettering: the
-Triassic's is a lighter-weight serif, more widely spaced, so its strokes still read finer than
-*Cambrian Conquest*'s. Matching that means redrawing `public/assets/triassic/brand/logo-engraved.webp`
-in the weight of the other two — same lettering, same two lines, heavier stems and tighter
-spacing, still on transparency — after which `npm run logos` regenerates the interface marks.
+**Delivered 19 September 2026: a Triassic wordmark at the other two's weight.** The original
+engraved raster is retained as `logo-engraved-source.webp`; `tools/art/triassic/weight-wordmark.mjs`
+rebuilds `logo-engraved.webp` with the same two-line lettering, slightly condensed spacing and an
+optically heavier engraved stroke on transparency. `npm run logos` then regenerates the shared
+header treatment so all three eras retain one palette, tonal balance and lettering height.
 
 ## Checking what is outstanding
 

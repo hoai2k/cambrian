@@ -33,8 +33,21 @@ const users = fs.readdirSync(DIR, { withFileTypes: true })
   // the builders carry a trailing `# noqa: E402` on this import, so match the statement, not the line
   .filter((p) => fs.existsSync(p) && /^\s*import shorekit as K\b/m.test(fs.readFileSync(p, 'utf8')));
 
+// Shared helpers are deliberately re-exported from the marine kit. Resolve the
+// imported symbol against that source rather than treating a valid import as a
+// missing local def, or accepting a misspelled import as an exported function.
+const marine = fs.readFileSync(path.join(DIR, '_pipeline/tripo.py'), 'utf8');
+const marineExports = new Set([...marine.matchAll(/^(?:def|class)\s+([A-Za-z_]\w*)/gm)].map(m => m[1]));
+const importFailures = [];
+for (const match of kit.matchAll(/^from tripo import ([^#\n]+)/gm)) {
+  for (const entry of match[1].split(',')) {
+    const [name, alias] = entry.trim().split(/\s+as\s+/);
+    if (!marineExports.has(name)) importFailures.push(`shorekit.py imports missing tripo.${name}`);
+    else exported.add(alias || name);
+  }
+}
 let checks = 0;
-const missing = [];
+const missing = [...importFailures];
 for (const p of users) {
   const src = fs.readFileSync(p, 'utf8');
   const wanted = new Set([...src.matchAll(/\bK\.([A-Za-z_]\w*)/g)].map((m) => m[1]));
