@@ -1243,6 +1243,30 @@ unless the user explicitly asks for a PR. Steps:
   `tools/sculpt-browser.mjs` drives the mode in a browser; `npm run sculpt:measure -- <glb> [sculpt.json]`
   measures a model the same way and reports how far a rebuilt candidate is from a sculpt's target,
   which is how a port is checked.
+- **The Animations pane's selection is sticky across a change of creature, and the *intent* is kept
+  apart from *what is playing*.** The pane is for comparing one motion across bodies — how six
+  animals hold a `Heavy`, what each does at the top of a `Crawl` — so picking an animal must not
+  also pick the animation again: the clip, the position in it, the pause and the *Base pose* (a
+  selection like a clip is, and the one a reviewer comparing rest poses most wants kept) all cross
+  over. Not every body has every clip, and that is where the whole thing is won or lost: an animal
+  without the chosen clip plays its resting clip and **the choice still stands**, so the next animal
+  that does have it plays it again. Store what is *playing* and the choice is lost at the first
+  animal that lacks the clip and can never come back — which is why `ClipIntent` (what was asked
+  for) and `Selection` (what this body can give) are two types in `src/viewer/playback/selection.ts`
+  and why nothing in the scene may write the intent. The same split decides three smaller things,
+  each of which reads as a bug the other way round: a position is **clamped** to a shorter clip
+  rather than wrapped (Ottoia's `Crawl` is 1.4 s where Hallucigenia's is 2.0 s, and wrapping 1.8 s
+  to 0.4 s jumps to the start of a stride) and the clamp lands on what plays, never on the intent,
+  so a longer clip further along gives the full position back; a fall-back starts at **zero**,
+  because a time is a position in one particular clip; and a running clip's clock is written back
+  onto the intent **only while the intended clip is the one playing** (`tracksIntent`), or some
+  other animal's idle frame quietly becomes the position that was chosen. Pausing changes only the
+  pause — it does not re-aim the selection at the stand-in on screen — while picking a clip or
+  scrubbing names the clip it is done to. The pane says out loud when it is standing in for
+  something (`.clip-fallback`) and carries both facts as `data-clip-intent`/`data-clip-playing`.
+  Session-scoped like the editors' stores and deliberately not `localStorage`: a reload puts every
+  body back on its own `Idle`. `npm run playback` holds the decision and
+  `node tools/playback-browser.mjs` drives the whole journey in a browser.
 - The viewer also has a **mark mode** (`&mode=mark`, the *Mark region* button), which is the answer
   to geometry that is welded to the body and should not be there — the extra fins and spare tails on
   the raw generated meshes, where 19 of the 21 bodies are one connected surface and only a human can

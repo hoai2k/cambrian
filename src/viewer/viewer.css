@@ -161,6 +161,10 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .clip-replaced { opacity: .7; border-style: dashed; font-weight: 500; }
 .clip-replaced.active { opacity: 1; }
 
+/* Said quietly and in the pane's own voice: the selection stands, this animal cannot meet it. */
+.clips .hint { color: var(--dim); font-size: 12px; margin: 0 0 10px; }
+.clip-fallback strong { color: var(--mist); font-weight: 600; }
+
 /* Matches the game's portrait spinner (src/app/styles.css): only drawn once a thumbnail is slow. */
 .portrait-wait { position: absolute; inset: 0; margin: auto; width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(238, 250, 246, .18); border-top-color: var(--foam); animation: portrait-spin .9s linear infinite; pointer-events: none; }
 @keyframes portrait-spin { to { transform: rotate(1turn); } }

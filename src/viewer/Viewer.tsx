@@ -14,6 +14,8 @@ import { isIdentity as stretchIsIdentity, warp as stretchWarp } from './stretch/
 import { MouthEditor } from './mouth/MouthEditor';
 import type { AppliesTo } from './mouth/mouth';
 import { BendEditor } from './bend/BendEditor';
+import { clampTime, intentMissing, tracksIntent, type ClipIntent } from './playback/selection';
+import { getIntent, setIntent } from './playback/store';
 
 const SPEEDS = [0.25, 0.5, 1, 2];
 
@@ -171,6 +173,46 @@ export function Viewer() {
   const [loadedId, setLoadedId] = useState('');
   const [picks, setPicks] = useState<Picks>(readPicks);
   const [slots, setSlots] = useState<readonly Slot[]>([]);
+  /**
+   * The reviewer's standing selection — which clip, where in it, paused or not — kept in the
+   * session store (`./playback/store`) so it crosses from one animal to the next, and mirrored
+   * here only so the pane can draw what is being asked for. The store is the truth: every writer
+   * below goes through `remember`, which sets both, and the load effect reads `getIntent()` rather
+   * than this copy so it can never be a render behind.
+   *
+   * What is *playing* is `active`, which the scene reports. The two are deliberately different
+   * things: a body without the chosen clip plays its `Idle` and the intent stands, so the next
+   * animal along that does have it gets it back.
+   */
+  const [intent, setIntentMirror] = useState<ClipIntent | undefined>(getIntent);
+  const remember = (next: ClipIntent) => { setIntent(next); setIntentMirror(next); };
+  /** Picking a clip, or the base pose, *is* the selection: it names what was meant from here on. */
+  const chooseClip = (name: string) => {
+    remember({ clip: name, time: 0, paused: playback.paused });
+    sceneRef.current?.play(name, loop);
+  };
+  const chooseBasePose = () => {
+    remember({ clip: null, time: 0, paused: playback.paused });
+    sceneRef.current?.setRestPose(true);
+  };
+  /**
+   * Pausing changes only the pause. It deliberately does not re-aim the selection at whatever is
+   * on screen: a reviewer pausing a body that fell back to its `Idle` has not given up on the clip
+   * they asked for, and the next animal that has it should still play it — paused.
+   */
+  const choosePaused = (next: boolean) => {
+    sceneRef.current?.setPaused(next);
+    const standing = getIntent();
+    remember(standing ? { ...standing, paused: next } : { clip: active || null, time: playback.time, paused: next });
+  };
+  /** Scrubbing names the clip under the scrubber, because a position is a position *in* one clip. */
+  const scrubTo = (seconds: number) => {
+    // Clamped here as well as in the scene: an arrow key at either end asks for a time outside the
+    // clip, and what is written down has to be the position the body was actually put in.
+    const t = clampTime(seconds, playback.duration);
+    sceneRef.current?.seek(t);
+    remember({ clip: active || null, time: t, paused: true });
+  };
   useEffect(() => { writeUrlState(id, mode); }, [id, mode]);
   // Re-pick the opening model when the specimen changes, and only then: a reviewer who has chosen
   // to look at the twin keeps looking at it. What the list opens on is `opening()` above — for an
@@ -237,6 +279,9 @@ export function Viewer() {
   // The show effect must not re-run when a pick changes, so it reads the picks through a ref.
   const picksRef = useRef(picks);
   picksRef.current = picks;
+  // Same for the loop switch: toggling it must not reload the body.
+  const loopRef = useRef(loop);
+  loopRef.current = loop;
   const schemeId = picks[id] ?? defaultScheme(id);
   const activeScheme = scheme(schemeId);
 
@@ -259,7 +304,11 @@ export function Viewer() {
     sceneRef.current?.setScheme(picksRef.current[id] ?? defaultScheme(id));
     // The yaw is the generated mesh's alone: the shipped body and the twin are already built to
     // the engine's convention and must not be turned.
-    sceneRef.current?.show({ ...def, model: modelPath, previewYaw: showGenerated ? def.previewYaw : 0 }, { preserveView: true })
+    // The standing selection is read from the store rather than from the mirror above, and the
+    // loop switch through a ref, so that neither puts this effect — a model load — back on the
+    // dependency list. What this body can give the selection is decided in `scene.show`.
+    sceneRef.current?.show({ ...def, model: modelPath, previewYaw: showGenerated ? def.previewYaw : 0 },
+      { preserveView: true, intent: getIntent(), loop: loopRef.current })
       .then((names) => {
         if (cancelled) return;
         // A sculpt made this session follows the creature back onto the stage, full or reduced.
@@ -281,6 +330,21 @@ export function Viewer() {
   useEffect(() => {
     try { sessionStorage.setItem(STORE_KEY, JSON.stringify(picks)); } catch { /* private mode: picks stay in memory */ }
   }, [picks]);
+  /**
+   * A running clip carries the reviewer's position along with it, so the position that crosses to
+   * the next animal is where they had got to — but **only while what is playing is what was asked
+   * for**. On a body that fell back to its `Idle`, that clock belongs to a clip nobody chose, and
+   * writing it back would quietly replace the intended position with somebody else's idle frame.
+   *
+   * Only the store is written, not the mirror: this runs on every playback report and none of it
+   * changes what the pane draws.
+   */
+  useEffect(() => {
+    if (!ready || playback.paused) return;
+    const standing = getIntent();
+    if (!tracksIntent(standing, active) || standing!.time === playback.time) return;
+    setIntent({ ...standing!, time: playback.time });
+  }, [playback, active, ready]);
 
   function exportColors() {
     const payload = {
@@ -483,7 +547,13 @@ export function Viewer() {
         </section>}
       </div>
 
-      <section className="clips" aria-label="Animations" data-loaded-specimen={loadedId} data-loaded-model={loadedId ? modelPath : ''}>
+      {/* `data-clip-intent` is what was asked for and `data-clip-playing` what this body could
+          give it — the two are the same except while a body without the chosen clip is standing
+          in, and keeping them both on the pane is what lets a browser drive prove the difference.
+          The base pose says so by name, since it is a selection with no clip in it. */}
+      <section className="clips" aria-label="Animations" data-loaded-specimen={loadedId} data-loaded-model={loadedId ? modelPath : ''}
+        data-clip-intent={intent ? intent.clip ?? 'base' : ''}
+        data-clip-playing={!loadedId ? '' : !clips.length ? 'none' : active || 'base'}>
         <div className="clips-head">
           <h3>Animations</h3>
           {(clips.length > 0 || loading) && <><label className="toggle">
@@ -497,7 +567,7 @@ export function Viewer() {
           </div></>}
         </div>
         {!loading && clips.length > 0 && <div className="timeline">
-          <button className="ghost" onClick={() => sceneRef.current?.setPaused(!playback.paused)}>
+          <button className="ghost" onClick={() => choosePaused(!playback.paused)}>
             {playback.paused ? 'Resume' : 'Pause'}
           </button>
           <label>
@@ -508,13 +578,19 @@ export function Viewer() {
                 const target = e.key === 'Home' ? 0 : e.key === 'End' ? playback.duration
                   : e.key === 'ArrowLeft' || e.key === 'ArrowDown' ? playback.time - 1 / 30
                   : e.key === 'ArrowRight' || e.key === 'ArrowUp' ? playback.time + 1 / 30 : undefined;
-                if (target != null) { e.preventDefault(); sceneRef.current?.seek(target); }
+                if (target != null) { e.preventDefault(); scrubTo(target); }
               }}
-              onChange={e => sceneRef.current?.seek(Number(e.target.value))} />
+              onChange={e => scrubTo(Number(e.target.value))} />
           </label>
           <output>{playback.time.toFixed(2)} / {playback.duration.toFixed(2)} s</output>
         </div>}
         {!loading && !clips.length && <p className="hint">Static specimen</p>}
+        {/* The intent is invisible while it is not being met, and an invisible intent reads as the
+            pane having forgotten what was chosen. So it says so, and says it is still standing. */}
+        {!loading && clips.length > 0 && intentMissing(intent, clips) && <p className="hint clip-fallback">
+          <strong>{intent!.clip}</strong> is not one of this animal's clips, so {active || 'the base pose'} is standing
+          in. The choice holds: the next animal that has {intent!.clip} plays it, where you left off.
+        </p>}
         <div className="clip-grid">
           {/* The rig at rest is the neutral pose: jaw shut, body straight, limbs where the builder
               bound them, which is the shape every clip here is authored from. It is a pose rather
@@ -524,7 +600,7 @@ export function Viewer() {
           {!loading && clips.length > 0 && (
             <button className={`clip clip-base ${active === '' ? 'active' : ''}`} aria-pressed={active === ''}
               title="The rig at rest: the neutral pose every clip is authored from"
-              onClick={() => sceneRef.current?.setRestPose(true)}>
+              onClick={chooseBasePose}>
               Base pose
             </button>
           )}
@@ -534,7 +610,7 @@ export function Viewer() {
             const queued = def.clipNotes?.[name];
             return (
               <button key={name} className={`clip ${name === active ? 'active' : ''}${queued ? ' clip-queued' : ''}`}
-                aria-pressed={name === active} onClick={() => sceneRef.current?.play(name, loop)}>
+                aria-pressed={name === active} onClick={() => chooseClip(name)}>
                 {name}
                 {queued && <ClipQueuedBadge name={name} note={queued} />}
               </button>
@@ -549,7 +625,7 @@ export function Viewer() {
           <div className="clip-grid clip-grid-replaced">
             {clips.filter(isReplaced).map((name) => (
               <button key={name} className={`clip clip-replaced ${name === active ? 'active' : ''}`} aria-pressed={name === active}
-                title={`The clip ${replacedName(name)} superseded; kept for comparison`} onClick={() => sceneRef.current?.play(name, loop)}>
+                title={`The clip ${replacedName(name)} superseded; kept for comparison`} onClick={() => chooseClip(name)}>
                 {replacedName(name)}
               </button>
             ))}
