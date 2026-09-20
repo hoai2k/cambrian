@@ -2,7 +2,7 @@
   "specimen": "triassic:askeptosaurus",
   "choices": [
     "Full model",
-    "Procedural twin \u00b7 reduced",
+    "Procedural twin · reduced",
     "Backup Model"
   ],
   "modelsLoaded": [
@@ -12,6 +12,6 @@
   ],
   "clipsPerModel": 24,
   "backupSwimPlayed": true,
-  "pageErrors": [],
-  "previewBadgeCleared": true
+  "previewBadgeCleared": true,
+  "pageErrors": []
 }
