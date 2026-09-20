@@ -4,6 +4,7 @@
  */
 import { UP, DOWN } from '../lib.mjs';
 import { wave, beatPhase } from '../common.mjs';
+import { flopClip } from '../gaits.mjs';
 
 const TAIL = ['tail0', 'tail1', 'tail2', 'tail3', 'tail4', 'tail5', 'tail6'];
 
@@ -28,3 +29,6 @@ export const clips = [
     },
   },
 ];
+
+// The flop (src/sim/beach.ts): a ray on the sand slaps with its whole margin.
+clips.push(flopClip({ tail: ['tail0','tail1','tail2','tail3','tail4','tail5','tail6'], pectorals: ['pectoral0L','pectoral0R','pectoral1L','pectoral1R','pectoral2L','pectoral2R'], skull: 'skull', jaw: 'jaw', amp: 0.2 }));

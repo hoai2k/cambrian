@@ -31,9 +31,15 @@ node tools/creatures/motion/pose-check.mjs <id> <Clip> [u ...]  # where the sock
 - **Contract checks** from `docs/animation-brief.md`: root never moves, loops close on
   themselves, one-shots start and end at rest, 30 fps linear keys, no animated scale.
 
-Both eras: an id that is not in `public/assets/creatures/` is looked up in
-`public/assets/devonian/creatures/`, and `tools/devonian/check.mjs <id>` validates the result
-(it checks every clip in the file, the replaced ones included).
+All three eras: an id that is not in `public/assets/creatures/` is looked up in
+`public/assets/devonian/creatures/` and then `public/assets/triassic/creatures/`;
+`tools/devonian/check.mjs <id>` validates a Devonian result (it checks every clip in the file, the
+replaced ones included) and `npm run triassic` a Triassic one. The shipped `<id>.json` beside a
+Devonian or Triassic GLB lists `clips` and `looping` and is edited by hand after a run, then
+`node tools/update-asset-sizes.mjs`.
+
+`gaits.mjs` holds the shore's shared performances — `Flop`, `Walk`, the lurkers' `Fish`/`Peer` —
+which a rig's file calls with its own bone names (src/sim/beach.ts, src/sim/triassic/shore.ts).
 
 LODs are not touched: the distant models only carry Idle/Swim/Crawl/Death, none of which this
 pass replaces. `npm run check` may still say the LOD is older than the model; that is the mtime

@@ -1,4 +1,5 @@
 import { hasEquivalentSizing } from '../sim/creatures';
+import { RULES } from '../sim/era-rules';
 import { ACTIVE_ERA } from '../content';
 import { useEffect, useRef } from 'react';
 import type { HudSnapshot } from '../render/engine';
@@ -259,6 +260,12 @@ export function Dialogs({ kind, onClose, settings, onSettings, scheme }: { kind:
             <label className="setting-row">
               <span>Equivalent sizing <small>Give every animal the same size, instead of its own. Takes effect next match.</small></span>
               <input type="checkbox" checked={settings.equivalentSizing} onChange={(e) => onSettings({ ...settings, equivalentSizing: e.target.checked })} />
+            </label>
+          )}
+          {RULES?.settings?.shoreAnimals && (
+            <label className="setting-row">
+              <span>Shore animals <small>Something stands at the water's edge now and then, and takes what holds still there. Off, the beach is empty. Takes effect next match.</small></span>
+              <input type="checkbox" checked={settings.shoreAnimals} onChange={(e) => onSettings({ ...settings, shoreAnimals: e.target.checked })} />
             </label>
           )}
           <p className="dim">Settings apply to every local player and are remembered on this device.</p>

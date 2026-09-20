@@ -495,6 +495,7 @@ function EraStatus({ era, alive, ashore }: { era: EraHud; alive: boolean; ashore
     : era.beached && !ashore ? 'ON THE SAND · nothing with gills can follow'
     : era.heldUnder ? 'HELD UNDER · nothing comes back until you are loose'
     : (era.shoreWarn ?? 0) > 0 ? 'SOMETHING ON THE SHORE · it is reaching for you'
+    : (era.shoreWatch ?? 0) > 0 ? 'SOMETHING ON THE SHORE · it is watching you'
     : era.drowning ? 'DROWNING · get to the surface'
     : era.air && !era.atSurface && (era.airLeft ?? 1) <= 0 ? 'OUT OF AIR · nothing comes back until you breathe'
     : era.airLow ? 'AIR RUNNING OUT · start for the surface' : '';

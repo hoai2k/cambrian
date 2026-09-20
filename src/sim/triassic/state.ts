@@ -40,6 +40,8 @@ export interface TriActor {
   strokeT: number;
   /** 0..1 while a shore animal is winding up on this player; for the HUD. */
   shoreWarn: number;
+  /** 0..1 while a shore animal is watching this player hold still within its reach; for the HUD. */
+  shoreWatch: number;
   /** Seconds the whorl has been sawing the current catch (Helicoprion). */
   sawT: number;
 }
@@ -59,7 +61,7 @@ export function triActor(g: Game, a: Actor): TriActor {
   const s = triState(g);
   let t = s.actors.get(a.id);
   if (!t) {
-    t = { atSurface: false, air: AIR_MAX, drownT: 0, windT: 0, heldT: 0, podShield: 0, pod: [], strokeT: 0, shoreWarn: 0, sawT: 0 };
+    t = { atSurface: false, air: AIR_MAX, drownT: 0, windT: 0, heldT: 0, podShield: 0, pod: [], strokeT: 0, shoreWarn: 0, shoreWatch: 0, sawT: 0 };
     s.actors.set(a.id, t);
   }
   return t;

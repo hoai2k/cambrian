@@ -1,6 +1,6 @@
 import { ACTIVE_ERA } from '../content';
 import type { Vec3 } from '../shared/math';
-import type { Game } from './game';
+import type { Game, RadarBlip } from './game';
 import type { Actor, InputFrame, Mode, WorldEvent } from './types';
 import type { CreatureId } from './creatures';
 import type { ExpansionContext } from './expansion-abilities';
@@ -40,6 +40,8 @@ export interface EraHud {
   drowning?: boolean;
   /** 0..1 while a shore animal is winding up to strike at this player; 0 otherwise. */
   shoreWarn?: number;
+  /** 0..1 while a shore animal has noticed this player holding still within its reach: the warning before the warning. */
+  shoreWatch?: number;
   /** Held under by something that will not let it up: its bar is going and cannot come back. */
   heldUnder?: boolean;
   beached: boolean;
@@ -190,7 +192,15 @@ export interface EraRules {
    * what every other body gets. Nothing here may touch simulation state: it is read off state that
    * has already been decided, so a replay is unaffected by whether anyone was watching.
    */
-  clip?(a: Actor): { name: string; dur: number } | undefined;
+  clip?(a: Actor): { name: string; dur: number; loop?: boolean } | undefined;
+  /** Optional: the era's own radar contacts for player `p` (the Triassic's occupied shore posts, ringed by their reach). */
+  radar?(g: Game, p: Actor, range: number): RadarBlip[];
+  /**
+   * Optional: the match options this era offers on the Settings screen, each a setter the shell
+   * calls once when a match starts (never mid-match: `src/sim` replays from its inputs). Absent
+   * keys are not offered; the Triassic's shore animals are the first.
+   */
+  settings?: { shoreAnimals?: (on: boolean) => void };
 }
 
 export const RULES: EraRules | undefined = ACTIVE_ERA.id === 'devonian' ? DEVONIAN_RULES : ACTIVE_ERA.id === 'triassic' ? TRIASSIC_RULES : undefined;

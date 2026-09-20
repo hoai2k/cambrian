@@ -30,7 +30,8 @@
     "Breath",
     "Growth",
     "Haul",
-    "Breathe"
+    "Breathe",
+    "Walk"
   ],
   "looping": [
     "Idle",
@@ -40,7 +41,8 @@
     "Eat",
     "Grab",
     "Breathe",
-    "Haul"
+    "Haul",
+    "Walk"
   ],
   "anchors": [
     "anchor_mouth",

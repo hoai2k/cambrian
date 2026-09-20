@@ -106,14 +106,14 @@ onto it.
   under the ring for every era — *OUT OF THE WATER · flop back to the sea* or *ON THE SHORE · the
   sea is behind you* — plus the era hint.
 
-## Not done, and where it would go
+## Since
 
-- **A `Flop` clip** would be better than the swim stroke thrown at the sand. The hop and the
-  twist are in the sim, so a clip that is only the body's own writhe would layer on them; it goes
-  through each era's builder (`tools/<era>/creatures/<id>/`), never into a shipped GLB, and the
-  renderer would pick it over `Sprint` in `src/render/creature.ts`.
-- **A `Walk` clip** for Tiktaalik, Acanthostega, Nothosaurus and Cartorhynchus, which walk on a
-  slowed swim today. The four with `Crawl` are fine.
-- **A landing sound** for the Cambrian and the Triassic: the `beach` event plays `devonian/beach`
-  and the other two eras have no sample under that name yet (see `docs/audio-requests.md`).
-- **Shore animals** on the Triassic beach, per their own document.
+- **`Flop`** is authored for the Devonian and Triassic fish (`tools/creatures/motion/gaits.mjs`,
+  applied through `apply.mjs`): the body's own lash under the simulation's hop and twist, one
+  `FLOP_PERIOD` long so the loop is the flop. Onychodus keeps the swim stroke (its performance
+  file is stale against its rebuilt rig); the Cambrian rigs keep it by design.
+- **`Walk`** for Tiktaalik, Acanthostega, Nothosaurus and Cartorhynchus, the same sprawling gait
+  lent to lobe fins, palms and paddles.
+- **The Triassic shore animals** are built and switchable (`docs/triassic/06-shore-visitors.md`,
+  `Settings → Shore animals`): they take what lingers at the edge of the water *or on the sand*.
+- **A flop sound** is still asked for in `docs/audio-requests.md`.
