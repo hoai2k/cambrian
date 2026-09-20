@@ -1,0 +1,78 @@
+{
+  "checkedAt": "2026-09-19",
+  "results": [
+    {
+      "id": "brachiopod-cluster",
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "inputSha256": "96acf3f1cf0e88155a92e810d22edcd7a09406631e2851814ef5cee291709509",
+      "backupMatches": true,
+      "canonicalMatchesInput": true
+    },
+    {
+      "id": "daonella-bed",
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "inputSha256": "e6496436db41180f323227938647c18f4c2762cead7a371f50cae55a058bd18c",
+      "backupMatches": true,
+      "canonicalMatchesInput": true
+    },
+    {
+      "id": "cidaris",
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "inputSha256": "904995dc87e2b7660bff129de5d34408643fb501aa96d518f16ae9d735a49ab1",
+      "backupMatches": true,
+      "canonicalMatchesInput": true
+    },
+    {
+      "id": "encrinus-litter",
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "inputSha256": "67d8d76f6a970da9e6ecace40287ed9f290cb5d3ec7ce3c7b2fedba7a07613e0",
+      "backupMatches": true,
+      "canonicalMatchesInput": true
+    },
+    {
+      "id": "neocalamites",
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "inputSha256": "ea3a6d91ca305030f8a4b48f7b130338da49098427a422da2c70d5b9264d7f63",
+      "backupMatches": true,
+      "canonicalMatchesInput": true
+    },
+    {
+      "id": "bjuvia",
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "inputSha256": "1b05cbcd2dc68e07d6dcc2fd55e8bed09cbd0d2f8f4283402c0dbad4bbd44914",
+      "backupMatches": true,
+      "canonicalMatchesInput": false
+    },
+    {
+      "id": "pleuromeia",
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "inputSha256": "8117bd19884b3ec53d6dabffb1afc73452a66f2a4a18e33268fc75456fd64fa2",
+      "backupMatches": true,
+      "canonicalMatchesInput": false
+    }
+  ],
+  "viewer": "pass",
+  "typecheck": "pass",
+  "build": "pass"
+}

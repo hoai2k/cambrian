@@ -25,13 +25,15 @@
     "Eat",
     "Stagger",
     "Ability",
-    "Growth"
+    "Growth",
+    "Walk"
   ],
   "looping": [
     "Idle",
     "Swim",
     "Guard",
-    "Eat"
+    "Eat",
+    "Walk"
   ],
   "anchors": [
     "anchor_mouth",

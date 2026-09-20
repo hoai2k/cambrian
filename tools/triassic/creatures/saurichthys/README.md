@@ -13,11 +13,11 @@ performances**. The twin is also the runtime LOD.
 
 | Delivery | Triangles | Vertices | Packaged bytes |
 | --- | ---: | ---: | ---: |
-| `saurichthys.glb` — worked Tripo body | 22,152 | 13,517 | 1,802,240 |
-| `saurichthys.puppet.glb` — procedural twin | 8,530 | 4,389 | 1,318,788 |
-| `saurichthys.lod1.glb` — byte-identical twin alias | 8,530 | 4,389 | 1,318,788 |
+| `saurichthys.glb` — worked Tripo body | 22,078 | 13,491 | 1,796,060 |
+| `saurichthys.puppet.glb` — procedural twin | 8,443 | 4,288 | 1,311,040 |
+| `saurichthys.lod1.glb` — byte-identical twin alias | 8,443 | 4,288 | 1,311,040 |
 
-The reduced model is **38.5 %** of the authored triangles, inside the contract's 40 %. The model is
+The reduced model is **38.2 %** of the authored triangles, inside the contract's 40 %. The model is
 5.000 engine authoring units long, faces +Z in glTF and uses +Y up; the research registry gives the
 animal 1 m.
 
@@ -112,87 +112,65 @@ needles two head-depths long**, each tooth stretched between the skull and the j
 labels from the skin was tried as the fix and is worse here — the seeds are sparse on a tube this
 thin and the label boundary wanders through the snout, which tore it into ribbons.
 
-### Proving the gape is not a hole
+### The mouth's interior, and proving the gape is not a hole
 
-One skinned lining, wound inwards, roof on the skull, floor on the jaw, wall stretching, skin
-double-sided behind it; the mandible's cut boundary filled so the jaw is a closed shell; one blunt
-plug rigid on the skull, fitted vertex by vertex inside the head's own silhouette, closing the wedge
-at the pivot. Everything authored takes its UVs from the nearest intake surface and wears the body's
-own albedo.
+**A palate and a floor, not one sac.** The skinned lining that stood here — roof on the skull,
+floor on the jaw, wall stretching between them — could not part, and photographed as a mouth
+webbed shut. It is now the era's contract, imported from `_pipeline/tripo.py`: `T.oral_shells`, a
+**palate** rigid on `skull` and a **floor** rigid on `jaw`, each a closed shell wound outwards,
+each filling its own jaw's interior to a room cast inwards from outside on the closed intake
+surface, overlapping behind the hinge and joined nowhere. `tools/triassic/oral-shell-audit.mjs`
+proves it in the packaged authored body, twin and LOD (one bone per vertex, no bridging triangle,
+every edge on two faces, both halves closed); `throat-audit.mjs` reports 0 mixed jaw/skull
+vertices in the lining, where 320 of 336 were mixed before.
 
-Two things about the sac are this animal's own. Its **roof and floor overlap a little way into the
-flesh** above and below the cut rather than stopping flush with it: drawn flush, the far wall of the
-lumen ends exactly where the skin's cut edge begins, and on a rostrum with two hundred pixels of
-one-polygon-thick lip a pixel straddling that boundary is part skin and part nothing at all. And its
-**front taper was shortened** — tapered over the last twelfth, the sac had run out well before the
-cut had, which is two hundredths of the body of open lip with nothing behind it.
+What this rostrum taught the port, each recorded in `validation.json` under `oralShells`:
+
+- **The generation arrived gaping, and a mouth built about the mouth line is built in the water.**
+  Both shells about the cavity's mid-height hung in the gape: the palate sat 0.011 raw below the
+  underside of its own upper jaw, and no room measured from mid-gape and held short of the skin
+  ever reached the jaw it belonged to. Each shell is built about its own jaw's edge of the lumen —
+  the roof and the mandible's top, read as the largest empty interval on the vertical line through
+  the mouth's axis, never more than 0.0015 of a body from the jaw's real surface — with the room's
+  width cast *in the jaw's flesh*, because at the line a side cast passes under the upper rod and
+  `T.mouth_room`'s positive fallback then read as 0.02 of a body of room where there was open
+  water, twice the width of the rostrum. The floor ends where there is mandible under the axis.
+- **The rostrum is not on the midline.** After the intake unbend it runs 0.001–0.025 raw to one
+  side (`lateralAxisAtStations`), and a lining on x = 0 stood beside the jaws: from its supposed
+  axis, rays to every side and up and down met nothing at all. The mouth's lateral centre is now
+  measured from the cavity itself and every width is taken about it.
+- **Every shell vertex is seated inside the head's silhouette** by rays against the closed intake
+  surface, with the two exceptions a gaping mouth needs (a point in the measured gape may look out
+  through the parted lips; a palate point may look down through the gape). 174 pulled in, the
+  furthest by 0.037 raw. The `np.interp` clearance is recorded and no longer asserted.
+- **The throat is 0.35 of the mouth's length** and the shells fill 97 % of the room, so the corner
+  wedge behind the mandible is a wall rather than a line of sight into the neck.
+
+And three faults in the cut: the skull's hinge cross-section was open and is capped with its own
+cut vertices (`T.cap_cut`, 33 faces on the authored body); the seam's rim is folded in by 0.0035
+raw (`T.rim_flange`, 99 vertices, running out at the tip where the two rims meet); and **the
+generation's own opercular seams**, open slits into a hollow head behind the corner of the mouth,
+are sealed with their own vertices (`T.seal_seams`, 12 faces, each new face wearing its rim's UVs).
+Those seams were the whole of what the old count had been reading: 373 px with the sac, in the same
+places with the shells until they were sealed, every one of them a line of sight through one
+back-facing skin surface. The mandible's normals are put to a vote against the intake surface
+(+2377 here, already outward; Hybodus' were not).
 
 ```
-/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- saurichthys Heavy@0.50 Attack@0.40 Bite@0.15
+blender -b --python tools/triassic/gape-solid.py -- saurichthys Heavy@0.50 Attack@0.40 Bite@0.15
 ```
 
-**3 pixels of 378,000** at the worst of three shots, against a tolerance of 12. The full record is
-in [`gape-solid.json`](gape-solid.json), which the builder now folds into `validation.json` so a
-rebuild cannot silently drop it. The mouth itself is sealed: the aperture at full gape is solid
-lining in every shot.
-
-| shot | differing pixels | opened by culling | seen through the body |
-| --- | ---: | ---: | ---: |
-| `Heavy` @ 0.50 | 6,248 | 2 | 0 |
-| `Attack` @ 0.40 | 6,243 | 3 | 0 |
-| `Bite` @ 0.15 | 68,149 | 6 | **3** |
-
-### It read 17, and 14 of those were this fish's own skin
-
-This was the era's one recorded gape failure, and it stayed one through a tool correction that was
-supposed to have settled the question. On 15 September `gape-solid.py` was found to be identifying
-its backdrop by a half-space loose enough to catch a lit oral lining; tightened from
-`r > .5, g < .3, b > .5` to `r > .75, g < .45, b > .75`, this body went from 18 px to **17**, which
-was read — correctly, on the evidence then available — as proof that the remaining hole was real
-geometry.
-
-It was not. Tightened once, the window still caught the animal, and on this fish it caught the part
-of it that a magenta world lights most brightly: **the skin.** Saurichthys is a pale silvery fish,
-and its flank and lip line render under that world at about **(0.78, 0.44, 0.76)** — inside
-`r > .75, g < .45, b > .75` by one part in two hundred on green. Sampled directly, the failing
-pixels came back (203, 120, 198), (202, 117, 199), (192, 113, 192): pink, not magenta. The backdrop
-itself, measured over every render this repository has made, comes back with green below **0.063**
-and red and blue at 1.00.
-
-Two other things said the same before the colours were sampled. A ray cast through each failing
-pixel — reporting every surface it met and its own distance to each part, rather than reading a
-render — found **solid, front-facing skin at every one**. And the count would not move: the rim of
-the cut, the lining's width, its section, the hinge plug and the gape angle itself were each
-changed, and the number stayed at 17 at the same six screen positions. That is the tell the tool's
-own header warns about, and it had already caught Rhaeticosaurus once.
-
-So the discriminator is now measured against the backdrop rather than set by eye:
-`r > .90, g < .20, b > .90`, still three times wider in green than any backdrop pixel this
-repository has rendered, and a clear factor of two away from a lit pale hide. Re-run across every
-delivered body that uses this proof — 33 shots over 7 animals — nothing goes up:
-
-| body | before | after |
+| shot | seen through the body, before this port | now |
 | --- | ---: | ---: |
-| Birgeria | 0 | 0 |
-| Henodus | 2 | **0** |
-| Hybodus | 0 | 0 |
-| Keichousaurus | 6 | **0** |
-| Macrocnemus | 0 | 0 |
-| Rhaeticosaurus | 1 | **0** |
-| Saurichthys | 17 | **3** |
+| `Heavy` @ 0.50 | 373 | **1** |
+| `Attack` @ 0.40 | 372 | **1** |
+| `Bite` @ 0.15 | 0 | **2** |
 
-**No geometry changed on this fish.** The body is the same one, from the same preserved source, and
-the paired audit says so by value. What was wrong was the instrument.
-
-What is left is three isolated pixels at the very edge of the frame, where a surface one polygon
-thick loses its back face at a grazing silhouette. The shipped body material is **double-sided**, so
-none of them arise at runtime at all; the cull is the worst case a single-sided renderer would draw.
-
-The figure started at 352 pixels, and the four corrections that took it down are each recorded in
-`build.py` where they were made: the sac's width flush to the cut, the roof flattened onto the seam,
-the overlap into the flesh, and the front taper. It was **5 pixels** at one point in this animal's
-history — with a hinge plug so large it stood out of the snout as a pale ball in every three-quarter
-render, on the twin as well as the authored body. That trade is still the right way round.
+**PASS**, 2 px of 378,000 at the worst of three shots against a tolerance of 12 — and honest gape
+(backdrop in both passes) of 16 / 16 / 4 px where the sac had a mouth webbed shut. The record is
+[`gape-solid.json`](gape-solid.json), with the shipped body's counts under `beforeThisPort`, and
+the builder folds it into `validation.json`. The 15 September note below, on what the tool was
+reading before its backdrop test was tightened, stands as history.
 
 ## Rig
 

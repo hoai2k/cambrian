@@ -1,0 +1,17 @@
+{
+  "specimen": "triassic:askeptosaurus",
+  "choices": [
+    "Full model",
+    "Procedural twin · reduced",
+    "Backup Model"
+  ],
+  "modelsLoaded": [
+    "askeptosaurus.glb",
+    "askeptosaurus.backup.glb",
+    "askeptosaurus.puppet.glb"
+  ],
+  "clipsPerModel": 24,
+  "backupSwimPlayed": true,
+  "previewBadgeCleared": true,
+  "pageErrors": []
+}

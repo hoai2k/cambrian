@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-19",
+  "task": "T3D-10A",
+  "canonicalStatus": "agent-reviewed-candidate",
+  "humanApprovalClaimed": false,
+  "canonical": "canonical.png",
+  "canonicalSource": "../../encrinus-litter-candidate03.png",
+  "canonicalSha256": "67d8d76f6a970da9e6ecace40287ed9f290cb5d3ec7ce3c7b2fedba7a07613e0",
+  "input": "input.png",
+  "inputSha256": "67d8d76f6a970da9e6ecace40287ed9f290cb5d3ec7ce3c7b2fedba7a07613e0",
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "nativeInput": "../../prop-inputs-2026-09-19/native/encrinus-litter-attempt3.png",
+  "nativeDimensions": [
+    1254,
+    1254
+  ],
+  "resolutionProcessing": "Lanczos3 resampling from the native 1254-square ImageGen output; not native 2048 detail.",
+  "original": "../../originals/2026-09-19-prop-candidate02/encrinus-litter-candidate02.png",
+  "originalSha256": "d5bd2d224621a8e21ba51dbf6c312bb91cf07c341becdb55c050e61f91099ada",
+  "generator": "builtin image_gen.imagegen",
+  "inputPrompt": "Use case: precise-object-edit. This is Encrinus crinoid stem debris. Keep exact arrangement, count, ivory material, dimensions, camera, clean opaque gray background, and circular holes. Correct ONLY the articular end-face ornament on EVERY loose disc and EVERY stem end. ERASE the ornamental branching flowers, starfish patterns, leaf-shaped veins and star engravings. Make each face mostly FLAT SMOOTH ivory calcite from the edge of its circular central lumen to near the perimeter. Only in a NARROW outer annulus add many SHORT FINE STRAIGHT radial ridges like fine gear teeth, all pointing directly toward the center. These are simple radial articulation striae, not petals. No large star shape, no flower pattern, no branching veins, no carving. Keep the cylindrical outer profile and central circular axial holes. Keep full silhouettes and clear border margin. Do not add sand, slab, floor texture or text. Square 2048 image with opaque uniform light gray background.",
+  "provenance": "../../prop-inputs-2026-09-19/provenance.json",
+  "review": {
+    "verdict": "pass",
+    "evidence": "Twelve loose circular columnals and three stem lengths share consistent circular lumina, flat end faces and short straight peripheral radial crenulation. Ornate star motifs and giant hollow ragged stem ends removed. Single shallow scatter, no sand or slab.",
+    "risk": "Disconnected scatter elements must share a controlled base plane. Avoid underside terrain, overly thick discs or reconstructing minute articular texture as excessive geometry."
+  },
+  "tripoSubmitted": false,
+  "downstreamApproval": {
+    "reviewer": "/root",
+    "method": "Visual contact-sheet review of all seven final input images",
+    "scope": "Approved for Tripo submission",
+    "note": "Complete silhouettes, neutral background, no substrate slab, and revised morphology reads correctly.",
+    "humanApprovalClaimed": false
+  }
+}

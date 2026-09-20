@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-19",
+  "task": "T3D-10A",
+  "canonicalStatus": "agent-reviewed-candidate",
+  "humanApprovalClaimed": false,
+  "canonical": "canonical.png",
+  "canonicalSource": "../../cidaris-candidate03.png",
+  "canonicalSha256": "904995dc87e2b7660bff129de5d34408643fb501aa96d518f16ae9d735a49ab1",
+  "input": "input.png",
+  "inputSha256": "904995dc87e2b7660bff129de5d34408643fb501aa96d518f16ae9d735a49ab1",
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "nativeInput": "../../prop-inputs-2026-09-19/native/cidaris-attempt2.png",
+  "nativeDimensions": [
+    1254,
+    1254
+  ],
+  "resolutionProcessing": "Lanczos3 resampling from the native 1254-square ImageGen output; not native 2048 detail.",
+  "original": "../../originals/2026-09-19-prop-candidate02/cidaris-candidate02.png",
+  "originalSha256": "9432a3e7f8be51753167e025f94886ba3bd52158eb4b364d9a65b3aa997d3d92",
+  "generator": "builtin image_gen.imagegen",
+  "inputPrompt": "Use case: precise-object-edit. Correct this failed cidaroid anatomical edit. Keep the organism silhouette, club spines, pose, lighting and colors. Completely ERASE the two conspicuous vertical cream rows of oval perforated washer-like plates visible on the front of the round test (and every analogous band around its back). Replace these erroneous broad cream bands with VERY NARROW subdued olive bands only one-fifth their current width, finely dotted with tiny paired pores and covered with minute short secondary spines. NO cream oval washers, NO large holes, NO circular craters anywhere on the test. Expand the neighboring primary-spine-bearing areas into the vacated space; arrange their raised spine-bearing tubercles in orderly adjacent columns. The fine ambulacral pore bands are subtle inconspicuous anatomy, not the main ornament. Living cidaroid appearance with secondary spines clothing the test, not a bare fossil test. Preserve all club spines. Zoom out slightly so every spine and the entire test has 8 percent clear margins. Opaque light gray background, no alpha transparency, no substrate or floor, 2048-square single specimen studio reference.",
+  "provenance": "../../prop-inputs-2026-09-19/provenance.json",
+  "review": {
+    "verdict": "pass",
+    "evidence": "Club-spine silhouette retained; giant perforated washer plates replaced by narrow pore bands and orderly raised spine-base fields. Complete test, primary tips and lower contact spines visible; no ground.",
+    "risk": "Single view does not prove hidden-side pentaradial organization. Reconstructed test must retain fivefold zones and seated spines; tiny pores and secondary spines are appearance detail, not a mandate for dense topology."
+  },
+  "tripoSubmitted": false,
+  "downstreamApproval": {
+    "reviewer": "/root",
+    "method": "Visual contact-sheet review of all seven final input images",
+    "scope": "Approved for Tripo submission",
+    "note": "Complete silhouettes, neutral background, no substrate slab, and revised morphology reads correctly.",
+    "humanApprovalClaimed": false
+  }
+}

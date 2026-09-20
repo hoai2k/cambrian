@@ -1,3 +1,4 @@
+import { TEXT } from '../../shared/text';
 import { clamp, dist, distXZ, heading, type Vec3 } from '../../shared/math';
 import type { EraHud, EraRules } from '../era-rules';
 import { applyScaleStats, bandOf, brokeSurface, isAlive, isHidden, lengthOf, speedFactor } from '../actors';
@@ -192,15 +193,19 @@ function updateDeadZoneEffects(g: Game, a: Actor, d: DevActor, dt: number) {
 function updateShore(g: Game, a: Actor, d: DevActor) {
   const def = creature(a.creature);
   const wall = SHORE_WALL + bodyRadius(a) * 3;
-  const beached = (def.shoreReach ?? 0) > 0 && shoreDistance(a.pos.x, a.pos.z) < wall;
-  if (beached !== d.beached && a.controller === 'player') g.events.push({ kind: 'beach', pos: { ...a.pos }, actor: a.id, player: a.player, strength: beached ? 1 : 0 });
+  // Two ways onto the sand: the limbed animals' old push past the wall, and the shared shore rule
+  // that any body may now be ashore by (src/sim/beach.ts), which announces itself.
+  const beached = ((def.shoreReach ?? 0) > 0 && shoreDistance(a.pos.x, a.pos.z) < wall) || a.ashore;
+  if (beached !== d.beached && a.controller === 'player' && !a.ashore) g.events.push({ kind: 'beach', pos: { ...a.pos }, actor: a.id, player: a.player, strength: beached ? 1 : 0 });
   d.beached = beached;
-  if (beached) {
-    // slow, out of the water, on the sand: the seabed here is above the game's ceiling clamp
+  if (beached) a.hunted = 0;
+  // Slow, out of the water, on the sand: the seabed here is above the game's ceiling clamp. Only
+  // where the shared shore rule is not already holding the body to the sand (any wade at all,
+  // src/sim/beach.ts): two pins at two heights would have the body jitter between them.
+  if (beached && a.wade === 0) {
     a.vel.x *= 0.9; a.vel.z *= 0.9;
     const floor = groundHeight(g.world, a.pos.x, a.pos.z, []) + lengthOf(a) * 0.12;
     if (a.pos.y < floor) { a.pos.y = floor; a.prevT.y = Math.max(a.prevT.y, floor - 0.5); }
-    a.hunted = 0;
   }
 }
 function updateShoal(g: Game, a: Actor, d: DevActor, dt: number) {
@@ -335,12 +340,17 @@ export const DEVONIAN_RULES: EraRules = {
       // Somebody who came in on the top rung has already done this; the clock is not theirs to
       // run. Everyone else in the same sea keeps theirs and can still win it.
       if (a.carriedTop) { d.primeT = 0; continue; }
+      // Per seat and per animal, never per match: a bot has no seat to remember with, so the old
+      // whole-match latch is what holds one of those.
+      const pr = a.player >= 0 ? g.progress[a.player] : undefined;
+      const already = pr ? pr.apexDone.includes(a.creature) : g.endless;
       if (d.stage >= PRIME_STAGE && isAlive(a)) {
         d.primeT += dt;
-        if (d.primeT >= HOLD_TO_WIN && g.state.status === 'playing' && !g.endless) {
+        if (d.primeT >= HOLD_TO_WIN && g.state.status === 'playing' && !already) {
           const name = creature(a.creature).name;
           // The top rung of the record is banked by finishing, never by arriving.
           g.bankLadderTop(a);
+          pr?.apexDone.push(a.creature);
           g.state = { status: a.player >= 0 ? 'won' : 'lost', winner: a.player,
             message: a.player >= 0 ? `${name} grew up and held the sea.` : `A rival ${name} grew up first.` };
         }
@@ -348,9 +358,12 @@ export const DEVONIAN_RULES: EraRules = {
     }
   },
 
-  /** Rise wins on a held timer; zero it so play resumes with the sea open. */
-  continueMatch(g) {
-    for (const a of players(g)) devActor(g, a).primeT = 0;
+  /**
+   * Rise wins on a held timer; zero the *winner's* so play resumes with the sea open. Everyone
+   * else's clock is their own and keeps running — theirs is a separate apex, on their own animal.
+   */
+  continueMatch(g, winner) {
+    for (const a of players(g)) if (a.player === winner) devActor(g, a).primeT = 0;
   },
 
   /**
@@ -376,10 +389,11 @@ export const DEVONIAN_RULES: EraRules = {
   hint(g, i) {
     const p = g.players[i]; if (!p || !isAlive(p)) return undefined;
     const d = devActor(g, p), def = creature(p.creature), rung = rungOf(p);
-    if (d.deadZoneIn && def.breathing !== 'bimodal') return 'Dead water. Get out of it, or up to the surface if you can breathe.';
-    if (g.time < 12) return rung === 1 ? 'Feed, hide, moult. Everything out there is bigger than you are today.' : rung === 2 ? 'Feed and keep your shoal. You grow on what you catch.' : rung === 3 ? 'Hunt the shoals. Five stages between you and Prime.' : 'Stay fed. The sea is hiding from you.';
-    if (def.shell && g.time < 40) return 'Your funnel makes rise and sink free, and no direction is slow. Block withdraws into the shell.';
-    if ((def.shoreReach ?? 0) > 0 && g.time < 40) return 'You can push into water nothing with gills can follow you into.';
+    const H = TEXT.sim.hints;
+    if (d.deadZoneIn && def.breathing !== 'bimodal') return H.deadWater;
+    if (g.time < 12) return H.opening[Math.min(rung, H.opening.length) - 1] ?? H.opening[H.opening.length - 1];
+    if (def.shell && g.time < 40) return H.shell;
+    if ((def.shoreReach ?? 0) > 0 && g.time < 40) return H.shallows;
     return undefined;
   },
 };

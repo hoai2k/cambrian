@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { appBase } from '../shared/base';
 import { ANIMAL_ERA, BIG_ANIMAL, COMING_SOON, GAMES, OPEN_GAMES, SLOTS, TRILOGY_LOGO, isDelivered, parseVersion, sourceFor, type EraId, type Slot } from './page';
 import { poll, step, type Dir } from './picker';
+import { PAGE_TEXT } from './strings';
 
 /** The page is the app root, so `assets/...` and each game's folder hang directly off it. */
 const url = (path: string) => `${appBase()}${path}`;
@@ -13,12 +14,12 @@ const url = (path: string) => `${appBase()}${path}`;
  */
 function TrilogyTitle({ ground }: { ground: 'dark' | 'parchment' }) {
   if (ground === 'dark' && isDelivered(TRILOGY_LOGO)) {
-    return <h1 className="as-title as-title-art"><img src={url(TRILOGY_LOGO)} alt="Ancient Seas Trilogy" width={1536} height={512} /></h1>;
+    return <h1 className="as-title as-title-art"><img src={url(TRILOGY_LOGO)} alt={PAGE_TEXT.title.alt} width={1536} height={512} /></h1>;
   }
   return (
     <h1 className={`as-title as-title-text as-title-${ground}`}>
-      <span className="as-title-line">Ancient Seas</span>
-      <span className="as-title-line as-title-sub">Trilogy</span>
+      <span className="as-title-line">{PAGE_TEXT.title.line}</span>
+      <span className="as-title-line as-title-sub">{PAGE_TEXT.title.sub}</span>
     </h1>
   );
 }
@@ -37,11 +38,11 @@ function VersionOne() {
   return (
     <main className="as as-v1">
       <header className="as-head">
-        <p className="as-eyebrow">Three games · one sea · five hundred million years</p>
+        <p className="as-eyebrow">{PAGE_TEXT.head.eyebrow}</p>
         <TrilogyTitle ground="dark" />
-        <p className="as-rule" aria-hidden="true">— ❧ —</p>
+        <p className="as-rule" aria-hidden="true">{PAGE_TEXT.head.rule}</p>
       </header>
-      <nav className="as-games" aria-label="The three games">
+      <nav className="as-games" aria-label={PAGE_TEXT.plate.gamesLabel}>
         {GAMES.map((g) => {
           const inside = (
             <>
@@ -55,7 +56,7 @@ function VersionOne() {
           );
           const cls = `as-game as-game-${g.id}${g.comingSoon ? ' as-soon' : ''}`;
           return g.comingSoon
-            ? <div key={g.id} className={cls} aria-label={`${g.title} — ${COMING_SOON}`}>{inside}</div>
+            ? <div key={g.id} className={cls} aria-label={PAGE_TEXT.badge.label(g.title, COMING_SOON)}>{inside}</div>
             : <a key={g.id} className={cls} href={url(g.path)}>{inside}</a>;
         })}
       </nav>
@@ -221,7 +222,7 @@ function VersionTwo() {
           {GROUND.map((slot) => <SlotView key={slot.id} slot={slot} active={null} onActive={() => {}} />)}
         </div>
       </div>
-      <div className="as-stage" role="navigation" aria-label="The three games">
+      <div className="as-stage" role="navigation" aria-label={PAGE_TEXT.plate.gamesLabel}>
         {PIECES.map((slot) => <SlotView key={slot.id} slot={slot} active={active} onActive={setActive} />)}
       </div>
     </main>

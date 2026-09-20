@@ -25,8 +25,13 @@ export interface DebugPage {
   /** The file that has to exist for the link to resolve, relative to the repository root. */
   readonly entry: string;
   readonly blurb: string;
-  /** Deeper links into the same page, each a full query string without the leading '?'. */
-  readonly modes?: readonly { readonly name: string; readonly query: string; readonly blurb: string }[];
+  /**
+   * Deeper links into the same page, each a full query string without the leading '?'.
+   *
+   * `reads` names the module whose check answers that mode's own parameter, for the same reason a
+   * game parameter carries one: a row that outlives the mode it advertises is worse than no row.
+   */
+  readonly modes?: readonly { readonly name: string; readonly query: string; readonly reads: string; readonly blurb: string }[];
 }
 
 /** A parameter added to a game's own URL, which every game answers the same way. */
@@ -48,16 +53,24 @@ export const DEBUG_PAGES: readonly DebugPage[] = [
     blurb: 'Every creature and prop in all three eras, on a turntable: its clips, its reduced model, its colour schemes, and the ⚠ badge and reason for anything whose art is still queued. Which specimen is open lives in the URL, so a link comes back to it.',
     modes: [
       {
-        name: 'Sculpt', query: 'specimen=cambrian:anomalocaris&mode=sculpt',
+        name: 'Sculpt', query: 'specimen=cambrian:anomalocaris&mode=sculpt', reads: 'src/viewer/Viewer.tsx',
         blurb: 'Reshape a body on side and top drawings — twenty stations, the eyes and the mouth — and export the change as a sculpt file for its builder. Offered only where a builder authors a profile table by hand, so the Cambrian and the Devonian; a Triassic animal opens the plain view instead.',
       },
       {
-        name: 'Mark region', query: 'specimen=triassic:placodus&mode=mark',
+        name: 'Mark region', query: 'specimen=triassic:placodus&mode=mark', reads: 'src/viewer/Viewer.tsx',
         blurb: 'Paint the geometry that should not be there — a spare tail, an extra fin welded to the body — and export the vertices as a region file for tools/triassic/cut-region.py. Marks on whatever body is on stage, the raw generated mesh included.',
       },
       {
-        name: 'Stretch', query: 'specimen=triassic:dinocephalosaurus&mode=stretch',
+        name: 'Stretch', query: 'specimen=triassic:dinocephalosaurus&mode=stretch', reads: 'src/viewer/Viewer.tsx',
         blurb: 'Lengthen a run of a body between two cuts: the fault a profile table cannot reach, a neck that is simply the wrong length. On a raw generation it is an edit; on a built body it is a measurement for that animal’s builder.',
+      },
+      {
+        name: 'Mouth', query: 'specimen=triassic:placodus&mode=mouth', reads: 'src/viewer/Viewer.tsx',
+        blurb: 'Aim the mouth cut by hand — how far back the hinge goes, where the mouth line sits, and its pitch, yaw and roll — with every vertex the jaw would carry lit on the body. Exports the hinge and the plane in the model’s own frame, hashed to the exact file, for exact use by a builder or as guidance for its author.',
+      },
+      {
+        name: 'Bend', query: 'specimen=triassic:askeptosaurus&mode=bend', reads: 'src/viewer/Viewer.tsx',
+        blurb: 'Turn a run of a body between two points placed on it — a neck off its trunk — and, which is the point of it, measure the turn: the span’s angle before and after, taken both off the body’s own traced centre and off the bone chain, with the two references each reading is between named on the screen. Exports the span, the axle and a per-joint table a builder poses a rig with.',
       },
     ],
   },
@@ -65,8 +78,8 @@ export const DEBUG_PAGES: readonly DebugPage[] = [
     id: 'workbench', name: 'Workbench', path: 'workbench/', entry: 'workbench/index.html',
     blurb: 'The development benches, each picked with ?edit=. The page itself lists them, so a new bench appears here without this entry changing.',
     modes: [
-      { name: 'Environment', query: 'edit=environment', blurb: 'Every biome painting, every radar glyph, and every instanced seabed prop on its own turntable \u2014 loaded from the same manifest the game places them from, so a prop that fails to load here fails in the sea.' },
-      { name: 'Audio', query: 'edit=audio', blurb: 'Every sound the game can make, on one page and played through the real audio module \u2014 the same file pick, volume shaping and distance falloff \u2014 with both eras\u2019 libraries registered and each sample\u2019s measured level beside it.' },
+      { name: 'Environment', query: 'edit=environment', reads: 'src/workbench/Workbench.tsx', blurb: 'Every biome painting, every radar glyph, and every instanced seabed prop on its own turntable \u2014 loaded from the same manifest the game places them from, so a prop that fails to load here fails in the sea.' },
+      { name: 'Audio', query: 'edit=audio', reads: 'src/workbench/Workbench.tsx', blurb: 'Every sound the game can make, on one page and played through the real audio module \u2014 the same file pick, volume shaping and distance falloff \u2014 with both eras\u2019 libraries registered and each sample\u2019s measured level beside it.' },
     ],
   },
   {
@@ -106,7 +119,7 @@ export const DEBUG_SELF: readonly DebugParam[] = [
   },
 ];
 
-/** Every game the index offers the parameters against, the not-yet-open one included: it opens by address. */
+/** Every game the index offers the parameters against, one the plate does not link to included: it opens by address. */
 export const DEBUG_GAMES: readonly GameLink[] = GAMES;
 
 /** The URL a parameter opens on one game, relative to the app root. */

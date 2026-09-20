@@ -1,0 +1,134 @@
+{
+  "schema": "mouth-cut/1",
+  "id": "birgeria",
+  "model": "assets/triassic/creatures/birgeria.glb",
+  "sha256": "b8bcf8e90d589a5dd0322154f2a55a6c53ae480e138d3411d47ed97228861b03",
+  "sha256Source": "measured",
+  "appliesTo": "built",
+  "authoredAt": "2026-09-20T21:46:04.627Z",
+  "note": "",
+  "creature": {
+    "key": "triassic:birgeria",
+    "id": "birgeria",
+    "collection": "triassic",
+    "vertices": 13287,
+    "rigged": true
+  },
+  "frame": {
+    "axis": "z",
+    "forward": 1,
+    "up": "y",
+    "source": "mouth",
+    "note": "Model root frame, unscaled: the file's own coordinates with the scene graph flattened. The body runs along z; the head is at the high end."
+  },
+  "seat": {
+    "source": "manual"
+  },
+  "hinge": {
+    "depth": 0.492595,
+    "headFraction": 0.0985,
+    "centre": [
+      -0.114347,
+      -0.02212,
+      1.451389
+    ],
+    "axis": [
+      0.975204,
+      -0.199175,
+      0.096469
+    ]
+  },
+  "plane": {
+    "point": [
+      -0.114347,
+      -0.02212,
+      1.451389
+    ],
+    "normal": [
+      0.221301,
+      0.881071,
+      -0.418018
+    ],
+    "forward": [
+      -0.001737,
+      0.429002,
+      0.903302
+    ],
+    "pitch": 0.44338753370839556,
+    "yaw": -0.0019227255539744422,
+    "roll": -0.22232340773081888,
+    "pitchDegrees": 25.404,
+    "yawDegrees": -0.11,
+    "rollDegrees": -12.738
+  },
+  "sides": {
+    "mandible": 788,
+    "skull": 12499,
+    "total": 13287
+  },
+  "bounds": {
+    "length": 5.0000001192092896,
+    "height": 2.124297618865967,
+    "width": 2.4270232915878296,
+    "axisMin": -3.056015968322754,
+    "axisMax": 1.9439841508865356,
+    "lateralMid": -0.07103580236434937,
+    "upMid": -0.13069403171539307
+  },
+  "head": {
+    "height": 0.9831010103225708,
+    "width": 1.011379599571228,
+    "upMid": 0.06941694021224976,
+    "lateralMid": -0.03289920091629028
+  },
+  "rule": "A vertex is on the mandible when (v − plane.point) · plane.normal < 0 and (v − plane.point) · plane.forward > 0: below the cut plane and ahead of the hinge. hinge.axis is the pivot the jaw swings about, through hinge.centre. See docs/viewer-mouth.md.",
+  "mouth": {
+    "version": 1,
+    "key": "triassic:birgeria",
+    "id": "birgeria",
+    "collection": "triassic",
+    "model": "assets/triassic/creatures/birgeria.glb",
+    "frame": {
+      "axis": "z",
+      "forward": 1,
+      "up": "y"
+    },
+    "frameSource": "mouth",
+    "vertices": 13287,
+    "rigged": true,
+    "box": {
+      "lo": [
+        -1.2845474481582642,
+        -1.1928428411483765,
+        -3.056015968322754
+      ],
+      "hi": [
+        1.1424758434295654,
+        0.9314547777175903,
+        1.9439841508865356
+      ]
+    },
+    "bounds": {
+      "length": 5.0000001192092896,
+      "height": 2.124297618865967,
+      "width": 2.4270232915878296,
+      "axisMin": -3.056015968322754,
+      "axisMax": 1.9439841508865356,
+      "lateralMid": -0.07103580236434937,
+      "upMid": -0.13069403171539307
+    },
+    "head": {
+      "height": 0.9831010103225708,
+      "width": 1.011379599571228,
+      "upMid": 0.06941694021224976,
+      "lateralMid": -0.03289920091629028
+    },
+    "seatSource": "manual",
+    "depth": 0.49259473307557444,
+    "up": -0.022120011805171213,
+    "lateral": -0.1143466555813022,
+    "pitch": 0.44338753370839556,
+    "yaw": -0.0019227255539744422,
+    "roll": -0.22232340773081888
+  }
+}

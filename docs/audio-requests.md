@@ -10,29 +10,31 @@ size budget, a description of the sound, and the code that will consume it.
 
 ## Open
 
-- **Sprint bed — 1 file.** `public/assets/sfx/sprint-loop.mp3`, 3–5 s, seamless
-  loop, mono, -26 LUFS, under 60 KB. The wash of water over a body driving hard:
-  broadband, no transient, nothing that reads as a repeating swoosh when it comes
-  round. Sprint is held down for minutes at a time, so it is a bed rather than a
-  sting — `audio.setSprint` in `src/audio/audio.ts` fades it up while a local
-  player is driving and away when they stop, at 0.16 gain under the reef. It
-  loops the delivered one-shot `burst` sample on itself until this lands, which
-  is audible as a pulse if you listen for it. Shared between the eras; a
-  nautiloid's jet keeps its own discrete `jet` sting and does not want this.
-
-- **Egg hatch — 2 files.** `public/assets/sfx/egg-poke.mp3` (~0.4 s) and
-  `public/assets/sfx/egg-crack.mp3` (~1.2 s), mono, -18 LUFS, under 30 KB each.
+- **Egg poke — 1 file.** `public/assets/sfx/egg-poke.mp3` (~0.4 s), mono,
+  -18 LUFS, under 30 KB.
   Every player now hatches out of an egg on the bottom rung: five seconds of a
-  soft shell taking a poke from inside, splitting along the top, and the animal
-  wriggling clear (`HATCH_TIME` in `src/sim/game.ts`, drawn by
-  `src/render/eggs.ts`). *Poke* is the muffled thud of something pressing the
-  wall from within, underwater and close — a knuckle on a taut membrane, not a
-  drum. *Crack* is the wall giving way: a wet tearing rather than a shell
-  shattering, these are not birds' eggs. Consumed by the `hatch` case in
-  `src/render/engine.ts`, which plays `respawn` in their place for now. Shared
-  between the eras (`assets/sfx/`), because both hatch the same way.
+  soft shell taking a poke from inside before it splits (`HATCH_TIME` in
+  `src/sim/game.ts`, drawn by `src/render/eggs.ts`). The poke is the muffled thud
+  of something pressing the wall from within, underwater and close — a knuckle
+  on a taut membrane, not a drum. The final crack has been delivered below.
 
 ## Delivered
+
+- **Flop variations — 2 files** (`flop-1`, `flop-2`) in the shared
+  `public/assets/sfx/`. `src/sim/beach.ts` emits `flop` when a stranded
+  water-breather throws itself toward the sea, and the sample table randomly
+  chooses one of the two short wet-sand takes.
+
+- **Depth-layered sprint beds — 3 files** (`sprint-loop-1/-2/-3`) in the shared
+  `public/assets/sfx/`, each 4.584 seconds. `audio.setSprint` keeps the three
+  loops phase-aligned and equal-power crossfades from #1 at the surface, through
+  #2 in mid-water, to #3 in the deepest part of the local water column. The
+  common gain still follows the strongest local sprint and sits at 0.16 under
+  the ambience; a nautiloid jet retains its discrete sting.
+
+- **Egg crack — 1 file** (`egg-crack`) in the shared `public/assets/sfx/`, 1.392
+  seconds. The `hatch` event now plays this wet soft-shell tear instead of
+  borrowing `respawn`; the earlier poke remains open above.
 
 - **Area music themes — 4 tracks** (`Cambrian Drifting`, `Cambrian Abyss`, `Devonian Calm`,
   `Devonian Ritual`) in `public/music/`, replacing the placeholder `theme-calm` / `theme-danger`

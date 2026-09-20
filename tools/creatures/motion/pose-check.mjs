@@ -5,7 +5,7 @@ import { Vector3 } from 'three';
 const [id, clipName, ...us] = process.argv.slice(2);
 const io = await makeIO();
 import { existsSync } from 'node:fs';
-const rig = await loadRig(io, existsSync(`public/assets/creatures/${id}.glb`) ? `public/assets/creatures/${id}.glb` : `public/assets/devonian/creatures/${id}.glb`);
+const rig = await loadRig(io, ['public/assets/creatures', 'public/assets/devonian/creatures', 'public/assets/triassic/creatures'].map((d) => `${d}/${id}.glb`).find((f) => existsSync(f)) ?? `public/assets/creatures/${id}.glb`);
 const { clips } = await import(`./performances/${id}.mjs`);
 const def = clips.find((c) => c.name === clipName);
 const f = (v) => '[' + v.toArray().map((x) => x.toFixed(2)).join(',') + ']';

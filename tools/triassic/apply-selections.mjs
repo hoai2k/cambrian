@@ -251,7 +251,8 @@ const stateOf = (id) => manifest.subjects[id]?.canonical;
 const rows = (want) => [...subjects.keys()].filter((id) => stateOf(id) === want).sort()
   .map((id) => ({ id, subject: subjects.get(id), ...manifest.subjects[id] }));
 const greenlit = rows('greenlit'), rework = rows('needs-rework'), delivered = rows('delivered');
-const undecided = [...subjects.keys()].filter((id) => !['greenlit', 'needs-rework'].includes(stateOf(id)));
+const decidedStates = new Set(['greenlit', 'needs-rework', 'delivered']);
+const undecided = [...subjects.keys()].filter((id) => !decidedStates.has(stateOf(id)));
 
 const esc = (v) => String(v ?? '').replace(/\|/g, '\\|').replace(/\n+/g, ' ').trim();
 const when = (exported.generated ?? new Date().toISOString()).slice(0, 10);

@@ -1,7 +1,7 @@
 import { clamp, smoothstep } from '../shared/math';
 import { propShapeFor } from '../content/prop-shapes';
 import { fpMax, fpReachAt, FOOTPRINT_BANDS, ROUND, type Footprint, type Reach } from './footprint';
-import { bodyRadius } from './actors';
+import { bodyRadius, floorClearance } from './actors';
 import { WEED_LEVERAGE, WEED_PULL } from './locomotion';
 import { creature } from './creatures';
 import type { Actor } from './types';
@@ -79,6 +79,13 @@ export const FLORA_PHYS: Record<FloraKind, FloraPhys> = {
   stromatolite: { h: 0.314, r: 0.37, profile: (t) => 1 - t * 0.55, rigidity: 100, maxLean: 0, k: 200, c: 20, drag: 0.1 },
   saltCrust: { h: 0.097, r: 0.51, profile: () => 1, rigidity: 100, maxLean: 0, k: 200, c: 20, drag: 0.05 },
   mudRipple: { h: 0.184, r: 1.0, profile: () => 1, rigidity: 100, maxLean: 0, k: 200, c: 20, drag: 0.05 },
+  encrinusLitter: { h: 0.071, r: 0.3, profile: () => 1, rigidity: 100, maxLean: 0, k: 200, c: 20, drag: 0.05 },
+  daonellaBed: { h: 0.216, r: 0.6, profile: () => 1, rigidity: 100, maxLean: 0, k: 200, c: 20, drag: 0.05 },
+  brachiopodCluster: { h: 0.146, r: 0.15, profile: () => 1, rigidity: 12, maxLean: 0.03, k: 70, c: 11, drag: 0.15 },
+  cidaris: { h: 0.258, r: 0.15, profile: () => 1, rigidity: 12, maxLean: 0.03, k: 70, c: 11, drag: 0.2 },
+  neocalamites: { h: 3.0, r: 0.984, profile: (f) => 0.2 + 0.8 * f, rigidity: 0.3, maxLean: 0.55, k: 15, c: 2.5, drag: 1.5 },
+  pleuromeia: { h: 2.0, r: 0.979, profile: (f) => 0.25 + 0.75 * f, rigidity: 0.7, maxLean: 0.35, k: 20, c: 3.5, drag: 1.0 },
+  bjuvia: { h: 1.5, r: 0.975, profile: (f) => 0.35 + 0.65 * f, rigidity: 0.9, maxLean: 0.28, k: 24, c: 4, drag: 1.0 },
 };
 
 /**
@@ -157,6 +164,17 @@ export function resolveFlora(world: WorldData, a: Actor, dt: number, scratch: Fl
     const H = f.H;
     if (pos.y - ra * 0.6 > f.pos.y + H || pos.y + ra * 0.6 < f.pos.y) continue;
     const P = FLORA_PHYS[f.kind];
+    // Substrate is not an obstacle. A kind that never bends (`maxLean: 0`) is a carpet on the
+    // seabed rather than something standing in it — a salt crust, a shell pavement, a mud ripple, a
+    // crinoid litter, none of them a third of a unit tall — and having no bend to give, it resists
+    // in *full*: `resist` is `(1 - give) * stout` with nothing taken off for bending, so it pushes
+    // the body out and kills its inward velocity every step for as long as it is touched. A
+    // ten-centimetre salt crust stopped a ten-metre Nothosaurus dead on the last stretch of shelf
+    // before the beach, which is exactly where those carpets are thickest. Anything shorter than the
+    // height a body *rides* at passes under it, the way a low rock is glided over rather than
+    // collided with (`glideOver`); a body small enough for the carpet to be real furniture still
+    // meets it.
+    if (P.maxLean <= 0 && H <= floorClearance(a)) continue;
     const fr = clamp((pos.y - f.pos.y) / H, 0.08, 1);
     const lean = Math.pow(fr, BEND_EXP);
     const cx = f.pos.x + f.bx * lean, cz = f.pos.z + f.bz * lean;
@@ -301,4 +319,3 @@ export function floraSize(kind: FloraKind, scale: number, sy: number) {
   const H = P.h * sy;
   return { H, R: floraReachOf(kind) * scale, maxB: P.maxLean * H };
 }
-

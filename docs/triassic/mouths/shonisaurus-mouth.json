@@ -1,0 +1,134 @@
+{
+  "schema": "mouth-cut/1",
+  "id": "shonisaurus",
+  "model": "assets/triassic/creatures/shonisaurus.glb",
+  "sha256": "c3ce5d29967c2296266fd922844252197819f974762ce9e49f36ddc21c17bf7f",
+  "sha256Source": "measured",
+  "appliesTo": "built",
+  "authoredAt": "2026-09-20T21:38:50.857Z",
+  "note": "",
+  "creature": {
+    "key": "triassic:shonisaurus",
+    "id": "shonisaurus",
+    "collection": "triassic",
+    "vertices": 61731,
+    "rigged": true
+  },
+  "frame": {
+    "axis": "z",
+    "forward": 1,
+    "up": "y",
+    "source": "mouth",
+    "note": "Model root frame, unscaled: the file's own coordinates with the scene graph flattened. The body runs along z; the head is at the high end."
+  },
+  "seat": {
+    "source": "manual"
+  },
+  "hinge": {
+    "depth": 1.092713,
+    "headFraction": 0.1821,
+    "centre": [
+      -0.025891,
+      -0.081507,
+      1.907287
+    ],
+    "axis": [
+      1,
+      0,
+      0
+    ]
+  },
+  "plane": {
+    "point": [
+      -0.025891,
+      -0.081507,
+      1.907287
+    ],
+    "normal": [
+      0,
+      0.983381,
+      -0.181552
+    ],
+    "forward": [
+      0,
+      0.181552,
+      0.983381
+    ],
+    "pitch": 0.1825646558262768,
+    "yaw": 0,
+    "roll": 0,
+    "pitchDegrees": 10.46,
+    "yawDegrees": 0,
+    "rollDegrees": 0
+  },
+  "sides": {
+    "mandible": 1830,
+    "skull": 59901,
+    "total": 61731
+  },
+  "bounds": {
+    "length": 6,
+    "height": 2.9123587608337402,
+    "width": 3.806580066680908,
+    "axisMin": -3,
+    "axisMax": 3,
+    "lateralMid": 0,
+    "upMid": 0
+  },
+  "head": {
+    "height": 0.4889335185289383,
+    "width": 0.6046576797962189,
+    "upMid": 0.0196719691157341,
+    "lateralMid": -0.0004299432039260864
+  },
+  "rule": "A vertex is on the mandible when (v − plane.point) · plane.normal < 0 and (v − plane.point) · plane.forward > 0: below the cut plane and ahead of the hinge. hinge.axis is the pivot the jaw swings about, through hinge.centre. See docs/viewer-mouth.md.",
+  "mouth": {
+    "version": 1,
+    "key": "triassic:shonisaurus",
+    "id": "shonisaurus",
+    "collection": "triassic",
+    "model": "assets/triassic/creatures/shonisaurus.glb",
+    "frame": {
+      "axis": "z",
+      "forward": 1,
+      "up": "y"
+    },
+    "frameSource": "mouth",
+    "vertices": 61731,
+    "rigged": true,
+    "box": {
+      "lo": [
+        -1.903290033340454,
+        -1.4561793804168701,
+        -3
+      ],
+      "hi": [
+        1.903290033340454,
+        1.4561793804168701,
+        3
+      ]
+    },
+    "bounds": {
+      "length": 6,
+      "height": 2.9123587608337402,
+      "width": 3.806580066680908,
+      "axisMin": -3,
+      "axisMax": 3,
+      "lateralMid": 0,
+      "upMid": 0
+    },
+    "head": {
+      "height": 0.4889335185289383,
+      "width": 0.6046576797962189,
+      "upMid": 0.0196719691157341,
+      "lateralMid": -0.0004299432039260864
+    },
+    "seatSource": "manual",
+    "depth": 1.092713291821128,
+    "up": -0.08150658720211723,
+    "lateral": -0.025891068257426385,
+    "pitch": 0.1825646558262768,
+    "yaw": 0,
+    "roll": 0
+  }
+}

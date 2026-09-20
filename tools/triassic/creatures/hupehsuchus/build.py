@@ -130,14 +130,16 @@ depth, bvh_auth = T.depth_probe(auth)
 # Dinocephalosaurus' was. So the mouth line is read off the albedo instead.
 MOUTH_GAP = .030
 CAV = T.mouth_cavity(auth, front_fraction=.34, gap=MOUTH_GAP)
-SNOUT_BACK = Y0 + .165
+# The accepted skin's lip continues behind the eye. The old .165 measurement
+# window stopped on the narrow rostrum and mistook its end for a jaw hinge.
+SNOUT_BACK = Y0 + .255
 CAV_ON_SNOUT = int((CAV[:, 1] < SNOUT_BACK).sum()) if len(CAV) else 0
 MOUTH_METHOD = 'albedo light/dark boundary (the geometric method found no modelled cavity)'
 assert CAV_ON_SNOUT < 40, ('a modelled cavity turned up after all -- use it', CAV_ON_SNOUT)
 
 # Walking **outwards from the belly** on each flank, because the pale belly is one solid block
 # with a sharp step off it where the dark back is mottled and crosses mid value several times.
-LIP = T.albedo_mouth_line(auth, luminance_at, Y0 + .012, SNOUT_BACK, cz, half_depth, stations=22)
+LIP = T.albedo_mouth_line(auth, luminance_at, Y0 + .012, SNOUT_BACK, cz, half_depth, stations=34)
 assert len(LIP) >= 14, ('the mouth line did not measure off the albedo', len(LIP))
 _ly = np.array([r['y'] for r in LIP])
 _lm = T.blur1d(np.array([r['mid'] for r in LIP]), 1.4)
@@ -212,7 +214,7 @@ def bone(n, p, parent):
     B[n] = (Vector(p), parent)
 
 
-NECK_Y, CHEST_Y, BODY_Y = HINGE_Y + .030, HINGE_Y + .090, HINGE_Y + .215
+NECK_Y, CHEST_Y, BODY_Y = HINGE_Y + .030, HINGE_Y + .055, Y0 + .380
 TAIL_Y = [BODY_Y + .075 + .058 * i for i in range(7)]
 bone('root', (0, 0, 0), None)
 bone('body', on_axis(BODY_Y), 'root')
@@ -383,6 +385,10 @@ parts = {}
 for o in (auth, puppet):
     T.bisect_on_curve(o, seam, HINGE_Y, JAW_FRONT_Y - .004, margin=.03)
     T.split_part(o, 'lower jaw', is_jaw, parts)
+    # Close the actual cut cross-sections; an ellipsoid hidden with oral meshes
+    # cannot stand in for the body wall behind the open jaw.
+    T.cap_cut(o, lambda p: abs(p.y - HINGE_Y) < 1e-5, Vector((0, -1, 0)))
+    T.cap_cut(parts['lower jaw'][o.name], lambda p: abs(p.y - HINGE_Y) < 1e-5, Vector((0, 1, 0)))
 
 # Every measured tooth patch must belong whole to one jaw or the other. Placodus' first delivery
 # cut its chisels in half with a straight ramp; the measurement is what stops that happening here.
@@ -428,6 +434,10 @@ for o, thin in ((auth, thickness), (puppet, puppet_thickness)):
     counts, owners = [], {}
     for v in o.data.vertices:
         w = relaxed[v.index]
+        # The two copies of the throat cut must have the same deformation at
+        # their shared rim. Diffusion may not change only the body's copy.
+        if abs(v.co.y - HINGE_Y) < 1e-5 and v.co.z < seam(v.co.y):
+            w = weights(v.co, THIN * 2)
         counts.append(len(w))
         for n, value in w.items():
             o.vertex_groups[n].add([v.index], value, 'REPLACE')
@@ -443,9 +453,18 @@ for o, thin in ((auth, thickness), (puppet, puppet_thickness)):
     weight_report[o.name] = {'maxInfluences': max(counts), 'vertices': len(counts),
                              'verticesPerBone': owners}
 for o in parts['lower jaw'].values():
-    g = o.vertex_groups.new(name='jaw')
-    g.add(list(range(len(o.data.vertices))), 1., 'REPLACE')
+    for n in B:
+        o.vertex_groups.new(name=n)
     for v in o.data.vertices:
+        # The jaw becomes the pouch at its posterior attachment, rather than
+        # rotating away from a throat carried by a different bone field.
+        blend = T.smooth((HINGE_Y - v.co.y) / .045)
+        w = {n: value * (1. - blend) for n, value in weights(v.co, THIN * 2).items()}
+        w['jaw'] = w.get('jaw', 0.) + blend
+        top = sorted(w.items(), key=lambda item: -item[1])[:4]
+        total = sum(value for _, value in top)
+        for n, value in top:
+            if value > 1e-8: o.vertex_groups[n].add([v.index], value / total, 'REPLACE')
         v.co = tx(v.co)
     for p in o.data.polygons:
         p.use_smooth = True
@@ -454,10 +473,11 @@ for o in parts['lower jaw'].values():
     o.parent = rig
 
 # ------------------------------------------------------------ the mouth interior ----
-# One lining, wound inwards and *skinned*: the roof follows the skull, the floor follows the jaw
-# and the wall between them stretches, so no opening the clips reach can part it. Both worked
-# examples shipped two split tubes that opened a wedge at the back of the mouth, and because the
-# source material culls its backfaces, what showed through that wedge was the far side of the head.
+# A palate rigid on the skull and a floor rigid on the jaw, each closed on its own and each filling
+# its own jaw's interior out to the head's measured room, overlapping rather than joining at the
+# corner of the mouth where the jaw's rotation is zero (`T.oral_shells`). One sac whose wall
+# stretched between the two bones stood here; the wall could not part, which is what it was written
+# for, and it still photographs as a mouth webbed shut.
 mouth_mat = T.inward_material(NAME + ' mouth interior', (.30, .13, .115, 1))
 MOUTH_BACK = HINGE_Y - .004
 MOUTH_FRONT = JAW_FRONT_Y + .006
@@ -505,9 +525,39 @@ def lining_jaw_blend(p):
     return t * T.smooth((MOUTH_BACK - p.y) / .012) * T.smooth((p.y - MOUTH_FRONT) / .006)
 
 
+# How much head there is round the mouth line at each station. **This is what the palate and the
+# floor are each sized to fill**, and it is the difference between two shells and one sac: the
+# measured cavity of a shut mouth is much narrower than the head that holds it, so two shells drawn
+# to the lumen alone leave a gap either side of them and a ray into the gape passes between them and
+# hits the inside of the far cheek. The sac's stretching wall used to stand across exactly that line.
+# Cast inwards from outside the animal, on the closed intake surface before the jaw comes off --
+# see `T.mouth_room` for why outwards is wrong wherever a generation models a real oral cavity.
+_room_cache = {}
+
+
+def mouth_room(_y):
+    k = round(_y, 5)
+    if k not in _room_cache:
+        _room_cache[k] = T.mouth_room(bvh_auth, Vector((cx(_y), _y, seam(_y))),
+                                      Vector((1, 0, 0)), Vector((0, 0, 1)),
+                                      limit=.20, fallback=.02,
+                                      # Capped by this builder's own measured head section: a cast
+                                      # from outside stops on the first surface it meets, which on
+                                      # a paddled body is a flipper rather than the cheek. The two
+                                      # vertical caps are **not** the half depth: the mouth line
+                                      # sits below the head's centre, so the roof is nearer than
+                                      # half a head above it and the floor further below. Measured
+                                      # from the axis, a palate capped at the half depth still came
+                                      # out through the top of Rhaeticosaurus' skull.
+                                      cap=(head_half_width(_y),
+                                           max(.002, head_half_depth(_y) - (seam(_y) - cz(_y))),
+                                           max(.002, head_half_depth(_y) + (seam(_y) - cz(_y)))))
+    return _room_cache[k]
+
+
 lining, lining_raw = T.lining('Oral cavity lining', rig, tx, seam, mouth_section,
                               MOUTH_BACK, MOUTH_FRONT, lining_jaw_blend, mouth_mat,
-                              rings=26, ring=14, centre_x=cx)
+                              rings=26, ring=14, centre_x=cx, room=mouth_room)
 oralparts = [lining]
 # What went wrong on both worked examples is a lining narrower than the mouth, so that is what
 # is checked: across the stations the lip was measured at, the lining carries the head's own
@@ -591,7 +641,13 @@ for o in oralparts:
     # exactly where the lining lives. This catches gross errors -- a lining built on the file's
     # midline instead of the measured one came out at -0.019 here -- and the real check on the
     # gape is the measured see-through in mouth-views.py.
-    assert worst > -.012, ('mouth geometry breaks the skin', o.name, worst)
+    # **The lining is exempt, and `T.mouth_room` is why.** `depth()` is a nearest-surface probe, so
+    # a palate filling the head out to the skin reads as broken skin wherever the generation models
+    # a real oral cavity: the nearest surface there is the lumen's own wall, not the cheek. What the
+    # shells are held inside is the head's own **measured section**, which uses no normals, and the
+    # thing that proves the mouth is `gape-solid.py`. The probe is still recorded.
+    if not o.get('measuredRoom'):
+        assert worst > -.012, ('mouth geometry breaks the skin', o.name, worst)
 
 # ------------------------------------------------------- measured paired profile ----
 AUTH_GROUP = [auth, parts['lower jaw'][auth.name]]
@@ -608,7 +664,7 @@ assert max(distances) < ENVELOPE_TOLERANCE, max(distances)
 SNOUT_Y = Y0 + .012
 ANCHOR_POINTS = {
     'anchor_mouth': ('jaw', (cx(SNOUT_Y), SNOUT_Y, seam(SNOUT_Y) - .006), 'mouth'),
-    'anchor_mouth_inside': ('skull', (cx(HINGE_Y - .05), HINGE_Y - .05, seam(HINGE_Y - .05)), 'swallow'),
+    'anchor_mouth_inside': ('skull', (cx(HINGE_Y - .08), HINGE_Y - .08, seam(HINGE_Y - .08)), 'swallow'),
     # **Not the skull.** This animal has `noBite`: its light and heavy attacks are a gape and a
     # gulp, and what delivers the blow is the open mouth closing, which is the mandible. So the
     # attack anchor rides `jaw` and travels with the gape rather than with the braincase.

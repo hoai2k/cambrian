@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-19",
+  "canonicalStatus": "approved-scenery",
+  "canonical": "canonical.png",
+  "canonicalSource": "../../sponge-mound.png",
+  "canonicalSha256": "d8195c8a81572c157950e70e7de4c7dfbbdec49046677ddcfc1a1f71299f9850",
+  "input": "input.png",
+  "inputSha256": "d8195c8a81572c157950e70e7de4c7dfbbdec49046677ddcfc1a1f71299f9850",
+  "turnaround": "turnaround.png",
+  "turnaroundSource": "../../sponge-mound-turnaround.png",
+  "turnaroundSha256": "e6a289539773c6a3fd279c6de5f7d516d4b7edb8c49b026175ea5e85278e006f",
+  "generator": "existing approved scenery canonical set",
+  "review": "Packaged without regeneration: the existing four-panel sheet already supplies side, top, three-quarter, and arch views, so it is the lowest-drift Tripo input."
+}

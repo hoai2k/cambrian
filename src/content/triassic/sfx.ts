@@ -6,6 +6,7 @@
  */
 export const TRIASSIC_SAMPLES: Record<string, string[]> = {
   gulp: ['devonian/air-gulp'],            // the blow at the surface
+  beach: ['devonian/beach'],              // a leap, or a walk, coming down on the sand (src/sim/beach.ts)
   winded: ['devonian/air-low'],           // the bar running down with no way to refill it
   armour: ['devonian/armour-clang-1', 'devonian/armour-clang-2'],
   armourPierce: ['devonian/armour-pierce'],

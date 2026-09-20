@@ -1,0 +1,180 @@
+{
+  "schema": 1,
+  "snapshot": "19 September 2026, after shared-kit/ShoreKit recovery and new Askeptosaurus delivery",
+  "models": 54,
+  "species": 27,
+  "clipModelCombinations": 1264,
+  "sampledPoses": 31600,
+  "remainingMixedLiningSpecies": [
+    "dinocephalosaurus",
+    "hybodus",
+    "keichousaurus",
+    "phragmoteuthis",
+    "placodus",
+    "saurichthys"
+  ],
+  "remainingMixedLiningModels": [
+    {
+      "id": "dinocephalosaurus",
+      "variant": "authored",
+      "sha256": "216e77811a9ba5aeed6ba23df400e59580f03ea8a34fc1a157d043f30cf0f51c",
+      "linings": [
+        {
+          "name": "Mouth_lining",
+          "hiddenOral": true,
+          "vertices": 364,
+          "mixedJawSkullVertices": 364
+        }
+      ]
+    },
+    {
+      "id": "dinocephalosaurus",
+      "variant": "puppet",
+      "sha256": "a6c6c5cb25bbf02af760c103ec65230509c2ff9d62e0e59026c697bf8c0abd0e",
+      "linings": [
+        {
+          "name": "Mouth_lining",
+          "hiddenOral": true,
+          "vertices": 364,
+          "mixedJawSkullVertices": 364
+        }
+      ]
+    },
+    {
+      "id": "hybodus",
+      "variant": "authored",
+      "sha256": "a1592bc0b343bcc1dbf7950bb0d9c2960de682e5fe3c5135e098df383e72a212",
+      "linings": [
+        {
+          "name": "Mouth_lining",
+          "hiddenOral": true,
+          "vertices": 336,
+          "mixedJawSkullVertices": 320
+        }
+      ]
+    },
+    {
+      "id": "hybodus",
+      "variant": "puppet",
+      "sha256": "f76996122a8ef57485ea16ac9e2754997ce7eb47bea4c29d8440796c45e0ea75",
+      "linings": [
+        {
+          "name": "Mouth_lining",
+          "hiddenOral": true,
+          "vertices": 336,
+          "mixedJawSkullVertices": 320
+        }
+      ]
+    },
+    {
+      "id": "keichousaurus",
+      "variant": "authored",
+      "sha256": "6691879bd4482db810997238e35e814159e76e23f2f51bb2dab096238b73d821",
+      "linings": [
+        {
+          "name": "Oral_cavity_lining",
+          "hiddenOral": true,
+          "vertices": 180,
+          "mixedJawSkullVertices": 132
+        }
+      ]
+    },
+    {
+      "id": "keichousaurus",
+      "variant": "puppet",
+      "sha256": "277a0ea7b56752b8d7f61bbf5cdddcf1e188f1c90dee26efc0b4a91cf009371d",
+      "linings": [
+        {
+          "name": "Oral_cavity_lining",
+          "hiddenOral": true,
+          "vertices": 180,
+          "mixedJawSkullVertices": 132
+        }
+      ]
+    },
+    {
+      "id": "phragmoteuthis",
+      "variant": "authored",
+      "sha256": "c1b30b12cd8eb0594058db34b2e92967c63362a6d82b4458ad6427425ec92834",
+      "linings": [
+        {
+          "name": "Phragmoteuthis_oral_lining",
+          "hiddenOral": true,
+          "vertices": 224,
+          "mixedJawSkullVertices": 205
+        }
+      ]
+    },
+    {
+      "id": "phragmoteuthis",
+      "variant": "puppet",
+      "sha256": "52a8f5c89a04f8759ca8ba47a73e50c0fd4ba881d1b8c1afe11f74342119accb",
+      "linings": [
+        {
+          "name": "Phragmoteuthis_oral_lining",
+          "hiddenOral": true,
+          "vertices": 224,
+          "mixedJawSkullVertices": 205
+        }
+      ]
+    },
+    {
+      "id": "placodus",
+      "variant": "authored",
+      "sha256": "cd2e7586c998d42368b99cad7eb7c63881b2a2f241d2663c1a08efbd856b49d9",
+      "linings": [
+        {
+          "name": "Oral_cavity_lining",
+          "hiddenOral": true,
+          "vertices": 308,
+          "mixedJawSkullVertices": 208
+        }
+      ]
+    },
+    {
+      "id": "placodus",
+      "variant": "puppet",
+      "sha256": "dfb15a7d03fc47713a40c6400baba8f511fa1972945f6d8dc04e67730315e69d",
+      "linings": [
+        {
+          "name": "Oral_cavity_lining",
+          "hiddenOral": true,
+          "vertices": 308,
+          "mixedJawSkullVertices": 208
+        }
+      ]
+    },
+    {
+      "id": "saurichthys",
+      "variant": "authored",
+      "sha256": "51e72a47746c58b1c232365fd1a13d011cf3640fa5d2dfb3fa54d1b2cc31b109",
+      "linings": [
+        {
+          "name": "Mouth_lining",
+          "hiddenOral": true,
+          "vertices": 336,
+          "mixedJawSkullVertices": 320
+        }
+      ]
+    },
+    {
+      "id": "saurichthys",
+      "variant": "puppet",
+      "sha256": "7dd8309f90bfe5df298b84e1f9540a5dc6625f1a42a17f3140148da4a072d1ce",
+      "linings": [
+        {
+          "name": "Mouth_lining",
+          "hiddenOral": true,
+          "vertices": 336,
+          "mixedJawSkullVertices": 320
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "Actual authored and puppet roster models; LODs and optional Askeptosaurus backup are outside this animation sweep and have their separate delivery audits.",
+    "Mixed lining identifies legacy topology, not an automatically visible runtime defect: oral interiors remain hidden by the current runtime/viewer policy.",
+    "Edge strain is diagnostic; every clip is sampled, but this is not an exhaustive intersection solver or every-camera visual approval.",
+    "T3D-12 custom recovery remains pending; no optional regeneration is needed."
+  ]
+}

@@ -77,7 +77,7 @@
       "dorsalDegrees": 73.743204961454
     },
     {
-      "y": -0.000008271009829252662,
+      "y": -8.271009829252662e-06,
       "strength": 0.6007894519477809,
       "dorsalDegrees": 87.64927102593516
     },
@@ -860,9 +860,9 @@
       "radiusOuter": 0.055268571953577914
     }
   },
-  "authoredTriangles": 20446,
-  "twinTriangles": 7774,
-  "twinTriangleFraction": 0.3802210701359679,
+  "authoredTriangles": 20442,
+  "twinTriangles": 7770,
+  "twinTriangleFraction": 0.3800997945406516,
   "twinRemeshTriangles": 116076,
   "twinDecimateRatio": 0.055136289447546005,
   "twinVerticesHeldBackFromRelaxation": 23826,
@@ -1016,25 +1016,25 @@
     "aStraightCutWouldHaveDeviatedOverBodyLength": 0.0016532928969674732
   },
   "clips": {
-    "Idle": 2,
+    "Idle": 2.0,
     "Swim": 1.1,
     "Sprint": 0.7,
-    "TurnLeft": 1,
-    "TurnRight": 1,
-    "Dive": 1,
-    "Rise": 1,
+    "TurnLeft": 1.0,
+    "TurnRight": 1.0,
+    "Dive": 1.0,
+    "Rise": 1.0,
     "Attack": 0.7,
     "Bite": 0.35,
     "Heavy": 0.9,
     "Hit": 0.45,
     "Death": 1.6,
-    "Guard": 1,
+    "Guard": 1.0,
     "Parry": 0.3,
     "Dodge": 0.4,
     "Eat": 1.2,
-    "Stagger": 1,
+    "Stagger": 1.0,
     "Ability": 0.8,
-    "Grab": 1,
+    "Grab": 1.0,
     "Breath": 1.8,
     "Growth": 1.2,
     "Dart": 0.6,
@@ -1057,9 +1057,9 @@
     "TurnRight": 6.298990804004863e-33,
     "Dive": 5.699087180296294e-33,
     "Rise": 5.699087180296294e-33,
-    "Attack": 0,
-    "Bite": 0,
-    "Heavy": 0,
+    "Attack": 0.0,
+    "Bite": 0.0,
+    "Heavy": 0.0,
     "Hit": 4.1993275700118934e-33,
     "Death": 2.5999999046325684,
     "Guard": 3.012631081997223e-19,
@@ -1071,7 +1071,7 @@
     "Grab": 4.518946622995835e-19,
     "Breath": 2.9995195879107854e-33,
     "Growth": 3.5994235789613394e-33,
-    "Dart": 0,
+    "Dart": 0.0,
     "Breathe": 4.518946622995835e-19
   },
   "boundsAt13Phases": {
@@ -1355,15 +1355,15 @@
   "weights": {
     "Mixosaurus authored body": {
       "maxInfluences": 4,
-      "vertices": 9523,
+      "vertices": 9830,
       "verticesPerBone": {
         "hind_tip_R": 188,
         "hind_mid_R": 424,
         "dorsal": 864,
-        "chest": 3690,
+        "chest": 3676,
         "fore_mid_R": 479,
-        "body": 3603,
-        "neck": 2309,
+        "body": 3570,
+        "neck": 2278,
         "hind_mid_L": 436,
         "hind_upper_L": 681,
         "hind_tip_L": 210,
@@ -1374,20 +1374,34 @@
         "tail_04": 800,
         "tail_03": 1198,
         "tail_05": 715,
-        "skull": 1077,
+        "skull": 1029,
         "fore_mid_L": 553,
         "tail_06": 1056,
         "caudal_upper": 530,
         "fore_upper_L": 859,
-        "fore_upper_R": 957,
+        "fore_upper_R": 921,
         "fore_tip_L": 211,
         "fore_tip_R": 196,
-        "caudal_lower": 612
+        "caudal_lower": 612,
+        "jaw": 170
+      },
+      "jawJunction": {
+        "cutRimPairs": 46,
+        "lipPairs": 83,
+        "rimReach": 0.05660715609566297,
+        "rimDepth": 0.024699153378605843,
+        "dz": 0.008233051126201948,
+        "band": 0.015,
+        "back": 0.06,
+        "throat": 1.0,
+        "shellVertices": 307,
+        "shellFullJaw": 261,
+        "bodyThroatVertices": 144
       }
     },
     "Mixosaurus procedural volume twin": {
       "maxInfluences": 4,
-      "vertices": 3279,
+      "vertices": 3453,
       "verticesPerBone": {
         "caudal_lower": 286,
         "tail_06": 441,
@@ -1403,23 +1417,37 @@
         "hind_mid_R": 147,
         "hind_tip_R": 74,
         "hind_upper_L": 211,
-        "body": 1195,
+        "body": 1173,
         "hind_mid_L": 122,
         "hind_tip_L": 71,
-        "chest": 1398,
-        "fore_upper_R": 398,
-        "neck": 963,
+        "chest": 1382,
+        "fore_upper_R": 371,
+        "neck": 951,
         "fore_mid_R": 235,
         "fore_tip_R": 103,
-        "skull": 507,
-        "fore_upper_L": 375,
+        "jaw": 68,
+        "skull": 491,
+        "fore_upper_L": 370,
         "fore_mid_L": 246,
         "fore_tip_L": 105
+      },
+      "jawJunction": {
+        "cutRimPairs": 28,
+        "lipPairs": 60,
+        "rimReach": 0.057004842529323814,
+        "rimDepth": 0.024802567437291145,
+        "dz": 0.008267522479097048,
+        "band": 0.015,
+        "back": 0.06,
+        "throat": 1.0,
+        "shellVertices": 174,
+        "shellFullJaw": 143,
+        "bodyThroatVertices": 61
       }
     }
   },
   "maxInfluences": 4,
-  "meanInfluences": 3.159896891110764,
+  "meanInfluences": 3.0938041105172025,
   "mouth": {
     "method": "albedo light/dark boundary (the geometric method found no modelled cavity)",
     "note": "Placodus' geometric method was tried first and does not reach this animal: over the whole front third it returns 29 vertices and only 1 of them are on the rostrum at all. The rostrum is one smooth closed tube with the mouth painted on it, so the lip was read off the albedo -- walking outwards from the pale belly on each flank, where the step off it is sharp -- and fitted to a ramp.",
@@ -1689,7 +1717,7 @@
     "oralPartSeating": [
       {
         "part": "Oral cavity lining",
-        "worstDepthRaw": 0.001102148205973208
+        "worstDepthRaw": 0.0006023215828463435
       },
       {
         "part": "Seated jaw hinge tissue",
@@ -1723,29 +1751,5 @@
   },
   "normalizedWeights": true,
   "rootStable": true,
-  "noScaleChannels": true,
-  "skinTears": {
-    "tool": "tools/triassic/skin-tears.mjs",
-    "phasesPerClip": 17,
-    "clips": 23,
-    "edges": 32314,
-    "bodyLength": 4,
-    "skin": {
-      "worstRatio": 3.62,
-      "clip": "Dart",
-      "bone": "hind_mid_R",
-      "grewFrom": 0.0196,
-      "grewTo": 0.0709,
-      "instancesOverTwice": 61
-    },
-    "oralLining": {
-      "worstRatio": 29.16,
-      "clip": "Heavy",
-      "bone": "skull",
-      "grewFrom": 0.0061,
-      "grewTo": 0.1786,
-      "instancesOverTwice": 6220
-    },
-    "note": "The lining wall is built to stretch -- roof on the skull, floor on the jaw -- so its ratio at full gape says the mouth opened, not that anything tore. `skin` is the figure to compare against the shore batch's (Nothosaurus 2.98x, Tanystropheus 6.1x, Placodus 12.4x)."
-  }
+  "noScaleChannels": true
 }

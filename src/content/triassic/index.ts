@@ -4,7 +4,7 @@ import type { DevonianCreatureId } from '../devonian/ids';
 import type { Slot } from '../../shared/palettes';
 import { TRIASSIC_CREATURES } from './creatures';
 import { SNACK_SCHOOLS, GIANTS } from './ecology';
-import { BIOME_NAMES, BIOME_DANGER, BIOME_PLATES, ATMOS, SAND_COLORS, FLORA_BASE, FLORA_DENSITY, FLORA_PROPS, SURFACE_Y, FLOOR_DEPTH } from './environment';
+import { BIOME_NAMES, BIOME_DANGER, BIOME_PLATES, ATMOS, SAND_COLORS, FLORA_BASE, FLORA_DENSITY, FLORA_PROPS, SHORE_FLORA, SURFACE_Y, FLOOR_DEPTH } from './environment';
 import { MUSIC } from './music';
 import { SCHEMES, CREATURE_SCHEMES } from './palettes';
 import { TRIASSIC_SCENERY } from './scenery';
@@ -13,6 +13,7 @@ import shippedBytes from './asset-sizes.json';
 import devonianBytes from '../devonian/asset-sizes.json';
 import pendingRefinements from './pending-refinements.json';
 import { refinementTables, type PendingRefinement } from '../pending-refinements';
+import { TRIASSIC_STRINGS } from './strings';
 
 /** The badges, derived from the one refinement queue: every Triassic model is outstanding today. */
 const { modelStatus, modelNotes, clipNotes } = refinementTables(pendingRefinements as PendingRefinement[]);
@@ -62,6 +63,7 @@ const DEVONIAN_LINK = { title: 'Devonian Domination', path: 'devonian/', blurb: 
 export const TRIASSIC = defineEra({
   id: 'triassic',
   title: 'Triassic Triumph',
+  strings: TRIASSIC_STRINGS,
   copy: {
     // What the era is *about* is the return to the water: after the end-Permian, land vertebrates
     // went back into the sea — the ichthyosaurs, the nothosaurs and placodonts, and the
@@ -86,7 +88,7 @@ export const TRIASSIC = defineEra({
     title: ['cymbospondylus', 'nothosaurus', 'mixosaurus', 'rhaeticosaurus'],
   },
   ecology: { schools: SNACK_SCHOOLS, giants: GIANTS, shadow: { creature: 'shonisaurus', scale: 1.0 } },
-  environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, flora: FLORA_DENSITY, floraProps: FLORA_PROPS, surfaceY: SURFACE_Y, floorDepth: FLOOR_DEPTH, biomePlates: BIOME_PLATES },
+  environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, flora: FLORA_DENSITY, floraProps: FLORA_PROPS, shoreFlora: SHORE_FLORA, surfaceY: SURFACE_Y, floorDepth: FLOOR_DEPTH, biomePlates: BIOME_PLATES },
   assets: {
     // Portraits began as the placeholder set cut from docs/triassic/canonical/; undelivered models
     // remain borrowed (see TRIASSIC_STAND_INS) until this folder fills. The UI

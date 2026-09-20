@@ -290,6 +290,8 @@ export function endRide(rider: Actor, host: Actor | undefined, shaken = false) {
 export function startSwallow(ctx: HitContext, predator: Actor, victim: Actor) {
   victim.hp = 0;
   victim.state = 'swallowed'; victim.stateT = 0; victim.stateDur = 1.6;
+  // In something's mouth: the chase is over even before the body is (see `kill`).
+  victim.hunted = 0; victim.hunterId = -1; victim.wasHunted = false;
   stopHiding(victim); victim.swallowedBy = predator.id; victim.lockTarget = -1; victim.abilityActive = false; victim.vel = { x: 0, y: 0, z: 0 };
   if (victim.grabbedBy >= 0) { const g = ctx.byId(victim.grabbedBy); if (g && g.grabbing === victim.id) { g.state = 'free'; g.grabbing = -1; } victim.grabbedBy = -1; }
   predator.holdT = 1.4;
@@ -306,6 +308,11 @@ export function kill(ctx: HitContext, victim: Actor, killer?: Actor) {
   // a little random spin so the body tumbles as it goes limp
   victim.tumble = { x: (ctx.rng() - 0.5) * 2.2, y: (ctx.rng() - 0.5) * 1.2, z: (ctx.rng() - 0.5) * 2.2 };
   stopHiding(victim); victim.lockTarget = -1; victim.abilityActive = false;
+  // Being eaten is the end of the chase. The hunt warning — the arrow, the eye, the line — is a
+  // reading of the *live* world, and `updateHunted` only runs on a body that can still act, so a
+  // corpse kept whatever score it died holding and went on saying something was hunting it. The
+  // one moment it stopped being true is the moment it stopped mattering.
+  victim.hunted = 0; victim.hunterId = -1; victim.wasHunted = false;
   if (victim.grabbing >= 0) { const g = ctx.byId(victim.grabbing); if (g && g.state === 'grabbed') { g.state = 'free'; g.grabbedBy = -1; } victim.grabbing = -1; }
   if (victim.grabbedBy >= 0) { const g = ctx.byId(victim.grabbedBy); if (g && g.state === 'grabbing') { g.state = 'free'; g.grabbing = -1; } victim.grabbedBy = -1; }
   // A ride ends with whichever of the two died: the rider is thrown clear, the host loses its passenger.

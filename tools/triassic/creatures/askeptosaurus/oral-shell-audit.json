@@ -1,0 +1,64 @@
+{
+  "id": "askeptosaurus",
+  "verdict": "separate closed rigid palate/floor",
+  "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present. A body with no lining mesh is reported as such, with the hidden oral parts it does carry listed, and all three variants must agree.",
+  "models": [
+    {
+      "variant": "authored",
+      "sha256": "29e62d2fa0b1ed824601db88bf575370f1429b88627e4a98216a2cb1cd206713",
+      "meshes": [
+        {
+          "name": "Oral cavity lining",
+          "vertices": 288,
+          "triangles": {
+            "skull": 284,
+            "jaw": 284
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ],
+      "otherOralMeshes": [],
+      "oralShells": "separate palate and floor"
+    },
+    {
+      "variant": ".puppet",
+      "sha256": "edde99529bec82a75b139b1e85e3a90bb3a60a2c2d627d079daffc38b31a7394",
+      "meshes": [
+        {
+          "name": "Oral cavity lining",
+          "vertices": 288,
+          "triangles": {
+            "skull": 284,
+            "jaw": 284
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ],
+      "otherOralMeshes": [],
+      "oralShells": "separate palate and floor"
+    },
+    {
+      "variant": ".lod1",
+      "sha256": "edde99529bec82a75b139b1e85e3a90bb3a60a2c2d627d079daffc38b31a7394",
+      "meshes": [
+        {
+          "name": "Oral cavity lining",
+          "vertices": 288,
+          "triangles": {
+            "skull": 284,
+            "jaw": 284
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ],
+      "otherOralMeshes": [],
+      "oralShells": "separate palate and floor"
+    }
+  ]
+}

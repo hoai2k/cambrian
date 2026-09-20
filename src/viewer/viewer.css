@@ -286,8 +286,10 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
  * a pointer event — the brush listens on the canvas underneath, and the orbit still owns the
  * right button — so the overlay is inert and only the panel in the info column is interactive.
  */
-.viewer.marking .stage { grid-row: 1 / 3; }
-.viewer.marking .clips, .viewer.marking .info { display: none; }
+.viewer.marking .stage, .viewer.mouthing .stage, .viewer.bending .stage { grid-row: 1 / 3; }
+.viewer.marking .clips, .viewer.marking .info,
+.viewer.mouthing .clips, .viewer.mouthing .info,
+.viewer.bending .clips, .viewer.bending .info { display: none; }
 .mark-stage { grid-column: 2; grid-row: 1 / 3; position: relative; z-index: 5; min-width: 0; min-height: 0; pointer-events: none; }
 .mark-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .mark-label { position: absolute; left: 10px; top: 8px; z-index: 2; font: 700 10px var(--font-display); letter-spacing: .14em; color: var(--dim); text-transform: uppercase; }
@@ -303,6 +305,68 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .mark-note textarea { width: 100%; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: rgba(6, 22, 28, .72); color: var(--foam); font: 400 12px var(--font-body); resize: vertical; }
 .mark-panel code { font-size: 11px; color: var(--lagoon); overflow-wrap: anywhere; }
 @media (max-width: 900px) {
-  .viewer.marking .stage, .mark-stage { grid-column: 1; grid-row: 2 / 4; }
-  .mark-panel { grid-column: 2; grid-row: 2 / 4; }
+  .viewer.marking .stage, .viewer.mouthing .stage, .viewer.bending .stage, .mark-stage { grid-column: 1; grid-row: 2 / 4; }
+  .mark-panel, .mouth-panel, .bend-panel { grid-column: 2; grid-row: 2 / 4; }
 }
+
+/* ---------- mouth mode ----------
+ * The same layout as mark mode: the handles live in the scene and listen on the canvas, so this
+ * layer is inert — only the legend along the top edge and the panel in the info column draw.
+ * The legend's swatches are the handles' own colours, so a reviewer knows which sphere is which.
+ */
+.mouth-legend { position: absolute; left: 10px; top: 26px; z-index: 2; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; font: 600 10px var(--font-body); letter-spacing: .04em; color: var(--dim); }
+.mouth-legend li { display: flex; align-items: center; gap: 6px; }
+.mouth-legend li.hover { color: var(--foam); }
+.mouth-legend i { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
+.mouth-legend .hinge i { background: var(--ember); }
+.mouth-legend .front i { background: var(--lagoon); }
+.mouth-legend .side i { background: #ff2fa8; }
+.mouth-panel .mouth-count { margin: 0; font: 700 14px var(--font-body); color: var(--foam); font-variant-numeric: tabular-nums; }
+
+/* The gape: the preview control, straight under the count because it is what a reviewer reaches
+ * for between every adjustment. Holding it clears the screen (see `.viewer.previewing` below). */
+.mouth-gape { display: flex; flex-direction: column; gap: 6px; padding: 10px 0 2px; border-bottom: 1px solid var(--line); }
+.mouth-gape label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--mist); }
+.mouth-gape label b { color: var(--ember); font-variant-numeric: tabular-nums; }
+.mouth-gape input { width: 100%; margin: 0; accent-color: var(--ember); }
+.mouth-gape small { color: var(--dim); font-size: 11px; }
+.mouth-gape em { font-style: italic; }
+
+/* Held, the furniture goes: the panel, the legend and the specimen list fade out together and the
+ * handles and planes come off the scene, so what is on screen while the jaw swings is the animal.
+ * Opacity rather than `display`, for two reasons: the slider keeps the pointer through the drag
+ * that hid it, and nothing in the grid moves, so the camera is not reframed mid-preview. */
+.viewer.previewing .specimens,
+.mouth-stage.previewing,
+.mouth-panel.previewing { opacity: 0; transition: opacity .12s ease-out; }
+.viewer.previewing .specimens { pointer-events: none; }
+.mouth-fields { padding-top: 4px; }
+.mouth-panel code { font-size: 11px; color: var(--lagoon); overflow-wrap: anywhere; }
+
+/* ---------- bend mode ----------
+ * The same layout as mark and mouth mode: the handles live in the scene and listen on the canvas,
+ * so this layer is inert — only the legend along the top edge and the panel in the info column
+ * draw. The readouts are the point of the mode, so they are the biggest thing in the panel and each
+ * one carries the definition it was measured under underneath it.
+ */
+.bend-legend .base i { background: var(--ember); }
+.bend-legend .tip i { background: var(--lagoon); }
+.bend-legend .axis i { background: #ff2fa8; }
+.bend-panel .bend-reading { display: flex; flex-direction: column; gap: 2px; padding: 8px 0; border-top: 1px solid var(--line); }
+.bend-panel .bend-reading h4 { margin: 0; font: 700 10px var(--font-display); letter-spacing: .14em; color: var(--dim); text-transform: uppercase; }
+.bend-panel .bend-reading-value { margin: 0; font: 700 14px var(--font-body); color: var(--foam); font-variant-numeric: tabular-nums; }
+.bend-panel .bend-reading-value .changed { color: var(--lagoon); }
+.bend-panel .bend-reading small { color: var(--dim); font-size: 11px; line-height: 1.35; }
+.bend-panel .bend-residual.warn { color: var(--ember); }
+.bend-readout { display: flex; flex-direction: column; gap: 2px; }
+.bend-readout b { font: 700 20px var(--font-body); color: var(--foam); font-variant-numeric: tabular-nums; }
+.bend-readout b.changed { color: var(--lagoon); }
+.bend-readout small { color: var(--dim); font-size: 11px; }
+.bend-fields { padding-top: 4px; }
+.bend-fields select { width: 100%; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--line); background: rgba(6, 22, 28, .72); color: var(--foam); font: 400 12px var(--font-body); }
+.bend-joints { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; font-variant-numeric: tabular-nums; }
+.bend-joints li { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 6px; font-size: 12px; color: var(--mist); }
+.bend-joints li code { color: var(--lagoon); font-size: 11px; }
+.bend-joints li b { color: var(--foam); }
+.bend-joints li small { grid-column: 1 / -1; color: var(--dim); font-size: 10px; }
+.bend-panel code { font-size: 11px; color: var(--lagoon); overflow-wrap: anywhere; }

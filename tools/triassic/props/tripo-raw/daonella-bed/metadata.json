@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "name": "daonella-bed",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "input": {
+      "pbr": true,
+      "file": {
+        "type": "jpeg",
+        "object": {
+          "key": "tcli_2f16803761ed4cf0af45a11555b61c60/20260920/55679608-293e-4fb4-9acf-bd712cac9982/image.jpeg",
+          "bucket": "tripo-data"
+        }
+      },
+      "texture": true,
+      "export_uv": true,
+      "face_limit": 20000,
+      "model_version": "v3.1-20260211",
+      "geometry_quality": "standard",
+      "enable_image_autofix": false
+    },
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    },
+    "task_id": "55679608-293e-4fb4-9acf-bd712cac9982",
+    "created_at": "2026-09-20T02:50:33.751560Z",
+    "completed_at": "2026-09-20T02:52:30.288066Z",
+    "credits_consumed": 30
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/daonella-bed/input.png",
+    "sha256": "e6496436db41180f323227938647c18f4c2762cead7a371f50cae55a058bd18c",
+    "bytes": 6291943
+  },
+  "artifact": {
+    "path": "tools/triassic/props/tripo-raw/daonella-bed/daonella-bed.raw.glb",
+    "bytes": 1534380,
+    "sha256": "445ed5227569adb5e5778656edc8de80f8e5e0355b05df2e7472135877e7df95",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-20T02:52:37.498Z"
+}

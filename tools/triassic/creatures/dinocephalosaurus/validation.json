@@ -5,14 +5,14 @@
   "removedFlakeVertices": 0,
   "remeshTriangles": 105412,
   "puppetBudget": 6400,
-  "fullTriangles": 21276,
-  "puppetTriangles": 8092,
+  "fullTriangles": 20552,
+  "puppetTriangles": 7368,
   "parts": {
     "authoredBody": 19869,
     "authoredJaw": 143,
     "puppetBody": 6756,
     "puppetJaw": 72,
-    "sharedOral": 1264
+    "sharedOral": 540
   },
   "bones": 57,
   "cervicals": 32,
@@ -391,7 +391,7 @@
     "chest": 0.0374
   },
   "maxInfluences": 4,
-  "meanInfluences": 1.9923652694610778,
+  "meanInfluences": 1.9912689604143545,
   "neckUnbending": {
     "applied": true,
     "neckArc": 0.7253,
@@ -696,12 +696,95 @@
     "hingeAlongHead": 0.0346
   },
   "oralPartDepthInsideHead": {
-    "Mouth lining": 0.0019,
     "Upper fangs": 0.0037,
     "Lower fangs": 0.0027,
     "Seated jaw hinge tissue": 0.0013
   },
+  "oralGeometry": {
+    "lining": null,
+    "palate": null,
+    "floor": null,
+    "verdict": "neither: the sac closed nothing the seated hinge tissue was not already closing; see docs/triassic/throat-repairs/oral-verdicts.md",
+    "parts": [
+      "Upper fangs",
+      "Lower fangs",
+      "Seated jaw hinge tissue"
+    ]
+  },
   "normalizedWeights": true,
   "rootStable": true,
-  "noScaleChannels": true
+  "noScaleChannels": true,
+  "postBuildQA": {
+    "skinTears": {
+      "tool": "node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/dinocephalosaurus.glb",
+      "worstEdgeStretch": 7.0,
+      "worstClip": "Sprint",
+      "worstBone": "chest",
+      "worstOutsideTheOralLining": 7.0,
+      "note": "Unchanged by the oral verdict: the figure is the paddle row against the chest in Sprint, nowhere near the mouth, and it is the same 7.00x the era-wide table in CLAUDE.md records. Removing the sac removed the only oral surface that stretched, so the 'including the oral lining' figure is now the skin figure."
+    },
+    "gapeSolid": {
+      "tool": "/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- dinocephalosaurus Bite@0.133 Attack@0.367 Heavy@0.5 Eat@0.233 NeckStrike@0.567",
+      "shots": [
+        "Bite@0.133",
+        "Attack@0.367",
+        "Heavy@0.5",
+        "Eat@0.233",
+        "NeckStrike@0.567"
+      ],
+      "shotsAre": "the peak jaw rotation of each clip, measured off the packaged rig (skull-to-jaw angle per frame)",
+      "backdropTest": "r > .90, g < .20, b > .90",
+      "tolerance": 12,
+      "verdict": "PASS -- neither a palate nor a floor is needed",
+      "seenThroughTheBody": {
+        "shippedWithTheSac": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "sacRemoved_thisBuild": [
+          0,
+          2,
+          3,
+          1,
+          1
+        ],
+        "sacAndHingeTissueRemoved": [
+          98,
+          87,
+          113,
+          50,
+          101
+        ]
+      },
+      "openedByCulling": {
+        "shippedWithTheSac": [
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "sacRemoved_thisBuild": [
+          67,
+          63,
+          80,
+          12,
+          67
+        ],
+        "sacAndHingeTissueRemoved": [
+          160,
+          146,
+          190,
+          61,
+          165
+        ]
+      },
+      "maxSeenThroughTheBody": 3,
+      "ofPixels": 378000,
+      "note": "Three renders of the same five shots decide the verdict. With the one-sac lining in place nothing showed through; with the sac stripped out of the unpacked GLB and everything else left as it was, 3 px at worst, inside the roster's 12 px tolerance; with the sac and the seated hinge tissue both stripped out, 50 to 113 px. So the sac was closing nothing that the hinge tissue was not already closing: what a plane cut through a closed head leaves open is the head's own cross-section at the hinge, the back wall of the mouth, and the hinge tissue fills it. The generation paints its lip on a closed snout and models no cavity, so there is no lumen wall for a gape to open onto. The sac is removed and no palate or floor is built in its place. The 'opened by culling' figures that are not seen through the body are the silhouette's own one-polygon rims losing their back face, which the tool discounts by design."
+    }
+  }
 }

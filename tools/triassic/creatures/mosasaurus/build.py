@@ -723,39 +723,40 @@ for n, (p, parent) in B.items():
         eb.parent = arm.edit_bones[parent]
 bpy.ops.object.mode_set(mode='OBJECT')
 
-weight_report, influences = {}, []
+weight_report, influences, JUNCTION = {}, [], {}
 for o in (auth, puppet):
-    for n in B:
-        o.vertex_groups.new(name=n)
+    shell = parts['lower jaw'][o.name]
+    for part in (o, shell):
+        for n in B:
+            part.vertex_groups.new(name=n)
     raw_weights = [weights(v.co) for v in o.data.vertices]
     relaxed = T.relax_weights(o, raw_weights, passes=5, hold=.45)
+    # The mandible is skinned *into* the head rather than rigid against it: one field over both
+    # parts, the throat under the hinge following the jaw and the shell ramping to full jaw over
+    # `band` from the cut rim, so the two copies of every rim vertex carry the same weights and the
+    # cut cannot open (`T.jaw_junction`; `tools/triassic/lag.mjs` measures the seam it closes).
+    body_w, shell_w, JUNCTION[o.name] = T.jaw_junction(
+        o, shell, relaxed, B['jaw'][0], rear=lambda p: abs(p.y - HINGE_Y) < 1e-5,
+        upper_jaw=lambda p: p.y < HINGE_Y and p.z >= seam(p.y) - 1e-6, axis=(0., -1., 0.))
     counts, owners = [], {}
-    for v in o.data.vertices:
-        w = relaxed[v.index]
-        counts.append(len(w))
-        for n, value in w.items():
-            o.vertex_groups[n].add([v.index], value, 'REPLACE')
-            owners[n] = owners.get(n, 0) + 1
+    for part, field in ((o, body_w), (shell, shell_w)):
+        for v in part.data.vertices:
+            w = field[v.index]
+            counts.append(len(w))
+            for n, value in w.items():
+                part.vertex_groups[n].add([v.index], value, 'REPLACE')
+                if part is o:
+                    owners[n] = owners.get(n, 0) + 1
+        for v in part.data.vertices:
+            v.co = tx(v.co)
+        for p in part.data.polygons:
+            p.use_smooth = True
+        mod = part.modifiers.new('Shared articulated skeleton' if part is o else 'Mandible into the head', 'ARMATURE')
+        mod.object = rig
+        part.parent = rig
     influences.extend(counts)
-    for v in o.data.vertices:
-        v.co = tx(v.co)
-    for p in o.data.polygons:
-        p.use_smooth = True
-    mod = o.modifiers.new('Shared articulated skeleton', 'ARMATURE')
-    mod.object = rig
-    o.parent = rig
     weight_report[o.name] = {'maxInfluences': max(counts), 'vertices': len(counts),
-                             'verticesPerBone': owners}
-for o in parts['lower jaw'].values():
-    g = o.vertex_groups.new(name='jaw')
-    g.add(list(range(len(o.data.vertices))), 1., 'REPLACE')
-    for v in o.data.vertices:
-        v.co = tx(v.co)
-    for p in o.data.polygons:
-        p.use_smooth = True
-    mo = o.modifiers.new('Rigid mandible', 'ARMATURE')
-    mo.object = rig
-    o.parent = rig
+                             'verticesPerBone': owners, 'jawJunction': JUNCTION[o.name]}
 
 # ------------------------------------------------------------ the mouth interior ----
 # Double-sided, as Rhaeticosaurus' is. The generation already models a cavity, so this sac's job is
@@ -821,24 +822,30 @@ def mouth_section(y):
     return w, h
 
 
+_room_cache = {}
+
+
+def mouth_room(_y):
+    k = round(_y, 5)
+    if k not in _room_cache:
+        axis = lining_axis(_y)
+        _room_cache[k] = T.mouth_room(
+            bvh_auth, Vector((cx(_y), _y, axis)), Vector((1, 0, 0)), Vector((0, 0, 1)),
+            limit=.20, fallback=.02,
+            cap=(head_half_width(_y),
+                 max(.002, head_half_depth(_y) - (axis - cz(_y))),
+                 max(.002, head_half_depth(_y) + (axis - cz(_y)))))
+    return _room_cache[k]
+
+
 lining, lining_raw = T.lining('Oral cavity lining', rig, tx, lining_axis, mouth_section,
                               MOUTH_BACK, MOUTH_FRONT, (lambda _p: 0.), mouth_mat,
-                              rings=30, ring=24, centre_x=cx, power=LINING_POWER, fit=None)
+                              rings=30, ring=24, centre_x=cx, power=LINING_POWER, fit=None,
+                              room=mouth_room)
 oralparts = [lining]
-lining_jaw = []
-for idx, p in enumerate(lining_raw):
-    _w, h = mouth_section(p.y)
-    # **The floor may not take the jaw's whole rotation**, and this is the one place on the animal
-    # where that is forced rather than chosen. At the snout the closing rotation is *defined* as the
-    # one that carries the mandible's dorsal margin exactly onto the palate's ventral one, so a
-    # lining floor riding the jaw at weight 1 arrives exactly where its own roof already is: the
-    # tube is degenerate at the shut pose and rounding decides which side of the roof each vertex
-    # lands, which is a pink shard through the top of the snout. Held at 0.93 the floor arrives a
-    # fifth of the local gape below the roof and the sac closes instead of crossing.
-    t = min(.93, T.smooth(.5 + 1.6 * ((lining_axis(p.y) + .45 * h) - p.z) / max(h, 1e-6)))
-    lining.vertex_groups['jaw'].add([idx], t, 'REPLACE')
-    lining.vertex_groups['skull'].add([idx], 1 - t, 'REPLACE')
-    lining_jaw.append(round(float(t), 3))
+_jaw_group = lining.vertex_groups['jaw'].index
+lining_jaw = [round(next((g.weight for g in v.groups if g.group == _jaw_group), 0.), 3)
+              for v in lining.data.vertices]
 
 mouth_cover = []
 for _y in np.linspace(MOUTH_FRONT + .006, MOUTH_BACK - .006, 14):

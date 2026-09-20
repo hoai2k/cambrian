@@ -1,8 +1,10 @@
 import type { Vec3 } from '../shared/math';
 import type { CreatureId, MoveDef } from './creatures';
+import { TEXT } from '../shared/text';
 
 export type Tier = 0 | 1 | 2 | 3 | 4;
-export const TIER_NAMES = ['Larva', 'Juvenile', 'Adult', 'Giant', 'Apex'] as const;
+/** The rungs of the Cambrian ladder, as the HUD names them (`TEXT.sim.ladder.tiers`). */
+export const TIER_NAMES: readonly string[] = TEXT.sim.ladder.tiers;
 /**
  * The rungs' scales, as multiples of the creature's adult length. Ask `tierScale` in
  * src/sim/tiers.ts rather than indexing this: with equivalent sizing on the two rungs below Adult
@@ -162,6 +164,13 @@ export interface Actor {
   climbTo: number;
   /** Out of the water: a leap in flight, gravity only, until the splash. */
   airborne: boolean;
+  /**
+   * The shore (src/sim/beach.ts). `wade` is how far out of the water the sand under this body
+   * puts it, 0 afloat to 1 with the sand at the waterline, continuous in position; `ashore` is the
+   * rule that follows from it, past `ASHORE_WADE`. `strandT` is how long a water-breather has been
+   * ashore, against `STRAND_BREATH`; `flopT` counts down through one flop, 0 between them.
+   */
+  wade: number; ashore: boolean; strandT: number; flopT: number;
   prev: { light: boolean; heavy: boolean; ability: boolean; dodge: boolean; guard: boolean; lock: boolean; sense: boolean; rise: boolean; burst: boolean; dash: boolean; aim: boolean };
   brain?: BrainState;
   respawnT: number; hatching: boolean;
@@ -296,6 +305,6 @@ export const isCoop = (m: Mode) => COOP_MODES.includes(m);
 export interface Prompt { text: string; t: number; }
 
 export interface WorldEvent {
-  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate' | 'teleport' | 'gulp' | 'winded' | 'anoxia' | 'beach' | 'shoalJoin' | 'shellCrush' | 'breach' | 'splash' | 'hatch';
+  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate' | 'teleport' | 'gulp' | 'winded' | 'anoxia' | 'beach' | 'flop' | 'shoalJoin' | 'shellCrush' | 'breach' | 'splash' | 'hatch';
   pos: Vec3; actor: number; other?: number; strength?: number; player?: number;
 }

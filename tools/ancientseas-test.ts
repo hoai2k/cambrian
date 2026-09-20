@@ -324,14 +324,24 @@ for (const page of DEBUG_PAGES) {
   ok(page.path.endsWith('/'), `${page.name} links to a directory`);
   ok(!page.path.startsWith('/'), `${page.name} is relative to the app root, so it survives a nested base`);
 }
-// Each mode is a query on its own page, not a path of its own.
+// Each mode is a query on its own page, not a path of its own, and the value it opens on has to be
+// one that page still answers: the module named in `reads` must name it, as a string it compares
+// against or as the key of the table it looks it up in. A row that outlives its mode is worse than
+// no row, which is the same rule the game parameters below are held to.
 for (const page of DEBUG_PAGES) for (const mode of page.modes ?? []) {
   ok(!mode.query.startsWith('?'), `${page.name} / ${mode.name} stores its query without the leading '?'`);
   ok(modeHref(page, mode.query).startsWith(page.path), `${page.name} / ${mode.name} opens on its own page`);
+  const params = new URLSearchParams(mode.query);
+  const value = params.get('mode') ?? params.get('edit') ?? '';
+  ok(value, `${page.name} / ${mode.name} opens on a named mode`);
+  ok(existsSync(mode.reads), `${page.name} / ${mode.name} names a module that exists (${mode.reads})`);
+  const source = readFileSync(mode.reads, 'utf8');
+  ok(new RegExp(`(['"\`])${value}\\1|^\\s*${value}\\s*:`, 'm').test(source),
+    `${page.name} / ${mode.name} names the value ${mode.reads} reads (${value})`);
 }
 // A viewer mode that names a specimen must name one that exists, or the link opens on the wrong animal.
 const viewerModes = DEBUG_PAGES.find((p) => p.id === 'viewer')?.modes ?? [];
-ok(viewerModes.length === 3, 'the viewer offers its three editors');
+ok(viewerModes.length === 5, 'the viewer offers its five editors');
 // Checked against the era rosters rather than the viewer's own catalogue: that module imports
 // assetPaths, which reads ACTIVE_ERA at module top, and this page must never pull an era in.
 const ROSTERS: Record<string, readonly { id: string }[]> = { cambrian: CAMBRIAN.creatures, devonian: DEVONIAN.creatures, triassic: TRIASSIC.creatures };
@@ -352,9 +362,10 @@ for (const param of DEBUG_PARAMS) {
   ok(source.includes(`'${name}'`), `${param.name} names the parameter ${param.reads} reads`);
   ok(source.includes(`'${value}'`), `...and the value it checks for (${value})`);
 }
-// Every game gets every parameter, the not-yet-open one included: /triassic/ opens by address.
+// Every game gets every parameter, a game the plate does not link to included: it opens by
+// address. Derived from the flag rather than naming a game, so it holds whichever games are open.
 eq(DEBUG_GAMES.map((g) => g.id), GAMES.map((g) => g.id), 'the index offers every game, coming-soon or not');
-ok(DEBUG_GAMES.some((g) => g.comingSoon), 'including the one the plate does not link to');
+for (const g of GAMES.filter((g) => g.comingSoon)) ok(DEBUG_GAMES.includes(g), `including ${g.title}, which the plate does not link to`);
 for (const game of DEBUG_GAMES) {
   ok(existsSync(`${game.path}index.html`), `${game.title} has an entry page for the parameters to open`);
   for (const param of DEBUG_PARAMS) ok(paramHref(game, param) === `${game.path}?${param.query}`, `${game.title} ?${param.query}`);

@@ -1,8 +1,12 @@
 # The shore comes and goes — Tanystropheus fishing, and the runners
 
-*Design and implementation plan. Triassic only. Nothing here is built yet; this is the brief the
-build will work from, written against what `src/sim/triassic/shore.ts` already does so the work
-is a delta and not a rewrite.*
+*Design and implementation plan. Triassic only.* **Built**, in `src/sim/triassic/shore.ts`, behind
+*Settings → Shore animals* (off by default). What follows is the brief the build was made from;
+where the build departed from it: a runner's catch is taken whole (`startSwallow`) and eaten at the
+inland spot rather than carried on the grip rules, so the runner stays scripted; the clips are
+authored through `tools/creatures/motion/` (`Fish`, `Peer`) rather than the Blender builders; a
+body on the *sand* (src/sim/beach.ts) counts as within reach exactly as one at the surface does;
+and the recorder fields are not written. `npm run triassic` holds the rest.
 
 ## What is asked for
 

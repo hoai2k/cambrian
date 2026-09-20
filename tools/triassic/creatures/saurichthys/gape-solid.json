@@ -1,42 +1,97 @@
 {
-  "tool": "/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- saurichthys Heavy@0.50 Attack@0.40 Bite@0.15",
-  "backdropTest": "r > 0.90, g < 0.20, b > 0.90",
-  "pixelsPerFrame": 378000,
-  "tolerance": 12,
-  "maxSeenThroughTheBody": 3,
-  "previously": {
-    "value": 17,
-    "backdropTest": "r > 0.75, g < 0.45, b > 0.75",
-    "why": "fourteen of those seventeen were this fish's own pale skin, which renders at about (0.78, 0.44, 0.76) under a magenta world and sat inside that window by one part in two hundred on green. The backdrop itself renders with green below 0.063 everywhere measured. A ray cast through each failing pixel found solid front-facing skin at every one, and five corrections to the geometry moved the count by nothing at all."
-  },
-  "note": "the tool counts pixels over the whole frame; what is left is three isolated pixels at the far edge of it where a surface one polygon thick loses its back face. The shipped body material is double-sided, so none of them arise at runtime at all -- the cull is the worst case a single-sided renderer would draw.",
+  "id": "saurichthys",
+  "backdrop": [
+    1.0,
+    0.0,
+    1.0,
+    1.0
+  ],
   "shots": [
     {
       "clip": "Heavy",
       "t": 0.5,
       "pixels": 378000,
-      "differingPixels": 6248,
-      "holesOpenedByCulling": 2,
-      "seenThroughTheBody": 0,
-      "backdropInBothPasses": 2
+      "differingPixels": 729,
+      "holesOpenedByCulling": 6,
+      "seenThroughTheBody": 1,
+      "backdropInBothPasses": 16,
+      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Heavy-0.5-opened.png",
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Heavy-0.5-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Heavy-0.5-culled.png",
+      "openedPixelsAlsoOpenedBeforeThisPort": 6,
+      "openedPixelsNewSinceThisPort": 0,
+      "sharedPixelBox": [
+        518,
+        352,
+        543,
+        353
+      ]
     },
     {
       "clip": "Attack",
       "t": 0.4,
       "pixels": 378000,
-      "differingPixels": 6243,
-      "holesOpenedByCulling": 3,
-      "seenThroughTheBody": 0,
-      "backdropInBothPasses": 5
+      "differingPixels": 725,
+      "holesOpenedByCulling": 6,
+      "seenThroughTheBody": 1,
+      "backdropInBothPasses": 16,
+      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Attack-0.4-opened.png",
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Attack-0.4-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Attack-0.4-culled.png",
+      "openedPixelsAlsoOpenedBeforeThisPort": 6,
+      "openedPixelsNewSinceThisPort": 0,
+      "sharedPixelBox": [
+        518,
+        352,
+        543,
+        353
+      ]
     },
     {
       "clip": "Bite",
       "t": 0.15,
       "pixels": 378000,
-      "differingPixels": 68149,
-      "holesOpenedByCulling": 6,
-      "seenThroughTheBody": 3,
-      "backdropInBothPasses": 1
+      "differingPixels": 2037,
+      "holesOpenedByCulling": 158,
+      "seenThroughTheBody": 2,
+      "backdropInBothPasses": 4,
+      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Bite-0.15-opened.png",
+      "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Bite-0.15-solid.png",
+      "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Bite-0.15-culled.png",
+      "openedPixelsAlsoOpenedBeforeThisPort": 12,
+      "openedPixelsNewSinceThisPort": 146,
+      "sharedPixelBox": [
+        5,
+        155,
+        12,
+        158
+      ]
     }
-  ]
+  ],
+  "beforeThisPort": {
+    "note": "the one-sac Mouth_lining with no hinge plug, the shipped 15 September body, same shots",
+    "shots": [
+      {
+        "clip": "Heavy",
+        "t": 0.5,
+        "holesOpenedByCulling": 378,
+        "seenThroughTheBody": 373,
+        "backdropInBothPasses": 4
+      },
+      {
+        "clip": "Attack",
+        "t": 0.4,
+        "holesOpenedByCulling": 377,
+        "seenThroughTheBody": 372,
+        "backdropInBothPasses": 1
+      },
+      {
+        "clip": "Bite",
+        "t": 0.15,
+        "holesOpenedByCulling": 3404,
+        "seenThroughTheBody": 0,
+        "backdropInBothPasses": 1
+      }
+    ]
+  }
 }

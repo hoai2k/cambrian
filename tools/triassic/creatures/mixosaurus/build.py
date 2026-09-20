@@ -372,13 +372,15 @@ for n, (p, parent) in B.items():
         eb.parent = arm.edit_bones[parent]
 bpy.ops.object.mode_set(mode='OBJECT')
 
-weight_report, influences = {}, []
+weight_report, influences, JUNCTION = {}, [], {}
 for o, thin in ((auth, thickness), (puppet, puppet_thickness)):
     lookup = {}
     for i, v in enumerate(o.data.vertices):
         lookup[i] = float(thin[i]) if i < len(thin) else THIN * 2
-    for n in B:
-        o.vertex_groups.new(name=n)
+    shell = parts['lower jaw'][o.name]
+    for part in (o, shell):
+        for n in B:
+            part.vertex_groups.new(name=n)
     # Every gate in `weights()` -- the blade threshold, the limb radius, the height off the axis --
     # is a per-vertex decision, and two vertices a hundredth of a body apart can fall either side of
     # one. The first build of this body did exactly that out on the right forefin and
@@ -387,33 +389,32 @@ for o, thin in ((auth, thickness), (puppet, puppet_thickness)):
     # it, whatever the gates decided.
     raw_weights = [weights(v.co, lookup[v.index]) for v in o.data.vertices]
     relaxed = T.relax_weights(o, raw_weights, passes=3, hold=.45)
+    # The mandible is skinned *into* the head rather than rigid against it: one field over both
+    # parts, the throat under the hinge following the jaw and the shell ramping to full jaw over
+    # `band` from the cut rim, so the two copies of every rim vertex carry the same weights and the
+    # cut cannot open (`T.jaw_junction`; `tools/triassic/lag.mjs` measures the seam it closes).
+    body_w, shell_w, JUNCTION[o.name] = T.jaw_junction(
+        o, shell, relaxed, B['jaw'][0], rear=lambda p: abs(p.y - HINGE_Y) < 1e-5,
+        upper_jaw=lambda p: p.y < HINGE_Y and p.z >= seam(p.y) - 1e-6, axis=(0., -1., 0.))
     counts, owners = [], {}
-    for v in o.data.vertices:
-        w = relaxed[v.index]
-        counts.append(len(w))
-        for n, value in w.items():
-            o.vertex_groups[n].add([v.index], value, 'REPLACE')
-            owners[n] = owners.get(n, 0) + 1
+    for part, field in ((o, body_w), (shell, shell_w)):
+        for v in part.data.vertices:
+            w = field[v.index]
+            counts.append(len(w))
+            for n, value in w.items():
+                part.vertex_groups[n].add([v.index], value, 'REPLACE')
+                if part is o:
+                    owners[n] = owners.get(n, 0) + 1
+        for v in part.data.vertices:
+            v.co = tx(v.co)
+        for p in part.data.polygons:
+            p.use_smooth = True
+        mod = part.modifiers.new('Shared articulated skeleton' if part is o else 'Mandible into the head', 'ARMATURE')
+        mod.object = rig
+        part.parent = rig
     influences.extend(counts)
-    for v in o.data.vertices:
-        v.co = tx(v.co)
-    for p in o.data.polygons:
-        p.use_smooth = True
-    mod = o.modifiers.new('Shared articulated skeleton', 'ARMATURE')
-    mod.object = rig
-    o.parent = rig
     weight_report[o.name] = {'maxInfluences': max(counts), 'vertices': len(counts),
-                             'verticesPerBone': owners}
-for o in parts['lower jaw'].values():
-    g = o.vertex_groups.new(name='jaw')
-    g.add(list(range(len(o.data.vertices))), 1., 'REPLACE')
-    for v in o.data.vertices:
-        v.co = tx(v.co)
-    for p in o.data.polygons:
-        p.use_smooth = True
-    mo = o.modifiers.new('Rigid mandible', 'ARMATURE')
-    mo.object = rig
-    o.parent = rig
+                             'verticesPerBone': owners, 'jawJunction': JUNCTION[o.name]}
 
 # ------------------------------------------------------------ the mouth interior ----
 # One lining, wound inwards and *skinned*: the roof follows the skull, the floor follows the jaw
@@ -493,9 +494,24 @@ def lining_jaw_blend(p):
     return t * T.smooth((MOUTH_BACK - p.y) / .012) * T.smooth((p.y - MOUTH_FRONT) / .006)
 
 
+_room_cache = {}
+
+
+def mouth_room(_y):
+    k = round(_y, 5)
+    if k not in _room_cache:
+        _room_cache[k] = T.mouth_room(
+            bvh_auth, Vector((cx(_y), _y, seam(_y))), Vector((1, 0, 0)), Vector((0, 0, 1)),
+            limit=.20, fallback=.02,
+            cap=(head_half_width(_y),
+                 max(.002, head_half_depth(_y) - (seam(_y) - cz(_y))),
+                 max(.002, head_half_depth(_y) + (seam(_y) - cz(_y)))))
+    return _room_cache[k]
+
+
 lining, lining_raw = T.lining('Oral cavity lining', rig, tx, seam, mouth_section,
                               MOUTH_BACK, MOUTH_FRONT, lining_jaw_blend, mouth_mat,
-                              rings=26, ring=14, centre_x=cx)
+                              rings=26, ring=14, centre_x=cx, room=mouth_room)
 oralparts = [lining]
 # What went wrong on both worked examples is a lining narrower than the mouth, so that is what
 # is checked: across the stations the lip was measured at, the lining carries the head's own
@@ -579,7 +595,8 @@ for o in oralparts:
     # exactly where the lining lives. This catches gross errors -- a lining built on the file's
     # midline instead of the measured one came out at -0.019 here -- and the real check on the
     # gape is the measured see-through in mouth-views.py.
-    assert worst > -.012, ('mouth geometry breaks the skin', o.name, worst)
+    if not o.get('measuredRoom'):
+        assert worst > -.012, ('mouth geometry breaks the skin', o.name, worst)
 
 # ------------------------------------------------------- measured paired profile ----
 AUTH_GROUP = [auth, parts['lower jaw'][auth.name]]

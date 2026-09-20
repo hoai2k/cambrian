@@ -1266,9 +1266,9 @@
     "margin": 0.042,
     "rootFade": 0.34
   },
-  "authoredTriangles": 22477,
-  "twinTriangles": 7766,
-  "twinTriangleFraction": 0.3455087422698759,
+  "authoredTriangles": 22473,
+  "twinTriangles": 7762,
+  "twinTriangleFraction": 0.3453922484759489,
   "twinRemeshTriangles": 103988,
   "twinDecimateRatio": 0.05385236814618111,
   "twinVerticesHeldBackFromRelaxation": 12728,
@@ -1805,10 +1805,10 @@
   "weights": {
     "Aphaneramma authored body": {
       "maxInfluences": 4,
-      "vertices": 9650,
+      "vertices": 10551,
       "verticesPerBone": {
         "body": 3031,
-        "chest": 3537,
+        "chest": 3517,
         "hind_upper_L": 983,
         "tail_00": 2171,
         "tail_01": 1868,
@@ -1817,11 +1817,11 @@
         "fore_foot_L": 314,
         "fore_upper_L": 919,
         "hind_lower_L": 627,
-        "skull": 1358,
+        "skull": 1342,
         "tail_07": 1428,
         "fore_foot_R": 508,
         "fore_lower_R": 647,
-        "neck_00": 2097,
+        "neck_00": 2079,
         "hind_upper_R": 848,
         "hind_lower_R": 529,
         "hind_foot_L": 412,
@@ -1831,12 +1831,25 @@
         "tail_04": 956,
         "jaw": 945,
         "tail_03": 1046,
-        "fore_upper_R": 797
+        "fore_upper_R": 788
+      },
+      "jawJunction": {
+        "cutRimPairs": 74,
+        "lipPairs": 116,
+        "rimReach": 0.07411100667105978,
+        "rimDepth": 0.055714648216962814,
+        "dz": 0.01857154940565427,
+        "band": 0.015,
+        "back": 0.06,
+        "throat": 1.0,
+        "shellVertices": 901,
+        "shellFullJaw": 789,
+        "bodyThroatVertices": 323
       }
     },
     "Aphaneramma procedural volume twin": {
       "maxInfluences": 4,
-      "vertices": 2856,
+      "vertices": 3106,
       "verticesPerBone": {
         "tail_06": 420,
         "tail_07": 426,
@@ -1851,23 +1864,36 @@
         "tail_00": 680,
         "body": 724,
         "hind_upper_L": 386,
-        "chest": 1044,
+        "chest": 1038,
         "hind_foot_L": 170,
         "hind_lower_L": 216,
-        "neck_00": 722,
+        "neck_00": 716,
         "jaw": 387,
         "fore_upper_R": 309,
-        "fore_upper_L": 341,
-        "skull": 429,
+        "fore_upper_L": 337,
+        "skull": 423,
         "fore_lower_R": 270,
         "fore_foot_R": 233,
         "fore_lower_L": 203,
         "fore_foot_L": 159
+      },
+      "jawJunction": {
+        "cutRimPairs": 41,
+        "lipPairs": 60,
+        "rimReach": 0.07386473287752578,
+        "rimDepth": 0.0556795671582222,
+        "dz": 0.0185598557194074,
+        "band": 0.015,
+        "back": 0.06,
+        "throat": 1.0,
+        "shellVertices": 250,
+        "shellFullJaw": 205,
+        "bodyThroatVertices": 93
       }
     }
   },
   "maxInfluences": 4,
-  "meanInfluences": 3.152566767951383,
+  "meanInfluences": 3.005125576627371,
   "mouth": {
     "method": "painted line, read as a continuous curve under a raised jump penalty (the geometric method found no slit)",
     "cavityVertices": 34,
@@ -2232,117 +2258,57 @@
         0.05399,
         0.02374
       ],
-      "-0.26501": [
-        0.05812,
-        0.03069
+      "-0.27469": [
+        0.05893,
+        0.02983
       ],
-      "-0.27405": [
-        0.05891,
-        0.02981
+      "-0.29341": [
+        0.05831,
+        0.02822
       ],
-      "-0.28308": [
-        0.05903,
-        0.0298
+      "-0.31212": [
+        0.05635,
+        0.02493
       ],
-      "-0.29212": [
-        0.05846,
-        0.02845
+      "-0.33084": [
+        0.05333,
+        0.02153
       ],
-      "-0.30115": [
-        0.0575,
-        0.02698
+      "-0.34955": [
+        0.04325,
+        0.01903
       ],
-      "-0.31019": [
-        0.05663,
-        0.02546
+      "-0.36827": [
+        0.03491,
+        0.01568
       ],
-      "-0.31922": [
-        0.0557,
-        0.02378
+      "-0.38698": [
+        0.02958,
+        0.01388
       ],
-      "-0.32826": [
-        0.05412,
-        0.02206
+      "-0.40569": [
+        0.02671,
+        0.01209
       ],
-      "-0.33729": [
-        0.04917,
-        0.02062
+      "-0.42441": [
+        0.02371,
+        0.00982
       ],
-      "-0.34632": [
-        0.04474,
-        0.01948
+      "-0.44312": [
+        0.02111,
+        0.0089
       ],
-      "-0.35536": [
-        0.041,
-        0.01821
+      "-0.46184": [
+        0.0193,
+        0.00782
       ],
-      "-0.36439": [
-        0.03702,
-        0.01634
+      "-0.48055": [
+        0.01682,
+        0.00702
       ],
-      "-0.37343": [
-        0.03238,
-        0.01504
-      ],
-      "-0.38246": [
-        0.03015,
-        0.01428
-      ],
-      "-0.3915": [
-        0.02898,
-        0.01349
-      ],
-      "-0.40053": [
-        0.02748,
-        0.01271
-      ],
-      "-0.40957": [
-        0.02622,
-        0.01152
-      ],
-      "-0.4186": [
-        0.02474,
-        0.01032
-      ],
-      "-0.42764": [
-        0.02341,
-        0.00966
-      ],
-      "-0.43667": [
-        0.02215,
-        0.00929
-      ],
-      "-0.4457": [
-        0.02081,
-        0.00873
-      ],
-      "-0.45474": [
-        0.01994,
-        0.00822
-      ],
-      "-0.46377": [
-        0.01914,
-        0.0077
-      ],
-      "-0.47281": [
-        0.01808,
-        0.00728
-      ],
-      "-0.48184": [
-        0.0166,
-        0.00698
-      ],
-      "-0.49088": [
-        0.01512,
-        0.00683
-      ],
-      "-0.49991": [
-        0.01368,
-        0.00648
-      ],
-      "-0.50895": [
-        0.01187,
-        0.00587
+      "-0.49927": [
+        0.0138,
+        0.00651
       ],
       "-0.51798": [
         0.00852,
@@ -2627,7 +2593,7 @@
     "oralPartSeating": [
       {
         "part": "Oral cavity lining",
-        "worstDepthRaw": 0.0006165298982523382
+        "worstDepthRaw": 0.0006005688919685781
       },
       {
         "part": "Seated jaw hinge tissue",

@@ -1,0 +1,64 @@
+{
+  "id": "placodus",
+  "verdict": "separate closed rigid palate/floor",
+  "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present. A body with no lining mesh is reported as such, with the hidden oral parts it does carry listed, and all three variants must agree.",
+  "models": [
+    {
+      "variant": "authored",
+      "sha256": "d941fbc745c480da93eba682e8ad38160643d4dd141fca9333448cb8efcabdbd",
+      "meshes": [
+        {
+          "name": "Oral cavity lining",
+          "vertices": 308,
+          "triangles": {
+            "skull": 304,
+            "jaw": 304
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ],
+      "otherOralMeshes": [],
+      "oralShells": "separate palate and floor"
+    },
+    {
+      "variant": ".puppet",
+      "sha256": "d51f4671a47e2353c61a1b516897a578771789045bf85f3d3f3fd547818ebcd8",
+      "meshes": [
+        {
+          "name": "Oral cavity lining",
+          "vertices": 308,
+          "triangles": {
+            "skull": 304,
+            "jaw": 304
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ],
+      "otherOralMeshes": [],
+      "oralShells": "separate palate and floor"
+    },
+    {
+      "variant": ".lod1",
+      "sha256": "d51f4671a47e2353c61a1b516897a578771789045bf85f3d3f3fd547818ebcd8",
+      "meshes": [
+        {
+          "name": "Oral cavity lining",
+          "vertices": 308,
+          "triangles": {
+            "skull": 304,
+            "jaw": 304
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ],
+      "otherOralMeshes": [],
+      "oralShells": "separate palate and floor"
+    }
+  ]
+}

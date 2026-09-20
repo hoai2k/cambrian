@@ -1,55 +1,59 @@
 {
   "placodus.card.png": {
-    "bytes": 280999,
-    "sha256": "d1acfe765a017ab9e22ed80f782177d45accea452dca8e5d7b60d77eac8d49fe",
+    "bytes": 280634,
+    "sha256": "42b0e4145e435cc2f840b1bcafcdfb288a0d6dd5959c12a14f5c06913693fb82",
     "dimensions": [
       800,
       600
     ]
   },
   "placodus.glb": {
-    "bytes": 2111872,
-    "sha256": "58bd12ce335d244861808935b55212fc3254a496fe962c4aebc9dab7b1315ca1"
+    "bytes": 2117248,
+    "sha256": "dd7a75f9ddc2cb1547ba935d1e3a255eebe31a3b1de13d630bb383291a98e874"
   },
   "placodus.json": {
-    "bytes": 2719,
-    "sha256": "14ec332f997b02538f785fc9f309332ef39750e2b90d58e9489f81c0d47909bf"
+    "bytes": 2731,
+    "sha256": "2d06d66d91e97534e2b969ceee8c50130883aa5ce1001dc0b2f9fb231c4f5a55"
   },
   "placodus.lod1.glb": {
-    "bytes": 793848,
-    "sha256": "961e99bd4b45af68e66727a34b54b35ef0b09970d51d17727716450b7728ab7a"
+    "bytes": 787400,
+    "sha256": "70a2056adec7a3db56f1a45fcb2ef35d44c2d4039a5d918bc0d4994d14e69ff9"
+  },
+  "placodus.origpose.glb": {
+    "bytes": 1737372,
+    "sha256": "da0e59fb34fee098f9fdd2da12b95ce1a48de640db1b34428c9b1575508eed84"
   },
   "placodus.png": {
-    "bytes": 604503,
-    "sha256": "4148810bffe52c08ce1ece54c0018a0575855876c5de34090c76bcf34868a9fb",
+    "bytes": 604873,
+    "sha256": "6ca288c7c35d66b6305a727a8ecebc8a1deda2a4d9e44d73cbf1d7029b1f2c1f",
     "dimensions": [
       1200,
       900
     ]
   },
   "placodus.puppet.glb": {
-    "bytes": 793848,
-    "sha256": "961e99bd4b45af68e66727a34b54b35ef0b09970d51d17727716450b7728ab7a"
+    "bytes": 787400,
+    "sha256": "70a2056adec7a3db56f1a45fcb2ef35d44c2d4039a5d918bc0d4994d14e69ff9"
   },
   "placodus.puppet.png": {
-    "bytes": 505034,
-    "sha256": "ef255f4e2a4e03459dd6277fd34db0b6e2fe714d499645fe324ee64e7dd4b493",
+    "bytes": 505243,
+    "sha256": "f4738eaea77066e791accc7da43fddc7c2a3f2f7c9c9c35def25cdc9eff5760a",
     "dimensions": [
       1200,
       900
     ]
   },
   "placodus.select.png": {
-    "bytes": 1050322,
-    "sha256": "dfb841202d0965973cac5f9c71907e8ba2600f7de021ce3bbd6a4579d1aa2190",
+    "bytes": 1050338,
+    "sha256": "2a68faeee6644c55cd20753cd32b5a22383e91550eca6a256d72d287ef505dd9",
     "dimensions": [
       1600,
       1200
     ]
   },
   "placodus.thumb.png": {
-    "bytes": 35572,
-    "sha256": "0953e733bbb7eb650a9b1c20e7ac52c458d14178b2a748c3341190e33648080e",
+    "bytes": 35581,
+    "sha256": "8787a896a5f300d3aa426cc2b5bc8397091828aa3bc3f87544aee52b21da31d9",
     "dimensions": [
       256,
       192

@@ -19,6 +19,7 @@
  * not something the page offers a visitor.
  */
 import DELIVERED from './delivered.json';
+import { PAGE_TEXT } from './strings';
 
 export type PageVersion = 1 | 2;
 export const DEFAULT_VERSION: PageVersion = 2;
@@ -78,14 +79,17 @@ export const GAMES: readonly GameLink[] = [
     art: 'assets/triassic/brand/title.webp', artWidth: 1536, artHeight: 1024,
     wordmark: 'assets/triassic/brand/logo-header.webp',
     when: '240 million years ago', tagline: 'Dive. Hunt. Grow. Hold.',
-    comingSoon: true,
   },
 ];
 
 /** The games a visitor can actually go to: what the pad walks and the keyboard steps through. */
 export const OPEN_GAMES: readonly GameLink[] = GAMES.filter((g) => !g.comingSoon);
-/** What a game not yet open says for itself, in place of being a link. */
-export const COMING_SOON = 'Coming soon';
+/**
+ * What a game not yet open says for itself, in place of being a link. The words are in
+ * `./strings.ts` with the rest of the page's copy; this stays exported because the checks and the
+ * components already read it by this name.
+ */
+export const COMING_SOON = PAGE_TEXT.badge.comingSoon;
 
 /** Where every piece the trilogy page asks for lives once delivered. */
 export const ART_DIR = 'assets/ancientseas/';

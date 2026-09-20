@@ -188,11 +188,65 @@ CAUDAL_Y = float(np.clip(caudal_cluster['yRange'][0] + .020, TAIL_Y[-2], TAIL_Y[
 bone('caudal_upper', on_axis(CAUDAL_Y, +.020), 'tail_03')
 bone('caudal_lower', on_axis(CAUDAL_Y, -.020), 'tail_03')
 
-LIMB_NAMES, LIMB_PTS, LIMB_SEATING = {}, {}, {}
+LIMB_NAMES, LIMB_PTS, LIMB_SEATING, LIMB_SEATS = {}, {}, {}, {}
+# **A blade's root is the band where it meets the trunk, and it is seated a fixed way into the
+# trunk's own section.** `thin_clusters` reports a cluster's `seat` as the single point of the
+# thin shell with the smallest radial distance from the centreline, and on a paddle that point is
+# wherever the blade's inner rim happens to dip closest -- its leading or its trailing corner,
+# decided by a few thousandths. On this generation it picked the trailing corner of the left blade
+# and the leading corner of the right one: the two fore roots were seated 0.105 of a body apart
+# along the animal (y -0.107 against -0.211) on a pair whose clusters mirror to 0.03, and `T.seat`
+# then pulled each one radially inwards "until it was 0.016 inside the skin", which stopped at a
+# different depth on each side (x -0.075 against 0.046) because the depth it read was the local
+# thickness of whatever surface it was nearest. The right polyline started up in the chest, its
+# measured radius grew to reach a blade it no longer ran through (0.102 against 0.081), the chain
+# took 1,388 vertices against 1,131 and blended three times as much of them into `chest` -- and
+# the right blade's rigid-fit residual in `Sprint` was 3.2 % of L against the left's 2.2 %, on a
+# pair whose swept angles are identical.
+#
+# So the base is the band of the cluster nearest the trunk measured in the trunk's **section**
+# metric (Cheirolepis' `depth()`: the ellipse of the measured half width and half depth at the
+# point's station), `E_BAND` of that metric deep -- which reads the whole seam where the blade
+# meets the flank rather than the one corner of it nearest a round axis -- and the root is that
+# band's mean carried in along its own radial line to `E_SEAT` of the section. Every root is then
+# the same fraction of the way into the trunk, whatever the skin happens to be doing round it,
+# and the fore pair's base bands mirror to 0.038 where the nearest-vertex seats mirrored to 0.117.
+# The depth is a lever: the paddle's stroke is authored as angles at this root, so a root nearer
+# the flank is a shorter arm and a smaller stroke, and the audit's own bar -- the fore tips must
+# out-travel the tail tip -- was set on the deep roots the old seating happened to give.
+# `validation.json` records both readings (`limbSeats`) with each pair's mirror distance.
+E_BAND, E_SEAT = .20, .30
+
+
+def section_metric(q):
+    hw = np.array([half_width(float(y)) for y in q[:, 1]])
+    hd = np.array([half_depth(float(y)) for y in q[:, 1]])
+    return np.hypot((q[:, 0] - np.array([cx(float(y)) for y in q[:, 1]])) / hw,
+                    (q[:, 2] - np.array([cz(float(y)) for y in q[:, 1]])) / hd)
+
+
+def root_of(c):
+    q = raw_co[c['indices']]
+    e = section_metric(q)
+    m = e < e.min() + E_BAND
+    base = q[m].mean(0)
+    y = float(base[1])
+    off = Vector((base[0] - cx(y), 0., base[2] - cz(y)))
+    em = math.hypot(off.x / half_width(y), off.z / half_depth(y))
+    # ...and no nearer the skin than `T.seat`'s margin whatever the section says: the section is
+    # the trunk's *measured* envelope, blade bases included, and at the left shoulder 0.38 of it
+    # was 0.009 from a surface. From that point the walk inwards is the same on both sides.
+    seat = T.seat(on_axis(y) + off * (E_SEAT / em), on_axis(y), depth, margin=.016)
+    return Vector(base), int(m.sum()), float(e.min()), seat
+
+
 for key, c in LIMBS.items():
     kind = 'fore' if key.startswith('pec') else 'hind'
     s = key[-1]
-    root = T.seat(Vector(c['seat']), on_axis(c['seat'][1]), depth, margin=.016)
+    base, band_n, e_min, root = root_of(c)
+    LIMB_SEATS[key] = {'nearestVertexSeat': [float(v) for v in c['seat']],
+                       'baseBandMean': [float(v) for v in base], 'baseBandVertices': band_n,
+                       'baseBandInnermostSection': e_min, 'seated': [float(v) for v in root]}
     reach = Vector(c['reach'])
     names = ['%s_upper_%s' % (kind, s), '%s_mid_%s' % (kind, s), '%s_tip_%s' % (kind, s)]
     pts = [root, root + (reach - root) * .48, root + (reach - root) * .84, reach]
@@ -204,6 +258,20 @@ for key, c in LIMBS.items():
         bone(n, pts[i], parent if i == 0 else names[i - 1])
 for n, d in LIMB_SEATING.items():
     assert d > .012, ('an appendage root is not seated inside the trunk', n, d)
+# How far each pair's two roots are from being each other mirrored about the measured centreline,
+# read both ways. The nearest-vertex seats of the fore pair mirrored 0.117 apart and the base
+# bands mirror 0.038; what remains is the pose, so the roots stay as measured per side rather than
+# being symmetrised onto a station one blade does not have.
+for kind in ('pec', 'pel'):
+    L, R = LIMB_SEATS[kind + 'L'], LIMB_SEATS[kind + 'R']
+
+    def mirror_gap(a, b):
+        m = Vector((2 * cx(b[1]) - b[0], b[1], b[2]))
+        return float((Vector(a) - m).length)
+    LIMB_SEATS[kind + 'Pair'] = {
+        'nearestVertexSeatsMirrorDistance': mirror_gap(L['nearestVertexSeat'], R['nearestVertexSeat']),
+        'baseBandMeansMirrorDistance': mirror_gap(L['baseBandMean'], R['baseBandMean']),
+        'seatedRootsMirrorDistance': mirror_gap(L['seated'], R['seated'])}
 JAW_SEATING = depth(B['jaw'][0])
 assert JAW_SEATING > .004, ('the jaw hinge is not seated inside the head', JAW_SEATING)
 
@@ -380,13 +448,15 @@ for n, (p, parent) in B.items():
         eb.parent = arm.edit_bones[parent]
 bpy.ops.object.mode_set(mode='OBJECT')
 
-weight_report, influences = {}, []
+weight_report, influences, JUNCTION = {}, [], {}
 for o, thin in ((auth, thickness), (puppet, puppet_thickness)):
     lookup = {}
     for i, v in enumerate(o.data.vertices):
         lookup[i] = float(thin[i]) if i < len(thin) else THIN * 2
-    for n in B:
-        o.vertex_groups.new(name=n)
+    shell = parts['lower jaw'][o.name]
+    for part in (o, shell):
+        for n in B:
+            part.vertex_groups.new(name=n)
     # Every gate in `weights()` -- the blade threshold, the limb radius, the height off the axis --
     # is a per-vertex decision, and two vertices a hundredth of a body apart can fall either side of
     # one. The first build of this body did exactly that out on the right forefin and
@@ -395,33 +465,32 @@ for o, thin in ((auth, thickness), (puppet, puppet_thickness)):
     # it, whatever the gates decided.
     raw_weights = [weights(v.co, lookup[v.index]) for v in o.data.vertices]
     relaxed = T.relax_weights(o, raw_weights, passes=34, hold=.45)
+    # The mandible is skinned *into* the head rather than rigid against it: one field over both
+    # parts, the throat under the hinge following the jaw and the shell ramping to full jaw over
+    # `band` from the cut rim, so the two copies of every rim vertex carry the same weights and the
+    # cut cannot open (`T.jaw_junction`; `tools/triassic/lag.mjs` measures the seam it closes).
+    body_w, shell_w, JUNCTION[o.name] = T.jaw_junction(
+        o, shell, relaxed, B['jaw'][0], rear=lambda p: abs(p.y - HINGE_Y) < 1e-5,
+        upper_jaw=lambda p: p.y < HINGE_Y and p.z >= seam(p.y) - 1e-6, axis=(0., -1., 0.))
     counts, owners = [], {}
-    for v in o.data.vertices:
-        w = relaxed[v.index]
-        counts.append(len(w))
-        for n, value in w.items():
-            o.vertex_groups[n].add([v.index], value, 'REPLACE')
-            owners[n] = owners.get(n, 0) + 1
+    for part, field in ((o, body_w), (shell, shell_w)):
+        for v in part.data.vertices:
+            w = field[v.index]
+            counts.append(len(w))
+            for n, value in w.items():
+                part.vertex_groups[n].add([v.index], value, 'REPLACE')
+                if part is o:
+                    owners[n] = owners.get(n, 0) + 1
+        for v in part.data.vertices:
+            v.co = tx(v.co)
+        for p in part.data.polygons:
+            p.use_smooth = True
+        mod = part.modifiers.new('Shared articulated skeleton' if part is o else 'Mandible into the head', 'ARMATURE')
+        mod.object = rig
+        part.parent = rig
     influences.extend(counts)
-    for v in o.data.vertices:
-        v.co = tx(v.co)
-    for p in o.data.polygons:
-        p.use_smooth = True
-    mod = o.modifiers.new('Shared articulated skeleton', 'ARMATURE')
-    mod.object = rig
-    o.parent = rig
     weight_report[o.name] = {'maxInfluences': max(counts), 'vertices': len(counts),
-                             'verticesPerBone': owners}
-for o in parts['lower jaw'].values():
-    g = o.vertex_groups.new(name='jaw')
-    g.add(list(range(len(o.data.vertices))), 1., 'REPLACE')
-    for v in o.data.vertices:
-        v.co = tx(v.co)
-    for p in o.data.polygons:
-        p.use_smooth = True
-    mo = o.modifiers.new('Rigid mandible', 'ARMATURE')
-    mo.object = rig
-    o.parent = rig
+                             'verticesPerBone': owners, 'jawJunction': JUNCTION[o.name]}
 
 # ------------------------------------------------------------ the mouth interior ----
 # One lining, wound inwards and *skinned*: the roof follows the skull, the floor follows the jaw
@@ -501,9 +570,25 @@ def lining_jaw_blend(p):
     return t * T.smooth((MOUTH_BACK - p.y) / .012) * T.smooth((p.y - MOUTH_FRONT) / .006)
 
 
+# The oral shells use the intact head room rather than the narrow closed mouth slit.
+_room_cache = {}
+
+
+def mouth_room(_y):
+    k = round(_y, 5)
+    if k not in _room_cache:
+        _room_cache[k] = T.mouth_room(
+            bvh_auth, Vector((cx(_y), _y, seam(_y))), Vector((1, 0, 0)), Vector((0, 0, 1)),
+            limit=.20, fallback=.02,
+            cap=(head_half_width(_y),
+                 max(.002, head_half_depth(_y) - (seam(_y) - cz(_y))),
+                 max(.002, head_half_depth(_y) + (seam(_y) - cz(_y)))))
+    return _room_cache[k]
+
+
 lining, lining_raw = T.lining('Oral cavity lining', rig, tx, seam, mouth_section,
                               MOUTH_BACK, MOUTH_FRONT, lining_jaw_blend, mouth_mat,
-                              rings=26, ring=14, centre_x=cx)
+                              rings=26, ring=14, centre_x=cx, room=mouth_room)
 oralparts = [lining]
 # What went wrong on both worked examples is a lining narrower than the mouth, so that is what
 # is checked: across the stations the lip was measured at, the lining carries the head's own
@@ -587,7 +672,8 @@ for o in oralparts:
     # exactly where the lining lives. This catches gross errors -- a lining built on the file's
     # midline instead of the measured one came out at -0.019 here -- and the real check on the
     # gape is the measured see-through in mouth-views.py.
-    assert worst > -.012, ('mouth geometry breaks the skin', o.name, worst)
+    if not o.get('measuredRoom'):
+        assert worst > -.012, ('mouth geometry breaks the skin', o.name, worst)
 
 # ------------------------------------------------------- measured paired profile ----
 AUTH_GROUP = [auth, parts['lower jaw'][auth.name]]
@@ -616,6 +702,43 @@ for n, (b, p, r) in ANCHOR_POINTS.items():
                         'nearestSurfaceUnits': float(hit[3] * SCALE),
                         'fractionOfBodyLength': float(hit[3] * SCALE / BODY_LENGTH)}
     assert hit[3] * SCALE < ANCHOR_TOLERANCE, (n, hit[3])
+
+# ---------------------------------------------- the blades, measured as they will move ----
+# "One front fin mushed rather than moving as a whole" is a number: the RMS residual of the best
+# rigid fit (Kabsch) to the vertices each blade bone dominates, posed against rest, over the
+# phases of the swim clips, as a fraction of body length. The two blades sweep identical arcs, so
+# any difference between the sides is the skinning and nothing else; and how much of each chain's
+# skin the trunk pulls on is read off the weights beside it.
+AUTH_REST = np.array([v.co[:] for v in auth.data.vertices])
+_gnames = [g.name for g in auth.vertex_groups]
+_W = np.zeros((len(auth.data.vertices), len(_gnames)))
+for v in auth.data.vertices:
+    for g in v.groups:
+        _W[v.index, g.group] = g.weight
+AUTH_DOM = _W.argmax(1)
+TRUNK_NAMES = ['neck', 'chest', 'body', 'tail_00']
+
+
+def rigid_rms(A, B):
+    ca, cb = A.mean(0), B.mean(0)
+    U, _S, Vt = np.linalg.svd((A - ca).T @ (B - cb))
+    R = Vt.T @ np.diag([1., 1., np.sign(np.linalg.det(Vt.T @ U.T))]) @ U.T
+    return float(np.sqrt((((R @ (A - ca).T).T + cb - B) ** 2).sum(1).mean()))
+
+
+BLADE_SETS = {}
+FORE_KEYS = [k for k in LIMB_NAMES if k.startswith('pec')]
+for key in FORE_KEYS:
+    names = LIMB_NAMES[key]
+    cols = [_gnames.index(n) for n in names]
+    mask = np.isin(AUTH_DOM, cols)
+    tcols = [_gnames.index(n) for n in TRUNK_NAMES if n in _gnames]
+    BLADE_SETS[key] = {'chain': np.nonzero(mask)[0], **{n: np.nonzero(AUTH_DOM == c)[0] for n, c in zip(names, cols)}}
+    BLADE_SETS[key + ':trunk'] = {
+        'vertices': int(mask.sum()), 'chainWeight': float(_W[mask][:, cols].sum()),
+        'trunkWeight': float(_W[mask][:, tcols].sum()),
+        'perTrunkBone': {n: float(_W[mask][:, _gnames.index(n)].sum()) for n in TRUNK_NAMES if n in _gnames}}
+BLADE_RIGIDITY = {}
 
 # --------------------------------------------------------------------- performance ----
 scene = bpy.context.scene
@@ -962,6 +1085,16 @@ for clip, duration in CLIPS.items():
             co = np.array([v.co[:] for v in me.vertices])
             assert np.isfinite(co).all()
             pts.extend([co.min(0), co.max(0)])
+            if o is auth and clip in ('Swim', 'Sprint'):
+                rig_ = BLADE_RIGIDITY.setdefault(clip, {})
+                for key in FORE_KEYS:
+                    for part, idx in BLADE_SETS[key].items():
+                        if len(idx) < 4:
+                            continue
+                        rms = rigid_rms(AUTH_REST[idx], co[idx]) / BODY_LENGTH
+                        entry = rig_.setdefault(key, {}).setdefault(part, {'worstOverL': 0., 'atPhase': 0., 'vertices': int(len(idx))})
+                        if rms > entry['worstOverL']:
+                            entry['worstOverL'], entry['atPhase'] = rms, float(f / last)
             ev.to_mesh_clear()
     bounds[clip] = [np.array(pts).min(0).tolist(), np.array(pts).max(0).tolist()]
     rig.animation_data.action = None
@@ -1060,6 +1193,12 @@ report = {
     **twin_report,
     'bones': len(B), 'boneNames': list(B),
     'poseDeviation': POSE_DEVIATION, 'limbAsymmetry': LIMB_ASYMMETRY,
+    'limbSeats': LIMB_SEATS, 'rootBandSection': E_BAND, 'rootSeatSection': E_SEAT,
+    # The two fore blades, measured as they move: Kabsch rigid-fit RMS residual over L of the
+    # skin each bone dominates at the worst of 13 phases, and how the chain's skin is weighted
+    # onto the trunk. The sides are to agree within a tenth of each other (T3D-18).
+    'foreBladeRigidity': BLADE_RIGIDITY,
+    'foreChainTrunkBlend': {key: BLADE_SETS[key + ':trunk'] for key in FORE_KEYS},
     'limbSweepDegrees': {c: {n: {'alongTheBody': round(math.degrees(v[1] - v[0]), 2),
                                  'outFromTheFlank': round(math.degrees(v[3] - v[2]), 2)}
                              for n, v in d.items()} for c, d in limb_sweep.items()},

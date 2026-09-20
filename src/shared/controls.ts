@@ -24,13 +24,13 @@ export type Action =
   | 'sprint' | 'rise' | 'sink'
   | 'light' | 'heavy' | 'ability' | 'dash' | 'guard' | 'aim'
   | 'sense' | 'teleport' | 'view' | 'menu'
-  | 'confirm' | 'back' | 'modePrev' | 'modeNext' | 'pick';
+  | 'confirm' | 'back' | 'modePrev' | 'modeNext';
 
 interface Label { pad: string; kbm: string; key1: string; key2: string; short?: Partial<Record<Scheme, string>>; }
 
 /** Long names, for prose and for the diagrams. `short` overrides them inside a chip or a <kbd>. */
 const LABELS: Record<Action, Label> = {
-  swim:     { pad: 'Left stick', kbm: 'W / X, A / D turn', key1: 'W / X, A / D turn', key2: 'IJKL' },
+  swim:     { pad: 'Left stick', kbm: 'W forward, X back, A / D turn', key1: 'W / X, A / D turn', key2: 'IJKL' },
   look:     { pad: 'Right stick', kbm: 'Drag', key1: 'Arrow keys', key2: 'IJKL (no camera)' },
   zoom:     { pad: 'Right stick click + up/down', kbm: 'Mouse wheel', key1: 'PgUp / PgDn', key2: '—', short: { pad: 'RS + ▲▼', kbm: 'Wheel' } },
   sprint:   { pad: 'LB', kbm: 'Shift', key1: 'Shift', key2: 'Right Shift', short: { key2: 'R-Shift' } },
@@ -50,7 +50,6 @@ const LABELS: Record<Action, Label> = {
   back:     { pad: 'B', kbm: 'Backspace', key1: 'Backspace', key2: 'Backspace', short: { kbm: 'Bksp', key1: 'Bksp', key2: 'Bksp' } },
   modePrev: { pad: 'LB', kbm: 'Q', key1: 'Q', key2: 'Q' },
   modeNext: { pad: 'RB', kbm: 'E', key1: 'E', key2: 'E' },
-  pick:     { pad: 'D-pad', kbm: 'Arrow keys', key1: 'Arrow keys', key2: 'Arrow keys', short: { pad: 'D-pad ◀▶', kbm: 'Arrows', key1: 'Arrows', key2: 'Arrows' } },
 };
 
 /** The action's name in this scheme's words, as it reads in a sentence. */

@@ -1,0 +1,1818 @@
+{
+  "scope": "Snapshot before roster-wide mouth recovery, with three priority repair results. Source SHA-256 values identify precisely which deliveries were sampled. Later main changes require rerunning throat-audit.mjs.",
+  "models": 52,
+  "clips": 1212,
+  "phasesPerClip": 25,
+  "sampledPoses": 30300,
+  "limits": "Edge strain locates candidates, not intersections. Mouth-region membership includes neck/pouch influences and can include limb roots. Hidden legacy oral surfaces are inventoried separately. This is not a blanket visual approval of every animation.",
+  "rows": [
+    {
+      "id": "aphaneramma",
+      "variant": "authored",
+      "clips": 23,
+      "beforeSha256": "3be78621d48b70e738eff4bdb1ee3032a61be4be713cfea00710b9975d7d923f",
+      "afterPriorityRepairSha256": "3be78621d48b70e738eff4bdb1ee3032a61be4be713cfea00710b9975d7d923f",
+      "mouthSkinBefore": {
+        "ratio": 2.8240326891293734,
+        "rest": 0.0347542803169994,
+        "posed": 0.09814722370237186,
+        "phase": 0.5,
+        "mesh": "Aphaneramma_authored_body",
+        "vertices": [
+          4333,
+          7916
+        ],
+        "clip": "Ability"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 2.8240326891293734,
+        "rest": 0.0347542803169994,
+        "posed": 0.09814722370237186,
+        "phase": 0.5,
+        "mesh": "Aphaneramma_authored_body",
+        "vertices": [
+          4333,
+          7916
+        ],
+        "clip": "Ability"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "aphaneramma",
+      "variant": "puppet",
+      "clips": 23,
+      "beforeSha256": "cd0d6e4a5b2b5552808fb31e3f05b110b7ca1b4b35bd70b0dda47ebeaf82899d",
+      "afterPriorityRepairSha256": "cd0d6e4a5b2b5552808fb31e3f05b110b7ca1b4b35bd70b0dda47ebeaf82899d",
+      "mouthSkinBefore": {
+        "ratio": 3.5700915450868567,
+        "rest": 0.026083002754407225,
+        "posed": 0.09311870760398643,
+        "phase": 0.5,
+        "mesh": "Aphaneramma_procedural_volume_twin",
+        "vertices": [
+          1709,
+          1890
+        ],
+        "clip": "Ability"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 3.5700915450868567,
+        "rest": 0.026083002754407225,
+        "posed": 0.09311870760398643,
+        "phase": 0.5,
+        "mesh": "Aphaneramma_procedural_volume_twin",
+        "vertices": [
+          1709,
+          1890
+        ],
+        "clip": "Ability"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "archelon",
+      "variant": "authored",
+      "clips": 22,
+      "beforeSha256": "3e96a2494879aba05fe1efc5076c175342a0b027db249fce251c28606166e1b7",
+      "afterPriorityRepairSha256": "3e96a2494879aba05fe1efc5076c175342a0b027db249fce251c28606166e1b7",
+      "mouthSkinBefore": {
+        "ratio": 1.5479905826646356,
+        "rest": 0.05639492883805694,
+        "posed": 0.08729881875135442,
+        "phase": 0.4583333333333333,
+        "mesh": "Archelon_authored_body",
+        "vertices": [
+          9740,
+          1891
+        ],
+        "clip": "Dive"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.5479905826646356,
+        "rest": 0.05639492883805694,
+        "posed": 0.08729881875135442,
+        "phase": 0.4583333333333333,
+        "mesh": "Archelon_authored_body",
+        "vertices": [
+          9740,
+          1891
+        ],
+        "clip": "Dive"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "archelon",
+      "variant": "puppet",
+      "clips": 22,
+      "beforeSha256": "84d03295d929ce4e474e1af89a4023181ccd5d9816a51afc34f91fabbe819b1e",
+      "afterPriorityRepairSha256": "84d03295d929ce4e474e1af89a4023181ccd5d9816a51afc34f91fabbe819b1e",
+      "mouthSkinBefore": {
+        "ratio": 1.575909362557461,
+        "rest": 0.05117801332732787,
+        "posed": 0.0806519103596265,
+        "phase": 0.7083333333333334,
+        "mesh": "Archelon_procedural_volume_twin",
+        "vertices": [
+          1919,
+          1917
+        ],
+        "clip": "Heavy"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.575909362557461,
+        "rest": 0.05117801332732787,
+        "posed": 0.0806519103596265,
+        "phase": 0.7083333333333334,
+        "mesh": "Archelon_procedural_volume_twin",
+        "vertices": [
+          1919,
+          1917
+        ],
+        "clip": "Heavy"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "atopodentatus",
+      "variant": "authored",
+      "clips": 23,
+      "beforeSha256": "4fcdeab652963e6e0dda0517f846492d3a2d56a1a65ebb64a2938d2acf679d9d",
+      "afterPriorityRepairSha256": "4fcdeab652963e6e0dda0517f846492d3a2d56a1a65ebb64a2938d2acf679d9d",
+      "mouthSkinBefore": {
+        "ratio": 3.92082138442559,
+        "rest": 0.02539113711288948,
+        "posed": 0.09955411336709931,
+        "phase": 0.5416666666666666,
+        "mesh": "Atopodentatus_authored_body",
+        "vertices": [
+          3682,
+          4583
+        ],
+        "clip": "Heavy"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 3.92082138442559,
+        "rest": 0.02539113711288948,
+        "posed": 0.09955411336709931,
+        "phase": 0.5416666666666666,
+        "mesh": "Atopodentatus_authored_body",
+        "vertices": [
+          3682,
+          4583
+        ],
+        "clip": "Heavy"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "atopodentatus",
+      "variant": "puppet",
+      "clips": 23,
+      "beforeSha256": "4c9b2a0769497207a4c14953952fd20b5807cb6670047fa62d1ed17cf4a2e038",
+      "afterPriorityRepairSha256": "4c9b2a0769497207a4c14953952fd20b5807cb6670047fa62d1ed17cf4a2e038",
+      "mouthSkinBefore": {
+        "ratio": 3.450790985145693,
+        "rest": 0.02308437865665476,
+        "posed": 0.0796593657660739,
+        "phase": 0.5416666666666666,
+        "mesh": "Atopodentatus_procedural_volume_twin",
+        "vertices": [
+          1661,
+          1662
+        ],
+        "clip": "Heavy"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 3.450790985145693,
+        "rest": 0.02308437865665476,
+        "posed": 0.0796593657660739,
+        "phase": 0.5416666666666666,
+        "mesh": "Atopodentatus_procedural_volume_twin",
+        "vertices": [
+          1661,
+          1662
+        ],
+        "clip": "Heavy"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "birgeria",
+      "variant": "authored",
+      "clips": 23,
+      "beforeSha256": "5bc0cddb4cfc7959f7998900f4336cbd76f418ec6042caab858758744add8521",
+      "afterPriorityRepairSha256": "5bc0cddb4cfc7959f7998900f4336cbd76f418ec6042caab858758744add8521",
+      "mouthSkinBefore": {
+        "ratio": 1.622400158823139,
+        "rest": 0.06809129425914348,
+        "posed": 0.11047132662050747,
+        "phase": 0.20833333333333334,
+        "mesh": "Birgeria_authored_body",
+        "vertices": [
+          1983,
+          6435
+        ],
+        "clip": "FastStart"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.622400158823139,
+        "rest": 0.06809129425914348,
+        "posed": 0.11047132662050747,
+        "phase": 0.20833333333333334,
+        "mesh": "Birgeria_authored_body",
+        "vertices": [
+          1983,
+          6435
+        ],
+        "clip": "FastStart"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "birgeria",
+      "variant": "puppet",
+      "clips": 23,
+      "beforeSha256": "96e74fb6ca38c43950367e6b9634c8a259baac0deb92349593114da241d8bc0e",
+      "afterPriorityRepairSha256": "96e74fb6ca38c43950367e6b9634c8a259baac0deb92349593114da241d8bc0e",
+      "mouthSkinBefore": {
+        "ratio": 1.645250107866584,
+        "rest": 0.05503346998835774,
+        "posed": 0.09054382243461798,
+        "phase": 0.20833333333333334,
+        "mesh": "Birgeria_procedural_volume_twin",
+        "vertices": [
+          2264,
+          2265
+        ],
+        "clip": "FastStart"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.645250107866584,
+        "rest": 0.05503346998835774,
+        "posed": 0.09054382243461798,
+        "phase": 0.20833333333333334,
+        "mesh": "Birgeria_procedural_volume_twin",
+        "vertices": [
+          2264,
+          2265
+        ],
+        "clip": "FastStart"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "cartorhynchus",
+      "variant": "authored",
+      "clips": 23,
+      "beforeSha256": "4e046c4872bb120f9c2ca267df62f5df4afa5711f4a6924589afa6b8c71e1b88",
+      "afterPriorityRepairSha256": "4e046c4872bb120f9c2ca267df62f5df4afa5711f4a6924589afa6b8c71e1b88",
+      "mouthSkinBefore": {
+        "ratio": 1.293323846493986,
+        "rest": 0.05652757101593667,
+        "posed": 0.07310845557929317,
+        "phase": 0.20833333333333334,
+        "mesh": "Cartorhynchus_authored_body",
+        "vertices": [
+          4624,
+          5359
+        ],
+        "clip": "Ability"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.293323846493986,
+        "rest": 0.05652757101593667,
+        "posed": 0.07310845557929317,
+        "phase": 0.20833333333333334,
+        "mesh": "Cartorhynchus_authored_body",
+        "vertices": [
+          4624,
+          5359
+        ],
+        "clip": "Ability"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "cartorhynchus",
+      "variant": "puppet",
+      "clips": 23,
+      "beforeSha256": "3f6ad57034b8e820e43533383bceb5019c36a68239a06b9ebf44e08f5d1ed59d",
+      "afterPriorityRepairSha256": "3f6ad57034b8e820e43533383bceb5019c36a68239a06b9ebf44e08f5d1ed59d",
+      "mouthSkinBefore": {
+        "ratio": 1.2173189257241679,
+        "rest": 0.04010874905869723,
+        "posed": 0.04882513931627354,
+        "phase": 0.20833333333333334,
+        "mesh": "Cartorhynchus_procedural_volume_twin",
+        "vertices": [
+          1473,
+          1472
+        ],
+        "clip": "Attack"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.2173189257241679,
+        "rest": 0.04010874905869723,
+        "posed": 0.04882513931627354,
+        "phase": 0.20833333333333334,
+        "mesh": "Cartorhynchus_procedural_volume_twin",
+        "vertices": [
+          1473,
+          1472
+        ],
+        "clip": "Attack"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "ceratites",
+      "variant": "authored",
+      "clips": 21,
+      "beforeSha256": "dbc5122c0af9174acaf65e8eafb0a17d8ad0f4bac7a299914a892ea57d420519",
+      "afterPriorityRepairSha256": "a5bec74e67e4965354eb32cae08e89d2d40897c1bc865116b1c4c8694402f793",
+      "mouthSkinBefore": {
+        "ratio": 1.5847636426074245,
+        "rest": 0.04733207464689658,
+        "posed": 0.07501015102958235,
+        "phase": 0.20833333333333334,
+        "mesh": "Ceratites_authored_body",
+        "vertices": [
+          13059,
+          7018
+        ],
+        "clip": "Guard"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.6061516007345875,
+        "rest": 0.1371125576807887,
+        "posed": 0.22022355399981222,
+        "phase": 0.041666666666666664,
+        "mesh": "Ceratites_authored_body",
+        "vertices": [
+          4422,
+          9290
+        ],
+        "clip": "Guard"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Ceratites_oral_lining"
+      ],
+      "reviewStatus": "priority repair verified"
+    },
+    {
+      "id": "ceratites",
+      "variant": "puppet",
+      "clips": 21,
+      "beforeSha256": "a0c6b744cd2d1e580cc1cf4367d42f68c92963d5183019272370eddf5d50959b",
+      "afterPriorityRepairSha256": "50c3e4257080bfe9d4205801f05f52999c26534888302bc8d3d31cd942c3a675",
+      "mouthSkinBefore": {
+        "ratio": 1.5728584033337452,
+        "rest": 0.06494770243495236,
+        "posed": 0.10215353955203436,
+        "phase": 0.375,
+        "mesh": "Ceratites_procedural_volume_twin",
+        "vertices": [
+          1980,
+          1982
+        ],
+        "clip": "Guard"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.6137920932471799,
+        "rest": 0.06494771489665664,
+        "posed": 0.10481210877469657,
+        "phase": 0.375,
+        "mesh": "Ceratites_procedural_volume_twin",
+        "vertices": [
+          1980,
+          1982
+        ],
+        "clip": "Guard"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Ceratites_oral_lining"
+      ],
+      "reviewStatus": "priority repair verified"
+    },
+    {
+      "id": "coelophysis",
+      "variant": "authored",
+      "clips": 29,
+      "beforeSha256": "99f3270a65a1f07cbf10b3d2e93369f1298d0111db6e5a0ea640f281ed9b0994",
+      "afterPriorityRepairSha256": "99f3270a65a1f07cbf10b3d2e93369f1298d0111db6e5a0ea640f281ed9b0994",
+      "mouthSkinBefore": {
+        "ratio": 2.7744120001339585,
+        "rest": 0.033097847018691715,
+        "posed": 0.09182706394725626,
+        "phase": 0.4166666666666667,
+        "mesh": "Coelophysis_authored_body",
+        "vertices": [
+          7636,
+          243
+        ],
+        "clip": "SnapRight"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 2.7744120001339585,
+        "rest": 0.033097847018691715,
+        "posed": 0.09182706394725626,
+        "phase": 0.4166666666666667,
+        "mesh": "Coelophysis_authored_body",
+        "vertices": [
+          7636,
+          243
+        ],
+        "clip": "SnapRight"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "coelophysis",
+      "variant": "puppet",
+      "clips": 29,
+      "beforeSha256": "5266ebf60bce37d39b9cfb3203b4656e664f80d89fadc673b82bc4396fec2179",
+      "afterPriorityRepairSha256": "5266ebf60bce37d39b9cfb3203b4656e664f80d89fadc673b82bc4396fec2179",
+      "mouthSkinBefore": {
+        "ratio": 2.252392158637041,
+        "rest": 0.03757701289111438,
+        "posed": 0.08463816918094902,
+        "phase": 0.4166666666666667,
+        "mesh": "Coelophysis_procedural_volume_puppet",
+        "vertices": [
+          232,
+          233
+        ],
+        "clip": "SnapLeft"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 2.252392158637041,
+        "rest": 0.03757701289111438,
+        "posed": 0.08463816918094902,
+        "phase": 0.4166666666666667,
+        "mesh": "Coelophysis_procedural_volume_puppet",
+        "vertices": [
+          232,
+          233
+        ],
+        "clip": "SnapLeft"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "cymbospondylus",
+      "variant": "authored",
+      "clips": 23,
+      "beforeSha256": "ddf1a1b32d0b9db02583169aec75b7b9bf8e21d6be9aa22d23b6758a77ced8fe",
+      "afterPriorityRepairSha256": "ddf1a1b32d0b9db02583169aec75b7b9bf8e21d6be9aa22d23b6758a77ced8fe",
+      "mouthSkinBefore": {
+        "ratio": 1.148300874267554,
+        "rest": 0.08937300612693985,
+        "posed": 0.1026271010714845,
+        "phase": 0.625,
+        "mesh": "Cymbospondylus_authored_body",
+        "vertices": [
+          3595,
+          5608
+        ],
+        "clip": "Attack"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.148300874267554,
+        "rest": 0.08937300612693985,
+        "posed": 0.1026271010714845,
+        "phase": 0.625,
+        "mesh": "Cymbospondylus_authored_body",
+        "vertices": [
+          3595,
+          5608
+        ],
+        "clip": "Attack"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "cymbospondylus",
+      "variant": "puppet",
+      "clips": 23,
+      "beforeSha256": "f874efe4690cb5933c239b7d631a4d653a523efad1380413ef48059e01997e00",
+      "afterPriorityRepairSha256": "f874efe4690cb5933c239b7d631a4d653a523efad1380413ef48059e01997e00",
+      "mouthSkinBefore": {
+        "ratio": 1.2218849702542993,
+        "rest": 0.07699215362307105,
+        "posed": 0.09407555533954061,
+        "phase": 0.625,
+        "mesh": "Cymbospondylus_procedural_volume_twin",
+        "vertices": [
+          3018,
+          3022
+        ],
+        "clip": "Attack"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.2218849702542993,
+        "rest": 0.07699215362307105,
+        "posed": 0.09407555533954061,
+        "phase": 0.625,
+        "mesh": "Cymbospondylus_procedural_volume_twin",
+        "vertices": [
+          3018,
+          3022
+        ],
+        "clip": "Attack"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "dinocephalosaurus",
+      "variant": "authored",
+      "clips": 24,
+      "beforeSha256": "216e77811a9ba5aeed6ba23df400e59580f03ea8a34fc1a157d043f30cf0f51c",
+      "afterPriorityRepairSha256": "216e77811a9ba5aeed6ba23df400e59580f03ea8a34fc1a157d043f30cf0f51c",
+      "mouthSkinBefore": {
+        "ratio": 6.705511995798032,
+        "rest": 0.029940435318256912,
+        "posed": 0.20076594818598678,
+        "phase": 0.375,
+        "mesh": "Dinocephalosaurus_authored_body",
+        "vertices": [
+          5421,
+          10925
+        ],
+        "clip": "Sprint"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 6.705511995798032,
+        "rest": 0.029940435318256912,
+        "posed": 0.20076594818598678,
+        "phase": 0.375,
+        "mesh": "Dinocephalosaurus_authored_body",
+        "vertices": [
+          5421,
+          10925
+        ],
+        "clip": "Sprint"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Mouth_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "dinocephalosaurus",
+      "variant": "puppet",
+      "clips": 24,
+      "beforeSha256": "a6c6c5cb25bbf02af760c103ec65230509c2ff9d62e0e59026c697bf8c0abd0e",
+      "afterPriorityRepairSha256": "a6c6c5cb25bbf02af760c103ec65230509c2ff9d62e0e59026c697bf8c0abd0e",
+      "mouthSkinBefore": {
+        "ratio": 6.717022841617027,
+        "rest": 0.05335881403865775,
+        "posed": 0.35841237269925935,
+        "phase": 0.375,
+        "mesh": "Dinocephalosaurus_procedural_volume_puppet",
+        "vertices": [
+          861,
+          914
+        ],
+        "clip": "Sprint"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 6.717022841617027,
+        "rest": 0.05335881403865775,
+        "posed": 0.35841237269925935,
+        "phase": 0.375,
+        "mesh": "Dinocephalosaurus_procedural_volume_puppet",
+        "vertices": [
+          861,
+          914
+        ],
+        "clip": "Sprint"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Mouth_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "helicoprion",
+      "variant": "authored",
+      "clips": 21,
+      "beforeSha256": "1724fe50340a60244984ef9e775e151e6c0a09cc76ba3518b9a9a77b89f7a62f",
+      "afterPriorityRepairSha256": "1724fe50340a60244984ef9e775e151e6c0a09cc76ba3518b9a9a77b89f7a62f",
+      "mouthSkinBefore": {
+        "ratio": 4.20959788336927,
+        "rest": 0.0206237992539748,
+        "posed": 0.08681790168656504,
+        "phase": 0.25,
+        "mesh": "Helicoprion_authored_body",
+        "vertices": [
+          2595,
+          1523
+        ],
+        "clip": "Eat"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 4.20959788336927,
+        "rest": 0.0206237992539748,
+        "posed": 0.08681790168656504,
+        "phase": 0.25,
+        "mesh": "Helicoprion_authored_body",
+        "vertices": [
+          2595,
+          1523
+        ],
+        "clip": "Eat"
+      },
+      "legacyMixedLiningMeshesBefore": [],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "helicoprion",
+      "variant": "puppet",
+      "clips": 21,
+      "beforeSha256": "7f1741d4da38a8406004c053b27d4da84680b3a6b5342672f35ec775cb1adac5",
+      "afterPriorityRepairSha256": "7f1741d4da38a8406004c053b27d4da84680b3a6b5342672f35ec775cb1adac5",
+      "mouthSkinBefore": {
+        "ratio": 10.553425556190888,
+        "rest": 0.0257877298010982,
+        "posed": 0.2721488867190551,
+        "phase": 0.25,
+        "mesh": "Helicoprion_procedural_volume_twin",
+        "vertices": [
+          2368,
+          2366
+        ],
+        "clip": "Eat"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 10.553425556190888,
+        "rest": 0.0257877298010982,
+        "posed": 0.2721488867190551,
+        "phase": 0.25,
+        "mesh": "Helicoprion_procedural_volume_twin",
+        "vertices": [
+          2368,
+          2366
+        ],
+        "clip": "Eat"
+      },
+      "legacyMixedLiningMeshesBefore": [],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "henodus",
+      "variant": "authored",
+      "clips": 24,
+      "beforeSha256": "4025fb20207022ec588ae82cf305ad918ca33169a5c3f9e0fcf78ff3f70a4236",
+      "afterPriorityRepairSha256": "f07b5096a8c530ba99833ed35120d58d6ca18bf61d7f4dbc56693c59e45724ff",
+      "mouthSkinBefore": {
+        "ratio": 4.842775973666979,
+        "rest": 0.044592033508242084,
+        "posed": 0.2159492284906676,
+        "phase": 0.4583333333333333,
+        "mesh": "Henodus_authored_body",
+        "vertices": [
+          5641,
+          1658
+        ],
+        "clip": "Dodge"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 4.842775973666979,
+        "rest": 0.044592033508242084,
+        "posed": 0.2159492284906676,
+        "phase": 0.4583333333333333,
+        "mesh": "Henodus_authored_body",
+        "vertices": [
+          5774,
+          1685
+        ],
+        "clip": "Dodge"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "priority repair verified"
+    },
+    {
+      "id": "henodus",
+      "variant": "puppet",
+      "clips": 24,
+      "beforeSha256": "7ae8e7e627e4caf063d1cc1fccd83b86d42c42e56e15ab854d356fbab3219b7a",
+      "afterPriorityRepairSha256": "1da063701d48e1a0158a9ff46b590865b8e3b6972dc44915ff0013227aab4e11",
+      "mouthSkinBefore": {
+        "ratio": 5.168191764686428,
+        "rest": 0.024065632888203445,
+        "posed": 0.12437580570477991,
+        "phase": 0.08333333333333333,
+        "mesh": "Henodus_procedural_volume_puppet",
+        "vertices": [
+          1036,
+          1035
+        ],
+        "clip": "Crawl"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 5.168175374602185,
+        "rest": 0.024065697142896723,
+        "posed": 0.12437574334655299,
+        "phase": 0.08333333333333333,
+        "mesh": "Henodus_procedural_volume_puppet",
+        "vertices": [
+          1069,
+          1068
+        ],
+        "clip": "Crawl"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "priority repair verified"
+    },
+    {
+      "id": "hupehsuchus",
+      "variant": "authored",
+      "clips": 23,
+      "beforeSha256": "395a93b1ee73e105d2bd7b4fcf0b906b942d8539330863c147ae8669ecfd9675",
+      "afterPriorityRepairSha256": "f31f31e60372e728d19a325b01361d5afc713be73c726c0a8993ec43aad75e41",
+      "mouthSkinBefore": {
+        "ratio": 5.807426706292617,
+        "rest": 0.014389879156338384,
+        "posed": 0.083568168512843,
+        "phase": 0.4166666666666667,
+        "mesh": "Hupehsuchus_authored_body",
+        "vertices": [
+          10958,
+          10971
+        ],
+        "clip": "Attack"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 3.166521982421134,
+        "rest": 0.0255018340870471,
+        "posed": 0.08075211822869123,
+        "phase": 0.5,
+        "mesh": "Hupehsuchus_authored_body",
+        "vertices": [
+          3679,
+          2906
+        ],
+        "clip": "Heavy"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "priority repair verified"
+    },
+    {
+      "id": "hupehsuchus",
+      "variant": "puppet",
+      "clips": 23,
+      "beforeSha256": "da48df005dd528898da2e4cc9f5cade01093ba2309b1a6147661060cc4ad3e4e",
+      "afterPriorityRepairSha256": "a08e963201ffa7f674581cd25333dc999a0834d1dac1369098b0f167c8a2865d",
+      "mouthSkinBefore": {
+        "ratio": 4.698803676546005,
+        "rest": 0.013079322199598677,
+        "posed": 0.06145716723820405,
+        "phase": 0.4166666666666667,
+        "mesh": "Hupehsuchus_procedural_volume_twin",
+        "vertices": [
+          3198,
+          3184
+        ],
+        "clip": "Attack"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 2.927870060294404,
+        "rest": 0.04363897819191612,
+        "posed": 0.12776925770995162,
+        "phase": 0.6666666666666666,
+        "mesh": "Hupehsuchus_procedural_volume_twin_lower_jaw",
+        "vertices": [
+          93,
+          92
+        ],
+        "clip": "Ability"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "priority repair verified"
+    },
+    {
+      "id": "hybodus",
+      "variant": "authored",
+      "clips": 23,
+      "beforeSha256": "a1592bc0b343bcc1dbf7950bb0d9c2960de682e5fe3c5135e098df383e72a212",
+      "afterPriorityRepairSha256": "a1592bc0b343bcc1dbf7950bb0d9c2960de682e5fe3c5135e098df383e72a212",
+      "mouthSkinBefore": {
+        "ratio": 6.083311787054787,
+        "rest": 0.016669982290208534,
+        "posed": 0.10140869975602013,
+        "phase": 0.5416666666666666,
+        "mesh": "Hybodus_authored_body",
+        "vertices": [
+          10077,
+          2243
+        ],
+        "clip": "Shake"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 6.083311787054787,
+        "rest": 0.016669982290208534,
+        "posed": 0.10140869975602013,
+        "phase": 0.5416666666666666,
+        "mesh": "Hybodus_authored_body",
+        "vertices": [
+          10077,
+          2243
+        ],
+        "clip": "Shake"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Mouth_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "hybodus",
+      "variant": "puppet",
+      "clips": 23,
+      "beforeSha256": "f76996122a8ef57485ea16ac9e2754997ce7eb47bea4c29d8440796c45e0ea75",
+      "afterPriorityRepairSha256": "f76996122a8ef57485ea16ac9e2754997ce7eb47bea4c29d8440796c45e0ea75",
+      "mouthSkinBefore": {
+        "ratio": 4.550300753701493,
+        "rest": 0.01754533573914054,
+        "posed": 0.07983655443775695,
+        "phase": 0.5416666666666666,
+        "mesh": "Hybodus_procedural_volume_twin",
+        "vertices": [
+          1977,
+          1976
+        ],
+        "clip": "Shake"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 4.550300753701493,
+        "rest": 0.01754533573914054,
+        "posed": 0.07983655443775695,
+        "phase": 0.5416666666666666,
+        "mesh": "Hybodus_procedural_volume_twin",
+        "vertices": [
+          1977,
+          1976
+        ],
+        "clip": "Shake"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Mouth_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "keichousaurus",
+      "variant": "authored",
+      "clips": 23,
+      "beforeSha256": "510d3c0666196861df719e92edda250ff66c469e5bbc611f220003f11b4107ce",
+      "afterPriorityRepairSha256": "510d3c0666196861df719e92edda250ff66c469e5bbc611f220003f11b4107ce",
+      "mouthSkinBefore": {
+        "ratio": 2.316790892051342,
+        "rest": 0.03461948837852623,
+        "posed": 0.08020611536284684,
+        "phase": 0.041666666666666664,
+        "mesh": "Keichousaurus_authored_body",
+        "vertices": [
+          208,
+          9295
+        ],
+        "clip": "Sprint"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 2.316790892051342,
+        "rest": 0.03461948837852623,
+        "posed": 0.08020611536284684,
+        "phase": 0.041666666666666664,
+        "mesh": "Keichousaurus_authored_body",
+        "vertices": [
+          208,
+          9295
+        ],
+        "clip": "Sprint"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "keichousaurus",
+      "variant": "puppet",
+      "clips": 23,
+      "beforeSha256": "51bc695d23e5829d529a531284c86bac7f6f7735689f267498fab4cf60be9040",
+      "afterPriorityRepairSha256": "51bc695d23e5829d529a531284c86bac7f6f7735689f267498fab4cf60be9040",
+      "mouthSkinBefore": {
+        "ratio": 2.271095932699796,
+        "rest": 0.0859969351921322,
+        "posed": 0.19530728973949937,
+        "phase": 0.08333333333333333,
+        "mesh": "Keichousaurus_procedural_volume_puppet",
+        "vertices": [
+          962,
+          959
+        ],
+        "clip": "Sprint"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 2.271095932699796,
+        "rest": 0.0859969351921322,
+        "posed": 0.19530728973949937,
+        "phase": 0.08333333333333333,
+        "mesh": "Keichousaurus_procedural_volume_puppet",
+        "vertices": [
+          962,
+          959
+        ],
+        "clip": "Sprint"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "macrocnemus",
+      "variant": "authored",
+      "clips": 26,
+      "beforeSha256": "4980648fe4bded9fc143a79c7faf617807bb66ee63a9997eeebe037aa3868071",
+      "afterPriorityRepairSha256": "4980648fe4bded9fc143a79c7faf617807bb66ee63a9997eeebe037aa3868071",
+      "mouthSkinBefore": {
+        "ratio": 2.8467611823447583,
+        "rest": 0.02672447067944186,
+        "posed": 0.07607818574894573,
+        "phase": 0.3333333333333333,
+        "mesh": "Macrocnemus_authored_body",
+        "vertices": [
+          12184,
+          12030
+        ],
+        "clip": "Snatch"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 2.8467611823447583,
+        "rest": 0.02672447067944186,
+        "posed": 0.07607818574894573,
+        "phase": 0.3333333333333333,
+        "mesh": "Macrocnemus_authored_body",
+        "vertices": [
+          12184,
+          12030
+        ],
+        "clip": "Snatch"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "macrocnemus",
+      "variant": "puppet",
+      "clips": 26,
+      "beforeSha256": "6bd1871024707bbed0f7be5c9e8a3f128476ef05d197e8f5373b18ccf8cfc95f",
+      "afterPriorityRepairSha256": "6bd1871024707bbed0f7be5c9e8a3f128476ef05d197e8f5373b18ccf8cfc95f",
+      "mouthSkinBefore": {
+        "ratio": 2.3945027856069747,
+        "rest": 0.03818321457622709,
+        "posed": 0.0914298136662046,
+        "phase": 0.3333333333333333,
+        "mesh": "Macrocnemus_procedural_volume_puppet",
+        "vertices": [
+          3572,
+          3508
+        ],
+        "clip": "Snatch"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 2.3945027856069747,
+        "rest": 0.03818321457622709,
+        "posed": 0.0914298136662046,
+        "phase": 0.3333333333333333,
+        "mesh": "Macrocnemus_procedural_volume_puppet",
+        "vertices": [
+          3572,
+          3508
+        ],
+        "clip": "Snatch"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "mixosaurus",
+      "variant": "authored",
+      "clips": 23,
+      "beforeSha256": "75fefe166b9dada21d63637b4c173c30f071f0ddf43ffd57f0a6c04dc981c532",
+      "afterPriorityRepairSha256": "75fefe166b9dada21d63637b4c173c30f071f0ddf43ffd57f0a6c04dc981c532",
+      "mouthSkinBefore": {
+        "ratio": 1.8031192968939704,
+        "rest": 0.0349201403599185,
+        "posed": 0.062965178933215,
+        "phase": 0.5416666666666666,
+        "mesh": "Mixosaurus_authored_body",
+        "vertices": [
+          10912,
+          10897
+        ],
+        "clip": "Dart"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.8031192968939704,
+        "rest": 0.0349201403599185,
+        "posed": 0.062965178933215,
+        "phase": 0.5416666666666666,
+        "mesh": "Mixosaurus_authored_body",
+        "vertices": [
+          10912,
+          10897
+        ],
+        "clip": "Dart"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "mixosaurus",
+      "variant": "puppet",
+      "clips": 23,
+      "beforeSha256": "6a6c1969e57182b6bc7e1c556e7caf1e50fcf399cffe8bc4e234cfde7f0002bf",
+      "afterPriorityRepairSha256": "6a6c1969e57182b6bc7e1c556e7caf1e50fcf399cffe8bc4e234cfde7f0002bf",
+      "mouthSkinBefore": {
+        "ratio": 1.6577285739564624,
+        "rest": 0.04511616702267889,
+        "posed": 0.07479035922088706,
+        "phase": 0.5416666666666666,
+        "mesh": "Mixosaurus_procedural_volume_twin",
+        "vertices": [
+          3269,
+          3238
+        ],
+        "clip": "Dart"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.6577285739564624,
+        "rest": 0.04511616702267889,
+        "posed": 0.07479035922088706,
+        "phase": 0.5416666666666666,
+        "mesh": "Mixosaurus_procedural_volume_twin",
+        "vertices": [
+          3269,
+          3238
+        ],
+        "clip": "Dart"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "mosasaurus",
+      "variant": "authored",
+      "clips": 22,
+      "beforeSha256": "4c1bccea8f6383b04b77d093da206ec34da27aba9f354b7604b5dd7a8ac943ae",
+      "afterPriorityRepairSha256": "4c1bccea8f6383b04b77d093da206ec34da27aba9f354b7604b5dd7a8ac943ae",
+      "mouthSkinBefore": {
+        "ratio": 2.547924164255748,
+        "rest": 0.03177201461820769,
+        "posed": 0.08095268379281824,
+        "phase": 0.5416666666666666,
+        "mesh": "Mosasaurus_authored_body",
+        "vertices": [
+          4808,
+          3076
+        ],
+        "clip": "Dodge"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 2.547924164255748,
+        "rest": 0.03177201461820769,
+        "posed": 0.08095268379281824,
+        "phase": 0.5416666666666666,
+        "mesh": "Mosasaurus_authored_body",
+        "vertices": [
+          4808,
+          3076
+        ],
+        "clip": "Dodge"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "mosasaurus",
+      "variant": "puppet",
+      "clips": 22,
+      "beforeSha256": "0cdf6c07803d63a0b1b4d82b6585972d780a2cb0afe7179fd053d36240cc6afb",
+      "afterPriorityRepairSha256": "0cdf6c07803d63a0b1b4d82b6585972d780a2cb0afe7179fd053d36240cc6afb",
+      "mouthSkinBefore": {
+        "ratio": 2.4775598384286326,
+        "rest": 0.06212473283136221,
+        "posed": 0.15391774303609174,
+        "phase": 0.5,
+        "mesh": "Mosasaurus_procedural_volume_twin",
+        "vertices": [
+          1363,
+          1069
+        ],
+        "clip": "TurnRight"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 2.4775598384286326,
+        "rest": 0.06212473283136221,
+        "posed": 0.15391774303609174,
+        "phase": 0.5,
+        "mesh": "Mosasaurus_procedural_volume_twin",
+        "vertices": [
+          1363,
+          1069
+        ],
+        "clip": "TurnRight"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "mystriosuchus",
+      "variant": "authored",
+      "clips": 27,
+      "beforeSha256": "e175c276f7b8391306861a5ee4fc457b5e2ca7d54d437398f2eafcf7a514745f",
+      "afterPriorityRepairSha256": "e175c276f7b8391306861a5ee4fc457b5e2ca7d54d437398f2eafcf7a514745f",
+      "mouthSkinBefore": {
+        "ratio": 2.05296702627306,
+        "rest": 0.039260358772757784,
+        "posed": 0.08060022200012198,
+        "phase": 0.5833333333333334,
+        "mesh": "Mystriosuchus_authored_body",
+        "vertices": [
+          4220,
+          10146
+        ],
+        "clip": "SnapLeft"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 2.05296702627306,
+        "rest": 0.039260358772757784,
+        "posed": 0.08060022200012198,
+        "phase": 0.5833333333333334,
+        "mesh": "Mystriosuchus_authored_body",
+        "vertices": [
+          4220,
+          10146
+        ],
+        "clip": "SnapLeft"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "mystriosuchus",
+      "variant": "puppet",
+      "clips": 27,
+      "beforeSha256": "25d967b403692e74836fec2c1555a391ea25face184326060f33ad4a802bb3e3",
+      "afterPriorityRepairSha256": "25d967b403692e74836fec2c1555a391ea25face184326060f33ad4a802bb3e3",
+      "mouthSkinBefore": {
+        "ratio": 1.844943131554597,
+        "rest": 0.08962414244036132,
+        "posed": 0.16535144601681548,
+        "phase": 0.5833333333333334,
+        "mesh": "Mystriosuchus_procedural_volume_twin",
+        "vertices": [
+          2154,
+          2167
+        ],
+        "clip": "SnapLeft"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.844943131554597,
+        "rest": 0.08962414244036132,
+        "posed": 0.16535144601681548,
+        "phase": 0.5833333333333334,
+        "mesh": "Mystriosuchus_procedural_volume_twin",
+        "vertices": [
+          2154,
+          2167
+        ],
+        "clip": "SnapLeft"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "nothosaurus",
+      "variant": "authored",
+      "clips": 21,
+      "beforeSha256": "49a50b0f8dd6ffb657893d62d19b7472290394dfdc93c3713b7b3f3765c6d10b",
+      "afterPriorityRepairSha256": "49a50b0f8dd6ffb657893d62d19b7472290394dfdc93c3713b7b3f3765c6d10b",
+      "mouthSkinBefore": {
+        "ratio": 1.5409659406108422,
+        "rest": 0.05698326785975083,
+        "posed": 0.08780927495658052,
+        "phase": 0.4583333333333333,
+        "mesh": "Nothosaurus_authored_body",
+        "vertices": [
+          10903,
+          9498
+        ],
+        "clip": "Dodge"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.5409659406108422,
+        "rest": 0.05698326785975083,
+        "posed": 0.08780927495658052,
+        "phase": 0.4583333333333333,
+        "mesh": "Nothosaurus_authored_body",
+        "vertices": [
+          10903,
+          9498
+        ],
+        "clip": "Dodge"
+      },
+      "legacyMixedLiningMeshesBefore": [],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "nothosaurus",
+      "variant": "puppet",
+      "clips": 21,
+      "beforeSha256": "6712840284e75fef1b553f74c48ddc3e611bb3bafd3744dbf0d2836fd1dcd7b6",
+      "afterPriorityRepairSha256": "6712840284e75fef1b553f74c48ddc3e611bb3bafd3744dbf0d2836fd1dcd7b6",
+      "mouthSkinBefore": {
+        "ratio": 1.544822742849087,
+        "rest": 0.16205884998872375,
+        "posed": 0.25035219714254897,
+        "phase": 0.4583333333333333,
+        "mesh": "Nothosaurus_procedural_volume_puppet",
+        "vertices": [
+          134,
+          179
+        ],
+        "clip": "Dodge"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.544822742849087,
+        "rest": 0.16205884998872375,
+        "posed": 0.25035219714254897,
+        "phase": 0.4583333333333333,
+        "mesh": "Nothosaurus_procedural_volume_puppet",
+        "vertices": [
+          134,
+          179
+        ],
+        "clip": "Dodge"
+      },
+      "legacyMixedLiningMeshesBefore": [],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "odontochelys",
+      "variant": "authored",
+      "clips": 23,
+      "beforeSha256": "a1e9e9a0a46501e3056a69604034ec1a8589d751c4babc32f0f1aefeb515dcf8",
+      "afterPriorityRepairSha256": "a1e9e9a0a46501e3056a69604034ec1a8589d751c4babc32f0f1aefeb515dcf8",
+      "mouthSkinBefore": {
+        "ratio": 1.4141935468892157,
+        "rest": 0.07319543059919909,
+        "posed": 0.10351250561516478,
+        "phase": 0.20833333333333334,
+        "mesh": "Odontochelys_authored_body",
+        "vertices": [
+          1178,
+          3254
+        ],
+        "clip": "Heavy"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.4141935468892157,
+        "rest": 0.07319543059919909,
+        "posed": 0.10351250561516478,
+        "phase": 0.20833333333333334,
+        "mesh": "Odontochelys_authored_body",
+        "vertices": [
+          1178,
+          3254
+        ],
+        "clip": "Heavy"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "odontochelys",
+      "variant": "puppet",
+      "clips": 23,
+      "beforeSha256": "a92fa498b7d576d37c674788f921ad2320ac76a26dc08b59654ef943a954e39e",
+      "afterPriorityRepairSha256": "a92fa498b7d576d37c674788f921ad2320ac76a26dc08b59654ef943a954e39e",
+      "mouthSkinBefore": {
+        "ratio": 1.3327188137586217,
+        "rest": 0.06845814841628019,
+        "posed": 0.09123546234945659,
+        "phase": 0.20833333333333334,
+        "mesh": "Odontochelys_procedural_volume_twin",
+        "vertices": [
+          1881,
+          1877
+        ],
+        "clip": "Heavy"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.3327188137586217,
+        "rest": 0.06845814841628019,
+        "posed": 0.09123546234945659,
+        "phase": 0.20833333333333334,
+        "mesh": "Odontochelys_procedural_volume_twin",
+        "vertices": [
+          1881,
+          1877
+        ],
+        "clip": "Heavy"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "phragmoteuthis",
+      "variant": "authored",
+      "clips": 21,
+      "beforeSha256": "c1b30b12cd8eb0594058db34b2e92967c63362a6d82b4458ad6427425ec92834",
+      "afterPriorityRepairSha256": "c1b30b12cd8eb0594058db34b2e92967c63362a6d82b4458ad6427425ec92834",
+      "mouthSkinBefore": {
+        "ratio": 1.630314675767961,
+        "rest": 0.04850328914812673,
+        "posed": 0.07907562412120789,
+        "phase": 0.08333333333333333,
+        "mesh": "Phragmoteuthis_authored_body",
+        "vertices": [
+          7217,
+          6985
+        ],
+        "clip": "Guard"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.630314675767961,
+        "rest": 0.04850328914812673,
+        "posed": 0.07907562412120789,
+        "phase": 0.08333333333333333,
+        "mesh": "Phragmoteuthis_authored_body",
+        "vertices": [
+          7217,
+          6985
+        ],
+        "clip": "Guard"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Phragmoteuthis_oral_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "phragmoteuthis",
+      "variant": "puppet",
+      "clips": 21,
+      "beforeSha256": "52a8f5c89a04f8759ca8ba47a73e50c0fd4ba881d1b8c1afe11f74342119accb",
+      "afterPriorityRepairSha256": "52a8f5c89a04f8759ca8ba47a73e50c0fd4ba881d1b8c1afe11f74342119accb",
+      "mouthSkinBefore": {
+        "ratio": 1.8492202805841926,
+        "rest": 0.04196981588854311,
+        "posed": 0.07761143471347859,
+        "phase": 0.16666666666666666,
+        "mesh": "Phragmoteuthis_procedural_volume_twin",
+        "vertices": [
+          2319,
+          2263
+        ],
+        "clip": "Guard"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.8492202805841926,
+        "rest": 0.04196981588854311,
+        "posed": 0.07761143471347859,
+        "phase": 0.16666666666666666,
+        "mesh": "Phragmoteuthis_procedural_volume_twin",
+        "vertices": [
+          2319,
+          2263
+        ],
+        "clip": "Guard"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Phragmoteuthis_oral_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "placodus",
+      "variant": "authored",
+      "clips": 25,
+      "beforeSha256": "58bd12ce335d244861808935b55212fc3254a496fe962c4aebc9dab7b1315ca1",
+      "afterPriorityRepairSha256": "58bd12ce335d244861808935b55212fc3254a496fe962c4aebc9dab7b1315ca1",
+      "mouthSkinBefore": {
+        "ratio": 12.204616586476046,
+        "rest": 0.033880758965360386,
+        "posed": 0.4135016728310344,
+        "phase": 0.4166666666666667,
+        "mesh": "Placodus_authored_body",
+        "vertices": [
+          6567,
+          1784
+        ],
+        "clip": "Pry"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 12.204616586476046,
+        "rest": 0.033880758965360386,
+        "posed": 0.4135016728310344,
+        "phase": 0.4166666666666667,
+        "mesh": "Placodus_authored_body",
+        "vertices": [
+          6567,
+          1784
+        ],
+        "clip": "Pry"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "placodus",
+      "variant": "puppet",
+      "clips": 25,
+      "beforeSha256": "961e99bd4b45af68e66727a34b54b35ef0b09970d51d17727716450b7728ab7a",
+      "afterPriorityRepairSha256": "961e99bd4b45af68e66727a34b54b35ef0b09970d51d17727716450b7728ab7a",
+      "mouthSkinBefore": {
+        "ratio": 8.738812321773931,
+        "rest": 0.046255041277240214,
+        "posed": 0.40421412465770856,
+        "phase": 0.4166666666666667,
+        "mesh": "Placodus_procedural_volume_puppet",
+        "vertices": [
+          187,
+          307
+        ],
+        "clip": "Pry"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 8.738812321773931,
+        "rest": 0.046255041277240214,
+        "posed": 0.40421412465770856,
+        "phase": 0.4166666666666667,
+        "mesh": "Placodus_procedural_volume_puppet",
+        "vertices": [
+          187,
+          307
+        ],
+        "clip": "Pry"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "rhaeticosaurus",
+      "variant": "authored",
+      "clips": 23,
+      "beforeSha256": "225bf6c039aa8aa32422c3aa243f8782fe31d7f13825f0c4a0150c67a7b90064",
+      "afterPriorityRepairSha256": "225bf6c039aa8aa32422c3aa243f8782fe31d7f13825f0c4a0150c67a7b90064",
+      "mouthSkinBefore": {
+        "ratio": 1.5992253786655408,
+        "rest": 0.04734081281563389,
+        "posed": 0.0757086293014166,
+        "phase": 0.20833333333333334,
+        "mesh": "Rhaeticosaurus_authored_body",
+        "vertices": [
+          6093,
+          7753
+        ],
+        "clip": "Heavy"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.5992253786655408,
+        "rest": 0.04734081281563389,
+        "posed": 0.0757086293014166,
+        "phase": 0.20833333333333334,
+        "mesh": "Rhaeticosaurus_authored_body",
+        "vertices": [
+          6093,
+          7753
+        ],
+        "clip": "Heavy"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "rhaeticosaurus",
+      "variant": "puppet",
+      "clips": 23,
+      "beforeSha256": "a590a42eec29464dfe3026401d39c3faf54075aede84b8352311378f3600ef65",
+      "afterPriorityRepairSha256": "a590a42eec29464dfe3026401d39c3faf54075aede84b8352311378f3600ef65",
+      "mouthSkinBefore": {
+        "ratio": 1.5331747797406918,
+        "rest": 0.05423092188213853,
+        "posed": 0.0831454817117824,
+        "phase": 0.5833333333333334,
+        "mesh": "Rhaeticosaurus_procedural_volume_twin",
+        "vertices": [
+          1825,
+          1823
+        ],
+        "clip": "Heavy"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.5331747797406918,
+        "rest": 0.05423092188213853,
+        "posed": 0.0831454817117824,
+        "phase": 0.5833333333333334,
+        "mesh": "Rhaeticosaurus_procedural_volume_twin",
+        "vertices": [
+          1825,
+          1823
+        ],
+        "clip": "Heavy"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "saurichthys",
+      "variant": "authored",
+      "clips": 23,
+      "beforeSha256": "51e72a47746c58b1c232365fd1a13d011cf3640fa5d2dfb3fa54d1b2cc31b109",
+      "afterPriorityRepairSha256": "51e72a47746c58b1c232365fd1a13d011cf3640fa5d2dfb3fa54d1b2cc31b109",
+      "mouthSkinBefore": {
+        "ratio": 2.3827045805424083,
+        "rest": 0.048518153079077045,
+        "posed": 0.11560442558097463,
+        "phase": 1,
+        "mesh": "Saurichthys_authored_body",
+        "vertices": [
+          3024,
+          9130
+        ],
+        "clip": "Death"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 2.3827045805424083,
+        "rest": 0.048518153079077045,
+        "posed": 0.11560442558097463,
+        "phase": 1,
+        "mesh": "Saurichthys_authored_body",
+        "vertices": [
+          3024,
+          9130
+        ],
+        "clip": "Death"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Mouth_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "saurichthys",
+      "variant": "puppet",
+      "clips": 23,
+      "beforeSha256": "7dd8309f90bfe5df298b84e1f9540a5dc6625f1a42a17f3140148da4a072d1ce",
+      "afterPriorityRepairSha256": "7dd8309f90bfe5df298b84e1f9540a5dc6625f1a42a17f3140148da4a072d1ce",
+      "mouthSkinBefore": {
+        "ratio": 2.1236703812128357,
+        "rest": 0.05235939364761964,
+        "posed": 0.11119409346771333,
+        "phase": 1,
+        "mesh": "Saurichthys_procedural_volume_twin",
+        "vertices": [
+          2361,
+          2331
+        ],
+        "clip": "Death"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 2.1236703812128357,
+        "rest": 0.05235939364761964,
+        "posed": 0.11119409346771333,
+        "phase": 1,
+        "mesh": "Saurichthys_procedural_volume_twin",
+        "vertices": [
+          2361,
+          2331
+        ],
+        "clip": "Death"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Mouth_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "shonisaurus",
+      "variant": "authored",
+      "clips": 19,
+      "beforeSha256": "f4a1cc71bfb9920026a51467d5da83c74527be8c7d82c30974f1e15a7473c2f5",
+      "afterPriorityRepairSha256": "f4a1cc71bfb9920026a51467d5da83c74527be8c7d82c30974f1e15a7473c2f5",
+      "mouthSkinBefore": {
+        "ratio": 1.0176565780324944,
+        "rest": 0.09073131332359402,
+        "posed": 0.09233331783728276,
+        "phase": 0.25,
+        "mesh": "Oral_throat_and_cheeks",
+        "vertices": [
+          44,
+          31
+        ],
+        "clip": "Heavy"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.0176565780324944,
+        "rest": 0.09073131332359402,
+        "posed": 0.09233331783728276,
+        "phase": 0.25,
+        "mesh": "Oral_throat_and_cheeks",
+        "vertices": [
+          44,
+          31
+        ],
+        "clip": "Heavy"
+      },
+      "legacyMixedLiningMeshesBefore": [],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "shonisaurus",
+      "variant": "puppet",
+      "clips": 19,
+      "beforeSha256": "013710ef4131b066caf2fd9f77686bde299f60a05dd7f8132415031945950d9f",
+      "afterPriorityRepairSha256": "013710ef4131b066caf2fd9f77686bde299f60a05dd7f8132415031945950d9f",
+      "mouthSkinBefore": {
+        "ratio": 1.0537712761305378,
+        "rest": 0.10757190982091565,
+        "posed": 0.11335618868778541,
+        "phase": 0.25,
+        "mesh": "Puppet_lower_rostrum",
+        "vertices": [
+          56,
+          39
+        ],
+        "clip": "Heavy"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.0537712761305378,
+        "rest": 0.10757190982091565,
+        "posed": 0.11335618868778541,
+        "phase": 0.25,
+        "mesh": "Puppet_lower_rostrum",
+        "vertices": [
+          56,
+          39
+        ],
+        "clip": "Heavy"
+      },
+      "legacyMixedLiningMeshesBefore": [],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "tanystropheus",
+      "variant": "authored",
+      "clips": 28,
+      "beforeSha256": "07d17cb80e3e59f07fd69e23249954ae79dedc6dfdf22a889c68e205c90dcaf3",
+      "afterPriorityRepairSha256": "07d17cb80e3e59f07fd69e23249954ae79dedc6dfdf22a889c68e205c90dcaf3",
+      "mouthSkinBefore": {
+        "ratio": 1.1219984584992377,
+        "rest": 0.07367702294173356,
+        "posed": 0.08266550616743804,
+        "phase": 0.4583333333333333,
+        "mesh": "Tanystropheus_authored_body",
+        "vertices": [
+          8812,
+          11241
+        ],
+        "clip": "SnapRight"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.1219984584992377,
+        "rest": 0.07367702294173356,
+        "posed": 0.08266550616743804,
+        "phase": 0.4583333333333333,
+        "mesh": "Tanystropheus_authored_body",
+        "vertices": [
+          8812,
+          11241
+        ],
+        "clip": "SnapRight"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    },
+    {
+      "id": "tanystropheus",
+      "variant": "puppet",
+      "clips": 28,
+      "beforeSha256": "efa6a088ca995c904dc1ca1c356213380aea7413fac927101426e0d35aeb4875",
+      "afterPriorityRepairSha256": "efa6a088ca995c904dc1ca1c356213380aea7413fac927101426e0d35aeb4875",
+      "mouthSkinBefore": {
+        "ratio": 1.2182390061485804,
+        "rest": 0.0659500397963263,
+        "posed": 0.08034291093693588,
+        "phase": 0.4583333333333333,
+        "mesh": "Tanystropheus_procedural_volume_puppet",
+        "vertices": [
+          1649,
+          1656
+        ],
+        "clip": "SnapRight"
+      },
+      "mouthSkinAfterPriorityRepair": {
+        "ratio": 1.2182390061485804,
+        "rest": 0.0659500397963263,
+        "posed": 0.08034291093693588,
+        "phase": 0.4583333333333333,
+        "mesh": "Tanystropheus_procedural_volume_puppet",
+        "vertices": [
+          1649,
+          1656
+        ],
+        "clip": "SnapRight"
+      },
+      "legacyMixedLiningMeshesBefore": [
+        "Oral_cavity_lining"
+      ],
+      "reviewStatus": "all-clip numerical sweep; remaining visual/mouth recovery tracked separately"
+    }
+  ]
+}

@@ -232,10 +232,27 @@ report.fins = [];
 const fin = (n) => report.fins.find((f) => f.clip === n);
 
 // --- 4. the crown, the tentacles and the anchors -------------------------------------------------
+// **Measured in the body's own frame.** The strike is now a dart: `body` carries the whole animal
+// a tenth of a body forward (T3D-23), and that translation moves every tip, every socket and the
+// mouth by the same amount, so a world-frame travel ratio -- tentacles against arms, the attack
+// anchor against the mouth -- reads 0.73 against 0.73 and says nothing about whether the crown
+// used its pair. What these checks ask is what the crown does *on* the animal, so the body's own
+// translation is taken out first; `bodyTravel` still records the dart itself.
+const inBodyFrame = (rows, names) => {
+  for (const r of rows) for (const n of names) if (n !== 'body') r[n] = r[n].map((v, i) => v - r.body[i]);
+  return rows;
+};
+const trackOnBody = (clip, names, samples) => {
+  const rows = track(clip, [...names, 'body'], samples);
+  const world = rows.map((r) => ({ body: r.body }));
+  inBodyFrame(rows, names);
+  for (let i = 0; i < rows.length; i++) rows[i].body = world[i].body;
+  return rows;
+};
 report.crown = [];
 for (const clip of CLIPS) {
-  const names = [...TENTACLES.map(distal), ...ARMS.map(distal), 'head', 'body', 'funnel:tip'];
-  const rows = track(clip, names, 60);
+  const names = [...TENTACLES.map(distal), ...ARMS.map(distal), 'head', 'funnel:tip'];
+  const rows = trackOnBody(clip, names, 60);
   const tent = TENTACLES.map((a) => travelOf(rows, distal(a)));
   const arms = ARMS.map((a) => travelOf(rows, distal(a)));
   report.crown.push({
@@ -249,7 +266,7 @@ for (const clip of CLIPS) {
   });
 }
 const crown = (n) => report.crown.find((c) => c.clip === n);
-report.anchorTravel = anchorTravel(track, CLIPS,
+report.anchorTravel = anchorTravel(trackOnBody, CLIPS,
   ['anchor_mouth', 'anchor_mouth_inside', 'anchor_attack_primary', 'anchor_grasp']);
 const anchor = (n) => report.anchorTravel.find((r) => r.clip === n);
 

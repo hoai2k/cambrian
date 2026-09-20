@@ -1,0 +1,122 @@
+{
+  "skinTears": {
+    "tool": "node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/phragmoteuthis.glb",
+    "worstEdgeStretch": 5.37,
+    "worstClip": "Guard",
+    "worstBone": "funnel",
+    "worstOutsideTheOralLining": 5.37,
+    "perClipBeforeAfter": {
+      "Guard": [
+        5.37,
+        5.37
+      ],
+      "Heavy": [
+        4.3,
+        4.3
+      ],
+      "Grab": [
+        4.29,
+        4.29
+      ],
+      "Bite": [
+        4.29,
+        4.29
+      ],
+      "Attack": [
+        4.28,
+        4.28
+      ],
+      "Eat": [
+        3.51,
+        3.51
+      ],
+      "Parry": [
+        3.2,
+        3.2
+      ],
+      "Hit": [
+        3.17,
+        3.17
+      ],
+      "Stagger": [
+        3.16,
+        3.16
+      ],
+      "TurnRight": [
+        5.06,
+        2.79
+      ],
+      "TurnLeft": [
+        1.71,
+        2.57
+      ],
+      "Dive": [
+        4.19,
+        2.11
+      ],
+      "Rise": [
+        1.97,
+        2.25
+      ],
+      "Sprint": [
+        2.37,
+        2.37
+      ],
+      "Ability": [
+        2.04,
+        2.04
+      ],
+      "Dodge": [
+        1.81,
+        1.99
+      ]
+    },
+    "note": "The worst figure is the funnel in Guard and it did not move. The clips that did move are the ones whose worst edge sat at the crown: closing the peristome puts the cut's 79 rim vertices and 317 faces back into the mesh, so the weight relaxation -- diffusion over the mesh's own edge graph -- runs across a closed dome instead of round a hole, and TurnRight (5.06x to 2.79x) and Dive (4.19x to 2.11x) came down while TurnLeft, Rise and Dodge came up by a fraction. Nothing about the weighting scheme changed; the graph did."
+  },
+  "gapeSolid": {
+    "tool": "/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- phragmoteuthis Bite@0.22 Attack@0.4 Eat@0.37",
+    "verdict": "PASS",
+    "backdropTest": "r > .90, g < .20, b > .90",
+    "tolerance": 12,
+    "before": {
+      "seenThroughTheBody": [
+        0,
+        0,
+        0
+      ],
+      "openedByCulling": [
+        0,
+        0,
+        0
+      ],
+      "differingPixels": [
+        5,
+        3,
+        8
+      ]
+    },
+    "after": {
+      "seenThroughTheBody": [
+        0,
+        0,
+        0
+      ],
+      "openedByCulling": [
+        0,
+        0,
+        0
+      ],
+      "differingPixels": [
+        1,
+        0,
+        0
+      ]
+    },
+    "note": "The crown is the closed surface the generation delivered, so the cull shim has nothing to open: the two passes differ by at most one pixel."
+  },
+  "gapeCrown": {
+    "tool": "/opt/blender/blender -b --factory-startup --python tools/triassic/gape-crown.py -- phragmoteuthis Bite@0.22 Attack@0.4 Eat@0.37",
+    "moot": true,
+    "note": "This tool judges backdrop opened where the mouth is drawn, and no mouth is drawn: there is no lining to size its frame off and no oral material to paint its marker with. It now says so and exits rather than failing on an empty max(); the 8 px it once reported was the sewn sac's own rim, which no longer exists."
+  }
+}
