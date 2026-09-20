@@ -1,0 +1,23 @@
+[
+  {
+    "path": "tools/triassic/creatures/askeptosaurus/tripo-raw/askeptosaurus.raw.glb",
+    "sha256": "8348549043848ee2c71f109968b41a1d4f7fd3215cd1b65a916c32bad71f9a2c",
+    "bytes": 1637620,
+    "skins": 0,
+    "animations": []
+  },
+  {
+    "path": "tools/triassic/creatures/askeptosaurus/askeptosaurus.preview.glb",
+    "sha256": "a57ec31122d5eeadd314b0c2eafa2f92d6b472054ff7d15adbb7a9e2808a92cd",
+    "bytes": 1516160,
+    "skins": 0,
+    "animations": []
+  },
+  {
+    "path": "public/assets/triassic/creatures/askeptosaurus.preview.glb",
+    "sha256": "a57ec31122d5eeadd314b0c2eafa2f92d6b472054ff7d15adbb7a9e2808a92cd",
+    "bytes": 1516160,
+    "skins": 0,
+    "animations": []
+  }
+]

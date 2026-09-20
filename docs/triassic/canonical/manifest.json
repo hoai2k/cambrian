@@ -78,7 +78,9 @@
     "askeptosaurus": {
       "canonical": "greenlit",
       "turnaround": "not-started",
-      "decidedAt": "2026-09-13T01:02:52.596Z"
+      "decidedAt": "2026-09-19",
+      "regenerationAuthorizedBy": "User requested corrected canonical images and Tripo regeneration, 19 September 2026",
+      "previousCanonical": "model-inputs/askeptosaurus/backup-2026-09-19/original-canonical.png"
     },
     "placodus": {
       "canonical": "delivered",

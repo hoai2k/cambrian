@@ -117,3 +117,30 @@ Two routes out, and the recommendation is the first:
 
 What is **not** recommended is building it on the shared kit as it stands. That is what was tried
 once, and the numbers above say why it could not have worked.
+
+## Regeneration in progress · 19 September 2026
+
+The owner requested a new canonical and Tripo generation, retaining the previous body as
+**Model: Backup Model** with its corrections and animations. The new canonical and single
+Tripo input are byte-identical studio images: a straight axis, closed mouth, separated limbs,
+a visible neck, and a projected tail fraction around 0.64. The four-view sheet is only a
+qualitative review aid; the single image is the submission authority.
+
+All previous canonical/model-input files are preserved in
+`canonical/model-inputs/askeptosaurus/backup-2026-09-19/`. The original raw GLB and corrected
+preview remain untouched at their existing paths; their hashes and actual animation state
+are recorded in `tools/triassic/creatures/askeptosaurus/backup-source-manifest.json`. They
+currently contain **zero skins and zero animation clips**. A final animated backup therefore
+requires new rigging of the preserved corrected surface, not merely relabeling the raw preview.
+
+The reviewed request is ready to run from the repository root (requires `TRIPO_API_KEY`):
+
+```sh
+node tools/triassic/tripo/run-image-to-model.mjs --name askeptosaurus --image docs/triassic/canonical/model-inputs/askeptosaurus/input.png --out tools/triassic/creatures/askeptosaurus/tripo-regenerated-2026-09-19 --submit
+```
+
+The new output directory prevents overwriting or resuming the previous generation. Its
+`request-dry-run.json` records the exact image digest and textured v3.1 request. The canonical
+change is authorized by the owner's regeneration instruction; it is not marked delivered.
+T3D-01 remains active until the replacement, animated backup, authored/puppet parity, portraits,
+LOD, anchors and runtime integration have actually passed review.
