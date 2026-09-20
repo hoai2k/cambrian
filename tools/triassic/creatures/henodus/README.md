@@ -1,9 +1,8 @@
 # Henodus — paired authored Tripo body and procedural twin
 
-*Henodus chelyops*, 1.0 m, the roster's slowest swimmer. Built to Placodus' pattern, because it is
-the same kind of animal and the same kind of generation. Awaiting review: registered in
-`src/content/triassic/review-bodies.json`, **not** in `tools/triassic/shipped.json`, so the game
-still borrows a Devonian body for it and the preview badge stands.
+*Henodus chelyops*, 1.0 m, the roster's slowest swimmer. The authored body, procedural twin,
+and puppet LOD are shipped and playable. The current mouth repair was verified on 19 September
+2026; `paired-audit.json` is the current export record.
 
 ## Reproduce
 
@@ -19,13 +18,13 @@ node tools/triassic/creatures/henodus/delivery-record.mjs
 node tools/triassic/review-bodies.mjs
 ```
 
-`qa.json` holds the two figures that cannot be measured inside the build — the edge-stretch sweep
-and the gape pair — and `build.py` folds it into `validation.json`, so a rebuild carries them
-rather than dropping them.
+`qa.json` contains older gape and strain measurements. The builder keeps them under
+`historicalQA`, explicitly marked unvalidated after rebuilding. Current paired checks and the
+posterior jaw attachment test are in `paired-audit.json`.
 
 CYCLES on CPU throughout: EEVEE and Workbench want EGL, which this container has not got.
 
-## What was measured, and what it says
+## Earlier reconstruction measurements (historical)
 
 | | |
 |---|---|
@@ -46,32 +45,20 @@ of a body length at every limb joint, and 0.005 of reach between the two forelim
 
 ## The mouth
 
-The generation carries a real modelled slit, so Placodus' method applies unchanged: cast each head
-vertex's own outward normal back into the mesh over 0.020 raw units, and the vertices whose ray
-comes back are looking across the slit at the lip opposite. 78 of them, over raw x 0.46 to 0.495 —
-the front 3.5 % of the body, which is what a beaked filter feeder's mouth is. The seam is the mid
-height of that cavity per station; behind the measured range it is held at its rearmost value
-rather than extrapolated down the steep ramp the front of the slit is on, which would have put the
-seam 0.006 off the chin and made the mandible a sliver. At the hinge the mandible is **0.224** of
-the head's depth.
+The source contains a narrow inner mandible inside a hanging upper fringe. A cut based only on
+mouth height severed the fringe and assigned its tips to the lower jaw. The cut now descends
+outside the measured inner width. Only the connected sheet reaching the hinge becomes the
+mandible; disconnected tooth fragments remain on the skull with their roots. This returns
+80 authored and 18 puppet candidate faces to the upper fringe without deleting any source face.
 
-The interior is **one closed skinned lining**, not a floor and a palate: roof on the skull, floor
-on the jaw, wall stretching between them, wound inwards so the near wall culls and the far wall
-draws, with the skin double-sided behind it as a backstop. Two separate tubes look identical at
-rest and part the moment the jaw swings, which is how Placodus came to open onto transparency.
+At the rear cut, the mandible shares the body's weights and blends to its rigid jaw bone over
+0.018 source units. The exported attachment test matches 80 authored and 53 puppet rim vertices
+at 61 phases of all 24 clips; both measure zero separation. Both cut cross-sections are capped
+with source skin. Separate rigid palate/floor shells replace the hidden stretching sac.
 
-The one thing this beak taught that Placodus could not: **a midline hinge envelope does not reach
-the corner of a wide mouth.** Henodus' commissure sits 0.065 raw off the midline, six times further
-out than the hinge tissue can stretch without breaking the skin, and the first three builds leaked
-9–18 px there. What closed it was the lining itself — carried 0.048 behind the hinge at 85 % of the
-mouth's own measured width, instead of pinched to 16 % as Placodus pinches its narrower one.
-
-A note against a future assert: the build **records** the lining's nearest-surface depth rather
-than asserting it, because a point in the lumen is *outside* the closed shell — the shell folds in
-through the modelled slit — so that depth is as often measuring the mouth's own inner wall as the
-skin. What the lining being inside the mouth rests on is the coverage measurement instead: its
-section is the cavity's own 92nd-percentile half width and 94th-to-6th-percentile height, inset by
-5 %, asserted station by station.
+Grab is also included in the loop metadata and tested at the seam. Authored, puppet and LOD retain
+matching skeletons, clips and anchors. The current close-up evidence, including a view from below
+showing the inner mandible behind the intact fringe, lives in `docs/triassic/throat-repairs/`.
 
 ## The forked tail — a recorded generation defect, repaired under bound
 

@@ -53,3 +53,16 @@ closed with source skin and the hidden sac is replaced by separate palate/floor 
 extent and attachment; the automatic framing follows the new hinge, so the scales differ.
 All existing paired rig, clip, stiff-trunk, pouch and anchor tests pass. Both portrait families
 were rendered again from the decoded packaged deliveries.
+
+## Finished: Henodus
+
+The original height-only cut severed the hanging upper fringe. The revised cut follows the inner
+mandible; a connectivity check returns detached tip candidates to the skull (80 authored and 18
+puppet faces retained with their upper roots). The posterior jaw copies share the body weights:
+80 authored and 53 puppet rim vertices stay coincident over 61 phases of all 24 clips. Separate
+rigid palate/floor shells replace the sac, and Grab is correctly declared and checked as a loop.
+
+[Bite before](henodus-Bite-before.png), [after](henodus-Bite-after.png), and
+[after from below](henodus-Bite-below-after.png) show the intact upper fringe and inner mandible.
+Historical gape figures are explicitly separated from current export validation. Paired assets,
+rigs, clips, anchors and attachment checks pass; portraits are refreshed.
