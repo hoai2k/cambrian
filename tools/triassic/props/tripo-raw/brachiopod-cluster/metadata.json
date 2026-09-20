@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "name": "brachiopod-cluster",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "input": {
+      "pbr": true,
+      "file": {
+        "type": "jpeg",
+        "object": {
+          "key": "tcli_2f16803761ed4cf0af45a11555b61c60/20260920/e253afcc-b3ef-49e2-84a1-b52fa63cb12b/image.jpeg",
+          "bucket": "tripo-data"
+        }
+      },
+      "texture": true,
+      "export_uv": true,
+      "face_limit": 20000,
+      "model_version": "v3.1-20260211",
+      "geometry_quality": "standard",
+      "enable_image_autofix": false
+    },
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    },
+    "task_id": "e253afcc-b3ef-49e2-84a1-b52fa63cb12b",
+    "created_at": "2026-09-20T02:54:21.955635Z",
+    "completed_at": "2026-09-20T02:56:18.580737Z",
+    "credits_consumed": 30
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/brachiopod-cluster/input.png",
+    "sha256": "96acf3f1cf0e88155a92e810d22edcd7a09406631e2851814ef5cee291709509",
+    "bytes": 6235918
+  },
+  "artifact": {
+    "path": "tools/triassic/props/tripo-raw/brachiopod-cluster/brachiopod-cluster.raw.glb",
+    "bytes": 1364808,
+    "sha256": "b38ed6179bef7808e23ec0c970f6a3d2d13009bf9719325cf15bce665e99628c",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-20T02:56:26.534Z"
+}

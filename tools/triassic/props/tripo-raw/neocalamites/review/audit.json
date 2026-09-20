@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/props/tripo-raw/neocalamites/neocalamites.raw.glb",
+    "bytes": 1603848,
+    "sha256": "4b869939f059ddae5c6fe8f38d583632f4aa0f2a70c5f0d9b449fc132a0f497f"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 17796,
+    "faces": 19808,
+    "triangles": 19808,
+    "connected_components": 1303,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.147267,
+      -0.32952,
+      -0.5
+    ],
+    "max_xyz": [
+      0.147267,
+      0.32952,
+      0.5
+    ],
+    "center_xyz": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "size_xyz": [
+      0.294535,
+      0.659039,
+      1.0
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_cb7ae60b-c1ec-4772-924e-7ea9e6c444a0",
+      "mesh": "tripo_mesh_cb7ae60b-c1ec-4772-924e-7ea9e6c444a0",
+      "vertices": 17796,
+      "edges": 36301,
+      "faces": 19808,
+      "triangles": 19808,
+      "connected_components": 1303,
+      "material_slots": [
+        "tripo_material_cb7ae60b-c1ec-4772-924e-7ea9e6c444a0"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_cb7ae60b-c1ec-4772-924e-7ea9e6c444a0",
+      "image_textures": [
+        "Color_cb7ae60b-c1ec-4772-924e-7ea9e6c444a0",
+        "NormalGL_cb7ae60b-c1ec-4772-924e-7ea9e6c444a0",
+        "ORM_cb7ae60b-c1ec-4772-924e-7ea9e6c444a0"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_cb7ae60b-c1ec-4772-924e-7ea9e6c444a0",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_cb7ae60b-c1ec-4772-924e-7ea9e6c444a0",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_cb7ae60b-c1ec-4772-924e-7ea9e6c444a0",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/props/tripo-raw/neocalamites/review/side.png",
+    "top": "tools/triassic/props/tripo-raw/neocalamites/review/top.png",
+    "three-quarter": "tools/triassic/props/tripo-raw/neocalamites/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-publish/local/triassic-authoring/props/neocalamites/neocalamites.preview.glb",
+    "triangle_limit": 6000,
+    "triangles_before": 19808,
+    "triangles_after": 5910,
+    "bytes": 1080164,
+    "sha256": "ba388d7a4e6139e6c34850e760ce86b9d1979167f5b40c77280c18619a3ac28b"
+  }
+}

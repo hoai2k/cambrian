@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "input": {
+    "path": "tools/triassic/props/tripo-raw/pleuromeia/pleuromeia.raw.glb",
+    "bytes": 1392404,
+    "sha256": "3e549989f3de8e7b2002a170ab76e90bd34ad72ef1ebba8b17842b7d23059337"
+  },
+  "summary": {
+    "mesh_objects": 1,
+    "vertices": 13458,
+    "faces": 18573,
+    "triangles": 18573,
+    "connected_components": 443,
+    "materials": 1,
+    "textures": 3
+  },
+  "bounds": {
+    "min_xyz": [
+      -0.457597,
+      -0.49078,
+      -0.5
+    ],
+    "max_xyz": [
+      0.457597,
+      0.49078,
+      0.5
+    ],
+    "center_xyz": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "size_xyz": [
+      0.915194,
+      0.98156,
+      1.0
+    ]
+  },
+  "meshes": [
+    {
+      "object": "tripo_node_669ea3a5-e3d7-4b1b-8b83-713e559cb19a",
+      "mesh": "tripo_mesh_669ea3a5-e3d7-4b1b-8b83-713e559cb19a",
+      "vertices": 13458,
+      "edges": 31588,
+      "faces": 18573,
+      "triangles": 18573,
+      "connected_components": 443,
+      "material_slots": [
+        "tripo_material_669ea3a5-e3d7-4b1b-8b83-713e559cb19a"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "tripo_material_669ea3a5-e3d7-4b1b-8b83-713e559cb19a",
+      "image_textures": [
+        "Color_669ea3a5-e3d7-4b1b-8b83-713e559cb19a",
+        "NormalGL_669ea3a5-e3d7-4b1b-8b83-713e559cb19a",
+        "ORM_669ea3a5-e3d7-4b1b-8b83-713e559cb19a"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Color_669ea3a5-e3d7-4b1b-8b83-713e559cb19a",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "NormalGL_669ea3a5-e3d7-4b1b-8b83-713e559cb19a",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "ORM_669ea3a5-e3d7-4b1b-8b83-713e559cb19a",
+      "width": 2048,
+      "height": 2048,
+      "channels": 4,
+      "packed": true,
+      "source": "FILE",
+      "colorspace": "Non-Color"
+    }
+  ],
+  "renders": {
+    "side": "tools/triassic/props/tripo-raw/pleuromeia/review/side.png",
+    "top": "tools/triassic/props/tripo-raw/pleuromeia/review/top.png",
+    "three-quarter": "tools/triassic/props/tripo-raw/pleuromeia/review/three-quarter.png"
+  },
+  "preview": {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-publish/local/triassic-authoring/props/pleuromeia/pleuromeia.preview.glb",
+    "triangle_limit": 6000,
+    "triangles_before": 18573,
+    "triangles_after": 5910,
+    "bytes": 966232,
+    "sha256": "c02c49a973f08975761830da85ddcf721e0960e9441572e213a602fdedff8199"
+  }
+}

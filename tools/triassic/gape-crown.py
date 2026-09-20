@@ -194,9 +194,15 @@ for (clip, t, fa), (_, _, fb), (_, _, fc) in zip(solid, culled, marked):
     w, h = a.size
     n = w * h
 
+    # The same window as gape-solid.py's `BG`, and for the same reason: the loose `r > .5, g < .3,
+    # b > .5` this file first carried admitted a lit oral lining (Rhaeticosaurus) and pale skin
+    # (Saurichthys), and the backdrop itself never renders above 0.063 on green. Tightening can only
+    # lower a count, so the 4 px and 8 px the two crowns measured under the old window stand as
+    # upper bounds. Both cephalopods now ship without any mouth geometry, so the verdict here is
+    # about the crown's own silhouette rather than a beak.
     def bg(px, i):
         r, g, bl = px[i * 4], px[i * 4 + 1], px[i * 4 + 2]
-        return r > .5 and g < .3 and bl > .5
+        return r > .90 and g < .20 and bl > .90
 
     def is_mouth(i):
         r, g, bl = pc[i * 4], pc[i * 4 + 1], pc[i * 4 + 2]
