@@ -13,6 +13,7 @@ import { getStretch } from './stretch/store';
 import { isIdentity as stretchIsIdentity, warp as stretchWarp } from './stretch/stretch';
 import { MouthEditor } from './mouth/MouthEditor';
 import type { AppliesTo } from './mouth/mouth';
+import type { AppliesTo as BendAppliesTo } from './bend/bend';
 import { BendEditor } from './bend/BendEditor';
 
 const SPEEDS = [0.25, 0.5, 1, 2];
@@ -208,6 +209,20 @@ export function Viewer() {
   const canMouth = canMark;
   const appliesTo: AppliesTo = stage.kind === 'generated' ? 'preview' : stage.kind === 'origpose' ? 'generation' : stage.kind === 'twin' ? 'twin' : 'built';
   /**
+   * The same answer for the bend editor, which tells the original pose apart from the generation.
+   *
+   * The mouth editor does not need to: a cut aimed on either is aimed on geometry no builder has
+   * moved. A bend does, and by the whole size of the thing it is about — Askeptosaurus' shipped
+   * rest already carries the 67.7° head correction its builder put into the bind, so a bend
+   * measured on `built` and one measured on `origpose` are opposite claims about the same animal.
+   */
+  const bendAppliesTo: BendAppliesTo = stage.kind === 'origpose' ? 'origpose' : appliesTo;
+  /** The untouched generation this specimen publishes, for the bend panel to point a reviewer at. */
+  const origPoseStage = choices.find(o => o.kind === 'origpose');
+  const origPoseNote = origPoseStage && def.origPoseChanged?.length
+    ? { label: origPoseStage.label, changed: def.origPoseChanged }
+    : undefined;
+  /**
    * Whether `model` is this animal's own body or one it borrows in play.
    *
    * An animal with a generated mesh and nothing built yet resolves `model` to a Devonian fish, and
@@ -346,7 +361,8 @@ export function Viewer() {
           was — and is keyed by the body on stage because a span is placed on one file. */}
       {mode === 'bend' && canBend && sceneRef.current && canvasRef.current && (
         <BendEditor key={`${id}|${modelPath}|bend`} scene={sceneRef.current} specimen={def} model={modelPath}
-          sha256={showGenerated ? def.generatedSha256 : undefined} appliesTo={appliesTo}
+          sha256={showGenerated ? def.generatedSha256 : undefined} appliesTo={bendAppliesTo}
+          stageLabel={stage.label} origPose={origPoseNote}
           canvas={canvasRef.current} onExit={() => setMode('view')} />
       )}
 

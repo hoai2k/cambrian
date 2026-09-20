@@ -351,7 +351,8 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
  */
 .bend-legend .base i { background: var(--ember); }
 .bend-legend .tip i { background: var(--lagoon); }
-.bend-legend .axis i { background: #ff2fa8; }
+.bend-legend .baseAim i { background: #ffd9a8; }
+.bend-legend .tipAim i { background: #ff2fa8; }
 .bend-panel .bend-reading { display: flex; flex-direction: column; gap: 2px; padding: 8px 0; border-top: 1px solid var(--line); }
 .bend-panel .bend-reading h4 { margin: 0; font: 700 10px var(--font-display); letter-spacing: .14em; color: var(--dim); text-transform: uppercase; }
 .bend-panel .bend-reading-value { margin: 0; font: 700 14px var(--font-body); color: var(--foam); font-variant-numeric: tabular-nums; }
@@ -370,3 +371,9 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .bend-joints li b { color: var(--foam); }
 .bend-joints li small { grid-column: 1 / -1; color: var(--dim); font-size: 10px; }
 .bend-panel code { font-size: 11px; color: var(--lagoon); overflow-wrap: anywhere; }
+/* Which body the numbers describe. It is a warning wherever the body on stage already carries its
+   builder's own correction, because aiming a correction on top of one is the mistake this mode
+   makes easy and the reason the original pose is published at all. */
+.bend-body-note { border-left: 2px solid var(--line); padding-left: 8px; }
+.bend-body-note[data-corrected="yes"] { border-left-color: var(--ember); color: var(--mist); }
+.bend-plane[data-source="manual"] > label:first-child > small { color: var(--lagoon); }

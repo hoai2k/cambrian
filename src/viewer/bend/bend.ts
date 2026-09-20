@@ -1,6 +1,6 @@
 /**
- * The bend document: two cuts across a body, an axis to turn about, and two angles — the
- * stretcher's shape with rotation in place of scale.
+ * The bend document: two **oriented planes** on a body, and the turn that carries the creature's
+ * axis line from the one to the other.
  *
  * It exists because of a diagnosis that went wrong three times on the same animal. Askeptosaurus'
  * head stood **67.7°** off its trunk; a coordinator first derived 78.6° by adding a chain's
@@ -31,29 +31,49 @@
  * axis would cover half the neck's length and the bend about them would swing the head rather than
  * bend the neck. Two points put the span on the neck.
  *
- * ## The bend
+ * ## The two planes
  *
- *   - `axisRoll` turns the **bend plane** about the span: 0 lifts the tip the way up is, 90° swings
- *     it towards +lateral. The axis is always square to the span, because a component along it is a
- *     *twist* and not a bend at all.
- *   - `baseTurn` and `tipTurn` are how hard the body turns at the base of the span and at its tip,
- *     in radians **across the whole span**, interpolated linearly between. Equal values are a
- *     circular arc; a zero base and a full tip is a bend that starts straight and tightens.
+ * Each end of the span is a **plane with its own orientation**, and a plane's normal is the
+ * direction the creature's axis line runs through it. That is the whole control:
+ *
+ *   - `baseNormal` — where the axis line runs **in**. It is the **reference**, and it never moves
+ *     the body: nothing behind the base cut is touched by any bend. What a reviewer aiming it is
+ *     saying is *which direction they are calling the trunk* — which is the argument this tool was
+ *     built out of, three defensible readings of one animal's trunk 43° apart, made into a thing
+ *     you can point at.
+ *   - `tipRest` — where the axis line ran **out** when the plane was seated on the body. Measured,
+ *     never typed: it is the animal's own heading at that end and the pivot the turn is taken from.
+ *   - `tipNormal` — where the axis line is **to** run out. Seated equal to `tipRest`, so the editor
+ *     opens on the body as it is.
+ *
+ * The bend is the rotation that carries `tipRest` onto `tipNormal`, spread linearly across the
+ * span. So **aim both planes the same way and the run between them comes straight**: with
+ * `tipNormal` set to `baseNormal`, the head's own heading is turned onto the trunk's, which is
+ * exactly what straightening a curve is. Nothing else has to be dialled for it.
  *
  * What that does to a vertex: everything on the body side of the base cut stays exactly where it
- * is, everything past the tip cut is carried **rigidly** by the total accumulated rotation — so the
- * head is moved without being deformed — and the part between is bent, turning progressively along
- * its own length. The blend is linear for the stretcher's own stated reason: an eased one would
- * pile the change into the middle of the span and kink both ends.
+ * is, everything past the tip cut is carried **rigidly** by the whole rotation — so the head is
+ * moved without being deformed — and the part between is bent, turning progressively along its own
+ * length. The blend is linear for the stretcher's own stated reason: an eased one would pile the
+ * change into the middle of the span and kink both ends.
  *
- * The turn is a *rate* rather than an offset, which is the one choice here worth stating plainly.
- * Under the other reading — `baseTurn` is the angle already turned at the first cut — a non-zero
- * base angle puts a **kink** at the base cut, because the rotation would jump from nothing to that
- * angle across it. As a rate the rotation at the base cut is exactly identity however large the
- * numbers are, so the only seam is the slope one the stretcher already documents, and the two
- * numbers still say what a person wants to say: how tight the bend is where the neck leaves the
- * shoulder, and how tight it is where the head begins. The total the span turns through is their
- * mean, and the panel and the file both print it.
+ * This replaced a pair of turn **rates**, one at each end of the span, and it keeps what those were
+ * for. The rates existed because the obvious reading of two *angles* — "the base angle is the angle
+ * already turned at the first cut" — puts a kink at the base cut, the rotation jumping from nothing
+ * to that angle across it. An orientation per plane cannot do that at all: the rotation at the base
+ * cut is the rotation carrying `tipRest` to itself, which is identity by construction however far
+ * apart the two planes are aimed. What is given up is the rates' one extra shape — a bend that
+ * starts straight and tightens — and two orientations are a circular arc. That is the shape
+ * straightening wants, and a distribution nobody can measure was never the thing being argued over.
+ *
+ * The **axle** is derived rather than dialled, which is the other thing the planes settle. It used
+ * to be a roll about the span, so the control a reviewer grabbed swept round the creature's own
+ * long axis — a twist — while the body it bent went ninety degrees the other way. Now the hinge is
+ * whatever the two plane normals imply, `tipRest × tipNormal`, and the thing a reviewer drags is a
+ * plane: tip the tip plane back to front and the body bends back to front, because the plane's
+ * motion *is* the bend. Where the aim is oblique the hinge can carry a little of itself along the
+ * span, which is a twist of the span about its own length; that is the honest consequence of the
+ * aim rather than something to clamp away, and the file reports it as `axis.twistDegrees`.
  *
  * The map bends rather than sweeps. A point at fraction `s` of the span is carried to the bent
  * centreline at `s` and then rotated about the axis by the rotation accumulated up to `s`, so the
@@ -103,6 +123,17 @@ export interface BoneRefs { base: BoneRef; tip: BoneRef }
 /** Where one end of the span was put: by the tool, or by a person who looked at it. */
 export type EndSource = 'trace' | 'manual';
 
+/**
+ * Where a plane's aim came from. `trace` is the body's own centre line at that end, `bones` is the
+ * chord the rig runs on there, and `manual` is a reviewer who looked at both and said which — or
+ * neither, and aimed it by hand. The distinction is load-bearing in the same way the chain's and
+ * the references' is: a guess is re-made whenever the span moves and an answer never is.
+ */
+export type PlaneSource = 'trace' | 'bones' | 'manual';
+
+/** Which end of the span a plane is at. */
+export type PlaneEnd = 'base' | 'tip';
+
 export interface BendDoc {
   version: 1;
   key: string;
@@ -148,11 +179,32 @@ export interface BendDoc {
    */
   baseSource: EndSource;
   tipSource: EndSource;
-  /** The bend plane, as a roll about the span. 0 lifts the tip the way up is, +π/2 swings to +lateral. */
-  axisRoll: number;
-  /** How hard the body turns at each end of the span, in radians across the whole span. */
-  baseTurn: number;
-  tipTurn: number;
+  /**
+   * The base plane's normal: the direction the creature's axis line runs **into** the span.
+   *
+   * A pure reference. Nothing behind the base cut moves under any bend, so aiming this never moves
+   * the body — what it changes is what the tip plane is aimed *at*, and therefore what "straight"
+   * means. That is the whole argument this tool was built out of made into a control: on
+   * Askeptosaurus the hip-to-shoulder run, the `body`→`chest` chord and the measured axis' tangent
+   * at the shoulder are three different directions up to 43° apart, and a reviewer who believes one
+   * of them can say so here instead of hoping the trace agreed.
+   */
+  baseNormal: Vec3;
+  /**
+   * The tip plane at rest: the direction the axis line ran **out** of the span when the plane was
+   * last seated on the body. Measured, never typed, and re-measured whenever the span moves —
+   * it is the animal's own heading there and the pivot every turn is taken from, so a `tipRest`
+   * a person could set would be a rotation measured from a place the body never was.
+   */
+  tipRest: Vec3;
+  /**
+   * The tip plane as aimed: the direction the axis line is **to** run out of the span. Seated equal
+   * to `tipRest`, so the editor opens on the body as it stands; set equal to `baseNormal`, the run
+   * between the two planes comes straight.
+   */
+  tipNormal: Vec3;
+  /** Where each plane's aim came from, so a guess and an answer are told apart. */
+  planeSource: { base: PlaneSource; tip: PlaneSource };
   /**
    * How much body beyond each cut the *geometry* reading traces over, as a fraction of the body's
    * length. It is in the document rather than a constant because it is part of the definition being
@@ -192,8 +244,9 @@ export interface BendDoc {
 }
 
 /**
- * The turns may go a long way — a neck curls further than a mouth opens — but not so far that the
- * span wraps round on itself, which stops the readings meaning anything.
+ * The most a bend can ever be, and it is a fact rather than a clamp now: the turn is the angle
+ * between two unit vectors, so it cannot exceed a half turn and the span can never wrap round on
+ * itself. Kept because the panel's fields still need a range to offer.
  */
 export const MAX_TURN = Math.PI;
 /** Where the span starts: the front third of the animal, which is where a neck is on everything this is for. */
@@ -240,39 +293,82 @@ export function spanDirection(doc: Pick<BendDoc, 'base' | 'tip' | 'frame'>): Vec
 }
 
 /**
- * The bend as three unit vectors: `forward` along the span, `up` the way a positive turn carries
- * the tip, and `axis` the axle it turns about.
+ * The rotation the two planes ask for: the shortest turn carrying `tipRest` onto `tipNormal`.
  *
- * `up` is built by taking the frame's own up, squaring it against the span (the span is rarely
- * along an axis, so it has to be), and rolling it by `axisRoll` — so at 0 a positive turn lifts the
- * tip and at 90° it swings it towards +lateral, whatever direction the span runs in. `axis` is
- * `forward × up`, which is what makes a positive rotation about it carry `forward` towards `up`. It
- * never has a component along the span: that would be a twist of the span about its own length,
- * which turns no direction any reading is about and is not a bend.
+ * `angle` is never negative and never more than a half turn — it is the angle between two unit
+ * vectors — and which way the body goes is carried by `axis` rather than by a sign, so there is no
+ * convention for a reader to get wrong. With the two planes aimed the same way `angle` is zero and
+ * there is no rotation to take an axis from; `axis` then falls back, in order, to the plane the
+ * animal's **own** curve lies in (`tipRest` against `baseNormal`, which is the plane a straightening
+ * would happen in and so the right one to read every angle in) and, where even those agree, to the
+ * frame's own up squared against the span.
+ */
+export interface BendRotation { axis: Vec3; angle: number }
+
+/** The axle of the shortest rotation from `a` to `b`, or null where the two are parallel. */
+function turnAxis(a: Vec3, b: Vec3): Vec3 | null {
+  const c = cross(norm(a), norm(b));
+  return len(c) < 1e-9 ? null : norm(c);
+}
+
+/** The axle the old scheme had at a roll of zero: the frame's own up squared against the span. */
+function levelAxis(doc: Pick<BendDoc, 'base' | 'tip' | 'frame'>): Vec3 {
+  const forward = spanDirection(doc);
+  const u: Vec3 = [0, 1, 0], l = lateralVector(doc.frame);
+  let e1 = addTo(u, forward, -dot(u, forward));
+  if (len(e1) < 1e-6) e1 = addTo(l, forward, -dot(l, forward));
+  return norm(cross(forward, norm(e1)));
+}
+
+/** The parts of the document a bend is computed from, which is everything but the readings' knobs. */
+export type BendShape = Pick<BendDoc, 'base' | 'tip' | 'frame' | 'baseNormal' | 'tipRest' | 'tipNormal'>;
+
+export function bendRotation(doc: BendShape): BendRotation {
+  const rest = norm(doc.tipRest), aim = norm(doc.tipNormal);
+  const angle = Math.acos(clamp(dot(rest, aim), -1, 1));
+  const axis = turnAxis(rest, aim) ?? turnAxis(doc.baseNormal, rest) ?? levelAxis(doc);
+  return { axis, angle };
+}
+
+/**
+ * The bend as three unit vectors: `forward` along the span, `axis` the axle it turns about, and
+ * `up` the way a positive turn carries the tip.
+ *
+ * `axis` comes from the two planes rather than from a roll — that is the whole of what changed when
+ * the planes arrived, and it is why there is no bend-plane control any more. `up` is
+ * `axis × forward`, the direction a positive rotation about the axle carries the span, and it is
+ * what the pinch and the normals are measured against.
+ *
+ * The axle is **not** forced square to the span. Under the old scheme it was, because a roll about
+ * the span cannot produce anything else and a component along the span is a twist rather than a
+ * bend; under two aimed planes it is simply whatever they imply, and an oblique aim really does ask
+ * for a little twist. Clamping it would mean the warp no longer carried `tipRest` onto `tipNormal`,
+ * which is the one promise the planes make, so the twist is reported (`axis.twistDegrees` in the
+ * file) rather than taken away.
  */
 export interface BendBasis { forward: Vec3; up: Vec3; axis: Vec3 }
 
-export function bendBasis(doc: Pick<BendDoc, 'base' | 'tip' | 'frame' | 'axisRoll'>): BendBasis {
+export function bendBasis(doc: BendShape): BendBasis {
   const forward = spanDirection(doc);
-  const u: Vec3 = [0, 1, 0], l = lateralVector(doc.frame);
-  // Square the frame's up against the span; if the span runs straight up, use the lateral instead.
-  let e1 = addTo(u, forward, -dot(u, forward));
-  if (len(e1) < 1e-6) e1 = addTo(l, forward, -dot(l, forward));
-  e1 = norm(e1);
-  const e2 = norm(cross(e1, forward));
-  const c = Math.cos(doc.axisRoll), s = Math.sin(doc.axisRoll);
-  const up = norm([e1[0] * c + e2[0] * s, e1[1] * c + e2[1] * s, e1[2] * c + e2[2] * s]);
-  return { forward, up, axis: norm(cross(forward, up)) };
+  const axis = bendRotation(doc).axis;
+  let up = cross(axis, forward);
+  // An axle along the span names no direction for the span to be carried in; the frame's own up
+  // squared against the span is the honest stand-in, and at that point the turn is a pure twist.
+  if (len(up) < 1e-6) {
+    const u: Vec3 = [0, 1, 0], l = lateralVector(doc.frame);
+    let e1 = addTo(u, forward, -dot(u, forward));
+    if (len(e1) < 1e-6) e1 = addTo(l, forward, -dot(l, forward));
+    up = e1;
+  }
+  return { forward, up: norm(up), axis };
 }
 
-/** The roll that puts the bend plane on a given axis, so a measured turn can aim its own plane. */
-export function rollForAxis(doc: Pick<BendDoc, 'base' | 'tip' | 'frame'>, axis: Vec3): number | null {
-  const level = bendBasis({ ...doc, axisRoll: 0 });
-  const up = cross(axis, level.forward);
-  if (len(up) < 1e-9) return null;                 // an axis along the span says nothing
-  const u = norm(up);
-  return Math.atan2(dot(u, norm(cross(level.up, level.forward))), dot(u, level.up));
-}
+/** How far the axle leans along the span: the share of the aim that is a twist rather than a bend. */
+export const twistAngle = (doc: BendShape): number =>
+  Math.asin(clamp(Math.abs(dot(bendRotation(doc).axis, spanDirection(doc))), 0, 1));
+
+/** The angle between two directions, plain and unsigned: what "the planes are N° apart" means. */
+export const angleOf = (a: Vec3, b: Vec3): number => Math.acos(clamp(dot(norm(a), norm(b)), -1, 1));
 
 /** How far back from the nose a point is, as a fraction of the body: for the panel and the file. */
 export function headFractionAt(doc: Pick<BendDoc, 'frame' | 'bounds'>, p: Vec3): number {
@@ -292,19 +388,24 @@ export function pointAtHeadFraction(doc: Pick<BendDoc, 'frame' | 'bounds'>, head
   return p;
 }
 
-/** The total the span turns through: the mean of the two rates, because they interpolate linearly. */
-export const totalTurn = (doc: Pick<BendDoc, 'baseTurn' | 'tipTurn'>): number => (doc.baseTurn + doc.tipTurn) / 2;
+/** The whole the span turns through: the angle between the tip plane's rest and its aim. */
+export const totalTurn = (doc: BendShape): number => bendRotation(doc).angle;
 
-export const isIdentity = (doc: Pick<BendDoc, 'baseTurn' | 'tipTurn'>): boolean =>
-  Math.abs(doc.baseTurn) < 1e-9 && Math.abs(doc.tipTurn) < 1e-9;
+export const isIdentity = (doc: Pick<BendDoc, 'tipRest' | 'tipNormal'>): boolean =>
+  Math.acos(clamp(dot(norm(doc.tipRest), norm(doc.tipNormal)), -1, 1)) < 1e-9;
 
-/** The rotation accumulated by the fraction `s` of the span: ∫ of a rate that runs base → tip. */
-export const turnAt = (doc: Pick<BendDoc, 'baseTurn' | 'tipTurn'>, s: number): number =>
-  doc.baseTurn * s + (doc.tipTurn - doc.baseTurn) * s * s / 2;
+/**
+ * The rotation accumulated by the fraction `s` of the span.
+ *
+ * Linear, for the stretcher's own stated reason: an eased distribution would pile the change into
+ * the middle of the span and kink both ends. At `s` of 0 it is exactly zero however far apart the
+ * two planes are aimed, which is what replaces the old rates' one guarantee — there is no number
+ * anywhere that can kink the body where the span begins.
+ */
+export const turnAt = (doc: BendShape, s: number): number => bendRotation(doc).angle * s;
 
-/** How fast it is turning there — the rate itself, which is what pinches the inside of the bend. */
-export const turnRateAt = (doc: Pick<BendDoc, 'baseTurn' | 'tipTurn'>, s: number): number =>
-  doc.baseTurn + (doc.tipTurn - doc.baseTurn) * s;
+/** How fast it is turning there — constant across the span, and what pinches the inside of the bend. */
+export const turnRateAt = (doc: BendShape, _s?: number): number => bendRotation(doc).angle;
 
 // ---------------------------------------------------------------------------------------------
 // The warp
@@ -323,37 +424,39 @@ export function rotateAbout(v: Vec3, axis: Vec3, angle: number, out: Vec3): Vec3
  * Everything the warp shares, gathered once: the basis, the span's base end and length, and the
  * bent centreline.
  *
- * The centreline is the integral of the turned span direction, which for a rate that varies
- * linearly is a Fresnel integral — so it is sampled rather than solved, at `ARC_SAMPLES` steps with
- * the trapezium rule, and read back by linear interpolation. Both the viewer and the consumer go
- * through this one function, so "sampled" is a property of the definition rather than a difference
- * between two implementations, and the error at these step counts is a millionth of the span.
+ * The centreline is the integral of the turned span direction, which for a turn that grows linearly
+ * is a Fresnel integral — so it is sampled rather than solved, at `ARC_SAMPLES` steps with the
+ * trapezium rule, and read back by linear interpolation. It is integrated as a **vector** rather
+ * than as ∫cos and ∫sin against a forward/up pair, because the axle the planes imply need not be
+ * square to the span and a rotation about an oblique axle carries `forward` out of that pair's own
+ * plane. Both the viewer and the consumer go through this one function, so "sampled" is a property
+ * of the definition rather than a difference between two implementations, and the error at these
+ * step counts is a millionth of the span.
  */
 export interface BendGeometry {
   basis: BendBasis;
   /** The base end: the point the whole bend is anchored at. */
   origin: Vec3;
   span: number;
-  /** ∫cos Θ and ∫sin Θ from 0 to each sample, so the centreline is origin + span·(forward·ic + up·is). */
-  ic: Float64Array;
-  is: Float64Array;
+  /** ∫ of the turned span direction from 0 to each sample, as xyz triples, in units of the span. */
+  path: Float64Array;
 }
 
 export function bendGeometry(doc: BendDoc): BendGeometry {
   const basis = bendBasis(doc);
+  const { forward, axis } = basis;
+  const { angle } = bendRotation(doc);
   const span = spanLength(doc);
   const n = ARC_SAMPLES;
-  const ic = new Float64Array(n + 1), is = new Float64Array(n + 1);
+  const path = new Float64Array((n + 1) * 3);
   const h = 1 / n;
-  let pc = 1, ps = 0;
+  const prev: Vec3 = [forward[0], forward[1], forward[2]], here: Vec3 = [0, 0, 0];
   for (let i = 1; i <= n; i++) {
-    const t = turnAt(doc, i * h);
-    const c = Math.cos(t), s = Math.sin(t);
-    ic[i] = ic[i - 1] + (pc + c) * h / 2;
-    is[i] = is[i - 1] + (ps + s) * h / 2;
-    pc = c; ps = s;
+    rotateAbout(forward, axis, angle * i * h, here);
+    for (let k = 0; k < 3; k++) path[i * 3 + k] = path[(i - 1) * 3 + k] + (prev[k] + here[k]) * h / 2;
+    prev[0] = here[0]; prev[1] = here[1]; prev[2] = here[2];
   }
-  return { basis, origin: [...doc.base] as Vec3, span, ic, is };
+  return { basis, origin: [...doc.base] as Vec3, span, path };
 }
 
 /** The bent centreline at fraction `s` of the span, in the root frame. */
@@ -361,12 +464,10 @@ export function centrelineAt(g: BendGeometry, s: number, out: Vec3): Vec3 {
   const n = ARC_SAMPLES;
   const x = clamp(s, 0, 1) * n;
   const i = Math.min(n - 1, Math.floor(x)), u = x - i;
-  const a = g.ic[i] + (g.ic[i + 1] - g.ic[i]) * u;
-  const b = g.is[i] + (g.is[i + 1] - g.is[i]) * u;
-  const { forward, up } = g.basis;
-  out[0] = g.origin[0] + g.span * (forward[0] * a + up[0] * b);
-  out[1] = g.origin[1] + g.span * (forward[1] * a + up[1] * b);
-  out[2] = g.origin[2] + g.span * (forward[2] * a + up[2] * b);
+  for (let k = 0; k < 3; k++) {
+    const a = g.path[i * 3 + k], b = g.path[(i + 1) * 3 + k];
+    out[k] = g.origin[k] + g.span * (a + (b - a) * u);
+  }
   return out;
 }
 
@@ -383,6 +484,7 @@ export function warp(doc: BendDoc): WarpFn {
   const g = bendGeometry(doc);
   const { forward, axis } = g.basis;
   const { origin, span } = g;
+  const { angle } = bendRotation(doc);
   const c: Vec3 = [0, 0, 0], r: Vec3 = [0, 0, 0], d: Vec3 = [0, 0, 0];
   return (x, y, z, out) => {
     const u = (x - origin[0]) * forward[0] + (y - origin[1]) * forward[1] + (z - origin[2]) * forward[2];
@@ -392,7 +494,7 @@ export function warp(doc: BendDoc): WarpFn {
     const cx = origin[0] + forward[0] * span * s, cy = origin[1] + forward[1] * span * s, cz = origin[2] + forward[2] * span * s;
     centrelineAt(g, s, c);
     d[0] = x - cx; d[1] = y - cy; d[2] = z - cz;
-    rotateAbout(d, axis, turnAt(doc, s), r);
+    rotateAbout(d, axis, angle * s, r);
     out[0] = c[0] + r[0];
     out[1] = c[1] + r[1];
     out[2] = c[2] + r[2];
@@ -416,6 +518,7 @@ export function normalWarp(doc: BendDoc): (x: number, y: number, z: number, nx: 
   const g = bendGeometry(doc);
   const { forward, up, axis } = g.basis;
   const { origin, span } = g;
+  const { angle } = bendRotation(doc);
   const t: Vec3 = [0, 0, 0];
   return (x, y, z, nx, ny, nz, out) => {
     const dx = x - origin[0], dy = y - origin[1], dz = z - origin[2];
@@ -424,13 +527,13 @@ export function normalWarp(doc: BendDoc): (x: number, y: number, z: number, nx: 
     let ox = nx, oy = ny, oz = nz;
     if (s > 0 && s < 1) {
       const beta = dx * up[0] + dy * up[1] + dz * up[2];
-      const k = 1 - turnRateAt(doc, s) * beta / span;
+      const k = 1 - angle * beta / span;
       if (Math.abs(k) > 1e-6 && Math.abs(k - 1) > 1e-12) {
         const along = (nx * forward[0] + ny * forward[1] + nz * forward[2]) * (1 / k - 1);
         ox += forward[0] * along; oy += forward[1] * along; oz += forward[2] * along;
       }
     }
-    rotateAbout(norm([ox, oy, oz]), axis, turnAt(doc, s), t);
+    rotateAbout(norm([ox, oy, oz]), axis, angle * s, t);
     out[0] = t[0]; out[1] = t[1]; out[2] = t[2];
   };
 }
@@ -446,6 +549,7 @@ export function normalWarp(doc: BendDoc): (x: number, y: number, z: number, nx: 
 export function pinch(doc: BendDoc, chunks: readonly ArrayLike<number>[]): number {
   if (isIdentity(doc)) return 1;
   const { forward, up } = bendBasis(doc);
+  const { angle } = bendRotation(doc);
   const origin = doc.base, span = spanLength(doc);
   let worst = 1;
   for (const c of chunks) for (let i = 0; i + 2 < c.length; i += 3) {
@@ -454,7 +558,7 @@ export function pinch(doc: BendDoc, chunks: readonly ArrayLike<number>[]): numbe
     const s = u / span;
     if (s <= 0 || s >= 1) continue;
     const beta = dx * up[0] + dy * up[1] + dz * up[2];
-    const k = 1 - turnRateAt(doc, s) * beta / span;
+    const k = 1 - angle * beta / span;
     if (k < worst) worst = k;
   }
   return worst;
@@ -976,7 +1080,8 @@ export function measureBend(input: BendInput, meta: { key: string; id: string; c
     box: { lo: [lo[0], lo[1], lo[2]], hi: [hi[0], hi[1], hi[2]] },
     bounds: { length: 0, height: 0, width: 0, axisMin: 0, axisMax: 0, lateralMid: 0, upMid: 0 },
     base: [0, 0, 0], tip: [0, 0, 0], baseSource: 'trace', tipSource: 'trace',
-    axisRoll: 0, baseTurn: 0, tipTurn: 0,
+    baseNormal: forwardVector(frame), tipRest: forwardVector(frame), tipNormal: forwardVector(frame),
+    planeSource: { base: 'trace', tip: 'trace' },
     window: DEFAULT_WINDOW, reach: DEFAULT_REACH, chain: null, refs: null,
     chainSource: 'auto', refsSource: 'auto',
   };
@@ -1000,7 +1105,8 @@ export function reframe(doc: BendDoc, frame: BendFrame, frameSource: FrameSource
       axisMin: lo[A], axisMax: hi[A],
       lateralMid: (lo[L] + hi[L]) / 2, upMid: (lo[1] + hi[1]) / 2,
     },
-    axisRoll: 0, baseTurn: 0, tipTurn: 0,
+    baseNormal: forwardVector(frame), tipRest: forwardVector(frame), tipNormal: forwardVector(frame),
+    planeSource: { base: 'trace', tip: 'trace' },
     baseSource: 'trace', tipSource: 'trace',
     chainSource: 'auto', refsSource: 'auto',
   };
@@ -1043,7 +1149,64 @@ export function seat(doc: BendDoc, chunks: readonly ArrayLike<number>[], fresh =
   if (doc.tipSource === 'trace') next.tip = settle(doc.tip);
   const keep = keepApart(next);
   next.base = keep.base; next.tip = keep.tip;
-  return reguess(next, fresh || !next.chain);
+  return seatPlanes(reguess(next, fresh || !next.chain), chunks, fresh);
+}
+
+/**
+ * Seat the two planes on the body: measure which way the creature's axis line actually runs at
+ * each end of the span, and point the planes along it.
+ *
+ * `tipRest` is **always** re-measured, whoever aimed the tip plane. It is not an opinion — it is
+ * the animal's own heading where the span leaves it, and the turn is measured from there, so a
+ * `tipRest` left behind when the span moved would be a rotation taken from a place the body never
+ * was. An *aim* a person has given is kept: a straightened tip plane stays aimed at the base
+ * plane while the span is nudged about under it, which is the whole use of the thing.
+ *
+ * Measured from the traces, which are the same run of body the geometry reading is taken over —
+ * so a freshly seated pair of planes **is** that reading, and the panel says the same number twice
+ * on purpose. Where a trace finds nothing the span's own chord stands in, which is what a bounding
+ * box would have said all along.
+ */
+export function seatPlanes(doc: BendDoc, chunks: readonly ArrayLike<number>[], force = false): BendDoc {
+  const next = cloneDoc(doc);
+  const t = traces(next, chunks);
+  const chord = spanDirection(next);
+  // The base trace runs tailward from the base cut, so the direction the axis line runs *in* along
+  // it is its negation; the tip trace already runs headward.
+  const into: Vec3 = t.base ? [-t.base.direction[0], -t.base.direction[1], -t.base.direction[2]] : chord;
+  const outOf: Vec3 = t.tip ? [...t.tip.direction] as Vec3 : chord;
+  const held = isIdentity(next);
+  next.tipRest = norm(outOf);
+  if (force || next.planeSource.base !== 'manual') {
+    next.baseNormal = norm(into);
+    next.planeSource = { ...next.planeSource, base: 'trace' };
+  }
+  if (force || next.planeSource.tip !== 'manual' || held) {
+    next.tipNormal = [...next.tipRest] as Vec3;
+    next.planeSource = { ...next.planeSource, tip: 'trace' };
+  }
+  return next;
+}
+
+/**
+ * Seat the planes on the **bone chords** the reading is between instead of on the traced surface.
+ *
+ * The human answer on a body whose trace cannot be believed, and Askeptosaurus is that body: the
+ * trace ahead of its neck reads a residual of 0.009 and the one behind it 0.062, because its trunk
+ * is short, fat, curled and crossed by both forelimbs. There the rig is the thing to read, and
+ * which two chords is already a choice this tool makes a person make.
+ */
+export function seatPlanesFromBones(doc: BendDoc): BendDoc {
+  if (!doc.refs || !doc.bones.length) return doc;
+  const into = boneDirection(doc.bones, doc.refs.base);
+  const outOf = boneDirection(doc.bones, doc.refs.tip);
+  if (!into || !outOf) return doc;
+  const next = cloneDoc(doc);
+  next.baseNormal = into;
+  next.tipRest = outOf;
+  next.tipNormal = [...outOf] as Vec3;
+  next.planeSource = { base: 'bones', tip: 'bones' };
+  return next;
 }
 
 /**
@@ -1082,6 +1245,8 @@ export type EndName = 'base' | 'tip';
 
 export const cloneDoc = (doc: BendDoc): BendDoc => ({
   ...doc, bounds: { ...doc.bounds }, frame: { ...doc.frame },
+  baseNormal: [...doc.baseNormal] as Vec3, tipRest: [...doc.tipRest] as Vec3, tipNormal: [...doc.tipNormal] as Vec3,
+  planeSource: { ...doc.planeSource },
   bones: doc.bones.map((b) => ({ ...b, head: [...b.head] as Vec3 })),
   box: { lo: [...doc.box.lo] as Vec3, hi: [...doc.box.hi] as Vec3 },
   base: [...doc.base] as Vec3, tip: [...doc.tip] as Vec3,
@@ -1124,28 +1289,54 @@ export function reguessRefs(doc: BendDoc): BendDoc {
   return reguess(next, true);
 }
 
-/** Turn the bend plane about the span. 0 lifts the tip; +90° swings it towards +lateral. */
-export function setAxisRoll(doc: BendDoc, radians: number): BendDoc {
+/**
+ * Aim one of the two planes: say which way the creature's axis line runs through it.
+ *
+ * The vector is normalised and need not be square to anything — it *is* the plane, since a plane
+ * square to a direction is that direction. Aiming the **tip** plane is the bend: the body turns so
+ * that its own heading at that end comes onto the aim, and the plane's motion is therefore exactly
+ * the motion of the body under it, which is what the old roll control could not be. Aiming the
+ * **base** plane moves nothing at all — nothing behind the base cut ever does — and changes what
+ * the tip plane is aimed *at*, which is to say what "straight" means here.
+ *
+ * A direction that says nothing (a zero vector, or nonsense) is refused rather than collapsing the
+ * plane, because a plane with no normal has no orientation and every angle taken against it would
+ * come back as a NaN a reviewer would read as an answer.
+ */
+export function setPlaneNormal(doc: BendDoc, which: PlaneEnd, v: Vec3): BendDoc {
+  if (!v.every((x) => Number.isFinite(x)) || len(v) < 1e-9) return doc;
   const next = cloneDoc(doc);
-  const r = Number.isFinite(radians) ? radians : 0;
-  // Wrapped rather than clamped: every plane is reachable and −180° is +180°, so a plane turned
-  // round the far side comes back rather than sticking at a limit that means nothing.
-  next.axisRoll = Math.atan2(Math.sin(r), Math.cos(r));
+  const n = norm(v);
+  if (which === 'base') next.baseNormal = n; else next.tipNormal = n;
+  next.planeSource = { ...next.planeSource, [which]: 'manual' } as BendDoc['planeSource'];
   return next;
 }
 
-export type TurnName = 'baseTurn' | 'tipTurn';
-
-export function setTurn(doc: BendDoc, which: TurnName, radians: number): BendDoc {
+/**
+ * **Aim the tip plane at the base plane**, which is the whole of what straightening is.
+ *
+ * The bend is the rotation carrying the tip end's own heading onto the tip plane's aim, so with the
+ * two planes aimed the same way that rotation carries the head's heading onto the trunk's and the
+ * run between them comes straight. Nothing is solved for and nothing is iterated: the reviewer says
+ * which direction they are calling the trunk, and this points the other plane along it.
+ *
+ * It is still an *aim* rather than a proof. What comes out is measured afterwards — both readings,
+ * over the warped mesh and the warped rig — and a base plane aimed somewhere the body's own centre
+ * line does not run will straighten the body onto *that*, which is the reviewer's judgement to make
+ * and the panel's job to show.
+ */
+export function straighten(doc: BendDoc): BendDoc {
   const next = cloneDoc(doc);
-  next[which] = clamp(Number.isFinite(radians) ? radians : 0, -MAX_TURN, MAX_TURN);
+  next.tipNormal = norm(doc.baseNormal);
+  next.planeSource = { ...next.planeSource, tip: 'manual' };
   return next;
 }
 
-/** Both ends at once: the circular arc through the span that turns it by `radians` in total. */
-export function setTotalTurn(doc: BendDoc, radians: number): BendDoc {
-  const t = clamp(Number.isFinite(radians) ? radians : 0, -MAX_TURN, MAX_TURN);
-  return setTurn(setTurn(doc, 'baseTurn', t), 'tipTurn', t);
+/** Put the tip plane back on the body's own heading there: no bend, the planes left where they sit. */
+export function resetTurn(doc: BendDoc): BendDoc {
+  const next = cloneDoc(doc);
+  next.tipNormal = [...doc.tipRest] as Vec3;
+  return next;
 }
 
 /** How much body a trace runs over. Held to something that has vertices in it. */
@@ -1181,54 +1372,20 @@ export function setRef(doc: BendDoc, which: keyof BoneRefs, end: keyof BoneRef, 
   return next;
 }
 
-/** Back to straight, with the span, the plane and the references left where they were put. */
-export function resetTurn(doc: BendDoc): BendDoc {
-  const next = cloneDoc(doc);
-  next.baseTurn = 0; next.tipTurn = 0;
-  return next;
-}
-
 /**
- * Aim the bend plane at the turn the body actually has, from a reading taken in some other plane.
+ * Which end of the *body* the head is at.
  *
- * Finding the plane a bend lies in by eye is the hardest part of using this, and it is the part a
- * measurement can simply answer: the plane containing a reading's two directions is the one whose
- * axis is their cross product. A reading with nothing to aim at — two directions the same — leaves
- * the plane where it is.
- */
-export function aimAxisAt(doc: BendDoc, reading: Reading): BendDoc {
-  const c = cross(reading.base, reading.tip);
-  if (len(c) < 1e-9) return doc;
-  const roll = rollForAxis(doc, norm(c));
-  return roll === null ? doc : setAxisRoll(doc, roll);
-}
-
-/**
- * Turn the span so a reading comes out at `target`, by taking off what it currently reads in the
- * plane. A circular arc, because with nothing said about the distribution an even one is the honest
- * guess; the two ends are then the reviewer's to bias.
- *
- * It is an *aim* and not a solve, because a reference sitting inside the span moves with the bend
- * and by more than the turn if it sits well off the span's line: the resulting reading is measured
- * afterwards and the panel shows it, so a target that came out short is visible rather than assumed.
- */
-export function turnToTarget(doc: BendDoc, reading: Reading, target: number): BendDoc {
-  return setTotalTurn(doc, totalTurn(doc) + (target - reading.inPlane));
-}
-
-/**
- * Which end of the *body* the head is at. The span keeps its two ends exactly where they are — only
- * which of them the tool calls the base changes, and the turns swap and negate with them, so a span
- * bent one way from the tail end is the same shape bent the other way from the head end and nothing
- * drawn on screen moves. A human correcting the frame must not have the edit move under them.
+ * It re-reads "back from the nose", which is what the frame is for, and changes nothing else: the
+ * span keeps its two ends, the planes keep their aims and the bend keeps its shape. It used to swap
+ * the span's ends and negate the turns with them, so that a span bent one way from the tail end came
+ * back as the same shape bent the other way from the head end. Two aimed planes have no such
+ * negation — which end of the span the bend is anchored at is a real choice about which part of the
+ * animal is held still, and it is one the reviewer already made by placing the two ends.
  */
 export function flipForward(doc: BendDoc): BendDoc {
   const next = cloneDoc(doc);
   next.frame = { ...doc.frame, forward: doc.frame.forward === 1 ? -1 : 1 };
   next.frameSource = 'manual';
-  next.base = [...doc.tip] as Vec3; next.tip = [...doc.base] as Vec3;
-  next.baseSource = doc.tipSource; next.tipSource = doc.baseSource;
-  next.baseTurn = -doc.tipTurn; next.tipTurn = -doc.baseTurn;
   return reguess(next);
 }
 
@@ -1237,10 +1394,16 @@ export function flipForward(doc: BendDoc): BendDoc {
 // ---------------------------------------------------------------------------------------------
 
 /**
- * What the body on stage is, so a consumer knows which file the bend describes. The same four the
- * mouth editor names, because the same bodies can be on the stage.
+ * What the body on stage is, so a consumer knows which file the bend describes.
+ *
+ * The mouth editor's four, plus one this mode needs and that one does not: **`origpose`**, the
+ * untouched generation republished beside a body whose builder moved the mesh or carried a pose
+ * into the bind (`tools/triassic/base-poses.mjs`). A bend measured on a corrected body and one
+ * measured on the body before the correction are different claims about different geometry, and on
+ * Askeptosaurus they differ by the whole 67.7° the correction was about — so the file has to say
+ * which, and `built` cannot be allowed to mean either.
  */
-export type AppliesTo = 'generation' | 'preview' | 'built' | 'twin';
+export type AppliesTo = 'generation' | 'preview' | 'built' | 'twin' | 'origpose';
 
 export interface BendExportInput {
   sha256: string | null;
@@ -1296,7 +1459,7 @@ export function exportDoc(doc: BendDoc, input: BendExportInput) {
   const basis = bendBasis(doc);
   const joints = jointTurns(doc);
   return {
-    schema: 'bend-span/1' as const,
+    schema: 'bend-span/2' as const,
     id: doc.id,
     model: doc.model,
     sha256: input.sha256,
@@ -1308,8 +1471,13 @@ export function exportDoc(doc: BendDoc, input: BendExportInput) {
      * because every clip re-specifies each joint's translation on every frame and a bent bind pose
      * would be overridden and deformed the moment anything played. Either way the numbers go to the
      * animal's builder — there is no bake.
+     *
+     * An `origpose` body carries no rig and is still a measurement rather than an edit: the file on
+     * stage is a published **copy** of the generation in `tripo-raw/`, so an edit to it would be an
+     * edit to a copy nothing is built from, and what the numbers are for is the builder that turns
+     * that generation into the body.
      */
-    use: doc.rigged ? 'builder-measurement' : 'mesh-edit',
+    use: doc.rigged || input.appliesTo === 'origpose' ? 'builder-measurement' : 'mesh-edit',
     authoredAt: input.authoredAt,
     note: input.note,
     creature: { key: doc.key, id: doc.id, collection: doc.collection, vertices: doc.vertices, rigged: doc.rigged },
@@ -1329,18 +1497,28 @@ export function exportDoc(doc: BendDoc, input: BendExportInput) {
       percentOfBody: round(spanLength(doc) / doc.bounds.length * 100, 2),
       note: 'Two points on the body. Both cuts are square to the line between them, that line is the span\'s direction, and its length is the distance between them. The bend is anchored at `base`, and both points are where the geometry reading\'s traces start. "trace" is the automatic seat — the body\'s own centre near where the end was asked for — and "manual" is a reviewer who put it there by hand.',
     },
+    planes: {
+      baseNormal: r3(norm(doc.baseNormal)),
+      baseNormalBlenderZUp: toBlender(norm(doc.baseNormal)),
+      baseSource: doc.planeSource.base,
+      tipRest: r3(norm(doc.tipRest)),
+      tipNormal: r3(norm(doc.tipNormal)),
+      tipNormalBlenderZUp: toBlender(norm(doc.tipNormal)),
+      tipSource: doc.planeSource.tip,
+      apartDegrees: deg(angleOf(doc.baseNormal, doc.tipNormal)),
+      apartBeforeDegrees: deg(angleOf(doc.baseNormal, doc.tipRest)),
+      note: 'Two planes, one at each end of the span, each named by the direction the creature\u2019s axis line runs through it. baseNormal is where it runs in and is a pure reference \u2014 nothing behind the base cut moves under any bend. tipRest is where it ran out when the plane was seated on the body, measured rather than chosen; tipNormal is where it is to run out. apartDegrees is how far the two planes are aimed apart now and apartBeforeDegrees how far they were before the bend, so a zero in the first and the animal\u2019s own curve in the second is a run that has been straightened.',
+    },
     axis: {
-      roll: doc.axisRoll, rollDegrees: deg(doc.axisRoll),
       vector: r3(basis.axis),
       vectorBlenderZUp: toBlender(basis.axis),
       up: r3(basis.up),
-      note: 'The axle the span turns about, through span.base. Always square to the span: a component along it would be a twist, not a bend. A positive turn carries the body towards axis.up. vectorBlenderZUp is the same direction in a Z-up armature frame ([x, −z, y]).',
+      twistDegrees: deg(twistAngle(doc)),
+      note: 'The axle the span turns about, through span.base: the shortest rotation carrying planes.tipRest onto planes.tipNormal, so it is derived from the two planes rather than dialled. A positive turn carries the body towards axis.up. twistDegrees is how far it leans along the span, which is the share of an oblique aim that is a twist of the span about its own length rather than a bend; it is reported rather than clamped, because clamping it would mean the turn no longer carried the tip plane where it was aimed. vectorBlenderZUp is the same direction in a Z-up armature frame ([x, \u2212z, y]).',
     },
     turn: {
-      base: doc.baseTurn, tip: doc.tipTurn,
-      baseDegrees: deg(doc.baseTurn), tipDegrees: deg(doc.tipTurn),
       totalDegrees: deg(totalTurn(doc)),
-      note: 'base and tip are how hard the span turns at each of its ends, in degrees across the whole span, interpolated linearly between. The total the span turns through is their mean. They are rates rather than offsets, so the rotation at the base cut is exactly identity and there is no kink there.',
+      note: 'The whole the span turns through: the angle between planes.tipRest and planes.tipNormal, spread linearly across the span so the rotation at the base cut is exactly identity and there is no kink there. It is never negative \u2014 which way the body goes is carried by axis.vector.',
     },
     reading: {
       window: doc.window,
@@ -1379,7 +1557,7 @@ export function exportDoc(doc: BendDoc, input: BendExportInput) {
       worst: round(input.pinch, 4),
       note: 'The smallest the inside of the bend is squeezed to, as a fraction of its own length. 1 is no squeeze; below 0 the turn is tighter than the body is thick and the surface has folded through itself.',
     },
-    rule: 'A vertex at fraction s through the span (its distance from span.base along span.direction, over span.length) is carried to the bent centreline at s and turned about axis.vector by turn.base·s + (turn.tip − turn.base)·s²/2. Behind the base cut s is 0 and nothing moves; past the tip cut s is 1 and the far part is carried rigidly. See docs/viewer-bend.md.',
+    rule: 'A vertex at fraction s through the span (its distance from span.base along span.direction, over span.length) is carried to the bent centreline at s and turned about axis.vector by turn.totalDegrees·s. Behind the base cut s is 0 and nothing moves; past the tip cut s is 1 and the far part is carried rigidly. See docs/viewer-bend.md.',
     bend: doc,
   };
 }
@@ -1398,16 +1576,28 @@ export type BendExport = ReturnType<typeof exportDoc>;
 export function fromExport(payload: unknown, actual?: { sha256?: string | null; vertices?: number }): BendDoc {
   const p = payload as Partial<BendExport> | null;
   if (!p || typeof p !== 'object') throw new Error('not a bend file');
-  if (p.schema !== 'bend-span/1') throw new Error(`not a bend file (schema "${String(p.schema)}")`);
+  if ((p.schema as string) === 'bend-span/1') {
+    throw new Error('this bend file was written before the two planes (schema "bend-span/1"): it carries turn rates and a bend-plane roll, which no longer describe a bend. Open the body in the viewer and place the span again.');
+  }
+  if (p.schema !== 'bend-span/2') throw new Error(`not a bend file (schema "${String(p.schema)}")`);
   const doc = p.bend as BendDoc | undefined;
   if (!doc || typeof doc !== 'object') throw new Error('bend file has no document');
-  for (const k of ['axisRoll', 'baseTurn', 'tipTurn', 'window', 'reach'] as const) {
+  for (const k of ['window', 'reach'] as const) {
     if (!Number.isFinite(doc[k])) throw new Error(`bend file has no usable "${k}"`);
   }
   for (const k of ['base', 'tip'] as const) {
     const v = doc[k] as unknown;
     if (!Array.isArray(v) || v.length !== 3 || !v.every((n) => Number.isFinite(n))) throw new Error(`bend file has no usable "${k}"`);
   }
+  // A plane is its normal, so a normal that is not a direction is a plane with no orientation, and
+  // every angle taken against it would come back NaN and read as an answer.
+  for (const k of ['baseNormal', 'tipRest', 'tipNormal'] as const) {
+    const v = doc[k] as unknown;
+    if (!Array.isArray(v) || v.length !== 3 || !v.every((n) => Number.isFinite(n)) || Math.hypot(v[0], v[1], v[2]) < 1e-9) {
+      throw new Error(`bend file has no usable "${k}"`);
+    }
+  }
+  if (!doc.planeSource || typeof doc.planeSource !== 'object') throw new Error('bend file has no usable "planeSource"');
   if (!doc.frame || (doc.frame.axis !== 'x' && doc.frame.axis !== 'z')) throw new Error('bend file has no usable frame');
   if (!doc.bounds || !Number.isFinite(doc.bounds.length)) throw new Error('bend file has no usable bounds');
   if (!Array.isArray(doc.bones)) throw new Error('bend file has no usable bone list');
