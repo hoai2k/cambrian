@@ -30,7 +30,7 @@ interface Label { pad: string; kbm: string; key1: string; key2: string; short?: 
 
 /** Long names, for prose and for the diagrams. `short` overrides them inside a chip or a <kbd>. */
 const LABELS: Record<Action, Label> = {
-  swim:     { pad: 'Left stick', kbm: 'W / X, A / D turn', key1: 'W / X, A / D turn', key2: 'IJKL' },
+  swim:     { pad: 'Left stick', kbm: 'W forward, X back, A / D turn', key1: 'W / X, A / D turn', key2: 'IJKL' },
   look:     { pad: 'Right stick', kbm: 'Drag', key1: 'Arrow keys', key2: 'IJKL (no camera)' },
   zoom:     { pad: 'Right stick click + up/down', kbm: 'Mouse wheel', key1: 'PgUp / PgDn', key2: '—', short: { pad: 'RS + ▲▼', kbm: 'Wheel' } },
   sprint:   { pad: 'LB', kbm: 'Shift', key1: 'Shift', key2: 'Right Shift', short: { key2: 'R-Shift' } },
