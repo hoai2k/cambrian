@@ -47,6 +47,9 @@ export const SAMPLES: Record<string, string[]> = {
   sense: ['sense'], ability: ['ability'], heartbeat: ['heartbeat'], noticed: ['noticed'], respawn: ['respawn'],
   pounce: ['pounce'], swallow: ['swallow'], disintegrate: ['disintegrate'], routed: ['routed'],
   'ui-move': ['ui-move'], 'ui-confirm': ['ui-confirm'], 'ui-back': ['ui-back'], 'ui-join': ['ui-join'], 'ui-start': ['ui-start'], won: ['won'],
+  // A body coming down on the sand (src/sim/beach.ts): every era can land on its shore now, and
+  // the Devonian's own recording is the one that exists, so the shared table borrows it.
+  beach: ['devonian/beach'],
 };
 /**
  * The two always-on beds, from the era rather than from a constant: the Devonian's ambience is
