@@ -5,8 +5,9 @@ import { useMeasuredHash } from '../file-hash';
 import { History } from '../sculpt/history';
 import { NumberField } from '../stretch/StretchEditor';
 import {
-  MAX_ANGLE, aimForward, aimHinge, countSides, cutBasis, describeSides, exportDoc, flipForward, levelCut, mandibleTest,
-  measureMouth, moveHinge, setAngle, setAxis, setDepth, setLateral, setUp, type AppliesTo, type MouthDoc, type Vec3,
+  DEFAULT_GAPE, MAX_ANGLE, MAX_GAPE, aimForward, aimHinge, countSides, cutBasis, describeSides, exportDoc, flipForward,
+  gapeWarp, levelCut, mandibleTest, measureMouth, moveHinge, setAngle, setAxis, setDepth, setLateral, setUp,
+  type AppliesTo, type MouthDoc, type Vec3,
 } from './mouth';
 import { getMouth, mouthKey, setMouth } from './store';
 
@@ -26,6 +27,17 @@ import { getMouth, mouthKey, setMouth } from './store';
  * the model turnable without a modifier nobody would find. The rig goes to its bind pose while the
  * cut is aimed: a swimming body is drawn somewhere its vertex positions are not.
  *
+ * **Gape** is the preview, and it is a preview of the cut rather than of the animal. Playing the
+ * body's own clips would answer the wrong question — they open the jaw the file was *built* with,
+ * which is a cut somebody measured before this one, and the cut being aimed is nowhere in the rig
+ * — so the slider swings the document's own mandible set about its own hinge instead, rigidly,
+ * live. Holding it hides every piece of the editor's furniture (the handles, the planes, the lit
+ * vertices, the panel itself, the specimen list) so what is on screen while the jaw moves is the
+ * animal and nothing else; letting go brings it all back with the jaw still where it was left, so
+ * the hinge can be dragged and the fields typed with the mouth open and the effect seen as it is
+ * made. That is what makes the two questions one: *is the hinge in the right place* is answered
+ * by watching this jaw swing, not by reading a count.
+ *
  * Nothing is saved. The document lives in the session's store so a trip through view mode does
  * not lose it, and a reload starts from the body's own guess. What leaves is the mouth file, with
  * the hash of the exact body it was aimed on (`docs/viewer-mouth.md`).
@@ -42,6 +54,8 @@ interface Props {
   appliesTo: AppliesTo;
   /** The stage canvas: the handles listen on it directly, because the orbit already owns it. */
   canvas: HTMLCanvasElement;
+  /** Raised while the gape is being held, so the viewer can take its own chrome off the screen. */
+  onPreview?(previewing: boolean): void;
   onExit(): void;
 }
 
@@ -55,21 +69,35 @@ interface Drag {
   start: Vec3;
 }
 
-export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas, onExit }: Props) {
+export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas, onPreview, onExit }: Props) {
   const [doc, setDocState] = useState<MouthDoc | null>(null);
   const [error, setError] = useState('');
   const [note, setNote] = useState('');
   const [hover, setHover] = useState<MouthHandle | null>(null);
   const [historyTick, setHistoryTick] = useState(0);
+  const [gape, setGapeState] = useState(0);
+  const [previewing, setPreviewingState] = useState(false);
   const historyRef = useRef<History<MouthDoc> | null>(null);
   const chunksRef = useRef<Float32Array[]>([]);
   const dragRef = useRef<Drag | null>(null);
+  // The gape and the hold are read from inside `show`, which every commit goes through, so they
+  // are kept in refs as well as in state: `show` has to stay stable or the effect that measures
+  // the body would re-run — and re-measure it — every time the slider moved.
+  const gapeRef = useRef(0);
+  const previewRef = useRef(false);
   const key = mouthKey(specimen.key, model);
 
-  /** The document on stage: the helpers sized to the head, and every mandible-side vertex lit. */
+  /**
+   * The document on stage: the body's jaw swung to the current gape, the helpers sized to the
+   * head, and every mandible-side vertex lit *where the swing has put it*. While the gape is
+   * being held the furniture comes off entirely, so the animal is all that is drawn.
+   */
   const show = useCallback((d: MouthDoc) => {
+    const warp = gapeWarp(d, gapeRef.current);
+    scene.setMouthGape(warp);
+    if (previewRef.current) { scene.showMouthCut(null, null); return; }
     const b = cutBasis(d);
-    scene.showMouthCut({ ...b, reach: Math.max(d.depth, d.head.height * 0.25), halfWidth: d.head.width / 2, height: d.head.height }, mandibleTest(d));
+    scene.showMouthCut({ ...b, reach: Math.max(d.depth, d.head.height * 0.25), halfWidth: d.head.width / 2, height: d.head.height }, mandibleTest(d), warp);
   }, [scene]);
 
   // ---- measure once per body, or take up the session's document ----
@@ -95,6 +123,7 @@ export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas,
     show(d);
     return () => {
       scene.showMouthCut(null, null);
+      scene.setMouthGape(null);
       scene.setMarkInteraction(false);
       scene.setRestPose(false);
       canvas.style.cursor = '';
@@ -121,6 +150,50 @@ export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas,
   }, [commitDoc]);
   const undo = useCallback(() => { const h = historyRef.current; if (!h?.canUndo) return; commitDoc(h.undo()); setHistoryTick((t) => t + 1); }, [commitDoc]);
   const redo = useCallback(() => { const h = historyRef.current; if (!h?.canRedo) return; commitDoc(h.redo()); setHistoryTick((t) => t + 1); }, [commitDoc]);
+
+  // ---- the gape, and the hold that clears the screen for it ----
+  /**
+   * Set the gape and redraw. The angle is the preview's and never the document's: it is not in
+   * the export, it is not an undo step, and a body left with its mouth open is a body a reviewer
+   * chose to look at that way, not a cut that has changed.
+   */
+  const applyGape = useCallback((radians: number) => {
+    const next = Math.max(0, Math.min(MAX_GAPE, Number.isFinite(radians) ? radians : 0));
+    gapeRef.current = next;
+    setGapeState(next);
+    const d = historyRef.current?.present;
+    if (d) show(d);
+  }, [show]);
+
+  const setPreviewing = useCallback((on: boolean) => {
+    if (previewRef.current === on) return;
+    previewRef.current = on;
+    setPreviewingState(on);
+    onPreview?.(on);
+    const d = historyRef.current?.present;
+    if (d) show(d);
+  }, [show, onPreview]);
+
+  // A hold has to end wherever the pointer or the key comes up. The slider keeps the pointer
+  // through a drag, but a release off the window, a cancelled touch or a key let go while focus
+  // has moved would otherwise leave the screen cleared with nothing holding it.
+  useEffect(() => {
+    if (!previewing) return;
+    const off = () => setPreviewing(false);
+    window.addEventListener('pointerup', off);
+    window.addEventListener('pointercancel', off);
+    window.addEventListener('keyup', off);
+    window.addEventListener('blur', off);
+    return () => {
+      window.removeEventListener('pointerup', off);
+      window.removeEventListener('pointercancel', off);
+      window.removeEventListener('keyup', off);
+      window.removeEventListener('blur', off);
+    };
+  }, [previewing, setPreviewing]);
+
+  // Leaving the mode, or the body changing under it, must not leave a jaw hanging open.
+  useEffect(() => () => { onPreview?.(false); }, [onPreview]);
 
   // ---- the handles, on the canvas ----
   useEffect(() => {
@@ -213,12 +286,13 @@ export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas,
   const h = historyRef.current;
   void historyTick;
   const sides = doc ? countSides(chunksRef.current, doc) : { mandible: 0, skull: 0, total: 0 };
+  const gapeDeg = deg(gape);
   const squared = !!doc && !doc.pitch && !doc.yaw && !doc.roll;
   const hash = measured ?? sha256 ?? null;
 
   return (
     <>
-      <div className="mark-stage mouth-stage">
+      <div className={`mark-stage mouth-stage ${previewing ? 'previewing' : ''}`}>
         <span className="mark-label">Mouth · left-drag a handle · right-drag orbits · shift+right pans · scroll zooms</span>
         <ul className="mouth-legend" aria-label="Handles">
           <li className={`hinge ${hover === 'hinge' ? 'hover' : ''}`}><i />hinge · drag to move the cut</li>
@@ -226,7 +300,8 @@ export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas,
           <li className={`side ${hover === 'side' ? 'hover' : ''}`}><i />side · drag to tip the plane</li>
         </ul>
       </div>
-      <aside className="sculpt-panel mouth-panel" aria-label="Mouth">
+      <aside className={`sculpt-panel mouth-panel ${previewing ? 'previewing' : ''}`} aria-label="Mouth"
+        data-gape={gapeDeg} data-previewing={previewing ? 'yes' : 'no'}>
         <div className="sculpt-head">
           <span className="role">MOUTH</span>
           <h2 className={specimen.name.length > 11 ? 'long-name' : undefined}>{specimen.name}</h2>
@@ -238,6 +313,34 @@ export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas,
           its hash, so a cut aimed here cannot be applied to a body that has changed since.
         </p>
         <p className="mouth-count" data-mandible={sides.mandible} data-total={sides.total}>{describeSides(sides)}</p>
+
+        <section className="mouth-gape" aria-label="Gape preview">
+          <label>
+            <span>Gape · swing the jaw <b>{gapeDeg.toFixed(0)}°</b></span>
+            <input type="range" min={0} max={MAX_GAPE_DEG} step={0.5} value={gapeDeg} disabled={!doc}
+              aria-label="Gape"
+              onChange={(e) => applyGape(rad(Number(e.target.value)))}
+              onPointerDown={() => setPreviewing(true)}
+              onPointerUp={() => setPreviewing(false)}
+              onKeyDown={() => setPreviewing(true)}
+              onKeyUp={() => setPreviewing(false)}
+              onBlur={() => setPreviewing(false)} />
+          </label>
+          <div className="sculpt-actions">
+            <button className="ghost" onClick={() => applyGape(gape > 1e-6 ? 0 : DEFAULT_GAPE)} disabled={!doc}
+              title="Open the jaw to the preview angle, or shut it again. The jaw stays where you leave it, so the cut can be aimed on an open mouth.">
+              {gape > 1e-6 ? 'Shut the jaw' : 'Open the jaw'}
+            </button>
+          </div>
+          <small>
+            This is the cut being previewed, not the animal: the body’s own clips open the jaw it was
+            <em> built</em> with, and the cut you are aiming is nowhere in its rig. Everything the cut takes
+            onto the mandible swings rigidly about the hinge — where it tears away from the head is where
+            the cut runs. Hold the slider and the handles, the planes and this panel come off the screen;
+            let go and they come back with the jaw still open, so the hinge can be dragged and watched.
+          </small>
+        </section>
+
         <div className="sculpt-actions">
           <button className="ghost" onClick={undo} disabled={!h?.canUndo} title="⌘/Ctrl+Z">Undo</button>
           <button className="ghost" onClick={redo} disabled={!h?.canRedo} title="⇧⌘/Ctrl+Z · Ctrl+Y">Redo</button>
@@ -310,6 +413,7 @@ export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas,
 }
 
 const MAX_DEG = Math.round(MAX_ANGLE * 180 / Math.PI);
+const MAX_GAPE_DEG = Math.round(MAX_GAPE * 180 / Math.PI);
 const fmt = (v: number, signed = false) => `${signed && v > 0 ? '+' : ''}${Number.isFinite(v) ? v.toFixed(3) : '—'}`;
 const deg = (r: number) => Math.round(r * 180 / Math.PI * 10) / 10;
 const rad = (d: number) => d * Math.PI / 180;

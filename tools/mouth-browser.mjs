@@ -9,6 +9,10 @@
  *   - the handles are really on the stage: the pointer finds one by hover, a drag on it changes
  *     the numbers, and the drag is one undo step;
  *   - the numeric fields set the same numbers, the count follows, and Square levels the angles;
+ *   - the gape really moves the body: the jaw swings on the stage (measured as pixels changed in
+ *     the rendered frame, not inferred from the control), holding the slider clears the editor's
+ *     furniture off the screen and letting go brings it back with the jaw still open, shutting it
+ *     again restores the frame, and none of it reaches the document or the exported file;
  *   - the export carries the hash of the file on stage, *measured* in the page and equal to the
  *     hash of that file on disk, and `npm run triassic:mouth` accepts it and refuses a tampered copy;
  *   - the cut survives a trip through view mode and is forgotten on reload.
@@ -18,6 +22,7 @@
  * exported as a cut on a generation rather than a built body.
  */
 import { chromium } from 'playwright-core';
+import { PNG } from 'pngjs';
 import { silenceCounter } from './qa-counter.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -132,6 +137,63 @@ try {
   await page.locator('.mark-note textarea').fill('browser drive: the hinge a little further back');
   await page.screenshot({ path: path.join(out, 'mouth-mode.png') });
 
+  // ---- the gape: the preview really swings the jaw, and holding it clears the screen ----
+  // The proof is the rendered frame rather than the control: a slider that moved a number while
+  // the body stood still is exactly the failure this is here to catch. Shots are of the canvas,
+  // decoded and compared pixel by pixel.
+  const shot = async (name) => {
+    await page.waitForTimeout(1600);   // the software renderer draws about a frame a second
+    const buf = await page.locator('.viewer-canvas').screenshot({ path: name ? path.join(out, name) : undefined });
+    return PNG.sync.read(buf);
+  };
+  /** How many pixels differ between two shots by more than a hair, which antialiasing alone will not. */
+  const moved = (a, b) => {
+    let n = 0;
+    for (let i = 0; i < a.data.length; i += 4) {
+      if (Math.abs(a.data[i] - b.data[i]) + Math.abs(a.data[i + 1] - b.data[i + 1]) + Math.abs(a.data[i + 2] - b.data[i + 2]) > 24) n++;
+    }
+    return n;
+  };
+  const gapeSlider = page.getByRole('slider', { name: 'Gape' });
+  const gapeDeg = async () => Number(await page.locator('.mouth-panel').getAttribute('data-gape'));
+  const countShut = await mandible();
+  const shut = await shot('mouth-gape-shut.png');
+  assert.equal(await gapeDeg(), 0, 'the jaw starts shut');
+
+  await page.getByRole('button', { name: 'Open the jaw' }).click();
+  const open = await shot('mouth-gape-open.png');
+  const opened = await gapeDeg();
+  assert.ok(opened > 0, `the button opens the jaw (${opened}°)`);
+  const swung = moved(shut, open);
+  assert.ok(swung > 400, `and the body on stage actually moves with it (${swung} pixels changed)`);
+  assert.equal(await mandible(), countShut, 'the preview says nothing about the document: the count is unchanged');
+  assert.equal(await page.locator('.mouth-panel').getAttribute('data-previewing'), 'no', 'and pressing the button is not a hold, so the panel stays up');
+
+  // Holding the slider clears the screen; letting go brings it back with the jaw still open.
+  const box = await gapeSlider.boundingBox();
+  await page.mouse.move(box.x + box.width * 0.5, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width * 0.95, box.y + box.height / 2, { steps: 6 });
+  await page.waitForTimeout(400);
+  assert.equal(await page.locator('.viewer').getAttribute('data-previewing'), 'yes', 'holding the slider raises the preview');
+  assert.equal(await page.locator('.mouth-panel').evaluate((el) => getComputedStyle(el).opacity), '0', 'and the panel is off the screen');
+  assert.equal(await page.locator('.specimens').evaluate((el) => getComputedStyle(el).opacity), '0', 'and so is the specimen list');
+  const held = await shot('mouth-gape-held.png');
+  assert.ok(moved(open, held) > 200, 'the jaw is still moving while it is held');
+  await page.mouse.up();
+  await page.waitForTimeout(400);
+  assert.equal(await page.locator('.viewer').getAttribute('data-previewing'), 'no', 'letting go puts the furniture back');
+  assert.equal(await page.locator('.mouth-panel').evaluate((el) => getComputedStyle(el).opacity), '1', 'panel and all');
+  const wide = await gapeDeg();
+  assert.ok(wide > opened, `and the jaw stays where the drag left it, open, so the cut can be aimed on it (${wide}°)`);
+
+  // Shutting it again puts the body back exactly: a preview that left the mesh warped would be
+  // worse than no preview, because everything measured afterwards would be measured on it.
+  await page.getByRole('button', { name: 'Shut the jaw' }).click();
+  const reshut = await shot();
+  assert.equal(await gapeDeg(), 0, 'the jaw shuts again');
+  assert.ok(moved(shut, reshut) < swung / 8, `and the body is back where it started (${moved(shut, reshut)} pixels differ, against ${swung} open)`);
+
   // ---- the hand-off: the hash is measured here and is the file's own ----
   const hash = await measuredHash();
   assert.match(hash, /^[0-9a-f]{64}$/, 'the page hashed the file on stage');
@@ -155,6 +217,7 @@ try {
   assert.ok(Math.abs(Math.hypot(...json.plane.normal) - 1) < 1e-4, 'the plane normal is unit');
   assert.ok(Math.abs(json.plane.pitchDegrees + 8) < 1e-3, 'and the angle the field showed is in it');
   assert.ok(json.mouth && Number.isFinite(json.mouth.depth), 'and the document itself, for a consumer to rebuild the test');
+  assert.ok(!JSON.stringify(json).includes('gape'), 'and nothing about the preview: the gape is a way of looking, not part of the cut');
 
   // ---- the consumer: accepts the file on this body, refuses a tampered one ----
   const check = (f) => spawnSync('npm', ['run', '--silent', 'triassic:mouth', '--', f], { encoding: 'utf8' });
@@ -213,6 +276,7 @@ try {
   if (errors.length) console.error(`page errors:\n${errors.join('\n---\n')}`);
   assert.deepEqual(errors, [], 'no page errors');
   console.log(`PASS: mouth mode — seated on the jaw bone (${first} mandible vertices), a ${handle.which} handle found and dragged, undone, deepened to ${deepCount},`);
+  console.log(`      the gape swung the jaw on stage (${swung} pixels) and hid the furniture while held, then shut and put the body back;`);
   console.log(`      exported with the measured hash ${hash.slice(0, 12)}…, accepted and refused by npm run triassic:mouth, kept through view mode, forgotten on reload;`);
   console.log('      the original pose framed from its box and seated by a guess, exported as a cut on the generation');
 } finally {

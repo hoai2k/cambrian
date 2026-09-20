@@ -83,6 +83,13 @@ export function Viewer() {
   const [id, setId] = useState(initial.current.key);
   const [mode, setMode] = useState<Mode>(initial.current.mode);
   /**
+   * Raised while an editor is holding a preview — the mouth's gape is the one — so the viewer can
+   * take its own chrome off the screen and leave the animal alone with what is being looked at.
+   * The chrome only fades: hiding it outright would change the grid and reframe the camera under
+   * a reviewer mid-drag, which is the one thing a preview must not do.
+   */
+  const [previewing, setPreviewing] = useState(false);
+  /**
    * What can be on stage, as one list rather than two crossed axes.
    *
    * There used to be a *Model detail* control (full / reduced) and a *Body* control (authored /
@@ -296,7 +303,8 @@ export function Viewer() {
   const changed = roster.filter((c) => (picks[c.key] ?? defaultScheme(c.key)) !== defaultScheme(c.key)).length;
 
   return (
-    <div className={`viewer ${mode === 'sculpt' ? 'sculpting' : mode === 'stretch' ? 'stretching' : mode === 'mark' ? 'marking' : mode === 'mouth' ? 'mouthing' : mode === 'bend' ? 'bending' : ''}`} data-mode={mode}>
+    <div className={`viewer ${mode === 'sculpt' ? 'sculpting' : mode === 'stretch' ? 'stretching' : mode === 'mark' ? 'marking' : mode === 'mouth' ? 'mouthing' : mode === 'bend' ? 'bending' : ''} ${previewing ? 'previewing' : ''}`}
+      data-mode={mode} data-previewing={previewing ? 'yes' : 'no'}>
       <div className="stage">
         <canvas ref={canvasRef} className="viewer-canvas" />
         {/* The notice sits on the stage, over where the specimen will stand. `status` stays in the
@@ -332,7 +340,7 @@ export function Viewer() {
       {mode === 'mouth' && canMouth && sceneRef.current && canvasRef.current && (
         <MouthEditor key={`${id}|${modelPath}|mouth`} scene={sceneRef.current} specimen={def} model={modelPath}
           sha256={showGenerated ? def.generatedSha256 : undefined} appliesTo={appliesTo}
-          canvas={canvasRef.current} onExit={() => setMode('view')} />
+          canvas={canvasRef.current} onPreview={setPreviewing} onExit={() => setMode('view')} />
       )}
       {/* Bend mode is the same shape again — handles on the orbit view, a panel where the info card
           was — and is keyed by the body on stage because a span is placed on one file. */}

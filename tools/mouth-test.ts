@@ -11,9 +11,9 @@
  */
 import assert from 'node:assert/strict';
 import {
-  DEFAULT_DEPTH, HEAD_SHARE, MAX_ANGLE, aimForward, aimHinge, axisBack, backOf, countSides, cutBasis, describeSides,
-  exportDoc, flipForward, fromExport, levelCut, mandibleTest, measureHead, measureMouth, moveHinge, setAngle, setAxis,
-  setDepth, setLateral, setUp, type MouthDoc, type Vec3,
+  DEFAULT_DEPTH, DEFAULT_GAPE, HEAD_SHARE, MAX_ANGLE, MAX_GAPE, aimForward, aimHinge, axisBack, backOf, countSides,
+  cutBasis, describeSides, exportDoc, flipForward, fromExport, gapeAxis, gapeWarp, levelCut, mandibleTest, measureHead,
+  measureMouth, moveHinge, setAngle, setAxis, setDepth, setLateral, setUp, type MouthDoc, type Vec3,
 } from '../src/viewer/mouth/mouth';
 import { History } from '../src/viewer/sculpt/history';
 
@@ -226,6 +226,95 @@ ok(setUp(rigged, NaN).up === rigged.up && setLateral(rigged, NaN).lateral === ri
   assert.throws(() => fromExport(null), /not a mouth file/); passes++;
 }
 
+// ------------------------------------------------------------------------------ the gape preview
+// The preview is the document made visible: the vertices the test takes, swung rigidly about the
+// hinge, and nothing else touched. What is checked here is what a reviewer is entitled to believe
+// while looking at it — that the swing opens rather than shuts on every frame, that it is rigid,
+// that it moves exactly the lit set, and that it says nothing about the document.
+
+{
+  ok(gapeWarp(rigged, 0) === null, 'a shut mouth is no pass over the mesh at all');
+  ok(gapeWarp(rigged, -1) === null, 'and neither is a negative gape: the jaw opens one way');
+  const out: Vec3 = [0, 0, 0];
+
+  // All four frames, because this is exactly where the sign of the pivot is not a constant:
+  // `normal × forward` is +hinge in two of them and −hinge in the other two, so a preview turned
+  // about `hinge` itself would shut the mouth on half the bodies — and shut is where it starts,
+  // so it would have read as a slider that did nothing rather than as a bug.
+  const frames = {
+    'along z, head high': rigged,
+    'along z, head low': flipForward(rigged),
+    'along x, head high': setAxis(rigged, 'x'),
+    'along x, head low': flipForward(setAxis(rigged, 'x')),
+  };
+  const signs = new Set<number>();
+  for (const [what, doc] of Object.entries(frames)) {
+    const basis = cutBasis(doc);
+    const axis = gapeAxis(basis);
+    // The hinge is the pivot to within a sign; which sign opens is the thing the frames disagree on.
+    const alongHinge = dot(axis, basis.hinge);
+    signs.add(Math.round(alongHinge));
+    near(Math.abs(alongHinge), 1, 1e-9, `${what}: the gape turns about the hinge line`);
+    near(Math.hypot(...axis), 1, 1e-9, `${what}: on a unit axis`);
+
+    const swing = gapeWarp(doc, DEFAULT_GAPE)!;
+    // A point out on the mouth line, a quarter of a head ahead of the hinge and just inside the
+    // mandible's side of the plane: the tip of the jaw, as near as this body has one.
+    const r = 0.5;
+    const tip: Vec3 = [
+      basis.centre[0] + basis.forward[0] * r - basis.normal[0] * 1e-3,
+      basis.centre[1] + basis.forward[1] * r - basis.normal[1] * 1e-3,
+      basis.centre[2] + basis.forward[2] * r - basis.normal[2] * 1e-3,
+    ];
+    ok(mandibleTest(doc)(...tip), `${what}: the test takes that point onto the mandible`);
+    swing(tip[0], tip[1], tip[2], out);
+    const moved: Vec3 = [out[0] - basis.centre[0], out[1] - basis.centre[1], out[2] - basis.centre[2]];
+    const before: Vec3 = [tip[0] - basis.centre[0], tip[1] - basis.centre[1], tip[2] - basis.centre[2]];
+    ok(dot(moved, basis.normal) < dot(before, basis.normal) - 0.1,
+      `${what}: a positive gape carries the jaw away from the skull's side of the cut — it opens`);
+    near(Math.hypot(...moved), Math.hypot(...before), 1e-9, `${what}: rigidly, at its own distance from the hinge`);
+    near(dot(moved, axis), dot(before, axis), 1e-9, `${what}: and square to the pivot, so nothing slides along it`);
+    near(Math.acos(dot(moved, before) / (Math.hypot(...moved) * Math.hypot(...before))), DEFAULT_GAPE, 1e-6,
+      `${what}: by exactly the angle asked for`);
+
+    // The hinge itself is the one point on the mandible side that a swing cannot move.
+    const onAxis: Vec3 = [
+      basis.centre[0] + axis[0] * 0.01 + basis.forward[0] * r - basis.normal[0] * 1e-3,
+      basis.centre[1] + axis[1] * 0.01 + basis.forward[1] * r - basis.normal[1] * 1e-3,
+      basis.centre[2] + axis[2] * 0.01 + basis.forward[2] * r - basis.normal[2] * 1e-3,
+    ];
+    swing(onAxis[0], onAxis[1], onAxis[2], out);
+    near(dot([out[0] - basis.centre[0], out[1] - basis.centre[1], out[2] - basis.centre[2]], axis), 0.01, 1e-9,
+      `${what}: a vertex seated along the pivot keeps its seat`);
+
+    // Everything on the skull's side stays exactly where it is, at every angle.
+    let moved2 = 0, held = 0;
+    const inJaw = mandibleTest(doc);
+    for (const angle of [DEFAULT_GAPE, MAX_GAPE]) {
+      const w = gapeWarp(doc, angle)!;
+      for (const c of chunks) for (let i = 0; i + 2 < c.length; i += 3) {
+        w(c[i], c[i + 1], c[i + 2], out);
+        const still = Math.abs(out[0] - c[i]) + Math.abs(out[1] - c[i + 1]) + Math.abs(out[2] - c[i + 2]) < 1e-9;
+        if (inJaw(c[i], c[i + 1], c[i + 2])) { if (!still) moved2++; } else { if (still) held++; else moved2 = -1e9; }
+      }
+    }
+    ok(moved2 > 0, `${what}: the mandible side moves`);
+    ok(held === (chunks[0].length / 3 - countSides(chunks, doc).mandible) * 2, `${what}: and the skull side does not, at any angle`);
+  }
+  ok(signs.has(1) && signs.has(-1), 'and the four frames really do disagree about which way the hinge points, which is why the axis is measured rather than taken');
+
+  // The ceiling is the ceiling, and the preview is never the document.
+  const wide = gapeWarp(rigged, MAX_GAPE * 4)!;
+  const capped = gapeWarp(rigged, MAX_GAPE)!;
+  const a: Vec3 = [0, 0, 0], b: Vec3 = [0, 0, 0];
+  const basis = cutBasis(rigged);
+  const p: Vec3 = [basis.centre[0] + basis.forward[0] * .5, basis.centre[1] + basis.forward[1] * .5 - 1e-3, basis.centre[2] + basis.forward[2] * .5];
+  wide(p[0], p[1], p[2], a); capped(p[0], p[1], p[2], b);
+  nearV(a, b, 1e-9, 'a gape past the ceiling is the ceiling');
+  const file = exportDoc(rigged, { sha256: null, sha256Source: null, appliesTo: 'built', sides: countSides(chunks, rigged), note: '', authoredAt: 'now' });
+  ok(!JSON.stringify(file).includes('gape'), 'and nothing about the preview reaches the exported file');
+}
+
 // ---------------------------------------------------------------------------------- history
 
 {
@@ -239,4 +328,4 @@ ok(setUp(rigged, NaN).up === rigged.up && setLateral(rigged, NaN).lateral === ri
 ok(describeSides({ mandible: 1204, skull: 10855, total: 12059 }) === '1,204 of 12,059 vertices on the mandible · 10.0%', 'the readout');
 ok(describeSides({ mandible: 0, skull: 0, total: 0 }) === '0 of 0 vertices on the mandible · 0.00%', 'even of nothing');
 
-console.log(`PASS: mouth cut — ${passes} checks: the guess from rig, socket or section; the basis; the test; the three handles; flipping; the file and its refusals`);
+console.log(`PASS: mouth cut — ${passes} checks: the guess from rig, socket or section; the basis; the test; the three handles; flipping; the file and its refusals; the gape preview`);

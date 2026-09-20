@@ -72,6 +72,45 @@ With all three set they interact — the price of three angles — which is why 
 basis vectors as well as the angles: a consumer never recomposes them. The angles are held to ±60°,
 past any real mouth and safely short of a plane lying along the body.
 
+## The gape
+
+The cut is a test, and a test is hard to look at. **Gape** swings it: every vertex the document
+takes onto the mandible, rotated rigidly about the hinge, live on the body on stage. That is the
+preview, and the whole reason the editor has one is that *is the hinge in the right place* is a
+question about a mouth opening, which no count answers.
+
+**The body's own clips cannot show it, and this is why there is a slider rather than a play button.**
+A built body's `Bite` opens the jaw the file was *built* with — a cut somebody measured before this
+one, baked into the rig's weights — and the cut being aimed is nowhere in that rig. Playing a clip
+after moving the hinge would therefore show exactly the same mouth as before it, which is worse
+than showing nothing: it would look like an answer. The slider swings the document instead, so what
+moves is what the hinge and the plane say moves.
+
+- **Holding it clears the screen.** While the slider is held — dragged, or nudged with the arrow
+  keys — the handles, the planes, the lit vertices, the panel and the specimen list all come off,
+  so what is on screen while the jaw moves is the animal. Letting go brings it all back.
+- **The jaw stays where it is left.** The gape does not snap shut on release, so the hinge can be
+  dragged and the fields typed with the mouth open, and the change is seen as it is made. The lit
+  vertices ride the open jaw rather than staying behind in the shut mouth.
+- **Open the jaw / Shut the jaw** is the same control without the hold, for when the screen should
+  stay as it is.
+- It is **rigid on purpose.** The document's test is a vertex in or out, so the preview is that
+  test moved, tear and all: where the mandible parts from the head along the cut is exactly the
+  slot a builder's rigid shell opens there (CLAUDE.md, the jaw junction). A feathered preview would
+  smooth over a hinge in the wrong place, which is the one thing this is for.
+- It is **not the document.** The gape is not in the export, is not an undo step, and shutting the
+  jaw puts the body back exactly — positions *and* the file's own normals, which is why clearing a
+  warp restores the shipped normals rather than recomputing them.
+- The ceiling is 60° and a gape past it is held there, for the reason the angles are: past that,
+  what is being looked at is the rotation rather than the cut.
+
+One measured thing worth keeping: the axis the jaw turns about is `normal × forward`, not `hinge`.
+`hinge` is the pivot to within a sign, and which sign *opens* is right-handed in only two of the
+four frames a document can be in — along z with the head high it is +hinge, along x with the head
+high it is −hinge, and flipping the head end turns each round again. Turning about `hinge` itself
+would have shut the mouth on half the bodies, and since shut is where the slider starts, that reads
+as a control that does nothing rather than as a bug.
+
 ## The handles
 
 Three spheres on the stage, sized to the head so a hatchling's and a shonisaur's grab alike, drawn
@@ -183,13 +222,16 @@ wrong body" is one claim in one place, and `npm run mouth` holds it.
 
 | File | What it is |
 | --- | --- |
-| `src/viewer/mouth/mouth.ts` | The document, the basis, the test and the file. Pure — no DOM, no three.js. |
+| `src/viewer/mouth/mouth.ts` | The document, the basis, the test, the gape and the file. Pure — no DOM, no three.js. |
 | `src/viewer/mouth/MouthEditor.tsx` | The handles, the drags, the hashing and the panel. |
 | `src/viewer/mouth/store.ts` | The session's documents, in memory only. |
-| `src/viewer/scene.ts` | `showMouthCut`, `mouthPick` and the shared `dragPoint`: the helpers, the lit mandible and the pointer's ray. |
-| `tools/mouth-test.ts` | `npm run mouth` — the guess, the basis, the test, the three handles, flipping, the file and its refusals. |
-| `tools/mouth-browser.mjs` | The editor in a real browser: seated on the jaw bone, a handle found by hover and dragged, the fields, the measured hash, the consumer's acceptance and refusal, the original pose. |
+| `src/viewer/scene.ts` | `showMouthCut`, `mouthPick`, `setMouthGape` and the shared `dragPoint`: the helpers, the lit mandible, the swing and the pointer's ray. |
+| `tools/mouth-test.ts` | `npm run mouth` — the guess, the basis, the test, the three handles, flipping, the gape, the file and its refusals. |
+| `tools/mouth-browser.mjs` | The editor in a real browser: seated on the jaw bone, a handle found by hover and dragged, the fields, the gape measured as pixels that moved in the rendered frame, the measured hash, the consumer's acceptance and refusal, the original pose. |
 | `tools/triassic/mouth-check.ts` | `npm run triassic:mouth` — the consumer. |
 
 Nothing is saved. The document lives in the session so a trip through view mode does not lose it,
 and a reload starts from the body's own guess. What leaves the viewer is the mouth file.
+
+Files that have been aimed and handed over live in `docs/triassic/mouths/`, with their numbers in a
+table beside them.

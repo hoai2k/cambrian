@@ -189,6 +189,12 @@ export interface ViewerScene {
   sculptTarget(): SculptTarget | undefined;
   /** Writes warped positions into every geometry (null restores the shipped ones); `finalize` recomputes normals. */
   applySculpt(fn: WarpFn | null, finalize: boolean): void;
+  /**
+   * The mouth preview's swing, laid *over* whatever `applySculpt` has on the body rather than in
+   * place of it — a Triassic body can be stretched and have its mouth aimed in the same session,
+   * and a preview that reset the geometry would quietly drop the stretch. Null closes the jaw.
+   */
+  setMouthGape(fn: WarpFn | null): void;
   /** The split layout renders the orbit view into `main` and two orthographic views; single is the whole stage. */
   setLayout(layout: 'single' | 'split', main?: Rect): void;
   setOrthoView(view: 'side' | 'top', v: OrthoView): void;
@@ -216,7 +222,12 @@ export interface ViewerScene {
    * on the mandible side of it (null takes it all down). The test is the document's own, handed in
    * as a closure so the scene knows nothing about how a mouth is aimed.
    */
-  showMouthCut(cut: MouthCut | null, mandible: ((x: number, y: number, z: number) => boolean) | null): void;
+  showMouthCut(
+    cut: MouthCut | null,
+    mandible: ((x: number, y: number, z: number) => boolean) | null,
+    /** Where to draw a lit vertex, when the preview has swung the jaw away from where it rests. */
+    moveVertex?: ((x: number, y: number, z: number, out: [number, number, number]) => void) | null,
+  ): void;
   /** Which of the mouth cut's handles is under the pointer, if any: canvas CSS pixels in. */
   mouthPick(x: number, y: number): MouthHandle | undefined;
   /**
@@ -416,6 +427,8 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     sculptTarget = undefined;
     markTargetCache = undefined; markIndexOf = new Map(); markPoints.visible = false;
     mouthRootCache = undefined; mouthGroup.visible = false; mouthPoints.visible = false;
+    // Both warps belong to the body that is going away: the next one gets its own geometry.
+    baseWarp = null; gapeWarp = null; shippedNormals.clear();
     bendRootCache = undefined; bendGroup.visible = false; bendPoints.visible = false;
     actions = new Map();
     paused = false;
@@ -599,13 +612,57 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     return { meshes, mouth, mouthInside, jaw, skinned, bones };
   }
 
+  // What is currently written into the geometry, kept as its two halves. The sculpt or stretch a
+  // session has on the body is one thing and the mouth preview's swing is another, and either may
+  // be set or cleared without disturbing the other, so the composition lives here rather than in
+  // whichever editor happens to be open.
+  let baseWarp: WarpFn | null = null;
+  let gapeWarp: WarpFn | null = null;
+
+  /** The gape runs first: it is aimed on the shipped positions, which is the frame it was measured in. */
+  function composedWarp(): WarpFn | null {
+    const base = baseWarp, gape = gapeWarp;
+    if (!gape) return base;
+    if (!base) return gape;
+    return (x, y, z, out, eye) => { gape(x, y, z, out, eye); base(out[0], out[1], out[2], out, eye); };
+  }
+
   function applySculpt(fn: WarpFn | null, finalize: boolean) {
+    baseWarp = fn;
+    writeWarp(composedWarp(), finalize);
+  }
+
+  /**
+   * The mouth preview's swing. Always finalized: the point of it is to *look* at the open mouth,
+   * and a jaw swung without its normals recomputed is lit as though it were still shut.
+   */
+  function setMouthGape(fn: WarpFn | null) {
+    if (!gapeWarp && !fn) return;
+    gapeWarp = fn;
+    writeWarp(composedWarp(), true);
+  }
+
+  /**
+   * The shipped normals, kept the first time a warp is written over a geometry.
+   *
+   * `computeVertexNormals` builds a smooth-shaded set from the faces, which is not what a
+   * delivered body carries — split edges, authored creases — so recomputing and then clearing the
+   * warp left the *positions* back where they started and the *shading* subtly changed for the
+   * rest of the session. That is a real cost on a preview a reviewer takes on and off to compare:
+   * every look after the first would be at a slightly differently lit animal. So the originals go
+   * in here, and clearing the warp puts them back rather than recomputing again.
+   */
+  const shippedNormals = new Map<THREE.BufferGeometry, Float32Array>();
+
+  function writeWarp(fn: WarpFn | null, finalize: boolean) {
     if (!sculptTarget) return;
     const v = new THREE.Vector3();
     const out: [number, number, number] = [0, 0, 0];
     for (const m of sculptTarget.meshes) {
       const attr = m.geometry.getAttribute('position') as THREE.BufferAttribute;
       const dst = attr.array as Float32Array;
+      const normals = m.geometry.getAttribute('normal') as THREE.BufferAttribute | undefined;
+      if (fn && normals && !shippedNormals.has(m.geometry)) shippedNormals.set(m.geometry, Float32Array.from(normals.array as ArrayLike<number>));
       if (!fn) dst.set(m.base);
       else for (let i = 0; i < m.base.length; i += 3) {
         v.set(m.base[i], m.base[i + 1], m.base[i + 2]).applyMatrix4(m.toRoot);
@@ -614,7 +671,12 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
         dst[i] = v.x; dst[i + 1] = v.y; dst[i + 2] = v.z;
       }
       attr.needsUpdate = true;
-      if (finalize) { m.geometry.computeVertexNormals(); m.geometry.computeBoundingSphere(); m.geometry.computeBoundingBox(); }
+      const restored = !fn && normals && shippedNormals.get(m.geometry);
+      if (restored) { (normals.array as Float32Array).set(restored); normals.needsUpdate = true; }
+      if (finalize) {
+        if (!restored) m.geometry.computeVertexNormals();
+        m.geometry.computeBoundingSphere(); m.geometry.computeBoundingBox();
+      }
     }
   }
 
@@ -780,7 +842,11 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   /** Every sculptable mesh's shipped positions in the root frame, once per body, for the test to run over. */
   let mouthRootCache: { mesh: SculptMesh; root: Float32Array }[] | undefined;
 
-  function showMouthCut(cut: MouthCut | null, mandible: ((x: number, y: number, z: number) => boolean) | null) {
+  function showMouthCut(
+    cut: MouthCut | null,
+    mandible: ((x: number, y: number, z: number) => boolean) | null,
+    moveVertex?: ((x: number, y: number, z: number, out: [number, number, number]) => void) | null,
+  ) {
     if (!cut || !mandible || !model || !sculptTarget) { mouthGroup.visible = false; mouthPoints.visible = false; return; }
     model.updateMatrixWorld();
     mouthGroup.matrix.copy(model.matrixWorld);
@@ -813,10 +879,15 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     }
     const dst = (mouthGeo.getAttribute('position') as THREE.BufferAttribute).array as Float32Array;
     const v = new THREE.Vector3();
+    const moved: [number, number, number] = [0, 0, 0];
     let w = 0;
     for (const { root } of mouthRootCache) for (let i = 0; i < root.length; i += 3) {
       if (!mandible(root[i], root[i + 1], root[i + 2])) continue;
-      v.set(root[i], root[i + 1], root[i + 2]).applyMatrix4(model.matrixWorld);
+      // The overlay is drawn on the body as it stands, so a jaw the preview has swung open takes
+      // its lit vertices with it; otherwise the marks would stay behind in the shut mouth.
+      if (moveVertex) moveVertex(root[i], root[i + 1], root[i + 2], moved);
+      else { moved[0] = root[i]; moved[1] = root[i + 1]; moved[2] = root[i + 2]; }
+      v.set(moved[0], moved[1], moved[2]).applyMatrix4(model.matrixWorld);
       dst[w++] = v.x; dst[w++] = v.y; dst[w++] = v.z;
     }
     (mouthGeo.getAttribute('position') as THREE.BufferAttribute).needsUpdate = true;
@@ -1139,6 +1210,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     resetCamera: frame,
     sculptTarget() { return sculptTarget; },
     applySculpt,
+    setMouthGape,
     // A new viewport shape needs the specimen framed again for it.
     setLayout(next, main) { const changed = next !== layout; layout = next; mainRect = main; resize(); if (changed) frame(); },
     setOrthoView(view, v) { orthoViews[view] = v; },

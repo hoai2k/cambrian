@@ -431,6 +431,78 @@ export function levelCut(doc: MouthDoc): MouthDoc {
 }
 
 // ---------------------------------------------------------------------------------------------
+// The gape preview
+// ---------------------------------------------------------------------------------------------
+
+/**
+ * A map on root-frame positions. The same shape as the sculpt and stretch warps, declared here
+ * rather than imported, because this module is pure and theirs are not.
+ */
+export type MouthWarp = (x: number, y: number, z: number, out: Vec3) => void;
+
+/**
+ * How far the preview may swing the jaw. Past any real gape on these animals, and the point of
+ * the ceiling is that the preview stays a reading of the document: at 90° the mandible has swung
+ * to square with the head and what is being looked at is the rotation rather than the cut.
+ */
+export const MAX_GAPE = 60 * Math.PI / 180;
+/** Where the gape starts when it is first opened: a mouth plainly open, short of the widest. */
+export const DEFAULT_GAPE = 25 * Math.PI / 180;
+
+/**
+ * The direction the jaw turns about, for opening.
+ *
+ * `hinge` is the pivot and this is it to within a sign — but which sign opens the mouth is not a
+ * constant, because (forward, hinge, normal) is right-handed in only two of the four frames a
+ * document can be in. Measured: along z with the head high `normal × forward` is +hinge and along
+ * x with the head high it is −hinge, and flipping which end the head is at turns each of those
+ * round again. A preview that simply turned about `hinge` would therefore have shut the mouth on
+ * half the bodies this is aimed at — and shut is where it starts, so it would have looked like a
+ * slider that did nothing rather than like a bug.
+ *
+ * `normal × forward` has no such doubt. It is a unit vector along ±`hinge`, and rotating `forward`
+ * about it carries `forward` to `forward·cos θ − normal·sin θ` — away from the skull's side of the
+ * cut — in every frame, so a positive gape opens on every body.
+ */
+export function gapeAxis(basis: CutBasis): Vec3 {
+  const { normal: n, forward: f } = basis;
+  return norm([n[1] * f[2] - n[2] * f[1], n[2] * f[0] - n[0] * f[2], n[0] * f[1] - n[1] * f[0]]);
+}
+
+/**
+ * The document as a movement: every vertex the cut takes onto the mandible, swung rigidly about
+ * the hinge by `radians`; everything else left exactly where it is. Null at nothing, so a closed
+ * mouth costs no pass over the mesh.
+ *
+ * This is the preview, and it is a preview of the **document** rather than of the animal's rig.
+ * The body's own clips cannot show a cut being aimed — they open the jaw the file was built with,
+ * which is the cut somebody measured before, and the one being aimed is nowhere in the rig — so a
+ * reviewer who wants to know whether the hinge is in the right place has to be shown *this* jaw
+ * swinging. Rigid on purpose: the document's test is a vertex in or out, so the preview is the
+ * test moved, tear and all. Where the mandible parts from the head along the cut is exactly what
+ * a builder's rigid shell would open there (CLAUDE.md, the jaw junction), and seeing it is worth
+ * more than a feather that would smooth over a hinge in the wrong place.
+ */
+export function gapeWarp(doc: MouthDoc, radians: number): MouthWarp | null {
+  const angle = clamp(Number.isFinite(radians) ? radians : 0, 0, MAX_GAPE);
+  if (angle <= 1e-9) return null;
+  const basis = cutBasis(doc);
+  const inJaw = mandibleTest(doc);
+  const [ax, ay, az] = gapeAxis(basis);
+  const [cx, cy, cz] = basis.centre;
+  const c = Math.cos(angle), s = Math.sin(angle), t = 1 - c;
+  return (x, y, z, out) => {
+    if (!inJaw(x, y, z)) { out[0] = x; out[1] = y; out[2] = z; return; }
+    const px = x - cx, py = y - cy, pz = z - cz;
+    const along = px * ax + py * ay + pz * az;                       // Rodrigues about the hinge
+    const kx = ay * pz - az * py, ky = az * px - ax * pz, kz = ax * py - ay * px;
+    out[0] = cx + px * c + kx * s + ax * along * t;
+    out[1] = cy + py * c + ky * s + ay * along * t;
+    out[2] = cz + pz * c + kz * s + az * along * t;
+  };
+}
+
+// ---------------------------------------------------------------------------------------------
 // Export
 // ---------------------------------------------------------------------------------------------
 

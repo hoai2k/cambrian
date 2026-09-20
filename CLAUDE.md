@@ -1348,7 +1348,22 @@ unless the user explicitly asks for a PR. Steps:
   a file whose hash or vertex count no longer matches, `npm run triassic:mouth -- <file>` is the
   consumer that hashes the GLB on disk and re-counts the cut over the real mesh, `npm run mouth`
   and `node tools/mouth-browser.mjs` check it, and `docs/viewer-mouth.md` is the schema and the
-  workflow, exact use and guidance both.
+  workflow, exact use and guidance both. Aimed cuts that have been handed over live in
+  `docs/triassic/mouths/`. **And a cut is previewed by swinging it, never by playing the body's own
+  clips**: a built body's `Bite` opens the jaw the file was *built* with, baked into weights, so a
+  clip played after the hinge moves shows the same mouth as before it — which is worse than showing
+  nothing, because it looks like an answer. The *Gape* slider rotates the document's own mandible
+  set about its own hinge instead, rigidly, so the tear along the cut is the slot a rigid shell
+  would open there; holding it takes the handles, the planes, the lit vertices and the panel off the
+  screen and letting go brings them back with the jaw still open, so the hinge is dragged and
+  watched at once. It is a way of looking and never the document — not in the export, not an undo
+  step, and shutting it restores the positions *and* the file's own normals (clearing a warp now
+  puts the shipped normals back rather than recomputing a smooth set, or every look after the first
+  was at a differently lit animal). The axis it turns about is `normal × forward` rather than
+  `hinge`, because `hinge` is the pivot only to within a sign: the triple is right-handed in two of
+  the four frames a document can be in, so turning about it would have shut the mouth on half the
+  bodies — and shut is where the slider starts, so that reads as a control that does nothing rather
+  than as a bug.
 - A bare `?debug` on the site root (`/?debug`) opens the index of every one of these tools —
   `src/ancientseas/DebugIndex.tsx`, data in `src/ancientseas/debug-index.ts`, mounted by
   `src/ancientseas/main.tsx` the way `Root.tsx` mounts the state editor. It is the trilogy page's

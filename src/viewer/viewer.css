@@ -322,6 +322,24 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .mouth-legend .front i { background: var(--lagoon); }
 .mouth-legend .side i { background: #ff2fa8; }
 .mouth-panel .mouth-count { margin: 0; font: 700 14px var(--font-body); color: var(--foam); font-variant-numeric: tabular-nums; }
+
+/* The gape: the preview control, straight under the count because it is what a reviewer reaches
+ * for between every adjustment. Holding it clears the screen (see `.viewer.previewing` below). */
+.mouth-gape { display: flex; flex-direction: column; gap: 6px; padding: 10px 0 2px; border-bottom: 1px solid var(--line); }
+.mouth-gape label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--mist); }
+.mouth-gape label b { color: var(--ember); font-variant-numeric: tabular-nums; }
+.mouth-gape input { width: 100%; margin: 0; accent-color: var(--ember); }
+.mouth-gape small { color: var(--dim); font-size: 11px; }
+.mouth-gape em { font-style: italic; }
+
+/* Held, the furniture goes: the panel, the legend and the specimen list fade out together and the
+ * handles and planes come off the scene, so what is on screen while the jaw swings is the animal.
+ * Opacity rather than `display`, for two reasons: the slider keeps the pointer through the drag
+ * that hid it, and nothing in the grid moves, so the camera is not reframed mid-preview. */
+.viewer.previewing .specimens,
+.mouth-stage.previewing,
+.mouth-panel.previewing { opacity: 0; transition: opacity .12s ease-out; }
+.viewer.previewing .specimens { pointer-events: none; }
 .mouth-fields { padding-top: 4px; }
 .mouth-panel code { font-size: 11px; color: var(--lagoon); overflow-wrap: anywhere; }
 

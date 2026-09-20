@@ -1,0 +1,134 @@
+{
+  "schema": "mouth-cut/1",
+  "id": "aphaneramma",
+  "model": "assets/triassic/creatures/aphaneramma.glb",
+  "sha256": "ed7d40d7ed85f2c44ec2fce28578d714e3fc2c5ae78756064eb4d13a868ad54f",
+  "sha256Source": "measured",
+  "appliesTo": "built",
+  "authoredAt": "2026-09-20T21:49:19.381Z",
+  "note": "",
+  "creature": {
+    "key": "triassic:aphaneramma",
+    "id": "aphaneramma",
+    "collection": "triassic",
+    "vertices": 13446,
+    "rigged": true
+  },
+  "frame": {
+    "axis": "z",
+    "forward": 1,
+    "up": "y",
+    "source": "mouth",
+    "note": "Model root frame, unscaled: the file's own coordinates with the scene graph flattened. The body runs along z; the head is at the high end."
+  },
+  "seat": {
+    "source": "manual"
+  },
+  "hinge": {
+    "depth": 1.191702,
+    "headFraction": 0.2383,
+    "centre": [
+      -0.110865,
+      0.132445,
+      1.458198
+    ],
+    "axis": [
+      0.925906,
+      -0.180877,
+      0.331633
+    ]
+  },
+  "plane": {
+    "point": [
+      -0.110865,
+      0.132445,
+      1.458198
+    ],
+    "normal": [
+      0.254787,
+      0.947183,
+      -0.194749
+    ],
+    "forward": [
+      -0.278892,
+      0.264815,
+      0.923088
+    ],
+    "pitch": 0.2680122995380835,
+    "yaw": -0.2934089823778538,
+    "roll": -0.1886917369151463,
+    "pitchDegrees": 15.356,
+    "yawDegrees": -16.811,
+    "rollDegrees": -10.811
+  },
+  "sides": {
+    "mandible": 1177,
+    "skull": 12269,
+    "total": 13446
+  },
+  "bounds": {
+    "length": 5,
+    "height": 1.4046946167945862,
+    "width": 2.0050063729286194,
+    "axisMin": -2.35010027885437,
+    "axisMax": 2.64989972114563,
+    "lateralMid": -0.10317286849021912,
+    "upMid": -0.1613222062587738
+  },
+  "head": {
+    "height": 0.4127715528011322,
+    "width": 0.48441264778375626,
+    "upMid": 0.3346393257379532,
+    "lateralMid": -0.3355124108493328
+  },
+  "rule": "A vertex is on the mandible when (v − plane.point) · plane.normal < 0 and (v − plane.point) · plane.forward > 0: below the cut plane and ahead of the hinge. hinge.axis is the pivot the jaw swings about, through hinge.centre. See docs/viewer-mouth.md.",
+  "mouth": {
+    "version": 1,
+    "key": "triassic:aphaneramma",
+    "id": "aphaneramma",
+    "collection": "triassic",
+    "model": "assets/triassic/creatures/aphaneramma.glb",
+    "frame": {
+      "axis": "z",
+      "forward": 1,
+      "up": "y"
+    },
+    "frameSource": "mouth",
+    "vertices": 13446,
+    "rigged": true,
+    "box": {
+      "lo": [
+        -1.1056760549545288,
+        -0.8636695146560669,
+        -2.35010027885437
+      ],
+      "hi": [
+        0.8993303179740906,
+        0.5410251021385193,
+        2.64989972114563
+      ]
+    },
+    "bounds": {
+      "length": 5,
+      "height": 1.4046946167945862,
+      "width": 2.0050063729286194,
+      "axisMin": -2.35010027885437,
+      "axisMax": 2.64989972114563,
+      "lateralMid": -0.10317286849021912,
+      "upMid": -0.1613222062587738
+    },
+    "head": {
+      "height": 0.4127715528011322,
+      "width": 0.48441264778375626,
+      "upMid": 0.3346393257379532,
+      "lateralMid": -0.3355124108493328
+    },
+    "seatSource": "manual",
+    "depth": 1.1917021057990753,
+    "up": 0.1324451120059411,
+    "lateral": -0.11086540293151717,
+    "pitch": 0.2680122995380835,
+    "yaw": -0.2934089823778538,
+    "roll": -0.1886917369151463
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "schema": "mouth-cut/1",
+  "id": "odontochelys",
+  "model": "assets/triassic/creatures/odontochelys.glb",
+  "sha256": "c455d132ba3265062960253cb2cc448661e22580b0180ceeb9bcc55e83c11321",
+  "sha256Source": "measured",
+  "appliesTo": "built",
+  "authoredAt": "2026-09-20T21:52:32.968Z",
+  "note": "",
+  "creature": {
+    "key": "triassic:odontochelys",
+    "id": "odontochelys",
+    "collection": "triassic",
+    "vertices": 13050,
+    "rigged": true
+  },
+  "frame": {
+    "axis": "z",
+    "forward": 1,
+    "up": "y",
+    "source": "mouth",
+    "note": "Model root frame, unscaled: the file's own coordinates with the scene graph flattened. The body runs along z; the head is at the high end."
+  },
+  "seat": {
+    "source": "manual"
+  },
+  "hinge": {
+    "depth": 0.423716,
+    "headFraction": 0.0847,
+    "centre": [
+      -0.078059,
+      0.334127,
+      1.650582
+    ],
+    "axis": [
+      0.999534,
+      0,
+      -0.030519
+    ]
+  },
+  "plane": {
+    "point": [
+      -0.078059,
+      0.334127,
+      1.650582
+    ],
+    "normal": [
+      -0.010348,
+      0.940769,
+      -0.338891
+    ],
+    "forward": [
+      0.028712,
+      0.339049,
+      0.94033
+    ],
+    "pitch": 0.3459058222189194,
+    "yaw": 0.030524101033528827,
+    "roll": 0,
+    "pitchDegrees": 19.819,
+    "yawDegrees": 1.749,
+    "rollDegrees": 0
+  },
+  "sides": {
+    "mandible": 419,
+    "skull": 12631,
+    "total": 13050
+  },
+  "bounds": {
+    "length": 5,
+    "height": 1.8017345666885376,
+    "width": 2.5508965253829956,
+    "axisMin": -2.925701379776001,
+    "axisMax": 2.074298620223999,
+    "lateralMid": -0.06936591863632202,
+    "upMid": 0.0679273009300232
+  },
+  "head": {
+    "height": 1.4995654225349426,
+    "width": 1.4892060160636902,
+    "upMid": -0.08315727114677429,
+    "lateralMid": 0.3756270706653595
+  },
+  "rule": "A vertex is on the mandible when (v − plane.point) · plane.normal < 0 and (v − plane.point) · plane.forward > 0: below the cut plane and ahead of the hinge. hinge.axis is the pivot the jaw swings about, through hinge.centre. See docs/viewer-mouth.md.",
+  "mouth": {
+    "version": 1,
+    "key": "triassic:odontochelys",
+    "id": "odontochelys",
+    "collection": "triassic",
+    "model": "assets/triassic/creatures/odontochelys.glb",
+    "frame": {
+      "axis": "z",
+      "forward": 1,
+      "up": "y"
+    },
+    "frameSource": "mouth",
+    "vertices": 13050,
+    "rigged": true,
+    "box": {
+      "lo": [
+        -1.3448141813278198,
+        -0.8329399824142456,
+        -2.925701379776001
+      ],
+      "hi": [
+        1.2060823440551758,
+        0.968794584274292,
+        2.074298620223999
+      ]
+    },
+    "bounds": {
+      "length": 5,
+      "height": 1.8017345666885376,
+      "width": 2.5508965253829956,
+      "axisMin": -2.925701379776001,
+      "axisMax": 2.074298620223999,
+      "lateralMid": -0.06936591863632202,
+      "upMid": 0.0679273009300232
+    },
+    "head": {
+      "height": 1.4995654225349426,
+      "width": 1.4892060160636902,
+      "upMid": -0.08315727114677429,
+      "lateralMid": 0.3756270706653595
+    },
+    "seatSource": "manual",
+    "depth": 0.4237162820096436,
+    "up": 0.33412718084557724,
+    "lateral": -0.07805912874514442,
+    "pitch": 0.3459058222189194,
+    "yaw": 0.030524101033528827,
+    "roll": 0
+  }
+}
