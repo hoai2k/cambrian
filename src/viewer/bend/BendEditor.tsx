@@ -6,7 +6,7 @@ import { History } from '../sculpt/history';
 import { NumberField } from '../stretch/StretchEditor';
 import {
   MAX_TURN, aimAxisAt, bendBasis, describeReadingText, exportDoc, flipForward, isIdentity, jointTurns,
-  measureBend, moveEnd, pinch, readBend, refLabel, refMoves, reseat, resetTurn, rollForAxis, setAxis,
+  measureBend, moveEnd, pinch, readBend, refLabel, refMoves, reguessRefs, reseat, resetTurn, rollForAxis, setAxis,
   setAxisRoll, setChain, setRef, setReach, setTurn, setWindow, spanDirection, spanLength, totalTurn,
   traces, turnToTarget, warp, type BendDoc, type Reading, type Vec3,
 } from './bend';
@@ -323,6 +323,8 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, canvas, 
           ))}
           <div className="sculpt-actions">
             <button className="ghost" onClick={() => step(reseat(doc, chunksRef.current))} title="Put both ends back where the body's own centre is near them">Re-seat on the body</button>
+            {doc.refs && <button className="ghost" onClick={() => step(reguessRefs(doc))} disabled={doc.chainSource === 'auto' && doc.refsSource === 'auto'}
+              title="Hand the chain and the two chords back to the tool, to be guessed from where the span is now">Re-guess the references</button>}
           </div>
 
           <h3>How it is measured</h3>

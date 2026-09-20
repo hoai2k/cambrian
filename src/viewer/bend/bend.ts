@@ -177,6 +177,18 @@ export interface BendDoc {
   chain: BoneRef | null;
   /** Which chords the bone reading is between. Null on a body with no rig. */
   refs: BoneRefs | null;
+  /**
+   * Whether the chain and the references are still the tool's guess or a person's choice.
+   *
+   * Both are guessed from where the span is, so moving the span makes an old guess stale — the
+   * default tip chord on a neck span is the neck's own last segment, and left alone while the span
+   * was dragged onto the neck it stayed `skull → jaw`, which points down at the chin and read the
+   * head as ninety-seven degrees off the trunk. A guess is therefore re-made whenever the span
+   * moves, and a choice never is: the references are the question this tool exists to make
+   * askable, and an answer a person has given must not be taken back off them.
+   */
+  chainSource: 'auto' | 'manual';
+  refsSource: 'auto' | 'manual';
 }
 
 /**
@@ -542,16 +554,61 @@ export function traceCentreline(
     px.push(c[i]); py.push(c[i + 1]); pz.push(c[i + 2]);
   }
   if (!px.length) return null;
-  /** The centroid of the vertices in a disc: within `reach` of `at`, within half a step of its plane. */
+  /**
+   * The step's own disc: the surface within half a step of the plane through `at`, and near enough
+   * to `at` to be the run the trace is on.
+   *
+   * "Near enough" is `reach`, **or the nearest surface there plus a third, whichever is further**.
+   * The second half is not a softening: a body is a shell, so the surface at a station stands at
+   * that station's own radius and there is nothing at all at the centre — a reach smaller than the
+   * radius would find an empty disc and the trace would stop at its first step. With the band the
+   * trace always has the body it is standing on, and `reach` does the job it is for, which is
+   * refusing a *different* part of the animal that happens to pass nearby.
+   */
   const disc = (at: Vec3, along: Vec3): { c: Vec3; n: number } | null => {
-    let sx = 0, sy = 0, sz = 0, n = 0;
+    let nearest = Infinity;
+    const near: number[] = [];
     for (let j = 0; j < px.length; j++) {
       const dx = px[j] - at[0], dy = py[j] - at[1], dz = pz[j] - at[2];
-      if (dx * dx + dy * dy + dz * dz > r2) continue;
       if (Math.abs(dx * along[0] + dy * along[1] + dz * along[2]) > step * 0.75) continue;
+      const d2 = dx * dx + dy * dy + dz * dz;
+      if (d2 < nearest) nearest = d2;
+      near.push(j);
+    }
+    if (!near.length) return null;
+    const limit = Math.max(reach, Math.sqrt(nearest) * 1.35);
+    const l2 = limit * limit;
+    let sx = 0, sy = 0, sz = 0, n = 0;
+    for (const j of near) {
+      const dx = px[j] - at[0], dy = py[j] - at[1], dz = pz[j] - at[2];
+      if (dx * dx + dy * dy + dz * dz > l2) continue;
       sx += px[j]; sy += py[j]; sz += pz[j]; n++;
     }
     return n > 0 ? { c: [sx / n, sy / n, sz / n], n } : null;
+  };
+  /** The same disc, measured after a warp: the run is the run, wherever the edit has put it. */
+  const warpedDisc = (at: Vec3, along: Vec3, fn: WarpFn): Vec3 | null => {
+    let nearest = Infinity;
+    const near: number[] = [];
+    for (let j = 0; j < px.length; j++) {
+      const dx = px[j] - at[0], dy = py[j] - at[1], dz = pz[j] - at[2];
+      if (Math.abs(dx * along[0] + dy * along[1] + dz * along[2]) > step * 0.75) continue;
+      const d2 = dx * dx + dy * dy + dz * dz;
+      if (d2 < nearest) nearest = d2;
+      near.push(j);
+    }
+    if (!near.length) return null;
+    const limit = Math.max(reach, Math.sqrt(nearest) * 1.35);
+    const l2 = limit * limit;
+    const w: Vec3 = [0, 0, 0];
+    let sx = 0, sy = 0, sz = 0, n = 0;
+    for (const j of near) {
+      const dx = px[j] - at[0], dy = py[j] - at[1], dz = pz[j] - at[2];
+      if (dx * dx + dy * dy + dz * dz > l2) continue;
+      fn(px[j], py[j], pz[j], w);
+      sx += w[0]; sy += w[1]; sz += w[2]; n++;
+    }
+    return n > 0 ? [sx / n, sy / n, sz / n] : null;
   };
   const points: Vec3[] = [];
   const warped: Vec3[] = [];
@@ -569,16 +626,8 @@ export function traceCentreline(
     points.push(centre);
     count += found.n;
     if (warpFn) {
-      // The same disc measured after the warp: the run is the run, wherever the edit has put it.
-      let sx = 0, sy = 0, sz = 0, n = 0;
-      for (let j = 0; j < px.length; j++) {
-        const dx = px[j] - at[0], dy = py[j] - at[1], dz = pz[j] - at[2];
-        if (dx * dx + dy * dy + dz * dz > r2) continue;
-        if (Math.abs(dx * along[0] + dy * along[1] + dz * along[2]) > step * 0.75) continue;
-        warpFn(px[j], py[j], pz[j], w);
-        sx += w[0]; sy += w[1]; sz += w[2]; n++;
-      }
-      if (n > 0) warped.push([sx / n, sy / n, sz / n]);
+      const wc = warpedDisc(at, along, warpFn);
+      if (wc) warped.push(wc);
     }
     if (i === TRACE_STEPS) break;
     // Step on, and turn towards where the body actually was: half the old direction, half the new,
@@ -839,10 +888,15 @@ export function defaultRefs(doc: BendDoc): BendDoc {
   return { ...doc, refs: { base, tip } };
 }
 
-/** Whether a reference moves when the span bends: either of its bones sits inside the span or past it. */
+/**
+ * Whether a reference moves when the span bends: either of its bones sits inside the span or past
+ * it. A joint *on* a cut does not move — nothing at the base cut turns at all — so the test has a
+ * thousandth of the span's slack in it, which is what a reviewer typing an end onto a joint's own
+ * coordinates rounded to four places leaves behind.
+ */
 export function refMoves(doc: BendDoc, ref: BoneRef): boolean {
   const a = boneNamed(doc.bones, ref.from), b = boneNamed(doc.bones, ref.to);
-  return [a, b].some((x) => !!x && boneStation(doc, x) > 0);
+  return [a, b].some((x) => !!x && boneStation(doc, x) > 1e-3);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -913,6 +967,7 @@ export function measureBend(input: BendInput, meta: { key: string; id: string; c
     base: [0, 0, 0], tip: [0, 0, 0], baseSource: 'trace', tipSource: 'trace',
     axisRoll: 0, baseTurn: 0, tipTurn: 0,
     window: DEFAULT_WINDOW, reach: DEFAULT_REACH, chain: null, refs: null,
+    chainSource: 'auto', refsSource: 'auto',
   };
   return reframe(doc, frame, frameSource, input.chunks);
 }
@@ -936,6 +991,7 @@ export function reframe(doc: BendDoc, frame: BendFrame, frameSource: FrameSource
     },
     axisRoll: 0, baseTurn: 0, tipTurn: 0,
     baseSource: 'trace', tipSource: 'trace',
+    chainSource: 'auto', refsSource: 'auto',
   };
   next.base = pointAtHeadFraction(next, DEFAULT_BASE);
   next.tip = pointAtHeadFraction(next, DEFAULT_TIP);
@@ -951,7 +1007,7 @@ export function reframe(doc: BendDoc, frame: BendFrame, frameSource: FrameSource
  * left alone. An end with no body near it stays where it was asked for, which is what a bounding
  * box would have said all along.
  */
-export function seat(doc: BendDoc, chunks: readonly ArrayLike<number>[], reguess = false): BendDoc {
+export function seat(doc: BendDoc, chunks: readonly ArrayLike<number>[], fresh = false): BendDoc {
   const next: BendDoc = cloneDoc(doc);
   const reach = Math.max(doc.reach, 1e-4) * doc.bounds.length;
   /** The body's own centre near a point: the centroid of what is within reach, settled on the mode. */
@@ -976,9 +1032,17 @@ export function seat(doc: BendDoc, chunks: readonly ArrayLike<number>[], reguess
   if (doc.tipSource === 'trace') next.tip = settle(doc.tip);
   const keep = keepApart(next);
   next.base = keep.base; next.tip = keep.tip;
-  if (!reguess && next.chain) return next;
-  next.chain = defaultChain(next);
-  return defaultRefs(next);
+  return reguess(next, fresh || !next.chain);
+}
+
+/**
+ * Re-make whatever about the chain and the references is still the tool's own guess. `force` is a
+ * body that has none yet, where there is nothing of anybody's to keep.
+ */
+function reguess(doc: BendDoc, force = false): BendDoc {
+  const next = cloneDoc(doc);
+  if (force || next.chainSource === 'auto') next.chain = defaultChain(next);
+  return (force || next.refsSource === 'auto') ? defaultRefs(next) : next;
 }
 
 /**
@@ -1026,7 +1090,9 @@ export function setEnd(doc: BendDoc, which: EndName, at: Vec3): BendDoc {
   next[which === 'base' ? 'baseSource' : 'tipSource'] = 'manual';
   const keep = keepApart(next);
   next.base = keep.base; next.tip = keep.tip;
-  return next;
+  // Which joints are inside the span has just changed, so a guessed chain and guessed references
+  // are guessed again about where the span is now. A chosen one is left exactly as it was chosen.
+  return reguess(next);
 }
 
 /** Carry an end by a root-frame displacement — what a drag hands over. */
@@ -1038,6 +1104,13 @@ export function reseat(doc: BendDoc, chunks: readonly ArrayLike<number>[]): Bend
   const next = cloneDoc(doc);
   next.baseSource = 'trace'; next.tipSource = 'trace';
   return seat(next, chunks);
+}
+
+/** Put the chain and the chords back to what the span implies, whoever last named them. */
+export function reguessRefs(doc: BendDoc): BendDoc {
+  const next = cloneDoc(doc);
+  next.chainSource = 'auto'; next.refsSource = 'auto';
+  return reguess(next, true);
 }
 
 /** Turn the bend plane about the span. 0 lifts the tip; +90° swings it towards +lateral. */
@@ -1078,17 +1151,22 @@ export function setReach(doc: BendDoc, fraction: number): BendDoc {
   return next;
 }
 
+/** Which run of the rig the joint table follows. Naming one re-defaults the chords onto it. */
 export function setChain(doc: BendDoc, end: keyof BoneRef, bone: string): BendDoc {
   if (!doc.chain) return doc;
   const next = cloneDoc(doc);
   next.chain![end] = bone;
+  next.chainSource = 'manual';
+  next.refsSource = 'auto';
   return defaultRefs(next);
 }
 
+/** Which chord the reading is between. A chord a person has named is never guessed again. */
 export function setRef(doc: BendDoc, which: keyof BoneRefs, end: keyof BoneRef, bone: string): BendDoc {
   if (!doc.refs) return doc;
   const next = cloneDoc(doc);
   next.refs![which][end] = bone;
+  next.refsSource = 'manual';
   return next;
 }
 
@@ -1140,7 +1218,7 @@ export function flipForward(doc: BendDoc): BendDoc {
   next.base = [...doc.tip] as Vec3; next.tip = [...doc.base] as Vec3;
   next.baseSource = doc.tipSource; next.tipSource = doc.baseSource;
   next.baseTurn = -doc.tipTurn; next.tipTurn = -doc.baseTurn;
-  return defaultRefs(next);
+  return reguess(next);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1268,6 +1346,8 @@ export function exportDoc(doc: BendDoc, input: BendExportInput) {
       },
       bones: doc.refs ? {
         chain: doc.chain ? refLabel(doc.chain) : null,
+        chainSource: doc.chainSource,
+        referencesSource: doc.refsSource,
         baseReference: refLabel(doc.refs.base),
         baseMovesWithTheBend: refMoves(doc, doc.refs.base),
         tipReference: refLabel(doc.refs.tip),
