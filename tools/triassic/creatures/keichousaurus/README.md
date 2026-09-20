@@ -35,8 +35,8 @@ want EGL, which this container has not got.
 | Joints | **27** — root, body, chest, three cervicals, skull, jaw, seven caudals, four limbs of three |
 | Clips | **23** — the 21 contract clips plus Shoal and Breathe |
 | Triangles | authored **20,264**, twin **7,732**; LOD fraction 0.38 |
-| Skin tears | **6.57×** worst overall (the oral lining); **2.34×** worst outside it (Sprint, `chest`) |
-| Gape solid | **PASS**, 11 px of 378,000 seen through the body at worst, tolerance 12 |
+| Skin tears | **2.34×** (Sprint, `chest`), and the same figure including the oral parts — it was 6.57× when the lining was one stretching sac |
+| Gape solid | **PASS**, 0 px of 378,000 seen through the body at every shot, tolerance 12, on the sac and on the palate/floor pair alike |
 | Limb sweep per cycle | Swim fore 54.9° / hind 30.3°; Sprint 73.8° / 40.8°; Shoal 46.7° / 25.8° |
 | Anchors | `anchor_mouth` (jaw), `anchor_mouth_inside` (skull), `anchor_attack_primary` (skull) |
 
@@ -80,10 +80,19 @@ each station. It came out 1.3° off, which is a way of saying the head frame tak
 centreline was already square — worth confirming rather than hoping, since Dinocephalosaurus' was
 rolled most of a right angle and cut the jaw off the side of the snout.
 
-The interior is **one closed skinned lining**: roof on the skull, floor on the jaw, wall stretching
-between them, wound inwards so the near wall culls and the far wall draws, with the skin
-double-sided behind it as a backstop. Three separate leaks had to be closed, and each named a
-different mistake:
+The interior is **a palate and a floor** (`T.oral_shells`, T3D-12B): a palate rigid on the skull
+and a floor rigid on the jaw, each a closed shell filling its own jaw's interior out to 0.84 of the
+head's measured room, overlapping rather than joining at the corner of the mouth where the jaw's
+rotation is zero. The seam they are built on is unchanged — the thin dark lip line within the pale
+zone, above, not the countershading boundary. One sac whose wall stretched between the two bones
+stood here before, and at `Bite`'s widest it photographed as a flat pink triangle webbing the mouth
+shut ([before](../../../../docs/triassic/throat-repairs/keichousaurus-Bite-before.png),
+[after](../../../../docs/triassic/throat-repairs/keichousaurus-Bite-after.png)); the shells stretch
+nothing, so the body's worst deformer went from 6.57× (the sac) to the skin's own 2.34×. The room the
+shells fill is measured by `mouth_extent`, which casts *outwards* from the mouth axis — honest here
+and only here, because this generation models no slit for a ray to stop on. Three separate leaks
+had to be closed on the sac, each naming a different mistake, and all three stayed closed on the
+shells:
 
 1. **The mandible's tip swung out from under it.** The lining's front was pinned entirely to the
    skull by a taper meant to stop tearing. The floor of the mouth at the front *is* the tip of the
@@ -112,10 +121,9 @@ the head steadier than Swim (0.044 against 0.091 of lateral skull travel).
 
 ## What is weak
 
-- **The oral lining is the body's worst deformer at 6.57×**, and the number outside it is 2.34×.
-  That split is the honest reading: the skin is cleaner than Nothosaurus and the lining's wall is
-  doing what it is for. It can be brought down further only by lowering the gape, which would cost
-  the bite its read.
+- ~~The oral lining is the body's worst deformer at 6.57×~~ **Closed by T3D-12B**: the sac is a
+  palate and a floor now, rigid on their own bones, and the figure including the oral parts is the
+  skin's own 2.34×. The skin is cleaner than Nothosaurus.
 - **One envelope station of 21 is outside the 4 % tolerance**, at raw x −0.198: the twin's right
   hind paddle stops 0.009 of a body length short of the authored blade's knife-edge tip, so the one
   station that lands in that 0.9 % reads the whole paddle as absent rather than displaced. The voxel

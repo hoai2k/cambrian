@@ -1,4 +1,13 @@
-/** Validate the packaged separate-palate/floor contract. Usage: node ... <id> [id ...]. */
+/** Validate the packaged separate-palate/floor contract. Usage: node ... <id> [id ...].
+ *
+ * A body may also carry **no oral lining at all** -- Dinocephalosaurus, whose cut is closed by its
+ * seated hinge tissue alone, and the two cephalopods, whose crowns are the closed surface the
+ * generation delivered. That is a verdict, not an omission (`docs/triassic/throat-repairs/oral-verdicts.md`),
+ * so it is reported cleanly rather than failed: every variant must agree that there is nothing, and
+ * the hidden oral parts that *are* present (hinge tissue) are listed so nothing named like a mouth
+ * slips past as "no lining".
+ */
+const ORAL = /lining|mouth[ _]interior|hinge[ _]tissue|beak|palate/i;
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
@@ -15,8 +24,15 @@ for (const id of ids) {
     const file = `public/assets/triassic/creatures/${id}${suffix}.glb`;
     const bytes = fs.readFileSync(file), d = await io.readBinary(bytes);
     const row = { variant: suffix || 'authored', sha256: crypto.createHash('sha256').update(bytes).digest('hex'), meshes: [] };
+    row.otherOralMeshes = [];
     for (const node of d.getRoot().listNodes()) {
-      if (!node.getMesh() || !/lining/i.test(node.getName() + ' ' + node.getMesh().getName())) continue;
+      if (!node.getMesh()) continue;
+      const label = node.getName() + ' ' + node.getMesh().getName();
+      if (!/lining/i.test(label)) {
+        if (ORAL.test(label + ' ' + node.getMesh().listPrimitives().map(p => p.getMaterial()?.getName() || '').join(' ')))
+          row.otherOralMeshes.push(node.getName());
+        continue;
+      }
       const bones = node.getSkin().listJoints().map(n => n.getName());
       for (const p of node.getMesh().listPrimitives()) {
         const j = p.getAttribute('JOINTS_0'), w = p.getAttribute('WEIGHTS_0'), ix = p.getIndices();
@@ -45,9 +61,15 @@ for (const id of ids) {
         row.meshes.push({ name: node.getName(), vertices: w.getCount(), triangles, boundaryEdges, mixedVertices: 0, bridgingTriangles: 0 });
       }
     }
-    assert(row.meshes.length > 0, `${id}${suffix}: no oral shells found`);
+    row.oralShells = row.meshes.length ? 'separate palate and floor' : 'none';
     rows.push(row);
   }
-  fs.writeFileSync(`tools/triassic/creatures/${id}/oral-shell-audit.json`, JSON.stringify({ id, method: 'Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present.', models: rows }, null, 2) + '\n');
-  console.log(`${id}: separate closed rigid palate/floor on authored, puppet and LOD`);
+  const none = rows.filter(r => r.oralShells === 'none').length;
+  assert(none === 0 || none === rows.length, `${id}: the variants disagree about whether there is an oral lining (${rows.map(r => r.variant + ': ' + r.oralShells).join(', ')})`);
+  const verdict = none ? 'no oral lining: nothing to be mixed' : 'separate closed rigid palate/floor';
+  fs.writeFileSync(`tools/triassic/creatures/${id}/oral-shell-audit.json`, JSON.stringify({ id, verdict, method: 'Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present. A body with no lining mesh is reported as such, with the hidden oral parts it does carry listed, and all three variants must agree.', models: rows }, null, 2) + '\n');
+  const other = [...new Set(rows.flatMap(r => r.otherOralMeshes))];
+  console.log(none
+    ? `${id}: no oral lining on authored, puppet or LOD -- nothing to be mixed${other.length ? ` (other hidden oral parts: ${other.join(', ')})` : ''}`
+    : `${id}: separate closed rigid palate/floor on authored, puppet and LOD`);
 }

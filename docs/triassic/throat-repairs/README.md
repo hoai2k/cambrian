@@ -68,6 +68,67 @@ rigid palate/floor shells replace the sac, and Grab is correctly declared and ch
 Historical gape figures are explicitly separated from current export validation. Paired assets,
 rigs, clips, anchors and attachment checks pass; portraits are refreshed.
 
+## Finished: Dinocephalosaurus, Keichousaurus and Phragmoteuthis (T3D-12B)
+
+Three of the six custom builders in the inventory below, decided one at a time and then acted on.
+The decision per animal — palate, floor, or neither — and the measurement behind it are the
+[verdict table](oral-verdicts.md); this section is what changed in the builders and what the
+packaged bodies now measure. None of it touches the rig, the clips or the anchors, so every later
+skinning and `Grab` fix on these bodies stands: the paired audits pass with exact decoded parity on
+all three authored/puppet/LOD triplets, `idle-bones.mjs` finds every joint owning skin, and the skin
+figures are what they were (7.00×, 2.34×, 5.37×).
+
+**Dinocephalosaurus — neither.** The owner's expectation was that this head needs no oral geometry
+at all, and it was measured rather than assumed: `gape-solid.py` at the peak jaw rotation of `Bite`,
+`Attack`, `Heavy`, `Eat` and `NeckStrike` (read off the packaged rig), strict cull, backdrop test
+`r > .90, g < .20, b > .90`, on three versions of the same body. Shipped with the one-sac lining, 0 px
+through the head at every shot. With the sac stripped out of the unpacked GLB and everything else
+left alone, **0, 2, 3, 1, 1 px** against a tolerance of 12. With the sac *and* the seated hinge
+tissue stripped out, 98, 87, 113, 50, 101 px. So the sac closed nothing that the hinge tissue was
+not already closing — what a plane cut leaves open is the head's cross-section at the hinge, and
+the hinge plug fills it, as it does on every jawed body in the era — and the generation paints its
+lip on a closed snout with no cavity behind it, so there is no lumen wall for a gape to open onto.
+The `Mouth_lining` (364 vertices, every one blended between `skull` and `jaw`) is removed from the
+builder and nothing is built in its place; fangs and hinge tissue are unchanged.
+[Before](dinocephalosaurus-Heavy-before.png) is the sac at `Heavy`'s widest, a flat pink triangle
+filling the gape from hinge to snout; [after](dinocephalosaurus-Heavy-after.png) is the fang trap.
+
+**Keichousaurus — palate and floor.** The 180-vertex sac (132 mixed) is now `T.oral_shells`: a
+palate rigid on `skull` and a floor rigid on `jaw`, each a closed shell, sized to 0.84 of the head's
+measured room and placed through the head's own curved frame (the `point` hook), overlapping at the
+corner of the mouth. The seam is exactly where it was — the thin dark lip line within the pale
+zone, not the countershading boundary that fooled the albedo method on this head — and the `Grab`
+loop from T3D-05 is untouched (the paired audit checks it). `oral-shell-audit.mjs`: 200 vertices,
+one unit weight each, no triangle bridging the bones, every edge shared by two faces, both halves
+present, on authored, puppet and LOD. `gape-solid.py` at `Bite@0.25 Heavy@0.1 Attack@0.1 Eat@0.4
+Ability@0.1`: 0 px through the body on the sac *and* on the shells, at the same backdrop test; the
+shells open fewer silhouette pixels (55–62 against 76–84). The oral figure in `skin-tears.mjs` went
+from 6.57× (the sac's wall doing what a stretching wall does) to the skin's own 2.34×; nine clips
+tore an edge past 2× before and two do now. [Before](keichousaurus-Bite-before.png) and
+[after](keichousaurus-Bite-after.png) at `Bite`'s widest.
+
+**Phragmoteuthis — neither**, exactly as Ceratites above. The peristome cut (317 authored faces,
+79 rim vertices; 128 and 49 on the twin), the sewn `crown_lining` sac (224 vertices, 205 mixed) and
+the two `crown_beak` mandibles are retired and the crown is the closed surface the generation
+delivered; `cut_peristome` survives uncalled because it is the crown-axis measurement the three
+anchors are placed from, and `skull`/`jaw` survive because the lip band of the crown's own skin is
+weighted to them. The jet bones (translation channels; `Sprint` 0.207 and `Ability` 0.331 off a
+0.772 mantle) and the twelve-arm count are untouched, and the paired audit still proves both.
+`gape-solid.py` at `Bite@0.22 Attack@0.4 Eat@0.37`: 0 px, the two passes differing by at most one
+pixel, because a closed crown gives the cull shim nothing to open. `gape-crown.py` is **moot** on a
+body with no mouth drawn — it frames off the lining and masks on the oral materials — and it now
+records that and exits rather than failing on an empty `max()`. Closing the hole changed the mesh
+graph the weight relaxation runs over, so clips whose worst edge sat at the crown moved both ways
+by a fraction (`TurnRight` 5.06× → 2.79×, `Dive` 4.19× → 2.11×, `TurnLeft` 1.71× → 2.57×); the
+worst figure, `Guard`'s funnel at 5.37×, did not move. [Before](phragmoteuthis-Attack-before.png)
+and [after](phragmoteuthis-Attack-after.png), both straight down the crown axis at `Attack`'s reach.
+
+`oral-shell-audit.mjs` now reports a body with no lining cleanly — every variant must agree, and
+the hidden oral parts it *does* carry (hinge tissue) are listed — rather than failing it; the
+per-body records are `oral-shell-audit.json` in each creature folder, and `qa.json` beside each
+builder carries the gape and skin figures into `validation.json` on every rebuild. The SHA-bound
+throat audit of the three rebuilt pairs is [`t3d-12b-audit.json`](t3d-12b-audit.json).
+
 ## Full roster diagnostic snapshot
 
 The [baseline sweep](baseline-audit.json) evaluates 52 actual delivered models (authored and puppet
@@ -103,8 +164,10 @@ the newly shipped Askeptosaurus authored/puppet pair. Its optional backup and ea
 delivery audits and are not counted twice in this animation sweep.
 
 The eleven shared-kit ports and three ShoreKit ports are delivered, in addition to the three
-priority repairs above. Exactly six custom builders still retain a named lining with mixed
-jaw/skull weights in **both** authored and puppet models:
+priority repairs above. At that snapshot exactly six custom builders still retained a named lining
+with mixed jaw/skull weights in **both** authored and puppet models; three of them
+(Dinocephalosaurus, Keichousaurus, Phragmoteuthis) have since been decided and delivered in
+T3D-12B, above, and the other three are T3D-12A's:
 
 | Species | Mixed lining vertices per variant | Remaining bounded work |
 | --- | ---: | --- |
@@ -115,9 +178,10 @@ jaw/skull weights in **both** authored and puppet models:
 | Placodus | 208 | Port its custom cavity sac while retaining current skinning and Grab loop. |
 | Saurichthys | 320 | Port its custom fish-mouth sac while retaining current fin/tail corrections. |
 
-Those six changes exist as candidate deltas on the preserved branch but have not been ported or
-rebuilt here. They are **pending T3D-12**, not hidden under the completed shared-kit claim, and no
-new repair batch has started. Oral meshes remain hidden in the runtime and by default in the viewer.
+Those six changes existed as candidate deltas on the preserved branch. The T3D-12B three were
+ported from those deltas onto the current builders (never merged wholesale, since the branch
+predates the skinning and `Grab` fixes on `main`) and rebuilt; the T3D-12A three are **pending
+T3D-12A**, not hidden under the completed shared-kit claim. Oral meshes remain hidden in the runtime and by default in the viewer.
 The inventory is not a request for optional Tripo regenerations.
 
 The [ShoreKit record](shorekit.md) includes exact posterior attachment tests, selected strict gape

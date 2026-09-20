@@ -86,7 +86,10 @@ smooth = T.smooth
 auth, intake = T.load_raw(RAW, NAME + ' authored body')
 sample_albedo, luminance_at, albedo_sha, skin_material = T.retain_albedo(
     auth, NAME + ' mantle and arms', roughness=.52)
-skin_material.use_backface_culling = False       # the backstop behind the oral lining
+# Double-sided, as the era's rule asks of every skin. The crown is no longer cut, so there is no hole
+# for this to be the backstop under; it stays because a single-sided skin is a runtime decision the
+# whole roster makes the same way, and the cost is a little overdraw.
+skin_material.use_backface_culling = False
 frame = T.measure_frame(auth, head_is_positive_pca=True, luminance_at=luminance_at)
 
 bm = bmesh.new(); bm.from_mesh(auth.data)
@@ -381,14 +384,15 @@ puppet, pup_thickness, twin_report, _bvh = T.build_twin(
     triangle_target=PUPPET_TRIANGLE_TARGET, sample_albedo=sample_albedo,
     blade_dilation=.0022, thin=THIN, band=THIN_BAND, roughness=.66)
 
-mouth_cut = {}
-for o, key in ((auth, 'authored'), (puppet, 'twin')):
-    n, pts = cut_peristome(o)
-    mouth_cut[key] = {'facesRemoved': int(n), 'rimVertices': int(len(pts))}
-    if key == 'authored':
-        PERISTOME = pts
-    assert n >= (7 if key == 'authored' else 3), ('the peristome cut found no faces on the ' + key, n)
-    assert len(pts) >= (9 if key == 'authored' else 5), ('the peristome left no rim on the ' + key, len(pts))
+# **The peristome is not cut and there is no mouth modelled here at all.** It used to be: a hole in
+# the crown, a sac sewn to its rim and two authored mandibles behind it. A beak inside an arm crown
+# is a mouth the player never sees -- it faces down the crown's own axis, inside a thicket of arms --
+# and the whole of it was geometry invented to close a hole that was itself invented. The generation
+# models no mouth, so the crown stays closed and `anchor_mouth`, `anchor_mouth_inside` and
+# `anchor_attack_primary` below are all the simulation ever needed. `cut_peristome` is kept because
+# it is the measurement the anchors are placed from, and because a later pass may want the hole back.
+mouth_cut = {'authored': {'facesRemoved': 0, 'rimVertices': 0},
+             'twin': {'facesRemoved': 0, 'rimVertices': 0}, 'cut': False}
 mouth_cut.update({'centre': MOUTH_P.round(5).tolist(), 'normal': M_N.round(4).tolist(),
                   'radius': round(MOUTH_R, 5), 'armBandRadius': round(ARM_BAND, 5),
                   'method': 'authored on the crown axis; the generation models no mouth, and casting '
@@ -672,32 +676,20 @@ _total = sum(weight_tally.values())
 thin_joints = sorted((n, round(weight_tally[n] / _total, 6)) for n in weight_tally
                      if weight_tally[n] / _total < .0005)
 
-# ----------------------------------------------- the mouth interior: one closed skinned lining ----
-mouth_material = T.inward_material(NAME + ' mouth interior', (.23, .10, .10, 1), roughness=.60)
-beak_material = T.opaque_material(NAME + ' beak', (.050, .038, .033, 1), roughness=.32)
+# --------------------------------------------------------- the mouth: an anchor and nothing else ----
+# There is no oral geometry on this animal. See the note at the peristome above: a beak inside an arm
+# crown is never seen, and the lining and the two mandibles that used to stand here were built to
+# close a hole this builder had itself cut. `MOUTH_R` and `MOUTH_P` survive because they are the
+# measurement the mouth anchors are placed from, and `skull` and `jaw` survive because the lip band
+# of the crown's own skin is weighted to them, so they are joints that own skin and the clips that
+# move them move the animal rather than a prop.
 oralparts = []
-LINING_RINGS, LINING_RING = 16, 14
-LINING_DEPTH = min(MOUTH_R * 2.3, HEAD_ROOM * .80)
-assert LINING_DEPTH > MOUTH_R * .8, ('no room for a mouth behind the peristome', HEAD_ROOM)
+MOUTH_DEPTH = min(MOUTH_R * 2.3, HEAD_ROOM * .80)   # how far in `anchor_mouth_inside` sits
 
 
 def mouth_point(a, dn, ds):
     return Vector((MOUTH_P + M_N * a + M_DN * dn + M_DS * ds).tolist())
 
-
-_lining, _lining_raw = T.crown_lining(
-    NAME + ' oral lining', rig, tx, PERISTOME, MOUTH_P, M_N, M_DN, M_DS,
-    into_head=LINING_DEPTH, skin_weights=lambda q: weights(q, 0.), material=mouth_material,
-    rings=LINING_RINGS, ring=LINING_RING)
-oralparts.append(_lining)
-
-
-for _label, _bone, _sign in ((' upper mandible', 'skull', -1), (' lower mandible', 'jaw', 1)):
-    oralparts.append(T.crown_beak(NAME + _label, rig, _bone, tx, MOUTH_P, M_N, M_DN, M_DS,
-                                  MOUTH_R, _sign, beak_material))
-lining_back = Vector(np.asarray(_lining_raw)[-LINING_RING:].mean(0).tolist())
-lining_depth_raw = depth(lining_back)
-assert lining_depth_raw > .003, ('the lining reaches outside the head', round(float(lining_depth_raw), 5))
 
 # --------------------------------------------- measured comparison of the two real surfaces ----
 auth_v = np.array([v.co[:] for v in auth.data.vertices])
@@ -1054,7 +1046,7 @@ anchors = [
     {'name': 'anchor_mouth', 'bone': 'jaw', 'role': 'mouth',
      'point': list(tx(mouth_point(MOUTH_R * .70, MOUTH_R * .14, 0)))},
     {'name': 'anchor_mouth_inside', 'bone': 'skull', 'role': 'swallow',
-     'point': list(tx(mouth_point(-LINING_DEPTH * .55, 0, 0)))},
+     'point': list(tx(mouth_point(-MOUTH_DEPTH * .55, 0, 0)))},
     {'name': 'anchor_attack_primary', 'bone': '%s_%02d' % (TENT[0]['name'], TENT[0]['nseg'] - 1),
      'role': 'attack', 'point': list(tx(Vector([float(x) for x in TENT[0]['pts'][-1]]))),
      'chain': ['%s_%02d' % (TENT[0]['name'], i) for i in range(TENT[0]['nseg'])]},
@@ -1121,8 +1113,9 @@ open(os.path.join(HERE, ID + '-profile.json'), 'w').write(json.dumps({
 meta = {'id': ID, 'name': NAME, 'species': 'Phragmoteuthis bisinuata',
         'description': 'Canonical Tripo body and procedural volume twin on one %d-joint rig: a stiff '
                        'mantle that squeezes by translation rather than scale, two lateral fins '
-                       'carrying a travelling wave, %d appendages of which two are tentacles, and an '
-                       'authored beak inside a closed oral lining.' % (len(B), NARM),
+                       'carrying a travelling wave, %d appendages of which two are tentacles, and no '
+                       'modelled mouth: the crown is the closed surface it was delivered as, with the '
+                       'mouth and attack anchors on its axis.' % (len(B), NARM),
         'modelLength': round(model_length, 4), 'lengthMeters': 2.42, 'locomotion': 'Swim',
         'clips': list(CLIPS), 'looping': LOOPS, 'anchors': [a['name'] for a in anchors],
         'puppet': ID + '.puppet.glb',
@@ -1136,9 +1129,10 @@ meta = {'id': ID, 'name': NAME, 'species': 'Phragmoteuthis bisinuata',
             'The mantle is one stiff bone: a phragmoteuthid carries a rigid internal shell up its '
             'back. Its jet is a radial contraction, which the contract cannot express as scale, so '
             'it is two flank bones with translation channels and the audit measures the width.',
-            'The generation models no mouth, and casting head normals back into the mesh finds '
-            'neighbouring arms across the crown gaps rather than a lip opposite, so the peristome '
-            'is authored on the crown axis with one closed skinned lining and two mandibles.',
+            'The generation models no mouth, and this animal is not given one: a beak inside an '
+            'arm crown faces down the crown axis inside a thicket of arms and is never in frame, '
+            'so the crown stays the closed surface it was delivered as and the three mouth and '
+            'attack anchors are the whole of it.',
             'This animal has `swimStyle: omnidirectional` and NOT `shell: true`, so it does not '
             'jet in the simulation and nothing scrubs its Swim clip to a phase. Its cruise is the '
             'fin wave, which is what an animal with fins this size and no fixed front actually '
@@ -1182,11 +1176,9 @@ report = {'id': ID, 'intake': intake,
           'mantleSqueezeTravelEngineUnits': squeeze_travel,
           'squeezeTravelAtFull': SQUEEZE_TRAVEL,
           'curvature': curvature, 'pairedAppendageAsymmetry': asymmetry,
-          'mouth': dict(mouth_cut, liningRings=LINING_RINGS, liningRing=LINING_RING,
-                        liningDepth=LINING_DEPTH,
-                        liningNearestSurfaceDepthRaw=round(float(lining_depth_raw), 5),
-                        skinDoubleSided=True, liningCullsBackfaces=True, oneClosedLining=True,
-                        beak='two authored mandibles, 7 sections each, rigid on skull and jaw'),
+          'mouth': dict(mouth_cut, modelled=False, anchorDepth=round(MOUTH_DEPTH, 5),
+                        note='no peristome cut, no lining and no beak: a mouth inside an arm crown '
+                             'is never seen, so the anchors are the whole of it'),
           'albedoSha256': albedo_sha,
           'mantleIsStiff': True, 'squeezeIsTranslationNotScale': True,
           'normalizedWeights': True, 'rootStable': True, 'noScaleChannels': True}
