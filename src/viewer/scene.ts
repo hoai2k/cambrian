@@ -70,6 +70,12 @@ export interface SculptTarget {
   jaw?: [number, number, number];
   /** Whether anything on stage is skinned — a built body is, a raw generation is not. */
   skinned: boolean;
+  /**
+   * Every bone of the rig at its bind pose, root frame, with its parent's name: what the bend
+   * editor reads a chain off. Empty on a body with no rig. Taken at load, before any clip has
+   * played, which is when the nodes stand at the transforms the file authored — the bind.
+   */
+  bones: { name: string; parent: string | null; head: [number, number, number] }[];
 }
 
 /** Which handle of the mouth cut the pointer is on. */
@@ -87,6 +93,25 @@ export interface MouthCut {
   reach: number;
   halfWidth: number;
   height: number;
+}
+/** Which handle of the bend span the pointer is on. */
+export type BendHandle = 'base' | 'tip' | 'axis';
+/**
+ * The bend span as the stage draws it, in the model's root frame: the two ends, the three
+ * directions of the bend, how wide to draw the cut planes, and the two traced centrelines — which
+ * are drawn because the geometry reading is only as good as the run it followed, and a reviewer who
+ * cannot see the trace cannot see it set off down a flipper.
+ */
+export interface BendSpan {
+  base: [number, number, number];
+  tip: [number, number, number];
+  forward: [number, number, number];
+  up: [number, number, number];
+  axis: [number, number, number];
+  /** Half the width the cut planes and the axle are drawn at. */
+  reach: number;
+  baseTrace: readonly (readonly [number, number, number])[];
+  tipTrace: readonly (readonly [number, number, number])[];
 }
 export type WarpFn = (x: number, y: number, z: number, out: [number, number, number], eye?: boolean) => void;
 
@@ -195,10 +220,20 @@ export interface ViewerScene {
   /** Which of the mouth cut's handles is under the pointer, if any: canvas CSS pixels in. */
   mouthPick(x: number, y: number): MouthHandle | undefined;
   /**
-   * Where the pointer's ray crosses the camera-facing plane through a root-frame anchor, in the
-   * root frame — how a drag on a handle in the orbit view becomes a point the document can use.
+   * Draws the bend span — the two cut planes, the axle it turns about, the two traced centrelines
+   * and the three handles — and lights every vertex inside the span (null takes it all down). The
+   * "inside" test is the document's own, handed in as a closure so the scene knows nothing about
+   * how a bend is aimed.
    */
-  mouthDragPoint(x: number, y: number, anchor: readonly [number, number, number]): [number, number, number] | undefined;
+  showBend(span: BendSpan | null, inSpan: ((x: number, y: number, z: number) => boolean) | null): void;
+  /** Which of the bend span's handles is under the pointer, if any: canvas CSS pixels in. */
+  bendPick(x: number, y: number): BendHandle | undefined;
+  /**
+   * Where the pointer's ray crosses the camera-facing plane through a root-frame anchor, in the
+   * root frame — how a drag on a handle in the orbit view becomes a point a document can use. The
+   * mouth editor and the bend editor both drag handles this way, so there is one of it.
+   */
+  dragPoint(x: number, y: number, anchor: readonly [number, number, number]): [number, number, number] | undefined;
   dispose(): void;
 }
 
@@ -381,6 +416,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     sculptTarget = undefined;
     markTargetCache = undefined; markIndexOf = new Map(); markPoints.visible = false;
     mouthRootCache = undefined; mouthGroup.visible = false; mouthPoints.visible = false;
+    bendRootCache = undefined; bendGroup.visible = false; bendPoints.visible = false;
     actions = new Map();
     paused = false;
     setClip('');
@@ -549,7 +585,18 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     const jaw = landmark('jaw');
     let skinned = false;
     root.traverse((o) => { if (o instanceof THREE.SkinnedMesh) skinned = true; });
-    return { meshes, mouth, mouthInside, jaw, skinned };
+    // The whole rig, in the frame the editors measure in. A bone's parent is named only when it is
+    // itself a bone, so the armature's own container does not become a joint of the chain.
+    const bones: SculptTarget['bones'] = [];
+    const boneNames = new Set<string>();
+    root.traverse((o) => { if (o instanceof THREE.Bone) boneNames.add(o.name); });
+    root.traverse((o) => {
+      if (!(o instanceof THREE.Bone)) return;
+      const p = o.getWorldPosition(new THREE.Vector3()).applyMatrix4(rootInverse);
+      const parentName = o.parent && o.parent instanceof THREE.Bone && boneNames.has(o.parent.name) ? o.parent.name : null;
+      bones.push({ name: o.name, parent: parentName, head: [p.x, p.y, p.z] });
+    });
+    return { meshes, mouth, mouthInside, jaw, skinned, bones };
   }
 
   function applySculpt(fn: WarpFn | null, finalize: boolean) {
@@ -786,7 +833,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     return (Object.entries(mouthHandles).find(([, m]) => m === hit.object)?.[0] as MouthHandle | undefined);
   }
 
-  function mouthDragPoint(x: number, y: number, anchor: readonly [number, number, number]): [number, number, number] | undefined {
+  function dragPoint(x: number, y: number, anchor: readonly [number, number, number]): [number, number, number] | undefined {
     if (!model) return undefined;
     const w = canvas.clientWidth || 1, h = canvas.clientHeight || 1;
     raycaster.setFromCamera(new THREE.Vector2((x / w) * 2 - 1, -(y / h) * 2 + 1), camera);
@@ -796,6 +843,127 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     if (!p) return undefined;
     p.applyMatrix4(model.matrixWorld.clone().invert());
     return [p.x, p.y, p.z];
+  }
+
+  // ---- the bend span ----
+  // Drawn in the model's own frame like the mouth cut, and for the same reason: the document is
+  // measured there, and a raw generation's preview turn has to reach the helpers exactly as it
+  // reaches the body. Without a depth test, because a span through a neck is inside the neck.
+  const bendGroup = new THREE.Group();
+  bendGroup.matrixAutoUpdate = false;
+  bendGroup.visible = false;
+  scene.add(bendGroup);
+  const bendCut = (color: string) => {
+    const m = new THREE.Mesh(G(new THREE.PlaneGeometry(1, 1).rotateY(Math.PI / 2)), helperMat(color, 0.16));
+    m.renderOrder = 4;
+    return m;
+  };
+  const bendPlanes = { base: bendCut('#ffb36b'), tip: bendCut('#61f2d5') };
+  const axleMat = M(new THREE.LineBasicMaterial({ color: '#ff2fa8', transparent: true, opacity: 0.95, depthTest: false, depthWrite: false }));
+  const bendAxle = new THREE.Line(G(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-1, 0, 0), new THREE.Vector3(1, 0, 0)])), axleMat);
+  const spanLine = new THREE.Line(G(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 0, 0)])), M(new THREE.LineBasicMaterial({ color: '#eefaf6', transparent: true, opacity: 0.8, depthTest: false, depthWrite: false })));
+  const traceMat = (color: string) => M(new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.95, depthTest: false, depthWrite: false }));
+  const bendTraces = {
+    base: new THREE.Line(G(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()])), traceMat('#ffb36b')),
+    tip: new THREE.Line(G(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()])), traceMat('#61f2d5')),
+  };
+  const bendHandles: Record<BendHandle, THREE.Mesh> = {
+    base: new THREE.Mesh(handleGeo, helperMat('#ffb36b', 0.95)),
+    tip: new THREE.Mesh(handleGeo, helperMat('#61f2d5', 0.95)),
+    axis: new THREE.Mesh(handleGeo, helperMat('#ff2fa8', 0.95)),
+  };
+  for (const [name, h] of Object.entries(bendHandles)) { h.name = `bend-${name}`; h.renderOrder = 5; }
+  for (const o of [bendAxle, spanLine, bendTraces.base, bendTraces.tip]) o.renderOrder = 5;
+  bendGroup.add(bendPlanes.base, bendPlanes.tip, bendAxle, spanLine, bendTraces.base, bendTraces.tip,
+    bendHandles.base, bendHandles.tip, bendHandles.axis);
+  // The span's own vertices, lit point by point — the same overlay mark mode and the mouth editor
+  // use, so what the turn will actually carry is seen rather than inferred.
+  const bendGeo = G(new THREE.BufferGeometry());
+  bendGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(3), 3).setUsage(THREE.DynamicDrawUsage));
+  const bendPoints = new THREE.Points(bendGeo, M(new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false,
+    vertexShader: `void main(){vec4 mv=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mv;gl_Position.z-=.0016*gl_Position.w;gl_PointSize=clamp(420./max(1.,-mv.z),2.5,7.);}`,
+    fragmentShader: `void main(){float r=length(gl_PointCoord-.5)*2.;if(r>1.)discard;gl_FragColor=vec4(.38,.95,.84,.85-.3*r);}`,
+  })));
+  bendPoints.frustumCulled = false;
+  bendPoints.visible = false;
+  bendPoints.renderOrder = 3;
+  scene.add(bendPoints);
+  /** Every sculptable mesh's shipped positions in the root frame, once per body, for the test to run over. */
+  let bendRootCache: { mesh: SculptMesh; root: Float32Array }[] | undefined;
+
+  /** A polyline redrawn in place; an empty run hides it. */
+  function setPolyline(line: THREE.Line, pts: readonly (readonly [number, number, number])[]) {
+    if (pts.length < 2) { line.visible = false; return; }
+    const attr = line.geometry.getAttribute('position') as THREE.BufferAttribute | undefined;
+    if (!attr || attr.count < pts.length) {
+      line.geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pts.length * 3), 3).setUsage(THREE.DynamicDrawUsage));
+    }
+    const dst = (line.geometry.getAttribute('position') as THREE.BufferAttribute).array as Float32Array;
+    for (let i = 0; i < pts.length; i++) { dst[i * 3] = pts[i][0]; dst[i * 3 + 1] = pts[i][1]; dst[i * 3 + 2] = pts[i][2]; }
+    (line.geometry.getAttribute('position') as THREE.BufferAttribute).needsUpdate = true;
+    line.geometry.setDrawRange(0, pts.length);
+    line.visible = true;
+  }
+
+  function showBend(span: BendSpan | null, inSpan: ((x: number, y: number, z: number) => boolean) | null) {
+    if (!span || !inSpan || !model || !sculptTarget) { bendGroup.visible = false; bendPoints.visible = false; return; }
+    model.updateMatrixWorld();
+    bendGroup.matrix.copy(model.matrixWorld);
+    bendGroup.matrixWorldNeedsUpdate = true;
+    const f = new THREE.Vector3(...span.forward), u = new THREE.Vector3(...span.up), a = new THREE.Vector3(...span.axis);
+    const q = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(f, u, a));
+    const base = new THREE.Vector3(...span.base), tip = new THREE.Vector3(...span.tip);
+    const wide = span.reach * 2;
+    const place = (o: THREE.Object3D, at: THREE.Vector3, scale: THREE.Vector3) => { o.position.copy(at); o.quaternion.copy(q); o.scale.copy(scale); };
+    // The plane geometry is rotated onto the y–z face, so its x is the basis' forward: a cut square
+    // to the span is that face scaled across up and axis.
+    place(bendPlanes.base, base, new THREE.Vector3(1, wide, wide));
+    place(bendPlanes.tip, tip, new THREE.Vector3(1, wide, wide));
+    // The axle is a line along its own x, so it is aimed at the axis directly rather than through
+    // the span's basis: its length is the only thing the basis would have given it.
+    bendAxle.position.copy(base);
+    bendAxle.quaternion.setFromUnitVectors(new THREE.Vector3(1, 0, 0), a);
+    bendAxle.scale.setScalar(span.reach * 1.4);
+    spanLine.position.copy(base);
+    spanLine.quaternion.setFromUnitVectors(new THREE.Vector3(1, 0, 0), f);
+    spanLine.scale.setScalar(base.distanceTo(tip));
+    setPolyline(bendTraces.base, span.baseTrace);
+    setPolyline(bendTraces.tip, span.tipTrace);
+    const r = span.reach * 0.14;
+    const rs = new THREE.Vector3(r, r, r);
+    place(bendHandles.base, base, rs);
+    place(bendHandles.tip, tip, rs);
+    place(bendHandles.axis, base.clone().addScaledVector(a, span.reach * 1.4), rs);
+    bendGroup.visible = true;
+
+    if (!bendRootCache) bendRootCache = sculptTarget.meshes.map((mesh) => ({ mesh, root: rootFramePositions(mesh.base, mesh.toRoot) }));
+    let n = 0;
+    for (const { root } of bendRootCache) for (let i = 0; i < root.length; i += 3) if (inSpan(root[i], root[i + 1], root[i + 2])) n++;
+    const attr = bendGeo.getAttribute('position') as THREE.BufferAttribute;
+    if (attr.count < Math.max(n, 1)) {
+      bendGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(Math.max(n, 1) * 3), 3).setUsage(THREE.DynamicDrawUsage));
+    }
+    const dst = (bendGeo.getAttribute('position') as THREE.BufferAttribute).array as Float32Array;
+    const v = new THREE.Vector3();
+    let w = 0;
+    for (const { root } of bendRootCache) for (let i = 0; i < root.length; i += 3) {
+      if (!inSpan(root[i], root[i + 1], root[i + 2])) continue;
+      v.set(root[i], root[i + 1], root[i + 2]).applyMatrix4(model.matrixWorld);
+      dst[w++] = v.x; dst[w++] = v.y; dst[w++] = v.z;
+    }
+    (bendGeo.getAttribute('position') as THREE.BufferAttribute).needsUpdate = true;
+    bendGeo.setDrawRange(0, n);
+    bendPoints.visible = n > 0;
+  }
+
+  function bendPick(x: number, y: number): BendHandle | undefined {
+    if (!bendGroup.visible) return undefined;
+    const w = canvas.clientWidth || 1, h = canvas.clientHeight || 1;
+    raycaster.setFromCamera(new THREE.Vector2((x / w) * 2 - 1, -(y / h) * 2 + 1), camera);
+    const hit = raycaster.intersectObjects(Object.values(bendHandles), false)[0];
+    if (!hit) return undefined;
+    return (Object.entries(bendHandles).find(([, m]) => m === hit.object)?.[0] as BendHandle | undefined);
   }
 
   /** Applies the current oral-geometry setting to whatever is on stage. Re-applied on every load. */
@@ -984,7 +1152,9 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     setMarkInteraction,
     showMouthCut,
     mouthPick,
-    mouthDragPoint,
+    showBend,
+    bendPick,
+    dragPoint,
     dispose() {
       if (disposed) return;
       disposed = true;
