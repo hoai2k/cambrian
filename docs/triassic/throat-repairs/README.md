@@ -39,3 +39,17 @@ geometry is removed, restoring the closed source crown. authored: 5502 anatomica
 Visual playback frames: [before](ceratites-Attack-before.png), [after](ceratites-Attack-after.png).
 The image change is small; the anatomical weight audit is the stronger evidence. The paired audit,
 TypeScript check and production build pass; portraits are refreshed from the decoded packaged GLB.
+
+## Finished: Hupehsuchus
+
+The lip measurement now spans 0.255 body lengths behind the nose rather than 0.165. The body and
+rear jaw share a weight field at the cut; the mandible blends onto its rigid jaw bone forward of
+that attachment. This preserves the pouch motion without opening a slit through the throat.
+`cut-attachment.mjs` pairs the actual exported rim vertices: 162 authored and 67 puppet vertices,
+61 phases of every one of 23 clips, zero separation in both bodies. The cut's cross-sections are
+closed with source skin and the hidden sac is replaced by separate palate/floor shells.
+
+[Gulp before](hupehsuchus-Gulp-before.png) and [after](hupehsuchus-Gulp-after.png) show the mouth
+extent and attachment; the automatic framing follows the new hinge, so the scales differ.
+All existing paired rig, clip, stiff-trunk, pouch and anchor tests pass. Both portrait families
+were rendered again from the decoded packaged deliveries.
