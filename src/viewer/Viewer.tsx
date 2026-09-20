@@ -13,6 +13,7 @@ import { getStretch } from './stretch/store';
 import { isIdentity as stretchIsIdentity, warp as stretchWarp } from './stretch/stretch';
 import { MouthEditor } from './mouth/MouthEditor';
 import type { AppliesTo } from './mouth/mouth';
+import { BendEditor } from './bend/BendEditor';
 
 const SPEEDS = [0.25, 0.5, 1, 2];
 
@@ -36,14 +37,17 @@ function readPicks(): Picks {
   }
 }
 
-/** What the page is doing with the specimen: looking at it, reshaping it, lengthening a run of it, marking it up, or aiming its mouth. */
-type Mode = 'view' | 'sculpt' | 'mark' | 'stretch' | 'mouth';
+/**
+ * What the page is doing with the specimen: looking at it, reshaping it, lengthening a run of it,
+ * turning a run of it, marking it up, or aiming its mouth.
+ */
+type Mode = 'view' | 'sculpt' | 'mark' | 'stretch' | 'mouth' | 'bend';
 
 /**
  * The page remembers which specimen it is showing in the URL (`?specimen=<key>`, and `&mode=sculpt`,
- * `&mode=mark`, `&mode=stretch` or `&mode=mouth` while editing), so a reload — or a link — comes
- * back to the same creature. Nothing else is kept there: the view, the clip, any sculpt in
- * progress, any marked region and any mouth cut start over.
+ * `&mode=mark`, `&mode=stretch`, `&mode=mouth` or `&mode=bend` while editing), so a reload — or a
+ * link — comes back to the same creature. Nothing else is kept there: the view, the clip, any
+ * sculpt in progress, any marked region, any mouth cut and any bend start over.
  *
  * `mode=stretch` does not also restore the generated body it applies to, because which body is on
  * stage is not in the URL at all; the editor is shown only once one is, and the mode falls back to
@@ -60,7 +64,7 @@ function readUrlState(): { key: string; mode: Mode } {
   // not export anything portable.
   const collection = specimenByKey.get(key)?.collection;
   const editable = !isPropCollection(collection);
-  const asking = asked === 'mark' || asked === 'stretch' || asked === 'mouth' || (asked === 'sculpt' && collection !== 'triassic');
+  const asking = asked === 'mark' || asked === 'stretch' || asked === 'mouth' || asked === 'bend' || (asked === 'sculpt' && collection !== 'triassic');
   return { key, mode: editable && asking ? asked as Mode : 'view' };
 }
 function writeUrlState(key: string, mode: Mode) {
@@ -206,11 +210,20 @@ export function Viewer() {
    */
   const ownBody = !def.generated || !!def.inReview;
   const canStretch = !isPropCollection(collection) && !showPuppet && ready && (showGenerated || ownBody);
+  /**
+   * Bend sits exactly where stretch does, because it asks the same kind of question about the same
+   * run of body: stretch changes a span's *length* and bend changes its *direction*, and neither
+   * can be baked into a rigged body. So it is offered on a raw generation (where the warp on stage
+   * is the edit) and on a built body (where the rig is held at rest and the export is a measurement
+   * for the builder), and refused on the comparison twin and on props for stretch's own reasons —
+   * a measurement exported off the twin would name the right creature and describe the wrong mesh.
+   */
+  const canBend = canStretch;
   useEffect(() => {
     if (mode === 'sculpt' && (!sculptable || showPuppet || showGenerated)) setMode('view');
     // Stretch is the one mode a *built* body still answers: there it is a measurement rather than
     // an edit, so all it refuses is a prop and the comparison twin.
-    if (mode === 'stretch' && (isPropCollection(collection) || showPuppet)) setMode('view');
+    if ((mode === 'stretch' || mode === 'bend') && (isPropCollection(collection) || showPuppet)) setMode('view');
     if ((mode === 'mark' || mode === 'mouth') && isPropCollection(collection)) setMode('view');
   }, [mode, collection, sculptable, showPuppet, showGenerated]);
 
@@ -283,7 +296,7 @@ export function Viewer() {
   const changed = roster.filter((c) => (picks[c.key] ?? defaultScheme(c.key)) !== defaultScheme(c.key)).length;
 
   return (
-    <div className={`viewer ${mode === 'sculpt' ? 'sculpting' : mode === 'stretch' ? 'stretching' : mode === 'mark' ? 'marking' : mode === 'mouth' ? 'mouthing' : ''}`} data-mode={mode}>
+    <div className={`viewer ${mode === 'sculpt' ? 'sculpting' : mode === 'stretch' ? 'stretching' : mode === 'mark' ? 'marking' : mode === 'mouth' ? 'mouthing' : mode === 'bend' ? 'bending' : ''}`} data-mode={mode}>
       <div className="stage">
         <canvas ref={canvasRef} className="viewer-canvas" />
         {/* The notice sits on the stage, over where the specimen will stand. `status` stays in the
@@ -318,6 +331,13 @@ export function Viewer() {
           on one file. */}
       {mode === 'mouth' && canMouth && sceneRef.current && canvasRef.current && (
         <MouthEditor key={`${id}|${modelPath}|mouth`} scene={sceneRef.current} specimen={def} model={modelPath}
+          sha256={showGenerated ? def.generatedSha256 : undefined} appliesTo={appliesTo}
+          canvas={canvasRef.current} onExit={() => setMode('view')} />
+      )}
+      {/* Bend mode is the same shape again — handles on the orbit view, a panel where the info card
+          was — and is keyed by the body on stage because a span is placed on one file. */}
+      {mode === 'bend' && canBend && sceneRef.current && canvasRef.current && (
+        <BendEditor key={`${id}|${modelPath}|bend`} scene={sceneRef.current} specimen={def} model={modelPath}
           sha256={showGenerated ? def.generatedSha256 : undefined} appliesTo={appliesTo}
           canvas={canvasRef.current} onExit={() => setMode('view')} />
       )}
@@ -417,6 +437,10 @@ export function Viewer() {
               ? 'Lengthen a run of this raw generation — a neck, a tail — between two cuts, and export the change to be baked into the GLB'
               : 'Lengthen a run of this body between two cuts and measure it. A built body is held at rest and cannot be baked: the numbers go to its builder.'}>
             Stretch{(() => { const d = getStretch(id); return d && !stretchIsIdentity(d) ? ' (edited)' : ''; })()}
+          </button>}
+          {!isPropCollection(collection) && <button className="ghost" onClick={() => { if (def.generated && !def.inReview) setStageId('generated'); setMode('bend'); }} disabled={!canBend}
+            title="Turn a run of this body between two cuts — a neck off its trunk — and read the angle before and after. On a built body it is a measurement for its builder.">
+            Bend
           </button>}
           {!isPropCollection(collection) && <button className="ghost" onClick={() => setMode('mark')} disabled={!canMark} title="Paint the geometry that should not be there and export it as a region file for tools/triassic/cut-region.py">
             Mark region

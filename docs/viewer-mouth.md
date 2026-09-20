@@ -186,7 +186,7 @@ wrong body" is one claim in one place, and `npm run mouth` holds it.
 | `src/viewer/mouth/mouth.ts` | The document, the basis, the test and the file. Pure — no DOM, no three.js. |
 | `src/viewer/mouth/MouthEditor.tsx` | The handles, the drags, the hashing and the panel. |
 | `src/viewer/mouth/store.ts` | The session's documents, in memory only. |
-| `src/viewer/scene.ts` | `showMouthCut`, `mouthPick`, `mouthDragPoint`: the helpers, the lit mandible and the pointer's ray. |
+| `src/viewer/scene.ts` | `showMouthCut`, `mouthPick` and the shared `dragPoint`: the helpers, the lit mandible and the pointer's ray. |
 | `tools/mouth-test.ts` | `npm run mouth` — the guess, the basis, the test, the three handles, flipping, the file and its refusals. |
 | `tools/mouth-browser.mjs` | The editor in a real browser: seated on the jaw bone, a handle found by hover and dragged, the fields, the measured hash, the consumer's acceptance and refusal, the original pose. |
 | `tools/triassic/mouth-check.ts` | `npm run triassic:mouth` — the consumer. |

@@ -807,6 +807,23 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
   }
 }
 
+// ---- every specimen the viewer lists shows a picture of itself ----
+// A row with no `image` draws an empty tile. The roster creatures and the props each set one, and
+// the off-roster guests did not — Archelon and Mosasaurus sat in the viewer as blanks with their
+// portraits sitting rendered on disk the whole time, because being off the roster is a question
+// about which game an animal belongs to and had quietly become a different code path.
+{
+  const { SPECIMENS } = await import('../src/viewer/catalogue');
+  for (const row of SPECIMENS.filter((r) => String(r.collection).startsWith('triassic'))) {
+    // A body that is not shipped yet has nothing of its own to photograph; everything else does.
+    if (!row.model || row.model.includes('/preview/') || !row.model.endsWith('.glb')) continue;
+    const shipped = fs.existsSync(`public/${row.model}`);
+    if (!shipped) continue;
+    ok(!!row.image, `${row.key}: the viewer shows a picture of it`);
+    if (row.image) ok(fs.existsSync(`public/${row.image}`), `${row.key}: ${row.image} exists`);
+  }
+}
+
 // ---- the viewer's scenery catalogue ----
 // The props are static meshes with no rig, which is exactly why they are easy to forget: nothing
 // in the game loads this file, so a prop could be delivered, placed, and still never appear in the

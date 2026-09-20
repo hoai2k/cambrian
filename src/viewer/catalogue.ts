@@ -236,6 +236,11 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
         lod: built?.lod ?? (shipped ? TRIASSIC_PATHS.model(s.id, 1) : undefined),
         puppet: built?.puppet ?? (shipped ? TRIASSIC_PATHS.model(s.id, 1) : undefined),
         generated: TRIASSIC_PREVIEW.get(s.id)?.model,
+        // A shipped guest's portraits are rendered from its own model like every other body's, so
+        // it shows a picture of the animal rather than an empty tile. Off the roster is a question
+        // about which game it belongs to, not a reason to draw it differently: the row was written
+        // without this line and both Cretaceous bodies sat in the viewer with no image at all.
+        image: shipped ? TRIASSIC_PATHS.portrait(s.id, 'card') : undefined,
         previewYaw: TRIASSIC_PREVIEW.get(s.id)?.yaw,
         previewLength: TRIASSIC_PREVIEW.get(s.id)?.lengthUnits ?? undefined,
         generatedSha256: TRIASSIC_PREVIEW.get(s.id)?.sha256,
