@@ -1,13 +1,14 @@
 /**
  * Event kind → Triassic sample files, registered by the /triassic/ entry before the audio library
- * preloads. No Triassic recordings exist yet (docs/audio-requests.md lists them — the blow is the
- * era's signature sound and wants a real recording), so every entry here points at a delivered
- * Devonian or shared sample that is close enough to stand in. Swap a line when its file lands.
+ * preloads. The era's signature breath, winded pulse and shore strike now have their own recordings;
+ * the remaining combat vocabulary deliberately continues to borrow the nearest delivered sound.
  */
 export const TRIASSIC_SAMPLES: Record<string, string[]> = {
-  gulp: ['devonian/air-gulp'],            // the blow at the surface
+  gulp: ['triassic/blow-mid'],             // fallback for callers without a body size
+  'gulp-small': ['triassic/blow-small'], 'gulp-mid': ['triassic/blow-mid'], 'gulp-giant': ['triassic/blow-giant'],
   beach: ['devonian/beach'],              // a leap, or a walk, coming down on the sand (src/sim/beach.ts)
-  winded: ['devonian/air-low'],           // the bar running down with no way to refill it
+  winded: ['triassic/winded'], 'triassic:winded': ['triassic/winded'], // alias keeps both eras distinct in the workbench
+  shoreStrike: ['triassic/shore-strike'],
   armour: ['devonian/armour-clang-1', 'devonian/armour-clang-2'],
   armourPierce: ['devonian/armour-pierce'],
   jet: ['devonian/jet-1', 'devonian/jet-2'],

@@ -7,14 +7,19 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { audio, musicUrl, registerSamples, SAMPLES, sfxUrl } from '../audio/audio';
 import { distanceAtten } from '../audio/mix';
 import { music, openingTrack } from '../audio/music';
-import { BEDS, DEVONIAN_BEDS, DEVONIAN_GROUPS, GROUPS, type SoundEntry } from './audio-catalogue';
+import { BEDS, DEVONIAN_BEDS, DEVONIAN_GROUPS, GROUPS, TRIASSIC_BEDS, TRIASSIC_GROUPS, type SoundEntry } from './audio-catalogue';
 import { DEVONIAN_SAMPLES } from '../content/devonian/sfx';
+import { TRIASSIC_SAMPLES } from '../content/triassic/sfx';
 
 // The game registers an era's samples when that era's entry loads. The workbench is neither era,
 // so it registers them all up front and lists both libraries.
-registerSamples(DEVONIAN_SAMPLES);
-const ALL_GROUPS = [...GROUPS, ...DEVONIAN_GROUPS];
-const ALL_BEDS = [...BEDS, ...DEVONIAN_BEDS];
+registerSamples({
+  ...DEVONIAN_SAMPLES,
+  'gulp-small': TRIASSIC_SAMPLES['gulp-small'], 'gulp-mid': TRIASSIC_SAMPLES['gulp-mid'], 'gulp-giant': TRIASSIC_SAMPLES['gulp-giant'],
+  'triassic:winded': TRIASSIC_SAMPLES['triassic:winded'], shoreStrike: TRIASSIC_SAMPLES.shoreStrike,
+});
+const ALL_GROUPS = [...GROUPS, ...DEVONIAN_GROUPS, ...TRIASSIC_GROUPS];
+const ALL_BEDS = [...BEDS, ...DEVONIAN_BEDS, ...TRIASSIC_BEDS];
 import { formatLevel, isQuiet, measure, QUIET_MID_PEAK, type Level } from './levels';
 
 /** Every file the catalogue can reach, so we can report on the library as a whole. */

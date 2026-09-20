@@ -11,6 +11,7 @@ import { cloneMaterials, makeRecolor, type Recolor } from '../render/recolor';
 import { settleTranslucency } from '../render/translucency';
 import { DEFAULT_SCHEME, type Slot } from '../shared/palettes';
 import { appBase } from '../shared/base';
+import { resolveSelection, restingClip as restingClipOf, type ClipIntent } from './playback/selection';
 
 /**
  * The viewer page lives one directory below the app, so `BASE_URL` ('./' in a built bundle)
@@ -177,8 +178,15 @@ export interface OrthoView {
 }
 
 export interface ViewerScene {
-  /** Loads a creature and returns its clip names in button order. */
-  show(specimen: ViewerSpecimen, options?: { preserveView?: boolean }): Promise<string[]>;
+  /**
+   * Loads a creature and returns its clip names in button order.
+   *
+   * `intent` is the reviewer's standing selection — the clip, the position and the pause — which
+   * crosses from one animal to the next (`./playback/selection`). What this body can actually give
+   * it is decided there and reported back through `onClip`/`onPlayback`; the intent itself is the
+   * caller's and is never written to from in here.
+   */
+  show(specimen: ViewerSpecimen, options?: { preserveView?: boolean; intent?: ClipIntent; loop?: boolean }): Promise<string[]>;
   /**
    * Takes the stage down now. Loading the next specimen takes a moment, and the one standing
    * there must not spend it being recoloured into the next one's palette.
@@ -469,7 +477,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     controls.update();
   }
 
-  async function show(specimen: ViewerSpecimen, options: { preserveView?: boolean } = {}) {
+  async function show(specimen: ViewerSpecimen, options: { preserveView?: boolean; intent?: ClipIntent; loop?: boolean } = {}) {
     const mine = ++token;
     const gltf = await loadCreature(specimen);
     if (mine !== token || disposed) { disposeAsset(gltf); return []; }
@@ -479,6 +487,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
       name: currentName, time: current?.time ?? 0,
       paused: paused || !!current?.paused, loop: current?.loop === THREE.LoopRepeat,
     } : undefined;
+    const wasLooping = retained?.loop ?? false;
     clearModel();
     source = gltf;
     looping = specimen.looping;
@@ -522,16 +531,26 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     });
 
     const names = orderClips([...actions.keys()]);
-    restingClip = actions.has('Idle') ? 'Idle' : names[0] ?? '';
+    restingClip = restingClipOf(names);
     current = undefined; currentName = '';
-    if (retained && actions.has(retained.name)) {
-      play(retained.name, retained.loop);
-      seek(retained.time);
-      paused = retained.paused;
+    // One decision covers both ways a body arrives here: a change of specimen (the stage was
+    // cleared, so there is nothing playing and only the standing intent to go on) and a model swap
+    // (the stage was held, and what it was showing keeps the twin comparison honest where the
+    // intent cannot be met). `pick.clip === null` is the base pose, or a specimen with no rig.
+    const pick = resolveSelection(options.intent, names.map((n) => (
+      { name: n, duration: actions.get(n)!.getClip().duration })), retained);
+    if (pick.clip) {
+      play(pick.clip, options.loop ?? wasLooping);
+      // `seek` pauses, which is why the pause the reviewer actually asked for is set after it.
+      if (pick.time > 0) seek(pick.time);
+      restPose = false;
+      paused = pick.paused;
       reportPlayback();
-    } else if (restingClip) {
-      paused = retained?.paused ?? false;
-      play(restingClip, false);
+    } else if (names.length) {
+      // The base pose is a selection like a clip is, and it crosses bodies with the rest of them.
+      setRestPose(true);
+      paused = pick.paused;
+      reportPlayback();
     }
     if (!retained) frame();
     else {

@@ -1123,7 +1123,7 @@ export class Game implements AiWorld {
     if (egg) this.layEgg(a);
     // Nothing may eat a body that cannot yet move: the shell is protection until it is out of it.
     if (egg) a.spawnProtect = Math.max(a.spawnProtect, HATCH_TIME + 1.5);
-    this.events.push({ kind: egg ? 'hatch' : 'moult', pos: { ...a.pos }, actor: a.id, player: a.player, strength: egg ? 1 : 0.5 });
+    if (!egg) this.events.push({ kind: 'moult', pos: { ...a.pos }, actor: a.id, player: a.player, strength: 0.5 });
   }
 
   /**
@@ -2117,6 +2117,12 @@ export class Game implements AiWorld {
       // not a seed. A moult out of nothing (a respawn above the bottom rung) still swells from a
       // speck, which is what that second was always for.
       const inEgg = a.hatching && a.stateDur > 1.5;
+      if (inEgg) {
+        // Three soft pokes during Eggs' visible deformation phase build toward the seam giving.
+        for (const pokeAt of [HATCH_TIME * 0.2, HATCH_TIME * 0.32, HATCH_TIME * 0.43]) {
+          if (a.stateT - dt < pokeAt && a.stateT >= pokeAt) this.events.push({ kind: 'eggPoke', pos: { ...a.pos }, actor: a.id, player: a.player });
+        }
+      }
       const from = a.hatching ? to * (inEgg ? 0.62 : 0.3) : era ? era.from : tierScale(a.creature, Math.max(0, a.tier - 1));
       // Coming out of an egg, the animal is the size of what was in the egg until the shell starts
       // to give: the growth is what opens it, over the last third of the hold.
@@ -2130,7 +2136,10 @@ export class Game implements AiWorld {
         if (at) a.pos = { ...at };
         a.vel = v3(); a.yaw += Math.sin(a.stateT * 11) * 0.9 * dt; a.pitch = Math.sin(a.stateT * 7) * 0.12;
       }
-      if (a.stateT >= a.stateDur) { a.state = 'free'; a.stateT = 0; a.scale = to; applyScaleStats(a, true); a.hp = a.hpMax; a.hatching = false; this.eggAt.delete(a.id); }
+      if (a.stateT >= a.stateDur) {
+        if (inEgg) this.events.push({ kind: 'hatch', pos: { ...a.pos }, actor: a.id, player: a.player, strength: 1 });
+        a.state = 'free'; a.stateT = 0; a.scale = to; applyScaleStats(a, true); a.hp = a.hpMax; a.hatching = false; this.eggAt.delete(a.id);
+      }
     }
 
     // Snacks: swim-through consume

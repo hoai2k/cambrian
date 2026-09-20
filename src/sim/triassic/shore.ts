@@ -301,7 +301,7 @@ function bite(g: Game, ctx: HitContext, post: Post, a: Actor, target: Actor) {
     applyHit(ctx, a, target, { ...def.heavy, lunge: 0 }, 0.6);
     target.vel.z -= 4; target.vel.y += 1.5;                   // shoved off the bank, out to sea
   }
-  g.events.push({ kind: 'pounce', pos: { ...a.pos }, actor: a.id, other: target.id, player: target.player, strength: lengthOf(a) });
+  g.events.push({ kind: 'shoreStrike', pos: { ...a.pos }, actor: a.id, other: target.id, player: target.player, strength: lengthOf(a) });
 }
 
 /**
