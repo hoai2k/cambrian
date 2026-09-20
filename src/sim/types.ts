@@ -305,6 +305,6 @@ export const isCoop = (m: Mode) => COOP_MODES.includes(m);
 export interface Prompt { text: string; t: number; }
 
 export interface WorldEvent {
-  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate' | 'teleport' | 'gulp' | 'winded' | 'anoxia' | 'beach' | 'flop' | 'shoalJoin' | 'shellCrush' | 'breach' | 'splash' | 'hatch';
+  kind: 'hit' | 'kill' | 'eat' | 'tierUp' | 'parry' | 'guardBreak' | 'burst' | 'escape' | 'noticed' | 'hunted' | 'dodge' | 'ability' | 'grab' | 'moult' | 'death' | 'silt' | 'stagger' | 'sense' | 'pounce' | 'swallow' | 'routed' | 'disintegrate' | 'teleport' | 'gulp' | 'winded' | 'anoxia' | 'beach' | 'flop' | 'shoalJoin' | 'shellCrush' | 'breach' | 'splash' | 'eggPoke' | 'hatch' | 'shoreStrike';
   pos: Vec3; actor: number; other?: number; strength?: number; player?: number;
 }

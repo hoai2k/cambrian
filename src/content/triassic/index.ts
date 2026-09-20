@@ -98,7 +98,6 @@ export const TRIASSIC = defineEra({
     props: 'assets/triassic/props/', instancedScenery: TRIASSIC_SCENERY, biomes: 'assets/triassic/biomes/', ui: 'assets/ui/', sfx: 'assets/sfx/', music: 'music/',
     ...TRIASSIC_BRAND, modelStatus, modelNotes, clipNotes, modelBytes, standIns: TRIASSIC_STAND_INS, standInsPlayable: true,
   },
-  // No Triassic beds yet: the Devonian's open-water ambience and the shared drone stand in.
-  audio: { music: MUSIC, loops: { ambient: 'devonian/ambient-open-sea', drone: 'giant-drone' }, hugeLength: 10 },
+  audio: { music: MUSIC, loops: { ambient: 'triassic/ambient-lagoon', drone: 'triassic/basin-drone' }, hugeLength: 10 },
   presentation: { schemes: SCHEMES, creatureSchemes: CREATURE_SCHEMES, portraits: {}, authoredColors: { creatures: authoredCreatures, props: {} } },
 });

@@ -46,7 +46,7 @@ export const SAMPLES: Record<string, string[]> = {
   kill: ['kill'], death: ['death'], tierUp: ['tier-up'], hunted: ['hunted'], escape: ['escape'],
   sense: ['sense'], ability: ['ability'], heartbeat: ['heartbeat'], noticed: ['noticed'], respawn: ['respawn'],
   pounce: ['pounce'], swallow: ['swallow'], disintegrate: ['disintegrate'], routed: ['routed'],
-  flop: ['flop-1', 'flop-2'], hatch: ['egg-crack'],
+  flop: ['flop-1', 'flop-2'], eggPoke: ['egg-poke'], hatch: ['egg-crack'],
   sprint: ['sprint-loop-1', 'sprint-loop-2', 'sprint-loop-3'],
   'ui-move': ['ui-move'], 'ui-confirm': ['ui-confirm'], 'ui-back': ['ui-back'], 'ui-join': ['ui-join'], 'ui-start': ['ui-start'], won: ['won'],
   // A body coming down on the sand (src/sim/beach.ts): every era can land on its shore now, and
