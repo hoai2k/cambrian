@@ -94,6 +94,47 @@ def subject_bounds():
     return centre, size
 
 
+def posed_points():
+    """Every mesh vertex **as the armature has posed it**, in world space.
+
+    `subject_bounds` reads each object's own bounding box, which every camera in this pipeline is
+    framed on before a clip is applied; that is the right box for a review sheet, whose whole point
+    is that one camera holds still while the body moves inside it. A portrait shot from a posed
+    frame is the other case, and a box is no use for it twice over: it is the rest box rather than
+    the posed one, and even the posed box is a poor stand-in for a long thin animal bent into a
+    curve -- eight corners of it project to a rectangle far larger than the silhouette inside.
+    """
+    deps = bpy.context.evaluated_depsgraph_get()
+    points = []
+    for o in bpy.context.scene.objects:
+        if o.type != 'MESH':
+            continue
+        ev = o.evaluated_get(deps)
+        m = ev.matrix_world
+        points.extend(m @ v.co for v in ev.data.vertices)
+    return points
+
+
+def fit_ortho(loc, target, points, aspect, margin=1.14):
+    """Aim an orthographic camera at a cloud of points and fill the frame with it.
+
+    `ortho_scale` is the **wider** image dimension. The points are projected onto the camera's own
+    right and up axes, the view is slid (not re-aimed: `loc` and `target` move together, so the
+    direction and therefore the whole composition are untouched) until the silhouette is centred,
+    and the scale is whichever of width and height needs the room. The margin is the air round the
+    silhouette: the fit is exact, so a card set flush to it reads as cropped even when nothing is.
+    """
+    loc = Vector(loc)
+    q = (Vector(target) - loc).to_track_quat('-Z', 'Y')
+    right = q @ Vector((1, 0, 0))
+    up = q @ Vector((0, 1, 0))
+    xs = [(p - loc).dot(right) for p in points]
+    ys = [(p - loc).dot(up) for p in points]
+    shift = right * ((max(xs) + min(xs)) / 2) + up * ((max(ys) + min(ys)) / 2)
+    scale = max(max(xs) - min(xs), (max(ys) - min(ys)) * aspect) * margin
+    return tuple(loc + shift), tuple(Vector(target) + shift), scale
+
+
 def poser(scene, rig):
     def pose(clip, t):
         a = next(a for a in bpy.data.actions

@@ -79,7 +79,6 @@ export const GAMES: readonly GameLink[] = [
     art: 'assets/triassic/brand/title.webp', artWidth: 1536, artHeight: 1024,
     wordmark: 'assets/triassic/brand/logo-header.webp',
     when: '240 million years ago', tagline: 'Dive. Hunt. Grow. Hold.',
-    comingSoon: true,
   },
 ];
 

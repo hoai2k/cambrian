@@ -780,7 +780,7 @@ export const SHARED_STRINGS: GameStrings = {
     equivalentSizing: 'Equivalent sizing',
     equivalentSizingNote: 'Give every animal the same size, instead of its own. Takes effect next match.',
     shoreAnimals: 'Shore animals',
-    shoreAnimalsNote: 'Something stands at the water\'s edge now and then, and takes what holds still there. Off, the beach is empty. Takes effect next match.',
+    shoreAnimalsNote: 'Something stands at the water\'s edge now and then, and takes what holds still there. Off, the beach is empty.',
     footnote: 'Settings apply to every local player and are remembered on this device.',
   },
 

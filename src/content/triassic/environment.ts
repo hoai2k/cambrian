@@ -83,6 +83,26 @@ export const FLORA_DENSITY: Record<Biome, Partial<Record<FloraKind, number>>> = 
   basin: { mudRipple: 2, lilyColumn: 0.6, log: 0.3 },
 };
 /**
+ * The shore fringe: the only growth above the waterline in any era, and the Triassic's alone.
+ *
+ * The three land plants the era already has are a coastal gradient in their own right, so the
+ * bands are the plants (02-biomes-and-depth.md, research.md):
+ *
+ * - **Neocalamites**, the horsetail, stands in the water and in the wet sand at the very edge —
+ *   the one plant here that is happy with its feet wet, so its band crosses the waterline.
+ * - **Pleuromeia**, the lycopsid, is the Early Triassic's pioneer of bare salty coastal flats and
+ *   takes the strand behind it, where the tide reaches but does not stand.
+ * - **Bjuvia**, the bennettitalean, is the driest of the three and holds the back of the beach.
+ *
+ * Thin on purpose: the beach is a place a player arrives at by accident or is hunted on, not a
+ * second forest, and a fringe that hides the shore animals would spoil both.
+ */
+export const SHORE_FLORA: Partial<Record<FloraKind, { density: number; from: number; to: number }>> = {
+  neocalamites: { density: 3.2, from: 3, to: -9 },
+  pleuromeia: { density: 2.4, from: -6, to: -20 },
+  bjuvia: { density: 1.4, from: -15, to: -30 },
+};
+/**
  * Superseded by the scenery pack (`./scenery.ts`), which the era declares as `instancedScenery`
  * and which owns the complete mapping — including the kinds that are deliberately still
  * procedural. Kept empty and exported because the era shape still carries the field.

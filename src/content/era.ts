@@ -119,6 +119,19 @@ export interface EraDefinition {
      */
     readonly flora?: Record<Biome, Partial<Record<FloraKind, number>>>;
     /**
+     * The shore fringe: what grows on the *land*, inland of the waterline, where the main table
+     * places nothing at all (`generateChunk` skips everything inside `SHORE_WALL`). An era that
+     * declares none has a bare beach, which is what the Cambrian and the Devonian want — a sandy,
+     * rocky wasteland above the tide.
+     *
+     * Each kind names a band in `shoreDistance` (positive out to sea, negative inland) and a
+     * density on the same per-144-square-units scale as `flora`, so a plant can stand with its feet
+     * in the water (`from` positive), in the wrack line, or back in the dry sand — which is how a
+     * strip of coast reads as a gradient rather than a hedge. The bands are the plants' own
+     * tolerance of salt and wet, so they are a fact about the era's flora and belong here.
+     */
+    readonly shoreFlora?: Partial<Record<FloraKind, { density: number; from: number; to: number }>>;
+    /**
      * Authored geometry for a flora kind, by prop id under `assets.props`. A kind without one — or
      * whose file fails to load — keeps the procedural stand-in `src/render/sea.ts` builds for it,
      * so this can be filled in a kind at a time as art lands.

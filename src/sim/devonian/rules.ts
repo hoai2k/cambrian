@@ -340,12 +340,17 @@ export const DEVONIAN_RULES: EraRules = {
       // Somebody who came in on the top rung has already done this; the clock is not theirs to
       // run. Everyone else in the same sea keeps theirs and can still win it.
       if (a.carriedTop) { d.primeT = 0; continue; }
+      // Per seat and per animal, never per match: a bot has no seat to remember with, so the old
+      // whole-match latch is what holds one of those.
+      const pr = a.player >= 0 ? g.progress[a.player] : undefined;
+      const already = pr ? pr.apexDone.includes(a.creature) : g.endless;
       if (d.stage >= PRIME_STAGE && isAlive(a)) {
         d.primeT += dt;
-        if (d.primeT >= HOLD_TO_WIN && g.state.status === 'playing' && !g.endless) {
+        if (d.primeT >= HOLD_TO_WIN && g.state.status === 'playing' && !already) {
           const name = creature(a.creature).name;
           // The top rung of the record is banked by finishing, never by arriving.
           g.bankLadderTop(a);
+          pr?.apexDone.push(a.creature);
           g.state = { status: a.player >= 0 ? 'won' : 'lost', winner: a.player,
             message: a.player >= 0 ? `${name} grew up and held the sea.` : `A rival ${name} grew up first.` };
         }
@@ -353,9 +358,12 @@ export const DEVONIAN_RULES: EraRules = {
     }
   },
 
-  /** Rise wins on a held timer; zero it so play resumes with the sea open. */
-  continueMatch(g) {
-    for (const a of players(g)) devActor(g, a).primeT = 0;
+  /**
+   * Rise wins on a held timer; zero the *winner's* so play resumes with the sea open. Everyone
+   * else's clock is their own and keeps running — theirs is a separate apex, on their own animal.
+   */
+  continueMatch(g, winner) {
+    for (const a of players(g)) if (a.player === winner) devActor(g, a).primeT = 0;
   },
 
   /**

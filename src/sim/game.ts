@@ -16,7 +16,7 @@ import { emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type 
 import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, RISE_RATE, sampleCurrent, sampleHeight, shoreDistance, shoreZ, type StaticContact, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 import { areaProfile, bandScale, drawBand, headroom, PASSER_BY } from './population';
 import { columnY, DIP_CHANCE, DRIFT_CURRENT, driftRise, flipLaunch, FLIP_STAMINA, PULSE_CYCLE, pulseRefilling, pulseThrust, punting, rowWalkCurrent } from './locomotion';
-import { amphibious, ASHORE_WADE, ashoreInput, breathesAir, landSpeed, stepBeach, wadeAt, WALL_EASE, WALL_WADE, type BeachContext } from './beach';
+import { amphibious, ASHORE_WADE, ashoreInput, breathesAir, landSpeed, onFoot, stepBeach, wadeAt, WALL_EASE, WALL_WADE, type BeachContext } from './beach';
 import { TEXT } from '../shared/text';
 
 /** Everything the simulation says out loud; the words are in `src/content/strings.ts`. */
@@ -29,6 +29,14 @@ export interface PlayerProgress {
   flags: Set<string>;
   deaths: number;
   apexT: number;
+  /**
+   * The creatures this *seat* has already taken to Apex in this match, so a win is per player and
+   * per animal rather than per match. It used to be one latch on the whole game (`endless`), and
+   * that latch is why a second seat could never finish and why a player who carried on and grew a
+   * second animal to the top was never told. A seat standing at Apex on an animal already in here
+   * simply goes on swimming.
+   */
+  apexDone: CreatureId[];
   message: string;
 }
 
@@ -512,7 +520,7 @@ export class Game implements AiWorld {
       a.yaw = Math.PI;                                   // facing out to sea
       this.players.push(a);
       this.kept.push(new Map());
-      this.progress.push({ prompts: [], flags: new Set(), deaths: 0, apexT: 0, message: '' });
+      this.progress.push({ prompts: [], flags: new Set(), deaths: 0, apexT: 0, apexDone: [], message: '' });
       // Carrying a creature on part-grown skips the egg: that animal has already been through this.
       // So does a visitor, which did its growing up in another sea.
       if (carry === 0 && !s.visitorScale) hatchers.push(a);
@@ -860,10 +868,14 @@ export class Game implements AiWorld {
    */
   continueMatch(): boolean {
     if (this.state.status === 'playing' || !isCoop(this.mode)) return false;
+    const winner = this.state.winner;
     this.endless = true;
     this.state = { status: 'playing', winner: -1, message: '' };
-    for (const pr of this.progress) pr.apexT = 0;
-    RULES?.continueMatch(this);
+    // Only the seat that just finished. Zeroing every seat's clock was the bug a player saw as one
+    // player's apex resetting the other's: two animals grow up at their own pace and the second was
+    // sent back ninety seconds every time the first arrived.
+    if (winner >= 0 && this.progress[winner]) this.progress[winner].apexT = 0;
+    RULES?.continueMatch(this, winner);
     return true;
   }
 
@@ -1680,7 +1692,13 @@ export class Game implements AiWorld {
     // A face too steep to make any headway on is a contact as much as a wall is, and is climbed.
     const clear = floorClearance(a), px = a.pos.x, pz = a.pos.z;
     let floor = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + clear;
-    const stalled = this.followFloor(a, dt, floor, clear);
+    // A body on the beach's own terms walks up the slope rather than swimming up it, so the climb
+    // trade stands down (src/sim/beach.ts `onFoot`). It is a trade of travel for height, and on the
+    // last stretch of sand — where the floor rises into a ceiling that is not going anywhere — it
+    // spends a walker's whole step on height the beach rules then take back, which is what wedged
+    // a grown Nothosaurus sixteen units out and stopped it reaching the sand at all.
+    const walking = onFoot(a);
+    const stalled = walking ? -Infinity : this.followFloor(a, dt, floor, clear);
     if (a.pos.x !== px || a.pos.z !== pz) floor = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + clear;
     const leaning = controllable && mag > 0.35 && (contact.hit || floraHit.blocked || Number.isFinite(stalled));
     a.climbPush = leaning ? Math.min(1, a.climbPush + dt) : Math.max(0, a.climbPush - dt * 2);
@@ -1701,12 +1719,14 @@ export class Game implements AiWorld {
     } else {
       // Riding the floor: a swimmer skims the sand and is carried up and over rocks rather than
       // stopped by them, so the climb reads as a swim rather than a step.
-      const ceiling = swimCeiling(a);
+      // Out of the water the ceiling is the sky: a body already on the sand is not held under a
+      // waterline it is standing above.
+      const ceiling = a.ashore ? Infinity : swimCeiling(a);
       if (a.pos.y < floor) {
         const fell = a.vel.y;
         a.pos.y = floor; if (a.vel.y < 0) a.vel.y *= -0.2;
         // A leap that comes down on the sand lands there: the beach, not the splash.
-        if (a.airborne && floor > ceiling) {
+        if (a.airborne && floor > swimCeiling(a)) {
           a.airborne = false; a.vel.y = 0; a.vel.x *= 0.35; a.vel.z *= 0.35;
           // Far enough up the beach and it is ashore from this frame — the one way a swimmer
           // gets there (src/sim/beach.ts); short of that it is in the shallows and the water
@@ -1746,8 +1766,12 @@ export class Game implements AiWorld {
         } else {
           // The ceiling, unless the sand is higher: in water too shallow to be under, the body
           // sits on the sand with its back out of the water rather than being pressed into the
-          // beach, and the shore rules take it from there (src/sim/beach.ts).
-          a.pos.y = Math.min(a.pos.y, Math.max(ceiling, floor)); if (a.vel.y > 0) a.vel.y = 0;
+          // beach, and the shore rules take it from there (src/sim/beach.ts). Coming *down* to it
+          // is rate-limited by the pace the body could swim there under its own power, because a
+          // body leaving the sand is briefly above a ceiling that has just reappeared under it and
+          // must settle onto the water rather than be dropped onto it.
+          const cap = Math.max(ceiling, floor);
+          if (a.pos.y > cap) { a.pos.y = Math.max(cap, a.pos.y - Math.max(climbRise(a), 2) * dt); if (a.vel.y > 0) a.vel.y = 0; }
         }
       }
       stepBeach(this.beachCtx, a, input, dt, floor, controllable, mag);
@@ -2351,6 +2375,21 @@ export class Game implements AiWorld {
    * measures how far along the line a body sits and how far off it, and takes the nearest thing
    * inside a corridor rather than a wedge.
    */
+  /**
+   * Whether picking `o` for `a` would be *handing* one player to another.
+   *
+   * Another player is never chosen for you — that is what keeps turning on a friend deliberate —
+   * but a target you are holding the crosshair on is not being chosen for you, it is the choice.
+   * So a player the aiming player has actually locked onto is allowed through every automatic
+   * pick: the charge, the grip, the bite's own nudge and the lunge. Without this a player could
+   * aim squarely at another and find that nothing at all would take, which read as the grab button
+   * being broken rather than as a rule.
+   */
+  private handedOver(a: Actor, o: Actor): boolean {
+    if (o.controller !== 'player' || a.controller !== 'player') return false;
+    return !(a.aiming && a.lockTarget === o.id);
+  }
+
   private chargeTarget(a: Actor): Actor | undefined {
     const L = lengthOf(a);
     const line = len3(a.vel) > 1 ? norm(a.vel) : heading(a.yaw);
@@ -2358,8 +2397,9 @@ export class Game implements AiWorld {
     let best: Actor | undefined, bd = Infinity;
     for (const o of this.nearby(a.pos, reach)) {
       if (o.id === a.id || !isAlive(o) || isHidden(o)) continue;
-      // Another player is never chosen for you, charging or not: turning on one stays deliberate.
-      if (o.controller === 'player' && a.controller === 'player') continue;
+      // Another player is never chosen for you, charging or not: turning on one stays deliberate —
+      // and aiming at one *is* deliberate (`handedOver`).
+      if (this.handedOver(a, o)) continue;
       if (bandOf(a, o) === 'giant') continue;
       const to = sub(o.pos, a.pos), along = dot(to, line);
       if (along < 0 || along > reach) continue;
@@ -2410,8 +2450,9 @@ export class Game implements AiWorld {
     for (const o of this.nearby(a.pos, reach + L * 2)) {
       if (o.id === a.id || !isAlive(o) || isHidden(o) || isInvulnerable(o)) continue;
       if (o.state === 'grabbed' || o.state === 'swallowed' || o.riddenBy >= 0 || o.rideHost >= 0) continue;
-      // Whoever you take hold of stays your decision, exactly as it is for the bite's own aim.
-      if (o.controller === 'player' && a.controller === 'player') continue;
+      // Whoever you take hold of stays your decision, exactly as it is for the bite's own aim —
+      // and aiming at another player is that decision, so hold RT on one and it takes.
+      if (this.handedOver(a, o)) continue;
       // To the body, not to a ball around its middle: pressed against a giant's tail you are ten
       // units from its centre and touching it, and the old test called that out of reach.
       const gap = bodyGap(o, a);
@@ -2500,7 +2541,7 @@ export class Game implements AiWorld {
     let best: Actor | undefined, bd = Infinity;
     for (const o of this.nearby(a.pos, reach)) {
       if (o.id === a.id || !isAlive(o) || isHidden(o)) continue;
-      if (o.controller === 'player' && a.controller === 'player') continue;
+      if (this.handedOver(a, o)) continue;
       const to = sub(o.pos, a.pos), d = len3(to);
       if (d > reach) continue;
       // The cone is measured in the yaw plane. Against the full 3-D heading it narrowed with
@@ -2534,9 +2575,9 @@ export class Game implements AiWorld {
     const sweep = this.pounceRange(a) + lengthOf(a) * 4 + (grabbing ? GRAB_SWEEP : 0);
     for (const o of this.nearby(a.pos, sweep)) {
       if (o.id === a.id || !isAlive(o) || isHidden(o)) continue;
-      // Another player is never chosen for you. Turning on one is deliberate: lock onto them
-      // with the right stick, or simply bite what is in front of your mouth.
-      if (o.controller === 'player' && a.controller === 'player') continue;
+      // Another player is never chosen for you. Turning on one is deliberate: aim at them, or
+      // simply bite what is in front of your mouth.
+      if (this.handedOver(a, o)) continue;
       const band = bandOf(a, o);
       // A lunge that means to take hold is allowed to pick something enormous — that is the only
       // thing it *can* usefully do with one — where a lunge that means to bite is not.
@@ -2644,8 +2685,8 @@ export class Game implements AiWorld {
     const held = a.lockTarget >= 0 ? this.idMap.get(a.lockTarget) : undefined;
     const usable = (o: Actor | undefined): o is Actor => !!o && isAlive(o) && !isHidden(o)
       && o.riddenBy < 0 && o.rideHost < 0 && o.state !== 'grabbed'
-      && (bandOf(a, o) === 'threat' || bandOf(a, o) === 'giant')
-      && !(o.controller === 'player' && a.controller === 'player');
+      && (bandOf(a, o) === 'threat' || bandOf(a, o) === 'giant' || (a.aiming && a.lockTarget === o.id))
+      && !this.handedOver(a, o);
     const t = usable(held) ? held : this.pounceTargetAhead(a, true);
     if (!usable(t)) return false;
     // Setting out costs; carrying on does not. The swim is one act however far it turns out to be,
@@ -3381,8 +3422,9 @@ export class Game implements AiWorld {
           if (p.carriedTop) { pr.apexT = 0; return; }
           if (p.tier >= 4 && isAlive(p)) {
             pr.apexT += dt;
-            if (pr.apexT > APEX_HOLD_SECONDS && this.state.status === 'playing' && !this.endless) {
+            if (pr.apexT > APEX_HOLD_SECONDS && this.state.status === 'playing' && !pr.apexDone.includes(p.creature)) {
               this.bankLadderTop(p);
+              pr.apexDone.push(p.creature);
               this.state = { status: 'won', winner: i, message: SAY.match.rulesTheReef(creature(p.creature).name) };
             }
           } else pr.apexT = 0;

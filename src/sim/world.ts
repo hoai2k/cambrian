@@ -365,6 +365,15 @@ const density: Record<Biome, Partial<Record<FloraKind, number>>> = ACTIVE_ERA.en
 /** Every kind the table in use places, in first-seen order (the order the placement RNG is consumed in). */
 const KINDS: FloraKind[] = [];
 for (const b of BIOMES) for (const k of Object.keys(density[b]) as FloraKind[]) if (!KINDS.includes(k)) KINDS.push(k);
+/**
+ * The shore fringe: what grows on the sand, inland of everything the biome table places. An era
+ * that declares none keeps a bare beach.
+ */
+const SHORE_FLORA = ACTIVE_ERA.environment.shoreFlora;
+const SHORE_KINDS: FloraKind[] = SHORE_FLORA ? (Object.keys(SHORE_FLORA) as FloraKind[]) : [];
+/** How many columns a chunk's width is cut into to follow the coastline across it. */
+const FRINGE_COLUMNS = 8;
+
 const w2: BiomeWeights = { ...scratchW };
 
 // ---------------------------------------------------------------------------------------------
@@ -593,6 +602,51 @@ export function generateChunk(seed: number, cx: number, cz: number, detail: 'ful
         }
       }
     }
+
+  /**
+   * The shore fringe. Everything above places by biome and stops at the waterline; this places by
+   * *distance from it*, on the land, where there is no biome to blend. The coastline wanders across
+   * a chunk, so the strip is followed column by column and each column contributes the plants for
+   * the part of its band that actually falls inside this chunk — which is what keeps the fringe an
+   * even line rather than thinning wherever a chunk boundary crosses it.
+   */
+  if (SHORE_KINDS.length) {
+    const colW = CHUNK / FRINGE_COLUMNS;
+    // The coastline once per column rather than once per column per kind: `shoreZ` is noise and
+    // this runs for every chunk the streamer builds, most of them nowhere near the shore.
+    const colZ: number[] = [];
+    for (let c = 0; c < FRINGE_COLUMNS; c++) colZ.push(shoreZ(x0 + c * colW + colW / 2));
+    for (const kind of SHORE_KINDS) {
+      const band = SHORE_FLORA![kind]!;
+      for (let c = 0; c < FRINGE_COLUMNS; c++) {
+        const cx0 = x0 + c * colW, sz = colZ[c];
+        // The band in world z, clipped to this chunk. `from` is the seaward edge (larger
+        // `shoreDistance`), `to` the inland one, so seaward is the *smaller* z.
+        const lo = Math.max(z0, sz - band.from), hi = Math.min(z0 + CHUNK, sz - band.to);
+        if (hi <= lo) continue;
+        const expected = band.density * (colW * (hi - lo)) / 144;
+        const n = Math.floor(expected) + (rng() < expected - Math.floor(expected) ? 1 : 0);
+        for (let i = 0; i < n; i++) {
+          // How many to place comes off the column's middle; *where* comes off the coastline at
+          // the plant's own x, because a band a few units deep is narrower than the wander of the
+          // shore across a column and a plant seated on the column's average lands outside its own
+          // band. Clipped again to this chunk, since that is what moved it.
+          const x = cx0 + rng() * colW, sx = shoreZ(x);
+          const zlo = Math.max(z0, sx - band.from), zhi = Math.min(z0 + CHUNK, sx - band.to);
+          if (zhi <= zlo) continue;
+          const z = zlo + rng() * (zhi - zlo);
+          if (mark && Math.hypot(x - mark.pos.x, z - mark.pos.z) < mark.radius) continue;
+          let blocked = false;
+          for (const b of boulders) if (Math.hypot(x - b.pos.x, z - b.pos.z) < b.radius + 0.4) { blocked = true; break; }
+          if (blocked) continue;
+          const scale = 0.6 + rng() * 0.9;
+          const sy = scale * (0.85 + rng() * 0.4);
+          const y = sampleHeight(x, z) - 0.03;
+          flora.push({ pos: { x, y, z }, kind, scale, sy, rot: rng() * TAU, shade: 0.7 + rng() * 0.28, ...floraSize(kind, scale, sy), bx: 0, bz: 0, bvx: 0, bvz: 0, active: false });
+        }
+      }
+    }
+  }
 
   // Plankton blooms up in the light window; thick over the shallows, thin over the basin.
   const bloomChance = 0.28 + cw.shallows * 0.5 + cw.nursery * 0.2 - cw.basin * 0.2;

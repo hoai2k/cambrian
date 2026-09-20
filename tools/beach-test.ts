@@ -22,9 +22,10 @@ const { isAlive, lengthOf, bodyRadius, swimCeiling } = await import('../src/sim/
 const { creature } = await import('../src/sim/creatures');
 const { sampleHeight, shoreZ, shoreDistance, SURFACE_Y, SHORE_WALL, LAND_REACH, generateChunk, chunkCoord } = await import('../src/sim/world');
 const beach = await import('../src/sim/beach');
-const { STRAND_BREATH, ASHORE_WADE, wadeAt, landSpeed, breathesAir, amphibious, FLOP_PERIOD } = beach;
+const { STRAND_BREATH, ASHORE_WADE, WALL_WADE, wadeAt, landSpeed, breathesAir, amphibious, FLOP_PERIOD, JUMP_STAMINA } = beach;
 type CreatureId = import('../src/sim/creatures').CreatureId;
 type InputFrame = import('../src/sim/types').InputFrame;
+type WorldEvent = import('../src/sim/types').WorldEvent;
 type G = InstanceType<typeof Game>;
 
 const DT = 1 / 60;
@@ -140,22 +141,50 @@ if (!breathesAir(swimmerId())) {
   const worst = maxStep(g, p, 12, shoreward);
   const s = shoreDistance(p.pos.x, p.pos.z);
   assert(s >= SHORE_WALL + r * 3 - 0.5, `a swimmer driving at the beach is held at the wall (s=${s.toFixed(1)}, wall ${(SHORE_WALL + r * 3).toFixed(1)})`);
-  assert(!p.ashore && p.wade < ASHORE_WADE, `and never gets onto the sand that way (wade ${p.wade.toFixed(2)})`);
+  // `ashore` is the rule and the wade is only the ramp up to it. A fish that noses into water a
+  // little shallower than its own draught is wallowing in the shallows, which is a real thing for
+  // a fish to be doing and is where the shore animals hunt; what it is not is *on the beach*, and
+  // that is what nothing may reach by swimming. The draught wall (`WALL_WADE`, seven tenths of the
+  // water it needs) is what stops it going further.
+  assert(!p.ashore, `and never gets onto the sand that way (wade ${p.wade.toFixed(2)}, ashore ${p.ashore})`);
+  assert(p.wade <= WALL_WADE + 0.08, `the draught wall is what holds it (wade ${p.wade.toFixed(2)}, wall ${WALL_WADE.toFixed(2)})`);
   assert(worst < lengthOf(p), `no step of it teleports (worst ${worst.toFixed(2)})`);
   pass('the shore wall holds a swimmer');
 }
 
-// ---- the land is bare: nothing grows or stands on the beach ----
+// ---- what stands on the beach is the era's shore fringe and nothing else ----
 {
+  const fringe = (await import('../src/content')).ACTIVE_ERA.environment.shoreFlora;
   const cx = chunkCoord(0), cz = chunkCoord(shoreZ(0) + 10);
-  let inland = 0, total = 0;
-  for (const dz of [-1, 0, 1]) {
+  let strays = 0, fringed = 0, rocks = 0, total = 0;
+  const seen = new Map<string, number>();
+  for (const dz of [-2, -1, 0, 1]) {
     const c = generateChunk(5052026, cx, cz + dz);
-    for (const f of c.flora) { total++; if (shoreDistance(f.pos.x, f.pos.z) < SHORE_WALL) inland++; }
-    for (const b of c.boulders) { total++; if (shoreDistance(b.pos.x, b.pos.z) < SHORE_WALL) inland++; }
+    for (const f of c.flora) {
+      total++;
+      const s = shoreDistance(f.pos.x, f.pos.z);
+      if (s >= SHORE_WALL) continue;
+      const band = fringe?.[f.kind];
+      // Inside its own declared band, or it has no business being on the sand at all. The margin
+      // is the cell the plant was placed in rather than a tolerance: the bands are exact.
+      if (band && s <= band.from + 1e-6 && s >= band.to - 1e-6) { fringed++; seen.set(f.kind as string, (seen.get(f.kind as string) ?? 0) + 1); }
+      else strays++;
+    }
+    // Rock is the sea's business in every era: nothing rolls up the beach.
+    for (const b of c.boulders) { total++; if (shoreDistance(b.pos.x, b.pos.z) < SHORE_WALL) rocks++; }
   }
-  assert.equal(inland, 0, `nothing is placed on the beach (${inland} of ${total})`);
-  pass('the beach is a wasteland: sand, and whatever the sea throws onto it');
+  assert.equal(strays, 0, `nothing grows on the beach that the era did not put there (${strays} strays of ${total})`);
+  assert.equal(rocks, 0, `and no boulder is inland of the wall (${rocks})`);
+  if (!fringe) {
+    assert.equal(fringed, 0, 'this era declares no shore fringe, so its beach is bare');
+    pass('the beach is a wasteland: sand, and whatever the sea throws onto it');
+  } else {
+    // Every kind the era declares actually reaches the sand. A band that never produces anything
+    // is a plant nobody will ever see, which is the failure this catches.
+    for (const kind of Object.keys(fringe)) assert((seen.get(kind) ?? 0) > 0, `${kind} grows on this beach`);
+    assert(fringed > 0, `the shore fringe is planted (${fringed} plants over four chunks of coast)`);
+    pass(`the beach carries its shore fringe: ${[...seen].map(([k, n]) => `${k} ${n}`).join(', ')}`);
+  }
 }
 
 // ---- a real leap: a hard dash up at the surface near the shore carries a body onto the sand ----
@@ -257,6 +286,138 @@ for (const id of walkers) {
   assert(p.pos.y <= swimCeiling(p) + 0.01, 'and is under it');
   assert(worst < Math.max(0.5, L * 0.25), `without a jump on the way (worst ${worst.toFixed(3)})`);
   pass(`${id}: swim → walk up the beach (${vWater.toFixed(1)} → ${vSand.toFixed(1)} u/s) → slide back in`);
+}
+
+// ---- a grown walker gets up the beach anywhere along the coast, swimming at it ----
+//
+// The regression this is here for: a full-grown body stalled sixteen units out and never reached
+// the sand at all. Two things wedged it. The wade began exactly where the body stopped fitting, so
+// the floor and the swim ceiling closed on it before the beach rules engaged and `followFloor`
+// spent its whole step trading travel for height; and the substrate carpets that thicken toward
+// the shore — salt crust, shell pavement — never bend, so they resisted in full and killed its
+// inward speed every step. A ten-centimetre crust stopped a ten-metre animal.
+for (const id of walkers) {
+  const reached: string[] = [], failed: string[] = [];
+  for (const x of [0, 60, 120, 180, 240, 300, 360, 420]) {
+    const { g, p } = fresh(id);
+    place(g, p, 40, x);
+    p.yaw = 0; p.prevT.yaw = 0;
+    let t = 0;
+    for (let i = 0; i < 60 * 40 && !p.ashore; i++) { g.step(DT, new Map([[0, shoreward]])); g.events.length = 0; t = i / 60; }
+    (p.ashore ? reached : failed).push(p.ashore ? `${x}:${t.toFixed(0)}s` : `${x}:s=${shoreDistance(p.pos.x, p.pos.z).toFixed(0)}`);
+  }
+  assert.equal(failed.length, 0, `a grown ${id} reaches the sand from open water everywhere along the coast (stuck at ${failed.join(' ')})`);
+  pass(`${id} walked up the beach at all eight places (${reached.join(' ')})`);
+}
+
+// ---- substrate is not a wall ----
+{
+  // Every non-bending kind is a carpet on the seabed rather than something standing in it, and a
+  // body riding higher than the carpet is tall goes over it. Without that they resist in full,
+  // because `resist` takes its discount from *bending* and a mineral kind has none to give.
+  const { FLORA_PHYS } = await import('../src/sim/flora');
+  const { floorClearance } = await import('../src/sim/actors');
+  const mineral = (Object.keys(FLORA_PHYS) as (keyof typeof FLORA_PHYS)[]).filter((k) => FLORA_PHYS[k].maxLean <= 0);
+  assert(mineral.length > 0, 'there are non-bending kinds to reason about');
+  assert(mineral.every((k) => FLORA_PHYS[k].h < 0.4), 'every non-bending kind anywhere is a carpet rather than a wall');
+  // Only the ones this era actually scatters: the claim is about the sea a player is in, and the
+  // Devonian's biggest swimmer is smaller than a kind it never places.
+  const table = (await import('../src/content')).ACTIVE_ERA.environment.flora;
+  const here = table ? mineral.filter((k) => Object.values(table).some((b) => (b as Record<string, number>)[k] > 0)) : [];
+  const tallest = here.length ? Math.max(...here.map((k) => FLORA_PHYS[k].h)) : 0;
+  if (!here.length) pass(`this era scatters no substrate carpet, and the ${mineral.length} that exist are all under 0.4 tall`);
+  else {
+    // The rule is the body's own riding height against the carpet's height, so it stays size-
+    // relative: a grown animal goes over a shell pavement, a hatchling still bumps into one, and
+    // neither is a special case.
+    const { p } = fresh(swimmerId());
+    const hatchling = floorClearance(p);
+    p.scale = 1;
+    const grown = floorClearance(p);
+    assert(grown > tallest, `a grown body rides higher than this era's tallest carpet (${grown.toFixed(2)} over ${tallest.toFixed(2)}), so it goes over it`);
+    assert(hatchling < tallest, `a hatchling does not (${hatchling.toFixed(2)}), so the carpet is still furniture to something small enough`);
+    pass(`${here.length} substrate carpets here, under ${tallest.toFixed(2)} tall: ridden over at ${grown.toFixed(2)} clearance, met at ${hatchling.toFixed(2)}`);
+  }
+}
+
+// ---- the dash on the sand is a hop: a jump for legs, a harder flip for a fish ----
+for (const id of (walkers.length ? [walkers[0]] : [])) {
+  const { g, p } = fresh(id);
+  // Put it on the sand and let it settle.
+  place(g, p, 40);
+  p.yaw = 0; p.prevT.yaw = 0;
+  for (let i = 0; i < 60 * 40 && !p.ashore; i++) { g.step(DT, new Map([[0, shoreward]])); g.events.length = 0; }
+  assert(p.ashore, `${id} is on the sand to jump from`);
+  // Well up the beach rather than on the line it happens to have arrived on, so neither leg of the
+  // comparison spends its time crossing back over the threshold.
+  run(g, 5, shoreward);
+  assert(p.ashore && p.wade > ASHORE_WADE + 0.1, `${id} is properly ashore (wade ${p.wade.toFixed(2)})`);
+  // The same four seconds along the same beach from the same standing start, walked and bounded,
+  // so the two are actually comparable: measured one after the other they were measured at
+  // different places on the ramp, where the walk is slowed by different amounts.
+  const saved = { pos: { ...p.pos }, yaw: p.yaw, stamina: p.staminaMax };
+  const restore = () => { p.pos = { ...saved.pos }; p.prevT.x = saved.pos.x; p.prevT.y = saved.pos.y; p.prevT.z = saved.pos.z; p.yaw = saved.yaw; p.vel = { x: 0, y: 0, z: 0 }; p.stamina = saved.stamina; p.flopT = 0; };
+  restore();
+  run(g, 4, alongshore);
+  const walked = Math.hypot(p.pos.x - saved.pos.x, p.pos.z - saved.pos.z);
+  restore();
+  let top = 0, hops = 0, wasHop = false;
+  run(g, 4, drive(1, 0, { dash: true }), () => {
+    top = Math.max(top, p.pos.y - sampleHeight(p.pos.x, p.pos.z));
+    const hop = p.flopT > 0; if (hop && !wasHop) hops++; wasHop = hop;
+  });
+  const bounded = Math.hypot(p.pos.x - saved.pos.x, p.pos.z - saved.pos.z);
+  assert(hops >= 2, `holding the dash bounds it along the beach again and again (${hops} jumps in four seconds)`);
+  assert(bounded > walked * 1.25, `and covers more ground than the walk (${bounded.toFixed(1)} against ${walked.toFixed(1)} units, ${hops} jumps, stamina ${p.stamina.toFixed(0)}/${p.staminaMax})`);
+  assert(top > 0, `each jump leaves the sand (${top.toFixed(2)} up at the top)`);
+  /*
+   * What a bound costs, and where that cost can be seen.
+   *
+   * Not in the run above: an air-breather ashore is *at the surface* by definition, and both eras
+   * that have walkers refill the bar there every step (the Devonian's `up` in its own rules, which
+   * counts a beached body, and the Triassic's lung). So the throw takes its `JUMP_STAMINA` and the
+   * era hands it straight back, the bar never visibly dips, and four seconds of bounding ends at
+   * full — which is the mechanic working rather than failing, because bounding is meant to be the
+   * land gait rather than a sprint.
+   *
+   * What the price actually is, then, is a *gate*: a body with nothing left cannot throw. Asked
+   * through `g.step` that is unanswerable, because the refill runs before the beach does; asked of
+   * `stepBeach` directly it is exactly the rule.
+   */
+  restore();
+  const ctx = { events: [] as WorldEvent[], hitCtx: (g as unknown as { hitCtx: Parameters<typeof beach.stepBeach>[0]['hitCtx'] }).hitCtx };
+  const throwOne = (stamina: number) => {
+    p.flopT = 0; p.stamina = stamina;
+    beach.stepBeach(ctx, p, drive(1, 0, { dash: true }), DT, sampleHeight(p.pos.x, p.pos.z), true, 1);
+    return p.flopT > 0;
+  };
+  assert(!throwOne(JUMP_STAMINA * 0.5), `a body with less than one jump in hand (${(JUMP_STAMINA * 0.5).toFixed(1)} of ${JUMP_STAMINA}) cannot throw one`);
+  assert(throwOne(JUMP_STAMINA) && p.stamina < JUMP_STAMINA, 'and one with exactly enough throws it and spends it');
+  p.flopT = 0;
+  pass(`${id} bounds the beach: ${hops} jumps, ${bounded.toFixed(1)} units against a walk's ${walked.toFixed(1)}`);
+}
+
+// ---- a stranded fish's dash is a harder flip than a nudge of the stick ----
+if (!breathesAir(swimmerId())) {
+  const strand = () => {
+    const { g, p } = fresh(swimmerId());
+    place(g, p, -8);
+    p.pos.y = SURFACE_Y + 4; p.prevT.y = p.pos.y; p.airborne = true;
+    run(g, 3);
+    assert(p.ashore, 'stranded on the sand');
+    return { g, p };
+  };
+  const travel = (input: InputFrame) => {
+    const { g, p } = strand();
+    const z0 = p.pos.z;
+    run(g, FLOP_PERIOD * 4, input);
+    return z0 - p.pos.z;                                   // units gained toward the sea
+  };
+  const nudged = travel(seaward);
+  const dashed = travel(drive(0, -1, { dash: true }));
+  assert(nudged > 0 && dashed > nudged * 1.2,
+    `a flip thrown by the dash carries further than one the stick merely asked for (${dashed.toFixed(2)} against ${nudged.toFixed(2)})`);
+  pass(`the dash is the fish's flip: ${dashed.toFixed(1)} units against the stick's ${nudged.toFixed(1)}`);
 }
 
 // ---- the Triassic lung fills on the sand, as it does at the surface ----

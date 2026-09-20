@@ -906,17 +906,26 @@ export class Engine {
     for (const o of this.game.nearby(p.pos, range)) {
       if (o.id === p.id || !isAlive(o) || isHidden(o)) continue;
       const band = bandOf(p, o);
-      if (band === 'giant' || band === 'threat') continue;
-      // Another player can be aimed at, but never handed to you: the entry snap ignores them and
-      // the crosshair has to be genuinely on one for it to take.
+      // Anything the crosshair is over. The threat and giant bands used to be skipped outright,
+      // which meant a player holding the crosshair squarely on something their own size or larger
+      // was told there was nothing there — and what you do about a big animal (ride it, take hold
+      // of it, pounce at it) is exactly what aiming is for.
+      //
+      // Another player can be aimed at, but never *handed* to you: the entry snap, which happens
+      // on the frame aim mode comes on and picks a target without the player having pointed at
+      // anything, ignores them. Once the crosshair is being held, it is being held on purpose.
       const rival = o.controller === 'player';
-      if (rival && !wasAiming) continue;
+      const entrySnap = aiming && !wasAiming && !cursor;
+      if (rival && entrySnap) continue;
       const to = this.tmpDesired.set(o.pos.x - cs.camera.position.x, o.pos.y - cs.camera.position.y, o.pos.z - cs.camera.position.z);
       const d = to.length(); if (d < 0.01) continue;
       to.divideScalar(d);
       // angular distance from the crosshair, widened slightly for close/large targets
       const ang = Math.acos(clamp(fwd.dot(to), -1, 1)) - Math.min(0.08, lengthOf(o) * 0.5 / d);
-      const bandW = rival ? 2.4 : band === 'prey' ? 0.85 : band === 'snack' ? 1 : 1.25;
+      // The entry snap is the game choosing for you, so it leans toward what you probably meant:
+      // food ahead of a fight, and never another player. A crosshair being held is not choosing for
+      // you at all, so it ranks on pure angle — whatever is nearest the point of the cursor.
+      const bandW = entrySnap ? (rival ? 2.4 : band === 'prey' ? 0.85 : band === 'snack' ? 1 : 1.25) : 1;
       if (ang * bandW < bestAng) { bestAng = ang * bandW; best = o; }
     }
     // A cursor gets one cone and no snap: the player is already pointing, and easing the camera
