@@ -217,6 +217,29 @@ export const AIM_CLOSER = 0.42, AIM_SHOULDER = 0.75;
  * straight back and the drag would have been pointless.
  */
 const FOLLOW_RATE = 1.6, FOLLOW_HOLD = 1.2;
+/**
+ * The cursor's *height* nudges the camera's pitch, in mouse play.
+ *
+ * A mouse has one hand and two jobs — point at an animal, and look where you are going — and with
+ * the pointer free the second one only happened on a drag. So the top and bottom of the screen
+ * steer: carry the cursor up and the view tilts up with it, carry it down and it tilts down, and
+ * the middle `EDGE_DEAD` of the screen does nothing at all, which is the band a player aims in.
+ * That is the whole trade — the dead zone is what keeps pointing and looking from being the same
+ * gesture — so it is generous, and the push ramps in from its edge rather than starting at full
+ * rate, so there is no line the view jumps at.
+ *
+ * It is a *rate*, not a position: holding the cursor near the top keeps tilting, the way an
+ * edge-scroll does, because a screen's top edge is not a camera angle and cannot be mapped to one.
+ */
+const EDGE_DEAD = 0.38, EDGE_RATE = 0.85;
+/** Radians per second of pitch the cursor at `ndcY` is asking for. Positive tilts the view down. */
+export function edgePitch(ndcY: number): number {
+  const over = Math.abs(ndcY) - EDGE_DEAD;
+  if (over <= 0) return 0;
+  const k = Math.min(1, over / (1 - EDGE_DEAD));
+  // Squared, so the first part of the push past the dead zone is gentle and the corner is quick.
+  return -Math.sign(ndcY) * k * k * EDGE_RATE;
+}
 /** How much a body inside the near field outranks one the same apparent size further off. */
 const NEAR_RANK = 3;
 /** 1 at a full-width view, falling off for a narrow one; never less than a third of the shift. */
@@ -596,11 +619,18 @@ export class Engine {
             // `FOLLOW_HOLD` after a drag so a player who has just looked somewhere on purpose is
             // not immediately turned away from it.
             if (this.mouseLook && p) {
+              // The cursor's height is a second way of aiming the view, and it is *asking* for
+              // something just as a drag is — so it holds the follow off while it pushes, or the
+              // two would pull against each other and the pitch would sit wherever they balanced.
+              const edge = this.mouseFrame?.ndc && !this.mouseFrame.dragging ? edgePitch(this.mouseFrame.ndc.y) : 0;
+              if (edge !== 0) cs.pitch = clamp(cs.pitch + edge * dt, PITCH_UP, PITCH_DOWN);
               if (this.mouseFrame?.dragging || Math.abs(c.lookX) > 0.05 || Math.abs(c.lookY) > 0.05) cs.followHold = FOLLOW_HOLD;
               else cs.followHold = Math.max(0, cs.followHold - dt);
               if (cs.followHold === 0 && cs.climbHold === 0) {
                 cs.yaw = wrapAngle(cs.yaw + wrapAngle(p.yaw - cs.yaw) * (1 - Math.exp(-FOLLOW_RATE * dt)));
-                cs.pitch = damp(cs.pitch, 0.2, FOLLOW_RATE * 0.5, dt);
+                // The pitch only settles back while the cursor is in the dead zone: the follow is
+                // what a view does when nobody is asking, and the cursor up there is an ask.
+                if (edge === 0) cs.pitch = damp(cs.pitch, 0.2, FOLLOW_RATE * 0.5, dt);
               }
             }
           }
