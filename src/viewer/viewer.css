@@ -286,8 +286,9 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
  * a pointer event — the brush listens on the canvas underneath, and the orbit still owns the
  * right button — so the overlay is inert and only the panel in the info column is interactive.
  */
-.viewer.marking .stage { grid-row: 1 / 3; }
-.viewer.marking .clips, .viewer.marking .info { display: none; }
+.viewer.marking .stage, .viewer.mouthing .stage { grid-row: 1 / 3; }
+.viewer.marking .clips, .viewer.marking .info,
+.viewer.mouthing .clips, .viewer.mouthing .info { display: none; }
 .mark-stage { grid-column: 2; grid-row: 1 / 3; position: relative; z-index: 5; min-width: 0; min-height: 0; pointer-events: none; }
 .mark-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .mark-label { position: absolute; left: 10px; top: 8px; z-index: 2; font: 700 10px var(--font-display); letter-spacing: .14em; color: var(--dim); text-transform: uppercase; }
@@ -303,6 +304,22 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .mark-note textarea { width: 100%; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: rgba(6, 22, 28, .72); color: var(--foam); font: 400 12px var(--font-body); resize: vertical; }
 .mark-panel code { font-size: 11px; color: var(--lagoon); overflow-wrap: anywhere; }
 @media (max-width: 900px) {
-  .viewer.marking .stage, .mark-stage { grid-column: 1; grid-row: 2 / 4; }
-  .mark-panel { grid-column: 2; grid-row: 2 / 4; }
+  .viewer.marking .stage, .viewer.mouthing .stage, .mark-stage { grid-column: 1; grid-row: 2 / 4; }
+  .mark-panel, .mouth-panel { grid-column: 2; grid-row: 2 / 4; }
 }
+
+/* ---------- mouth mode ----------
+ * The same layout as mark mode: the handles live in the scene and listen on the canvas, so this
+ * layer is inert — only the legend along the top edge and the panel in the info column draw.
+ * The legend's swatches are the handles' own colours, so a reviewer knows which sphere is which.
+ */
+.mouth-legend { position: absolute; left: 10px; top: 26px; z-index: 2; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; font: 600 10px var(--font-body); letter-spacing: .04em; color: var(--dim); }
+.mouth-legend li { display: flex; align-items: center; gap: 6px; }
+.mouth-legend li.hover { color: var(--foam); }
+.mouth-legend i { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
+.mouth-legend .hinge i { background: var(--ember); }
+.mouth-legend .front i { background: var(--lagoon); }
+.mouth-legend .side i { background: #ff2fa8; }
+.mouth-panel .mouth-count { margin: 0; font: 700 14px var(--font-body); color: var(--foam); font-variant-numeric: tabular-nums; }
+.mouth-fields { padding-top: 4px; }
+.mouth-panel code { font-size: 11px; color: var(--lagoon); overflow-wrap: anywhere; }
