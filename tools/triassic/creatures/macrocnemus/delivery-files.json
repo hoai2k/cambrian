@@ -1,55 +1,59 @@
 {
   "macrocnemus.card.png": {
-    "bytes": 204933,
-    "sha256": "9cd97aa4224b7cbb24f6b54c001811b7c7b63b71981c79ffe0ffcbcba356b31e",
+    "bytes": 205376,
+    "sha256": "c99c9b86a9732fecbb575d4b79e0fe13133bfc86dfb8fa24d245a8c593361214",
     "dimensions": [
       800,
       600
     ]
   },
   "macrocnemus.glb": {
-    "bytes": 2004572,
-    "sha256": "4980648fe4bded9fc143a79c7faf617807bb66ee63a9997eeebe037aa3868071"
+    "bytes": 2005428,
+    "sha256": "648ef22f71a1873e0563df96674614df9e8cc326c47c3a0c6bdca6d0abcef1f2"
   },
   "macrocnemus.json": {
     "bytes": 3026,
     "sha256": "32a2e41cd714440930af36ee7adc4d3be4f19ccc36b3198fe1acb6d0a1a9faaa"
   },
   "macrocnemus.lod1.glb": {
-    "bytes": 1497648,
-    "sha256": "6bd1871024707bbed0f7be5c9e8a3f128476ef05d197e8f5373b18ccf8cfc95f"
+    "bytes": 1496524,
+    "sha256": "da47bcff7dd99f3c23fa1e27f333128dbe718fe3904654c1bea79d315bc76db4"
+  },
+  "macrocnemus.origpose.glb": {
+    "bytes": 1339712,
+    "sha256": "25fe69221698be87f6c7939edff529638baec8bc2b55988aeb315a865d14984a"
   },
   "macrocnemus.png": {
-    "bytes": 434291,
-    "sha256": "95405b42e04aa802243a01336753a4346bb7b265dbfffe9649e3a8899416f2cf",
+    "bytes": 434479,
+    "sha256": "974e49c4bfa9aec1e9cb8e7db69b5081bdeab29bef4df00e23f17e36e5440b52",
     "dimensions": [
       1200,
       900
     ]
   },
   "macrocnemus.puppet.glb": {
-    "bytes": 1497648,
-    "sha256": "6bd1871024707bbed0f7be5c9e8a3f128476ef05d197e8f5373b18ccf8cfc95f"
+    "bytes": 1496524,
+    "sha256": "da47bcff7dd99f3c23fa1e27f333128dbe718fe3904654c1bea79d315bc76db4"
   },
   "macrocnemus.puppet.png": {
-    "bytes": 407430,
-    "sha256": "e61e817ad826ad53a6e60a8068033115c22b80c4ebcf88d515230d2c050d4b88",
+    "bytes": 407695,
+    "sha256": "cf3572b00d5ff3daf26bc659f4cd91798217c239811591307323237c71fb4270",
     "dimensions": [
       1200,
       900
     ]
   },
   "macrocnemus.select.png": {
-    "bytes": 741079,
-    "sha256": "1779334d52887b283f99f275f17c1e450902a5fc86911b9b2fa2a3f4f4f814e7",
+    "bytes": 741286,
+    "sha256": "f6f6a01c49f77874c51ec7fd449fee7d108f3abc61b8f9885c8da30af45cf5d5",
     "dimensions": [
       1600,
       1200
     ]
   },
   "macrocnemus.thumb.png": {
-    "bytes": 26532,
-    "sha256": "aa6e82b680a4f30bb85c7c45377a8707c50297a9ae4228b7074e5d630145319a",
+    "bytes": 26506,
+    "sha256": "739e2d69e6e5faf1fb2c7915c8784b8e52397849eb52c42da88bb405d581bad8",
     "dimensions": [
       256,
       192

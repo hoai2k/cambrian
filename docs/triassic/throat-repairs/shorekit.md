@@ -55,3 +55,17 @@ Residual outside the mouth conversion: thin authored-source skin slivers behind 
 visible even at rest (also present before this change); the puppet does not have them. This is
 recorded for a separate bounded source cleanup, not represented as a mouth regression or a full
 visual approval of all Coelophysis geometry.
+
+## Macrocnemus — finished
+
+The first shell-only rebuild let the rigid palate poke above the flexible skull during Snatch.
+The measured skull region is now constrained after diffusion, with a smooth collar into the
+existing neck. The posterior mandible uses the same source-coordinate field as the body's cut
+and blends to the jaw over 0.022 raw units. Its **68 authored/46 puppet** shared-rim vertices stay
+exactly attached at 61 phases of all 26 clips. The paired runner/action audit and all-joint skin
+ownership check pass. Authored/puppet/LOD shell topology passes, and Bite at 0.2 s plus Snatch at
+0.3 s both show zero through-body pixels under strict culling. Fresh portraits and the delivery
+record are included. The source's pale creased gular skin remains visible; it is not a sac wall.
+
+![Before](macrocnemus-snatch-before.png)
+![After](macrocnemus-snatch-after.png)

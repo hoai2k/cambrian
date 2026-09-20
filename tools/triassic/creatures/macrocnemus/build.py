@@ -793,12 +793,48 @@ assert max(THROAT_REGION['box']) < .11, ('the throat share has reached past the 
 print('THROAT_REGION', json.dumps(THROAT_REGION))
 
 
+# Keep the measured skull surface with its rigid palate. Axial relaxation is useful on
+# the neck but must not flex the skull through an independently rigid oral shell.
+# The spatial gate follows the measured head axis so it cannot claim a raised hand.
+def skull_share(q):
+    axial = K.smooth((q.x - (MOUTH_BACK - .031)) / .025)
+    radial = K.smooth((.070 - K.project(HP, HCUM, Vector(q))[0]) / .015)
+    upper = K.smooth((q.z - seam(q.x) + .010) / .010)
+    return axial * radial * upper
+
+
+def mouth_skin_weights(q, current):
+    share = skull_share(q)
+    w = {n: v * (1 - share) for n, v in current.items()}
+    w['skull'] = w.get('skull', 0.) + share
+    top = sorted(w.items(), key=lambda item: -item[1])[:4]
+    total = sum(v for _, v in top)
+    return {n: v / total for n, v in top if v > 1e-8}
+
+
+def body_mouth_pin(q, relaxed):
+    # The duplicate posterior cut vertices use exactly the same field on both
+    # pieces. Independent diffusion otherwise opens this seam under neck turns.
+    if abs(q.x - HINGE_X) < 1e-5 and q.z <= seam(q.x) + 1e-5:
+        relaxed = weights(q)
+    return mouth_skin_weights(q, relaxed)
+
+
+def mandible_weights(q):
+    blend = K.smooth((q.x - HINGE_X) / .022)
+    w = {n: v * (1 - blend) for n, v in mouth_skin_weights(q, weights(q)).items()}
+    w['jaw'] = w.get('jaw', 0.) + blend
+    top = sorted(w.items(), key=lambda item: -item[1])[:4]
+    total = sum(v for _, v in top)
+    return {n: v / total for n, v in top if v > 1e-8}
+
 rig = K.build_armature(B, tx, 'Macrocnemus shared skeleton', 'Macrocnemus_Rig')
 influences = []
 for o in [auth, puppet]:
-    K.bind(o, rig, B, weights, tx, influences, passes=RELAX_PASSES)
+    K.bind(o, rig, B, weights, tx, influences, passes=RELAX_PASSES, pin=body_mouth_pin)
 for o in parts['lower jaw'].values():
-    K.bind_rigid(o, rig, 'jaw', tx)
+    K.bind(o, rig, B, mandible_weights, tx, influences, passes=0,
+           pin=lambda q, _: mandible_weights(q))
 for n in ['skull', 'jaw']:
     lining.vertex_groups.new(name=n)
 # **The lining's floor follows the mandible outright, and it tapers at neither end.** It was
