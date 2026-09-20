@@ -10,7 +10,7 @@ the lower-jaw symphysis -- rides the `jaw` bone.
 
 Writes only this species' asset family. Touches no shared registry and performs no git operations.
 """
-import bpy, bmesh, math, json, os, struct, hashlib, shutil, sys
+import bpy, bmesh, math, json, os, struct, hashlib, shutil, sys, heapq
 import numpy as np
 from mathutils import Vector, Matrix, Quaternion
 from mathutils.bvhtree import BVHTree
@@ -19,6 +19,8 @@ from math import sin, cos, pi
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, '../../../..'))
+sys.path.insert(0, os.path.join(ROOT, 'tools/triassic/creatures/_pipeline'))
+import tripo as T                                                        # noqa: E402
 LOCAL = os.path.join(ROOT, 'local/triassic-authoring/helicoprion')
 OUT = os.path.join(ROOT, 'public/assets/triassic/creatures')
 os.makedirs(LOCAL, exist_ok=True)
@@ -366,17 +368,192 @@ for i, y in enumerate(TAIL_Y):
 bone('caudal_upper', (0, .400, centre(.400) + .035), 'tail_06')
 bone('caudal_lower', (0, .400, centre(.400) - .035), 'tail_06')
 bone('dorsal', (0, -.100, centre(-.100) + .100), 'body')
+# ------------------------------------------------- the pectoral fins, measured ----
+# **The pectoral chain is measured off the fin, not typed.** The first three deliveries placed the
+# three joints of each pectoral by hand and weighted the blade by a radial |x| ramp gated on shell
+# thickness, and the roster verification (T3D-17) read the result off the packaged file: the right
+# chain owned 1,123 vertices to the left's 890, the mid joint sat 0.026 off the blade it drove, and
+# the gate -- a per-vertex thickness step next to a per-vertex |x| step -- tore the fin's root at
+# 11.68x in `Parry` and 14.33x in the shore gait `Flop`, on an edge 0.0024 of a body long whose two
+# ends fell on opposite sides of it. What tears is never the clip, it is a weight field that is not
+# smooth on the mesh; and a chain that is not on the blade lets the two fins own different skin.
+#
+# So each fin is found as the connected patch of blade-thin surface under the flank (a flood over
+# the mesh's own edges, bounded by the shell thickness that separates a 0.005-0.026 blade from a
+# 0.13 flank), stationed by **geodesic distance from its tip** -- the one point both sides agree on
+# to 0.001, where the seat (nearest the axis) is a noisy minimum that landed 0.037 apart on the two
+# sides -- and the two measured centrelines are checked against each other's mirror and averaged,
+# so the rig is symmetric by measurement rather than by typing. The root is the base station pulled
+# radially into the trunk until ray parity against the closed skin says it is inside and the nearest
+# surface is a margin away; the mid and tip joints sit *on* the measured centreline.
+PEC_BANDS = 8
+PEC_ROOT_MARGIN = .020          # how far inside the flank skin the root is seated
+PEC_RADIUS_MARGIN = .018        # the radial ramp outside the blade's own measured section
+PEC_MIRROR_TOLERANCE = .025     # the two fins' stationed centrelines must agree, mirrored, to this
+_adj_ptr, _adj_idx = _adjacency(auth.data)
+_cz_all = np.array([centre(float(y)) for y in raw_co[:, 1]])
+
+
+def _pectoral_cluster(side):
+    """The largest connected blade-thin patch under the flank on one side."""
+    m = ((thickness < THIN_PEC) & (raw_co[:, 1] > -.33) & (raw_co[:, 1] < -.05)
+         & (raw_co[:, 2] < _cz_all - .005) & (raw_co[:, 0] * side > .03))
+    seen, best = set(), []
+    for i in np.nonzero(m)[0]:
+        i = int(i)
+        if i in seen:
+            continue
+        stack, part = [i], []
+        seen.add(i)
+        while stack:
+            q = stack.pop()
+            part.append(q)
+            for j in _adj_idx[_adj_ptr[q]:_adj_ptr[q + 1]]:
+                j = int(j)
+                if m[j] and j not in seen:
+                    seen.add(j)
+                    stack.append(j)
+        if len(part) > len(best):
+            best = part
+    return best
+
+
+def _geodesic(seed, members):
+    """Distance over the patch's own edges from one vertex to every other."""
+    inside = set(members)
+    dist = {seed: 0.}
+    heap = [(0., seed)]
+    while heap:
+        d, v = heapq.heappop(heap)
+        if d > dist.get(v, 1e9):
+            continue
+        for w in _adj_idx[_adj_ptr[v]:_adj_ptr[v + 1]]:
+            w = int(w)
+            if w not in inside:
+                continue
+            nd = d + float(np.linalg.norm(raw_co[w] - raw_co[v]))
+            if nd < dist.get(w, 1e9):
+                dist[w] = nd
+                heapq.heappush(heap, (nd, w))
+    return dist
+
+
+def _inside_by_parity(p):
+    """A point inside a closed surface crosses it an odd number of times on the way out. No normals
+    and no table, which is what makes it exact beside a thin blade whose nearest face may be either
+    of its two sides."""
+    n, z = 0, float(p[2])
+    for _ in range(24):
+        hit = _bvh_auth.ray_cast(Vector((float(p[0]), float(p[1]), z)), Vector((0, 0, 1)), 1.)
+        if hit[0] is None:
+            break
+        n += 1
+        z = hit[0][2] + 1e-5
+    return n % 2 == 1
+
+
+THIN_PEC = .042                 # THIN + THIN_BAND, the blade gate's own outer edge
+PEC_MEASURED = {}
+for side, s in ((1, 'L'), (-1, 'R')):
+    cluster = _pectoral_cluster(side)
+    assert len(cluster) >= 300, ('the pectoral fin did not measure', s, len(cluster))
+    q = raw_co[cluster]
+    r = np.hypot(q[:, 0], q[:, 2] - _cz_all[cluster])
+    tip = cluster[int(np.argmax(r))]
+    geo = _geodesic(tip, cluster)
+    reach = max(geo.values())
+    stations = []
+    for k in range(PEC_BANDS):
+        lo, hi = reach * k / PEC_BANDS, reach * (k + 1) / PEC_BANDS
+        band = [v for v in cluster if lo <= geo.get(v, 1e9) <= hi + 1e-9]
+        assert len(band) >= 6, ('an empty station on the pectoral fin', s, k, len(band))
+        stations.append(raw_co[band].mean(0))
+    stations = stations[::-1]                      # base first, tip last
+    PEC_MEASURED[s] = {'cluster': cluster, 'vertices': len(cluster), 'tip': raw_co[tip].tolist(),
+                       'geodesicReach': float(reach), 'stations': stations,
+                       'box': [q.min(0).tolist(), q.max(0).tolist()]}
+_L = np.array(PEC_MEASURED['L']['stations'])
+_R = np.array(PEC_MEASURED['R']['stations']) * np.array([-1., 1., 1.])
+_mirror_gap = float(np.linalg.norm(_L - _R, axis=1).max())
+assert _mirror_gap < PEC_MIRROR_TOLERANCE, ('the two pectoral fins do not mirror', _mirror_gap)
+PEC_STATIONS = (_L + _R) / 2                     # the left fin's centreline; the right is its mirror
+
+
+def _seat_root(base):
+    """Pull the fin's base station radially into the trunk until it is inside the closed skin by
+    parity and a margin from the nearest surface -- which past the flank is the flank."""
+    base = np.asarray(base, float)
+    axis = np.array([0., base[1], centre(float(base[1]))])
+    d = axis - base
+    d /= np.linalg.norm(d)
+    for t in np.arange(0., .15, .002):
+        p = base + d * t
+        if _inside_by_parity(p) and _bvh_auth.find_nearest(Vector(p.tolist()))[3] >= PEC_ROOT_MARGIN:
+            return p, float(t)
+    raise AssertionError(('the pectoral root found no trunk to seat in', base.tolist()))
+
+
+_root_L, _root_pull = _seat_root(PEC_STATIONS[0])
+_poly_L = [_root_L] + [np.asarray(p, float) for p in PEC_STATIONS]
+_P_L, _cum_L = T.polyline([Vector(p.tolist()) for p in _poly_L])
+PEC_ARC = _cum_L[-1]
+PEC_MID_T, PEC_TIP_T = .42, .78
+
+
+def _along(P, cum, s):
+    for i in range(len(P) - 1):
+        if cum[i] <= s <= cum[i + 1]:
+            t = (s - cum[i]) / max(cum[i + 1] - cum[i], 1e-9)
+            return P[i] + (P[i + 1] - P[i]) * t
+    return P[-1]
+
+
 PECTORAL = {}
 PELVIC = {}
+PEC_CHAIN = {}
 for side in (-1, 1):
     s = 'L' if side > 0 else 'R'
-    pts = [(side * .075, -.245, -.072), (side * .155, -.205, -.135), (side * .215, -.165, -.185)]
+    mirror = Vector((side, 1, 1))
+    joints = [_root_L, _along(_P_L, _cum_L, PEC_ARC * PEC_MID_T), _along(_P_L, _cum_L, PEC_ARC * PEC_TIP_T)]
+    pts = [tuple(Vector([float(c) for c in j]) * mirror) for j in joints]
     names = ['pec_upper_' + s, 'pec_mid_' + s, 'pec_tip_' + s]
     PECTORAL[s] = (side, pts, names)
     for i, n in enumerate(names):
         bone(n, pts[i], 'chest' if i == 0 else names[i - 1])
+    PEC_CHAIN[s] = T.polyline([Vector([float(c) for c in p]) * mirror for p in _poly_L])
     PELVIC[s] = (side, ['pelvic_' + s])
     bone('pelvic_' + s, (side * .030, .075, -.090), 'tail_01')
+
+# The blade's own section at each station, measured as the 97th percentile of the fin's distance
+# from its centreline in that band, is the radius inside which a vertex is wholly the fin's; the
+# ramp outside it is a fixed margin. Read off the left fin and its mirrored right together, so the
+# two chains claim the same radius.
+_pec_radius_rows = []
+for s, mirror in (('L', np.array([1., 1., 1.])), ('R', np.array([-1., 1., 1.]))):
+    P, cum = PEC_CHAIN['L']
+    q = raw_co[PEC_MEASURED[s]['cluster']] * mirror
+    for row in q:
+        dist, arc = T.project(P, cum, Vector(row.tolist()))
+        _pec_radius_rows.append((arc / PEC_ARC, dist))
+_pec_radius_rows = np.array(_pec_radius_rows)
+PEC_RADIUS = []
+for k in range(PEC_BANDS):
+    lo, hi = k / PEC_BANDS, (k + 1) / PEC_BANDS
+    m = (_pec_radius_rows[:, 0] >= lo) & (_pec_radius_rows[:, 0] < (hi if k + 1 < PEC_BANDS else 1.01))
+    if m.sum() >= 12:
+        PEC_RADIUS.append(((lo + hi) / 2, float(np.quantile(_pec_radius_rows[m, 1], .97))))
+assert len(PEC_RADIUS) >= 5, ('the pectoral radius did not measure', PEC_RADIUS)
+PEC_SEAT_ARC = max(_cum_L[1] * .9, .010)       # the root's blend runs the length of the pull
+PEC_JOINT_ARC = [0., PEC_ARC * PEC_MID_T, PEC_ARC * PEC_TIP_T]
+# The blend at a joint is a fraction of the segments it joins, never a number (see CLAUDE.md).
+PEC_BLEND = max(.35 * min(PEC_ARC * PEC_MID_T, PEC_ARC * (PEC_TIP_T - PEC_MID_T)), 1e-4)
+
+
+def pec_radius(t):
+    ts = [r[0] for r in PEC_RADIUS]
+    rin = float(np.interp(t, ts, [r[1] for r in PEC_RADIUS]))
+    return rin, rin + PEC_RADIUS_MARGIN
+
 
 # The pectoral root must sit inside the trunk's own cross-section, as every builder in this
 # repository is required to check, or the fin reads as floating beside the flank.
@@ -386,6 +563,13 @@ for s, (side, pts, _names) in PECTORAL.items():
     depth = raw_co[(np.abs(raw_co[:, 1] - y) < .012)]
     floor = float(np.quantile(depth[:, 2], .02))
     assert abs(x) < .85 * w and z > floor + .012, ('pectoral root outside the trunk', s, x, w, z, floor)
+    assert _inside_by_parity(np.array([x, y, z])), ('pectoral root outside the closed skin', s)
+print('HELICOPRION_PECTORAL', json.dumps({
+    'clusterVertices': {s: PEC_MEASURED[s]['vertices'] for s in PEC_MEASURED},
+    'tips': {s: [round(v, 4) for v in PEC_MEASURED[s]['tip']] for s in PEC_MEASURED},
+    'mirrorGap': round(_mirror_gap, 4), 'rootPull': round(_root_pull, 4),
+    'joints': {s: [[round(v, 4) for v in p] for p in PECTORAL[s][1]] for s in PECTORAL},
+    'arc': round(PEC_ARC, 4), 'radius': [[round(a, 3), round(b, 4)] for a, b in PEC_RADIUS]}))
 for s, (side, _names) in PELVIC.items():
     x, y, z = B['pelvic_' + s][0]
     assert abs(x) < .85 * half_width(y), ('pelvic root outside the trunk', s)
@@ -447,20 +631,6 @@ def fin_weights(p, thin):
     blade = smooth((THIN + THIN_BAND - thin) / THIN_BAND)
     if blade <= 0:
         return None
-    if -.300 < y < -.100 and abs(x) > .055 and z < c - .010:
-        s = 'L' if x > 0 else 'R'
-        _side, _pts, names = PECTORAL[s]
-        d = abs(x)
-        span = smooth((d - .085) / .075)
-        if d < .145:
-            chain = {names[0]: 1.}
-        elif d < .190:
-            t = (d - .145) / .045
-            chain = {names[0]: 1 - t, names[1]: t}
-        else:
-            t = min(1., (d - .190) / .045)
-            chain = {names[1]: 1 - t, names[2]: t}
-        return chain, blade * span
     if .020 < y < .165 and z < c - .050 and abs(x) > .006:
         s = 'L' if x > 0 else 'R'
         return {'pelvic_' + s: 1.}, blade * smooth((c - z - .065) / .030)
@@ -472,10 +642,30 @@ def fin_weights(p, thin):
     return None
 
 
+def pectoral_weights(p):
+    """The pectoral chain and how strongly it owns this point: radially by the blade's own measured
+    section at the point's station along the fin, by arc length along the chain for which joint,
+    and faded in over the root's pull so a seated root blends onto the chest under it. No |x| step
+    and no thickness step: the field is continuous over the surface, which is what a skin needs."""
+    if not (-.34 < p[1] < -.06):
+        return None
+    q = Vector(p)
+    best = None
+    for s, (P, cum) in PEC_CHAIN.items():
+        dist, arc = T.project(P, cum, q)
+        rin, rout = pec_radius(arc / PEC_ARC)
+        if dist >= rout:
+            continue
+        alpha = (1. if dist <= rin else smooth(1 - (dist - rin) / (rout - rin))) * smooth(arc / PEC_SEAT_ARC)
+        if alpha > 1e-4 and (best is None or alpha > best[1]):
+            best = (T.limb_chain(PECTORAL[s][2], PEC_JOINT_ARC, arc, PEC_BLEND), alpha)
+    return best
+
+
 def weights(p, thin):
     x, y, z = p
     w = dict(axial(y))
-    fin = fin_weights(p, thin)
+    fin = pectoral_weights(p) or fin_weights(p, thin)
     if fin:
         chain, blend = fin
         if blend > 0:
@@ -595,12 +785,31 @@ for n, (p, parent) in B.items():
 bpy.ops.object.mode_set(mode='OBJECT')
 
 weight_report = {}
+HEAD_HOLD_Y = -.30              # forward of this the jaw's skinned hinge stands exactly as measured
+per_vertex_weights = {}
 for o, thin in [(auth, thickness), (puppet, puppet_thickness)]:
     for n in B:
         o.vertex_groups.new(name=n)
+    gated = [weights(v.co, float(thin[v.index])) for v in o.data.vertices]
+    # **The relaxation is what stops a fin tearing** (see `T.relax_weights`): every gate above is a
+    # per-vertex decision and two vertices a thousandth of a body apart can fall either side of it.
+    # Diffusion over the mesh's own edge graph, coupled by inverse edge length and trimmed to four
+    # influences every pass, turns each step into a ramp, and its sliver weld gives two vertices a
+    # rounding error apart one answer. The head is held out of it: the jaw is a skinned hinge whose
+    # weight is a measured separation surface between palate and whorl, `JAW_CLOSE` is swept from
+    # that same function, and the whorl's fit under the palate is judged on it -- so forward of
+    # `HEAD_HOLD_Y` every vertex keeps the weight it measured, byte for byte, and the mouth is
+    # exactly the mouth the closing rotation was measured for.
+    relaxed = T.relax_weights(o, gated, passes=3, keep=4, hold=.45)
+    held = 0
+    for v in o.data.vertices:
+        if v.co.y < HEAD_HOLD_Y:
+            relaxed[v.index] = gated[v.index]
+            held += 1
+    per_vertex_weights[o.name] = relaxed
     influences, owners = [], {}
     for v in o.data.vertices:
-        w = weights(v.co, float(thin[v.index]))
+        w = relaxed[v.index]
         influences.append(len(w))
         for n, value in w.items():
             o.vertex_groups[n].add([v.index], value, 'REPLACE')
@@ -613,7 +822,74 @@ for o, thin in [(auth, thickness), (puppet, puppet_thickness)]:
     mod.object = rig
     o.parent = rig
     weight_report[o.name] = {'maxInfluences': max(influences), 'vertices': len(influences),
-                             'verticesPerBone': owners}
+                             'verticesPerBone': owners, 'headVerticesHeldFromRelaxation': held}
+
+# ------------------------------------------- do the two fins own the same skin? ----
+# Read off the weights the body ships with, on the raw surface: what each chain dominates by count
+# and by *area* (the right blade is meshed a quarter denser than the left, 646 thin vertices to 515
+# over the same box, so a count compares the generator's tessellation and an area compares the fin),
+# and how far each joint sits from the skin it drives. Left and right have to agree within a fifth.
+_area = np.zeros(len(raw_co))
+for p in auth.data.polygons:
+    tri = raw_co[list(p.vertices[:3])]
+    a = float(np.linalg.norm(np.cross(tri[1] - tri[0], tri[2] - tri[0]))) / 2
+    for i in p.vertices:
+        _area[i] += a / len(p.vertices)
+_w_auth = per_vertex_weights[auth.name]
+_dom = [max(w, key=w.get) for w in _w_auth]
+PEC_PARITY = {}
+for s in ('L', 'R'):
+    names = PECTORAL[s][2]
+    owned = [i for i, d in enumerate(_dom) if d in names]
+    cluster = set(PEC_MEASURED[s]['cluster'])
+    joints = {}
+    for k, n in enumerate(names):
+        mine = np.array([i for i, d in enumerate(_dom) if d == n])
+        jp = np.array(PECTORAL[s][1][k])
+        joints[n] = {'dominates': int(len(mine)),
+                     'toNearestOwnedSkin': round(float(np.linalg.norm(raw_co[mine] - jp, axis=1).min()), 4) if len(mine) else None,
+                     'meanToOwnedSkin': round(float(np.linalg.norm(raw_co[mine] - jp, axis=1).mean()), 4) if len(mine) else None,
+                     'toNearestSkin': round(float(np.linalg.norm(raw_co - jp, axis=1).min()), 4)}
+    PEC_PARITY[s] = {'dominatedVertices': int(len(owned)),
+                     'dominatedArea': round(float(_area[owned].sum()), 5),
+                     'weightedArea': round(float(sum(_area[i] * sum(v for n, v in _w_auth[i].items() if n in names)
+                                                     for i in range(len(raw_co)))), 5),
+                     'finClusterVertices': len(cluster),
+                     'finClusterDominatedByItsChain': round(float(sum(1 for i in owned if i in cluster) / len(cluster)), 4),
+                     'joints': joints}
+
+
+def _ratio(a, b):
+    return abs(a - b) / max(a, b, 1e-9)
+
+
+# The root is seated inside the trunk on purpose and is judged by how deep it sits. The mid and tip
+# joints are on the blade, and there the question is the one Saurichthys failed (3.6 % of a body
+# from its skin on one side, 1.7 % on the other): is the chain on the fin it drives, and equally so
+# on both sides. The instrument is the joint's *mean* distance to the skin it dominates -- the
+# nearest single vertex is the blade's own half-thickness at that station (0.0096 against 0.0053 on
+# the first build, on a blade 0.005-0.010 thick), a number about the tessellation and not the seat.
+PEC_PARITY['ratios'] = {
+    'dominatedVertices': round(_ratio(PEC_PARITY['L']['dominatedVertices'], PEC_PARITY['R']['dominatedVertices']), 4),
+    'finClusterDominatedByItsChain': round(_ratio(PEC_PARITY['L']['finClusterDominatedByItsChain'],
+                                                  PEC_PARITY['R']['finClusterDominatedByItsChain']), 4),
+    'weightedArea': round(_ratio(PEC_PARITY['L']['weightedArea'], PEC_PARITY['R']['weightedArea']), 4),
+    'bladeJointsToOwnedSkin': round(max(_ratio(PEC_PARITY['L']['joints']['pec_%s_L' % j]['meanToOwnedSkin'],
+                                               PEC_PARITY['R']['joints']['pec_%s_R' % j]['meanToOwnedSkin'])
+                                        for j in ('mid', 'tip')), 4),
+    'bladeJointsToNearestOwnedSkin': round(max(_ratio(PEC_PARITY['L']['joints']['pec_%s_L' % j]['toNearestOwnedSkin'],
+                                                      PEC_PARITY['R']['joints']['pec_%s_R' % j]['toNearestOwnedSkin'])
+                                               for j in ('mid', 'tip')), 4),
+    'rootToSkin': round(_ratio(PEC_PARITY['L']['joints']['pec_upper_L']['toNearestSkin'],
+                               PEC_PARITY['R']['joints']['pec_upper_R']['toNearestSkin']), 4),
+    'meshDensityOfTheTwoBlades': round(_ratio(PEC_MEASURED['L']['vertices'], PEC_MEASURED['R']['vertices']), 4)}
+print('HELICOPRION_PEC_PARITY', json.dumps(PEC_PARITY))
+assert PEC_PARITY['ratios']['weightedArea'] < .20, ('the two pectoral chains own different skin', PEC_PARITY['ratios'])
+assert PEC_PARITY['ratios']['finClusterDominatedByItsChain'] < .20, ('the two chains own different shares of their blades', PEC_PARITY['ratios'])
+assert PEC_PARITY['ratios']['bladeJointsToOwnedSkin'] < .20, ('a pectoral joint sits off its skin', PEC_PARITY['ratios'])
+assert PEC_PARITY['ratios']['rootToSkin'] < .20, ('the two roots are seated at different depths', PEC_PARITY['ratios'])
+for s in ('L', 'R'):
+    assert PEC_PARITY[s]['finClusterDominatedByItsChain'] > .85, ('a pectoral chain does not own its blade', s, PEC_PARITY[s])
 
 # ------------------------------------------------ measured paired profile ----
 def section(o, y):
@@ -1181,6 +1457,13 @@ meta = {
         'authored. Measured on the surface rather than on its 382 vertices it is already a solid '
         'spiral saw, and what reads as holes in a render is the generated albedo. The generation '
         'also gave the animal upper-jaw teeth it did not have. See the README.',
+        'The pectoral chains are measured off the fins rather than typed: each blade is found as a '
+        'connected blade-thin patch, stationed by geodesic distance from its tip, mirror-checked '
+        'against the other, and the joints seated on that centreline with the root pulled inside '
+        'the trunk by ray parity. The blade is weighted by its own measured section and by arc '
+        'length, and the skin is relaxed over the mesh graph with the head held out of it, so the '
+        'jaw hinge and the whorl are exactly as measured. `validation.json` `pectoral` records the '
+        'left/right parity in owned area and joint-to-skin distance.',
         'Living colours, soft tissue and movement are artistic reconstruction. Whorl-saw grip, '
         'travel and capture rules remain engine-owned.'],
 }
@@ -1222,6 +1505,29 @@ report = {
     'bones': len(B), 'boneNames': list(B),
     'clips': CLIPS, 'looping': LOOPS, 'loopSeams': seams, 'boundsAt13Phases': bounds,
     'weights': weight_report,
+    'pectoral': {
+        'method': 'each fin is the largest connected blade-thin patch under the flank (a flood over '
+                  'the mesh\'s own edges, thickness under %g), stationed in %d bands of geodesic '
+                  'distance from its tip; the two centrelines are mirror-averaged; the root is the '
+                  'base station pulled radially into the trunk until ray parity says inside and the '
+                  'nearest skin is %g away; mid and tip joints sit on the centreline at %g and %g of '
+                  'its arc; a vertex is the fin\'s by the blade\'s own 97th-percentile section at '
+                  'its station (+%g ramp) and by arc length for the joint, and the head is held out '
+                  'of the relaxation' % (THIN_PEC, PEC_BANDS, PEC_ROOT_MARGIN, PEC_MID_T, PEC_TIP_T,
+                                         PEC_RADIUS_MARGIN),
+        'clusterVertices': {s: PEC_MEASURED[s]['vertices'] for s in PEC_MEASURED},
+        'clusterBox': {s: PEC_MEASURED[s]['box'] for s in PEC_MEASURED},
+        'tip': {s: PEC_MEASURED[s]['tip'] for s in PEC_MEASURED},
+        'geodesicReach': {s: round(PEC_MEASURED[s]['geodesicReach'], 4) for s in PEC_MEASURED},
+        'mirrorGapRaw': round(_mirror_gap, 4), 'mirrorTolerance': PEC_MIRROR_TOLERANCE,
+        'centreline': [[round(float(v), 4) for v in p] for p in _poly_L],
+        'rootPullRaw': round(_root_pull, 4), 'arcRaw': round(PEC_ARC, 4),
+        'joints': {s: [[round(float(v), 4) for v in p] for p in PECTORAL[s][1]] for s in PECTORAL},
+        'radiusByArcFraction': [[round(a, 3), round(b, 4)] for a, b in PEC_RADIUS],
+        'seatArcRaw': round(PEC_SEAT_ARC, 4), 'jointBlendRaw': round(PEC_BLEND, 4),
+        'parity': PEC_PARITY,
+        'relaxation': {'passes': 3, 'keep': 4, 'hold': .45, 'headHeldForwardOf': HEAD_HOLD_Y},
+    },
     'envelope': {k: profile_report[k] for k in
                  ('maximumEnvelopeDifference', 'maximumEnvelopeDifferenceFractionOfBodyLength',
                   'surfaceDistanceMax', 'surfaceDistanceP95', 'envelopeTolerance')},
