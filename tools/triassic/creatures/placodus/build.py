@@ -566,7 +566,7 @@ for k,x in enumerate(MX):
  assert h>=float(TALL[k])*.85,('the oral lining is shallower than the mouth',x,h,TALL[k])
 # Bean-shaped crushing bosses: three pairs on the palate, three on the mandible, seated in the
 # measured lumen rather than at a fixed offset, so the crush the clips perform is actually shown.
-for label,side,bonename in [('Palate crushing teeth',1,'skull'),('Mandibular crushing teeth',-1,'jaw')]:
+for label,side,bonename in [('Upper crushing teeth',1,'skull'),('Mandibular crushing teeth',-1,'jaw')]:
  verts=[];faces=[]
  for k,(x,r) in enumerate([(.437,.0105),(.455,.0115),(.472,.0095)]):
   w,h=mouth_section(x);lift=side*h*.46
