@@ -1,4 +1,4 @@
-# Askeptosaurus: original diagnosis and completed regeneration
+# Askeptosaurus: original diagnosis, regeneration, and the body that ships
 
 *15 September 2026. Reproduce with `local/askepto.py`, `local/askepto2.py`, `local/askepto3.py` and
 `local/askcurv.py` — each is a Blender or plain-Python script that prints its numbers.*
@@ -151,3 +151,50 @@ untouched, the clip amplitudes and the wave's phase step are re-tuned and measur
 `docs/triassic/3d-work-status.md` T3D-24.
 
 The preceding September 15 analysis is retained as the historical diagnosis, not current work.
+
+## The swap · 20 September 2026 (T3D-25)
+
+**The posed generation is the shipped body again, and the straight regeneration is the backup.**
+The owner's reading of the two: the regeneration is lumpy, too straight and too flat, while the
+preserved generation has the textures and the proportions the subject wants and only its
+*positioning* was ever wrong. So the regeneration's contribution stands as a diagnosis — it proved
+the shared axial kit could not build the posed body as it was — but the animal that ships is the one
+that reads as an animal.
+
+What the September 15 analysis got right and wrong about the posed body, measured again on the
+build:
+
+- **The tail's bend was never the blocker, and section 4 said so**: 8.84 mean curvature over
+  section is Dinocephalosaurus' tail, which straightened on the rig. It straightens here too, in
+  pose, and the trunk's 0.41 tightest — a bend radius smaller than its own section — is the exact
+  reason no *mesh* unbending can work there and the rejected one overlapped.
+- **The axis was the blocker, and it was fixable.** Section 3 was right that a geodesic banding
+  works once the seeds are declared, and half right about why the first one shredded. The seeds were
+  declared in the backup build and the banding still lied, because the four **paddles** were left in
+  the bands: a paddle sits at much the same geodesic distance from the snout as the flank it grows
+  from, so its vertices join the band and drag the median sideways. That axis measured 2.025 against
+  a surface the verdict itself measured at 1.578, and its first three tail controls doubled back on
+  each other at 68.9° and 89.9°. Excluding the paddles and smoothing once gives 1.612, a monotone
+  chain, and a tail fraction of **0.606** rather than 0.562 — against the board's 0.63–0.66 and the
+  regeneration's 0.632. The proportion complaint the original audit opened with was, in the end,
+  another artefact of a bad axis.
+
+The positioning is fixed in the rest skeleton and the clips and nowhere else: seventy per cent of the
+tail's 180.4° of turn is carried into the bind by posing the rig and letting the skin follow its own
+weights, and the rest is per-clip, so the animal holds a curve at rest, lays itself out to sprint and
+coils back past its own generation. Not one vertex is moved by anything but the weights that already
+held it — no remesh, no smoothing, no reshaping, no change to a UV or a texel — which is the whole
+reason this body was promoted. Skin 1.34x, second on the roster; the jaw cut closed; every joint
+owning skin.
+
+**One thing this swap leaves open, and it is a human's to close.** `docs/triassic/canonical/askeptosaurus.png`
+is the straight redraw, and the body that now ships is the generation made from the *previous*
+canonical (preserved at `model-inputs/askeptosaurus/backup-2026-09-19/original-canonical.png`). The
+pipeline's rule is that a body which no longer matches its pose is the body that is wrong — but here
+the owner's judgement is that the pose is what is wrong, so the two are deliberately out of step
+until a canonical is drawn in this body's own proportions and greenlit. Nothing downstream reads the
+image, and the manifest's `previousCanonical` already names the one this body came from; it is
+recorded here so nobody reads the disagreement as an oversight.
+
+See [the build and validation record](../../tools/triassic/creatures/askeptosaurus/README.md) and
+`docs/triassic/verification/askeptosaurus-swap-*.png`.

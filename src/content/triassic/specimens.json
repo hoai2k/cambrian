@@ -210,7 +210,7 @@
     "category": "creature",
     "modelStatus": "final",
     "provenance": "Middle Triassic · Monte San Giorgio",
-    "description": "Measured volume resurfacing of the regenerated Askeptosaurus, sharing its exact 33-joint rig, 24 clips, anchors and inverse binds.",
+    "description": "Measured volume resurfacing of the preserved posed Askeptosaurus generation, sharing its exact 33-joint rig, 24 clips, anchors and inverse binds.",
     "model": "assets/triassic/creatures/askeptosaurus.puppet.glb",
     "lod": "assets/triassic/creatures/askeptosaurus.puppet.glb",
     "image": "assets/triassic/creatures/askeptosaurus.thumb.png",
@@ -224,7 +224,7 @@
       "Grab"
     ],
     "sources": [
-      "tools/triassic/creatures/askeptosaurus/tripo-regenerated-2026-09-19/askeptosaurus.raw.glb",
+      "tools/triassic/creatures/askeptosaurus/askeptosaurus.preview.glb",
       "docs/triassic/canonical/askeptosaurus.png"
     ],
     "notes": [
