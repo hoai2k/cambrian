@@ -267,7 +267,15 @@ const clamp = (x: number, a: number, b: number) => (x < a ? a : x > b ? b : x);
 const dot = (a: Vec3, b: Vec3) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const cross = (a: Vec3, b: Vec3): Vec3 => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 const len = (v: Vec3) => Math.hypot(v[0], v[1], v[2]);
-const norm = (v: Vec3): Vec3 => { const l = len(v) || 1; return [v[0] / l, v[1] / l, v[2] / l]; };
+/**
+ * A unit vector, with negative zero folded away.
+ *
+ * The `+ 0` is not decoration. A plane's normal is stored in the document and the document goes
+ * through JSON, which writes `-0` as `0` — so a plane seated by negating a traced direction came
+ * back from its own export as a *different* document, and the one thing the file has to promise is
+ * that it rebuilds what it described.
+ */
+const norm = (v: Vec3): Vec3 => { const l = len(v) || 1; return [v[0] / l + 0, v[1] / l + 0, v[2] / l + 0]; };
 const sub = (a: Vec3, b: Vec3): Vec3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const addTo = (a: Vec3, b: Vec3, s: number): Vec3 => [a[0] + b[0] * s, a[1] + b[1] * s, a[2] + b[2] * s];
 
@@ -311,6 +319,20 @@ function turnAxis(a: Vec3, b: Vec3): Vec3 | null {
   return len(c) < 1e-9 ? null : norm(c);
 }
 
+/**
+ * The angle between two directions, as `atan2` of the cross against the dot rather than as an
+ * `acos` of the dot.
+ *
+ * Not a nicety: `acos` loses its precision exactly where this tool spends its time. Two planes
+ * aimed the same way have a dot of 1 to within a rounding error, and `acos` turns a rounding error
+ * of 1e-16 into an angle of 1e-8 — so a straightened span read back as a tenth of a thousandth of a
+ * degree of bend, which is nothing to a reviewer and is not nothing to `isIdentity`.
+ */
+const between = (a: Vec3, b: Vec3): number => {
+  const u = norm(a), v = norm(b);
+  return Math.atan2(len(cross(u, v)), dot(u, v));
+};
+
 /** The axle the old scheme had at a roll of zero: the frame's own up squared against the span. */
 function levelAxis(doc: Pick<BendDoc, 'base' | 'tip' | 'frame'>): Vec3 {
   const forward = spanDirection(doc);
@@ -325,9 +347,8 @@ export type BendShape = Pick<BendDoc, 'base' | 'tip' | 'frame' | 'baseNormal' | 
 
 export function bendRotation(doc: BendShape): BendRotation {
   const rest = norm(doc.tipRest), aim = norm(doc.tipNormal);
-  const angle = Math.acos(clamp(dot(rest, aim), -1, 1));
   const axis = turnAxis(rest, aim) ?? turnAxis(doc.baseNormal, rest) ?? levelAxis(doc);
-  return { axis, angle };
+  return { axis, angle: between(rest, aim) };
 }
 
 /**
@@ -368,7 +389,7 @@ export const twistAngle = (doc: BendShape): number =>
   Math.asin(clamp(Math.abs(dot(bendRotation(doc).axis, spanDirection(doc))), 0, 1));
 
 /** The angle between two directions, plain and unsigned: what "the planes are N° apart" means. */
-export const angleOf = (a: Vec3, b: Vec3): number => Math.acos(clamp(dot(norm(a), norm(b)), -1, 1));
+export const angleOf = (a: Vec3, b: Vec3): number => between(a, b);
 
 /** How far back from the nose a point is, as a fraction of the body: for the panel and the file. */
 export function headFractionAt(doc: Pick<BendDoc, 'frame' | 'bounds'>, p: Vec3): number {
@@ -391,8 +412,14 @@ export function pointAtHeadFraction(doc: Pick<BendDoc, 'frame' | 'bounds'>, head
 /** The whole the span turns through: the angle between the tip plane's rest and its aim. */
 export const totalTurn = (doc: BendShape): number => bendRotation(doc).angle;
 
+/**
+ * No bend at all: the two planes aimed the same way, to within the rounding that normalising a
+ * vector twice leaves behind. A ten-millionth of a radian is six ten-thousandths of a degree of
+ * arc-second, which is not a bend by any reading; the threshold is loose only against floating
+ * point and tight against everything else.
+ */
 export const isIdentity = (doc: Pick<BendDoc, 'tipRest' | 'tipNormal'>): boolean =>
-  Math.acos(clamp(dot(norm(doc.tipRest), norm(doc.tipNormal)), -1, 1)) < 1e-9;
+  between(doc.tipRest, doc.tipNormal) < 1e-7;
 
 /**
  * The rotation accumulated by the fraction `s` of the span.
