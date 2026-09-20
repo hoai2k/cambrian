@@ -16,6 +16,12 @@ import { emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type 
 import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, RISE_RATE, sampleCurrent, sampleHeight, shoreDistance, shoreZ, type StaticContact, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 import { areaProfile, bandScale, drawBand, headroom, PASSER_BY } from './population';
 import { columnY, DIP_CHANCE, DRIFT_CURRENT, driftRise, flipLaunch, FLIP_STAMINA, PULSE_CYCLE, pulseRefilling, pulseThrust, punting, rowWalkCurrent } from './locomotion';
+import { TEXT } from '../shared/text';
+
+/** Everything the simulation says out loud; the words are in `src/content/strings.ts`. */
+const SAY = TEXT.sim;
+/** Seconds at Apex that win a Rise match — and the number the scoreboard counts up to. */
+export const APEX_HOLD_SECONDS = 90;
 
 export interface PlayerProgress {
   prompts: Prompt[];
@@ -1835,7 +1841,7 @@ export class Game implements AiWorld {
           const gripped = a.graspHold && this.closeGrip(a, t);
           if (gripped) { /* the pounce closed a grip; the release settles it */ }
           else if (band === 'snack' && (t.controller === 'swarm' || (t.controller === 'ambient' && lengthOf(t) < L * 0.3))) this.takeWhole(a, t);
-          else { const m = { ...def.heavy, name: 'Pounce', damage: def.heavy.damage * 1.35, poise: def.heavy.poise * 1.2, knockback: def.heavy.knockback * 0.8, lunge: 0 }; applyHit(this.hitCtx, a, t, m, 1.2); }
+          else { const m = { ...def.heavy, name: SAY.pounce, damage: def.heavy.damage * 1.35, poise: def.heavy.poise * 1.2, knockback: def.heavy.knockback * 0.8, lunge: 0 }; applyHit(this.hitCtx, a, t, m, 1.2); }
           this.events.push({ kind: 'pounce', pos: { ...a.pos }, actor: a.id, other: t.id, player: a.player, strength: L });
           a.vel = vscale(a.vel, 0.25); a.iframes = 0.1;
           // A grip took over the body's state machine; only a pounce that ended in a blow is free.
@@ -2498,7 +2504,7 @@ export class Game implements AiWorld {
   /** LB: a burst of speed in the stick direction with invulnerability, covering a few body lengths. */
   private emergeStrike(a: Actor, def: ReturnType<typeof creature>) {
     a.emergenceHeavy = false; a.state = 'attack'; a.stateT = 0;
-    a.move = { ...def.heavy, name: 'Emergence strike', stamina: 0, poise: def.heavy.poise + 12 };
+    a.move = { ...def.heavy, name: SAY.emergenceStrike, stamina: 0, poise: def.heavy.poise + 12 };
     a.moveKind = 'heavy'; a.hitDone.clear(); a.seen = 1;
     this.silt.push({pos:{...a.pos}, radius:lengthOf(a)*.7, t:1.5});
     this.flag(a, 'heavy');
@@ -2607,7 +2613,7 @@ export class Game implements AiWorld {
     a.state = 'pounce'; a.stateT = 0; a.stateDur = clamp(dist(a.pos, target.pos) / Math.max(6, L * 3), 0.25, 0.9) + 0.15;
     if (!free) { a.stamina -= 12; a.pounceCd = 1.4; }
     a.combo = 0;
-    a.move = { ...creature(a.creature).heavy, name: 'Pounce' }; a.moveKind = 'heavy';
+    a.move = { ...creature(a.creature).heavy, name: SAY.pounce }; a.moveKind = 'heavy';
     this.events.push({ kind: 'dodge', pos: { ...a.pos }, actor: a.id, player: a.player, strength: L });
     this.flag(a, 'heavy');
     void sf;
@@ -3039,8 +3045,8 @@ export class Game implements AiWorld {
       case 'hunted': {
         const giant = this.hunterIndex >= 0 ? this.players[this.hunterIndex] : undefined;
         return {
-          title: `Turn ${Math.min(this.huntTurn + 1, this.huntTurns)} of ${this.huntTurns}`,
-          detail: giant ? `Player ${this.hunterIndex + 1} is hunting · most caught wins` : 'Changing over…',
+          title: SAY.board.huntTurn(Math.min(this.huntTurn + 1, this.huntTurns), this.huntTurns),
+          detail: giant ? SAY.board.huntingNow(this.hunterIndex + 1) : SAY.board.changingOver,
           clock: this.huntBreakT > 0 ? this.huntBreakT : this.huntTurnLeft(),
         };
       }
@@ -3048,11 +3054,11 @@ export class Game implements AiWorld {
         // Nobody left with a clock running — everyone here carried a finished run in — reads the
         // same as carrying on after a win, because that is exactly what it is.
         const chasing = this.players.filter((p) => !p.carriedTop);
-        if (this.endless || !chasing.length) return { title: 'Rise', detail: 'The reef is yours. Swim on.' };
+        if (this.endless || !chasing.length) return { title: SAY.board.riseTitle, detail: SAY.board.reefWon };
         const held = Math.max(0, ...this.players.map((p, i) => (p.carriedTop ? 0 : this.progress[i].apexT)));
-        return { title: 'Rise', detail: held > 0 ? `Apex held ${Math.floor(held)} s of 90` : 'Reach Apex and hold it for ninety seconds' };
+        return { title: SAY.board.riseTitle, detail: held > 0 ? SAY.board.apexHeld(Math.floor(held), APEX_HOLD_SECONDS) : SAY.board.riseGoal };
       }
-      case 'reef': return { title: 'Reef', detail: 'No goal. Just the sea.' };
+      case 'reef': return { title: SAY.board.reefTitle, detail: SAY.board.reefFree };
       default: return { title: ACTIVE_ERA.modes.find((m) => m.id === this.mode)?.name ?? this.mode, detail: '' };
     }
   }
@@ -3060,10 +3066,10 @@ export class Game implements AiWorld {
   /** Where this player could teleport right now. */
   teleportOptions(i: number): TeleportOption[] {
     const p = this.players[i]; if (!p) return [];
-    const out: TeleportOption[] = [{ dest: 'home', label: 'Your nursery', detail: 'Back to where you hatched', distance: distXZ(p.pos, p.home) }];
+    const out: TeleportOption[] = [{ dest: 'home', label: SAY.nursery, detail: SAY.nurseryDetail, distance: distXZ(p.pos, p.home) }];
     this.players.forEach((o, j) => {
       if (j === i) return;
-      out.push({ dest: j, label: `Player ${j + 1} · ${creature(o.creature).name}`, detail: isAlive(o) ? TIER_NAMES[o.tier] : 'respawning', distance: distXZ(p.pos, o.pos) });
+      out.push({ dest: j, label: SAY.teleportPlayer(j + 1, creature(o.creature).name), detail: isAlive(o) ? TIER_NAMES[o.tier] : SAY.respawning, distance: distXZ(p.pos, o.pos) });
     });
     return out;
   }
@@ -3316,9 +3322,9 @@ export class Game implements AiWorld {
           if (p.carriedTop) { pr.apexT = 0; return; }
           if (p.tier >= 4 && isAlive(p)) {
             pr.apexT += dt;
-            if (pr.apexT > 90 && this.state.status === 'playing' && !this.endless) {
+            if (pr.apexT > APEX_HOLD_SECONDS && this.state.status === 'playing' && !this.endless) {
               this.bankLadderTop(p);
-              this.state = { status: 'won', winner: i, message: `${creature(p.creature).name} rules the reef.` };
+              this.state = { status: 'won', winner: i, message: SAY.match.rulesTheReef(creature(p.creature).name) };
             }
           } else pr.apexT = 0;
         });
@@ -3369,10 +3375,8 @@ export class Game implements AiWorld {
   private endHuntTurn(grownUp: boolean) {
     const giant = this.players[this.hunterIndex];
     const caught = this.huntScore[this.hunterIndex] ?? 0;
-    const name = giant ? creature(giant.creature).name : 'The giant';
-    this.announce(grownUp
-      ? `The small ones grew up. ${name} caught ${caught}.`
-      : `Time. ${name} caught ${caught}.`);
+    const name = giant ? creature(giant.creature).name : SAY.theGiant;
+    this.announce(grownUp ? SAY.match.grownUp(name, caught) : SAY.match.timeUp(name, caught));
     if (this.huntTurn + 1 >= this.huntTurns) { this.finishHunt(); return; }
     this.huntTurn++;
     // Nobody is the giant during the pause. The old one keeps its body until the changeover —
@@ -3390,7 +3394,7 @@ export class Game implements AiWorld {
     const nursery = nurseryAt(0);
     this.world.loadAround(nursery);
     const giant = this.players[this.hunterIndex];
-    this.announce(`Turn ${this.huntTurn + 1} of ${this.huntTurns} — ${giant ? `Player ${this.hunterIndex + 1}` : 'nobody'} hunts.`);
+    this.announce(SAY.match.turnAnnounce(this.huntTurn + 1, this.huntTurns, giant ? SAY.match.playerName(this.hunterIndex + 1) : SAY.match.nobody));
     // Contenders are re-seated: the new giant at giant size, everybody else back to a juvenile in
     // a nursery. Scores stay; only the bodies are reset.
     for (const a of this.actors) {
@@ -3419,10 +3423,10 @@ export class Game implements AiWorld {
       if (n > bestScore) { bestScore = n; best = i; tied = false; }
       else if (n === bestScore) tied = true;
     });
-    const line = this.huntScore.map((n, i) => `P${i + 1} ${n}`).join(' · ');
-    if (bestScore <= 0) this.state = { status: 'lost', winner: -2, message: `Nobody caught anything. ${line}` };
-    else if (tied) this.state = { status: 'won', winner: -2, message: `A tie at ${bestScore}. ${line}` };
-    else this.state = { status: 'won', winner: best, message: `Player ${best + 1} hunted best: ${bestScore} caught. ${line}` };
+    const line = this.huntScore.map((n, i) => SAY.match.scoreLine(i + 1, n)).join(' · ');
+    if (bestScore <= 0) this.state = { status: 'lost', winner: -2, message: SAY.match.nobodyCaught(line) };
+    else if (tied) this.state = { status: 'won', winner: -2, message: SAY.match.tie(bestScore, line) };
+    else this.state = { status: 'won', winner: best, message: SAY.match.huntedBest(best + 1, bestScore, line) };
   }
 
   /** A short line in every player's viewport. */
@@ -3524,21 +3528,22 @@ export class Game implements AiWorld {
     if (RULES) return RULES.hint(this, i);
     const f = pr.flags;
     if (!isAlive(p)) return undefined;
-    if (p.hunted >= 0.5) return p.cover > 0.3 ? (len3(p.vel) < 0.3 ? 'Hold still. It is losing you.' : 'You are in cover. Now hold still.') : 'It is coming for you. Get under the sponges, then hold still.';
-    if (p.hunted > 0.2) return p.cover > 0.3 ? 'It is looking your way. Stay in cover and freeze.' : 'Something big is looking your way. Stop moving or slip into cover.';
-    if (!f.has('moved')) return '{swim} to swim.';
-    if (!f.has('burst')) return 'Hold {sprint} to sprint. Catch the school.';
-    if (!f.has('ate')) return 'Swim through the small fry to eat them.';
-    if (!f.has('sense') && this.time > 20) return 'Tap {sense}: the sense pulse shows what is near.';
-    if (p.tier === 0 && !f.has('tier')) return 'Eat. Grow. The ring fills toward your next moult.';
-    if (p.tier >= 1 && !f.has('light')) return '{light} bites. {heavy} pounces. Hunt something your own size.';
-    if (p.tier >= 1 && !f.has('dodge')) return '{dash} while you are moving dashes clear of a bite. {sprint} sprints.';
-    if (p.tier >= 1 && !f.has('guard') && creature(p.creature).canGuard) return 'Hold {guard} to guard. Tap it as a hit lands to parry.';
-    if (!f.has('ability')) return '{ability}: hide. Burrowers bury for free; camouflage copies nearby colours and uses stamina.';
-    if (!f.has('lock') && this.time > 30) return 'Hold {aim} to aim at prey. When the crosshair fills, {heavy} pounces.';
+    const H = SAY.hints;
+    if (p.hunted >= 0.5) return p.cover > 0.3 ? (len3(p.vel) < 0.3 ? H.huntedStill : H.huntedInCover) : H.huntedOpen;
+    if (p.hunted > 0.2) return p.cover > 0.3 ? H.noticedInCover : H.noticedOpen;
+    if (!f.has('moved')) return H.swim;
+    if (!f.has('burst')) return H.sprint;
+    if (!f.has('ate')) return H.eatSmallFry;
+    if (!f.has('sense') && this.time > 20) return H.sense;
+    if (p.tier === 0 && !f.has('tier')) return H.growRing;
+    if (p.tier >= 1 && !f.has('light')) return H.biteAndPounce;
+    if (p.tier >= 1 && !f.has('dodge')) return H.dashClear;
+    if (p.tier >= 1 && !f.has('guard') && creature(p.creature).canGuard) return H.guardParry;
+    if (!f.has('ability')) return H.hide;
+    if (!f.has('lock') && this.time > 30) return H.aim;
     // Graspers have a second way to use the same buttons, and nothing else in the game teaches it.
-    if (creature(p.creature).grasp && p.tier >= 1 && !f.has('ride')) return 'Hold {heavy} and you take hold — it costs nothing and hurts nothing. Let go of prey to eat it; hold on to anything your own size or bigger and ride it, then {light} to bite.';
-    if (!f.has('teleport') && this.time > 60 && (this.players.length > 1 || distXZ(p.pos, p.home) > 150)) return '{teleport}: teleport home, or to another player.';
+    if (creature(p.creature).grasp && p.tier >= 1 && !f.has('ride')) return H.grip;
+    if (!f.has('teleport') && this.time > 60 && (this.players.length > 1 || distXZ(p.pos, p.home) > 150)) return H.teleport;
     return undefined;
   }
 }

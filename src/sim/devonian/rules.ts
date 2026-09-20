@@ -1,3 +1,4 @@
+import { TEXT } from '../../shared/text';
 import { clamp, dist, distXZ, heading, type Vec3 } from '../../shared/math';
 import type { EraHud, EraRules } from '../era-rules';
 import { applyScaleStats, bandOf, brokeSurface, isAlive, isHidden, lengthOf, speedFactor } from '../actors';
@@ -376,10 +377,11 @@ export const DEVONIAN_RULES: EraRules = {
   hint(g, i) {
     const p = g.players[i]; if (!p || !isAlive(p)) return undefined;
     const d = devActor(g, p), def = creature(p.creature), rung = rungOf(p);
-    if (d.deadZoneIn && def.breathing !== 'bimodal') return 'Dead water. Get out of it, or up to the surface if you can breathe.';
-    if (g.time < 12) return rung === 1 ? 'Feed, hide, moult. Everything out there is bigger than you are today.' : rung === 2 ? 'Feed and keep your shoal. You grow on what you catch.' : rung === 3 ? 'Hunt the shoals. Five stages between you and Prime.' : 'Stay fed. The sea is hiding from you.';
-    if (def.shell && g.time < 40) return 'Your funnel makes rise and sink free, and no direction is slow. Block withdraws into the shell.';
-    if ((def.shoreReach ?? 0) > 0 && g.time < 40) return 'You can push into water nothing with gills can follow you into.';
+    const H = TEXT.sim.hints;
+    if (d.deadZoneIn && def.breathing !== 'bimodal') return H.deadWater;
+    if (g.time < 12) return H.opening[Math.min(rung, H.opening.length) - 1] ?? H.opening[H.opening.length - 1];
+    if (def.shell && g.time < 40) return H.shell;
+    if ((def.shoreReach ?? 0) > 0 && g.time < 40) return H.shallows;
     return undefined;
   },
 };

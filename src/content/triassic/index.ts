@@ -13,6 +13,7 @@ import shippedBytes from './asset-sizes.json';
 import devonianBytes from '../devonian/asset-sizes.json';
 import pendingRefinements from './pending-refinements.json';
 import { refinementTables, type PendingRefinement } from '../pending-refinements';
+import { TRIASSIC_STRINGS } from './strings';
 
 /** The badges, derived from the one refinement queue: every Triassic model is outstanding today. */
 const { modelStatus, modelNotes, clipNotes } = refinementTables(pendingRefinements as PendingRefinement[]);
@@ -62,6 +63,7 @@ const DEVONIAN_LINK = { title: 'Devonian Domination', path: 'devonian/', blurb: 
 export const TRIASSIC = defineEra({
   id: 'triassic',
   title: 'Triassic Triumph',
+  strings: TRIASSIC_STRINGS,
   copy: {
     // What the era is *about* is the return to the water: after the end-Permian, land vertebrates
     // went back into the sea — the ichthyosaurs, the nothosaurs and placodonts, and the

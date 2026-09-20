@@ -11,6 +11,7 @@ import { DEVONIAN_BRAND, DEVONIAN_BRAND_EXTRAS } from './brand';
 import shippedBytes from './asset-sizes.json';
 import pendingRefinements from './pending-refinements.json';
 import { refinementTables, type PendingRefinement } from '../pending-refinements';
+import { DEVONIAN_STRINGS } from './strings';
 
 /**
  * The badges, derived from the one refinement queue: a creature is a preview when its *model* is
@@ -51,6 +52,7 @@ export const DEVONIAN = defineEra({
   id: 'devonian',
   title: 'Devonian Domination',
   copy: { tagline: 'Feed. Grow. Fight. Escape.', taglineEm: '375 million years ago, the sea had a pecking order.', loading: 'FILLING THE BASIN…', lose: 'THE SEA WINS', settingsKey: 'devonian-settings', mobileIllustration: DEVONIAN_BRAND_EXTRAS.mobileIllustration, trilogy: { title: 'Ancient Seas Trilogy', path: '', blurb: 'All three games' }, sibling: { title: 'Cambrian Conquest', path: 'cambrian/', blurb: '133 million years earlier', logo: 'assets/brand/logo-header.webp' }, siblings: [{ title: 'Triassic Triumph', path: 'triassic/', blurb: '135 million years later', logo: 'assets/triassic/brand/logo-header.webp' }] },
+  strings: DEVONIAN_STRINGS,
   modes: [
     // The same three modes as the Cambrian, in the same order: this era changes the sea and the
     // animals in it, not what a match is.

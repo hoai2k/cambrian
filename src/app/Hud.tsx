@@ -10,6 +10,10 @@ import { BAND_COLOR, CALM_MARK } from '../sim/types';
 import { CreaturePortrait } from './CreaturePortrait';
 import { appBase } from '../shared/base';
 import { fillControls, key, type Scheme } from '../shared/controls';
+import { TEXT } from '../shared/text';
+
+/** Every word this panel says; see `src/content/strings.ts`. */
+const COPY = TEXT.hud;
 
 export function Hud({ snapshot }: { snapshot: HudSnapshot }) {
   const W = snapshot.rects.reduce((m, r) => Math.max(m, r.x + r.w), 1);
@@ -58,7 +62,7 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
       {p.grip && p.alive && <GripPanel grip={p.grip} s={s} />}
       <div className="fade" style={{ opacity: p.fade }} />
       {p.spectating && !p.alive && (
-        <div className="spectating"><b>SPECTATING</b><span style={{ color: p.spectating.color }}>{p.spectating.name} · {creature(p.spectating.creature).name}</span></div>
+        <div className="spectating"><b>{COPY.spectating}</b><span style={{ color: p.spectating.color }}>{p.spectating.name} · {creature(p.spectating.creature).name}</span></div>
       )}
       {!p.alive && p.fade < 0.9 && <DeathNote p={p} />}
     </>
@@ -72,8 +76,8 @@ function PlayerPanel({ p }: { p: PlayerHud }) {
  */
 function SenseOffMark({ s }: { s: Scheme }) {
   return (
-    <div className="sense-off-mark" role="status" aria-label={`Readouts off. Press ${key('sense', s)} for sense.`}>
-      <span className="btn dpad">{key('sense', s)}</span><span>Sense off</span>
+    <div className="sense-off-mark" role="status" aria-label={COPY.senseOffLabel(key('sense', s))}>
+      <span className="btn dpad">{key('sense', s)}</span><span>{COPY.senseOff}</span>
     </div>
   );
 }
@@ -106,11 +110,11 @@ function SensePanel({ p }: { p: PlayerHud }) {
             <circle cx="36" cy="36" r={R} className="ring-fg" strokeDasharray={`${C * p.progress} ${C}`} transform="rotate(-90 36 36)" />
           </svg>
           {p.era
-            ? <span className="tier-num rung-num" role="img" aria-label={`Rung ${p.era.rung}, ${p.era.rungName}. ${p.era.stage}, ${moultLabel(p.progress)}`}><small>RUNG</small>{RUNG_NUMERALS[p.era.rung] ?? p.era.rung}</span>
-            : <span className="tier-num" role="img" aria-label={`Tier ${p.tier + 1}: ${p.tierName}, ${moultLabel(p.progress)}`}><i className="tier-glyph" style={{ maskImage: `url(${appBase()}${assetPaths.ui(`tier-${p.tier + 1}.svg`)})` }} /></span>}
+            ? <span className="tier-num rung-num" role="img" aria-label={COPY.rungAria(p.era.rung, p.era.rungName, p.era.stage, moultLabel(p.progress))}><small>{COPY.rungLabel}</small>{RUNG_NUMERALS[p.era.rung] ?? p.era.rung}</span>
+            : <span className="tier-num" role="img" aria-label={COPY.tierAria(p.tier + 1, p.tierName, moultLabel(p.progress))}><i className="tier-glyph" style={{ maskImage: `url(${appBase()}${assetPaths.ui(`tier-${p.tier + 1}.svg`)})` }} /></span>}
         </div>
         <div className="bars">
-          <div className="name-row"><b>{def.name}</b><span className="tier-name">{p.tierName}</span>{p.protect && <span className="protect">PROTECTED</span>}</div>
+          <div className="name-row"><b>{def.name}</b><span className="tier-name">{p.tierName}</span>{p.protect && <span className="protect">{COPY.protected}</span>}</div>
           <div className="bar hp"><i style={{ width: `${(p.hp / p.hpMax) * 100}%` }} /></div>
           <div className={`bar stamina ${p.exhausted ? 'exhausted' : ''}`}>
             <i style={{ width: `${(p.stamina / p.staminaMax) * 100}%` }} />
@@ -124,7 +128,7 @@ function SensePanel({ p }: { p: PlayerHud }) {
             {p.era?.air && !p.era.atSurface && (p.era.airLeft ?? 1) <= 0
               && <i className={`air-mark ${p.stamina < p.staminaMax * 0.25 ? 'urgent' : ''}`}
                    role="img"
-                   aria-label={p.stamina < p.staminaMax * 0.25 ? 'Surface for air' : 'Out of air: no stamina recovery'}
+                   aria-label={p.stamina < p.staminaMax * 0.25 ? COPY.airSurfaceNow : COPY.airRecoveryOff}
                    style={{ maskImage: `url(${appBase()}${assetPaths.ui(p.stamina < p.staminaMax * 0.25 ? 'air-surface.svg' : 'air-recovery-off.svg')})` }} />}
           </div>
           {/* The breath being held, under the bar it governs. It is a clock on a dive rather than a
@@ -132,7 +136,7 @@ function SensePanel({ p }: { p: PlayerHud }) {
           {p.era?.airLeft != null && (
             <div className={`bar air ${p.era.airLow ? 'low' : ''}`}
                  role="img"
-                 aria-label={`Air ${Math.round(p.era.airLeft * 100)}%${p.era.airLow ? ', surface soon' : ''}`}>
+                 aria-label={COPY.airBarAria(Math.round(p.era.airLeft * 100), !!p.era.airLow)}>
               <i style={{ width: `${p.era.airLeft * 100}%` }} />
             </div>
           )}
@@ -142,7 +146,7 @@ function SensePanel({ p }: { p: PlayerHud }) {
       {p.aim && (
         <div className={`aim ${p.aim.hasTarget ? 'on-target' : ''} ${p.aim.inRange ? 'in-range' : ''} ${p.aim.ready ? '' : 'cooling'}`} style={{ color: p.aim.color }}>
           <i /><i /><i /><i /><b />
-          <span className="aim-label">{p.aim.inRange ? (p.aim.ready ? `${key('heavy', s)} · ${p.aim.action}` : '…') : p.aim.name ?? ''}</span>
+          <span className="aim-label">{p.aim.inRange ? (p.aim.ready ? `${key('heavy', s)} · ${p.aim.action}` : COPY.aimCooling) : p.aim.name ?? ''}</span>
         </div>
       )}
       {p.lock && !p.aim && (
@@ -160,26 +164,26 @@ function SensePanel({ p }: { p: PlayerHud }) {
       <div className="hud-bottom">
         <div className={`chip ability ${p.abilityUnlocked ? '' : 'locked'} ${p.abilityActive ? 'active' : ''}`} title={fillControls(hideDescription(def.id), s)}>
           <span className="btn y">{key('ability', s)}</span>
-          <span className="chip-label">{p.abilityUnlocked ? p.abilityName : 'Hide'}</span>
+          <span className="chip-label">{p.abilityUnlocked ? p.abilityName : COPY.hideChip}</span>
           <i className="cool" style={{ transform: `scaleX(${p.abilityUnlocked ? p.abilityReady : 0})` }} />
         </div>
         {/* Only ever drawn with sense on, so the chip is only ever the way out of it. */}
-        <div className="chip sense ready active" title="Band marks, the radar and the gauges. Off is the bare sea: nothing drawn over it at all.">
-          <span className="btn dpad">{key('sense', s)}</span><span className="chip-label">Sense</span>
+        <div className="chip sense ready active" title={COPY.senseChipTitle}>
+          <span className="btn dpad">{key('sense', s)}</span><span className="chip-label">{COPY.senseChip}</span>
           <i className="cool" style={{ transform: 'scaleX(1)' }} />
         </div>
-        <div className="tally"><span>{p.eats} eaten</span><span>{p.kills} kills</span><span>{p.escapes} escapes</span></div>
+        <div className="tally"><span>{COPY.tallyEaten(p.eats)}</span><span>{COPY.tallyKills(p.kills)}</span><span>{COPY.tallyEscapes(p.escapes)}</span></div>
       </div>
       {p.hunterState !== 'none' && (
         <div className={`threat-alert ${p.hunterState}`}>
           <span className="eye"><i style={{ transform: `scaleX(${Math.min(1, p.hunted)})` }} /></span>
           <div>
-            <b>{p.hunterState === 'hunting' ? `${p.hunterName ?? 'Something huge'} IS HUNTING YOU` : `${p.hunterName ?? 'Something huge'} is looking your way`}</b>
-            <span>{p.hunterState === 'hunting' ? (p.inCover ? (p.still ? 'Hold still. It is losing you.' : 'In cover. Now freeze.') : 'Break line of sight. Get under the sponges.') : (p.still ? 'Stay frozen until it turns away.' : 'Stop moving, or slip into cover.')}</span>
+            <b>{p.hunterState === 'hunting' ? COPY.threat.hunting(p.hunterName ?? COPY.threat.unknown) : COPY.threat.noticed(p.hunterName ?? COPY.threat.unknown)}</b>
+            <span>{p.hunterState === 'hunting' ? (p.inCover ? (p.still ? COPY.threat.huntingInCoverStill : COPY.threat.huntingInCover) : COPY.threat.huntingOpen) : (p.still ? COPY.threat.noticedStill : COPY.threat.noticedMoving)}</span>
           </div>
         </div>
       )}
-      {!p.modelReady && p.alive && <p className="hint">Your creature is taking shape…</p>}
+      {!p.modelReady && p.alive && <p className="hint">{COPY.modelLoading}</p>}
       {p.hint && p.hunterState === 'none' && p.modelReady && <p className="hint">{fillControls(p.hint, s)}</p>}
       {/* Co-op: where a team-mate went down, and how long is left to reach them. */}
       {p.downedAllies.map((d) => (
@@ -191,8 +195,8 @@ function SensePanel({ p }: { p: PlayerHud }) {
         <div className="downed-call">
           {p.downedAllies.map((d) => (
             <p key={d.index} style={{ ['--player' as string]: d.color }}>
-              <b>P{d.index + 1} is down</b>
-              <span>{d.progress > 0 ? 'Hold still — getting them up' : `${fmtDist(d.distance)} · reach them in ${Math.ceil(d.seconds)} s`}</span>
+              <b>{COPY.downed.heading(d.index + 1)}</b>
+              <span>{d.progress > 0 ? COPY.downed.reviving : COPY.downed.distance(fmtDist(d.distance), Math.ceil(d.seconds))}</span>
               <i className="revive-bar" style={{ transform: `scaleX(${d.progress})` }} />
             </p>
           ))}
@@ -219,17 +223,17 @@ function GripPanel({ grip, s }: { grip: NonNullable<PlayerHud['grip']>; s: Schem
   if (grip.kind === 'spent') {
     return (
       <div className="grip-panel spent">
-        <b>GRIP GIVEN OUT</b>
-        <span>Let go before trying again</span>
+        <b>{COPY.grip.spent}</b>
+        <span>{COPY.grip.spentNote}</span>
       </div>
     );
   }
   if (grip.kind === 'held') {
     return (
       <div className="grip-panel lost" style={{ color: BAND_COLOR[grip.band] }}>
-        <b>{grip.name.toUpperCase()} HAS YOU</b>
+        <b>{COPY.grip.heldBy(grip.name)}</b>
         <div className="bar grip"><i style={{ width: `${(grip.left ?? 1) * 100}%` }} /></div>
-        <span>{key('dash', s)} to break free · easier while it is pulling</span>
+        <span>{COPY.grip.breakFree(key('dash', s))}</span>
       </div>
     );
   }
@@ -238,14 +242,14 @@ function GripPanel({ grip, s }: { grip: NonNullable<PlayerHud['grip']>; s: Schem
   // both change what the button means, so the line changes with them rather than describing a grip
   // in general.
   const say = {
-    strike: 'Release NOW to strike',
-    eat: 'Release to eat it',
-    escape: 'It is working loose — let go or lose it',
-    nothing: `${key('light', s)} bite · release to let go`,
+    strike: COPY.grip.releaseToStrike,
+    eat: COPY.grip.releaseToEat,
+    escape: COPY.grip.workingLoose,
+    nothing: COPY.grip.biteOrLetGo(key('light', s)),
   }[grip.release];
   return (
     <div className={`grip-panel ${grip.release === 'strike' ? 'strike' : ''} ${grip.release === 'escape' ? 'lost' : ''}`} style={{ color: BAND_COLOR[grip.band] }}>
-      <b>{ride ? 'HOLDING ON' : 'IN YOUR JAWS'} · {grip.name}</b>
+      <b>{ride ? COPY.grip.holdingOn : COPY.grip.inYourJaws} · {grip.name}</b>
       {/* A bar only while something is actually running down — the strike window on a ride, the
           meal window on a mouthful. A settled ride has no clock, so it is given nothing that looks
           like one. */}
@@ -255,11 +259,19 @@ function GripPanel({ grip, s }: { grip: NonNullable<PlayerHud['grip']>; s: Schem
   );
 }
 
+/**
+ * A line of menu footer, with `**...**` drawn as a key cap. The copy stays one string in the text
+ * table — which is what a translator needs — while the buttons in it still read as buttons.
+ */
+function Keys({ text }: { text: string }) {
+  return <>{text.split('**').map((part, i) => (i % 2 ? <kbd key={i}>{part}</kbd> : part))}</>;
+}
+
 /** Where else you could be, and how far. Opened with the teleport button, so sense never hides it. */
 function TeleportMenu({ t, s }: { t: NonNullable<PlayerHud['teleport']>; s: Scheme }) {
   return (
     <div className="tele-menu">
-      <p className="eyebrow">TELEPORT</p>
+      <p className="eyebrow">{COPY.teleport.eyebrow}</p>
       <ul>
         {t.options.map((o, k) => (
           <li key={k} className={k === t.index ? 'sel' : ''}>
@@ -268,7 +280,7 @@ function TeleportMenu({ t, s }: { t: NonNullable<PlayerHud['teleport']>; s: Sche
           </li>
         ))}
       </ul>
-      <small>{t.cooldown > 0 ? `Ready in ${Math.ceil(t.cooldown)} s` : <><kbd>{key('confirm', s)}</kbd> go · <kbd>{key('back', s)}</kbd> back · <kbd>{key('teleport', s)}</kbd> next</>}</small>
+      <small>{t.cooldown > 0 ? COPY.teleport.cooling(Math.ceil(t.cooldown)) : <Keys text={COPY.teleport.ready(key('confirm', s), key('back', s), key('teleport', s))} />}</small>
     </div>
   );
 }
@@ -277,17 +289,17 @@ function TeleportMenu({ t, s }: { t: NonNullable<PlayerHud['teleport']>; s: Sche
 function SwapMenu({ swap, s }: { swap: NonNullable<PlayerHud['swap']>; s: Scheme }) {
   return (
     <div className="tele-menu swap-menu">
-      <p className="eyebrow">CHANGE CREATURE</p>
+      <p className="eyebrow">{COPY.swap.eyebrow}</p>
       <div className="swap-body">
         <CreaturePortrait creatureId={swap.creature} kind="thumb" assetBase={appBase()} alt="" draggable={false} loading="eager" />
         <div>
           <b>{swap.name}</b>
           {swap.kind && <span className="swap-kind">{swap.kind}</span>}
-          <span className="swap-rung">{swap.rung}{swap.kept ? ' · your progress' : swap.grown ? ' · fully grown' : ' · hatchling'}</span>
+          <span className="swap-rung">{swap.rung}{swap.kept ? COPY.swap.keptProgress : swap.grown ? COPY.swap.fullyGrown : COPY.swap.hatchling}</span>
           <i className="swap-fill"><b style={{ transform: `scaleX(${swap.fill})` }} /></i>
         </div>
       </div>
-      <small><kbd>◀▶</kbd> {swap.index + 1}/{swap.count} · <kbd>{key('ability', s)}</kbd> {swap.grown ? 'grown' : 'hatchling'} · <kbd>{key('confirm', s)}</kbd> take it · <kbd>{key('back', s)}</kbd> back</small>
+      <small><kbd>◀▶</kbd> <Keys text={COPY.swap.footer(key('ability', s), swap.grown, swap.index + 1, swap.count, key('confirm', s), key('back', s))} /></small>
     </div>
   );
 }
@@ -305,11 +317,11 @@ function DeathNote({ p }: { p: PlayerHud }) {
   const downed = p.downedFor > 0;
   return (
     <div className={`death-note ${downed ? 'downed' : ''} ${p.spectating ? 'spectating-too' : ''}`}>
-      <b>{downed ? 'You are down' : p.death?.eaten ? 'You\u2019ve been eaten' : 'You\u2019ve been killed'}
-        {!downed && p.death?.by && <i> by {p.death.by}</i>}</b>
+      <b>{downed ? COPY.death.down : p.death?.eaten ? COPY.death.eaten : COPY.death.killed}
+        {!downed && p.death?.by && <i>{COPY.death.by(p.death.by)}</i>}</b>
       <span>{downed
-        ? (p.reviveProgress > 0 ? 'Someone is getting you up\u2026' : `A team-mate can still reach you \u00b7 ${Math.ceil(p.downedFor)} s`)
-        : 'You slip down a tier.'}</span>
+        ? (p.reviveProgress > 0 ? COPY.death.beingRevived : COPY.death.reviveWindow(Math.ceil(p.downedFor)))
+        : COPY.death.demoted}</span>
       {downed && <i className="revive-bar wide" style={{ transform: `scaleX(${p.reviveProgress})` }} />}
     </div>
   );
@@ -333,15 +345,15 @@ function Scoreboard({ board, me }: { board: NonNullable<PlayerHud['board']>; me:
         {rows.map((r, k) => (
           <li key={k} className={`board-row ${r.player === me ? 'you' : ''} ${r.hunting ? 'hunting' : ''} ${r.alive ? '' : 'down'}`}
             style={{ ['--player' as string]: r.player >= 0 ? PLAYER_COLORS[r.player % 4] : '#8fa3a8' }}>
-            <span className="board-who">{r.player >= 0 ? `P${r.player + 1}` : 'BOT'}</span>
+            <span className="board-who">{r.player >= 0 ? TEXT.common.playerChip(r.player + 1) : COPY.scoreboard.bot}</span>
             <span className="board-name">
               <b>{r.name}</b>
-              <small>{r.rank}{r.hunting ? ' · hunting' : ''}{r.alive ? '' : ' · down'}</small>
+              <small>{r.rank}{r.hunting ? COPY.scoreboard.hunting : ''}{r.alive ? '' : COPY.scoreboard.down}</small>
               <i className="board-bar" style={{ transform: `scaleX(${r.progress})` }} />
             </span>
-            {r.score != null && <span className="board-score" title="caught">{r.score}</span>}
+            {r.score != null && <span className="board-score" title={COPY.scoreboard.caught}>{r.score}</span>}
             <span className="board-tally">
-              <small>{r.kills} k · {r.eats} e</small>
+              <small>{COPY.scoreboard.tally(r.kills, r.eats)}</small>
               <small>{r.player === me ? r.biome : fmtDist(r.distance)}</small>
             </span>
           </li>
@@ -355,10 +367,10 @@ function Scoreboard({ board, me }: { board: NonNullable<PlayerHud['board']>; me:
  * The ring reads the same in both eras: how close the next moult is. Full means the body grows —
  * a tier in the Cambrian, a life stage in the Devonian — so it is spoken as one thing.
  */
-const moultLabel = (progress: number) => progress >= 1 ? 'fully grown' : `${Math.round(progress * 100)}% to the next moult`;
+const moultLabel = (progress: number) => progress >= 1 ? COPY.fullyGrown : COPY.toNextMoult(Math.round(progress * 100));
 const fmtClock = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
-const fmtDist = (d: number) => (d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).toFixed(1)} km`);
+const fmtDist = (d: number) => (d < 1000 ? TEXT.common.metres(Math.round(d)) : TEXT.common.kilometres((d / 1000).toFixed(1)));
 
 /**
  * The radar: the nearest thing big enough to hurt, whatever is hunting you, the nearest shoal
@@ -371,9 +383,9 @@ const fmtDist = (d: number) => (d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).
 /** Spoken form of the food contacts, including whether they are over your head. */
 function foodLabel(blips: readonly RadarBlipHud[]): string {
   const food = blips.filter((b) => b.kind === 'food');
-  if (!food.length) return 'No food in reach.';
+  if (!food.length) return COPY.radar.noFood;
   const l = food[0].level;
-  return l === 'above' ? 'Food above you.' : l === 'below' ? 'Food below you.' : 'Food nearby.';
+  return l === 'above' ? COPY.radar.foodAbove : l === 'below' ? COPY.radar.foodBelow : COPY.radar.foodNear;
 }
 
 function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
@@ -448,7 +460,7 @@ function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
   const inside = radar.blips.filter((b) => !b.beyond).sort((a2, b2) => rank(a2) - rank(b2));
   const rim = radar.blips.filter((b) => b.beyond);
   return (
-    <div className="radar" aria-label={`Radar, ${Math.round(radar.range)} metre reach. ${biome}. ${foodLabel(radar.blips)}`}>
+    <div className="radar" aria-label={COPY.radar.label(Math.round(radar.range), biome, foodLabel(radar.blips))}>
       <svg viewBox="0 0 100 100">
         <defs><filter id={outline} colorInterpolationFilters="sRGB">
           <feMorphology in="SourceAlpha" operator="erode" radius=".7" result="inside"/>
@@ -462,7 +474,7 @@ function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
         {inside.map(dot)}{rim.map(dot)}
         <circle cx={C} cy={C} r={R} className="radar-rim" />
       </svg>
-      <span className="radar-range">{Math.round(radar.range)} m</span>
+      <span className="radar-range">{COPY.radar.range(Math.round(radar.range))}</span>
     </div>
   );
 }
@@ -475,17 +487,18 @@ const RUNG_NUMERALS = ['', 'I', 'II', 'III', 'IV'];
  */
 function EraStatus({ era, alive }: { era: EraHud; alive: boolean }) {
   if (!alive) return null;
-  const warn = era.inDeadZone ? (era.bimodal ? 'DEAD WATER · your lungs are fine, their gills are not' : 'DEAD WATER · no oxygen, get out')
-    : era.beached ? 'ON THE SAND · nothing with gills can follow'
-    : era.heldUnder ? 'HELD UNDER · nothing comes back until you are loose'
-    : (era.shoreWarn ?? 0) > 0 ? 'SOMETHING ON THE SHORE · it is reaching for you'
-    : era.drowning ? 'DROWNING · get to the surface'
-    : era.air && !era.atSurface && (era.airLeft ?? 1) <= 0 ? 'OUT OF AIR · nothing comes back until you breathe'
-    : era.airLow ? 'AIR RUNNING OUT · start for the surface' : '';
+  const W = COPY.warnings;
+  const warn = era.inDeadZone ? (era.bimodal ? W.deadWaterBimodal : W.deadWater)
+    : era.beached ? W.beached
+    : era.heldUnder ? W.heldUnder
+    : (era.shoreWarn ?? 0) > 0 ? W.shoreReaching
+    : era.drowning ? W.drowning
+    : era.air && !era.atSurface && (era.airLeft ?? 1) <= 0 ? W.outOfAir
+    : era.airLow ? W.airRunningOut : '';
   const danger = (era.inDeadZone && !era.bimodal) || era.heldUnder || (era.shoreWarn ?? 0) > 0 || !!era.drowning || !!era.airLow;
   return (
     <div className="era-status">
-      {era.primeT > 0 && <div className="dominant"><span>PRIME</span><b>{Math.max(0, Math.ceil(90 - era.primeT))}</b></div>}
+      {era.primeT > 0 && <div className="dominant"><span>{W.primeCountdown}</span><b>{Math.max(0, Math.ceil(90 - era.primeT))}</b></div>}
       {warn && <div className={`era-warn ${danger ? 'danger' : ''}`}>{warn}</div>}
     </div>
   );
@@ -502,11 +515,11 @@ function EraStatus({ era, alive }: { era: EraHud; alive: boolean }) {
 function DayPhase({ day }: { day: PlayerHud['day'] }) {
   const hot = day.phase === 'dusk' || day.phase === 'dawn';
   return (
-    <div className={`day-phase ${day.phase} ${hot ? 'hunting' : ''}`} aria-label={`${day.phase}, ${Math.ceil(day.until)} seconds left`}>
+    <div className={`day-phase ${day.phase} ${hot ? 'hunting' : ''}`} aria-label={COPY.day.label(day.phase, Math.ceil(day.until))}>
       <span className="day-mark" aria-hidden>{day.phase === 'night' ? '☾' : day.phase === 'day' ? '☀' : '◐'}</span>
       <span className="day-text">
         <b>{day.phase.toUpperCase()}</b>
-        <small>{hot ? 'the reef is hunting' : `${Math.ceil(day.until)}s`}</small>
+        <small>{hot ? COPY.day.hunting : COPY.day.seconds(Math.ceil(day.until))}</small>
       </span>
     </div>
   );
@@ -527,5 +540,5 @@ function BiomeBanner({ biome, alive }: { biome: string; alive: boolean }) {
   const art = BIOME_ART.find(b => b.name === shown);
   return shown ? <div className="biome-banner" key={shown}>
     {art && <img src={`${appBase()}${biomeArtPath(art.id)}`} alt="" aria-hidden="true" />}
-    <span>ENTERING</span><b>{shown}</b></div> : null;
+    <span>{COPY.biomeBanner}</span><b>{shown}</b></div> : null;
 }
