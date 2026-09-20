@@ -4,6 +4,6 @@
     "status": "pending",
     "scope": "initial-model",
     "model": true,
-    "reason": "No Triassic model has been delivered yet: this animal borrows a Devonian body in play until its own Tripo model, rig and clips land through the pipeline in docs/triassic/04-tripo-pipeline.md. Its canonical pose is greenlit in docs/triassic/canonical/review.md, so the four-view modelling sheet and the Tripo generation are cleared to be made from it."
+    "reason": "A replacement is actively being built from a new straight neutral canonical because the first Tripo generation curves back across itself and cannot use the shared axial rigging pipeline. The current generation remains available as the viewer's Backup Model while the replacement receives the shared rig, dynamic clips, anchors, LOD and paired-body validation. Coordination state: docs/triassic/3d-work-status.md."
   }
 ]

@@ -3,23 +3,23 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 2090780,
-      "sha256": "4fcdeab652963e6e0dda0517f846492d3a2d56a1a65ebb64a2938d2acf679d9d",
-      "triangles": 22890,
+      "bytes": 2087320,
+      "sha256": "12bcf40f3a1122a4932b34bc962b2cfde492414f2791d4bf1f8d2659a7726110",
+      "triangles": 22886,
       "vertices": 14865
     },
     {
       "suffix": ".puppet",
-      "bytes": 876372,
-      "sha256": "4c9b2a0769497207a4c14953952fd20b5807cb6670047fa62d1ed17cf4a2e038",
-      "triangles": 7872,
+      "bytes": 873480,
+      "sha256": "e2b22b7e9e074a5b92d01dbf88dcffcd15a34bbceb52e3ddfec6ff37a6dd7f6b",
+      "triangles": 7868,
       "vertices": 4142
     },
     {
       "suffix": ".lod1",
-      "bytes": 876372,
-      "sha256": "4c9b2a0769497207a4c14953952fd20b5807cb6670047fa62d1ed17cf4a2e038",
-      "triangles": 7872,
+      "bytes": 873480,
+      "sha256": "e2b22b7e9e074a5b92d01dbf88dcffcd15a34bbceb52e3ddfec6ff37a6dd7f6b",
+      "triangles": 7868,
       "vertices": 4142
     }
   ],
@@ -188,7 +188,7 @@
       "sha256": "e9fde64f5b2a0bdec51dd1ddc2dae9e66964a26f3ce6ad9b3497082f3fcf75ff"
     }
   ],
-  "twinTriangleFraction": 0.3439056356487549,
+  "twinTriangleFraction": 0.34379096390806607,
   "playback": [
     {
       "suffix": "",
@@ -197,7 +197,7 @@
           "clip": "Ability",
           "duration": 2.5,
           "samples": 61,
-          "maxVertexTravel": 0.6803743323606924
+          "maxVertexTravel": 0.6848065084599
         },
         {
           "clip": "Attack",
@@ -257,7 +257,7 @@
           "clip": "Graze",
           "duration": 2.5,
           "samples": 61,
-          "maxVertexTravel": 0.6791188283144317
+          "maxVertexTravel": 0.6835370249238502
         },
         {
           "clip": "Growth",
@@ -340,7 +340,7 @@
           "clip": "Ability",
           "duration": 2.5,
           "samples": 61,
-          "maxVertexTravel": 0.6803743323606924
+          "maxVertexTravel": 0.6848065084599
         },
         {
           "clip": "Attack",
@@ -358,7 +358,7 @@
           "clip": "Breath",
           "duration": 2.5999999046325684,
           "samples": 61,
-          "maxVertexTravel": 0.9491908276711232
+          "maxVertexTravel": 0.9491908325498737
         },
         {
           "clip": "Breathe",
@@ -400,7 +400,7 @@
           "clip": "Graze",
           "duration": 2.5,
           "samples": 61,
-          "maxVertexTravel": 0.6791188283144317
+          "maxVertexTravel": 0.6835370249238502
         },
         {
           "clip": "Growth",
@@ -418,7 +418,7 @@
           "clip": "Heavy",
           "duration": 1.2999999523162842,
           "samples": 61,
-          "maxVertexTravel": 2.493589951264597
+          "maxVertexTravel": 2.4935899161287085
         },
         {
           "clip": "Hit",

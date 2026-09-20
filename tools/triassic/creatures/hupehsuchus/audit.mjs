@@ -8,6 +8,8 @@
  *   node tools/triassic/creatures/hupehsuchus/audit.mjs --package --decode
  */
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { auditCutAttachment } from '../_pipeline/cut-attachment.mjs';
 import { auditPair, tracker, lateral, beatLag, swingPhase, anchorTravel } from '../_pipeline/paired-audit.mjs';
 
 const id = 'hupehsuchus';
@@ -18,6 +20,12 @@ const { report, CLIPS, authored, write } = await auditPair({
   local: `local/triassic-authoring/${id}`,
   joints: 28, sockets: 3,
 });
+const hinge = JSON.parse(fs.readFileSync(`tools/triassic/creatures/${id}/validation.json`)).mouth.hingeY;
+report.posteriorJawAttachment = {};
+for (const suffix of ['', '.puppet']) {
+  report.posteriorJawAttachment[suffix || 'authored'] = await auditCutAttachment(
+    `public/assets/triassic/creatures/${id}${suffix}.glb`, -hinge * 4);
+}
 const track = tracker(authored);
 const CHAIN = ['skull', 'neck', 'chest', 'body', 'tail_00', 'tail_02', 'tail_04', 'tail_06'];
 

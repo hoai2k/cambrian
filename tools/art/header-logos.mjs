@@ -30,6 +30,7 @@
  */
 import { chromium } from 'playwright-core';
 import fs from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 
 const MARKS = [
   ['cambrian', 'public/assets/brand/logo-engraved.webp', 'public/assets/brand/logo-header.webp'],
@@ -46,7 +47,15 @@ const REFERENCE = 'devonian';
 /** The shared canvas, and how much of its height the lettering is seated at. */
 const CANVAS = { w: 1536, h: 560, fill: 0.9 };
 
-const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] });
+const chromiumCandidates = [
+  process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
+  '/opt/pw-browsers/chromium',
+  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  '/Applications/Chromium.app/Contents/MacOS/Chromium',
+].filter(Boolean);
+const executablePath = chromiumCandidates.find(existsSync);
+if (!executablePath) throw new Error(`No Chromium executable found; tried: ${chromiumCandidates.join(', ')}`);
+const browser = await chromium.launch({ executablePath, args: ['--no-sandbox'] });
 const page = await browser.newPage();
 
 /** Every ink luminance in a mark, sorted: the curve that says what a rank is worth. */

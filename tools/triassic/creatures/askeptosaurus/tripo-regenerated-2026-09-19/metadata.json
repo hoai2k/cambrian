@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "name": "askeptosaurus",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "input": {
+      "pbr": true,
+      "file": {
+        "type": "jpeg",
+        "object": {
+          "key": "tcli_2f16803761ed4cf0af45a11555b61c60/20260920/5b497dd2-0f06-4764-8d91-401dd19f5ad0/image.jpeg",
+          "bucket": "tripo-data"
+        }
+      },
+      "texture": true,
+      "export_uv": true,
+      "face_limit": 20000,
+      "model_version": "v3.1-20260211",
+      "geometry_quality": "standard",
+      "enable_image_autofix": false
+    },
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    },
+    "task_id": "5b497dd2-0f06-4764-8d91-401dd19f5ad0",
+    "created_at": "2026-09-20T01:49:58.832755Z",
+    "completed_at": "2026-09-20T01:51:37.562933Z",
+    "credits_consumed": 30
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-publish/docs/triassic/canonical/model-inputs/askeptosaurus/input.png",
+    "sha256": "7bafe2ec6b3786e9f78cffb5f50575969c761da1039ebbea5fb74d2a586e8993",
+    "bytes": 1380978
+  },
+  "artifact": {
+    "path": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/devonian-publish/tools/triassic/creatures/askeptosaurus/tripo-regenerated-2026-09-19/askeptosaurus.raw.glb",
+    "bytes": 1311504,
+    "sha256": "fc074bb6df131052de8bd258909d1a876b90ae5400c73713f33b47159db24747",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-20T01:51:43.145Z"
+}
