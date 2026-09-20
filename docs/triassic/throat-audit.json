@@ -4,22 +4,16 @@
   "method": "Three.js GLTFLoader/AnimationMixer; all shipped authored and puppet clips, 25 samples including clamped endpoints; skin and hidden oral surfaces recorded separately; mouth region selected by jaw/skull/neck/pouch influences. Strain flags require posed edge >1.5% body length and ratio >2. No automatic claim of intersection-free geometry.",
   "models": [
     {
-      "id": "rhaeticosaurus",
+      "id": "mosasaurus",
       "variant": "authored",
-      "sha256": "019340956d4e9aea0976a4d65a6ec8440e44664a68dbdddfe9a61ba13f92c564",
-      "length": 4.9999998026076735,
+      "sha256": "2f64ea357717b1c93896176f9f65e381c64f25e16096b64e7bb9170b6c357b28",
+      "length": 4.999999563326137,
       "meshes": [
         {
-          "name": "Rhaeticosaurus_authored_body",
+          "name": "Mosasaurus_authored_body",
           "hiddenOral": false,
-          "vertices": 11315,
-          "mixedJawSkullVertices": 426
-        },
-        {
-          "name": "Rhaeticosaurus_authored_body_lower_jaw",
-          "hiddenOral": false,
-          "vertices": 670,
-          "mixedJawSkullVertices": 82
+          "vertices": 11562,
+          "mixedJawSkullVertices": 798
         }
       ],
       "clips": [
@@ -27,25 +21,25 @@
           "name": "Ability",
           "duration": 1.100000023841858,
           "skin": {
-            "ratio": 2.8106065887132177,
-            "rest": 0.0723600240150357,
-            "posed": 0.203375560256106,
-            "phase": 0.4583333333333333,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 1.7337545766030862,
+            "rest": 0.04928819587680658,
+            "posed": 0.08545363517392277,
+            "phase": 0.7083333333333334,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              6457,
-              6387
+              6860,
+              8666
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0193740455058558,
-            "rest": 0.09333299690392845,
-            "posed": 0.09514123463314304,
-            "phase": 0.25,
-            "mesh": "Rhaeticosaurus_authored_body_lower_jaw",
+            "ratio": 1.7337545766030862,
+            "rest": 0.04928819587680658,
+            "posed": 0.08545363517392277,
+            "phase": 0.7083333333333334,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              401,
-              359
+              6860,
+              8666
             ]
           },
           "hiddenOral": {
@@ -56,25 +50,25 @@
           "name": "Attack",
           "duration": 1,
           "skin": {
-            "ratio": 1.832245395114107,
-            "rest": 0.04106147199896426,
-            "posed": 0.07523469298670911,
-            "phase": 0.6666666666666666,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 3.2258998393987777,
+            "rest": 0.030889808575394487,
+            "posed": 0.09964742852242406,
+            "phase": 0.4583333333333333,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              3250,
-              7043
+              8779,
+              10743
             ]
           },
           "mouthSkin": {
-            "ratio": 1.3537531291951537,
-            "rest": 0.07955151763493756,
-            "posed": 0.10769311593052018,
-            "phase": 0.20833333333333334,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 3.2258998393987777,
+            "rest": 0.030889808575394487,
+            "posed": 0.09964742852242406,
+            "phase": 0.4583333333333333,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              132,
-              7086
+              8779,
+              10743
             ]
           },
           "hiddenOral": {
@@ -85,25 +79,25 @@
           "name": "Bite",
           "duration": 0.5,
           "skin": {
-            "ratio": 1.4102269161324577,
-            "rest": 0.0723600240150357,
-            "posed": 0.10204405351799438,
-            "phase": 1,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 3.432486173814902,
+            "rest": 0.030889808575394487,
+            "posed": 0.10602884084683056,
+            "phase": 0.20833333333333334,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              6457,
-              6387
+              8779,
+              10743
             ]
           },
           "mouthSkin": {
-            "ratio": 1.171232220748325,
-            "rest": 0.0655325071135866,
-            "posed": 0.07675378383785145,
+            "ratio": 3.432486173814902,
+            "rest": 0.030889808575394487,
+            "posed": 0.10602884084683056,
             "phase": 0.20833333333333334,
-            "mesh": "Rhaeticosaurus_authored_body_lower_jaw",
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              359,
-              349
+              8779,
+              10743
             ]
           },
           "hiddenOral": {
@@ -114,25 +108,25 @@
           "name": "Breath",
           "duration": 2.4000000953674316,
           "skin": {
-            "ratio": 1.698653039806555,
-            "rest": 0.047403153654238486,
-            "posed": 0.0805215110511894,
+            "ratio": 2.3702397306712877,
+            "rest": 0.03215667339402902,
+            "posed": 0.07621902488474791,
             "phase": 0.5,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              8417,
-              5063
+              7884,
+              8211
             ]
           },
           "mouthSkin": {
-            "ratio": 1.1651963565085668,
-            "rest": 0.09738201945985,
-            "posed": 0.11346917426406357,
+            "ratio": 2.3702397306712877,
+            "rest": 0.03215667339402902,
+            "posed": 0.07621902488474791,
             "phase": 0.5,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              3525,
-              10393
+              7884,
+              8211
             ]
           },
           "hiddenOral": {
@@ -143,25 +137,25 @@
           "name": "Breathe",
           "duration": 3,
           "skin": {
-            "ratio": 1.4523514675277582,
-            "rest": 0.057695397616065354,
-            "posed": 0.08379399539729004,
+            "ratio": 2.376318832391948,
+            "rest": 0.03215667339402902,
+            "posed": 0.07641450857330827,
             "phase": 0.25,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              7121,
-              10515
+              7884,
+              8211
             ]
           },
           "mouthSkin": {
-            "ratio": 1.1678050160207296,
-            "rest": 0.09738201945985,
-            "posed": 0.11372321079544113,
+            "ratio": 2.376318832391948,
+            "rest": 0.03215667339402902,
+            "posed": 0.07641450857330827,
             "phase": 0.25,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              3525,
-              10393
+              7884,
+              8211
             ]
           },
           "hiddenOral": {
@@ -172,25 +166,25 @@
           "name": "Death",
           "duration": 1.899999976158142,
           "skin": {
-            "ratio": 2.0144432011722553,
-            "rest": 0.047403153654238486,
-            "posed": 0.09549096059290448,
-            "phase": 0.625,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 1.738250411384253,
+            "rest": 0.044147332485540994,
+            "posed": 0.07673911885450903,
+            "phase": 1,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              8417,
-              5063
+              9208,
+              8666
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0475976134025449,
-            "rest": 0.09333299690392845,
-            "posed": 0.09777542480826255,
+            "ratio": 1.738250411384253,
+            "rest": 0.044147332485540994,
+            "posed": 0.07673911885450903,
             "phase": 1,
-            "mesh": "Rhaeticosaurus_authored_body_lower_jaw",
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              401,
-              359
+              9208,
+              8666
             ]
           },
           "hiddenOral": {
@@ -201,25 +195,25 @@
           "name": "Dive",
           "duration": 1.399999976158142,
           "skin": {
-            "ratio": 2.1305814496474036,
-            "rest": 0.047403153654238486,
-            "posed": 0.10099627983050606,
+            "ratio": 1.7477060004319558,
+            "rest": 0.05323445142120362,
+            "posed": 0.09303817017854103,
             "phase": 0.5,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              8417,
-              5063
+              7047,
+              3556
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0097775081596163,
-            "rest": 0.09008441352130998,
-            "posed": 0.09096521460956884,
-            "phase": 0.4583333333333333,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 1.733754226560294,
+            "rest": 0.04928819587680658,
+            "posed": 0.08545361792094507,
+            "phase": 0,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              2315,
-              508
+              6860,
+              8666
             ]
           },
           "hiddenOral": {
@@ -230,25 +224,25 @@
           "name": "Dodge",
           "duration": 0.5,
           "skin": {
-            "ratio": 2.264503585799042,
-            "rest": 0.047403153654238486,
-            "posed": 0.10734461142820602,
+            "ratio": 2.547924026856802,
+            "rest": 0.03177201490489981,
+            "posed": 0.08095268015784667,
             "phase": 0.5416666666666666,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              8417,
-              5063
+              5432,
+              3467
             ]
           },
           "mouthSkin": {
-            "ratio": 1.18034715265959,
-            "rest": 0.06388486802619843,
-            "posed": 0.07540632207275699,
-            "phase": 0.4583333333333333,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 2.547924026856802,
+            "rest": 0.03177201490489981,
+            "posed": 0.08095268015784667,
+            "phase": 0.5416666666666666,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              6610,
-              10250
+              5432,
+              3467
             ]
           },
           "hiddenOral": {
@@ -257,56 +251,27 @@
         },
         {
           "name": "Eat",
-          "duration": 1.600000023841858,
+          "duration": 1.7999999523162842,
           "skin": {
-            "ratio": 1.3489033798371095,
-            "rest": 0.0723600240150357,
-            "posed": 0.09760668095897607,
-            "phase": 0,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 2.931793080170161,
+            "rest": 0.030889808575394487,
+            "posed": 0.09056252702912246,
+            "phase": 0.75,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              6457,
-              6387
+              8779,
+              10743
             ]
           },
           "mouthSkin": {
-            "ratio": 1.1582470967526566,
-            "rest": 0.07614924374148638,
-            "posed": 0.088199640483487,
-            "phase": 0.125,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 2.931793080170161,
+            "rest": 0.030889808575394487,
+            "posed": 0.09056252702912246,
+            "phase": 0.75,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              7192,
-              10294
-            ]
-          },
-          "hiddenOral": {
-            "ratio": 1
-          }
-        },
-        {
-          "name": "Glide",
-          "duration": 3.200000047683716,
-          "skin": {
-            "ratio": 1.1400187285608483,
-            "rest": 0.0723600240150357,
-            "posed": 0.08249178257625345,
-            "phase": 1,
-            "mesh": "Rhaeticosaurus_authored_body",
-            "vertices": [
-              6457,
-              6387
-            ]
-          },
-          "mouthSkin": {
-            "ratio": 1.0036839634491004,
-            "rest": 0.08197781259854657,
-            "posed": 0.08227981586379682,
-            "phase": 0.25,
-            "mesh": "Rhaeticosaurus_authored_body",
-            "vertices": [
-              424,
-              6497
+              8779,
+              10743
             ]
           },
           "hiddenOral": {
@@ -317,25 +282,25 @@
           "name": "Grab",
           "duration": 1.100000023841858,
           "skin": {
-            "ratio": 1.7655436732957208,
-            "rest": 0.05199471726484593,
-            "posed": 0.09179894411174852,
-            "phase": 0.08333333333333333,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 1.2965613484659586,
+            "rest": 0.06114920547439371,
+            "posed": 0.07928369630750189,
+            "phase": 0.75,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              8416,
-              1963
+              7047,
+              2707
             ]
           },
           "mouthSkin": {
-            "ratio": 1.1006507993145747,
-            "rest": 0.07614924374148638,
-            "posed": 0.08381372599126735,
+            "ratio": 1.2548243563455024,
+            "rest": 0.08182868400379222,
+            "posed": 0.10268062573565807,
             "phase": 0.75,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              7192,
-              10294
+              6962,
+              10456
             ]
           },
           "hiddenOral": {
@@ -346,25 +311,25 @@
           "name": "Growth",
           "duration": 1.5,
           "skin": {
-            "ratio": 1.4102269161324577,
-            "rest": 0.0723600240150357,
-            "posed": 0.10204405351799438,
-            "phase": 1,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 1.733754226560294,
+            "rest": 0.04928819587680658,
+            "posed": 0.08545361792094507,
+            "phase": 0,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              6457,
-              6387
+              6860,
+              8666
             ]
           },
           "mouthSkin": {
-            "ratio": 1.004543955298149,
-            "rest": 0.11478156034635138,
-            "posed": 0.11530312262561698,
-            "phase": 0.375,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 1.733754226560294,
+            "rest": 0.04928819587680658,
+            "posed": 0.08545361792094507,
+            "phase": 0,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              9432,
-              9758
+              6860,
+              8666
             ]
           },
           "hiddenOral": {
@@ -375,25 +340,25 @@
           "name": "Guard",
           "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 1.3779206512057776,
-            "rest": 0.057695397616065354,
-            "posed": 0.07949967985470503,
-            "phase": 0.4583333333333333,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 1.7337539763086398,
+            "rest": 0.04928819587680658,
+            "posed": 0.08545360558649251,
+            "phase": 1,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              7121,
-              10515
+              6860,
+              8666
             ]
           },
           "mouthSkin": {
-            "ratio": 1.011770789139315,
-            "rest": 0.09333299690392845,
-            "posed": 0.09443159993022494,
-            "phase": 0.5,
-            "mesh": "Rhaeticosaurus_authored_body_lower_jaw",
+            "ratio": 1.7337539763086398,
+            "rest": 0.04928819587680658,
+            "posed": 0.08545360558649251,
+            "phase": 1,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              401,
-              359
+              6860,
+              8666
             ]
           },
           "hiddenOral": {
@@ -404,25 +369,25 @@
           "name": "Heavy",
           "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 1.8322454264983032,
-            "rest": 0.04106147199896426,
-            "posed": 0.07523469427539041,
-            "phase": 0.6666666666666666,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 3.6381388205745924,
+            "rest": 0.030889808575394487,
+            "posed": 0.11238141173826063,
+            "phase": 0.4583333333333333,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              3250,
-              7043
+              8779,
+              10743
             ]
           },
           "mouthSkin": {
-            "ratio": 1.739760365936126,
-            "rest": 0.0473407754537574,
-            "posed": 0.08236160482712895,
-            "phase": 0.20833333333333334,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 3.6381388205745924,
+            "rest": 0.030889808575394487,
+            "posed": 0.11238141173826063,
+            "phase": 0.4583333333333333,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              6093,
-              7753
+              8779,
+              10743
             ]
           },
           "hiddenOral": {
@@ -433,25 +398,25 @@
           "name": "Hit",
           "duration": 0.6000000238418579,
           "skin": {
-            "ratio": 1.4400135926374777,
-            "rest": 0.057695397616065354,
-            "posed": 0.08308215679975804,
-            "phase": 0.2916666666666667,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 2.326328875983059,
+            "rest": 0.036021436520995834,
+            "posed": 0.08379770793318335,
+            "phase": 0.5,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              7121,
-              10515
+              9208,
+              4806
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0555754199542808,
-            "rest": 0.09333299690392845,
-            "posed": 0.09852001740245586,
+            "ratio": 2.326328875983059,
+            "rest": 0.036021436520995834,
+            "posed": 0.08379770793318335,
             "phase": 0.5,
-            "mesh": "Rhaeticosaurus_authored_body_lower_jaw",
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              401,
-              359
+              9208,
+              4806
             ]
           },
           "hiddenOral": {
@@ -460,27 +425,27 @@
         },
         {
           "name": "Idle",
-          "duration": 2.799999952316284,
+          "duration": 3,
           "skin": {
-            "ratio": 1.37949027417062,
-            "rest": 0.0723600240150357,
-            "posed": 0.09981994936749426,
-            "phase": 0,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 1.7337553827366905,
+            "rest": 0.04928819587680658,
+            "posed": 0.08545367490679376,
+            "phase": 1,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              6457,
-              6387
+              6860,
+              8666
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0058666773518667,
-            "rest": 0.09333299690392845,
-            "posed": 0.09388055148304657,
-            "phase": 0.5,
-            "mesh": "Rhaeticosaurus_authored_body_lower_jaw",
+            "ratio": 1.7337553827366905,
+            "rest": 0.04928819587680658,
+            "posed": 0.08545367490679376,
+            "phase": 1,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              401,
-              359
+              6860,
+              8666
             ]
           },
           "hiddenOral": {
@@ -491,25 +456,25 @@
           "name": "Parry",
           "duration": 0.4000000059604645,
           "skin": {
-            "ratio": 1.5523583716897422,
-            "rest": 0.057695397616065354,
-            "posed": 0.08956393349726745,
-            "phase": 0.5,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 1.7337542381473312,
+            "rest": 0.04928819587680658,
+            "posed": 0.08545361849204922,
+            "phase": 0.4166666666666667,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              7121,
-              10515
+              6860,
+              8666
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0051939002794095,
-            "rest": 0.11478156034635138,
-            "posed": 0.11537772432470536,
-            "phase": 0.3333333333333333,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 1.7337542381473312,
+            "rest": 0.04928819587680658,
+            "posed": 0.08545361849204922,
+            "phase": 0.4166666666666667,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              9432,
-              9758
+              6860,
+              8666
             ]
           },
           "hiddenOral": {
@@ -520,25 +485,25 @@
           "name": "Rise",
           "duration": 1.399999976158142,
           "skin": {
-            "ratio": 1.4102269161324577,
-            "rest": 0.0723600240150357,
-            "posed": 0.10204405351799438,
-            "phase": 1,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 1.7337542391973892,
+            "rest": 0.04928819587680658,
+            "posed": 0.08545361854380469,
+            "phase": 0.5,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              6457,
-              6387
+              6860,
+              8666
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0121103503977489,
-            "rest": 0.07429917041667178,
-            "posed": 0.07519895940467973,
-            "phase": 0.4166666666666667,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 1.7337542391973892,
+            "rest": 0.04928819587680658,
+            "posed": 0.08545361854380469,
+            "phase": 0.5,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              4477,
-              5284
+              6860,
+              8666
             ]
           },
           "hiddenOral": {
@@ -547,27 +512,27 @@
         },
         {
           "name": "Sprint",
-          "duration": 1.100000023841858,
+          "duration": 1,
           "skin": {
-            "ratio": 2.532066960129003,
-            "rest": 0.03633199227505701,
-            "posed": 0.09199503723533402,
-            "phase": 0.125,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 1.733755067497653,
+            "rest": 0.04928819587680658,
+            "posed": 0.08545365936923033,
+            "phase": 1,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              2941,
-              3250
+              6860,
+              8666
             ]
           },
           "mouthSkin": {
-            "ratio": 1.035411464924895,
-            "rest": 0.08197781259854657,
-            "posed": 0.08488076703399962,
-            "phase": 0.125,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 1.733755067497653,
+            "rest": 0.04928819587680658,
+            "posed": 0.08545365936923033,
+            "phase": 1,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              424,
-              6497
+              6860,
+              8666
             ]
           },
           "hiddenOral": {
@@ -578,25 +543,25 @@
           "name": "Stagger",
           "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 1.4468628777537296,
-            "rest": 0.057695397616065354,
-            "posed": 0.08347732902792598,
-            "phase": 0.2916666666666667,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 2.326328875983059,
+            "rest": 0.036021436520995834,
+            "posed": 0.08379770793318335,
+            "phase": 0.5,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              7121,
-              10515
+              9208,
+              4806
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0555754199542808,
-            "rest": 0.09333299690392845,
-            "posed": 0.09852001740245586,
+            "ratio": 2.326328875983059,
+            "rest": 0.036021436520995834,
+            "posed": 0.08379770793318335,
             "phase": 0.5,
-            "mesh": "Rhaeticosaurus_authored_body_lower_jaw",
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              401,
-              359
+              9208,
+              4806
             ]
           },
           "hiddenOral": {
@@ -607,25 +572,25 @@
           "name": "Swim",
           "duration": 1.7999999523162842,
           "skin": {
-            "ratio": 2.1029250900683993,
-            "rest": 0.03633199227505701,
-            "posed": 0.07640345812738866,
-            "phase": 0.125,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 1.7337515790498084,
+            "rest": 0.04928819587680658,
+            "posed": 0.08545348742992966,
+            "phase": 1,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              2941,
-              3250
+              6860,
+              8666
             ]
           },
           "mouthSkin": {
-            "ratio": 1.026295679967975,
-            "rest": 0.08197781259854657,
-            "posed": 0.08413347492311259,
-            "phase": 0.625,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 1.7337515790498084,
+            "rest": 0.04928819587680658,
+            "posed": 0.08545348742992966,
+            "phase": 1,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              424,
-              6497
+              6860,
+              8666
             ]
           },
           "hiddenOral": {
@@ -636,25 +601,25 @@
           "name": "TurnLeft",
           "duration": 1.600000023841858,
           "skin": {
-            "ratio": 1.4102269161324577,
-            "rest": 0.0723600240150357,
-            "posed": 0.10204405351799438,
-            "phase": 1,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 1.771305267269944,
+            "rest": 0.05040096536791207,
+            "posed": 0.08927549543167268,
+            "phase": 0.5,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              6457,
-              6387
+              10448,
+              3193
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0341943131193432,
-            "rest": 0.08404784858752566,
-            "posed": 0.08692180703913466,
-            "phase": 0.5,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 1.733754226560294,
+            "rest": 0.04928819587680658,
+            "posed": 0.08545361792094507,
+            "phase": 1,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              5890,
-              5942
+              6860,
+              8666
             ]
           },
           "hiddenOral": {
@@ -665,25 +630,25 @@
           "name": "TurnRight",
           "duration": 1.600000023841858,
           "skin": {
-            "ratio": 1.866340431165352,
-            "rest": 0.04316271032871022,
-            "posed": 0.08055631140515022,
-            "phase": 0.5,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 2.4994602192369664,
+            "rest": 0.03502169429715337,
+            "posed": 0.08753533170601298,
+            "phase": 0.5416666666666666,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              1461,
-              4133
+              2212,
+              11283
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0376931978214474,
-            "rest": 0.08283929270637182,
-            "posed": 0.08596177055374188,
-            "phase": 0.4583333333333333,
-            "mesh": "Rhaeticosaurus_authored_body",
+            "ratio": 1.7407498174265716,
+            "rest": 0.05523721899248538,
+            "posed": 0.09615417887632048,
+            "phase": 0.5416666666666666,
+            "mesh": "Mosasaurus_authored_body",
             "vertices": [
-              7960,
-              6610
+              10613,
+              314
             ]
           },
           "hiddenOral": {
@@ -692,35 +657,29 @@
         }
       ],
       "worstMouth": {
-        "ratio": 1.739760365936126,
-        "rest": 0.0473407754537574,
-        "posed": 0.08236160482712895,
-        "phase": 0.20833333333333334,
-        "mesh": "Rhaeticosaurus_authored_body",
+        "ratio": 3.6381388205745924,
+        "rest": 0.030889808575394487,
+        "posed": 0.11238141173826063,
+        "phase": 0.4583333333333333,
+        "mesh": "Mosasaurus_authored_body",
         "vertices": [
-          6093,
-          7753
+          8779,
+          10743
         ],
         "clip": "Heavy"
       }
     },
     {
-      "id": "rhaeticosaurus",
+      "id": "mosasaurus",
       "variant": "puppet",
-      "sha256": "51e10596c1c3e8c51fa433a3da0439fca562eb4cb62f6e43ab549da41a6e60e3",
-      "length": 5.012686112906018,
+      "sha256": "f05b8bbbb4555b0faf7a8cf1fbbb437664c2df46e1ecbb946684ab1886b464a6",
+      "length": 5.026813665764745,
       "meshes": [
         {
-          "name": "Rhaeticosaurus_procedural_volume_twin",
+          "name": "Mosasaurus_procedural_volume_twin",
           "hiddenOral": false,
-          "vertices": 3006,
-          "mixedJawSkullVertices": 194
-        },
-        {
-          "name": "Rhaeticosaurus_procedural_volume_twin_lower_jaw",
-          "hiddenOral": false,
-          "vertices": 284,
-          "mixedJawSkullVertices": 47
+          "vertices": 2902,
+          "mixedJawSkullVertices": 283
         }
       ],
       "clips": [
@@ -728,25 +687,25 @@
           "name": "Ability",
           "duration": 1.100000023841858,
           "skin": {
-            "ratio": 3.2276039923401947,
-            "rest": 0.07370739949691119,
-            "posed": 0.2378982968812442,
-            "phase": 0.5833333333333334,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.962152921271858,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944866872527761,
+            "phase": 0.9166666666666666,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1707,
-              1690
+              2521,
+              2525
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0200162409214801,
-            "rest": 0.08671071096323262,
-            "posed": 0.0884463334443455,
-            "phase": 0.25,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.962152921271858,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944866872527761,
+            "phase": 0.9166666666666666,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              2234,
-              2135
+              2521,
+              2525
             ]
           },
           "hiddenOral": {
@@ -757,25 +716,25 @@
           "name": "Attack",
           "duration": 1,
           "skin": {
-            "ratio": 2.1956408851389257,
-            "rest": 0.07370739949691119,
-            "posed": 0.1618349798726865,
-            "phase": 0.20833333333333334,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 3.1764912717704035,
+            "rest": 0.029088983349565216,
+            "posed": 0.09240090171456851,
+            "phase": 0.4583333333333333,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1707,
-              1690
+              2530,
+              2531
             ]
           },
           "mouthSkin": {
-            "ratio": 1.2740548582627818,
-            "rest": 0.09089750053109333,
-            "posed": 0.11580840215558325,
-            "phase": 0.20833333333333334,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 3.1764912717704035,
+            "rest": 0.029088983349565216,
+            "posed": 0.09240090171456851,
+            "phase": 0.4583333333333333,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              2294,
-              2240
+              2530,
+              2531
             ]
           },
           "hiddenOral": {
@@ -786,25 +745,25 @@
           "name": "Bite",
           "duration": 0.5,
           "skin": {
-            "ratio": 1.463602492618414,
-            "rest": 0.07370739949691119,
-            "posed": 0.10787833362810044,
-            "phase": 0.25,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 3.3809116733473132,
+            "rest": 0.029088983349565216,
+            "posed": 0.09834728337235067,
+            "phase": 0.20833333333333334,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1707,
-              1690
+              2530,
+              2531
             ]
           },
           "mouthSkin": {
-            "ratio": 1.1350694891241748,
-            "rest": 0.09089750053109333,
-            "posed": 0.10317497949049252,
+            "ratio": 3.3809116733473132,
+            "rest": 0.029088983349565216,
+            "posed": 0.09834728337235067,
             "phase": 0.20833333333333334,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              2294,
-              2240
+              2530,
+              2531
             ]
           },
           "hiddenOral": {
@@ -815,25 +774,25 @@
           "name": "Breath",
           "duration": 2.4000000953674316,
           "skin": {
-            "ratio": 1.8018363503104393,
-            "rest": 0.07370739949691119,
-            "posed": 0.13280867170038796,
-            "phase": 0.3333333333333333,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621531060638082,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944867714938858,
+            "phase": 0.08333333333333333,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1707,
-              1690
+              2521,
+              2525
             ]
           },
           "mouthSkin": {
-            "ratio": 1.1651702684950034,
-            "rest": 0.0962364742297637,
-            "posed": 0.11213187851730624,
-            "phase": 0.5,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621531060638082,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944867714938858,
+            "phase": 0.08333333333333333,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              2048,
-              1766
+              2521,
+              2525
             ]
           },
           "hiddenOral": {
@@ -844,25 +803,25 @@
           "name": "Breathe",
           "duration": 3,
           "skin": {
-            "ratio": 1.9316965466018376,
-            "rest": 0.07370739949691119,
-            "posed": 0.14238032906718537,
-            "phase": 0.25,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621548121041248,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944875492265153,
+            "phase": 1,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1707,
-              1690
+              2521,
+              2525
             ]
           },
           "mouthSkin": {
-            "ratio": 1.1653251889737584,
-            "rest": 0.0962364742297637,
-            "posed": 0.1121467875179676,
-            "phase": 0.25,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621548121041248,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944875492265153,
+            "phase": 1,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              2048,
-              1766
+              2521,
+              2525
             ]
           },
           "hiddenOral": {
@@ -873,25 +832,25 @@
           "name": "Death",
           "duration": 1.899999976158142,
           "skin": {
-            "ratio": 2.0593605981639955,
-            "rest": 0.07370739949691119,
-            "posed": 0.1517901143170716,
-            "phase": 1,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621524754837159,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944864840313278,
+            "phase": 0,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1707,
-              1690
+              2521,
+              2525
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0516386500196395,
-            "rest": 0.08671071096323262,
-            "posed": 0.09118833501961711,
-            "phase": 1,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621524754837159,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944864840313278,
+            "phase": 0,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              2234,
-              2135
+              2521,
+              2525
             ]
           },
           "hiddenOral": {
@@ -902,25 +861,25 @@
           "name": "Dive",
           "duration": 1.399999976158142,
           "skin": {
-            "ratio": 1.8550673499214183,
-            "rest": 0.07370739949691119,
-            "posed": 0.1367321902543343,
-            "phase": 0.3333333333333333,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621526884996923,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944865811389248,
+            "phase": 0.5,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1707,
-              1690
+              2521,
+              2525
             ]
           },
           "mouthSkin": {
-            "ratio": 1.008858892472255,
-            "rest": 0.13797203344671272,
-            "posed": 0.1391943128551955,
-            "phase": 0.4166666666666667,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621526884996923,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944865811389248,
+            "phase": 0.5,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              2333,
-              2328
+              2521,
+              2525
             ]
           },
           "hiddenOral": {
@@ -931,25 +890,25 @@
           "name": "Dodge",
           "duration": 0.5,
           "skin": {
-            "ratio": 2.6121611438643497,
-            "rest": 0.07370739949691119,
-            "posed": 0.19253560498111813,
-            "phase": 0.375,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621527133080467,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944865924483097,
+            "phase": 0.5,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1707,
-              1690
+              2521,
+              2525
             ]
           },
           "mouthSkin": {
-            "ratio": 1.1557002444391486,
-            "rest": 0.1552745592590855,
-            "posed": 0.1794508460909062,
-            "phase": 0.4583333333333333,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621527133080467,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944865924483097,
+            "phase": 0.5,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              2515,
-              2512
+              2521,
+              2525
             ]
           },
           "hiddenOral": {
@@ -958,56 +917,27 @@
         },
         {
           "name": "Eat",
-          "duration": 1.600000023841858,
+          "duration": 1.7999999523162842,
           "skin": {
-            "ratio": 1.3863269670774379,
-            "rest": 0.07370739949691119,
-            "posed": 0.10218255559571796,
-            "phase": 0.25,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 2.885731248703505,
+            "rest": 0.029088983349565216,
+            "posed": 0.0839429882448563,
+            "phase": 0.75,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1707,
-              1690
+              2530,
+              2531
             ]
           },
           "mouthSkin": {
-            "ratio": 1.2066390222556582,
-            "rest": 0.06629995532856016,
-            "posed": 0.08000011327324764,
-            "phase": 0.125,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 2.885731248703505,
+            "rest": 0.029088983349565216,
+            "posed": 0.0839429882448563,
+            "phase": 0.75,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              2277,
-              2278
-            ]
-          },
-          "hiddenOral": {
-            "ratio": 1
-          }
-        },
-        {
-          "name": "Glide",
-          "duration": 3.200000047683716,
-          "skin": {
-            "ratio": 1.1221283249287013,
-            "rest": 0.07370739949691119,
-            "posed": 0.08270916073231956,
-            "phase": 0.25,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
-            "vertices": [
-              1707,
-              1690
-            ]
-          },
-          "mouthSkin": {
-            "ratio": 1.0030981726369415,
-            "rest": 0.08801256181405638,
-            "posed": 0.08828523992477581,
-            "phase": 0.25,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
-            "vertices": [
-              2309,
-              2290
+              2530,
+              2531
             ]
           },
           "hiddenOral": {
@@ -1018,25 +948,25 @@
           "name": "Grab",
           "duration": 1.100000023841858,
           "skin": {
-            "ratio": 1.865930429168958,
-            "rest": 0.07370739949691119,
-            "posed": 0.13753287957619934,
+            "ratio": 1.3800055826388933,
+            "rest": 0.07358885640156435,
+            "posed": 0.10155303265417065,
             "phase": 0.75,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1707,
-              1690
+              1363,
+              1073
             ]
           },
           "mouthSkin": {
-            "ratio": 1.1167135335949103,
-            "rest": 0.07666136375594068,
-            "posed": 0.08560878241010131,
-            "phase": 0.08333333333333333,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.3800055826388933,
+            "rest": 0.07358885640156435,
+            "posed": 0.10155303265417065,
+            "phase": 0.75,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              2262,
-              2261
+              1363,
+              1073
             ]
           },
           "hiddenOral": {
@@ -1047,25 +977,25 @@
           "name": "Growth",
           "duration": 1.5,
           "skin": {
-            "ratio": 1.6776362345644458,
-            "rest": 0.07370739949691119,
-            "posed": 0.12365420415153541,
-            "phase": 0.3333333333333333,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621526653451424,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944865705834597,
+            "phase": 0.5,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1707,
-              1690
+              2521,
+              2525
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0042013999041812,
-            "rest": 0.12017755746074028,
-            "posed": 0.12068247143914057,
-            "phase": 0.375,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621526653451424,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944865705834597,
+            "phase": 0.5,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              2263,
-              2322
+              2521,
+              2525
             ]
           },
           "hiddenOral": {
@@ -1076,25 +1006,25 @@
           "name": "Guard",
           "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 1.6122041934915663,
-            "rest": 0.07370739949691119,
-            "posed": 0.11883137856027838,
-            "phase": 0.4166666666666667,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.962152490176232,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944864907292054,
+            "phase": 1,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1707,
-              1690
+              2521,
+              2525
             ]
           },
           "mouthSkin": {
-            "ratio": 1.012215016170178,
-            "rest": 0.08671071096323262,
-            "posed": 0.08776988369977612,
-            "phase": 0.5,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.962152490176232,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944864907292054,
+            "phase": 1,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              2234,
-              2135
+              2521,
+              2525
             ]
           },
           "hiddenOral": {
@@ -1105,25 +1035,25 @@
           "name": "Heavy",
           "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 2.196541978456061,
-            "rest": 0.07370739949691119,
-            "posed": 0.16190139711779658,
-            "phase": 0.20833333333333334,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 3.5845339957519085,
+            "rest": 0.029088983349565216,
+            "posed": 0.10427044971837773,
+            "phase": 0.4583333333333333,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1707,
-              1690
+              2530,
+              2531
             ]
           },
           "mouthSkin": {
-            "ratio": 1.5331747797406918,
-            "rest": 0.05423092188213853,
-            "posed": 0.0831454817117824,
-            "phase": 0.5833333333333334,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 3.5845339957519085,
+            "rest": 0.029088983349565216,
+            "posed": 0.10427044971837773,
+            "phase": 0.4583333333333333,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1825,
-              1823
+              2530,
+              2531
             ]
           },
           "hiddenOral": {
@@ -1134,25 +1064,25 @@
           "name": "Hit",
           "duration": 0.6000000238418579,
           "skin": {
-            "ratio": 1.936663967947118,
-            "rest": 0.07370739949691119,
-            "posed": 0.14274646477675143,
-            "phase": 0.3333333333333333,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 2.2572574390629647,
+            "rest": 0.05049304236708165,
+            "posed": 0.1139757955040165,
+            "phase": 0.5,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1707,
-              1690
+              1556,
+              1557
             ]
           },
           "mouthSkin": {
-            "ratio": 1.060882672208163,
-            "rest": 0.08671071096323262,
-            "posed": 0.09198989075574387,
+            "ratio": 2.2572574390629647,
+            "rest": 0.05049304236708165,
+            "posed": 0.1139757955040165,
             "phase": 0.5,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              2234,
-              2135
+              1556,
+              1557
             ]
           },
           "hiddenOral": {
@@ -1161,27 +1091,27 @@
         },
         {
           "name": "Idle",
-          "duration": 2.799999952316284,
+          "duration": 3,
           "skin": {
-            "ratio": 1.4295052563869857,
-            "rest": 0.07370739949691119,
-            "posed": 0.10536511501545,
-            "phase": 0.25,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.962153882217746,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944871253191952,
+            "phase": 1,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1707,
-              1690
+              2521,
+              2525
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0061240796766968,
-            "rest": 0.09096952233328913,
-            "posed": 0.09152662693620923,
-            "phase": 0.3333333333333333,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.962153882217746,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944871253191952,
+            "phase": 1,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              2295,
-              2290
+              2521,
+              2525
             ]
           },
           "hiddenOral": {
@@ -1192,25 +1122,25 @@
           "name": "Parry",
           "duration": 0.4000000059604645,
           "skin": {
-            "ratio": 1.8818060919147452,
-            "rest": 0.07370739949691119,
-            "posed": 0.1387030333924813,
+            "ratio": 1.9621526662698958,
+            "rest": 0.04558700178541508,
+            "posed": 0.0894486571005027,
             "phase": 0.4166666666666667,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1707,
-              1690
+              2521,
+              2525
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0048566589596992,
-            "rest": 0.12017755746074028,
-            "posed": 0.12076121887193675,
-            "phase": 0.3333333333333333,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621526662698958,
+            "rest": 0.04558700178541508,
+            "posed": 0.0894486571005027,
+            "phase": 0.4166666666666667,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              2263,
-              2322
+              2521,
+              2525
             ]
           },
           "hiddenOral": {
@@ -1221,25 +1151,25 @@
           "name": "Rise",
           "duration": 1.399999976158142,
           "skin": {
-            "ratio": 1.3535608796284353,
-            "rest": 0.06204923235945557,
-            "posed": 0.08398741353273385,
-            "phase": 0.3333333333333333,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621526611300264,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944865686619147,
+            "phase": 0,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1603,
-              1611
+              2521,
+              2525
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0126030739894183,
-            "rest": 0.1287503278216237,
-            "posed": 0.1303729777293215,
-            "phase": 0.4583333333333333,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621526611300264,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944865686619147,
+            "phase": 0,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              2040,
-              2036
+              2521,
+              2525
             ]
           },
           "hiddenOral": {
@@ -1248,27 +1178,27 @@
         },
         {
           "name": "Sprint",
-          "duration": 1.100000023841858,
+          "duration": 1,
           "skin": {
-            "ratio": 3.0747533150418644,
-            "rest": 0.07370739949691119,
-            "posed": 0.22663207094624271,
-            "phase": 0.125,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621535308695184,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944869651500724,
+            "phase": 1,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1707,
-              1690
+              2521,
+              2525
             ]
           },
           "mouthSkin": {
-            "ratio": 1.031436017692897,
-            "rest": 0.08801256181405638,
-            "posed": 0.09077932626444024,
-            "phase": 0.625,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621535308695184,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944869651500724,
+            "phase": 1,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              2309,
-              2290
+              2521,
+              2525
             ]
           },
           "hiddenOral": {
@@ -1279,25 +1209,25 @@
           "name": "Stagger",
           "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 1.9452463827077522,
-            "rest": 0.07370739949691119,
-            "posed": 0.14337905225016168,
-            "phase": 0.2916666666666667,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 2.2572574390629647,
+            "rest": 0.05049304236708165,
+            "posed": 0.1139757955040165,
+            "phase": 0.5,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1707,
-              1690
+              1556,
+              1557
             ]
           },
           "mouthSkin": {
-            "ratio": 1.060882672208163,
-            "rest": 0.08671071096323262,
-            "posed": 0.09198989075574387,
+            "ratio": 2.2572574390629647,
+            "rest": 0.05049304236708165,
+            "posed": 0.1139757955040165,
             "phase": 0.5,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              2234,
-              2135
+              1556,
+              1557
             ]
           },
           "hiddenOral": {
@@ -1308,25 +1238,25 @@
           "name": "Swim",
           "duration": 1.7999999523162842,
           "skin": {
-            "ratio": 2.535758955734115,
-            "rest": 0.07370739949691119,
-            "posed": 0.18690419837816474,
-            "phase": 0.125,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621498396097692,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944852824154247,
+            "phase": 1,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1707,
-              1690
+              2521,
+              2525
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0240744634432357,
-            "rest": 0.08801256181405638,
-            "posed": 0.0901314170159944,
-            "phase": 0.625,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621498396097692,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944852824154247,
+            "phase": 1,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              2309,
-              2290
+              2521,
+              2525
             ]
           },
           "hiddenOral": {
@@ -1337,25 +1267,25 @@
           "name": "TurnLeft",
           "duration": 1.600000023841858,
           "skin": {
-            "ratio": 1.5325754019295061,
-            "rest": 0.07798277762790815,
-            "posed": 0.11951448676667062,
-            "phase": 0.6666666666666666,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621526611300264,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944865686619147,
+            "phase": 1,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1709,
-              1690
+              2521,
+              2525
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0314391969183931,
-            "rest": 0.09135248384438176,
-            "posed": 0.0942245325729496,
-            "phase": 0.5,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 1.9621526611300264,
+            "rest": 0.04558700178541508,
+            "posed": 0.08944865686619147,
+            "phase": 1,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1930,
-              1933
+              2521,
+              2525
             ]
           },
           "hiddenOral": {
@@ -1366,25 +1296,25 @@
           "name": "TurnRight",
           "duration": 1.600000023841858,
           "skin": {
-            "ratio": 2.3836169846855513,
-            "rest": 0.07370739949691119,
-            "posed": 0.17569020933784077,
-            "phase": 0.375,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 2.477561047536737,
+            "rest": 0.06212470009632378,
+            "posed": 0.15391773704855358,
+            "phase": 0.5,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              1707,
-              1690
+              1363,
+              1069
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0342203001853132,
-            "rest": 0.1552745592590855,
-            "posed": 0.1605881012880736,
-            "phase": 0.4583333333333333,
-            "mesh": "Rhaeticosaurus_procedural_volume_twin",
+            "ratio": 2.477561047536737,
+            "rest": 0.06212470009632378,
+            "posed": 0.15391773704855358,
+            "phase": 0.5,
+            "mesh": "Mosasaurus_procedural_volume_twin",
             "vertices": [
-              2515,
-              2512
+              1363,
+              1069
             ]
           },
           "hiddenOral": {
@@ -1393,14 +1323,14 @@
         }
       ],
       "worstMouth": {
-        "ratio": 1.5331747797406918,
-        "rest": 0.05423092188213853,
-        "posed": 0.0831454817117824,
-        "phase": 0.5833333333333334,
-        "mesh": "Rhaeticosaurus_procedural_volume_twin",
+        "ratio": 3.5845339957519085,
+        "rest": 0.029088983349565216,
+        "posed": 0.10427044971837773,
+        "phase": 0.4583333333333333,
+        "mesh": "Mosasaurus_procedural_volume_twin",
         "vertices": [
-          1825,
-          1823
+          2530,
+          2531
         ],
         "clip": "Heavy"
       }

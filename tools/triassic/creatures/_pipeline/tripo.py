@@ -2097,6 +2097,87 @@ def jaw_junction(body, shell, body_weights, hinge, rear, upper_jaw, axis, down=(
     return body_out, shell_out, report
 
 
+def jaw_field_uncut(body, body_weights, hinge, below, axis, band, behind, throat=1.,
+                    reach=None, reach_margin=.5):
+    """Give an **uncut** head a jaw, by weighting the mouth the generation already modelled.
+
+    This is the answer for the third kind of generation. A body that arrived with its mouth *shut*
+    has no aperture at all until a cut makes one, and `cap_mouth` is what closes behind that cut. A
+    body that arrived **gaping** is the opposite case: the aperture is there, and so are its walls
+    -- a palate, a floor, a commissure where the two meet, all modelled by the generator. Cutting
+    such a head makes a boundary where the surface was continuous and then has to close it again,
+    which is the whole of what the lining and the hinge plug were doing on those bodies. Mosasaurus'
+    own builder said so in as many words: the sac's job is "the **back** of the mouth: at the throat
+    the modelled cavity closes, the cut passes through real geometry and leaves a rim on each half,
+    and that rim is what parts when the jaw swings."
+
+    So do not cut it. The mouth opening and closing is then a bone turning inside skin that is one
+    continuous surface, which is what the owner asked for and what every other joint on the animal
+    already is. The mandible's own shell is rigid on `jaw` because the field is 1 there; the palate
+    is rigid on `skull` because the field is 0 there; and the commissure -- the fold of skin where
+    the two lips meet at the corner of the mouth -- is the band between, which stretches, exactly
+    as the skin over an elbow does.
+
+    `below(p)` is how far a point is **below the mouth line** in the builder's own measurement,
+    positive under it; the share ramps from 0 to 1 over `band` of that. `band` is a distance and it
+    is the one number with a real cost either way: too wide and the front of the mandible takes only
+    part of the jaw's rotation, so the lower tooth row lags the bone it is drawn on; too narrow and
+    the whole of the gape's swing is carried by a thin strip of skin at the corner, which is where
+    linear blend skinning pinches. Measure it, report it, and look at the corner at the widest gape
+    the clips reach.
+
+    Along the body the share is 1 forward of the `hinge` and falls to 0 over `behind` behind it, so
+    the throat follows the jaw and the neck does not -- the same thing `jaw_junction`'s `back` does,
+    without a rim to measure it from. `reach` bounds it across the head as well (the transverse
+    distance from the hinge past which nothing is the jaw's, `reach_margin` of it to fade over),
+    because a flipper tucked under a chin is not a throat: that is the lesson Aphaneramma's and
+    Mystriosuchus' cut shells paid for, and it applies here for the same reason. The limb term is
+    the other half of it, and is taken off the body's own relaxed field exactly as `jaw_junction`
+    takes it.
+
+    Returns `(field, report)` -- the field a list of {bone: weight} dicts trimmed to four
+    influences, in the body's vertex order.
+    """
+    import re
+    LIMB = re.compile(r'fore|hind|pec|pelvic|paddle|foot|hand|fin_|flipper', re.I)
+    H = Vector(hinge)
+    axis = Vector(axis).normalized()
+
+    def transverse(p):
+        d = Vector(p) - H
+        return (d - axis * d.dot(axis)).length
+
+    margin = max((reach or 0.) * reach_margin, 1e-4)
+
+    def trim(w):
+        items = sorted(((n, v) for n, v in w.items() if v > 1e-6), key=lambda kv: -kv[1])[:4]
+        total = sum(v for _, v in items) or 1.
+        return {n: v / total for n, v in items}
+
+    out, full, blended = [], 0, 0
+    for i, v in enumerate(body.data.vertices):
+        c = v.co
+        w = body_weights[i]
+        ahead = smooth(((Vector(c) - H).dot(axis) + behind) / behind)
+        radial = 1. if reach is None else 1. - smooth((transverse(c) - reach) / margin)
+        axial = 1. - sum(x for n, x in w.items() if LIMB.search(n))
+        j = throat * smooth(below(c) / band) * ahead * radial * max(0., axial)
+        if j > .99:
+            full += 1
+        elif j > .01:
+            blended += 1
+        if j <= 0:
+            out.append(trim(w))
+        else:
+            mixed = {n: x * (1. - j) for n, x in w.items()}
+            mixed['jaw'] = mixed.get('jaw', 0.) + j
+            out.append(trim(mixed))
+    report = {'vertices': len(out), 'fullJaw': full, 'blended': blended,
+              'band': band, 'behind': behind, 'throat': throat,
+              'reach': None if reach is None else float(reach), 'uncut': True}
+    return out, report
+
+
 def depth_probe(o):
     """How far inside the closed intake surface a point is: positive inside, negative outside.
     Every appendage root and the jaw hinge has to clear a margin, or a fin reads as floating
