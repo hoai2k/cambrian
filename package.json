@@ -39,6 +39,7 @@
     "focus": "esbuild tools/focus-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/focus-test.mjs && node node_modules/.cache/focus-test.mjs",
     "mark": "esbuild tools/mark-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/mark-test.mjs && node node_modules/.cache/mark-test.mjs",
     "bend": "esbuild tools/bend-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/bend-test.mjs && node node_modules/.cache/bend-test.mjs",
+    "playback": "esbuild tools/playback-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/playback-test.mjs && node node_modules/.cache/playback-test.mjs",
     "mouth": "esbuild tools/mouth-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/mouth-test.mjs && node node_modules/.cache/mouth-test.mjs",
     "sculpt": "esbuild tools/sculpt-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/sculpt-test.mjs && node node_modules/.cache/sculpt-test.mjs",
     "sculpt:measure": "esbuild tools/sculpt-measure.ts --bundle --platform=node --format=esm --packages=external --outfile=node_modules/.cache/sculpt-measure.mjs && node node_modules/.cache/sculpt-measure.mjs",
