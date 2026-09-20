@@ -56,8 +56,15 @@ import { triActor } from './state';
  * Whether shore animals are placed at all.
  *
  * **Off by default**, and a *Settings* toggle in the Triassic turns them on
- * (`Settings → Shore animals`, read once when a match starts, because `src/sim` has to replay the
- * same way from the same inputs). Off, the beach is empty and this module places nothing.
+ * (`Settings → Shore animals`). It is **live**: turned on mid-match the banks fill from the next
+ * step (`ensurePosts` builds a post the first time it is asked for one, so there is nothing to
+ * catch up on), and turned off `clearShore` takes every body off the beach and forgets every post,
+ * so the beach is empty again rather than holding whatever was standing there.
+ *
+ * That is a setting reaching into a running simulation, which the determinism rule would otherwise
+ * forbid — but it changes the world the same way in the same place whenever it is flipped, and the
+ * schedule behind it (`occupied`) is pure in the post and the clock rather than in the history, so
+ * a bank that comes back comes back on the same cycle it would have been on.
  */
 let SHORE_ANIMALS = false;
 export function setShoreAnimals(on: boolean) { SHORE_ANIMALS = on; }
@@ -297,7 +304,23 @@ function bite(g: Game, ctx: HitContext, post: Post, a: Actor, target: Actor) {
   g.events.push({ kind: 'pounce', pos: { ...a.pos }, actor: a.id, other: target.id, player: target.player, strength: lengthOf(a) });
 }
 
+/**
+ * Take the shore back off the beach. Every body standing at a post leaves the world the way it
+ * would at the end of its own excursion, and the posts are forgotten — so turning the setting back
+ * on rebuilds them from the schedule rather than resuming a half-finished strike.
+ */
+function clearShore(g: Game) {
+  const s = states.get(g);
+  if (!s || !s.posts.size) return;
+  for (const post of s.posts.values()) {
+    const a = post.actor >= 0 ? g.byId(post.actor) : undefined;
+    if (a) vanish(g, post, a);
+  }
+  s.posts.clear();
+}
+
 export function stepShore(g: Game, ctx: HitContext, dt: number) {
+  if (!SHORE_ANIMALS) { clearShore(g); return; }
   ensurePosts(g);
   const s = stateFor(g), seed = worldSeed(g);
   for (const post of s.posts.values()) {

@@ -170,9 +170,11 @@ export interface EraRules {
   updateModes(g: Game, dt: number): void;
   /**
    * A finished co-op match is being carried on (`Game.continueMatch`): clear whatever the era was
-   * counting towards its win so the goal is not met again the instant play resumes.
+   * counting towards its win so the goal is not met again the instant play resumes. `winner` is the
+   * seat that just finished, and it is *only* that seat's clock to clear — every other seat is
+   * still growing its own animal towards its own apex.
    */
-  continueMatch(g: Game): void;
+  continueMatch(g: Game, winner: number): void;
   hud(g: Game, i: number): EraHud | undefined;
   hint(g: Game, i: number): string | undefined;
   /**

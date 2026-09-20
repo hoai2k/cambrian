@@ -436,6 +436,31 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
   RULES!.settings!.shoreAnimals!(true);
   ok(shoreAnimalsOn(), 'the setting turns them on');
 }
+{
+  // And it is live. It used to be read once when a match started, so a player who found the switch
+  // mid-match saw nothing happen and reasonably concluded it was broken. Turned on, the banks fill
+  // from the next step; turned off, everything standing on them leaves and the beach is empty
+  // again — not frozen mid-strike.
+  forceOccupancy(true);
+  RULES!.settings!.shoreAnimals!(false);
+  const g = new Game('reef', [{ creature: 'keichousaurus', device: 'keyboard', ready: true }], 404);
+  g.skipHatch(); run(g, 1);
+  ok(shorePosts(g, g.players[0].pos, 3000).length === 0, 'a match started with the switch off has a bare beach');
+  RULES!.settings!.shoreAnimals!(true);
+  run(g, 1);
+  const on = shorePosts(g, g.players[0].pos, 3000);
+  ok(on.length > 0, `turning it on mid-match fills the banks (${on.length} posts)`);
+  // Give the lurkers time to actually walk down and stand there, so what is turned off is bodies.
+  run(g, 30);
+  const standing = g.actors.filter((a) => creature(a.creature).shore).length;
+  ok(standing > 0, `and bodies arrive at them (${standing} on the beach)`);
+  RULES!.settings!.shoreAnimals!(false);
+  run(g, 0.2);
+  ok(shorePosts(g, g.players[0].pos, 3000).length === 0, 'turning it off again clears the banks');
+  ok(g.actors.every((a) => !creature(a.creature).shore), '...and takes every body off the beach with them');
+  RULES!.settings!.shoreAnimals!(true);
+  forceOccupancy(undefined);
+}
 
 /** A match with the shore on and every bank held occupied (the schedule has its own block), the player stripped of protection, and a helper that parks it still at a spot. */
 const shoreMatch = (seed?: number, schedule = false) => {

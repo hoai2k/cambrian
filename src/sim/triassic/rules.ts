@@ -479,7 +479,7 @@ export const TRIASSIC_RULES: EraRules = {
    */
   clip(a) { return creature(a.creature).shore ? shoreClip(a) : undefined; },
   radar: shoreRadar,
-  /** Settings → Shore animals: off by default, read once when a match starts. */
+  /** Settings → Shore animals: off by default, and live — a match fills or clears its banks from the next step (`setShoreAnimals` in ./shore.ts). */
   settings: { shoreAnimals: setShoreAnimals },
 
   hud(g, i): EraHud | undefined {
