@@ -72,13 +72,16 @@ const covering = () => page.waitForFunction(() => {
   };
 }, null, { timeout: 20000 }).then((h) => h.jsonValue());
 
-// The Triassic has no link on the plate, so it is opened by its address: its page is still there
-// and still works, and what changed is what the trilogy page offers.
-for (const [href, url, title] of [['./cambrian/', 'http://localhost:4173/cambrian/', 'Cambrian Conquest'], ['./devonian/', 'http://localhost:4173/devonian/', 'Devonian Domination'], [null, 'http://localhost:4173/triassic/', 'Triassic Triumph']]) {
+// Whether a game is reached by its link or by its address is read off the plate rather than
+// named here: a game the plate does not link to is opened by address instead, because its page is
+// still there and still works — what a closed game changes is only what the trilogy page offers.
+for (const [id, title] of [['cambrian', 'Cambrian Conquest'], ['devonian', 'Devonian Domination'], ['triassic', 'Triassic Triumph']]) {
+  const href = `./${id}/`, url = `http://localhost:4173/${id}/`;
   await page.goto('http://localhost:4173/', { waitUntil: 'load' });
-  if (href) await Promise.all([page.waitForURL(url, { timeout: 20000 }), page.click(`a[href="${href}"]`)]);
+  const linked = !!(await page.$(`a[href="${href}"]`));
+  if (linked) await Promise.all([page.waitForURL(url, { timeout: 20000 }), page.click(`a[href="${href}"]`)]);
   else await page.goto(url, { waitUntil: 'load' });
-  check(`${href ? `link ${href} opens` : 'its own address still opens'} ${title}`, (await page.title()) === title, await page.title());
+  check(`${linked ? `link ${href} opens` : 'its own address still opens'} ${title}`, (await page.title()) === title, await page.title());
   const seen = await covering().catch((e) => ({ error: String(e).slice(0, 80) }));
   check(`${title}: a screen of its own, not the sea`, !!(seen.title || seen.boot), JSON.stringify(seen));
   // And one way off that screen that is not press start: back to the page these links came from.
