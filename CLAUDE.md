@@ -781,6 +781,21 @@ unless the user explicitly asks for a PR. Steps:
 - Nothosaurus now holds its head still in its authored `Swim` and `Sprint` clips. The earlier
   renderer-side `steadyHead` counter-rotation was removed when those clips were corrected; do not
   reintroduce a runtime pose patch for motion that belongs in the reproducible Blender builder.
+- **A jaw cut follows the lip the generation modelled, and the plane may tilt across the head.**
+  Nothosaurus' head arrived yawed 20° to its right and its cut was a horizontal plane at a typed
+  height, 0.005 raw under the modelled lip on one flank and on it on the other. The first instinct —
+  measure the head's roll and roll the head so a flat cut fits — asks two features that disagree:
+  the countershading boundary reads 13–15° of roll on this head and the modelled slit reads 4°,
+  because the pale zone's upper edge sits above the lip on the left flank (Keichousaurus' lesson
+  again, seen from the other side). So the cut is a plane fitted to the slit hits on *both* flanks,
+  `z = a + b·x + c·y`, which carries the lip's pitch and its tilt across the head, and nobody rolls
+  the head to meet it; the yaw is the pose and is unbent in the mesh before binding (Dinocephalosaurus'
+  rigid carry, with the frames built on the vertical so a yaw carries no incidental roll). Two
+  smaller things from the same builder: a hinge envelope is seated by **ray parity against the
+  closed intake, taken before the jaw cut opens it** — asked after the cut it says every vertex is
+  outside — and it is built with `from_pydata` like the shells, because a bisected primitive left
+  the exporter splitting the cap's vertices: 148 open edges to `oral-shell-audit.mjs` on a mesh
+  Blender itself called closed.
 - A body may shape itself to what it is on: `conformArms` bends a radial rig's arms onto the ground
   under them, or around a creature it is holding, after the mixer has written the pose
   (`src/render/conform.ts`, `npm run conform`). Presentation only, and asked for by name rather than

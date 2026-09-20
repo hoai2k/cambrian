@@ -12,10 +12,104 @@
     "Heavy",
     "Eat"
   ],
+  "oralGeometry": "none",
+  "eyes": {
+    "inset": 0.0025,
+    "headLengthRaw": 0.196,
+    "method": "painted centre = darkness-weighted centroid of the darkest 8% of flank vertices above the lip line; globe centre = nearest skin point to it, inset along the area-averaged skin normal; seat = signed distance of the centre to the skin (negative inside) and the fraction of the globe surface under the skin",
+    "L": {
+      "painted": [
+        -0.04983,
+        0.34168,
+        0.02368
+      ],
+      "paintedRegionVertices": 101,
+      "paintedDarkVertices": 9,
+      "skinNormal": [
+        -0.891,
+        0.43,
+        -0.144
+      ],
+      "before": {
+        "centre": [
+          -0.0512,
+          0.337,
+          0.014
+        ],
+        "centreToSkin": -0.00272,
+        "surfaceFractionInside": 0.667
+      },
+      "after": {
+        "centre": [
+          -0.0483,
+          0.34113,
+          0.02429
+        ],
+        "centreToSkin": -0.00224,
+        "surfaceFractionInside": 0.774
+      },
+      "move": [
+        0.0029,
+        0.00413,
+        0.01029
+      ],
+      "movePercentOfHeadLength": [
+        1.48,
+        2.11,
+        5.25
+      ],
+      "centreToPaintedBefore": 0.01084,
+      "centreToPaintedAfter": 0.00174
+    },
+    "R": {
+      "painted": [
+        0.04663,
+        0.34598,
+        0.02351
+      ],
+      "paintedRegionVertices": 123,
+      "paintedDarkVertices": 10,
+      "skinNormal": [
+        0.838,
+        0.465,
+        -0.286
+      ],
+      "before": {
+        "centre": [
+          0.0512,
+          0.337,
+          0.014
+        ],
+        "centreToSkin": -0.00209,
+        "surfaceFractionInside": 0.59
+      },
+      "after": {
+        "centre": [
+          0.04475,
+          0.34502,
+          0.02426
+        ],
+        "centreToSkin": -0.00223,
+        "surfaceFractionInside": 0.806
+      },
+      "move": [
+        -0.00645,
+        0.00802,
+        0.01026
+      ],
+      "movePercentOfHeadLength": [
+        -3.29,
+        4.09,
+        5.23
+      ],
+      "centreToPaintedBefore": 0.01386,
+      "centreToPaintedAfter": 0.00224
+    }
+  },
   "full": {
     "closedSurfaceWinding": [],
-    "triangles": 117442,
-    "weightedVertices": 62615,
+    "triangles": 116064,
+    "weightedVertices": 61731,
     "bones": 21,
     "clips": [
       {
@@ -195,8 +289,8 @@
         }
       }
     ],
-    "bytes": 7375132,
-    "sha256": "282bbb8cde2e84ccda1d7a057125556caa52055db49d8ebb8f0453d58d57acb1"
+    "bytes": 7371416,
+    "sha256": "5a872684b643a47924dedbc8b8eba9764321f522d1fe0a49b04a699d8c767cf4"
   },
   "puppet": {
     "closedSurfaceWinding": [
@@ -241,8 +335,8 @@
         "doubleSided": false
       }
     ],
-    "triangles": 10874,
-    "weightedVertices": 5942,
+    "triangles": 9496,
+    "weightedVertices": 5058,
     "bones": 21,
     "clips": [
       {
@@ -422,7 +516,7 @@
         }
       }
     ],
-    "bytes": 586068,
-    "sha256": "c64bfefcef54636bd71f58b8c9da0b8ee62f34b79e8a3cbec8c104aac688f2be"
+    "bytes": 560968,
+    "sha256": "8543b55dd7f48a31a2dc934cca48eeb3ed6194aa04b7315dd2734360de084dfb"
   }
 }

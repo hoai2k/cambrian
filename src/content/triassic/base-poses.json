@@ -28,6 +28,16 @@
     ]
   },
   {
+    "id": "nothosaurus",
+    "model": "assets/triassic/creatures/nothosaurus.origpose.glb",
+    "bytes": 1541680,
+    "sha256": "5cb48becbdcbbc3863519bca8a2bb99c5129c6a0e5b1affb6252e15e01c49604",
+    "changed": [
+      "the neck unbent onto its own measured axis",
+      "the neck lengthened"
+    ]
+  },
+  {
     "id": "placodus",
     "model": "assets/triassic/creatures/placodus.origpose.glb",
     "bytes": 1737372,
