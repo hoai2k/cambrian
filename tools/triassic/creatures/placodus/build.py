@@ -433,9 +433,12 @@ for n,(p,parent) in B.items():
  eb=arm.edit_bones.new(n);eb.head=tx(p);eb.tail=eb.head+Vector((0,.16,0))
  if parent:eb.parent=arm.edit_bones[parent]
 bpy.ops.object.mode_set(mode='OBJECT')
-influences=[]
+influences=[];JUNCTION={}
 for o in [auth,puppet]:
- for n in B:o.vertex_groups.new(name=n)
+ shell=parts['lower jaw'][o.name]
+ for part in [o,shell]:
+  for n in B:part.vertex_groups.new(name=n)
+ body_w=[]
  for v in o.data.vertices:
   w=weights(v.co);influences.append(len(w))
   # Vertices whose skin runs up to the armour seam are put on the trunk bone alone, which is
@@ -447,11 +450,21 @@ for o in [auth,puppet]:
    w={n:val for n,val in w.items() if val>1e-8}
    items=sorted(w.items(),key=lambda kv:-kv[1])[:4];tot=sum(val for _,val in items)
    w={n:val/tot for n,val in items};influences[-1]=len(w)
-  for n,val in w.items():o.vertex_groups[n].add([v.index],val,'REPLACE')
- for v in o.data.vertices:v.co=tx(v.co)
- for p in o.data.polygons:p.use_smooth=True
- mod=o.modifiers.new('Shared articulated skeleton','ARMATURE');mod.object=rig;o.parent=rig
-for label,bonename in [('lower jaw','jaw'),('ventral gastral armour','gastralia')]:
+  body_w.append(w)
+ # The mandible is skinned *into* the head rather than rigid against it: one field over both parts,
+ # the throat under the hinge following the jaw and the shell ramping to full jaw over `band` from
+ # the cut rim, so the two copies of every rim vertex carry the same weights and the cut cannot open
+ # (`T.jaw_junction`; `tools/triassic/lag.mjs` measures the seam it closes). The front cut behind
+ # the chisels and the mouth line part by design.
+ body_w,shell_w,JUNCTION[o.name]=T.jaw_junction(o,shell,body_w,B['jaw'][0],rear=lambda p:abs(p.x-HINGE_X)<1e-5,
+  upper_jaw=lambda p:p.x>HINGE_X and p.z>=seam(p.x)-1e-6,axis=(1.,0.,0.))
+ for part,field in [(o,body_w),(shell,shell_w)]:
+  for v in part.data.vertices:
+   for n,val in field[v.index].items():part.vertex_groups[n].add([v.index],val,'REPLACE')
+  for v in part.data.vertices:v.co=tx(v.co)
+  for p in part.data.polygons:p.use_smooth=True
+  mod=part.modifiers.new('Shared articulated skeleton' if part is o else 'Mandible into the head','ARMATURE');mod.object=rig;part.parent=rig
+for label,bonename in [('ventral gastral armour','gastralia')]:
  for o in parts[label].values():
   g=o.vertex_groups.new(name=bonename);g.add(list(range(len(o.data.vertices))),1.,'REPLACE')
   for v in o.data.vertices:v.co=tx(v.co)

@@ -1,10 +1,11 @@
 {
   "id": "hybodus",
-  "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present.",
+  "verdict": "separate closed rigid palate/floor",
+  "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present. A body with no lining mesh is reported as such, with the hidden oral parts it does carry listed, and all three variants must agree.",
   "models": [
     {
       "variant": "authored",
-      "sha256": "503be12faf6874c7c3d7d7d41baa04fcff135e48173e35ebfec24bacbbece839",
+      "sha256": "a65bebb98227753917ddb71d304d6b718f7516c1e2112776e4820c6e67f407e6",
       "meshes": [
         {
           "name": "Mouth lining",
@@ -17,11 +18,13 @@
           "mixedVertices": 0,
           "bridgingTriangles": 0
         }
-      ]
+      ],
+      "otherOralMeshes": [],
+      "oralShells": "separate palate and floor"
     },
     {
       "variant": ".puppet",
-      "sha256": "9ffb07b87f379a8d833aa917408ce5d2eb9eb280b3a923235a6322a906cf9ab4",
+      "sha256": "d246d2fb636fc204270d51220c0bbbaf0ebee873de07505747e5d6aca854e41e",
       "meshes": [
         {
           "name": "Mouth lining",
@@ -34,11 +37,13 @@
           "mixedVertices": 0,
           "bridgingTriangles": 0
         }
-      ]
+      ],
+      "otherOralMeshes": [],
+      "oralShells": "separate palate and floor"
     },
     {
       "variant": ".lod1",
-      "sha256": "9ffb07b87f379a8d833aa917408ce5d2eb9eb280b3a923235a6322a906cf9ab4",
+      "sha256": "d246d2fb636fc204270d51220c0bbbaf0ebee873de07505747e5d6aca854e41e",
       "meshes": [
         {
           "name": "Mouth lining",
@@ -51,7 +56,9 @@
           "mixedVertices": 0,
           "bridgingTriangles": 0
         }
-      ]
+      ],
+      "otherOralMeshes": [],
+      "oralShells": "separate palate and floor"
     }
   ]
 }

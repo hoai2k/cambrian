@@ -3,22 +3,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1589504,
-      "sha256": "1ca05b07f7852408cc02585981711aff1629d6752f1f3c2e9c020354863cbe36",
+      "bytes": 1591996,
+      "sha256": "b9963c71f3198056045b3164cbceda00bc2305b104409ca7609e04c46af0457c",
       "triangles": 22120,
       "vertices": 12918
     },
     {
       "suffix": ".puppet",
-      "bytes": 675036,
-      "sha256": "b6617a2445b515a22ddc5aca0f6506812d8b8014b8b59a51e14c865d338159ca",
+      "bytes": 676152,
+      "sha256": "a81bb22321674502b3d2ae1c1550ca0ae77c988a0a18efc1c19615aec0cb740e",
       "triangles": 7866,
       "vertices": 4081
     },
     {
       "suffix": ".lod1",
-      "bytes": 675036,
-      "sha256": "b6617a2445b515a22ddc5aca0f6506812d8b8014b8b59a51e14c865d338159ca",
+      "bytes": 676152,
+      "sha256": "a81bb22321674502b3d2ae1c1550ca0ae77c988a0a18efc1c19615aec0cb740e",
       "triangles": 7866,
       "vertices": 4081
     }
@@ -336,7 +336,7 @@
           "clip": "Attack",
           "duration": 1,
           "samples": 61,
-          "maxVertexTravel": 1.167308473120924
+          "maxVertexTravel": 1.1673084728473457
         },
         {
           "clip": "Bite",
@@ -360,13 +360,13 @@
           "clip": "Death",
           "duration": 1.899999976158142,
           "samples": 61,
-          "maxVertexTravel": 2.9238684066970206
+          "maxVertexTravel": 2.9238684065268705
         },
         {
           "clip": "Dive",
           "duration": 1.399999976158142,
           "samples": 61,
-          "maxVertexTravel": 1.425992903848803
+          "maxVertexTravel": 1.425992903865601
         },
         {
           "clip": "Dodge",
@@ -384,7 +384,7 @@
           "clip": "Grab",
           "duration": 1.100000023841858,
           "samples": 61,
-          "maxVertexTravel": 0.41107318484834915
+          "maxVertexTravel": 0.41107318512047153
         },
         {
           "clip": "Growth",
@@ -396,13 +396,13 @@
           "clip": "Guard",
           "duration": 1.2000000476837158,
           "samples": 61,
-          "maxVertexTravel": 0.40653543202135106
+          "maxVertexTravel": 0.40653543199879716
         },
         {
           "clip": "Heavy",
           "duration": 1.2000000476837158,
           "samples": 61,
-          "maxVertexTravel": 1.3976663442036952
+          "maxVertexTravel": 1.397666343878171
         },
         {
           "clip": "Hit",
@@ -414,7 +414,7 @@
           "clip": "Idle",
           "duration": 3,
           "samples": 61,
-          "maxVertexTravel": 0.2764621369877034
+          "maxVertexTravel": 0.27646213707721534
         },
         {
           "clip": "Parry",
@@ -432,31 +432,31 @@
           "clip": "Sprint",
           "duration": 1,
           "samples": 61,
-          "maxVertexTravel": 1.4625302326813454
+          "maxVertexTravel": 1.4625302327761898
         },
         {
           "clip": "Stagger",
           "duration": 1.2000000476837158,
           "samples": 61,
-          "maxVertexTravel": 0.9102051560056303
+          "maxVertexTravel": 0.9102051563124548
         },
         {
           "clip": "Swim",
           "duration": 1.7999999523162842,
           "samples": 61,
-          "maxVertexTravel": 0.9702010565385303
+          "maxVertexTravel": 0.970201056649047
         },
         {
           "clip": "TurnLeft",
           "duration": 1.600000023841858,
           "samples": 61,
-          "maxVertexTravel": 1.444425758298283
+          "maxVertexTravel": 1.444425758215919
         },
         {
           "clip": "TurnRight",
           "duration": 1.600000023841858,
           "samples": 61,
-          "maxVertexTravel": 1.563770910969504
+          "maxVertexTravel": 1.5637709108808056
         }
       ]
     }
@@ -648,7 +648,7 @@
     },
     {
       "clip": "Bite",
-      "maxRadians": 0.4600000075296487,
+      "maxRadians": 0.46000000752964865,
       "minRadians": -0.5681790148954501,
       "peakPhase": 0.2,
       "mouthSocketTravelInSkullFrame": 0.9201604447157212

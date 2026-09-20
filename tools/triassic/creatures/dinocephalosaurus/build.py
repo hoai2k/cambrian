@@ -27,6 +27,9 @@ from mathutils.geometry import barycentric_transform
 from math import sin, cos, pi
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.abspath(os.path.join(HERE, '../../../..'))
+import sys
+sys.path.insert(0, os.path.join(ROOT, 'tools/triassic/creatures/_pipeline'))
+from tripo import jaw_junction                                                  # noqa: E402
 LOCAL = os.path.join(ROOT, 'local/triassic-authoring/dinocephalosaurus'); OUT = os.path.join(ROOT, 'public/assets/triassic/creatures')
 os.makedirs(LOCAL, exist_ok=True); os.makedirs(OUT, exist_ok=True)
 RAW = os.path.join(HERE, 'tripo-raw/dinocephalosaurus.raw.glb'); ID = 'dinocephalosaurus'
@@ -734,20 +737,27 @@ for n, (p, parent) in B.items():
     eb = arm.edit_bones.new(n); eb.head = tx(p); eb.tail = eb.head + Vector((0, .16, 0))
     if parent: eb.parent = arm.edit_bones[parent]
 bpy.ops.object.mode_set(mode='OBJECT')
-influences = []
+# The mandible is skinned *into* the head rather than rigid against it: one field over both parts,
+# the throat under the hinge following the jaw and the shell ramping to full jaw over `band` from
+# the cut rim, so the two copies of every rim vertex carry the same weights and the cut cannot open
+# (`T.jaw_junction`; `tools/triassic/lag.mjs` measures the seam it closes).
+influences, JUNCTION = [], {}
 for o in [auth, puppet]:
-    for n in B: o.vertex_groups.new(name=n)
-    for v in o.data.vertices:
-        w = weights(v.co); influences.append(len(w))
-        for n, val in w.items(): o.vertex_groups[n].add([v.index], val, 'REPLACE')
-    for v in o.data.vertices: v.co = tx(v.co)
-    for p in o.data.polygons: p.use_smooth = True
-    mod = o.modifiers.new('Shared articulated skeleton', 'ARMATURE'); mod.object = rig; o.parent = rig
-for o in parts['lower jaw'].values():
-    g = o.vertex_groups.new(name='jaw'); g.add(list(range(len(o.data.vertices))), 1., 'REPLACE')
-    for v in o.data.vertices: v.co = tx(v.co)
-    for p in o.data.polygons: p.use_smooth = True
-    mo = o.modifiers.new('Rigid jaw', 'ARMATURE'); mo.object = rig; o.parent = rig
+    shell = parts['lower jaw'][o.name]
+    for part in (o, shell):
+        for n in B: part.vertex_groups.new(name=n)
+    body_w, shell_w, JUNCTION[o.name] = jaw_junction(
+        o, shell, [weights(v.co) for v in o.data.vertices], B['jaw'][0],
+        rear=lambda p: abs(head_local(p)[0] - HINGE_A) < 1e-5,
+        upper_jaw=lambda p: head_local(p)[0] > HINGE_A and head_local(p)[1] >= seam_n(head_local(p)[0]) - 1e-6,
+        axis=tuple(HEAD_DIR), down=tuple(-HEAD_UP))
+    for part, field in ((o, body_w), (shell, shell_w)):
+        for v in part.data.vertices:
+            w = field[v.index]; influences.append(len(w))
+            for n, val in w.items(): part.vertex_groups[n].add([v.index], val, 'REPLACE')
+        for v in part.data.vertices: v.co = tx(v.co)
+        for p in part.data.polygons: p.use_smooth = True
+        mod = part.modifiers.new('Shared articulated skeleton' if part is o else 'Mandible into the head', 'ARMATURE'); mod.object = rig; part.parent = rig
 
 # ---- mouth interior: the fang trap ---------------------------------------------------------------
 toothmat = bpy.data.materials.new('Dinocephalosaurus fangs'); toothmat.use_nodes = True

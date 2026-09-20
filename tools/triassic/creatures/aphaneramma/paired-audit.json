@@ -3,22 +3,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1901472,
-      "sha256": "98cff36b080059d5ec7b52c924bea330e1fbb2dae8428068ef485153f39c4f46",
+      "bytes": 1907612,
+      "sha256": "ed7d40d7ed85f2c44ec2fce28578d714e3fc2c5ae78756064eb4d13a868ad54f",
       "triangles": 22473,
       "vertices": 13446
     },
     {
       "suffix": ".puppet",
-      "bytes": 711916,
-      "sha256": "08be9f00b5ae768ac67463be3db0e7bd85673d7aca11ee9d8b549f2cf96e6787",
+      "bytes": 713956,
+      "sha256": "12cf60f097e3518823d243ad86d2440321b6c1e9ae7f1b37d010037895bbbe5f",
       "triangles": 7762,
       "vertices": 4033
     },
     {
       "suffix": ".lod1",
-      "bytes": 711916,
-      "sha256": "08be9f00b5ae768ac67463be3db0e7bd85673d7aca11ee9d8b549f2cf96e6787",
+      "bytes": 713956,
+      "sha256": "12cf60f097e3518823d243ad86d2440321b6c1e9ae7f1b37d010037895bbbe5f",
       "triangles": 7762,
       "vertices": 4033
     }
@@ -215,7 +215,7 @@
           "clip": "Breath",
           "duration": 2.200000047683716,
           "samples": 61,
-          "maxVertexTravel": 1.1736977393975514
+          "maxVertexTravel": 1.1687723950689433
         },
         {
           "clip": "Breathe",
@@ -352,7 +352,7 @@
           "clip": "Bite",
           "duration": 0.46666666865348816,
           "samples": 61,
-          "maxVertexTravel": 0.6252964408511255
+          "maxVertexTravel": 0.6252964408775784
         },
         {
           "clip": "Breath",
@@ -364,13 +364,13 @@
           "clip": "Breathe",
           "duration": 3,
           "samples": 61,
-          "maxVertexTravel": 0.6672727927290233
+          "maxVertexTravel": 0.6672727930138116
         },
         {
           "clip": "Crawl",
           "duration": 1.600000023841858,
           "samples": 61,
-          "maxVertexTravel": 1.1242318053197438
+          "maxVertexTravel": 1.1242318052739004
         },
         {
           "clip": "Death",
@@ -394,7 +394,7 @@
           "clip": "Eat",
           "duration": 1.5,
           "samples": 61,
-          "maxVertexTravel": 0.43758233465506524
+          "maxVertexTravel": 0.4375823337879474
         },
         {
           "clip": "Grab",
@@ -412,7 +412,7 @@
           "clip": "Guard",
           "duration": 1.2000000476837158,
           "samples": 61,
-          "maxVertexTravel": 0.3794587925287488
+          "maxVertexTravel": 0.3794587925126398
         },
         {
           "clip": "Heavy",

@@ -781,12 +781,12 @@
   "weights": {
     "Saurichthys authored body": {
       "maxInfluences": 4,
-      "vertices": 9489,
+      "vertices": 10914,
       "verticesPerBone": {
         "body": 3450,
-        "chest": 4375,
+        "chest": 4342,
         "tail_00": 2618,
-        "skull": 4499,
+        "skull": 4466,
         "tail_04": 1079,
         "tail_05": 898,
         "tail_03": 1326,
@@ -796,20 +796,34 @@
         "dorsal": 304,
         "tail_01": 1912,
         "pelvic_R": 395,
-        "pec_mid_L": 403,
+        "pec_mid_L": 385,
         "pec_tip_L": 196,
         "pec_upper_L": 469,
         "tail_06": 486,
         "caudal_lower": 140,
         "caudal_upper": 212,
-        "pec_mid_R": 370,
+        "jaw": 432,
+        "pec_mid_R": 346,
         "pelvic_L": 339,
         "pec_tip_R": 195
+      },
+      "jawJunction": {
+        "cutRimPairs": 76,
+        "lipPairs": 191,
+        "rimReach": 0.0604550865244325,
+        "rimDepth": 0.033115092664957047,
+        "dz": 0.01103836422165235,
+        "band": 0.016026434898376463,
+        "back": 0.06410573959350585,
+        "throat": 1.0,
+        "shellVertices": 1425,
+        "shellFullJaw": 1180,
+        "bodyThroatVertices": 352
       }
     },
     "Saurichthys procedural volume twin": {
       "maxInfluences": 4,
-      "vertices": 3627,
+      "vertices": 3952,
       "verticesPerBone": {
         "anal": 343,
         "tail_05": 473,
@@ -823,16 +837,30 @@
         "dorsal": 161,
         "tail_00": 951,
         "body": 1182,
-        "chest": 1852,
+        "chest": 1818,
         "pelvic_R": 199,
         "pelvic_L": 215,
-        "skull": 1868,
+        "skull": 1842,
         "pec_upper_L": 358,
         "pec_upper_R": 303,
         "pec_mid_L": 227,
         "pec_tip_L": 99,
         "pec_mid_R": 240,
-        "pec_tip_R": 105
+        "pec_tip_R": 105,
+        "jaw": 142
+      },
+      "jawJunction": {
+        "cutRimPairs": 37,
+        "lipPairs": 111,
+        "rimReach": 0.05614938041393517,
+        "rimDepth": 0.02911064773797989,
+        "dz": 0.009703549245993296,
+        "band": 0.016026434898376463,
+        "back": 0.06410573959350585,
+        "throat": 1.0,
+        "shellVertices": 325,
+        "shellFullJaw": 283,
+        "bodyThroatVertices": 117
       }
     }
   },
@@ -1031,10 +1059,10 @@
   "jawShutFromTheGenerationsPartedPose": {
     "closingRotationDegrees": 2.5,
     "mandibleVerticesMeasured": 1425,
-    "verticesInsideTheSkullSurface": 419,
+    "verticesInsideTheSkullSurface": 391,
     "maxPenetrationUnits": 0.13393,
     "maxPenetrationOverBodyLength": 0.02679,
-    "meanPenetrationOverBodyLength": 0.001075,
+    "meanPenetrationOverBodyLength": 0.001074,
     "note": "the mandible posed at the measured closing rotation, against the skull's own surface in the same pose. Anything above zero is the generation's two tooth rows, modelled apart, meeting for the first time."
   },
   "authoredVerticesFarthestFromTheTwin": [

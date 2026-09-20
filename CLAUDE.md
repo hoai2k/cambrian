@@ -623,13 +623,15 @@ unless the user explicitly asks for a PR. Steps:
   at full gape says only that the mouth opened — Hupehsuchus' 50x is the lining working, not a torn
   head. Two builders split it locally before it was split centrally; the tool now reports both and
   ranks on skin, matching those builders' own figures exactly. True era-wide skin picture:
-  Shonisaurus 1.44x, Keichousaurus 2.34x, Mosasaurus 2.54x, Cymbospondylus 2.48x, Rhaeticosaurus 2.81x, Macrocnemus
-  2.94x, Nothosaurus 2.98x, Tanystropheus 3.00x, Birgeria 3.46x, Saurichthys 3.61x, Cartorhynchus 3.72x,
-  Archelon 3.86x, Mixosaurus 3.62x, Aphaneramma 4.45x, Coelophysis 4.46x, Mystriosuchus 4.48x,
-  Henodus 4.81x, Hupehsuchus 5.79x, Hybodus 5.93x, Dinocephalosaurus 7.00x,
-  Helicoprion 11.68x, Placodus 12.36x. Placodus and Helicoprion are the outstanding repair work:
-  Coelophysis came down from 25.25x, Macrocnemus from 23.31x, Tanystropheus from 6.09x and
-  Cartorhynchus from 5.17x.
+  Askeptosaurus 1.10x, Shonisaurus 1.44x, Keichousaurus 2.34x, Cymbospondylus 2.48x, Mosasaurus 2.54x,
+  Rhaeticosaurus 2.81x, Nothosaurus 2.99x, Tanystropheus 3.00x, Macrocnemus 3.41x, Birgeria 3.46x,
+  Hupehsuchus 3.47x, Saurichthys 3.61x, Mixosaurus 3.62x, Cartorhynchus 3.72x, Archelon 3.86x,
+  Atopodentatus 3.90x, Helicoprion 4.21x, Aphaneramma 4.43x, Mystriosuchus 4.48x, Henodus 4.81x,
+  Odontochelys 5.12x, Hybodus 5.93x (its opercular crack), Dinocephalosaurus 7.00x, Coelophysis 7.74x
+  (SnapRight, skull/neck), Ceratites 7.73x, Placodus 12.36x. Placodus is the outstanding repair work:
+  Coelophysis came down from 25.25x, Macrocnemus from 23.31x, Helicoprion from 14.33x, Tanystropheus
+  from 6.09x and Cartorhynchus from 5.17x. `docs/triassic/jaw-skinning.md` is the per-body record of
+  the jaw cut and the mouth-region figures beside these.
 - **A skin weighting is three things, and the era has now paid for each of them separately.** The
   *relaxation* — diffusion over the mesh's own edge graph, coupled by inverse edge length, trimmed
   to four influences every pass, sliver runs welded into one weight set — is the one that stops a
@@ -710,6 +712,35 @@ unless the user explicitly asks for a PR. Steps:
   cut shell's own bounding box: a mandible is not a body-length deep. `local`-side proof is a lag
   measurement — skin travel round a joint over that joint's own travel — because neither
   `skin-tears.mjs` nor `idle-bones.mjs` can see this at all.
+- **A mandible cut off the head as a rigid shell opens the head at the hinge by the gape, and no
+  edge test sees it.** Every jawed Triassic body cuts its lower jaw off as a separate object, and
+  every one of them then weighted that shell to `jaw` at 1 against a body on the skull: the two
+  copies of each rim vertex parted by the rim's depth under the hinge times the gape angle — 6 % of
+  a body on Hybodus, 3.5 % on Saurichthys, 2 % on Nothosaurus, Cartorhynchus, Mystriosuchus and
+  Placodus, eleven bodies past half a percent — a slot under the corner of the mouth that `skin-tears.mjs` cannot measure
+  because no edge crosses a seam between two shells, `idle-bones.mjs` cannot because both parts
+  own plenty, and the paired audits cannot because the twin has the same slot.
+  `tools/triassic/lag.mjs` (in `npm run triassic`) measures it as the worst separation over every
+  clip of the rest-coincident pairs at the cut, and `T.jaw_junction` closes it: **one weight field
+  over both parts, evaluated on position**, so the two copies cannot disagree (it asserts they do
+  not), with the throat under the hinge following the jaw — bounded radially about the hinge and
+  along the body — and the shell ramping to full jaw over a *short* band from the rim. Short on
+  purpose: at 0.05 of a body Mixosaurus' jaw bowed, its dorsal-rear corner held by the skull while
+  its chin dropped, and a mouth that opens by bending its lower jaw is worse than a slot; the shell
+  only has to agree with the body at the rim, and where the two fields differ a point turns on a
+  short radius. Which shared points *are* the rim is the builder's word (`rear`), never a
+  coincidence test: a front cut (Mixosaurus' overhanging snout) taken for the junction glued the
+  mandible's tip to the snout's own tip at 7.6x, the label boundary round Saurichthys' interlocking
+  tooth roots pinned its mandible to the upper tooth row at 5.6x, and Hybodus' labelled rim runs
+  0.04 of a body *behind* the hinge, so a window ahead of the hinge found 30 of 109 rim points with
+  a negative depth and closed nothing. The corner of the mouth is one vertex on both the lip and
+  the cut, so a point or two parting there by the gape times its short radius is the lip; a cut
+  that opens opens along its length, which is what the tool fails on. And the throat share is
+  scaled by what a vertex is *not* a limb's, and is a builder parameter: Aphaneramma's tucked
+  forelimb took half of itself from the jaw at 4.6x until the limb term, and Atopodentatus'
+  `Heavy` pulls the neck back a third of a body while the jaw opens, so a full share tore the
+  neck behind the corner harder than the jaw's own edge (3.90x → 4.31x) and that body runs at
+  0.6. Record and renders: `docs/triassic/jaw-skinning.md`.
 - **A containment test written on `np.interp` cannot fail outside its own table**, because
   `np.interp` clamps rather than refusing. Hybodus' and Saurichthys' hinge plugs were "fitted" by
   asking whether each vertex was inside `head_half_width(y)` and between `head_z(y)` — both

@@ -5,7 +5,7 @@
   "models": [
     {
       "variant": "authored",
-      "sha256": "01f8ac61a0e4d93130c2ac125d045459aff24a1e3e61da5ba8d414dedf3391db",
+      "sha256": "c4a34e7f49b1608cbf37f5966b29c7e3599c60015dae89a9594493f3302c76a8",
       "meshes": [],
       "otherOralMeshes": [
         "Seated jaw hinge tissue"
@@ -14,7 +14,7 @@
     },
     {
       "variant": ".puppet",
-      "sha256": "b442c000a4b57ba927bf09ae7fa96efe7c2424dfe676cff03e776a858cbae27c",
+      "sha256": "a29aab7919b57444311169124eac9db21f03b83349c5a5b1ab5881ac0718f701",
       "meshes": [],
       "otherOralMeshes": [
         "Seated jaw hinge tissue"
@@ -23,7 +23,7 @@
     },
     {
       "variant": ".lod1",
-      "sha256": "b442c000a4b57ba927bf09ae7fa96efe7c2424dfe676cff03e776a858cbae27c",
+      "sha256": "a29aab7919b57444311169124eac9db21f03b83349c5a5b1ab5881ac0718f701",
       "meshes": [],
       "otherOralMeshes": [
         "Seated jaw hinge tissue"

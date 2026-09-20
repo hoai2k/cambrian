@@ -66,7 +66,7 @@
     "devonian:viewer": "node tools/research/viewer-bundle.mjs devonian",
     "research:images": "node tools/research/fetch-images.mjs",
     "triassic:selections": "node tools/triassic/apply-selections.mjs",
-    "triassic": "node tools/triassic/review-bodies.mjs --check && node tools/triassic/publish-portraits.mjs --check && node tools/triassic/base-poses.mjs --check && node tools/triassic/idle-bones.mjs --all && node tools/triassic/hidden-parts.mjs --check && esbuild tools/triassic-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/triassic-test.mjs && node node_modules/.cache/triassic-test.mjs",
+    "triassic": "node tools/triassic/review-bodies.mjs --check && node tools/triassic/publish-portraits.mjs --check && node tools/triassic/base-poses.mjs --check && node tools/triassic/idle-bones.mjs --all && node tools/triassic/lag.mjs --all && node tools/triassic/hidden-parts.mjs --check && esbuild tools/triassic-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/triassic-test.mjs && node node_modules/.cache/triassic-test.mjs",
     "triassic:portraits": "node tools/triassic/placeholder-portraits.mjs",
     "triassic:previews": "node tools/triassic/preview-bodies.mjs",
     "triassic:stats": "node tools/triassic/stats.mjs",

@@ -3,22 +3,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1993620,
-      "sha256": "06e4bb87049919a8ced28e13353680e3dbf108a19b85f0bd69df901d9a4c548d",
+      "bytes": 1995728,
+      "sha256": "a61153ea1c78cdd5044df9f931eaaad0f67ee30dec80a1cbef754cd1fac5e5f7",
       "triangles": 21316,
       "vertices": 12360
     },
     {
       "suffix": ".puppet",
-      "bytes": 836896,
-      "sha256": "4186f8f2f3d3924c1c06f65897aafb3de62762bde4b720bfde2001cff3f7a0fb",
+      "bytes": 838020,
+      "sha256": "554d38082105992a06ba5d7bb6f6a65942142552b5f2066a63da74e5d617fb93",
       "triangles": 7578,
       "vertices": 3909
     },
     {
       "suffix": ".lod1",
-      "bytes": 836896,
-      "sha256": "4186f8f2f3d3924c1c06f65897aafb3de62762bde4b720bfde2001cff3f7a0fb",
+      "bytes": 838020,
+      "sha256": "554d38082105992a06ba5d7bb6f6a65942142552b5f2066a63da74e5d617fb93",
       "triangles": 7578,
       "vertices": 3909
     }
@@ -215,7 +215,7 @@
           "clip": "Breath",
           "duration": 2.4000000953674316,
           "samples": 61,
-          "maxVertexTravel": 1.4227030085141454
+          "maxVertexTravel": 1.4416247100383388
         },
         {
           "clip": "Breathe",
@@ -340,7 +340,7 @@
           "clip": "Ability",
           "duration": 1.100000023841858,
           "samples": 61,
-          "maxVertexTravel": 2.3164519619605453
+          "maxVertexTravel": 2.3164519635703376
         },
         {
           "clip": "Attack",
@@ -358,7 +358,7 @@
           "clip": "Breath",
           "duration": 2.4000000953674316,
           "samples": 61,
-          "maxVertexTravel": 1.4392491812298203
+          "maxVertexTravel": 1.439249180486217
         },
         {
           "clip": "Breathe",
@@ -376,7 +376,7 @@
           "clip": "Dive",
           "duration": 1.399999976158142,
           "samples": 61,
-          "maxVertexTravel": 0.8549233151122788
+          "maxVertexTravel": 0.8549233166539572
         },
         {
           "clip": "Dodge",
