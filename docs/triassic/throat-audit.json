@@ -3520,7 +3520,7 @@
     {
       "id": "askeptosaurus",
       "variant": "authored",
-      "sha256": "29e62d2fa0b1ed824601db88bf575370f1429b88627e4a98216a2cb1cd206713",
+      "sha256": "afabea3c3d204da1b6d8f58c0d4b1aa352dff4ffa80cd7d0b2baa51d2ecbc04c",
       "length": 8.621802464567306,
       "meshes": [
         {
@@ -4256,7 +4256,7 @@
     {
       "id": "askeptosaurus",
       "variant": "puppet",
-      "sha256": "edde99529bec82a75b139b1e85e3a90bb3a60a2c2d627d079daffc38b31a7394",
+      "sha256": "05f1489f3c06e89306db093136ceb9bab1671dc484b61825169c0bc49724b0c8",
       "length": 8.622941850193927,
       "meshes": [
         {
@@ -39428,7 +39428,7 @@
     {
       "id": "rhaeticosaurus",
       "variant": "authored",
-      "sha256": "019340956d4e9aea0976a4d65a6ec8440e44664a68dbdddfe9a61ba13f92c564",
+      "sha256": "598ddd9f6129fb014bde91be46bb2cb1027b3895e32db49f6dd6310320c0be10",
       "length": 4.9999998026076735,
       "meshes": [
         {
@@ -39478,9 +39478,9 @@
           "name": "Attack",
           "duration": 1,
           "skin": {
-            "ratio": 1.832245395114107,
+            "ratio": 1.832245447480606,
             "rest": 0.04106147199896426,
-            "posed": 0.07523469298670911,
+            "posed": 0.07523469513695465,
             "phase": 0.6666666666666666,
             "mesh": "Rhaeticosaurus_authored_body",
             "vertices": [
@@ -39489,14 +39489,14 @@
             ]
           },
           "mouthSkin": {
-            "ratio": 1.3537531291951537,
-            "rest": 0.07955151763493756,
-            "posed": 0.10769311593052018,
+            "ratio": 1.2221198313196229,
+            "rest": 0.06388486802619843,
+            "posed": 0.078074964136054,
             "phase": 0.20833333333333334,
             "mesh": "Rhaeticosaurus_authored_body",
             "vertices": [
-              132,
-              7086
+              6610,
+              10250
             ]
           },
           "hiddenOral": {
@@ -39826,9 +39826,9 @@
           "name": "Heavy",
           "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 1.8322454264983032,
+            "ratio": 1.832245483042106,
             "rest": 0.04106147199896426,
-            "posed": 0.07523469427539041,
+            "posed": 0.07523469659716218,
             "phase": 0.6666666666666666,
             "mesh": "Rhaeticosaurus_authored_body",
             "vertices": [
@@ -39837,14 +39837,14 @@
             ]
           },
           "mouthSkin": {
-            "ratio": 1.739760365936126,
-            "rest": 0.0473407754537574,
-            "posed": 0.08236160482712895,
+            "ratio": 1.3648226967348747,
+            "rest": 0.06388486802619843,
+            "posed": 0.08719151786006771,
             "phase": 0.20833333333333334,
             "mesh": "Rhaeticosaurus_authored_body",
             "vertices": [
-              6093,
-              7753
+              6610,
+              10250
             ]
           },
           "hiddenOral": {
@@ -40114,14 +40114,14 @@
         }
       ],
       "worstMouth": {
-        "ratio": 1.739760365936126,
-        "rest": 0.0473407754537574,
-        "posed": 0.08236160482712895,
+        "ratio": 1.3648226967348747,
+        "rest": 0.06388486802619843,
+        "posed": 0.08719151786006771,
         "phase": 0.20833333333333334,
         "mesh": "Rhaeticosaurus_authored_body",
         "vertices": [
-          6093,
-          7753
+          6610,
+          10250
         ],
         "clip": "Heavy"
       }
@@ -40129,7 +40129,7 @@
     {
       "id": "rhaeticosaurus",
       "variant": "puppet",
-      "sha256": "51e10596c1c3e8c51fa433a3da0439fca562eb4cb62f6e43ab549da41a6e60e3",
+      "sha256": "56d6ff23d65c60a8e214abc2a21e797b043f144b6f58faa0346276cc62e9cc72",
       "length": 5.012686112906018,
       "meshes": [
         {
@@ -40179,9 +40179,9 @@
           "name": "Attack",
           "duration": 1,
           "skin": {
-            "ratio": 2.1956408851389257,
+            "ratio": 2.195640953007612,
             "rest": 0.07370739949691119,
-            "posed": 0.1618349798726865,
+            "posed": 0.16183498487511086,
             "phase": 0.20833333333333334,
             "mesh": "Rhaeticosaurus_procedural_volume_twin",
             "vertices": [
@@ -40190,10 +40190,10 @@
             ]
           },
           "mouthSkin": {
-            "ratio": 1.2740548582627818,
+            "ratio": 1.1963065757033406,
             "rest": 0.09089750053109333,
-            "posed": 0.11580840215558325,
-            "phase": 0.20833333333333334,
+            "posed": 0.10874127760034485,
+            "phase": 0.4583333333333333,
             "mesh": "Rhaeticosaurus_procedural_volume_twin",
             "vertices": [
               2294,
@@ -40527,9 +40527,9 @@
           "name": "Heavy",
           "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 2.196541978456061,
+            "ratio": 2.196542229805008,
             "rest": 0.07370739949691119,
-            "posed": 0.16190139711779658,
+            "posed": 0.16190141564407382,
             "phase": 0.20833333333333334,
             "mesh": "Rhaeticosaurus_procedural_volume_twin",
             "vertices": [
@@ -40538,14 +40538,14 @@
             ]
           },
           "mouthSkin": {
-            "ratio": 1.5331747797406918,
-            "rest": 0.05423092188213853,
-            "posed": 0.0831454817117824,
-            "phase": 0.5833333333333334,
+            "ratio": 1.3001657431278169,
+            "rest": 0.09089750053109333,
+            "posed": 0.11818181632647008,
+            "phase": 0.5,
             "mesh": "Rhaeticosaurus_procedural_volume_twin",
             "vertices": [
-              1825,
-              1823
+              2294,
+              2240
             ]
           },
           "hiddenOral": {
@@ -40815,14 +40815,14 @@
         }
       ],
       "worstMouth": {
-        "ratio": 1.5331747797406918,
-        "rest": 0.05423092188213853,
-        "posed": 0.0831454817117824,
-        "phase": 0.5833333333333334,
+        "ratio": 1.3001657431278169,
+        "rest": 0.09089750053109333,
+        "posed": 0.11818181632647008,
+        "phase": 0.5,
         "mesh": "Rhaeticosaurus_procedural_volume_twin",
         "vertices": [
-          1825,
-          1823
+          2294,
+          2240
         ],
         "clip": "Heavy"
       }
