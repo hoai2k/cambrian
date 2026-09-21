@@ -72,12 +72,12 @@
   },
   "pairedFinAsymmetry": {
     "jointPairs": 4,
-    "meanJointGapRaw": 0.00225,
-    "meanJointGapOverBodyLength": 0.00211,
-    "maxJointGapOverBodyLength": 0.00842,
-    "finVerticesMeasured": 1518,
-    "meanMirroredSurfaceGapOverBodyLength": 0.00865,
-    "p95MirroredSurfaceGapOverBodyLength": 0.02127
+    "meanJointGapRaw": 0.0,
+    "meanJointGapOverBodyLength": 0.0,
+    "maxJointGapOverBodyLength": 0.0,
+    "finVerticesMeasured": 1777,
+    "meanMirroredSurfaceGapOverBodyLength": 0.00843,
+    "p95MirroredSurfaceGapOverBodyLength": 0.02119
   },
   "mouth": {
     "method": "geometric: every head vertex casts its own outward normal back into the mesh",
@@ -435,10 +435,10 @@
     "pec_upper_R",
     "pec_mid_R",
     "pec_tip_R",
-    "pelvic_R",
     "pec_upper_L",
     "pec_mid_L",
     "pec_tip_L",
+    "pelvic_R",
     "pelvic_L"
   ],
   "clips": {
@@ -503,24 +503,24 @@
   "boundsAt13Phases": {
     "Idle": [
       [
-        -0.6566745042800903,
+        -0.6556739807128906,
         -2.518932342529297,
         -0.7238373756408691
       ],
       [
-        0.6067842245101929,
+        0.6064879894256592,
         2.5175342559814453,
         0.38635557889938354
       ]
     ],
     "Swim": [
       [
-        -0.6666901111602783,
+        -0.6621809005737305,
         -2.5193941593170166,
         -0.7263359427452087
       ],
       [
-        0.6095966100692749,
+        0.6079877018928528,
         2.5169949531555176,
         0.38980987668037415
       ]
@@ -532,7 +532,7 @@
         -0.734271228313446
       ],
       [
-        0.6144718527793884,
+        0.6100685596466064,
         2.517768144607544,
         0.4023782014846802
       ]
@@ -541,7 +541,7 @@
       [
         -0.6877802610397339,
         -2.5243797302246094,
-        -0.7414862513542175
+        -0.7243765592575073
       ],
       [
         0.794402003288269,
@@ -563,24 +563,24 @@
     ],
     "Dive": [
       [
-        -0.6572010517120361,
+        -0.6566288471221924,
         -2.518767833709717,
         -0.772407054901123
       ],
       [
-        0.6063969135284424,
+        0.6063069105148315,
         2.5169949531555176,
         0.7620718479156494
       ]
     ],
     "Rise": [
       [
-        -0.657626748085022,
+        -0.6553341150283813,
         -2.5198469161987305,
         -1.2184027433395386
       ],
       [
-        0.6070194244384766,
+        0.606240451335907,
         2.5169949531555176,
         0.7454026341438293
       ]
@@ -599,12 +599,12 @@
     ],
     "Bite": [
       [
-        -0.6577290296554565,
+        -0.6557626128196716,
         -2.5999090671539307,
         -0.7237433195114136
       ],
       [
-        0.6065047383308411,
+        0.6062574982643127,
         2.5169949531555176,
         0.38650965690612793
       ]
@@ -623,36 +623,36 @@
     ],
     "Hit": [
       [
-        -0.862835168838501,
+        -0.8613962531089783,
         -2.518767833709717,
         -0.7233179211616516
       ],
       [
-        0.6215298771858215,
+        0.6217634677886963,
         2.6332364082336426,
         0.3857799768447876
       ]
     ],
     "Death": [
       [
-        -0.8710364699363708,
+        -0.8551253080368042,
         -2.518767833709717,
-        -0.8587921261787415
+        -0.8653831481933594
       ],
       [
         0.6061351895332336,
         2.517026424407959,
-        0.6991798877716064
+        0.6983890533447266
       ]
     ],
     "Guard": [
       [
-        -0.6753715872764587,
+        -0.6663423180580139,
         -2.518767833709717,
         -0.7233179211616516
       ],
       [
-        0.6177067160606384,
+        0.616519033908844,
         2.517371892929077,
         0.4978196918964386
       ]
@@ -664,14 +664,14 @@
         -0.7259014844894409
       ],
       [
-        0.7716526985168457,
+        0.8302561044692993,
         2.517115592956543,
         0.389698326587677
       ]
     ],
     "Dodge": [
       [
-        -0.8136264681816101,
+        -0.8104535341262817,
         -2.521284580230713,
         -0.7233179211616516
       ],
@@ -683,19 +683,19 @@
     ],
     "Eat": [
       [
-        -0.6617118120193481,
+        -0.6643260717391968,
         -2.5278244018554688,
         -0.7245059013366699
       ],
       [
-        0.6076056957244873,
+        0.6091259717941284,
         2.5175857543945312,
         0.387136310338974
       ]
     ],
     "Stagger": [
       [
-        -0.8974354267120361,
+        -0.8931584358215332,
         -2.518767833709717,
         -0.7233179211616516
       ],
@@ -719,24 +719,24 @@
     ],
     "Grab": [
       [
-        -0.7336902618408203,
+        -0.7342331409454346,
         -2.6412978172302246,
         -0.7244017720222473
       ],
       [
-        0.6669837236404419,
+        0.6671496629714966,
         2.3969950675964355,
         0.38699930906295776
       ]
     ],
     "Breath": [
       [
-        -0.6579445600509644,
+        -0.6560201048851013,
         -2.5201010704040527,
         -0.7950859665870667
       ],
       [
-        0.6064497232437134,
+        0.6062912344932556,
         2.5169949531555176,
         0.3857799768447876
       ]
@@ -748,7 +748,7 @@
         -0.7974655628204346
       ],
       [
-        0.6081804633140564,
+        0.6147650480270386,
         2.5170505046844482,
         0.3857799768447876
       ]
@@ -767,12 +767,12 @@
     ],
     "Hover": [
       [
-        -0.6561377048492432,
+        -0.6582737565040588,
         -2.519723653793335,
         -0.7756823897361755
       ],
       [
-        0.6098822951316833,
+        0.6105219125747681,
         2.5172951221466064,
         0.42934656143188477
       ]
@@ -783,29 +783,29 @@
       "maxInfluences": 4,
       "vertices": 10914,
       "verticesPerBone": {
-        "body": 3450,
-        "chest": 4342,
+        "body": 3443,
+        "chest": 4347,
         "tail_00": 2618,
-        "skull": 4466,
+        "skull": 4552,
         "tail_04": 1079,
         "tail_05": 898,
         "tail_03": 1326,
         "anal": 645,
-        "pec_upper_R": 334,
+        "pec_upper_R": 506,
         "tail_02": 1648,
         "dorsal": 304,
         "tail_01": 1912,
         "pelvic_R": 395,
-        "pec_mid_L": 385,
-        "pec_tip_L": 196,
-        "pec_upper_L": 469,
+        "pec_mid_L": 400,
+        "pec_tip_L": 175,
         "tail_06": 486,
         "caudal_lower": 140,
         "caudal_upper": 212,
-        "jaw": 432,
-        "pec_mid_R": 346,
+        "jaw": 417,
+        "pec_mid_R": 361,
         "pelvic_L": 339,
-        "pec_tip_R": 195
+        "pec_upper_L": 633,
+        "pec_tip_R": 137
       },
       "jawJunction": {
         "cutRimPairs": 76,
@@ -818,7 +818,7 @@
         "throat": 1.0,
         "shellVertices": 1425,
         "shellFullJaw": 1180,
-        "bodyThroatVertices": 352
+        "bodyThroatVertices": 350
       }
     },
     "Saurichthys procedural volume twin": {
@@ -835,19 +835,19 @@
         "tail_02": 701,
         "tail_01": 779,
         "dorsal": 161,
-        "tail_00": 951,
-        "body": 1182,
+        "tail_00": 958,
+        "body": 1180,
         "chest": 1818,
         "pelvic_R": 199,
         "pelvic_L": 215,
-        "skull": 1842,
-        "pec_upper_L": 358,
-        "pec_upper_R": 303,
-        "pec_mid_L": 227,
-        "pec_tip_L": 99,
-        "pec_mid_R": 240,
-        "pec_tip_R": 105,
-        "jaw": 142
+        "skull": 1881,
+        "pec_upper_L": 376,
+        "pec_upper_R": 359,
+        "pec_mid_L": 249,
+        "pec_mid_R": 250,
+        "pec_tip_L": 83,
+        "pec_tip_R": 79,
+        "jaw": 141
       },
       "jawJunction": {
         "cutRimPairs": 37,
@@ -1047,8 +1047,8 @@
     }
   },
   "appendageRootSeating": {
-    "pec_upper_R": 0.0165,
-    "pec_upper_L": 0.0179,
+    "pec_upper_R": 0.0149,
+    "pec_upper_L": 0.0109,
     "pelvic_R": 0.0173,
     "pelvic_L": 0.0251,
     "jaw": 0.0129,
@@ -1059,10 +1059,10 @@
   "jawShutFromTheGenerationsPartedPose": {
     "closingRotationDegrees": 2.5,
     "mandibleVerticesMeasured": 1425,
-    "verticesInsideTheSkullSurface": 391,
-    "maxPenetrationUnits": 0.13393,
-    "maxPenetrationOverBodyLength": 0.02679,
-    "meanPenetrationOverBodyLength": 0.001074,
+    "verticesInsideTheSkullSurface": 380,
+    "maxPenetrationUnits": 0.12935,
+    "maxPenetrationOverBodyLength": 0.02587,
+    "meanPenetrationOverBodyLength": 0.000988,
     "note": "the mandible posed at the measured closing rotation, against the skull's own surface in the same pose. Anything above zero is the generation's two tooth rows, modelled apart, meeting for the first time."
   },
   "authoredVerticesFarthestFromTheTwin": [
@@ -1140,6 +1140,499 @@
     },
     "cycles": 2,
     "note": "total absolute change in each paired-fin root's Euler angles over the whole Sprint clip, which holds two tail beats. These are control surfaces and take no propulsive stroke, but they sweep with the beat rather than hanging."
+  },
+  "pectoral": {
+    "method": "each blade found as the largest connected blade-thin patch under the flank, flooded over the mesh's own edges; stationed in bands of geodesic distance from its tip; the two stationed centrelines checked against each other's mirror and averaged; the root pulled radially into the trunk by ray parity against the closed skin. T3D-21, after Helicoprion.",
+    "bands": 8,
+    "measured": {
+      "L": {
+        "vertices": 405,
+        "tip": [
+          0.1251,
+          -0.15826,
+          -0.10834
+        ],
+        "geodesicReach": 0.13839,
+        "box": [
+          [
+            0.02809,
+            -0.24235,
+            -0.10987
+          ],
+          [
+            0.1251,
+            -0.15694,
+            -0.03839
+          ]
+        ]
+      },
+      "R": {
+        "vertices": 390,
+        "tip": [
+          -0.13522,
+          -0.18325,
+          -0.11416
+        ],
+        "geodesicReach": 0.14018,
+        "box": [
+          [
+            -0.13566,
+            -0.24475,
+            -0.11504
+          ],
+          [
+            -0.02973,
+            -0.18048,
+            -0.03752
+          ]
+        ]
+      }
+    },
+    "mirrorGapRaw": 0.02667,
+    "mirrorGapOverBodyLength": 0.02496,
+    "rootPullRaw": 0.01282,
+    "arc": 0.12909,
+    "jointArcFractions": [
+      0.0,
+      0.42,
+      0.78
+    ],
+    "windowPerBlade": {
+      "L": [
+        -0.24235,
+        -0.15694
+      ],
+      "R": [
+        -0.24475,
+        -0.18048
+      ]
+    },
+    "joints": {
+      "R": [
+        [
+          -0.03309,
+          -0.22479,
+          -0.04046
+        ],
+        [
+          -0.0676,
+          -0.20325,
+          -0.06978
+        ],
+        [
+          -0.10412,
+          -0.18855,
+          -0.09429
+        ]
+      ],
+      "L": [
+        [
+          0.03309,
+          -0.22479,
+          -0.04046
+        ],
+        [
+          0.0676,
+          -0.20325,
+          -0.06978
+        ],
+        [
+          0.10412,
+          -0.18855,
+          -0.09429
+        ]
+      ]
+    },
+    "parity": {
+      "L": {
+        "dominatedVertices": 169,
+        "dominatedArea": 0.004719,
+        "finClusterVertices": 405,
+        "finClusterVerticesMeasured": 405,
+        "finClusterDominatedByItsChain": 0.4173,
+        "joints": {
+          "pec_upper_L": {
+            "dominates": 36,
+            "meanToOwnedSkin": 0.03652,
+            "toNearestOwnedSkin": 0.02123,
+            "toNearestSkinOverBodyLength": 0.01034
+          },
+          "pec_mid_L": {
+            "dominates": 106,
+            "meanToOwnedSkin": 0.02603,
+            "toNearestOwnedSkin": 0.00607,
+            "toNearestSkinOverBodyLength": 0.00568
+          },
+          "pec_tip_L": {
+            "dominates": 27,
+            "meanToOwnedSkin": 0.01095,
+            "toNearestOwnedSkin": 0.00295,
+            "toNearestSkinOverBodyLength": 0.00219
+          }
+        }
+      },
+      "R": {
+        "dominatedVertices": 140,
+        "dominatedArea": 0.004344,
+        "finClusterVertices": 390,
+        "finClusterVerticesMeasured": 390,
+        "finClusterDominatedByItsChain": 0.359,
+        "joints": {
+          "pec_upper_R": {
+            "dominates": 16,
+            "meanToOwnedSkin": 0.03335,
+            "toNearestOwnedSkin": 0.01912,
+            "toNearestSkinOverBodyLength": 0.01423
+          },
+          "pec_mid_R": {
+            "dominates": 109,
+            "meanToOwnedSkin": 0.03363,
+            "toNearestOwnedSkin": 0.00659,
+            "toNearestSkinOverBodyLength": 0.00617
+          },
+          "pec_tip_R": {
+            "dominates": 15,
+            "meanToOwnedSkin": 0.02489,
+            "toNearestOwnedSkin": 0.01894,
+            "toNearestSkinOverBodyLength": 0.00378
+          }
+        }
+      },
+      "ratios": {
+        "dominatedVertices": 0.1716,
+        "dominatedArea": 0.0795,
+        "finClusterDominatedByItsChain": 0.1397,
+        "bladeJointsToOwnedSkin": 0.5601,
+        "jointsToNearestSkin": 0.4206,
+        "meshDensityOfTheTwoBlades": 0.037
+      },
+      "jointToNearestSkinOverBodyLength": {
+        "pec_upper_L": 0.01034,
+        "pec_mid_L": 0.00568,
+        "pec_tip_L": 0.00219,
+        "pec_upper_R": 0.01423,
+        "pec_mid_R": 0.00617,
+        "pec_tip_R": 0.00378
+      },
+      "jointToSkinGapOverBodyLength": {
+        "upper": 0.00389,
+        "mid": 0.00049,
+        "tip": 0.00159
+      }
+    }
+  },
+  "mouthCutRim": {
+    "authored": {
+      "skull": {
+        "boundaryEdgesInRegion": 282,
+        "boundaryEdgesElsewhere": 8,
+        "loops": [
+          {
+            "vertices": 165,
+            "closed": false,
+            "box": [
+              [
+                -0.05182,
+                0.06011
+              ],
+              [
+                -0.3769,
+                -0.28891
+              ],
+              [
+                -0.05223,
+                -0.00686
+              ]
+            ],
+            "reach": 0.08799,
+            "verticesOnTheSeam": 65
+          },
+          {
+            "vertices": 36,
+            "closed": false,
+            "box": [
+              [
+                0.02006,
+                0.03589
+              ],
+              [
+                -0.52384,
+                -0.50859
+              ],
+              [
+                -0.00819,
+                -0.00281
+              ]
+            ],
+            "reach": 0.01525,
+            "verticesOnTheSeam": 15
+          },
+          {
+            "vertices": 16,
+            "closed": true,
+            "box": [
+              [
+                0.03556,
+                0.03837
+              ],
+              [
+                -0.46761,
+                -0.4626
+              ],
+              [
+                -0.00602,
+                -0.00237
+              ]
+            ],
+            "reach": 0.00501,
+            "verticesOnTheSeam": 13
+          },
+          {
+            "vertices": 12,
+            "closed": true,
+            "box": [
+              [
+                0.01393,
+                0.01621
+              ],
+              [
+                -0.492,
+                -0.48776
+              ],
+              [
+                -0.00876,
+                -0.00322
+              ]
+            ],
+            "reach": 0.00424,
+            "verticesOnTheSeam": 7
+          },
+          {
+            "vertices": 12,
+            "closed": true,
+            "box": [
+              [
+                -0.01074,
+                -0.00821
+              ],
+              [
+                -0.4004,
+                -0.39628
+              ],
+              [
+                -0.01039,
+                -0.00806
+              ]
+            ],
+            "reach": 0.00412,
+            "verticesOnTheSeam": 9
+          },
+          {
+            "vertices": 9,
+            "closed": true,
+            "box": [
+              [
+                0.04079,
+                0.04356
+              ],
+              [
+                -0.39703,
+                -0.39311
+              ],
+              [
+                -0.01047,
+                -0.00796
+              ]
+            ],
+            "reach": 0.00393,
+            "verticesOnTheSeam": 0
+          },
+          {
+            "vertices": 7,
+            "closed": false,
+            "box": [
+              [
+                0.03732,
+                0.03826
+              ],
+              [
+                -0.4469,
+                -0.44589
+              ],
+              [
+                -0.00837,
+                -0.007
+              ]
+            ],
+            "reach": 0.001,
+            "verticesOnTheSeam": 3
+          },
+          {
+            "vertices": 7,
+            "closed": false,
+            "box": [
+              [
+                0.03761,
+                0.03929
+              ],
+              [
+                -0.42443,
+                -0.42254
+              ],
+              [
+                -0.01226,
+                -0.0097
+              ]
+            ],
+            "reach": 0.00189,
+            "verticesOnTheSeam": 2
+          }
+        ]
+      },
+      "jaw": {
+        "boundaryEdgesInRegion": 222,
+        "boundaryEdgesElsewhere": 0,
+        "loops": [
+          {
+            "vertices": 162,
+            "closed": false,
+            "box": [
+              [
+                -0.05182,
+                0.06011
+              ],
+              [
+                -0.3769,
+                -0.28891
+              ],
+              [
+                -0.05223,
+                -0.00686
+              ]
+            ],
+            "reach": 0.08799,
+            "verticesOnTheSeam": 65
+          },
+          {
+            "vertices": 35,
+            "closed": false,
+            "box": [
+              [
+                0.02006,
+                0.03589
+              ],
+              [
+                -0.52384,
+                -0.5087
+              ],
+              [
+                -0.00819,
+                -0.00281
+              ]
+            ],
+            "reach": 0.01514,
+            "verticesOnTheSeam": 15
+          },
+          {
+            "vertices": 9,
+            "closed": true,
+            "box": [
+              [
+                0.04079,
+                0.04356
+              ],
+              [
+                -0.39703,
+                -0.39311
+              ],
+              [
+                -0.01047,
+                -0.00796
+              ]
+            ],
+            "reach": 0.00393,
+            "verticesOnTheSeam": 0
+          },
+          {
+            "vertices": 6,
+            "closed": true,
+            "box": [
+              [
+                0.03867,
+                0.03929
+              ],
+              [
+                -0.42443,
+                -0.42254
+              ],
+              [
+                -0.01215,
+                -0.0097
+              ]
+            ],
+            "reach": 0.00189,
+            "verticesOnTheSeam": 2
+          },
+          {
+            "vertices": 4,
+            "closed": true,
+            "box": [
+              [
+                0.03732,
+                0.03815
+              ],
+              [
+                -0.4469,
+                -0.44624
+              ],
+              [
+                -0.00805,
+                -0.007
+              ]
+            ],
+            "reach": 0.00065,
+            "verticesOnTheSeam": 0
+          }
+        ]
+      }
+    },
+    "twin": {
+      "skull": {
+        "boundaryEdgesInRegion": 148,
+        "boundaryEdgesElsewhere": 0,
+        "loops": [
+          {
+            "vertices": 148,
+            "closed": true,
+            "box": [
+              [
+                -0.03852,
+                0.05867
+              ],
+              [
+                -0.53477,
+                -0.33981
+              ],
+              [
+                -0.04822,
+                -0.00469
+              ]
+            ],
+            "reach": 0.19496,
+            "verticesOnTheSeam": 103
+          }
+        ]
+      },
+      "jaw": {
+        "boundaryEdgesInRegion": 0,
+        "boundaryEdgesElsewhere": 0,
+        "loops": []
+      }
+    },
+    "mouthRunOverBody": 0.18,
+    "jawFrontY": -0.53208,
+    "jawBackY": -0.33981,
+    "rawLength": 1.06843
   },
   "normalizedWeights": true,
   "rootStable": true,

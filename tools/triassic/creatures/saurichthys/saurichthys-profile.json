@@ -28,8 +28,8 @@
     }
   },
   "appendageRootSeating": {
-    "pec_upper_R": 0.0165,
-    "pec_upper_L": 0.0179,
+    "pec_upper_R": 0.0149,
+    "pec_upper_L": 0.0109,
     "pelvic_R": 0.0173,
     "pelvic_L": 0.0251,
     "jaw": 0.0129,

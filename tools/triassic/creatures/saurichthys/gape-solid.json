@@ -6,92 +6,44 @@
     1.0,
     1.0
   ],
+  "asDrawn": false,
   "shots": [
     {
-      "clip": "Heavy",
-      "t": 0.5,
+      "clip": "Bite",
+      "t": 0.133,
       "pixels": 378000,
-      "differingPixels": 729,
-      "holesOpenedByCulling": 6,
-      "seenThroughTheBody": 1,
-      "backdropInBothPasses": 16,
-      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Heavy-0.5-opened.png",
-      "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Heavy-0.5-solid.png",
-      "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Heavy-0.5-culled.png",
-      "openedPixelsAlsoOpenedBeforeThisPort": 6,
-      "openedPixelsNewSinceThisPort": 0,
-      "sharedPixelBox": [
-        518,
-        352,
-        543,
-        353
-      ]
+      "differingPixels": 4305,
+      "holesOpenedByCulling": 162,
+      "seenThroughTheBody": 2,
+      "backdropInBothPasses": 4,
+      "markedImage": "local/triassic-authoring/saurichthys/gape-solid/Bite-0.133-opened.png",
+      "solid": "local/triassic-authoring/saurichthys/gape-solid/Bite-0.133-solid.png",
+      "culled": "local/triassic-authoring/saurichthys/gape-solid/Bite-0.133-culled.png"
     },
     {
       "clip": "Attack",
-      "t": 0.4,
+      "t": 0.267,
       "pixels": 378000,
-      "differingPixels": 725,
-      "holesOpenedByCulling": 6,
-      "seenThroughTheBody": 1,
-      "backdropInBothPasses": 16,
-      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Attack-0.4-opened.png",
-      "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Attack-0.4-solid.png",
-      "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Attack-0.4-culled.png",
-      "openedPixelsAlsoOpenedBeforeThisPort": 6,
-      "openedPixelsNewSinceThisPort": 0,
-      "sharedPixelBox": [
-        518,
-        352,
-        543,
-        353
-      ]
+      "differingPixels": 5238,
+      "holesOpenedByCulling": 164,
+      "seenThroughTheBody": 2,
+      "backdropInBothPasses": 2,
+      "markedImage": "local/triassic-authoring/saurichthys/gape-solid/Attack-0.267-opened.png",
+      "solid": "local/triassic-authoring/saurichthys/gape-solid/Attack-0.267-solid.png",
+      "culled": "local/triassic-authoring/saurichthys/gape-solid/Attack-0.267-culled.png"
     },
     {
-      "clip": "Bite",
-      "t": 0.15,
+      "clip": "Heavy",
+      "t": 0.333,
       "pixels": 378000,
-      "differingPixels": 2037,
-      "holesOpenedByCulling": 158,
-      "seenThroughTheBody": 2,
+      "differingPixels": 3530,
+      "holesOpenedByCulling": 152,
+      "seenThroughTheBody": 4,
       "backdropInBothPasses": 4,
-      "markedImage": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Bite-0.15-opened.png",
-      "solid": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Bite-0.15-solid.png",
-      "culled": "/home/user/cambrian/.claude/worktrees/agent-ae1e0b849fa3f0378/local/triassic-authoring/saurichthys/gape-solid/Bite-0.15-culled.png",
-      "openedPixelsAlsoOpenedBeforeThisPort": 12,
-      "openedPixelsNewSinceThisPort": 146,
-      "sharedPixelBox": [
-        5,
-        155,
-        12,
-        158
-      ]
+      "markedImage": "local/triassic-authoring/saurichthys/gape-solid/Heavy-0.333-opened.png",
+      "solid": "local/triassic-authoring/saurichthys/gape-solid/Heavy-0.333-solid.png",
+      "culled": "local/triassic-authoring/saurichthys/gape-solid/Heavy-0.333-culled.png"
     }
   ],
-  "beforeThisPort": {
-    "note": "the one-sac Mouth_lining with no hinge plug, the shipped 15 September body, same shots",
-    "shots": [
-      {
-        "clip": "Heavy",
-        "t": 0.5,
-        "holesOpenedByCulling": 378,
-        "seenThroughTheBody": 373,
-        "backdropInBothPasses": 4
-      },
-      {
-        "clip": "Attack",
-        "t": 0.4,
-        "holesOpenedByCulling": 377,
-        "seenThroughTheBody": 372,
-        "backdropInBothPasses": 1
-      },
-      {
-        "clip": "Bite",
-        "t": 0.15,
-        "holesOpenedByCulling": 3404,
-        "seenThroughTheBody": 0,
-        "backdropInBothPasses": 1
-      }
-    ]
-  }
+  "note": "the file as it contains it, with the Mouth lining drawn. The gap between this and the as-drawn run is exactly what the hidden lining is worth: about 87 px through and 360 opened."
 }
