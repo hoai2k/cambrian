@@ -130,12 +130,23 @@ export function Viewer() {
    * other, and a difference you have to hold in your head across two list entries is not seen.
    *
    * A specimen opens on the head of its own list: its full model where it has one, the raw
-   * generation where it does not. A link into stretch mode is the exception, since a stretch is an
-   * edit to the raw generation and must open on it even for an animal whose built body would win.
+   * generation where it does not. The editing modes are the exception, and for the same reason in
+   * both: the body an edit *applies to* is not the body the viewer would otherwise show.
+   *
+   * A stretch is an edit to the raw generation, so it opens on that. **A bend is aimed on a body
+   * no builder has moved**, and on an animal whose builder carried a correction into the bind
+   * there is nothing left to aim on the shipped one — Askeptosaurus' rest already holds T3D-26's
+   * whole 67.7 degree head correction, so bend mode opening on `full` showed a reviewer a head
+   * that had already been straightened and invited them to straighten it again. It opens on the
+   * original pose where the animal publishes one, and falls back to the raw generation.
    */
   const opening = (key: string, mode?: Mode): string => {
     const list = stages(specimenByKey.get(key)!);
     if (mode === 'stretch' && list.some(o => o.kind === 'generated')) return 'generated';
+    if (mode === 'bend') {
+      const aimable = list.find(o => o.kind === 'origpose') ?? list.find(o => o.kind === 'generated');
+      if (aimable) return aimable.id;
+    }
     return list[0].id;
   };
   const [stageId, setStageId] = useState<string>(() => opening(initial.current.key, initial.current.mode));
@@ -526,7 +537,7 @@ export function Viewer() {
               : 'Lengthen a run of this body between two cuts and measure it. A built body is held at rest and cannot be baked: the numbers go to its builder.'}>
             Stretch{(() => { const d = getStretch(id); return d && !stretchIsIdentity(d) ? ' (edited)' : ''; })()}
           </button>}
-          {!isPropCollection(collection) && <button className="ghost" onClick={() => { if (def.generated && !def.inReview) setStageId('generated'); setMode('bend'); }} disabled={!canBend}
+          {!isPropCollection(collection) && <button className="ghost" onClick={() => { setStageId(opening(id, 'bend')); setMode('bend'); }} disabled={!canBend}
             title="Turn a run of this body between two cuts — a neck off its trunk — and read the angle before and after. On a built body it is a measurement for its builder.">
             Bend
           </button>}
