@@ -29,9 +29,9 @@ weights that already held it.** No remesh, no smoothing, no reshaping, no change
 
 | Variant | Triangles | Packed size | Purpose |
 | --- | ---: | ---: | --- |
-| Full (`askeptosaurus.glb`) | 20,064 | 2,201,816 bytes | The preserved posed generation, rigged and carried |
-| Procedural twin / LOD1 | 6,402 | 835,988 bytes | Same rig, clips and anchors; LOD is a byte-identical alias |
-| Backup (`askeptosaurus.backup.glb`) | 19,648 | 1,936,284 bytes | The straight regeneration, its own rig and all 24 clips |
+| Full (`askeptosaurus.glb`) | 20,064 | 2,203,676 bytes | The preserved posed generation, rigged and carried |
+| Procedural twin / LOD1 | 6,402 | 837,892 bytes | Same rig, clips and anchors; LOD is a byte-identical alias |
+| Backup (`askeptosaurus.backup.glb`) | 19,648 | 1,936,484 bytes | The straight regeneration, its own rig and all 24 clips |
 
 ## The posed body's own rigging map
 
@@ -131,8 +131,9 @@ puts the fault back in the bind the renderer sizes by and in every portrait shot
 *opening* — `level` in the held-shape table — is left for the clips.
 
 Carrying the front moves the head, and two things had to follow it. The **anchors** are points in
-the measured frame attached to `skull` and `jaw`, so `carry_rest` now hands back the per-bone map it
-bakes the skin through and the three anchors are placed through it — exactly what a weight-1 vertex
+the measured frame attached to `skull` and `jaw` (and now `tail_11`, which the carry also moves), so
+`carry_rest` now hands back the per-bone map it bakes the skin through and every anchor is placed
+through it — exactly what a weight-1 vertex
 on that bone does, and measurably so: each anchor's distance to the nearest skin vertex in the
 shipped file is unchanged to four decimals across the fix (`anchor_mouth` 0.0123,
 `anchor_mouth_inside` 0.0033, `anchor_attack_primary` 0.0086) while all three have moved with the
@@ -194,6 +195,48 @@ at full amplitude and the builder asserts they do:
 | Sprint | 0.280 | 2.39 | 1.01–1.03 |
 | Heavy / TailWhip | 0.681 / 0.682 | 4.13 / 4.15 | 1.01–1.49 |
 | Ability / Coil | 0.688 | 3.44 | 1.08–3.59 |
+
+### The tail has an anchor of its own (T3D-23, closed by T3D-32D)
+
+`Heavy` and `TailWhip` strike with the tail, and the body carried no anchor on it: measured over 41
+phases of the packaged file, `anchor_attack_primary` — on the skull, where every other body in the
+roster has it — moves **2.1 % of a body** in those two clips. That was never a clip failing to use
+the animal (the tail travels 0.68 of its own length in them against `Idle`'s 0.06); it was the
+anchor being in the wrong place, so what the simulation could point at was a head standing still
+while the blow landed somewhere else.
+
+The rule is that the attack anchor belongs on the bone that delivers the blow, and this animal
+delivers two different blows with two different ends of itself: a thalattosaur's `Attack` and
+`Bite` are bites, and its heavy is the tail. The runtime already holds more than one —
+`CreatureAnchors` collects **every** `role: attack` socket and `nearestAttack` lands the blow from
+whichever is closest to the target — so the skull keeps the primary and the tail gains
+`anchor_attack_tail`. Nothing has to name a clip.
+
+Off the packaged file, 41 phases, total displacement over body length:
+
+| Clip | `anchor_attack_primary` (skull) | `anchor_attack_tail` |
+| --- | ---: | ---: |
+| `TailWhip` | 2.1 % | **49.3 %** |
+| `Heavy` | 2.1 % | **48.9 %** |
+| `Ability` / `Coil` | 6.4 % | 78.5 % |
+| `Attack` | 2.1 % | 28.1 % |
+| `Idle` | 1.4 % | 12.8 % |
+
+**Where the tail ends is measured, not typed.** The centreline's last station is the end of a fitted
+polyline and not a point on the skin: on this body it lands 0.0006 raw outside the surface, and on
+the straight regeneration **0.068** outside it — a seventh of the tail's own length out in open
+water — and walking back down the axis does not find the skin either, because a fitted axis and a
+thin tapering tail part company at the very end. So the anchor is seated on the surface *nearest*
+the end of the animal's own centreline, which needs no threshold and no search and is the same
+construction on both bodies; each records the gap it closed (`tailAnchorSurfaceGapRaw`) and where
+it landed along the body (`tailAnchorArcOverBodyArc`: 0.995 here, 0.964 on the backup). The builder
+asserts the seat is inside the last tail control's own station, that the tail anchor swings a fifth
+of the animal in both tail clips, that it out-travels the skull's by at least 3× there (it is 27×),
+and that a bite does not swing the tail further than the whip does.
+
+Nothing else moved: skin **1.37x**, `lag.mjs` 0.00 % of a body, every joint owns skin, both bodies'
+`posedExtentOverBind` inside 0.90–1.10 on the straight-line clips, packaging parity exact and the
+LOD1 byte-identical to the twin. The socket count both audits check went 3 → 4.
 
 The wave is the straight body's, re-measured on this chain: `WAVE_STEP` 0.40 (twelve controls
 lagging by more than that carry over a wavelength and cancel at the tip), travel growing toward the

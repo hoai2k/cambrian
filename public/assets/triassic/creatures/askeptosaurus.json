@@ -44,7 +44,8 @@
   "anchors": [
     "anchor_mouth",
     "anchor_mouth_inside",
-    "anchor_attack_primary"
+    "anchor_attack_primary",
+    "anchor_attack_tail"
   ],
   "puppet": "askeptosaurus.puppet.glb",
   "sources": [

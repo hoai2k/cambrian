@@ -220,8 +220,38 @@ long axis and read as half a cycle apart if the sign is not undone.
 
 `Heavy` and `Ability` are the animal's own named **side swipe** — the sideways sweep of a long
 rostrum — and not a bigger `Attack`. The audit measures the lateral share of the snout's excursion
-to say so: Attack **0.05**, Heavy **0.73**, Ability **0.77**, and Ability reaches 1.65 against
-Attack's 0.48.
+to say so: Attack **0.03**, Heavy **1.00**, Ability **1.05**, and Ability reaches 0.91 against
+Attack's 0.65.
+
+### The swipe reaches (T3D-23, closed by T3D-32D)
+
+The swipe used to spend its first third taking the weapon away from the prey. Measured on the
+**packaged** file over 41 phases, `anchor_attack_primary`'s travel along the animal's forward
+direction, over body length:
+
+| clip | before | after |
+| --- | --- | --- |
+| `Heavy` | −18.0 % back, +11.5 % forward | **−4.7 % / +17.1 %** |
+| `Ability` | −24.9 % back, +9.8 % forward | **−4.8 % / +17.0 %** |
+| `Attack` | −2.9 % back, +8.4 % forward | **−0.3 % / +12.4 %** |
+
+Three changes, and the argument for each is in `build.py` beside it. The **gather no longer scales
+with the sweep** (`gather`): `sway` is how far the rostrum goes across, and multiplying the windup
+by it as well meant the widest sweep — the ability — cocked the head 53° before the animal moved and
+stood a tenth of a body *behind* its own rest while it did. The reach is the **dart** (`carry`):
+the body is carried 12 % of a body forward on a plateau that rises **through** the gather rather
+than after it and is held through the sweep, so the head cocks while the animal is already going
+forward and the swipe crosses in front of where it stood. And the head's **dip rides the carry**
+rather than the drive, because with the two half a clip apart the snout shot forward at 0.20 and
+then sank for the next half second, which the audit reads as a strike whose travel is spread out —
+half of `Attack`'s in 0.40 of the clip, its bar exactly. Together: half the travel now falls in
+0.20 / 0.21 / 0.32 of the clip. `validation.json` `attackReach` records the trace and `build.py`
+asserts the floors (+0.12 forward, −0.06 back, and the gather before the reach). Strip:
+[before and after](../../../../docs/triassic/verification/aphaneramma-attack-reach.png).
+
+Nothing else moved: skin **4.43x**, `gape-solid.py` 0 px plain and 7 px as drawn (identical to the
+file this replaced, both under the tolerance of 12), `lag.mjs` 0.00 % of a body, every joint owns
+skin, packaging parity exact and the LOD1 byte-identical to the twin.
 
 ## Measured tolerances
 
