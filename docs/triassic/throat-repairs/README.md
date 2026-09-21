@@ -367,6 +367,14 @@ mouth size by construction, because the distance from a point on the midline to 
 half-width there. A builder that has measured how much head there is above the mouth line passes it
 as a ceiling, and the cap then cannot reach the skin whatever the fraction says.
 
+**The fraction itself is a judgement and is recorded as one.** What is measured is the *rule* — the
+depth is the local mouth size, per vertex, and the ceiling is the head's own section — and what a
+person chose is how much of that to use: 0.34, on both bodies, from looking at the renders. Both
+builders write the fraction and the deepest push it produced into `validation.json`
+(0.0160 raw on Rhaeticosaurus' 0.10-long mouth, 0.0106 on Nothosaurus' 0.13-long one), so a
+reviewer who wants a shallower or deeper mouth changes one number and can see what the last one
+was worth.
+
 ### 2 — a gaping generation is not cut at all (`T.jaw_field_uncut`)
 
 The body stays one surface and the mouth opening is a bone turning inside skin, which is what every
