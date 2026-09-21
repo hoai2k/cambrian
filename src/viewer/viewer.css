@@ -380,8 +380,8 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
    makes easy and the reason the original pose is published at all. */
 .bend-body-note { border-left: 2px solid var(--line); padding-left: 8px; }
 .bend-body-note[data-corrected="yes"] { border-left-color: var(--ember); color: var(--mist); }
-/* The mode's own Model control: the info card's is off the screen while an editor is open, and a
-   mode that opens on one body has to let a reviewer go to the others. */
-.bend-model-pick { margin: 10px 0 4px; }
-.bend-model-pick > span { display: block; font: 700 10px var(--font-display); letter-spacing: .14em; color: var(--dim); text-transform: uppercase; margin-bottom: 4px; }
+/* An editing mode's own Model control: the info card's is off the screen while an editor is open,
+   and a mode that opens on one body has to let a reviewer go to the others. */
+.editor-model-pick { margin: 10px 0 4px; }
+.editor-model-pick > span { display: block; font: 700 10px var(--font-display); letter-spacing: .14em; color: var(--dim); text-transform: uppercase; margin-bottom: 4px; }
 .bend-plane[data-source="manual"] > label:first-child > small { color: var(--lagoon); }

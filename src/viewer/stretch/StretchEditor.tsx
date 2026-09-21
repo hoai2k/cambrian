@@ -7,7 +7,7 @@ import {
   measureStretch, regionLength, resetAll, resetFactor, setAxis, setFactor, setPlaneAt, setTilt, shiftOf,
   stretchDirection, warp, type PlaneName, type StretchDoc,
 } from './stretch';
-import { getStretch, setStretch } from './store';
+import { getStretch, setStretch, stretchKey } from './store';
 
 /**
  * Stretch mode: lengthen a run of a raw generated body.
@@ -38,6 +38,18 @@ interface Props {
    * throwing away the undo history, sixty times a second.
    */
   model: string;
+  /**
+   * The bodies this specimen offers, and which one is on stage. The stretcher means two different
+   * things on the two kinds of body — an edit that `npm run triassic:stretch` bakes into a raw
+   * generation, and a *measurement* for the builder on a rigged one, because a warped bind pose
+   * shows at rest and then flails once a clip plays — and the second of those is documented but was
+   * unreachable: `opening()` sends a reviewer to the generation, and the info card that carries the
+   * Model control is off the screen while any editor is open. So the mode carries its own, as bend
+   * does.
+   */
+  stages: readonly { id: string; label: string }[];
+  stageId: string;
+  onStage(id: string): void;
   onExit(): void;
 }
 
@@ -57,7 +69,7 @@ const MAX_UPP_FACTOR = 12, MIN_UPP_FACTOR = .02;
 /** How far a cut line is drawn either side of the body's centre line, as a share of its section. */
 const CUT_REACH = .85;
 
-export function StretchEditor({ scene, specimen, model, onExit }: Props) {
+export function StretchEditor({ scene, specimen, model, stages, stageId, onStage, onExit }: Props) {
   const stageRef = useRef<HTMLDivElement>(null);
   const cellRefs = { side: useRef<HTMLDivElement>(null), top: useRef<HTMLDivElement>(null), main: useRef<HTMLDivElement>(null) };
   const [doc, setDocState] = useState<StretchDoc | null>(null);
@@ -77,7 +89,7 @@ export function StretchEditor({ scene, specimen, model, onExit }: Props) {
     const target = scene.sculptTarget();
     if (!target) { setError('Nothing on stage to stretch'); return; }
     const chunks = target.meshes.map((m) => rootFramePositions(m.base, m.toRoot));
-    let d = getStretch(specimen.key);
+    let d = getStretch(stretchKey(specimen.key, model));
     if (!d || d.model !== model) {
       try {
         d = measureStretch(
@@ -104,7 +116,7 @@ export function StretchEditor({ scene, specimen, model, onExit }: Props) {
   // ---- every document change reaches the scene and the session store ----
   const commitDoc = useCallback((next: StretchDoc, finalize: boolean) => {
     setDocState(next);
-    setStretch(next.key, next);
+    setStretch(stretchKey(next.key, next.model), next);
     if (!previewRef.current) scene.applySculpt(isIdentity(next) ? null : warp(next), finalize);
   }, [scene]);
 
@@ -282,6 +294,12 @@ export function StretchEditor({ scene, specimen, model, onExit }: Props) {
         <h2 className={specimen.name.length > 11 ? 'long-name' : undefined}>{specimen.name}</h2>
       </div>
       {error && <p className="sculpt-error">{error}</p>}
+      {stages.length > 1 && <label className="scheme-pick editor-model-pick stretch-model-pick">
+        <span>Model</span>
+        <select aria-label="Which model in stretch mode" value={stageId} onChange={(e) => onStage(e.target.value)}>
+          {stages.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
+        </select>
+      </label>}
       <div className="sculpt-actions">
         <button className="ghost" onClick={undo} disabled={!h?.canUndo} title="⌘/Ctrl+Z">Undo</button>
         <button className="ghost" onClick={redo} disabled={!h?.canRedo} title="⇧⌘/Ctrl+Z · Ctrl+Y">Redo</button>

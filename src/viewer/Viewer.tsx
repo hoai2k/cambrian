@@ -9,7 +9,7 @@ import { MarkEditor } from './mark/MarkEditor';
 import { getSculpt } from './sculpt/store';
 import { isIdentity, warp } from './sculpt/profile';
 import { StretchEditor } from './stretch/StretchEditor';
-import { getStretch } from './stretch/store';
+import { getStretch, stretchKey } from './stretch/store';
 import { isIdentity as stretchIsIdentity, warp as stretchWarp } from './stretch/stretch';
 import { MouthEditor } from './mouth/MouthEditor';
 import type { AppliesTo } from './mouth/mouth';
@@ -296,6 +296,16 @@ export function Viewer() {
   const ownBody = !def.generated || !!def.inReview;
   const canStretch = !isPropCollection(collection) && !showPuppet && ready && (showGenerated || ownBody);
   /**
+   * The bodies an editing mode can actually be opened on, which is what its own Model control may
+   * offer. It is `canStretch`/`canBend`'s own test asked of each stage rather than of the one on
+   * stage: the twin is refused outright, and on an animal whose body is not built only the raw
+   * generation is allowed. Offering anything else would let a reviewer pick an option that either
+   * drops them back to the view or leaves the mode on screen with no panel in it.
+   */
+  const editableStages = choices
+    .filter(o => o.kind !== 'twin' && (ownBody || o.kind === 'generated'))
+    .map(o => ({ id: o.id, label: o.label }));
+  /**
    * Bend sits exactly where stretch does, because it asks the same kind of question about the same
    * run of body: stretch changes a span's *length* and bend changes its *direction*, and neither
    * can be baked into a rigged body. So it is offered on a raw generation (where the warp on stage
@@ -351,7 +361,7 @@ export function Viewer() {
         const sculpt = getSculpt(id);
         if (sculpt && !isIdentity(sculpt)) sceneRef.current?.applySculpt(warp(sculpt), true);
         // Only a raw generation keeps its stretch on the stage; a rigged one would flail once a clip played.
-        const stretch = showGenerated ? getStretch(id) : undefined;
+        const stretch = showGenerated ? getStretch(stretchKey(id, modelPath)) : undefined;
         if (stretch && stretch.model === modelPath && !stretchIsIdentity(stretch)) sceneRef.current?.applySculpt(stretchWarp(stretch), true);
         setClips(names); setSlots(sceneRef.current?.activeSlots() ?? []); setLoading(false); setLoadedId(id);
         setHasOral(sceneRef.current?.hasOralGeometry() ?? false);
@@ -423,7 +433,8 @@ export function Viewer() {
         <SculptEditor key={id} scene={sceneRef.current} specimen={def} onExit={() => setMode('view')} />
       )}
       {mode === 'stretch' && canStretch && sceneRef.current && (
-        <StretchEditor key={`${id}-stretch`} scene={sceneRef.current} specimen={def} model={modelPath} onExit={() => setMode('view')} />
+        <StretchEditor key={`${id}-stretch`} scene={sceneRef.current} specimen={def} model={modelPath}
+          stages={editableStages} stageId={stage.id} onStage={setStageId} onExit={() => setMode('view')} />
       )}
 
       {/* Mark mode keeps the ordinary single-stage layout — the brush paints on the orbit view
@@ -449,14 +460,13 @@ export function Viewer() {
           sha256={showGenerated ? def.generatedSha256 : undefined} appliesTo={bendAppliesTo}
           stageLabel={stage.label} origPose={origPoseNote}
           /* The mode *opens* on the unbent body and must not be a cage: the info card carries the
-             Model control and an editing mode replaces it, so bend mode carries its own. The twin
-             is left out because `canBend` refuses it anyway (the effect above drops straight back
-             to the view), and offering a choice that quietly ends the mode is worse than not
-             offering it. Everything the panel says about which body it is describing follows the
-             swap for free: the editor is keyed by the model, and `appliesTo`, `stageLabel` and the
-             corrected-body warning are all derived from the stage. */
-          stages={choices.filter(o => o.kind !== 'twin').map(o => ({ id: o.id, label: o.label }))}
-          stageId={stage.id} onStage={setStageId}
+             Model control and an editing mode replaces it, so bend mode carries its own. The list
+             is what this mode can actually be opened on (`editableStages`), because offering a
+             choice that quietly ends the mode is worse than not offering it. Everything the panel
+             says about which body it is describing follows the swap for free: the editor is keyed
+             by the model, and `appliesTo`, `stageLabel` and the corrected-body warning are all
+             derived from the stage. */
+          stages={editableStages} stageId={stage.id} onStage={setStageId}
           canvas={canvasRef.current} onExit={() => setMode('view')} />
       )}
 
@@ -554,7 +564,13 @@ export function Viewer() {
             title={def.generated && !def.inReview
               ? 'Lengthen a run of this raw generation — a neck, a tail — between two cuts, and export the change to be baked into the GLB'
               : 'Lengthen a run of this body between two cuts and measure it. A built body is held at rest and cannot be baked: the numbers go to its builder.'}>
-            Stretch{(() => { const d = getStretch(id); return d && !stretchIsIdentity(d) ? ' (edited)' : ''; })()}
+            {/* The label asks about the body the button would *open*, which is not always the one on
+                stage: `opening()` sends a stretch to the raw generation where there is one. */}
+            Stretch{(() => {
+              const on = choices.find(o => o.id === opening(id, 'stretch'))?.model ?? modelPath;
+              const d = getStretch(stretchKey(id, on));
+              return d && !stretchIsIdentity(d) ? ' (edited)' : '';
+            })()}
           </button>}
           {!isPropCollection(collection) && <button className="ghost" onClick={() => { setStageId(opening(id, 'bend')); setMode('bend'); }} disabled={!canBend}
             title="Turn a run of this body between two cuts — a neck off its trunk — and read the angle before and after. On a built body it is a measurement for its builder.">
