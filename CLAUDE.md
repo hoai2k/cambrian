@@ -1088,6 +1088,29 @@ unless the user explicitly asks for a PR. Steps:
   is what a quarter of a degree of yaw looks like in a file nobody was measuring. Record the
   **held shape** per clip beside it, and assert the clips' holds are actually different from each
   other, or a table of per-clip poses is a claim rather than a fact.
+- **"In line with the body" is a reference, and on a long-tailed animal the obvious references are
+  all wrong.** Askeptosaurus' head was brought onto the trunk and *landed* on it — 4.2° off the
+  hip-to-shoulder chord, a number nobody could argue with — and the animal still read as turned from
+  directly above, because that chord runs between two joints inside the front half of a body that is
+  two thirds tail. Measured on the shipped body, the same head stood 4.2° off that chord, 16.5° off
+  `body`→`chest`, 16.8° off mid-tail→shoulder and **30.6°** off the tail's own run to the shoulder:
+  one trunk, four defensible readings, 31° apart at the extremes, and the one the *picture* uses is
+  the longest, because that is the line the animal draws on the page. So the aim is a **human's**,
+  taken from a bend-editor export (`docs/triassic/bends/`) rather than from a chord, and the builder
+  applies the reviewer's rotation to *its own* head direction so the two never have to agree about
+  where the head points — only about how far it has to turn, which they do to half a degree (33.3
+  against 33.9). Two things make that safe to do. A direction handed in from outside is in the
+  *file's* frame and neither `T.measure_frame` nor a builder's own reframing returns the map it
+  rewrote every vertex with, so **fit it** (Kabsch, index to index, residual asserted — 8e-8 here)
+  rather than reconstructing it from what those functions record. And the acceptance test is the
+  **plan render**, not the angle: `plan-view.py`/`plan-sheet.py` shoot the body from directly above
+  and print the head against every reading there is, `carry.planViewReadings` regenerates that table
+  on every build, and `motion` carries the head against the new aim *beside* the old chord figure so
+  every earlier verdict stays comparable. A longer arc is not automatically a worse skin: shared
+  equally over six joints it read 1.40x, and sweeping the share's own curve (`aimcurve`, six
+  rebuilds) to take load off the shoulder — where a narrow neck meets a wide trunk, and where this
+  body's worst edge has always been — brought it to **1.36x**, better than the 1.37x the shorter
+  correction shipped at.
 - Devonian specimens land in batches (`tools/devonian/shipped.json`). When one lands: run
   `node tools/update-asset-sizes.mjs` (refreshes `src/content/devonian/asset-sizes.json`), remove its
   entry from `DEVONIAN_STAND_INS` in `src/content/devonian/index.ts`, and run `npm run devonian`.
@@ -1508,7 +1531,17 @@ unless the user explicitly asks for a PR. Steps:
   Which way a body lies is never taken from its bounding box if anything better exists: the mouth
   socket, then the generation's authored `previewYaw`, then the box, and the panel says which and
   lets a human override it — because Rhaeticosaurus' flippers span further than it is long, so its
-  box says the animal runs across itself. `npm run stretch` and
+  box says the animal runs across itself. **And the box picks the axis and cannot pick the end**:
+  with no socket to read a sign off, `frameFor` returns "the head is at the high end" as a
+  *default*, so half of a `bounds` frame is arrived at and half is assumed. The bend editor now says
+  which (`forwardEarned`, simply `frameSource !== 'bounds'`): an amber question over the flip button,
+  `ASSUMED` in the export's own `frame.note`, and the note names what turns round with it — every
+  "back from the nose" reading, `baseHeadFraction` included, while the bend itself does not, being a
+  turn about an axle through `span.base` that names no end. It has already cost an export.
+  Askeptosaurus' published original pose has no rig and so no `anchor_mouth`, and
+  `preview-orientation.json`'s yaw table is *empty*, so the box was all there was: its snout sits at
+  z 0.038 and its shoulders at 0.277, the panel said high z, and both head fractions in that file
+  are measured from the tail. `npm run stretch` and
   `node tools/stretch-browser.mjs` check it; `npm run triassic:stretch -- <file> --write` bakes a
   *generation's* stretch into `tools/triassic/creatures/<id>/<id>.preview.glb` (never into
   `tripo-raw/`, and it refuses a rigged body by name), importing the viewer's own `warp()` so the

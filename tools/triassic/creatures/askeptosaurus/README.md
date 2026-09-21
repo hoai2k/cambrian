@@ -29,8 +29,8 @@ weights that already held it.** No remesh, no smoothing, no reshaping, no change
 
 | Variant | Triangles | Packed size | Purpose |
 | --- | ---: | ---: | --- |
-| Full (`askeptosaurus.glb`) | 20,064 | 2,203,676 bytes | The preserved posed generation, rigged and carried |
-| Procedural twin / LOD1 | 6,402 | 837,892 bytes | Same rig, clips and anchors; LOD is a byte-identical alias |
+| Full (`askeptosaurus.glb`) | 20,064 | 2,202,972 bytes | The preserved posed generation, rigged and carried |
+| Procedural twin / LOD1 | 6,402 | 837,344 bytes | Same rig, clips and anchors; LOD is a byte-identical alias |
 | Backup (`askeptosaurus.backup.glb`) | 19,648 | 1,936,484 bytes | The straight regeneration, its own rig and all 24 clips |
 
 ## The posed body's own rigging map
@@ -340,17 +340,20 @@ has **zero gap** at all 61 phases of all 24 clips on all three variants.
 
 | | Shipped (posed) | Twin | Backup (straight) |
 | --- | ---: | ---: | ---: |
-| `skin-tears.mjs`, worst skin | **1.37x** | 1.30x | 1.31x |
+| `skin-tears.mjs`, worst skin | **1.36x** | 1.29x | 1.31x |
 | Clips over 2x | 0 of 24 | 0 of 24 | 0 of 24 |
 
-1.37x is still second on the roster, behind this animal's own other body at 1.31 and ahead of
-Shonisaurus at 1.44. The carry is most of why: with the whole straightening in the clips it read
-1.51x. **The three hundredths T3D-26 costs is the whole price of bringing the front into line** —
-against 2.62x for the same correction swung at the neck root, which is the measurement that says the
-sharing is doing the work rather than the aiming.
+1.36x is the best figure on the roster, ahead of this animal's own other body at 1.31 — the backup
+is a *different body*, so the two are not ranked against each other — and of Shonisaurus at 1.44.
+The carry is most of why: with the whole straightening in the clips it read 1.51x. T3D-26 cost three
+hundredths to bring the front into line against a chord, and T3D-33 **gave them back** while aiming
+it 34 degrees further, by sweeping how the arc is shared rather than how long it
+is (`aimcurve`; equal per joint it read 1.40x). Against 2.62x for the same correction swung at the
+neck root, which is still the measurement that says the sharing is doing the work rather than the
+aiming.
 
 `lag.mjs`: 74 rest-coincident cross-mesh pairs, cut plane 6, **0 open past 0.2 %**, worst 0.00 % of
-a body; lip 68, gape 0.9 %. That split moved with the front (it was 18/52 at a gape of 1.3 %),
+a body; lip 68, gape 0.3 %. That split moved with the front (it was 18/52 at a gape of 1.3 %),
 because `lag.mjs` divides the seam on a cardinal-snapped axis read off the neck and the neck has
 turned: twelve pairs that used to fall behind the hinge's station now fall ahead of it. Nothing
 opened — the same seam measured independently by `auditCutAttachment`, which selects on the cut
@@ -371,8 +374,9 @@ Nothing in the delivery depends on it: `oral-shell-audit.mjs`, `throat-audit.mjs
 and `auditCutAttachment` are what prove this mouth, and none of them frames a camera.
 
 `posedExtentOverBind` stays centred on the bind the renderer sizes by — `Idle` 0.94–0.97, `Swim`
-1.01–1.05, `Sprint` 1.03–1.06, `Dive` 1.01–1.02, `Rise` 0.97–0.98, `Grab` 0.96–0.98 — and the
-carried bind box measures 8.622 where it was 8.726, which is `modelLength` in `askeptosaurus.json`.
+1.01–1.05, `Sprint` 1.03–1.06, `Dive` 1.01–1.02, `Rise` 0.96–0.98, `Grab` 0.96–0.98 — and the
+carried bind box measures 8.660 (8.622 before T3D-33, 8.726 before T3D-26), which is `modelLength`
+in `askeptosaurus.json`.
 
 ## The two pectorals, measured
 
