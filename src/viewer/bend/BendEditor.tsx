@@ -390,7 +390,7 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
                 straight · past 1 overshoots, below 0 bends it further the way the animal already goes
               </small>
             </label>
-            <div className="bend-fields">
+            <div className="sculpt-station bend-fields">
               <label>
                 <span>Exactly</span>
                 <NumberField value={amount} step={0.05} places={3} range={[STRAIGHTEN_MIN, STRAIGHTEN_MAX]}
