@@ -1371,6 +1371,12 @@ def cap_mouth(obj, rim, facing, dome=.30, rounds=2, limit=None, eps=1e-9):
     there. `limit(p)` is an optional ceiling -- a builder that has measured how much head there is
     above the mouth line passes it, and the cap then cannot reach the skin whatever `dome` says.
 
+    **Several loops are normal and all of them are filled.** Nothosaurus' cut leaves 225 boundary
+    edges per half in *six* closed curves -- the lip, and five small ones the generation's own
+    modelled slit contributes at the snout -- and `triangle_fill` over the whole selection in the
+    mouth's own plane closes them all at once. What the helper refuses is a rim that is not a set
+    of closed curves; a leftover boundary after the fill is an assertion, not a warning.
+
     `rim(p)` selects the mouth's own boundary vertices; `facing` is the direction the cap's faces
     should point, which is into the mouth, so a skull's cap faces down and a mandible's up, and the
     dome runs the other way. `rounds` is how many times the fill is poked to give the dome interior
