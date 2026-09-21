@@ -5,7 +5,7 @@ import { useMeasuredHash } from '../file-hash';
 import { History } from '../sculpt/history';
 import { NumberField } from '../stretch/StretchEditor';
 import {
-  angleOf, bendBasis, describeReadingText, exportDoc, flipForward, isIdentity, jointTurns,
+  angleOf, bendBasis, describeReadingText, exportDoc, flipForward, forwardEarned, isIdentity, jointTurns,
   measureBend, moveEnd, pinch, readBend, refLabel, refMoves, reguessRefs, reseat, resetTurn, seatPlanes,
   seatPlanesFromBones, setAxis, setChain, setPlaneNormal, setRef, setReach, setWindow, spanDirection,
   spanLength, straighten, totalTurn, traces, twistAngle, warp,
@@ -475,7 +475,19 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
           </>}
 
           <h3>Orientation</h3>
-          <p className="hint bend-frame-note" data-frame={doc.frameSource}>{FRAME_NOTE[doc.frameSource]}</p>
+          <p className="hint bend-frame-note" data-frame={doc.frameSource}
+             data-forward-earned={forwardEarned(doc) ? 'yes' : 'no'}>{FRAME_NOTE[doc.frameSource]}</p>
+          {/* The panel must not state a direction it has not earned. The box picks the axis and
+              never the end, so where nothing else spoke the head end is written as a question with
+              the button that answers it sitting under the line. */}
+          {!forwardEarned(doc) && (
+            <p className="hint bend-frame-unearned" role="status">
+              Head at the {doc.frame.forward === 1 ? 'high' : 'low'} {doc.frame.axis.toUpperCase()} end?
+              Nothing on this body said so — no mouth socket, no authored turn — so that is the fallback
+              and not a reading. Every “back from the nose” figure here, and in the export, is measured
+              from that end.
+            </p>
+          )}
           <div className="sculpt-actions">
             {(['x', 'z'] as const).map((a) => (
               <button key={a} className={`ghost ${doc.frame.axis === a ? 'primary' : ''}`} aria-pressed={doc.frame.axis === a}
@@ -578,6 +590,6 @@ const SEAT_NOTE: Record<'trace' | 'manual', string> = {
 const FRAME_NOTE: Record<BendDoc['frameSource'], string> = {
   mouth: 'Taken from the mouth socket: this body says where its own head is. The span itself need not follow that axis — it is two points on the animal.',
   yaw: 'Taken from the generation’s authored turn, which says where its head was before it was faced forward.',
-  bounds: 'Guessed from the bounding box — the only signal this body carries. If “back from the nose” reads as nonsense, the box’s longest side runs across the animal (wide flippers do this): set the axis yourself.',
+  bounds: 'Guessed from the bounding box — the only signal this body carries, and it can only pick the axis. Which end is the head is not a finding here, it is the fallback: check it. Everything measured “back from the nose” turns round with it, and if that axis itself reads as nonsense the box’s longest side runs across the animal (wide flippers do this).',
   manual: 'Set by hand.',
 };

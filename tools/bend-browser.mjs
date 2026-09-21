@@ -225,6 +225,13 @@ try {
   assert.equal(await page.locator('.bend-body-note').getAttribute('data-applies-to'), 'origpose', 'and says the same thing about it');
   const framed = await page.locator('.bend-frame-note').textContent();
   assert.ok(framed.trim().length > 0, `the panel says where the frame came from (${framed.replace(/\s+/g, ' ').trim().slice(0, 60)}…)`);
+  // **And where it has not earned which end is the head, it says so.** This is the body it went
+  // wrong on: the published original pose carries no rig and so no mouth socket, and there is no
+  // authored yaw for it, so the box is all there is — and the box picks the axis and never the end.
+  assert.equal(await page.locator('.bend-frame-note').getAttribute('data-forward-earned'), 'no',
+    'the box has not earned which end is the head on this body');
+  assert.match(await page.locator('.bend-frame-unearned').textContent(), /fallback and not a reading/,
+    'and the panel asks about the head end rather than stating it');
 
   // ---- the handles are on the stage: find one by hover, drag it, undo it ----
   const handle = await findHandle();
@@ -402,7 +409,19 @@ try {
   // corrected, measured on *this* body rather than carried over from the generation, and the
   // reading is taken three times against three chords a person could reasonably call "the trunk".
   // Nothing here asserts a number — what it asserts is that they *differ*, which is the finding.
-  const neck = { base: [-0.1182, 0.0659, -1.2490], tip: [-0.5114, 0.1603, -0.5430] };
+  // **The span is asked of the body on stage, never typed from an older one.** These two points
+  // used to be literals — the `chest` and `skull` heads of the shipped rest as it stood in T3D-26 —
+  // and that rest is exactly the thing this animal's builders keep moving: T3D-34 aimed the front
+  // 34° further and carried it into the bind, which slid the skull 12 % of the span away from the
+  // number written here. The span then landed off the neck, the panel re-guessed its reference
+  // chords against it, and the three readings below came out of a different question. So the drive
+  // asks the scene where those two bones actually are, the way a reviewer's eye would.
+  const boneHead = async (name) => page.evaluate((n) => {
+    const b = window.__viewerScene.sculptTarget()?.bones?.find((x) => x.name === n);
+    return b ? [...b.head] : null;
+  }, name);
+  const neck = { base: await boneHead('chest'), tip: await boneHead('skull') };
+  assert.ok(neck.base && neck.tip, 'the scene says where this body\'s own shoulder and skull are');
   await typeSpan(neck);
   const refPickA = (side, end) => page.locator('.bend-refs label', { hasText: `${side} reference ${end}` }).locator('select');
   const trunkRows = [];
@@ -474,6 +493,10 @@ try {
   assert.equal(await rigNote.getAttribute('data-applies-to'), 'built', 'the panel knows it is on the shipped body');
   assert.equal(await rigNote.getAttribute('data-corrected'), 'no', 'and that this body\'s rest was never moved before binding');
   assert.match(await page.locator('.bend-frame-note').textContent(), /mouth socket/i, 'a body with a mouth socket is framed from it, not from its box');
+  // The other side of the pair: a socket *does* earn the head end, so no question is asked here.
+  assert.equal(await page.locator('.bend-frame-note').getAttribute('data-forward-earned'), 'yes',
+    'and that socket earns which end the head is at');
+  assert.equal(await page.locator('.bend-frame-unearned').count(), 0, 'so the panel asks nothing about it');
 
   // ---- both readings are on screen, each with the references it is between ----
   const geometry = await page.locator('.bend-reading[data-reading="geometry"]').textContent();

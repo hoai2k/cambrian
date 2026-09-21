@@ -29,8 +29,8 @@ weights that already held it.** No remesh, no smoothing, no reshaping, no change
 
 | Variant | Triangles | Packed size | Purpose |
 | --- | ---: | ---: | --- |
-| Full (`askeptosaurus.glb`) | 20,064 | 2,203,676 bytes | The preserved posed generation, rigged and carried |
-| Procedural twin / LOD1 | 6,402 | 837,892 bytes | Same rig, clips and anchors; LOD is a byte-identical alias |
+| Full (`askeptosaurus.glb`) | 20,064 | 2,202,972 bytes | The preserved posed generation, rigged and carried |
+| Procedural twin / LOD1 | 6,402 | 837,344 bytes | Same rig, clips and anchors; LOD is a byte-identical alias |
 | Backup (`askeptosaurus.backup.glb`) | 19,648 | 1,936,484 bytes | The straight regeneration, its own rig and all 24 clips |
 
 ## The posed body's own rigging map
@@ -170,6 +170,86 @@ box measures **8.726** where the straight regeneration's is 6.000 — so every t
 only divisor that makes the two bodies' numbers comparable. `askeptosaurus.json` reports that as
 `modelLength`.
 
+## Where the aim points (T3D-34)
+
+T3D-26 brought the head onto the trunk and the head landed on it: `restHeadVsTrunkRunDegrees` 4.17,
+which is a number that could not be argued with — and the animal still read as turned from directly
+above. That is this file's own lesson met a third time. **The reference was the argument, not the
+correction.** `trunk` is the chord from the hip joint to the shoulder joint, and on a body that is
+two thirds tail it is a line between two points inside the front half, which is not what an eye
+calls the run of the animal. Measured on the shipped body, the head sat:
+
+| the head, against | in space | in the dorsal view |
+| --- | ---: | ---: |
+| the hip→shoulder chord (what T3D-26 aimed at) | 0.6° | 0.6° |
+| `body`→`chest` | 16.5° | 15.7° |
+| mid-tail (`tail_04`)→shoulder | 16.8° | 15.4° |
+| the tail's own run (`tail_08`)→shoulder | **30.6°** | **28.7°** |
+
+(`plan-view.py` on the shipped T3D-26 file at `Idle` 0, where the head's direction is the skull's
+own dominantly weighted vertices rather than the bone chain — the two can disagree, which is half of
+what this animal has taught. At the bare rest the chord figure is `restHeadVsTrunkRunDegrees`, 4.2.)
+
+Four defensible readings of one trunk, 30° apart at the extremes. The reading the picture uses is
+the longest one, because that is the line the animal draws on the page.
+
+**So the reference is a human's.** A reviewer aimed two planes by hand in the viewer's bend editor,
+on this animal's published original pose, and exported them:
+`docs/triassic/bends/askeptosaurus-front-2026-09-21.json` (`bend-span/2`). The document says the
+head runs along `tipNormal` and the trunk along `baseNormal`, 100.9° apart, and the correction is
+the rotation carrying the first onto the second. `aimed_bend()` loads it and **checks it is about
+this body**: the export names `askeptosaurus.origpose.glb`, which `base-poses.mjs` publishes as a
+byte copy of `tripo-raw/askeptosaurus.raw.glb`, so the builder hashes that file and compares.
+
+Two directions in a document are no use in a frame that is not the document's, and neither
+`T.measure_frame` nor `posed_frame` returns the map it rewrote every vertex with. Reconstructing
+those two rotations from what they record would be a guess; `frame_fit` **measures** them instead —
+Kabsch between the vertices either side of the reframing, index to index, a rotation about the
+centroid with one uniform scale, asserted at a residual under 1e-5 (it comes out at 8e-8). The
+export's own `*BlenderZUp` fields are `[x, −z, y]` of the file's glTF coordinates, which is exactly
+what the importer produced, so nothing re-derives that convention either.
+
+The correction is then applied to **the builder's own last neck segment** — `aimed = Q(neck_d[-1])`,
+where `Q` carries `tipNormal` onto `baseNormal` — so the reviewer and the builder never have to
+agree about where the head points. What they agree about is how far it has to turn, and the two
+independently say the same thing: the reviewer's own `turn.totalDegrees` is 33.34 and the builder
+measures `aimedVsTrunkRunDegrees` at **33.85**. Their `baseNormal` and this builder's `trunk` differ
+by only 7.2°, so it is the *head* reading the two disagreed about, not the trunk.
+
+Nothing about the machinery changed: the aim is still shared over `NECKCHAIN`'s six joints by
+`uncurl`, still carried whole into the bind (`fcarry`'s second element), still leaves only the
+opening to the clips, and `restHeadVsAimedDegrees` is **4.17** — the same residual T3D-26 left
+against its own target. What moved is where the target is. In the dorsal view, against the
+tail's own run to the shoulder, the head reads **4.4°** at `Idle` where it read 28.6°, **3.4°** at
+`Swim` where it read 31.2° and **2.6°** at `Sprint` where it read 32.4°;
+`docs/triassic/verification/askeptosaurus-aimed-front-plan.png` is those six shots, each rendered
+from its own file by `plan-view.py` with its own angles under it.
+
+Two things follow through the file, and both are recorded rather than replaced. `carry` gains
+`planViewReadings`, which is the head against **every** reading of the trunk there is, in space and
+in plan, so the table above is regenerated by every build instead of being an argument. And
+`motion` gains `headVsAimedTrunkDegrees` per clip beside the unchanged `headVsTrunkRunDegrees`: the
+assertions moved onto the new one, because the aim moved, while the old figures stay exactly
+comparable with every earlier verdict on this animal. The live reference for the new one is the
+`body` bone's own world 3×3 applied to `aimed` — every rest frame is parallel, which `carry_rest`
+asserts, so that *is* the map from the frame the aim was measured in to the frame the clip has put
+the animal in, and it is a cleaner reference than a chord between two joints whose own bow and lean
+move it.
+
+**The arc is half as long again, and the skin came out better.** 88° against 55°, shared six ways.
+Equal per joint that is 14.7° each and the worst composed joint is 22.8°, still inside T3D-26's own
+25° ceiling — and `skin-tears.mjs` read 1.40x, three hundredths worse than the 1.37x this animal
+shipped at. The worst edge is the same one it has always been: `chest` in `Sprint`, where a narrow
+neck meets a wide trunk, and it is worth knowing that in *absolute* terms it did not move at all
+(0.109 → 0.150 before, 0.100 → 0.140 after: the same 0.040 of stretch on a rest edge the carry has
+shortened). `aimcurve` is the lever and it was swept rather than argued — six full rebuilds, the
+table is in `REST[POSED]` — and at 1.50 the shoulder takes 0.068 of the arc against the skull's
+0.240 and the skin reads **1.36x**, better than the figure the shorter correction shipped at. The
+per-joint ceiling is what stops the sweep: 1.70 puts the skull at 25.5°. Both bars are asserted, the
+absolute 25° T3D-26 set and a scale-free `frontCarryWorstJointShare` under 0.34, because the arc's
+length is now something that can change and an absolute ceiling stops meaning "distributed" when it
+does.
+
 ## The held shapes, and the coil
 
 `HOLD` is unchanged from T3D-24 and shared by both bodies — it is the *performance* — with two
@@ -265,17 +345,20 @@ has **zero gap** at all 61 phases of all 24 clips on all three variants.
 
 | | Shipped (posed) | Twin | Backup (straight) |
 | --- | ---: | ---: | ---: |
-| `skin-tears.mjs`, worst skin | **1.37x** | 1.30x | 1.31x |
+| `skin-tears.mjs`, worst skin | **1.36x** | 1.29x | 1.31x |
 | Clips over 2x | 0 of 24 | 0 of 24 | 0 of 24 |
 
-1.37x is still second on the roster, behind this animal's own other body at 1.31 and ahead of
-Shonisaurus at 1.44. The carry is most of why: with the whole straightening in the clips it read
-1.51x. **The three hundredths T3D-26 costs is the whole price of bringing the front into line** —
-against 2.62x for the same correction swung at the neck root, which is the measurement that says the
-sharing is doing the work rather than the aiming.
+1.36x is the best figure on the roster, ahead of this animal's own other body at 1.31 — the backup
+is a *different body*, so the two are not ranked against each other — and of Shonisaurus at 1.44.
+The carry is most of why: with the whole straightening in the clips it read 1.51x. T3D-26 cost three
+hundredths to bring the front into line against a chord, and T3D-34 **gave them back** while aiming
+it 34 degrees further, by sweeping how the arc is shared rather than how long it
+is (`aimcurve`; equal per joint it read 1.40x). Against 2.62x for the same correction swung at the
+neck root, which is still the measurement that says the sharing is doing the work rather than the
+aiming.
 
 `lag.mjs`: 74 rest-coincident cross-mesh pairs, cut plane 6, **0 open past 0.2 %**, worst 0.00 % of
-a body; lip 68, gape 0.9 %. That split moved with the front (it was 18/52 at a gape of 1.3 %),
+a body; lip 68, gape 0.3 %. That split moved with the front (it was 18/52 at a gape of 1.3 %),
 because `lag.mjs` divides the seam on a cardinal-snapped axis read off the neck and the neck has
 turned: twelve pairs that used to fall behind the hinge's station now fall ahead of it. Nothing
 opened — the same seam measured independently by `auditCutAttachment`, which selects on the cut
@@ -296,8 +379,9 @@ Nothing in the delivery depends on it: `oral-shell-audit.mjs`, `throat-audit.mjs
 and `auditCutAttachment` are what prove this mouth, and none of them frames a camera.
 
 `posedExtentOverBind` stays centred on the bind the renderer sizes by — `Idle` 0.94–0.97, `Swim`
-1.01–1.05, `Sprint` 1.03–1.06, `Dive` 1.01–1.02, `Rise` 0.97–0.98, `Grab` 0.96–0.98 — and the
-carried bind box measures 8.622 where it was 8.726, which is `modelLength` in `askeptosaurus.json`.
+1.01–1.05, `Sprint` 1.03–1.06, `Dive` 1.01–1.02, `Rise` 0.96–0.98, `Grab` 0.96–0.98 — and the
+carried bind box measures 8.660 (8.622 before T3D-34, 8.726 before T3D-26), which is `modelLength`
+in `askeptosaurus.json`.
 
 ## The two pectorals, measured
 
@@ -373,6 +457,15 @@ blender -b --python tools/triassic/creatures/askeptosaurus/review-swap.py -- --f
 blender -b --python tools/triassic/creatures/askeptosaurus/review-swap.py -- --tag t26
 python3 tools/triassic/creatures/askeptosaurus/front-sheets.py
 python3 tools/triassic/creatures/askeptosaurus/contact-sheets.py
+# T3D-34's acceptance: the dorsal view, before and after, each from its own file. The `before` body
+# is the shipped GLB of the commit that precedes the fix, taken out of version control into
+# local/triassic-authoring/askeptosaurus/t26/askeptosaurus.glb:
+for clip in Idle Swim Sprint; do
+  blender -b --python tools/triassic/creatures/askeptosaurus/plan-view.py -- \
+    --file local/triassic-authoring/askeptosaurus/t26/askeptosaurus.glb --tag t26 --clip $clip --overlay
+  blender -b --python tools/triassic/creatures/askeptosaurus/plan-view.py -- --tag t33 --clip $clip --overlay
+done
+python3 tools/triassic/creatures/askeptosaurus/plan-sheet.py
 node tools/triassic/creatures/askeptosaurus/review-viewer.mjs   # with Vite on port 4179
 node tools/triassic/publish-portraits.mjs
 node tools/update-asset-sizes.mjs
