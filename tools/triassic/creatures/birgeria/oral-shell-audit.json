@@ -5,7 +5,7 @@
   "models": [
     {
       "variant": "authored",
-      "sha256": "e443d92c0a9ad0d198951d8394b90fb9939619e3e732bc2abbfe6cec2c4f5308",
+      "sha256": "134d7f01fd21e04cd01b62a36b30d537c49455e9bab335437e902c5df5f7da7d",
       "meshes": [
         {
           "name": "Oral cavity lining",
@@ -26,7 +26,7 @@
     },
     {
       "variant": ".puppet",
-      "sha256": "6bd04aa8d9aab6b15c0a8b332b3c6cf80483fb4fd98fd24cc9e0f99d182c1bd9",
+      "sha256": "ff712025260394314b12c165c62ab6e49e46bc36e940b76d11440ccd25de0396",
       "meshes": [
         {
           "name": "Oral cavity lining",
@@ -47,7 +47,7 @@
     },
     {
       "variant": ".lod1",
-      "sha256": "6bd04aa8d9aab6b15c0a8b332b3c6cf80483fb4fd98fd24cc9e0f99d182c1bd9",
+      "sha256": "ff712025260394314b12c165c62ab6e49e46bc36e940b76d11440ccd25de0396",
       "meshes": [
         {
           "name": "Oral cavity lining",
