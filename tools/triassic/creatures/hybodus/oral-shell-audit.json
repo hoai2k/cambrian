@@ -1,64 +1,28 @@
 {
   "id": "hybodus",
-  "verdict": "separate closed rigid palate/floor",
+  "verdict": "no oral lining: nothing to be mixed",
   "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present. A body with no lining mesh is reported as such, with the hidden oral parts it does carry listed, and all three variants must agree.",
   "models": [
     {
       "variant": "authored",
-      "sha256": "a65bebb98227753917ddb71d304d6b718f7516c1e2112776e4820c6e67f407e6",
-      "meshes": [
-        {
-          "name": "Mouth lining",
-          "vertices": 336,
-          "triangles": {
-            "skull": 332,
-            "jaw": 332
-          },
-          "boundaryEdges": 0,
-          "mixedVertices": 0,
-          "bridgingTriangles": 0
-        }
-      ],
+      "sha256": "bc2018703c388eee39469a2facd882604ea8ca0e3038ccf98746ed642fee58c9",
+      "meshes": [],
       "otherOralMeshes": [],
-      "oralShells": "separate palate and floor"
+      "oralShells": "none"
     },
     {
       "variant": ".puppet",
-      "sha256": "d246d2fb636fc204270d51220c0bbbaf0ebee873de07505747e5d6aca854e41e",
-      "meshes": [
-        {
-          "name": "Mouth lining",
-          "vertices": 336,
-          "triangles": {
-            "skull": 332,
-            "jaw": 332
-          },
-          "boundaryEdges": 0,
-          "mixedVertices": 0,
-          "bridgingTriangles": 0
-        }
-      ],
+      "sha256": "0f536beee33f0817396a0d9d0cf7db9790560404b5ca4d2b6491c68a5d7ee8a8",
+      "meshes": [],
       "otherOralMeshes": [],
-      "oralShells": "separate palate and floor"
+      "oralShells": "none"
     },
     {
       "variant": ".lod1",
-      "sha256": "d246d2fb636fc204270d51220c0bbbaf0ebee873de07505747e5d6aca854e41e",
-      "meshes": [
-        {
-          "name": "Mouth lining",
-          "vertices": 336,
-          "triangles": {
-            "skull": 332,
-            "jaw": 332
-          },
-          "boundaryEdges": 0,
-          "mixedVertices": 0,
-          "bridgingTriangles": 0
-        }
-      ],
+      "sha256": "0f536beee33f0817396a0d9d0cf7db9790560404b5ca4d2b6491c68a5d7ee8a8",
+      "meshes": [],
       "otherOralMeshes": [],
-      "oralShells": "separate palate and floor"
+      "oralShells": "none"
     }
   ]
 }

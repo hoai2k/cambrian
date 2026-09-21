@@ -13,6 +13,7 @@ import {
   brushHits, buildRegion, cloneMarks, describeMarked, emptyMarks, markedCount, paintInto, totalVertices,
 } from '../src/viewer/mark/region';
 import { History } from '../src/viewer/sculpt/history';
+import { buttonRoles, schemeIsUsable } from '../src/viewer/pointer-scheme';
 
 // Two rings of eight around the z axis, a unit apart: a stand-in for a body with a fin on it, small
 // enough that every answer below can be counted by hand.
@@ -116,4 +117,17 @@ assert.equal(describeMarked(1204, 12059), '1,204 of 12,059 vertices · 10.0%');
 assert.equal(describeMarked(3, 12059), '3 of 12,059 vertices · 0.02%');
 assert.equal(describeMarked(0, 0), '0 of 0 vertices · 0.00%');
 
-console.log('PASS: mark regions — brush radius, erase, stroke history, region file addressing, bounds, single-mesh shorthand, readout');
+// ---- the pointer scheme the mode runs under ----
+// The brush owns the left button, which is the one thing that makes mark mode different from the
+// other two editors. So the orbit moves to the right and the pan to the middle — a pan it has to
+// have somewhere, and the wheel already dollies.
+{
+  const r = buttonRoles('paint');
+  assert.equal(r.left, null, 'the brush has the left button, so the orbit does not');
+  assert.equal(r.right, 'rotate', 'right orbits');
+  assert.equal(r.middle, 'pan', 'and middle pans — the wheel is the dolly here');
+  assert.ok(schemeIsUsable('paint'), 'both of the camera\'s questions are answered, once each');
+  assert.notDeepEqual(buttonRoles('paint'), buttonRoles('view'), 'and it is not the view scheme');
+}
+
+console.log('PASS: mark regions — brush radius, erase, stroke history, region file addressing, bounds, single-mesh shorthand, readout, paint pointer scheme');

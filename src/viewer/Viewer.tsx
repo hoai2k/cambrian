@@ -9,7 +9,7 @@ import { MarkEditor } from './mark/MarkEditor';
 import { getSculpt } from './sculpt/store';
 import { isIdentity, warp } from './sculpt/profile';
 import { StretchEditor } from './stretch/StretchEditor';
-import { getStretch } from './stretch/store';
+import { getStretch, stretchKey } from './stretch/store';
 import { isIdentity as stretchIsIdentity, warp as stretchWarp } from './stretch/stretch';
 import { MouthEditor } from './mouth/MouthEditor';
 import type { AppliesTo } from './mouth/mouth';
@@ -130,12 +130,23 @@ export function Viewer() {
    * other, and a difference you have to hold in your head across two list entries is not seen.
    *
    * A specimen opens on the head of its own list: its full model where it has one, the raw
-   * generation where it does not. A link into stretch mode is the exception, since a stretch is an
-   * edit to the raw generation and must open on it even for an animal whose built body would win.
+   * generation where it does not. The editing modes are the exception, and for the same reason in
+   * both: the body an edit *applies to* is not the body the viewer would otherwise show.
+   *
+   * A stretch is an edit to the raw generation, so it opens on that. **A bend is aimed on a body
+   * no builder has moved**, and on an animal whose builder carried a correction into the bind
+   * there is nothing left to aim on the shipped one — Askeptosaurus' rest already holds T3D-26's
+   * whole 67.7 degree head correction, so bend mode opening on `full` showed a reviewer a head
+   * that had already been straightened and invited them to straighten it again. It opens on the
+   * original pose where the animal publishes one, and falls back to the raw generation.
    */
   const opening = (key: string, mode?: Mode): string => {
     const list = stages(specimenByKey.get(key)!);
     if (mode === 'stretch' && list.some(o => o.kind === 'generated')) return 'generated';
+    if (mode === 'bend') {
+      const aimable = list.find(o => o.kind === 'origpose') ?? list.find(o => o.kind === 'generated');
+      if (aimable) return aimable.id;
+    }
     return list[0].id;
   };
   const [stageId, setStageId] = useState<string>(() => opening(initial.current.key, initial.current.mode));
@@ -229,7 +240,17 @@ export function Viewer() {
   // Not on the twin: a sculpt is the hand-off that goes into a builder's profile rows for the body
   // that ships, and one exported off the comparison body would name the right creature and describe
   // the wrong mesh.
-  const ready = !loading && !error && loadedId === id;
+  /**
+   * Ready means **the body on stage is the body this UI is describing**, which is stricter than
+   * "the last load finished" and has to be. The Bend button changes the mode and the model in one
+   * commit (`opening()`), a child's effects run before its parent's, and the load effect below is
+   * the parent's — so an editor mounted in that commit measures whatever the scene is still
+   * holding. On Askeptosaurus that is the shipped body, and because the bend document is cached
+   * under the *new* model's key, the panel then said `origpose` over numbers taken from the built
+   * body and never re-measured. Asking the scene what it is drawing is answered synchronously and
+   * cannot be a commit behind.
+   */
+  const ready = !loading && !error && loadedId === id && sceneRef.current?.loadedModel() === modelPath;
   /**
    * Sculpting is for a body a *builder* draws from profile rows. Its export is a hand-off into
    * those rows (docs/viewer-sculpt.md) — the change goes into the builder, never into the GLB — so
@@ -274,6 +295,16 @@ export function Viewer() {
    */
   const ownBody = !def.generated || !!def.inReview;
   const canStretch = !isPropCollection(collection) && !showPuppet && ready && (showGenerated || ownBody);
+  /**
+   * The bodies an editing mode can actually be opened on, which is what its own Model control may
+   * offer. It is `canStretch`/`canBend`'s own test asked of each stage rather than of the one on
+   * stage: the twin is refused outright, and on an animal whose body is not built only the raw
+   * generation is allowed. Offering anything else would let a reviewer pick an option that either
+   * drops them back to the view or leaves the mode on screen with no panel in it.
+   */
+  const editableStages = choices
+    .filter(o => o.kind !== 'twin' && (ownBody || o.kind === 'generated'))
+    .map(o => ({ id: o.id, label: o.label }));
   /**
    * Bend sits exactly where stretch does, because it asks the same kind of question about the same
    * run of body: stretch changes a span's *length* and bend changes its *direction*, and neither
@@ -330,7 +361,7 @@ export function Viewer() {
         const sculpt = getSculpt(id);
         if (sculpt && !isIdentity(sculpt)) sceneRef.current?.applySculpt(warp(sculpt), true);
         // Only a raw generation keeps its stretch on the stage; a rigged one would flail once a clip played.
-        const stretch = showGenerated ? getStretch(id) : undefined;
+        const stretch = showGenerated ? getStretch(stretchKey(id, modelPath)) : undefined;
         if (stretch && stretch.model === modelPath && !stretchIsIdentity(stretch)) sceneRef.current?.applySculpt(stretchWarp(stretch), true);
         setClips(names); setSlots(sceneRef.current?.activeSlots() ?? []); setLoading(false); setLoadedId(id);
         setHasOral(sceneRef.current?.hasOralGeometry() ?? false);
@@ -402,7 +433,8 @@ export function Viewer() {
         <SculptEditor key={id} scene={sceneRef.current} specimen={def} onExit={() => setMode('view')} />
       )}
       {mode === 'stretch' && canStretch && sceneRef.current && (
-        <StretchEditor key={`${id}-stretch`} scene={sceneRef.current} specimen={def} model={modelPath} onExit={() => setMode('view')} />
+        <StretchEditor key={`${id}-stretch`} scene={sceneRef.current} specimen={def} model={modelPath}
+          stages={editableStages} stageId={stage.id} onStage={setStageId} onExit={() => setMode('view')} />
       )}
 
       {/* Mark mode keeps the ordinary single-stage layout — the brush paints on the orbit view
@@ -427,6 +459,14 @@ export function Viewer() {
         <BendEditor key={`${id}|${modelPath}|bend`} scene={sceneRef.current} specimen={def} model={modelPath}
           sha256={showGenerated ? def.generatedSha256 : undefined} appliesTo={bendAppliesTo}
           stageLabel={stage.label} origPose={origPoseNote}
+          /* The mode *opens* on the unbent body and must not be a cage: the info card carries the
+             Model control and an editing mode replaces it, so bend mode carries its own. The list
+             is what this mode can actually be opened on (`editableStages`), because offering a
+             choice that quietly ends the mode is worse than not offering it. Everything the panel
+             says about which body it is describing follows the swap for free: the editor is keyed
+             by the model, and `appliesTo`, `stageLabel` and the corrected-body warning are all
+             derived from the stage. */
+          stages={editableStages} stageId={stage.id} onStage={setStageId}
           canvas={canvasRef.current} onExit={() => setMode('view')} />
       )}
 
@@ -524,9 +564,15 @@ export function Viewer() {
             title={def.generated && !def.inReview
               ? 'Lengthen a run of this raw generation — a neck, a tail — between two cuts, and export the change to be baked into the GLB'
               : 'Lengthen a run of this body between two cuts and measure it. A built body is held at rest and cannot be baked: the numbers go to its builder.'}>
-            Stretch{(() => { const d = getStretch(id); return d && !stretchIsIdentity(d) ? ' (edited)' : ''; })()}
+            {/* The label asks about the body the button would *open*, which is not always the one on
+                stage: `opening()` sends a stretch to the raw generation where there is one. */}
+            Stretch{(() => {
+              const on = choices.find(o => o.id === opening(id, 'stretch'))?.model ?? modelPath;
+              const d = getStretch(stretchKey(id, on));
+              return d && !stretchIsIdentity(d) ? ' (edited)' : '';
+            })()}
           </button>}
-          {!isPropCollection(collection) && <button className="ghost" onClick={() => { if (def.generated && !def.inReview) setStageId('generated'); setMode('bend'); }} disabled={!canBend}
+          {!isPropCollection(collection) && <button className="ghost" onClick={() => { setStageId(opening(id, 'bend')); setMode('bend'); }} disabled={!canBend}
             title="Turn a run of this body between two cuts — a neck off its trunk — and read the angle before and after. On a built body it is a measurement for its builder.">
             Bend
           </button>}

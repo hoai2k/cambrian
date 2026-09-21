@@ -1,0 +1,155 @@
+{
+  "gapeSolid": {
+    "tool": "/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- tanystropheus Severed@1.733 SnapLeft@0.167 SnapRight@0.167 Bite@0.2 Heavy@0.133 Ability@0.4 Drag@0.8 Attack@0.133 Eat@0.367 Death@1.6 Grab@0.533 Breath@0.967 Retract@0.5 [--as-drawn]",
+    "shotsAre": "the peak jaw rotation of each clip that opens the jaw past a degree, measured off the decoded packaged rig (skull-to-jaw angle per frame)",
+    "backdropTest": "r > .90, g < .20, b > .90",
+    "tolerance": 12,
+    "verdict": "PASS -- 0 through and 0 opened at every one of the thirteen opening clips, as drawn",
+    "asDrawnIsTheOneThatCounts": "the runtime hides everything src/shared/oral-geometry.ts matches, and this head carried two such parts -- the Oral cavity lining and the Seated jaw hinge tissue -- so the plain run was proving a body the game does not draw",
+    "asDrawn": [
+      {
+        "clip": "Severed",
+        "t": 1.733,
+        "beforeThrough": 0,
+        "beforeOpened": 1388,
+        "afterThrough": 0,
+        "afterOpened": 0
+      },
+      {
+        "clip": "SnapLeft",
+        "t": 0.167,
+        "beforeThrough": 167,
+        "beforeOpened": 1352,
+        "afterThrough": 0,
+        "afterOpened": 0
+      },
+      {
+        "clip": "SnapRight",
+        "t": 0.167,
+        "beforeThrough": 142,
+        "beforeOpened": 1364,
+        "afterThrough": 0,
+        "afterOpened": 0
+      },
+      {
+        "clip": "Bite",
+        "t": 0.2,
+        "beforeThrough": 121,
+        "beforeOpened": 1260,
+        "afterThrough": 0,
+        "afterOpened": 0
+      },
+      {
+        "clip": "Heavy",
+        "t": 0.133,
+        "beforeThrough": 105,
+        "beforeOpened": 1222,
+        "afterThrough": 0,
+        "afterOpened": 0
+      },
+      {
+        "clip": "Ability",
+        "t": 0.4,
+        "beforeThrough": 92,
+        "beforeOpened": 1205,
+        "afterThrough": 0,
+        "afterOpened": 0
+      },
+      {
+        "clip": "Drag",
+        "t": 0.8,
+        "beforeThrough": 73,
+        "beforeOpened": 1165,
+        "afterThrough": 0,
+        "afterOpened": 0
+      },
+      {
+        "clip": "Attack",
+        "t": 0.133,
+        "beforeThrough": 70,
+        "beforeOpened": 1158,
+        "afterThrough": 0,
+        "afterOpened": 0
+      },
+      {
+        "clip": "Eat",
+        "t": 0.367,
+        "beforeThrough": 70,
+        "beforeOpened": 1153,
+        "afterThrough": 0,
+        "afterOpened": 0
+      },
+      {
+        "clip": "Death",
+        "t": 1.6,
+        "beforeThrough": 35,
+        "beforeOpened": 1107,
+        "afterThrough": 0,
+        "afterOpened": 0
+      },
+      {
+        "clip": "Grab",
+        "t": 0.533,
+        "beforeThrough": 29,
+        "beforeOpened": 1017,
+        "afterThrough": 0,
+        "afterOpened": 0
+      },
+      {
+        "clip": "Breath",
+        "t": 0.967,
+        "beforeThrough": 628,
+        "beforeOpened": 701,
+        "afterThrough": 0,
+        "afterOpened": 0
+      },
+      {
+        "clip": "Retract",
+        "t": 0.5,
+        "beforeThrough": 548,
+        "beforeOpened": 623,
+        "afterThrough": 0,
+        "afterOpened": 0
+      }
+    ],
+    "plainAfter": [
+      {
+        "clip": "Severed",
+        "t": 1.733,
+        "through": 0,
+        "opened": 0
+      },
+      {
+        "clip": "SnapRight",
+        "t": 0.167,
+        "through": 0,
+        "opened": 0
+      },
+      {
+        "clip": "Bite",
+        "t": 0.2,
+        "through": 0,
+        "opened": 0
+      },
+      {
+        "clip": "Heavy",
+        "t": 0.133,
+        "through": 0,
+        "opened": 0
+      },
+      {
+        "clip": "Eat",
+        "t": 0.367,
+        "through": 0,
+        "opened": 0
+      },
+      {
+        "clip": "Attack",
+        "t": 0.133,
+        "through": 0,
+        "opened": 0
+      }
+    ],
+    "ofPixels": 378000
+  }
+}

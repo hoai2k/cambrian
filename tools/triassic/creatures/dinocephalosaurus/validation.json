@@ -5,14 +5,14 @@
   "removedFlakeVertices": 0,
   "remeshTriangles": 105412,
   "puppetBudget": 6400,
-  "fullTriangles": 20552,
-  "puppetTriangles": 7368,
+  "fullTriangles": 20786,
+  "puppetTriangles": 7404,
   "parts": {
-    "authoredBody": 19869,
-    "authoredJaw": 143,
-    "puppetBody": 6756,
-    "puppetJaw": 72,
-    "sharedOral": 540
+    "authoredBody": 20148,
+    "authoredJaw": 422,
+    "puppetBody": 6936,
+    "puppetJaw": 252,
+    "sharedOral": 216
   },
   "bones": 57,
   "cervicals": 32,
@@ -180,7 +180,7 @@
       [
         -1.0500826835632324,
         -3.6344215869903564,
-        -1.4605501890182495
+        -1.4607030153274536
       ],
       [
         1.0749599933624268,
@@ -353,7 +353,7 @@
       [
         1.1351168155670166,
         1.8966641426086426,
-        2.419994354248047
+        2.420379638671875
       ]
     ],
     "Breathe": [
@@ -376,10 +376,10 @@
   "envelopeTolerance": 0.22,
   "envelopeTolerancePercent": 4.0,
   "surfaceDistanceMax": 0.0338234007358551,
-  "surfaceDistanceP95": 0.0039288273081183435,
-  "surfaceDistanceP99": 0.006542369667440643,
+  "surfaceDistanceP95": 0.0039339086972177036,
+  "surfaceDistanceP99": 0.006525330860167743,
   "surfaceOutliersOver0p15": 0,
-  "surfaceVertices": 10063,
+  "surfaceVertices": 10289,
   "seatingDepthRaw": {
     "fore_upper_L": 0.0899,
     "fore_upper_R": 0.0241,
@@ -391,7 +391,7 @@
     "chest": 0.0374
   },
   "maxInfluences": 4,
-  "meanInfluences": 1.9912689604143545,
+  "meanInfluences": 1.9666594656873335,
   "neckUnbending": {
     "applied": true,
     "neckArc": 0.7253,
@@ -697,18 +697,217 @@
   },
   "oralPartDepthInsideHead": {
     "Upper fangs": 0.0037,
-    "Lower fangs": 0.0027,
-    "Seated jaw hinge tissue": 0.0013
+    "Lower fangs": 0.0027
+  },
+  "mouthCaps": {
+    "kind": "shut -- the generation models no interior; the lip is painted on a closed snout and the cut is what makes the aperture",
+    "cutRim": {
+      "Dinocephalosaurus authored body": {
+        "skull": {
+          "boundaryEdgesInRegion": 57,
+          "boundaryEdgesElsewhere": 26,
+          "loops": [
+            {
+              "vertices": 55,
+              "closed": true,
+              "box": [
+                [
+                  0.9988,
+                  1.08155
+                ],
+                [
+                  -0.02438,
+                  0.02638
+                ],
+                [
+                  -0.04932,
+                  -0.02899
+                ]
+              ],
+              "reach": 0.08275
+            },
+            {
+              "vertices": 3,
+              "closed": false,
+              "box": [
+                [
+                  0.99667,
+                  0.99732
+                ],
+                [
+                  0.00564,
+                  0.00717
+                ],
+                [
+                  0.0077,
+                  0.00828
+                ]
+              ],
+              "reach": 0.00065
+            }
+          ],
+          "boundaryOnTheCut": 92
+        },
+        "jaw": {
+          "boundaryEdgesInRegion": 55,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 55,
+              "closed": true,
+              "box": [
+                [
+                  0.9988,
+                  1.08155
+                ],
+                [
+                  -0.02438,
+                  0.02638
+                ],
+                [
+                  -0.04932,
+                  -0.02899
+                ]
+              ],
+              "reach": 0.08275
+            }
+          ],
+          "boundaryOnTheCut": 56
+        }
+      },
+      "Dinocephalosaurus procedural volume puppet": {
+        "skull": {
+          "boundaryEdgesInRegion": 36,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 36,
+              "closed": true,
+              "box": [
+                [
+                  0.99884,
+                  1.08014
+                ],
+                [
+                  -0.02376,
+                  0.02625
+                ],
+                [
+                  -0.0491,
+                  -0.02887
+                ]
+              ],
+              "reach": 0.0813
+            }
+          ],
+          "boundaryOnTheCut": 55
+        },
+        "jaw": {
+          "boundaryEdgesInRegion": 36,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 36,
+              "closed": true,
+              "box": [
+                [
+                  0.99884,
+                  1.08014
+                ],
+                [
+                  -0.02376,
+                  0.02625
+                ],
+                [
+                  -0.0491,
+                  -0.02887
+                ]
+              ],
+              "reach": 0.0813
+            }
+          ],
+          "boundaryOnTheCut": 36
+        }
+      }
+    },
+    "caps": {
+      "Dinocephalosaurus authored body": {
+        "skullAtHinge": 27,
+        "jawAtHinge": 27,
+        "palate": {
+          "rimEdges": 30,
+          "capped": true,
+          "faces": 252,
+          "domedVertices": 112,
+          "deepestRaw": 0.008054,
+          "dome": 0.34,
+          "rounds": 2,
+          "firstNewVertex": 9964,
+          "rimVertices": 30,
+          "cycles": [
+            30
+          ]
+        },
+        "floor": {
+          "rimEdges": 30,
+          "capped": true,
+          "faces": 252,
+          "domedVertices": 112,
+          "deepestRaw": 0.008054,
+          "dome": 0.34,
+          "rounds": 2,
+          "firstNewVertex": 101,
+          "rimVertices": 30,
+          "cycles": [
+            30
+          ]
+        }
+      },
+      "Dinocephalosaurus procedural volume puppet": {
+        "skullAtHinge": 18,
+        "jawAtHinge": 18,
+        "palate": {
+          "rimEdges": 20,
+          "capped": true,
+          "faces": 162,
+          "domedVertices": 72,
+          "deepestRaw": 0.008316,
+          "dome": 0.34,
+          "rounds": 2,
+          "firstNewVertex": 3398,
+          "rimVertices": 20,
+          "cycles": [
+            20
+          ]
+        },
+        "floor": {
+          "rimEdges": 20,
+          "capped": true,
+          "faces": 162,
+          "domedVertices": 72,
+          "deepestRaw": 0.008316,
+          "dome": 0.34,
+          "rounds": 2,
+          "firstNewVertex": 56,
+          "rimVertices": 20,
+          "cycles": [
+            20
+          ]
+        }
+      }
+    },
+    "dome": 0.34,
+    "domeRoom": 0.55
   },
   "oralGeometry": {
     "lining": null,
     "palate": null,
     "floor": null,
-    "verdict": "neither: the sac closed nothing the seated hinge tissue was not already closing; see docs/triassic/throat-repairs/oral-verdicts.md",
+    "hingeTissue": null,
+    "verdict": "none: the cut is capped with its own rim and domed (T.cap_cut at the hinge, then T.cap_mouth over the lip). The sac closed nothing the seated hinge tissue was already closing (T3D-12B) and the hinge tissue is hidden in play, so as drawn the head stood open at the hinge; see docs/triassic/throat-repairs/oral-verdicts.md",
     "parts": [
       "Upper fangs",
-      "Lower fangs",
-      "Seated jaw hinge tissue"
+      "Lower fangs"
     ]
   },
   "normalizedWeights": true,
@@ -721,10 +920,14 @@
       "worstClip": "Sprint",
       "worstBone": "chest",
       "worstOutsideTheOralLining": 7.0,
-      "note": "Unchanged by the oral verdict: the figure is the paddle row against the chest in Sprint, nowhere near the mouth, and it is the same 7.00x the era-wide table in CLAUDE.md records. Removing the sac removed the only oral surface that stretched, so the 'including the oral lining' figure is now the skin figure."
+      "mouthRegion": {
+        "jaw": "1.02x in Heavy (0.084->0.086)",
+        "skull": "1.03x in Heavy (0.081->0.084)"
+      },
+      "note": "Unchanged by T3D-32C's caps, exactly as it was unchanged by T3D-12B's verdict: the figure is the paddle row against the chest in Sprint, nowhere near the mouth, and it is the same 7.00x the era-wide table in CLAUDE.md records. The caps are part of the halves they close and ride the same weight field as the skin round them, so the mouth region reads 1.02x/1.03x -- the mouth opening rather than anything stretching."
     },
     "gapeSolid": {
-      "tool": "/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- dinocephalosaurus Bite@0.133 Attack@0.367 Heavy@0.5 Eat@0.233 NeckStrike@0.567",
+      "tool": "/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- dinocephalosaurus Bite@0.133 Attack@0.367 Heavy@0.5 Eat@0.233 NeckStrike@0.567 [--as-drawn]",
       "shots": [
         "Bite@0.133",
         "Attack@0.367",
@@ -735,56 +938,128 @@
       "shotsAre": "the peak jaw rotation of each clip, measured off the packaged rig (skull-to-jaw angle per frame)",
       "backdropTest": "r > .90, g < .20, b > .90",
       "tolerance": 12,
-      "verdict": "PASS -- neither a palate nor a floor is needed",
-      "seenThroughTheBody": {
-        "shippedWithTheSac": [
-          0,
-          0,
-          0,
-          0,
-          0
-        ],
-        "sacRemoved_thisBuild": [
-          0,
-          2,
-          3,
-          1,
-          1
-        ],
-        "sacAndHingeTissueRemoved": [
-          98,
-          87,
-          113,
-          50,
-          101
-        ]
+      "verdict": "PASS -- 0 through and 0 opened at every shot, plain and as drawn",
+      "asDrawnIsTheOneThatCounts": "The runtime hides everything src/shared/oral-geometry.ts matches, and this head's Seated jaw hinge tissue was one of them, so the plain run was proving a body the game does not draw.",
+      "asDrawn": {
+        "before_T3D_32C": {
+          "seenThroughTheBody": [
+            104,
+            94,
+            120,
+            54,
+            107
+          ],
+          "openedByCulling": [
+            166,
+            153,
+            197,
+            65,
+            171
+          ]
+        },
+        "after_T3D_32C": {
+          "seenThroughTheBody": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "openedByCulling": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
       },
-      "openedByCulling": {
-        "shippedWithTheSac": [
-          0,
-          0,
-          0,
-          0,
-          1
-        ],
-        "sacRemoved_thisBuild": [
-          67,
-          63,
-          80,
-          12,
-          67
-        ],
-        "sacAndHingeTissueRemoved": [
-          160,
-          146,
-          190,
-          61,
-          165
-        ]
+      "plain": {
+        "before_T3D_32C": {
+          "seenThroughTheBody": [
+            0,
+            2,
+            3,
+            1,
+            1
+          ],
+          "openedByCulling": [
+            67,
+            63,
+            80,
+            12,
+            67
+          ]
+        },
+        "after_T3D_32C": {
+          "seenThroughTheBody": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "openedByCulling": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
       },
-      "maxSeenThroughTheBody": 3,
+      "history": {
+        "shippedWithTheSac_plain": {
+          "seenThroughTheBody": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "openedByCulling": [
+            0,
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "sacRemoved_plain": {
+          "seenThroughTheBody": [
+            0,
+            2,
+            3,
+            1,
+            1
+          ],
+          "openedByCulling": [
+            67,
+            63,
+            80,
+            12,
+            67
+          ]
+        },
+        "sacAndHingeTissueRemoved_plain": {
+          "seenThroughTheBody": [
+            98,
+            87,
+            113,
+            50,
+            101
+          ],
+          "openedByCulling": [
+            160,
+            146,
+            190,
+            61,
+            165
+          ]
+        }
+      },
       "ofPixels": 378000,
-      "note": "Three renders of the same five shots decide the verdict. With the one-sac lining in place nothing showed through; with the sac stripped out of the unpacked GLB and everything else left as it was, 3 px at worst, inside the roster's 12 px tolerance; with the sac and the seated hinge tissue both stripped out, 50 to 113 px. So the sac was closing nothing that the hinge tissue was not already closing: what a plane cut through a closed head leaves open is the head's own cross-section at the hinge, the back wall of the mouth, and the hinge tissue fills it. The generation paints its lip on a closed snout and models no cavity, so there is no lumen wall for a gape to open onto. The sac is removed and no palate or floor is built in its place. The 'opened by culling' figures that are not seen through the body are the silhouette's own one-polygon rims losing their back face, which the tool discounts by design."
+      "note": "T3D-12B's three renders were right about the *lining*: the sac closed nothing the seated hinge tissue was not already closing. What nobody asked was whether the hinge tissue is drawn, and it is not -- so as drawn this head stood open at the hinge, 120 px through and 197 opened at Heavy. T3D-32C closes the head's cross-section at the hinge with its own vertices (T.cap_cut) and spans what is left of each half's boundary and domes it into that half (T.cap_mouth), which closes it for the player as well as for the audit. Both parts retired; this head now carries no hidden geometry at all."
     }
   }
 }

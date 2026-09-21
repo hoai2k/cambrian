@@ -5,7 +5,7 @@ import { useMeasuredHash } from '../file-hash';
 import { History } from '../sculpt/history';
 import { NumberField } from '../stretch/StretchEditor';
 import {
-  angleOf, bendBasis, describeReadingText, exportDoc, flipForward, isIdentity, jointTurns,
+  angleOf, bendBasis, describeReadingText, exportDoc, flipForward, forwardEarned, isIdentity, jointTurns,
   measureBend, moveEnd, pinch, readBend, refLabel, refMoves, reguessRefs, reseat, resetTurn, seatPlanes,
   seatPlanesFromBones, setAxis, setChain, setPlaneNormal, setRef, setReach, setWindow, spanDirection,
   spanLength, straighten, totalTurn, traces, twistAngle, warp,
@@ -25,10 +25,13 @@ import { bendKey, getBend, setBend } from './store';
  * lit as you go, and the two traced centrelines the geometry reading is taken from are drawn on
  * the body — so a trace that has set off down a flipper is seen rather than believed.
  *
- * Right-drag orbits, as in mark and mouth mode, because a mode where left-drag moves a handle has
- * to leave the model turnable without a modifier nobody would find. The rig goes to its bind pose:
- * a swimming body is drawn somewhere its vertex positions are not, and a span placed on the
- * swimming pose would bend the bind pose somewhere else.
+ * The stage keeps the ordinary pointer scheme (`../pointer-scheme`), as mouth mode does:
+ * **left-drag orbits** where it is not on a handle, **right-drag pans**, the wheel zooms. The
+ * handles take the left button only while the pointer is on one, and the orbit is *suspended*
+ * there rather than the press being swallowed — see `ViewerScene.setOrbitEnabled` for why the
+ * ordering leaves no other way. The rig goes to its bind pose: a swimming body is drawn somewhere
+ * its vertex positions are not, and a span placed on the swimming pose would bend the bind pose
+ * somewhere else.
  *
  * Nothing is saved. The document lives in the session's store so a trip through view mode does not
  * lose it, and a reload starts from the body's own guess. What leaves is the bend file, with the
@@ -52,6 +55,17 @@ interface Props {
   /** How the Model control names the body on stage, so the panel can say the same thing it does. */
   stageLabel: string;
   /**
+   * The bodies this specimen offers, and which one is on stage, because **the mode opens on the
+   * unbent body and must not be a cage**. `opening()` sends a reviewer to the original pose — that
+   * is where a correction is aimed — but the mode's headline is the two readings *side by side*,
+   * the per-joint table and the corrected-body warning, and all three need a rig. Locked out of
+   * the built body, a warning built to say "this body's rest already carries one" could never be
+   * shown to the person it is about.
+   */
+  stages: readonly { id: string; label: string }[];
+  stageId: string;
+  onStage(id: string): void;
+  /**
    * Where the untouched generation is, on a body whose rest was moved before binding, and what was
    * moved — `tools/triassic/base-poses.mjs`' own words. The panel points at it, because aiming a
    * correction on the body that already carries it is the one mistake this mode makes easy.
@@ -72,7 +86,7 @@ interface Drag {
   start: Vec3;
 }
 
-export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLabel, origPose, canvas, onExit }: Props) {
+export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLabel, origPose, stages, stageId, onStage, canvas, onExit }: Props) {
   const [doc, setDocState] = useState<BendDoc | null>(null);
   const [error, setError] = useState('');
   const [note, setNote] = useState('');
@@ -124,7 +138,9 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
     historyRef.current = new History(d);
     setDocState(d);
     scene.setRestPose(true);
-    scene.setMarkInteraction(true);
+    // The handles only claim the left button while the pointer is on one, so the stage keeps the
+    // ordinary scheme: left orbits, right pans, the wheel and the middle button dolly.
+    scene.setPointerScheme('view');
     show(d);
     const rigged = target.skinned;
     return () => {
@@ -134,7 +150,8 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
       // about joints that were left where they were — a neck that bends correctly at rest and
       // flails the moment it moves. It is put back on the way out.
       if (rigged) scene.applySculpt(null, true);
-      scene.setMarkInteraction(false);
+      // This also hands the orbit back enabled, whatever the pointer was sitting on on the way out.
+      scene.setPointerScheme('view');
       scene.setRestPose(false);
       canvas.style.cursor = '';
     };
@@ -178,7 +195,12 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
       const h = historyRef.current;
       if (!h) return;
       const handle = scene.bendPick(e.offsetX, e.offsetY);
-      if (!handle) return;
+      if (!handle) return;            // off a handle the press is the orbit's, and the orbit has it
+      // Belt and braces beside the hover suspension below: a press can arrive with no move before
+      // it (a tap, a pointer that entered already down, a synthetic event out of a harness), and
+      // OrbitControls checks `enabled` again in its own move handler, so a disable that lands
+      // after its `pointerdown` still keeps the camera still.
+      scene.setOrbitEnabled(false);
       e.preventDefault();
       canvas.setPointerCapture(e.pointerId);
       const anchor = handleAnchor(h.present, handle);
@@ -191,6 +213,10 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
         const over = scene.bendPick(e.offsetX, e.offsetY) ?? null;
         setHover(over);
         canvas.style.cursor = over ? 'grab' : '';
+        // The orbit is suspended for as long as the pointer is over a handle, which is what keeps
+        // a press on one from also swinging the camera — see `ViewerScene.setOrbitEnabled` for why
+        // it cannot be done by swallowing the event instead.
+        scene.setOrbitEnabled(!over);
         return;
       }
       const p = scene.dragPoint(e.offsetX, e.offsetY, d.anchor);
@@ -212,6 +238,9 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
       const d = dragRef.current;
       dragRef.current = null;
       try { canvas.releasePointerCapture(e.pointerId); } catch { /* already released */ }
+      // Back to whatever the pointer is now over: a drag that ends on a handle must not re-arm the
+      // orbit under it, or the next press there would swing the camera as well as the handle.
+      scene.setOrbitEnabled(!scene.bendPick(e.offsetX, e.offsetY));
       if (d) endDrag();
     };
     canvas.addEventListener('pointerdown', onDown);
@@ -284,7 +313,7 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
   return (
     <>
       <div className="mark-stage bend-stage">
-        <span className="mark-label">Bend · left-drag a handle · right-drag orbits · shift+right pans · scroll zooms</span>
+        <span className="mark-label">Bend · left-drag a handle, or the view to orbit · right-drag pans · scroll zooms</span>
         <ul className="mouth-legend bend-legend" aria-label="Handles">
           <li className={`base ${hover === 'base' ? 'hover' : ''}`}><i />base · the end the bend is anchored at</li>
           <li className={`tip ${hover === 'tip' ? 'hover' : ''}`}><i />tip · the end that is carried round</li>
@@ -311,11 +340,17 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
           {origPose && appliesTo !== 'origpose' && <>
             {' '}This body’s rest pose is <em>not</em> the shape the generation held: its builder moved it
             before binding ({origPose.changed.join('; ')}). A correction aimed here is aimed on a body
-            that already carries one. To aim it on the geometry it was measured from, switch the Model
-            control to <em>{origPose.label}</em>.
+            that already carries one. To aim it on the geometry it was measured from, take the Model
+            control below to <em>{origPose.label}</em>.
           </>}
-          {appliesTo === 'origpose' && <> This is the untouched generation, before the builder moved anything — which is the body a correction is aimed on.</>}
+          {appliesTo === 'origpose' && <> This is the untouched generation, before the builder moved anything — which is the body a correction is aimed on. What needs a rig — the bone chain's answer beside the geometry's, and the per-joint table — is on the built body, which the Model control below goes back to.</>}
         </p>
+        {stages.length > 1 && <label className="scheme-pick editor-model-pick bend-model-pick">
+          <span>Model</span>
+          <select aria-label="Which model in bend mode" value={stageId} onChange={(e) => onStage(e.target.value)}>
+            {stages.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
+          </select>
+        </label>}
 
         {doc && readings && <>
           <h3>What it measures</h3>
@@ -440,7 +475,19 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
           </>}
 
           <h3>Orientation</h3>
-          <p className="hint bend-frame-note" data-frame={doc.frameSource}>{FRAME_NOTE[doc.frameSource]}</p>
+          <p className="hint bend-frame-note" data-frame={doc.frameSource}
+             data-forward-earned={forwardEarned(doc) ? 'yes' : 'no'}>{FRAME_NOTE[doc.frameSource]}</p>
+          {/* The panel must not state a direction it has not earned. The box picks the axis and
+              never the end, so where nothing else spoke the head end is written as a question with
+              the button that answers it sitting under the line. */}
+          {!forwardEarned(doc) && (
+            <p className="hint bend-frame-unearned" role="status">
+              Head at the {doc.frame.forward === 1 ? 'high' : 'low'} {doc.frame.axis.toUpperCase()} end?
+              Nothing on this body said so — no mouth socket, no authored turn — so that is the fallback
+              and not a reading. Every “back from the nose” figure here, and in the export, is measured
+              from that end.
+            </p>
+          )}
           <div className="sculpt-actions">
             {(['x', 'z'] as const).map((a) => (
               <button key={a} className={`ghost ${doc.frame.axis === a ? 'primary' : ''}`} aria-pressed={doc.frame.axis === a}
@@ -543,6 +590,6 @@ const SEAT_NOTE: Record<'trace' | 'manual', string> = {
 const FRAME_NOTE: Record<BendDoc['frameSource'], string> = {
   mouth: 'Taken from the mouth socket: this body says where its own head is. The span itself need not follow that axis — it is two points on the animal.',
   yaw: 'Taken from the generation’s authored turn, which says where its head was before it was faced forward.',
-  bounds: 'Guessed from the bounding box — the only signal this body carries. If “back from the nose” reads as nonsense, the box’s longest side runs across the animal (wide flippers do this): set the axis yourself.',
+  bounds: 'Guessed from the bounding box — the only signal this body carries, and it can only pick the axis. Which end is the head is not a finding here, it is the fallback: check it. Everything measured “back from the nose” turns round with it, and if that axis itself reads as nonsense the box’s longest side runs across the animal (wide flippers do this).',
   manual: 'Set by hand.',
 };

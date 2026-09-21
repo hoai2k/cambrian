@@ -143,11 +143,11 @@ edge dominated by `jaw` and by `skull`.
 | cymbospondylus | yes | 1.14 % → 0.01 % | 1.03 (1.00) → 1.03 (1.00) | 2.48x → 2.48x | 1.00x → 1.15x | 1.15x → 1.15x |
 | dinocephalosaurus | yes | 0.67 % → 0.01 % | 1.01 (1.00) → 1.01 (1.00) | 7.00x → 7.00x | 1.00x → 1.00x | 1.00x → 1.00x |
 | helicoprion | no | no shell → no shell | 1.01 (0.99) → 1.01 (0.99) | 14.33x → 14.33x | 3.76x → 3.76x | 4.21x → 4.21x |
-| henodus | yes | 0.00 % → 0.00 % | 1.02 (1.00) → 1.02 (1.00) | 4.81x → 4.81x | 1.04x → 1.21x | 1.22x → 1.22x |
+| henodus | yes | 0.00 % → 0.00 % | 1.02 (1.00) → 1.02 (1.00) | 4.81x → 4.81x | 1.04x → 1.21x | 1.22x → 1.22x |   <!-- T3D-32B: lining and hinge plug removed, cut capped with its own rim; skin still 4.81x, mouth-region jaw 1.21x / skull 1.22x -->
 | hupehsuchus | no | 0.00 % → 0.00 % | 0.93 (0.98) → 0.93 (0.98) | 3.47x → 3.47x | 2.70x → 2.70x | 2.81x → 2.81x |
 | hybodus | yes | 6.05 % → 0.00 % | 1.10 (1.00) → 1.10 (1.00) | 5.93x → 5.93x | 1.00x → 2.55x | 5.93x → 5.93x |
 | keichousaurus | yes | 0.54 % → 0.33 % | 0.99 (1.00) → 0.99 (1.00) | 2.34x → 2.34x | 1.00x → 1.14x | 1.07x → 1.08x |
-| macrocnemus | no | 0.00 % → 0.00 % | 1.01 (1.02) → 1.01 (1.02) | 3.41x → 3.41x | 2.39x → 2.39x | 3.41x → 3.41x |
+| macrocnemus | no | 0.00 % → 0.00 % | 1.01 (1.02) → 1.01 (1.02) | 3.41x → **3.18x** | 2.39x → 2.46x | 3.41x → 3.18x |   <!-- T3D-32B: lining, hinge plug and rim flange removed, cut fitted to the painted lip and capped with its own rim -->
 | mixosaurus | yes | 1.64 % → 0.00 % | 1.01 (1.00) → 1.02 (1.00) | 3.62x → 3.62x | 1.00x → 1.88x | 1.65x → 1.81x |
 | mosasaurus | yes | 0.04 % → 0.00 % | 1.00 (1.00) → 1.00 (1.00) | 2.54x → 2.54x | 1.45x → 1.83x | 1.28x → 1.28x |
 | mystriosuchus | yes | 1.80 % → 0.00 % | 0.99 (1.00) → 0.98 (1.00) | 4.48x → 4.48x | 1.66x → 2.21x | 1.33x → 1.33x |
@@ -275,3 +275,80 @@ as the worst before the repair.
 - Each body's `audit.mjs --package --decode`: exact rig, clip and anchor parity.
 - Portraits re-rendered from the packaged files and `publish-portraits.mjs --check` current;
   `node tools/update-asset-sizes.mjs` run; `npx tsc --noEmit`, `npm run build`, `npm run triassic`.
+
+## T3D-32A: the two the as-drawn sweep put worst, and what the cut was worth on each
+
+T3D-31 replaced the shell-in-the-lumen construction with two things — `T.cut_rim`, which measures
+what a cut actually left open, and `gape-solid.py --as-drawn`, which renders the body the *game*
+draws rather than the body the file contains. Rolled out to the sweep's two worst bodies, the two
+answered differently, and `T.cut_rim` is what told them apart before any geometry was touched.
+
+**Atopodentatus — 3,738 px as drawn, capped with the cut's own rim.** The cut leaves **one closed
+loop of 153 vertices spanning y −0.276 to −0.214**: 87 on the measured seam and 66 across the hinge
+cross-section, on a mouth 0.124 of a body long. That is the *back half* and nothing else — behind
+−0.276 the generation is a closed head and the cut is what opens it, while forward of it the T-bar
+carries a modelled slit whose walls are already there and the seam plane passes between surfaces
+already apart. A few dozen small closed loops at the front are the cut sawing across the
+generation's own needle teeth, every vertex of each on the seam. So the cut earns its place over
+the back half and costs nothing over the front, and the leak was exactly the back half: every one
+of the 3,738 pixels was in the throat between the upper tooth row and the mandible, which is the
+back wall of the mouth and was simply absent. `T.cap_cut` over the hinge cross-section and
+`T.cap_mouth` over what is left (4,952 cap vertices, dome 0.30 bounded at 0.55 of the head's
+measured room) close each half by construction. The 780-vertex sac and the seated hinge ellipsoid
+are gone. As drawn, **0 through and 0 opened at all sixteen clips that move its jaw**; plain run
+9 px → 0. Skin 3.90x → 3.42x, and see below for why.
+
+**Hybodus — 1,346 px as drawn, not cut at all.** `T.seal_seams` run over the whole head *before*
+anything was cut fills **nothing**, on the authored body and the twin alike: the generation's head
+is a closed surface, and every boundary edge either half had afterwards was made by the cut. What
+the cut left is one component of 218 vertices, 94 on the seam and the rest the rear of the labelled
+mandible window — a curve running 0.04 of a body behind the hinge and dipping under the gills, the
+same fact `T.jaw_junction`'s `rear` had already been widened for. That rim was closed three ways —
+a hinge cap, a rim fold, a post-cut seal and two oral shells — and still read 1,346 px as drawn,
+because every one of those closes a hole *next to* the rim rather than spanning it. And spanning it
+is refused on this generation for a reason worth recording: the lip rim **pinches**. Sixteen of its
+vertices carry four boundary edges rather than two, where the interlocking tooth roots bring two
+runs of the rim to a point, so it is not a set of closed curves and `T.cap_mouth` declines it —
+which is its contract working. So the head stays one surface (`T.jaw_field_uncut`). As drawn,
+**0 through and 0 opened at every clip that moves its jaw**. Skin 5.93x unchanged (`Shake`, `skull`
+— the recorded opercular crack); `lag.mjs` has no seam to measure and says so, with the mandible
+following its own joint 0.97–0.99.
+
+**The commissure band, swept** (Hybodus, fraction of the head's half depth at the hinge):
+
+| band | worst skin | mandible follows its joint |
+| ---: | ---: | --- |
+| 0.20 | 6.76x | 0.98 / 0.99 / 0.99 / 0.98 |
+| 0.30 | 5.93x | 0.98 / 0.99 / 0.99 / 0.98 |
+| 0.38 | 5.93x | 0.98 / 0.99 / 0.99 / 0.98 |
+| **0.50** | **5.93x** | 0.98 / 0.99 / 0.99 / 0.97 |
+
+Ships at 0.50, which is Mosasaurus' figure and the flat part of the curve; 0.20 is the one that
+costs, and it costs where the rule says it would — a strip of skin at the corner carrying the whole
+swing.
+
+**Atopodentatus' 0.6 throat share was a symptom, not a setting.** That body ran `T.jaw_junction` at
+`throat=.6` because at a full share the gradient of jaw weight across the throat tore `neck_02`
+4.31x where the body read 3.90x, both in `Heavy`. What was actually wrong was the clip: the hammer
+laid its sweep on four axial bones, the trunk and the skull at once — 1.97 rad per unit of an
+envelope running −1.0 to +1.9 — so the snout swung through **327°** and travelled 10.4 units on a
+5.0-unit body. T3D-23's reading of that clip ("pulls the head 33.8 % of L back before reaching only
+7.1 % forward") was the over-rotation measured on the body axis rather than a wind-up. Re-authored
+to a quarter turn, `Heavy` is no longer the worst clip on the animal, and a **full** throat share
+now reads 3.42x — the same figure the lighter share gives, with the same worst edge (`Sprint`,
+`fore_upper_R`). The measurements, on `anchor_attack_primary` over body length:
+
+| | back | forward | across | lateral swing | snout path |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| before | 33.8 % | 7.1 % | 28.6 % | 51.7 % | 10.37 |
+| after | 4.5 % | 12.5 % | 22.1 % | 37.4 % | 5.64 |
+
+`audit.mjs` now asserts the sweep out-travels the wind-up rather than leaving it to a reading.
+
+**A hidden oral part that wears the skin is freight on the twin.** Hybodus' lining took a *copy of
+the body pigmentation material*, which is the right rule for an authored patch and carries the
+2048² albedo and normal maps — and it was exported with the twin group as well. Retiring it took
+`hybodus.lod1.glb` (= the twin, byte for byte) from **1,315,816 to 672,796 bytes, −48.9 %**, on a
+body whose twin needs no texture at all. Atopodentatus' parts wore a flat colour and a vertex-colour
+material, so there was nothing to lose there: its twin goes 875,528 → 891,384 bytes, up by the caps'
+own geometry.

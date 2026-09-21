@@ -2,22 +2,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1804304,
-      "sha256": "30f85d7010132839cd18f4db858949398a8b730551b19a6db1f05c28d3241dcc",
+      "bytes": 1806412,
+      "sha256": "962648e80f26813f1afce6809946e0cce621f7e2d4724785c80c42ae997f4be1",
       "triangles": 22078,
       "vertices": 13491
     },
     {
       "suffix": ".puppet",
-      "bytes": 1313156,
-      "sha256": "6586493b2676765cdd01cd1b20fb45a3c3f2caa606d482335164008b64b8fbb3",
+      "bytes": 708252,
+      "sha256": "40dc4c748e933908b23c14a968cdb97402311695766ca7de59b864cd96eac0ef",
       "triangles": 8443,
       "vertices": 4288
     },
     {
       "suffix": ".lod1",
-      "bytes": 1313156,
-      "sha256": "6586493b2676765cdd01cd1b20fb45a3c3f2caa606d482335164008b64b8fbb3",
+      "bytes": 708252,
+      "sha256": "40dc4c748e933908b23c14a968cdb97402311695766ca7de59b864cd96eac0ef",
       "triangles": 8443,
       "vertices": 4288
     }
@@ -95,95 +95,95 @@
   "clipSignatures": [
     {
       "name": "Ability",
-      "sha256": "6051f3ea402d6cc5a131062d5f9c1546073f859eb385d9c22dc7d974341dc0c3"
+      "sha256": "b7a277f41e59063493b8fa69fa9fc2a23e5feab30c3641ddb8166ab6433518d4"
     },
     {
       "name": "Attack",
-      "sha256": "3b546e9669be3b13a5aa9fada719026290b0a5127ba5870ac5726b57c18aeaec"
+      "sha256": "2e970ef7bd8838e23013de9dabd789f46be368bea1af5204cc245927222371aa"
     },
     {
       "name": "Bite",
-      "sha256": "8c3d3aa27ce32ec52e7413f16f9499a68d37b7192b613198aa22c7d3b05444d7"
+      "sha256": "e89b892a1ed9fd3437619e5dd297856e02a33ec793418a05dd8a2c304d90a5b9"
     },
     {
       "name": "Breath",
-      "sha256": "bfb01599426d4cfaddc3d162412fabca8da5043090ff8045c637715ce7c81b8c"
+      "sha256": "e3cd2163b284e4166aaf798c22363cf8876262b1b046807d359c74b0e26edb70"
     },
     {
       "name": "Death",
-      "sha256": "eceeb89a8f81da4d784da4554e7ae273628e28bdfa2980e88f231510b1c4baaa"
+      "sha256": "cab75ac831ed0c570a130ce93f269ebbccc03541584767f83baa1a3d2c24a478"
     },
     {
       "name": "Dive",
-      "sha256": "a1e18985ba8aec4308d7b4d0a31ce5d25de2a5102a5757d9f74f6484dbaf2023"
+      "sha256": "3d6417e273f2fb81152ca76d8493de2c3b2ffebcde25e7d865e97f82f8174f91"
     },
     {
       "name": "Dodge",
-      "sha256": "a5edac6df0d85f7d140b84aa0f29221ba80388f6dff2d3936d27269a59adc38b"
+      "sha256": "5a42bd6ff2a6ba413056c35748e61226605281a261681acc70c2d9313891b42d"
     },
     {
       "name": "Eat",
-      "sha256": "fdc33b2ee0a6cdcb3f1c0f681a0984b60177a8a7146c7788a55f923914097d7e"
+      "sha256": "3deef9a9350532cd86d541e0e3c12fe14f82d78ddad2e03fe65ad86cb1f77c71"
     },
     {
       "name": "FastStart",
-      "sha256": "2801bd61a1d3981514af755a0cb8b2d548190fa79f8e06778d0a0feb57bcaf99"
+      "sha256": "78c34388c1a3a16b9f2bfa33993b1d3ba52f491d866359a291351acc14c965ac"
     },
     {
       "name": "Grab",
-      "sha256": "91d5095e16e3399234db1438a0a2174d7ee9e0afb5455fa2eaa423b3bce22e10"
+      "sha256": "ad5937cb704d29cfd7b12e4f7a9ba5823bdd7e75ceecb0e6d03f1964648c2967"
     },
     {
       "name": "Growth",
-      "sha256": "894a304e0d61468bd4a8804df05043779ed37f329fd006ff003518b341f399e9"
+      "sha256": "983029a8647c5b5f73c410a181cb6dcb9abf4a57730f91d57f248826bdfbacfc"
     },
     {
       "name": "Guard",
-      "sha256": "901a6f808571f03279dd63751189372798f49bea4e20333e824f305e28bbe219"
+      "sha256": "1db36ce953a958f9d8f4005826b98e49c1368e527b8d7958cbbfc72e66c2ce42"
     },
     {
       "name": "Heavy",
-      "sha256": "fa87737330b61630d4e3825e3e13e7dca8f24c5c84a2a59ba7d169d1bb171171"
+      "sha256": "f7357261f2b1e5e1580eb0ed12dd5c5e83fc8769386672f6784886f946757146"
     },
     {
       "name": "Hit",
-      "sha256": "c11779b82fb5d7ddedd57421fab8255e66b1aad83c2171e33e48b09bdc8c59c4"
+      "sha256": "a0f3a2bce6acbd0bec8c041517313e596154715a149c1f57f59729d114a7d69c"
     },
     {
       "name": "Hover",
-      "sha256": "d70a615192690c95e7cee43b7c0d76f22246a57aac397aff66ac1434c0be7a71"
+      "sha256": "f1e322f55fe28cef84813fbb69be29250222fdb56172ede56c8213cc0a522148"
     },
     {
       "name": "Idle",
-      "sha256": "882d7dade09738ff6b9045a3bbaa98cf8f0d48910ae86acbf7be177a94025e70"
+      "sha256": "e163a6d405341488a24eeb11d6a503ca97a420928af3919c385a5b97c7ec9b72"
     },
     {
       "name": "Parry",
-      "sha256": "8d57071e3406222f53cfe6e3c03e9d77367b8cbb76b1a1774f4befdc30546a07"
+      "sha256": "35532f0bd9a28efa8bed5ab5acde66f9fc290d6d96f68bc0baf278bf49ea1a9e"
     },
     {
       "name": "Rise",
-      "sha256": "15dfff85d02a299646dbc6013cdeea110ea8a5255a4a558aa6055f3ded36590e"
+      "sha256": "3db87ca8a36d99b27890d9bf6be4a395f6de37a66484d27c80fb9defa2024682"
     },
     {
       "name": "Sprint",
-      "sha256": "09090aefa04c22d764b285648dec1c83ce9f9ac7205052d3d99bb5fef2d978a4"
+      "sha256": "842b3f4b66f6bd73ab911c1b2fca32e135fd0f89d4d5fb5470cbe96ba7194038"
     },
     {
       "name": "Stagger",
-      "sha256": "3ec638e76b7eb2c90af542ae2793601f72a15bc3943b21f9b40ace8f9fb76b8d"
+      "sha256": "6fcded4cb00f11920abcb400287cb343825f3a1c5b61698f4a4db56451aa8dd1"
     },
     {
       "name": "Swim",
-      "sha256": "4864145a63ebddcebe571efd949d9cb1d25258708c367af2d4fb04220b380282"
+      "sha256": "20ffa3c82db1ace58b52939897fc92b41a76d1b61be2d63915d6dce912ed657b"
     },
     {
       "name": "TurnLeft",
-      "sha256": "71d7b4a8284b7ca05622b13b19c00e441ca217c12d22745082c2981309c8ead5"
+      "sha256": "f86bab9f558b590435f7c184e5a8f61daf5d1ff09d5f1f378a5ed1e288dddaaf"
     },
     {
       "name": "TurnRight",
-      "sha256": "cdeb72ff3322f75c691d84b48c027e82ac4fd7aad2029f82588b70ae6ee8ed3f"
+      "sha256": "bfc79b5ac9b71a1c7a1acf628cd00a7f18800e2b80e33a3ac38414cb941fcefc"
     }
   ],
   "twinTriangleFraction": 0.3824168855874626,
@@ -219,7 +219,7 @@
           "clip": "Death",
           "duration": 1.7000000476837158,
           "samples": 61,
-          "maxVertexTravel": 1.3955526582773787
+          "maxVertexTravel": 1.4506181273494028
         },
         {
           "clip": "Dive",
@@ -362,7 +362,7 @@
           "clip": "Death",
           "duration": 1.7000000476837158,
           "samples": 61,
-          "maxVertexTravel": 1.415579773595527
+          "maxVertexTravel": 1.4592413930347916
         },
         {
           "clip": "Dive",
@@ -690,11 +690,11 @@
   ],
   "skinTearsPerSurface": {
     "Saurichthys_authored_body": {
-      "worstRatio": 3.6067266625715324,
-      "clip": "Death",
-      "grewFrom": 0.023875433930215025,
-      "grewTo": 0.08611216413657156,
-      "edgesOver2x": 67
+      "worstRatio": 3.317726929799414,
+      "clip": "FastStart",
+      "grewFrom": 0.023875439330215485,
+      "grewTo": 0.07921218802664799,
+      "edgesOver2x": 52
     },
     "Saurichthys_authored_body_lower_jaw": {
       "worstRatio": 1.6903137757726165,
@@ -711,7 +711,7 @@
       "edgesOver2x": 0
     }
   },
-  "worstSkinEdgeStretch": 3.6067266625715324,
+  "worstSkinEdgeStretch": 3.317726929799414,
   "exactRigParity": true,
   "exactAnimationParity": true,
   "exactAnchorParity": true,

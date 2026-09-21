@@ -114,9 +114,23 @@ for (const clip of ['Attack', 'Heavy', 'Bite']) {
   }
   const reachOf = (n) => Math.max(...rows.map((r) => Math.hypot(
     r[n][0] - rows[0][n][0], r[n][1] - rows[0][n][1], r[n][2] - rows[0][n][2])));
+  // **And the same travel measured in the animal's own frame**, which is where the question
+  // "is the neck delivering the head" actually lives (T3D-32D; Phragmoteuthis' dart made the same
+  // correction to its crown ratios for the same reason). The strike now carries the whole body
+  // forward on a held plateau, because a neck that already lies straight at rest cannot *extend* --
+  // it can only bend -- so the reach has to be the animal's. A dart moves the skull and the
+  // shoulder by exactly the same amount, so comparing their world travel measures the dart rather
+  // than the neck, and a clip made to reach forward fails a rule about its neck. Subtract the
+  // body's own travel and what is left is the neck's contribution, which is what the rule means.
+  const local = (n) => Math.max(...rows.map((r) => Math.hypot(
+    (r[n][0] - rows[0][n][0]) - (r.body[0] - rows[0].body[0]),
+    (r[n][1] - rows[0][n][1]) - (r.body[1] - rows[0].body[1]),
+    (r[n][2] - rows[0][n][2]) - (r.body[2] - rows[0].body[2]))));
   report.strike.push({
     clip, snoutPathLength: total, snoutReach: reachOf('anchor_attack_primary'),
     skullReach: reachOf('skull'), chestReach: reachOf('chest'),
+    snoutReachInBodyFrame: local('anchor_attack_primary'),
+    skullReachInBodyFrame: local('skull'), chestReachInBodyFrame: local('chest'),
     halfTravelInFractionOfClip: bestWindow / step.length,
   });
 }
@@ -175,8 +189,8 @@ for (const s of report.strike) {
   // The neck is what puts the head on the prey: the skull must out-travel the shoulder. Bite is
   // exempt and should be — it is half a second of snap with the head already where it needs to be,
   // and the whole animal simply lunges, so skull and shoulder travel together by construction.
-  need(s.clip === 'Bite' || s.skullReach > s.chestReach * 1.5,
-    `${s.clip}: the neck must deliver the head (skull ${s.skullReach.toFixed(3)} vs chest ${s.chestReach.toFixed(3)})`);
+  need(s.clip === 'Bite' || s.skullReachInBodyFrame > s.chestReachInBodyFrame * 1.5,
+    `${s.clip}: the neck must deliver the head (skull ${s.skullReachInBodyFrame.toFixed(3)} vs chest ${s.chestReachInBodyFrame.toFixed(3)}, both in the body's frame)`);
   need(s.halfTravelInFractionOfClip < 0.36,
     `${s.clip}: half the snout's travel must fall in a short window (${s.halfTravelInFractionOfClip.toFixed(3)})`);
   need(s.clip === 'Bite' || s.snoutReach > 0.25, `${s.clip}: the strike must reach (${s.snoutReach.toFixed(3)})`);

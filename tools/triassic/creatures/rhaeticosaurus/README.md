@@ -212,11 +212,49 @@ build refuses a flipper that sweeps under 60° in Sprint or 45° in Swim.
 0.146 radians apart — shoulders first, half the body's travel inside 0.22 of the clip. `Glide` is
 the other end of the same animal, all four held out and barely moving.
 
-`Heavy` is the snatch and the neck is what delivers it: skull travel 1.01 against the shoulder's
-0.47, and a snout reach of 1.43 against `Attack`'s 1.04. Built from the same three shapes with the
-same numbers the two measured an *identical* 1.04, which is two names for one clip; the snatch's
-extra reach is the neck's rather than the shoulder's, because carrying the trunk forward with it
-took the skull's travel down to 1.4× the chest's.
+`Heavy` is the snatch and the neck is what delivers it: skull travel **0.90 against the shoulder's
+0.086 in the animal's own frame**, and a snout reach of 1.09 against `Attack`'s 0.76. Built from the
+same three shapes with the same numbers the two measured an *identical* 1.04, which is two names
+for one clip; the snatch's extra is the neck's own excursion rather than a longer dart.
+
+### The snatch arrives in front of the animal (T3D-23, closed by T3D-32D)
+
+Measured on the **packaged** file over 41 phases, `anchor_attack_primary`'s travel along the
+animal's forward direction, over body length:
+
+| clip | before | after |
+| --- | --- | --- |
+| `Heavy` | −14.4 % back, **never more than +1.0 % forward** | **−0.4 % / +13.0 %** |
+| `Attack` | −4.2 % back, +2.1 % forward | **−0.1 % / +11.8 %** |
+
+Two lines were doing it. The drive added a **uniform** yaw of .26 to each of the four cervicals on
+top of the gather's alternating S, which at `Heavy`'s 1.6 is 1.66 radians of accumulated turn at
+the skull: the head was pointing across and behind the shoulder at the very moment the jaws shut. A
+neck that is bending round one way is not unrolling. And the nose-down pitch (.14 a cervical plus
+.24 on the skull, again ×1.6) bent the neck 51° and put the head 73° nose-down, which swings a
+snout standing 1.66 units out from the shoulder **0.61 of a unit backwards** — 12 % of a body, and
+the whole of the dart on its own.
+
+What replaced them: the gather is a **C with a counter-turn at the head** rather than a balanced S
+— the cervicals draw the neck round to one side, weighted towards the shoulder where the leverage
+is, while `neck_03` turns back the other way so the animal is still looking at what it is about to
+take, which is the heron's windup and the plesiosaur's. (A balanced S barely moves the head at all:
+with the uniform drive taken out, the skull's whole excursion collapsed to 0.61 against a shoulder
+travelling 0.63.) The head drops onto the prey by about a quarter turn in total. And the reach is
+the **dart**: `carry` rises early and is *held* through the close, because a neck that already lies
+straight at rest cannot extend — it can only bend — so the reach has to be the animal's.
+
+That last point made the audit's own rule wrong where it stood. "The neck must deliver the head"
+compared the skull's world travel with the shoulder's, and a dart moves the two by exactly the same
+amount, so a clip made to reach forward failed a rule about its neck. Both are now measured **in
+the body's own frame**, which is where that question lives — Phragmoteuthis' dart made the same
+correction to its crown ratios for the same reason — and the neck delivers the head by 10.5× at
+`Heavy` and 6.7× at `Attack`. Strip:
+[before and after](../../../../docs/triassic/verification/rhaeticosaurus-attack-reach.png).
+
+Nothing else moved: skin **2.81x**, `gape-solid.py --as-drawn` 1 px at `Heavy` (identical to the
+file this replaced, tolerance 12), `lag.mjs` 0.00 % of a body, every joint owns skin, packaging
+parity exact and the LOD1 byte-identical to the twin.
 
 ## What is measured, and what is weak
 

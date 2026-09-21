@@ -613,6 +613,27 @@ def spike(u, a, b, p=1.):
     return (sin(pi * (u - a) / (b - a)) ** 2) ** p
 
 
+# -------------------------------------------------------------- the reach, measured ----
+# T3D-23's own instrument in the builder: where the attack anchor stands against where it rests,
+# along the animal's own forward direction, in bodies. The verdict is taken off the *packaged*
+# file (41 phases), because the file is what the game loads; this is the same quantity on the rig,
+# so a strike that does not reach fails here rather than in a sweep months later.
+STRIKE_CLIPS = ('Attack', 'Heavy')
+_ATTACK_BONE, _ATTACK_RAW, _ = ANCHOR_POINTS['anchor_attack_primary']
+ATTACK_LOCAL = rig.data.bones[_ATTACK_BONE].matrix_local.inverted() @ tx(_ATTACK_RAW)
+FORWARD = Vector((0., -1., 0.))   # this rig faces -Y; the exporter maps that to +Z in the file
+reach_track = {}
+
+
+def attack_anchor_now():
+    """The attack anchor in armature space at the pose the rig is holding."""
+    bpy.context.view_layer.update()
+    return rig.pose.bones[_ATTACK_BONE].matrix @ ATTACK_LOCAL
+
+
+reset()
+ATTACK_REST = attack_anchor_now()
+
 seams, bounds, gape_trace = {}, {}, {}
 for clip, duration in CLIPS.items():
     action = bpy.data.actions.new(clip)
@@ -645,6 +666,23 @@ for clip, duration in CLIPS.items():
         # identical 1.04 of snout reach, which is two names for one clip. The snatch takes the neck
         # right out and drops the shoulder in behind it.
         strike = {'Heavy': 1.60}.get(clip, 1.0)
+        # **The snatch has to arrive somewhere in front of the animal** (T3D-23, closed by T3D-32D).
+        # Measured on the packaged file at 41 phases, `Heavy` took the attack anchor 14.4 % of a
+        # body **backwards** and never more than 1.0 % forward, and `Attack` reached 2.1 %. The
+        # cause was one line: the drive added a *uniform* yaw of .26 to each of the four cervicals
+        # on top of the cock's alternating S, which at `Heavy`'s 1.6 is 1.66 radians of accumulated
+        # turn at the skull -- the head ends up pointing across and behind the shoulder at the very
+        # moment the jaws shut. A neck that is bending round one way is not unrolling.
+        #
+        # So the drive **unrolls the S it gathered** (the same alternating pattern, taken past
+        # straight by a little), and the reach is the **dart**: `carry` is a plateau that rises
+        # with the drive and is held through the close, exactly as Phragmoteuthis' is, so the head
+        # arrives forward of where it rested. The cock stays large because that is what the neck's
+        # own excursion is -- an alternating S translates the head sideways rather than backwards,
+        # which is why the rear-back never came from it -- and the audit's rule that the skull must
+        # out-travel the shoulder is measured against that excursion.
+        carry = (ramp(u, .04, .20, 1.2) * (1 - ramp(u, .76, .94, 1.))
+                 if clip in ('Attack', 'Heavy') else 0.)
         # `Ability` is the roster's **power stroke**: all four flippers at once, shoulders first,
         # carried three body lengths. One enormous synchronised downbeat and a long glide out of it,
         # which is a different shape from the alternating cruise entirely.
@@ -701,8 +739,11 @@ for clip, duration in CLIPS.items():
             # The snatch's extra reach is the **neck's**, not the shoulder's: carrying the trunk
             # forward with it took the skull's travel down to 1.4x the chest's, which is a lunge
             # rather than a strike.
-            body.location.y = .12 * cock - .46 * drive
-            body.rotation_euler.x = .10 * cock - .09 * drive
+            # The snatch darts a little further than the bite does, but only a little: what makes
+            # it the snatch is the neck's own excursion (`snoutReach` 1.43 against 1.04), and a
+            # dart scaled by the whole of `strike` would make it a charge instead.
+            body.location.y = .12 * cock - .62 * carry * (1. + .22 * (strike - 1.))
+            body.rotation_euler.x = .10 * cock - .09 * carry
         if clip == 'Ability':
             # Shoulders first: the body pitches nose-down into the load and is thrown forward.
             body.location.y = .14 * load - 1.05 * power
@@ -745,10 +786,25 @@ for clip, duration in CLIPS.items():
             z += turn * (.030 + .004 * i)
             z += .050 * dead * sin(i * .8)
             if clip in ('Attack', 'Heavy'):
-                # The neck is what puts the head on the prey: it cocks back into an S and unrolls.
+                # **The neck is what puts the head on the prey, and it does that by coiling to one
+                # side rather than by folding in half.** The gather was an alternating S -- every
+                # other cervical bent the other way -- and a balanced S barely moves the head at
+                # all: with the drive's uniform bend taken out (see above), the skull's whole
+                # excursion collapsed to 0.61 against a shoulder travelling 0.63, and the audit's
+                # rule that the neck must out-travel the shoulder failed on a clip that had just
+                # been made to reach. So the gather is a **C** with a counter-turn at the head:
+                # the cervicals draw the neck round to one side, weighted towards the shoulder
+                # where the leverage on the head is, while `neck_03` turns back the other way so
+                # the animal is still looking at what it is about to take. That is the heron's
+                # windup and the plesiosaur's, and it is what a snatch is.
+                #
+                # The cock is spent by u = 0.40 and the close happens at 0.5, so the neck is
+                # straight at the blow without anything having to undo it; the drive only carries
+                # it a little past centre as a follow-through.
                 if n.startswith('neck') or n == 'skull':
-                    z += .34 * cock * (1 if i % 2 == 0 else -.6) * strike
-                    z -= .26 * drive * strike
+                    coil = (-.45, .70, .95, 1.0)[i] if i < 4 else 0.
+                    z += .24 * cock * coil * strike
+                    z -= .08 * drive * coil * strike
             if clip == 'Dodge':
                 z += .18 * e * sin(i * .55 + .6)
             if clip == 'Grab':
@@ -761,9 +817,17 @@ for clip, duration in CLIPS.items():
                 # the head goes up for the blow, which is what this animal's whole depth economy is
                 q.rotation_euler.x = -.16 * (e if clip == 'Breath' else .5 + .5 * sin(p))
         if clip in ('Attack', 'Heavy'):
-            pb['skull'].rotation_euler.x += (-.16 * cock + .24 * drive) * strike
+            # The head's own dip rides the carry, so the reach and the pitch are one movement
+            # rather than two bursts half a clip apart (Aphaneramma's lesson, same batch).
+            # And the **nose-down pitch is the other half of the same fault**. At .14 on each of
+            # four cervicals plus .24 on the skull, scaled by `Heavy`'s 1.6, the drive bent the
+            # neck 51 degrees downward and put the head 73 degrees nose-down: that swings a snout
+            # standing 1.66 units out from the shoulder through 0.61 of a unit *backwards*, which
+            # is 12 % of a body and ate the whole dart on its own. The head drops onto the prey by
+            # about a quarter of a turn in total now, which is a strike rather than a nod.
+            pb['skull'].rotation_euler.x += (-.16 * cock + .16 * carry) * strike
             for n in ('neck_00', 'neck_01', 'neck_02', 'neck_03'):
-                pb[n].rotation_euler.x += (-.10 * cock + .14 * drive) * strike
+                pb[n].rotation_euler.x += (-.10 * cock + .04 * carry) * strike
         if clip == 'Eat':
             pb['skull'].rotation_euler.z += .12 * sin(p * 2)
             pb['neck_03'].rotation_euler.x += -.10 * sin(p * 2)
@@ -837,6 +901,11 @@ for clip, duration in CLIPS.items():
                 pb[names[j]].rotation_euler.y = share * up.rotation_euler.y + s * lagshare * reach * lag
                 pb[names[j]].rotation_euler.x = feather * up.rotation_euler.x
 
+        if clip in STRIKE_CLIPS:
+            d = attack_anchor_now() - ATTACK_REST
+            reach_track.setdefault(clip, []).append({
+                'u': round(u, 4), 'forward': d.dot(FORWARD) / BODY_LENGTH,
+                'lateral': abs(d.x) / BODY_LENGTH, 'lunge': -body.location.y / BODY_LENGTH})
         state = np.array([tuple(q.rotation_euler) + tuple(q.location) for q in pb])
         if f == 0:
             first = state.copy()
@@ -863,6 +932,33 @@ for clip, duration in CLIPS.items():
 
 for c in LOOPS:
     assert seams[c] < 1e-6, (c, seams[c])
+
+# **The snatch reaches, and it does not spend its windup going the other way.** The floors are
+# T3D-23's (Phragmoteuthis, the worked example, asserts +0.12 and -0.04; this neck gathers into a
+# deep S first, which costs a little axially, so -0.06 is the bar and is measured rather than
+# guessed). `forwardAtPhase > rearBackAtPhase` is the shape of the thing: gather, then reach.
+ATTACK_REACH = {}
+for c in STRIKE_CLIPS:
+    rows = reach_track[c]
+    fwd = max(rows, key=lambda r: r['forward'])
+    back = min(rows, key=lambda r: r['forward'])
+    ATTACK_REACH[c] = {
+        'axis': 'the rig\'s own forward (-Y here, +Z in the packaged file), in bodies',
+        'anchorForwardOverL': round(fwd['forward'], 4), 'forwardAtPhase': fwd['u'],
+        'anchorRearBackOverL': round(back['forward'], 4), 'rearBackAtPhase': back['u'],
+        'anchorLateralOverL': round(max(r['lateral'] for r in rows), 4),
+        'bodyLungeOverL': round(max(r['lunge'] for r in rows), 4),
+        'anchorMinThroughTheCloseOverL': round(min(r['forward'] for r in rows if .40 < r['u'] < .70), 4),
+        'trace': [[r['u'], round(r['forward'], 3)] for r in rows[::max(1, len(rows) // 12)]],
+    }
+    assert ATTACK_REACH[c]['anchorForwardOverL'] >= .10, ('the strike does not reach in ' + c, ATTACK_REACH[c])
+    assert ATTACK_REACH[c]['anchorRearBackOverL'] >= -.06, ('the gather goes too far back in ' + c, ATTACK_REACH[c])
+    assert ATTACK_REACH[c]['forwardAtPhase'] > ATTACK_REACH[c]['rearBackAtPhase'], \
+        ('the gather must come first in ' + c, ATTACK_REACH[c])
+assert ATTACK_REACH['Heavy']['anchorForwardOverL'] > ATTACK_REACH['Attack']['anchorForwardOverL'], \
+    ('the snatch must reach further than the bite', ATTACK_REACH)
+print('RHAETICOSAURUS_REACH', json.dumps({c: {k: v for k, v in r.items() if k != 'trace'}
+                                          for c, r in ATTACK_REACH.items()}))
 
 # --- the swept angle at each limb root, measured from the limb's own direction.
 # **Not read off an Euler channel.** A rotation written on one axis can be a stroke on one body and
@@ -996,6 +1092,7 @@ report = {
     'bones': len(B), 'boneNames': list(B),
     'poseDeviation': POSE_DEVIATION, 'limbAsymmetry': LIMB_ASYMMETRY,
     'limbSweepDegrees': limb_sweep,
+    'attackReach': ATTACK_REACH,
     'limbSweepMethod': 'the largest angle between any two directions the limb points over the '
                        'cycle, taken from the root joint to the tip joint in world space',
     'gapeMaximaRadians': {c: max(v) for c, v in gape_trace.items()},

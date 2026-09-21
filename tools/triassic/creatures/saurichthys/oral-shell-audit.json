@@ -5,7 +5,7 @@
   "models": [
     {
       "variant": "authored",
-      "sha256": "30f85d7010132839cd18f4db858949398a8b730551b19a6db1f05c28d3241dcc",
+      "sha256": "962648e80f26813f1afce6809946e0cce621f7e2d4724785c80c42ae997f4be1",
       "meshes": [
         {
           "name": "Mouth lining",
@@ -24,10 +24,10 @@
     },
     {
       "variant": ".puppet",
-      "sha256": "6586493b2676765cdd01cd1b20fb45a3c3f2caa606d482335164008b64b8fbb3",
+      "sha256": "40dc4c748e933908b23c14a968cdb97402311695766ca7de59b864cd96eac0ef",
       "meshes": [
         {
-          "name": "Mouth lining",
+          "name": "Mouth lining twin",
           "vertices": 336,
           "triangles": {
             "skull": 332,
@@ -43,10 +43,10 @@
     },
     {
       "variant": ".lod1",
-      "sha256": "6586493b2676765cdd01cd1b20fb45a3c3f2caa606d482335164008b64b8fbb3",
+      "sha256": "40dc4c748e933908b23c14a968cdb97402311695766ca7de59b864cd96eac0ef",
       "meshes": [
         {
-          "name": "Mouth lining",
+          "name": "Mouth lining twin",
           "vertices": 336,
           "triangles": {
             "skull": 332,

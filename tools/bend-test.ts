@@ -16,13 +16,14 @@
 import assert from 'node:assert/strict';
 import {
   DEFAULT_REACH, DEFAULT_WINDOW, MIN_SPAN, angleBetween, angleOf, bendBasis, bendRotation, boneStation,
-  chainPath, describeReadingText, exportDoc, flipForward, fromExport, headFractionAt, isIdentity, jointTurns,
+  chainPath, describeReadingText, exportDoc, flipForward, forwardEarned, fromExport, headFractionAt, isIdentity, jointTurns,
   measureBend, moveEnd, normalWarp, pinch, readBend, readBones, readGeometry, refLabel, refMoves,
   reguessRefs, reseat, resetTurn, rotateAbout, seat, seatPlanes, seatPlanesFromBones, setAxis, setChain,
   setEnd, setPlaneNormal, setReach, setRef, setWindow, spanDirection, spanLength, straighten, toBlender,
   totalTurn, traceCentreline, traces, turnAt, twistAngle, warp, warpBones,
   type BendDoc, type BoneNode, type Vec3,
 } from '../src/viewer/bend/bend';
+import { buttonRoles, schemeIsUsable } from '../src/viewer/pointer-scheme';
 import { History } from '../src/viewer/sculpt/history';
 
 let passes = 0;
@@ -85,6 +86,15 @@ const bones: BoneNode[] = [
 
 const guessed = measureBend({ chunks }, meta);
 ok(guessed.frame.axis === 'z' && guessed.frame.forward === 1 && guessed.frameSource === 'bounds', 'with nothing better the frame is the box, and says so');
+// **The box picks the axis and cannot pick the end**, and saying otherwise cost a real reviewer a
+// real export: Askeptosaurus' published original pose carries no rig and so no mouth socket, and
+// there is no authored yaw for it either, so the panel said "the head is at the high end" of z
+// while the snout sat at z 0.038 and the shoulders at 0.277 — and both head fractions in the file
+// that came out are measured from the tail. Nothing may state that direction as a finding when
+// nothing found it.
+ok(!forwardEarned(guessed), 'the box has not earned which end is the head, and the document says so');
+ok(forwardEarned(measureBend({ chunks, mouth }, meta)) && forwardEarned(measureBend({ chunks, yaw: 180 }, meta)),
+  'a socket or an authored yaw does earn it');
 ok(guessed.vertices === chunks[0].length / 3, 'every vertex is counted, for a consumer to check against');
 near(guessed.bounds.length, 7, 1e-6, 'the body is as long as it is');
 ok(!guessed.rigged && guessed.bones.length === 0 && guessed.refs === null, 'a body with no rig has no chain and no bone reading');
@@ -421,6 +431,19 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
   // published copy of the generation the builder reads, so an edit to it would edit a copy.
   ok(exportDoc({ ...doc, rigged: false }, { sha256: null, sha256Source: null, appliesTo: 'origpose', note: '', authoredAt: '', readings, pinch: 1, traceResidual: { base: null, tip: null } }).use === 'builder-measurement',
     'and the untouched original pose is a measurement for the builder rather than a mesh edit');
+  // **The file must not claim a head end it has not earned either.** This document's frame came
+  // from a mouth socket, so it has; the one taken off a box has not, and both the flag and the note
+  // have to say which, because `span.baseHeadFraction` and every other "back from the nose" figure
+  // in the file invert with it while the bend itself does not.
+  ok(file.frame.forwardEarned === true && !/ASSUMED/.test(file.frame.note),
+    'a frame read off a socket states the head end plainly');
+  const boxed = exportDoc({ ...doc, frameSource: 'bounds' }, {
+    sha256: null, sha256Source: null, appliesTo: 'generation', note: '', authoredAt: '',
+    readings, pinch: 1, traceResidual: { base: null, tip: null },
+  });
+  ok(boxed.frame.forwardEarned === false && /ASSUMED/.test(boxed.frame.note)
+    && boxed.frame.note.includes('baseHeadFraction'),
+    'and one taken off the box says the head end is assumed, and which readings turn round with it');
   nearV(file.span.base, doc.base, 1e-5, 'the span is written out as its two points');
   nearV(file.span.direction, spanDirection(doc), 1e-5, 'with the direction they imply');
   nearV(file.planes.baseNormal, doc.baseNormal, 1e-5, 'both planes are in it, as the directions they are');
@@ -527,6 +550,17 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
   ok(t.count > 0 && t.residual < .02, 'with a count and its own opinion of how straight it was');
   ok(traceCentreline(chunks, { bounds: { length: 7, height: 2, width: 2, axisMin: -4, axisMax: 3, lateralMid: 0, upMid: 0 }, reach: DEFAULT_REACH }, [0, 40, 0], [0, 0, 1], 1.5) === null,
     'and nothing at all where there is no body');
+}
+
+// ---- the pointer scheme the mode runs under ----
+// Bend mode's handles take the left button only where the pointer is on one, so the stage keeps the
+// view scheme — left orbits, right pans. The pan is the point: the old editor scheme bound none at
+// all, so a zoomed-in neck could not be brought into the middle of the view.
+{
+  const r = buttonRoles('view');
+  ok(r.left === 'rotate' && r.right === 'pan' && r.middle === 'dolly', 'bend mode runs on the view scheme');
+  ok(schemeIsUsable('view'), 'which binds a rotate and a pan, to one button each');
+  ok(buttonRoles('paint').left === null, 'and is not the paint scheme, whose left button is the brush\'s');
 }
 
 console.log(`bend: ${passes} checks passed`);

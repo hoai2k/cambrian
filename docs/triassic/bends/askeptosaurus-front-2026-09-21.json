@@ -1,0 +1,229 @@
+{
+  "schema": "bend-span/2",
+  "id": "askeptosaurus",
+  "model": "assets/triassic/creatures/askeptosaurus.origpose.glb",
+  "sha256": "8348549043848ee2c71f109968b41a1d4f7fd3215cd1b65a916c32bad71f9a2c",
+  "sha256Source": "measured",
+  "appliesTo": "origpose",
+  "use": "builder-measurement",
+  "authoredAt": "2026-09-21T20:22:48.005Z",
+  "note": "",
+  "creature": {
+    "key": "triassic:askeptosaurus",
+    "id": "askeptosaurus",
+    "collection": "triassic",
+    "vertices": 11128,
+    "rigged": false
+  },
+  "frame": {
+    "axis": "z",
+    "forward": 1,
+    "up": "y",
+    "source": "bounds",
+    "note": "Model root frame, unscaled: the file's own coordinates with the scene graph flattened. The body runs along z; the head is at the high end. The span does not have to follow that axis — it is two points on the animal — but \"up\", \"lateral\" and \"how far back from the nose\" are measured in this frame."
+  },
+  "span": {
+    "base": [
+      0.174489,
+      -0.015439,
+      0.277412
+    ],
+    "tip": [
+      0.337587,
+      0.010657,
+      0.038481
+    ],
+    "baseSource": "manual",
+    "tipSource": "manual",
+    "baseHeadFraction": 0.2226,
+    "tipHeadFraction": 0.4615,
+    "direction": [
+      0.561507,
+      0.089844,
+      -0.82258
+    ],
+    "length": 0.290466,
+    "percentOfBody": 29.05,
+    "note": "Two points on the body. Both cuts are square to the line between them, that line is the span's direction, and its length is the distance between them. The bend is anchored at `base`, and both points are where the geometry reading's traces start. \"trace\" is the automatic seat — the body's own centre near where the end was asked for — and \"manual\" is a reviewer who put it there by hand."
+  },
+  "planes": {
+    "baseNormal": [
+      0.985517,
+      -0.108359,
+      0.130442
+    ],
+    "baseNormalBlenderZUp": [
+      0.985517,
+      -0.130442,
+      -0.108359
+    ],
+    "baseSource": "manual",
+    "tipRest": [
+      0.504285,
+      0.043729,
+      -0.862429
+    ],
+    "tipNormal": [
+      -0.053105,
+      0.065545,
+      -0.996436
+    ],
+    "tipNormalBlenderZUp": [
+      -0.053105,
+      0.996436,
+      0.065545
+    ],
+    "tipSource": "manual",
+    "apartDegrees": 100.919,
+    "apartBeforeDegrees": 67.682,
+    "note": "Two planes, one at each end of the span, each named by the direction the creature’s axis line runs through it. baseNormal is where it runs in and is a pure reference — nothing behind the base cut moves under any bend. tipRest is where it ran out when the plane was seated on the body, measured rather than chosen; tipNormal is where it is to run out. apartDegrees is how far the two planes are aimed apart now and apartBeforeDegrees how far they were before the bend, so a zero in the first and the animal’s own curve in the second is a run that has been straightened."
+  },
+  "axis": {
+    "vector": [
+      0.023571,
+      0.997648,
+      0.064368
+    ],
+    "vectorBlenderZUp": [
+      0.023571,
+      -0.064368,
+      0.997648
+    ],
+    "up": [
+      -0.82746,
+      0.055602,
+      -0.558765
+    ],
+    "twistDegrees": 2.861,
+    "note": "The axle the span turns about, through span.base: the shortest rotation carrying planes.tipRest onto planes.tipNormal, so it is derived from the two planes rather than dialled. A positive turn carries the body towards axis.up. twistDegrees is how far it leans along the span, which is the share of an oblique aim that is a twist of the span about its own length rather than a bend; it is reported rather than clamped, because clamping it would mean the turn no longer carried the tip plane where it was aimed. vectorBlenderZUp is the same direction in a Z-up armature frame ([x, −z, y])."
+  },
+  "turn": {
+    "totalDegrees": 33.338,
+    "note": "The whole the span turns through: the angle between planes.tipRest and planes.tipNormal, spread linearly across the span so the rotation at the base cut is exactly identity and there is no kink there. It is never negative — which way the body goes is carried by axis.vector."
+  },
+  "reading": {
+    "window": 0.12,
+    "reach": 0.05,
+    "windowNote": "The geometry reading traces the body's own centre outward from each end of the span, over 12% of the body, following the body rather than a coordinate: each step takes only what is within 5% of the body of where the trace stood one step back, so a limb that reaches past the head is left behind rather than averaged into it.",
+    "geometry": {
+      "baseReference": "the body's traced centre over the 12% behind the base cut",
+      "tipReference": "the body's traced centre over the 12% ahead of the tip cut",
+      "baseResidual": 0.0428,
+      "tipResidual": 0.0302,
+      "residualNote": "How far each trace sits off its own fitted line, over that run's length. A run of body is nearly a line, so a small figure means the trace followed one thing; past about 0.05 it wandered, and the angle it reports is between two directions nothing in the animal actually runs in.",
+      "before": {
+        "base": [
+          0.986778,
+          0.143483,
+          -0.075374
+        ],
+        "tip": [
+          0.504285,
+          0.043729,
+          -0.862429
+        ],
+        "inPlaneDegrees": 54.797,
+        "offPlaneDegrees": 9.297,
+        "totalDegrees": 55.327
+      },
+      "after": {
+        "base": [
+          0.98703,
+          0.143192,
+          -0.072576
+        ],
+        "tip": [
+          -0.051622,
+          0.083826,
+          -0.995142
+        ],
+        "inPlaneDegrees": 88.24,
+        "offPlaneDegrees": 8.239,
+        "totalDegrees": 88.093
+      }
+    },
+    "bones": null,
+    "note": "Every angle is measured between two named references and nothing else. inPlaneDegrees is the part of the turn the bend axis accounts for and is what an edit changes; offPlaneDegrees is what the plane does not hold, and a large one means the axis is aimed wrong rather than that the bend is small. A reference that moves with the bend sits inside the span, so \"after\" less \"before\" is not turn.totalDegrees — and is larger than it where that reference sits well off the span's own line."
+  },
+  "joints": [],
+  "jointsNote": "The joints of the chain that lie inside the span, plus the first one past it, in chain order. `local` is the step from the joint above it, which is what a pose bone's own rotation is; `accumulated` is the rotation at that joint's station, which is the product down the chain. Both are about axis.vectorBlenderZUp in an armature whose bones share one rest orientation. This is the shape `uncurl` returns and `carry_rest` consumes in tools/triassic/creatures/askeptosaurus/build.py.",
+  "pinch": {
+    "worst": -0.633,
+    "note": "The smallest the inside of the bend is squeezed to, as a fraction of its own length. 1 is no squeeze; below 0 the turn is tighter than the body is thick and the surface has folded through itself."
+  },
+  "rule": "A vertex at fraction s through the span (its distance from span.base along span.direction, over span.length) is carried to the bent centreline at s and turned about axis.vector by turn.totalDegrees·s. Behind the base cut s is 0 and nothing moves; past the tip cut s is 1 and the far part is carried rigidly. See docs/viewer-bend.md.",
+  "bend": {
+    "version": 1,
+    "key": "triassic:askeptosaurus",
+    "id": "askeptosaurus",
+    "collection": "triassic",
+    "model": "assets/triassic/creatures/askeptosaurus.origpose.glb",
+    "frame": {
+      "axis": "z",
+      "forward": 1,
+      "up": "y"
+    },
+    "frameSource": "bounds",
+    "vertices": 11128,
+    "rigged": false,
+    "bones": [],
+    "box": {
+      "lo": [
+        -0.4299479126930237,
+        -0.19996263086795807,
+        -0.5
+      ],
+      "hi": [
+        0.4299479126930237,
+        0.19996263086795807,
+        0.5
+      ]
+    },
+    "bounds": {
+      "length": 1,
+      "height": 0.39992526173591614,
+      "width": 0.8598958253860474,
+      "axisMin": -0.5,
+      "axisMax": 0.5,
+      "lateralMid": 0,
+      "upMid": 0
+    },
+    "base": [
+      0.1744887525118597,
+      -0.015439401401207139,
+      0.2774123439699064
+    ],
+    "tip": [
+      0.3375872726946974,
+      0.010657264966427382,
+      0.03848125637822666
+    ],
+    "baseSource": "manual",
+    "tipSource": "manual",
+    "baseNormal": [
+      0.9855166636228194,
+      -0.10835940374100887,
+      0.13044211491171
+    ],
+    "tipRest": [
+      0.5042850566884782,
+      0.04372940154040789,
+      -0.8624293136493079
+    ],
+    "tipNormal": [
+      -0.05310512788769164,
+      0.06554479698170708,
+      -0.9964355096947614
+    ],
+    "planeSource": {
+      "base": "manual",
+      "tip": "manual"
+    },
+    "window": 0.12,
+    "reach": 0.05,
+    "chain": null,
+    "refs": null,
+    "chainSource": "auto",
+    "refsSource": "auto"
+  }
+}

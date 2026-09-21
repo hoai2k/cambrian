@@ -15,6 +15,13 @@
  * It also checks the split with sculpt from the outside: a generated body offers Stretch and not
  * Edit sculpt, because a sculpt exported off a body with no rig would name a model nobody ships.
  *
+ * It also takes the mode's **own Model control** both ways — the info card's is off the screen
+ * while any editor is open, and `opening()` sends a stretch to the raw generation, so without one
+ * the documented rigged-body workflow (the rig held at rest, the export a measurement for the
+ * builder) could not be reached at all. What has to hold across the swap is that the panel keeps
+ * telling the truth about which body it is describing, since a stretch exported off the wrong one
+ * would name a model nobody ships.
+ *
  * Then a second pass on a *built* body, which is a different contract: the drawings must be framed
  * from the body's own mouth socket rather than from its bounding box, and the export must say it
  * is a measurement for a builder rather than something the bake can apply.
@@ -119,9 +126,50 @@ try {
   assert.equal(payload.direction.tiltTopDegrees, 0, 'and that the other view was left square');
   assert.ok(payload.creature.vertices > 1000, 'and the mesh it was measured on');
 
-  // ---- undo, and back ----
+  // ---- undo ----
   await page.keyboard.press('Control+z'); await page.waitForTimeout(300);
   assert.match(await page.locator('.stretch-slider output').textContent(), /^1\.00/, 'Ctrl+Z takes the stretch back off');
+
+  // ---- the mode is not a cage: its own Model control, and the panel follows the body ----
+  //
+  // `opening()` sends a stretch to the raw generation where the animal has one, which is right —
+  // that is the body the bake applies to. But the stretcher means something else on a rigged body,
+  // and that something is documented: the rig is held at rest and the export is a *measurement*
+  // for the builder, because a warped bind pose shows at rest and then flails once a clip plays.
+  // Unreachable, that is a workflow nobody can use. The info card carries the Model control and an
+  // editing mode replaces it, so the mode carries its own.
+  //
+  // Driven both ways, because the thing that has to hold is that **the panel keeps telling the
+  // truth about which body it is describing**: `rigged` is measured off the body on stage, and a
+  // stretch exported against the wrong one would name a model nobody ships.
+  const stretchModel = page.locator('.stretch-model-pick select');
+  assert.equal(await stretchModel.count(), 1, 'the stretch panel carries its own Model control');
+  const footNote = () => page.locator('.sculpt-foot .hint').last().textContent();
+  assert.match(await footNote(), /measurement to take to the builder/i, 'on the built body the panel says the export is a measurement');
+  await stretchModel.selectOption('origpose');
+  // The editor is unmounted while the new body loads — `ready` means the body on stage IS the body
+  // the panel describes — so wait for the file and then for the panel to come back on it.
+  await page.waitForFunction(() => /origpose\.glb$/.test(document.querySelector('.clips')?.getAttribute('data-loaded-model') ?? ''), null, { timeout: 90000 });
+  await page.waitForSelector('.stretch-panel', { timeout: 60000 });
+  await page.waitForTimeout(1500);
+  assert.match(await footNote(), /baked into the GLB/i, 'the swap re-measures: on a body with no rig the export is something the bake can apply');
+  const rawDownload = page.waitForEvent('download');
+  await page.getByRole('button', { name: /^Export stretch/ }).click();
+  const rawFile = path.join(out, 'stretch-export-origpose.json');
+  await (await rawDownload).saveAs(rawFile);
+  const rawPayload = JSON.parse(fs.readFileSync(rawFile, 'utf8'));
+  assert.equal(rawPayload.creature.rigged, false, 'and the file says which body it was measured on');
+  assert.match(rawPayload.creature.model, /origpose\.glb$/, 'by name');
+  assert.notEqual(rawPayload.appliesTo, 'builder', 'with what it applies to following the body rather than the animal');
+  // Back again, which is the other half of the guard: the numbers must follow the body in both
+  // directions, not merely change once.
+  await page.locator('.stretch-model-pick select').selectOption('full');
+  await page.waitForFunction(() => /dinocephalosaurus\.glb$/.test(document.querySelector('.clips')?.getAttribute('data-loaded-model') ?? ''), null, { timeout: 90000 });
+  await page.waitForSelector('.stretch-panel', { timeout: 60000 });
+  await page.waitForTimeout(1500);
+  assert.match(await footNote(), /measurement to take to the builder/i, 'and the control goes both ways');
+
+  // ---- and back to the view ----
   await page.getByRole('button', { name: 'Back to view' }).click();
   await page.waitForTimeout(500);
   assert.equal(new URL(page.url()).searchParams.get('mode'), null, 'leaving stretch mode clears it from the URL');
@@ -160,6 +208,7 @@ try {
 
   assert.deepEqual(errors, [], 'no page errors');
   console.log('PASS: stretch mode — two cuts on both views, one shared direction, the slider, the export and undo;');
+  console.log('      the panel\'s own Model control taken both ways, with what the export applies to following the body;');
   console.log('      a built body framed from its mouth socket, re-framed by hand, exported as a builder measurement');
 } finally {
   await browser.close();

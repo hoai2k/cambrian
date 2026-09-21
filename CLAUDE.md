@@ -930,7 +930,7 @@ unless the user explicitly asks for a PR. Steps:
   Rhaeticosaurus 2.81x, Nothosaurus 2.99x, Tanystropheus 3.00x, Macrocnemus 3.41x, Birgeria 3.46x,
   Hupehsuchus 3.47x, Saurichthys 3.61x, Mixosaurus 3.62x, Cartorhynchus 3.72x, Archelon 3.86x,
   Atopodentatus 3.90x, Helicoprion 4.21x, Aphaneramma 4.43x, Mystriosuchus 4.48x, Henodus 4.81x,
-  Askeptosaurus 1.37x (the promoted posed generation; the straight regeneration it replaced reads 1.31x as the backup), Odontochelys 5.12x, Hybodus 5.93x (its opercular crack), Dinocephalosaurus 7.00x, Coelophysis 7.74x
+  Askeptosaurus 1.36x (the promoted posed generation; the straight regeneration it replaced reads 1.31x as the backup), Odontochelys 5.12x, Hybodus 5.93x (its opercular crack), Dinocephalosaurus 7.00x, Coelophysis 7.74x
   (SnapRight, skull/neck), Ceratites 7.73x, Placodus 12.36x. Placodus is the outstanding repair work:
   Coelophysis came down from 25.25x, Macrocnemus from 23.31x, Helicoprion from 14.33x, Tanystropheus
   from 6.09x and Cartorhynchus from 5.17x. `docs/triassic/jaw-skinning.md` is the per-body record of
@@ -1112,6 +1112,29 @@ unless the user explicitly asks for a PR. Steps:
   is what a quarter of a degree of yaw looks like in a file nobody was measuring. Record the
   **held shape** per clip beside it, and assert the clips' holds are actually different from each
   other, or a table of per-clip poses is a claim rather than a fact.
+- **"In line with the body" is a reference, and on a long-tailed animal the obvious references are
+  all wrong.** Askeptosaurus' head was brought onto the trunk and *landed* on it — 4.2° off the
+  hip-to-shoulder chord, a number nobody could argue with — and the animal still read as turned from
+  directly above, because that chord runs between two joints inside the front half of a body that is
+  two thirds tail. Measured on the shipped body, the same head stood 4.2° off that chord, 16.5° off
+  `body`→`chest`, 16.8° off mid-tail→shoulder and **30.6°** off the tail's own run to the shoulder:
+  one trunk, four defensible readings, 31° apart at the extremes, and the one the *picture* uses is
+  the longest, because that is the line the animal draws on the page. So the aim is a **human's**,
+  taken from a bend-editor export (`docs/triassic/bends/`) rather than from a chord, and the builder
+  applies the reviewer's rotation to *its own* head direction so the two never have to agree about
+  where the head points — only about how far it has to turn, which they do to half a degree (33.3
+  against 33.9). Two things make that safe to do. A direction handed in from outside is in the
+  *file's* frame and neither `T.measure_frame` nor a builder's own reframing returns the map it
+  rewrote every vertex with, so **fit it** (Kabsch, index to index, residual asserted — 8e-8 here)
+  rather than reconstructing it from what those functions record. And the acceptance test is the
+  **plan render**, not the angle: `plan-view.py`/`plan-sheet.py` shoot the body from directly above
+  and print the head against every reading there is, `carry.planViewReadings` regenerates that table
+  on every build, and `motion` carries the head against the new aim *beside* the old chord figure so
+  every earlier verdict stays comparable. A longer arc is not automatically a worse skin: shared
+  equally over six joints it read 1.40x, and sweeping the share's own curve (`aimcurve`, six
+  rebuilds) to take load off the shoulder — where a narrow neck meets a wide trunk, and where this
+  body's worst edge has always been — brought it to **1.36x**, better than the 1.37x the shorter
+  correction shipped at.
 - Devonian specimens land in batches (`tools/devonian/shipped.json`). When one lands: run
   `node tools/update-asset-sizes.mjs` (refreshes `src/content/devonian/asset-sizes.json`), remove its
   entry from `DEVONIAN_STAND_INS` in `src/content/devonian/index.ts`, and run `npm run devonian`.
@@ -1489,7 +1512,8 @@ unless the user explicitly asks for a PR. Steps:
   to geometry that is welded to the body and should not be there — the extra fins and spare tails on
   the raw generated meshes, where 19 of the 21 bodies are one connected surface and only a human can
   say which fin is wanted (`docs/triassic/preview-mesh-defects.md`). Left-drag paints a world-space
-  brush over the vertices and right-drag orbits; *Export region* writes `<id>-region.json`: vertex
+  brush over the vertices, right-drag orbits and middle-drag pans (`npm run mark`'s `paint` scheme —
+  see the pointer bullet below); *Export region* writes `<id>-region.json`: vertex
   indices into one exact file, with that file's sha256 and the box the marked vertices occupy, so
   `tools/triassic/cut-region.py` can refuse a region marked on a mesh that has since changed rather
   than delete geometry at random. It marks on **whatever body is on stage**, the generated mesh
@@ -1515,10 +1539,33 @@ unless the user explicitly asks for a PR. Steps:
   because every clip these files carry re-specifies each joint's translation on every frame — a
   warped bind pose would show at rest and then flail — so the numbers go to the animal's builder,
   where the rig and the clips are generated downstream of the mesh and follow it by themselves.
+  **And that half has to be reachable.** `opening()` sends a stretch to the raw generation, which
+  is right — that is the body the bake applies to — but the Model control that would reach the
+  rigged one lives on the info card, which every editing mode replaces, so the documented
+  builder-measurement workflow could not be opened at all. The stretch panel carries its own
+  (`.stretch-model-pick`, the same shape bend's does), offering what the mode can actually be
+  opened on (`editableStages` in `Viewer.tsx`: never the comparison twin, and on an animal whose
+  body is not built only the raw generation), because a choice that quietly ends the mode — or
+  leaves it on screen with no panel in it — is worse than no choice. The panel keeps telling the
+  truth across a swap for free: `rigged` is *measured off the body on stage* and `appliesTo` is
+  derived from it, and the editor is unmounted while a body it does not yet have is loading. The
+  session store is keyed by specimen **and body** (`stretchKey`) for the reason the mark, mouth and
+  bend stores are: one key per specimen was harmless only while the mode could not change bodies,
+  and would now throw the other body's stretch away on a swap.
   Which way a body lies is never taken from its bounding box if anything better exists: the mouth
   socket, then the generation's authored `previewYaw`, then the box, and the panel says which and
   lets a human override it — because Rhaeticosaurus' flippers span further than it is long, so its
-  box says the animal runs across itself. `npm run stretch` and
+  box says the animal runs across itself. **And the box picks the axis and cannot pick the end**:
+  with no socket to read a sign off, `frameFor` returns "the head is at the high end" as a
+  *default*, so half of a `bounds` frame is arrived at and half is assumed. The bend editor now says
+  which (`forwardEarned`, simply `frameSource !== 'bounds'`): an amber question over the flip button,
+  `ASSUMED` in the export's own `frame.note`, and the note names what turns round with it — every
+  "back from the nose" reading, `baseHeadFraction` included, while the bend itself does not, being a
+  turn about an axle through `span.base` that names no end. It has already cost an export.
+  Askeptosaurus' published original pose has no rig and so no `anchor_mouth`, and
+  `preview-orientation.json`'s yaw table is *empty*, so the box was all there was: its snout sits at
+  z 0.038 and its shoulders at 0.277, the panel said high z, and both head fractions in that file
+  are measured from the tail. `npm run stretch` and
   `node tools/stretch-browser.mjs` check it; `npm run triassic:stretch -- <file> --write` bakes a
   *generation's* stretch into `tools/triassic/creatures/<id>/<id>.preview.glb` (never into
   `tripo-raw/`, and it refuses a rigged body by name), importing the viewer's own `warp()` so the
@@ -1593,7 +1640,37 @@ unless the user explicitly asks for a PR. Steps:
   table of local rotations in chain order** — which is exactly what `uncurl` returns and `carry_rest`
   consumes in that animal's builder. It is `bend-span/2`, and a `bend-span/1` file is refused by
   name rather than half-read: it carries turn rates and a plane roll, which no longer describe a
-  bend at all. `npm run bend` and `node tools/bend-browser.mjs` check it,
+  bend at all. **Bend mode opens on the body a bend is aimed on** — the original pose where the
+  specimen publishes one, else the raw generation (`opening()` in `Viewer.tsx`, the Bend button and
+  a `?mode=bend` link alike) — because on an animal whose builder carried a correction into the
+  bind there is nothing left to aim on the shipped one. Two things follow and both were found by
+  running the drive. The button changes the **mode and the model in one commit**, and a child's
+  effects run before its parent's, so the editor mounted while the scene still held the *previous*
+  body, measured that, and cached those numbers under the new body's key where nothing re-measured
+  them: the panel said `origpose` over the built body's angles. `ViewerScene.loadedModel()` answers
+  what is actually on stage, synchronously, and `ready` in `Viewer.tsx` now means *the body on
+  stage is the body this UI describes* rather than "the last load finished" — which is the invariant
+  the whole swap path rests on, so an editor is simply unmounted while a body it does not yet have
+  is loading. And **opening on the unbent body must not be a cage**: what the redirect locked away
+  was the mode's headline — the two readings side by side, the per-joint table and the
+  corrected-body warning, all of which need a rig — so a warning written to say "this body's rest
+  already carries one" could never be shown to the person it was about. The bend panel therefore
+  carries **its own Model control** (`.bend-model-pick`), because the info card's is off the screen
+  while any editor is open. It offers `editableStages` — `canBend`/`canStretch`'s own test asked of
+  each body rather than of the one on stage, so never the twin and, on an animal whose body is not
+  built, only the raw generation — and the panel goes on telling the truth for free: the editor is
+  keyed by the model, and
+  `appliesTo`, the stage label and the corrected-body warning are all derived from the stage.
+  `tools/bend-browser.mjs` takes that control **both ways** and uses it as the regression guard for
+  the one-commit swap, because a bone-chain reading is impossible on an unrigged body and
+  unavoidable on a rigged one: its appearing on the way in and going away on the way out is proof
+  the panel re-measured rather than keeping the numbers it had.
+  The per-joint table's local steps add up to the whole turn only where the chain carries the
+  *whole span* — the turn is spread along the span, so any part of it with no joint under it is a
+  share the bone table honestly cannot account for (four joints, 54° of an 83° turn on Mixosaurus,
+  which is the drive's second animal: it publishes neither an original pose nor a generation, so
+  bend mode opens straight on its built body and reaches the rigged half with no swap at all).
+  `npm run bend` and `node tools/bend-browser.mjs` check it,
   `npm run triassic:bend -- <file>` is the consumer and **re-measures rather than reprinting**,
   failing loudly where it disagrees with what the viewer recorded. There is no bake in either
   direction: a rigged body cannot have one (a bent bind pose flails the moment a clip plays) and a
@@ -1609,8 +1686,9 @@ unless the user explicitly asks for a PR. Steps:
   what stops the cut running back through the neck, and it is also the editor's honest limit — a
   paddle tucked forward under the snout falls inside it, as Aphaneramma's did in a builder's own
   cut, and the count says so rather than the tool hiding it. Three handles on the orbit view
-  (hinge moves the cut in the camera's plane, front aims the line, side tips it), right-drag
-  orbits as in mark mode, every mandible vertex is lit with the same overlay mark mode uses — a
+  (hinge moves the cut in the camera's plane, front aims the line, side tips it) on the ordinary
+  `view` pointer scheme — left-drag orbits off a handle, right-drag pans; see the pointer bullet
+  below — and every mandible vertex is lit with the same overlay mark mode uses: a
   vertex-colour tint was the obvious alternative and would have broken the recolour hook, which
   reads COLOR_0 as its mask. The first guess follows the stretcher's precedence: a rigged body's
   `jaw` bone *is* its hinge and `anchor_mouth` sets the pitch, a socket alone sets the height, a
@@ -1638,6 +1716,32 @@ unless the user explicitly asks for a PR. Steps:
   the four frames a document can be in, so turning about it would have shut the mouth on half the
   bodies — and shut is where the slider starts, so that reads as a control that does nothing rather
   than as a bug.
+- **Which mouse button does what on the viewer's stage is a named scheme, and the three editors
+  differ over buttons rather than over what they edit** (`src/viewer/pointer-scheme.ts`, pure).
+  `view` is the default and is what the **mouth** and **bend** editors use — left-drag orbits,
+  right-drag **pans**, the wheel and the middle button dolly — because their handles claim the left
+  button only while the pointer is actually on one. `paint` is **mark** mode's, whose brush owns the
+  left button outright: the orbit moves to the right button and the pan to the middle one, since
+  the wheel already dollies. The thing that was wrong for months is that the editors ran on one
+  boolean whose "on" state bound `LEFT: null, MIDDLE: DOLLY, RIGHT: ROTATE` — **no pan on any
+  button at all** — so a zoomed-in head could not be brought into the middle of the view, which is
+  exactly what zooming in on a jaw is for.
+  **The orbit is suspended while the pointer is over a handle** (`ViewerScene.setOrbitEnabled`,
+  driven off the hover hit-test the editors already do every `pointermove`), and it has to be done
+  that way round: OrbitControls is constructed with the canvas in `createViewerScene`, long before
+  an editor mounts and registers its own `pointerdown`, and listeners on one target fire in
+  **registration order whatever the capture flag says** — so `stopImmediatePropagation` from an
+  editor arrives after the orbit has already taken the press. Disabling on hover means the press
+  never reaches an enabled orbit. A disable at drag start and a re-enable on `pointerup` (only
+  where the pointer is not *still* on a handle) are the belt-and-braces path for a press that
+  arrives with no move before it, and a change of scheme hands the orbit back enabled so an editor
+  unmounted mid-hover cannot leave the camera dead. `npm run mouth`/`bend`/`mark` hold the schemes;
+  the three browser drives hold the rest, reading the camera through `cameraState()` on
+  `window.__viewerScene` (the viewer's `__cambrian`) because **an orbit and a pan are told apart by
+  what moves** — an orbit swings the position about a fixed target, a pan carries both — and the
+  page draws neither number. Those camera checks run **last** in each drive: OrbitControls' damping
+  unwinds for many frames after a drag, which under the software renderer is several seconds, and
+  anything measured in screen pixels meanwhile is measured on a camera that is still moving.
 - A bare `?debug` on the site root (`/?debug`) opens the index of every one of these tools —
   `src/ancientseas/DebugIndex.tsx`, data in `src/ancientseas/debug-index.ts`, mounted by
   `src/ancientseas/main.tsx` the way `Root.tsx` mounts the state editor. It is the trilogy page's

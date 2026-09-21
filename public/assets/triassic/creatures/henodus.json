@@ -2,7 +2,7 @@
   "id": "henodus",
   "name": "Henodus",
   "species": "Henodus chelyops",
-  "description": "Canonical Tripo body and procedural volume twin on one 25-joint rig: a fused rigid carapace, an articulated beak with a closed oral lining, four rowing limbs and a trailing tail.",
+  "description": "Canonical Tripo body and procedural volume twin on one 25-joint rig: a fused rigid carapace, an articulated beak whose cut is capped with its own rim, four rowing limbs and a trailing tail.",
   "modelLength": 5.0,
   "lengthMeters": 1.0,
   "locomotion": "Swim",

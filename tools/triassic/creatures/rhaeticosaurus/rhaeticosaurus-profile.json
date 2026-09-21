@@ -7,8 +7,8 @@
   "maximumEnvelopeDifferenceFractionOfBodyLength": 0.012399721145629882,
   "surfaceDistanceMax": 0.031030602753162384,
   "surfaceDistanceMaxFractionOfBodyLength": 0.006206120550632477,
-  "surfaceDistanceP95": 0.01662945710122585,
-  "surfaceDistanceP95FractionOfBodyLength": 0.0033258914202451704,
+  "surfaceDistanceP95": 0.01656900430098176,
+  "surfaceDistanceP95FractionOfBodyLength": 0.0033138008601963516,
   "anchorTolerance": 0.1,
   "anchorSurfaceDistances": {
     "anchor_mouth": {

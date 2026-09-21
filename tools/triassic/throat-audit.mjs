@@ -1,6 +1,12 @@
 /** Audit the actual shipped authored/puppet surfaces over every clip, not builder promises.
  * Edge strain is a diagnostic, not proof of intersection-free or watertight geometry.
  * Run: node tools/triassic/throat-audit.mjs [id...] [--out=path]
+ *
+ * **Naming an id narrows the audit but not the file it writes**, so a one-body run overwrites the
+ * whole-roster record at `docs/triassic/throat-audit.json` with a report about one animal — 46,000
+ * lines down to 1,500, silently, because a shorter file is not an error. Pass `--out=` with an id
+ * unless the roster-wide record is what you meant to replace, and re-run with no ids to put it
+ * back.
  */
 import fs from 'node:fs';
 import crypto from 'node:crypto';

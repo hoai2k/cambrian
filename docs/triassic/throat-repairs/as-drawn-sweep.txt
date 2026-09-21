@@ -24,11 +24,14 @@ coelophysis  Bite@0.167 through=1 opened=7189 | SnapRight@0.133 through=3 opened
 cymbospondylus  Heavy@0.5 through=1 opened=894 | Lunge@0.6 through=4 opened=890 | Bite@0.133 through=0 opened=933
 dinocephalosaurus  Heavy@0.5 through=120 opened=197 | NeckStrike@0.567 through=107 opened=171 | Attack@0.367 through=94 opened=153
 helicoprion  Eat@0.333 through=0 opened=0 | Heavy@0.133 through=0 opened=0 | Bite@0.2 through=0 opened=0
-henodus  Bite@0.2 through=407 opened=455 | Heavy@0.133 through=404 opened=462 | Attack@0.1 through=242 opened=302
+henodus  ported by T3D-32B: 0 through and 0 opened at the measured peak of all eight opening clips
+#   was: Bite@0.2 through=407 opened=455 | Heavy@0.133 through=404 opened=462 | Attack@0.1 through=242 opened=302
 hupehsuchus  Ability@0.667 through=4 opened=4784 | Gulp@0.467 through=38 opened=4444 | Heavy@0.467 through=32 opened=4215
 hybodus  Heavy@0.4 through=1346 opened=2833 | Bite@0.133 through=1261 opened=2670 | Attack@0.333 through=875 opened=1985
 keichousaurus  Bite@0.2 through=0 opened=4375 | Heavy@0.133 through=0 opened=4353 | Eat@0.967 through=2 opened=4267
-macrocnemus  Snatch@0.2 through=244 opened=2594 | Bite@0.167 through=343 opened=2307 | Heavy@0.1 through=210 opened=2141
+macrocnemus  ported by T3D-32B: 0 through and 0 opened at the measured peak of all twelve opening clips
+#   was: Snatch@0.2 through=244 opened=2594 | Bite@0.167 through=343 opened=2307 | Heavy@0.1 through=210 opened=2141
+#   and worse than the three the sweep took: Ability@0.4333 through=934 opened=1920
 mixosaurus  Heavy@0.367 through=0 opened=3697 | Bite@0.067 through=0 opened=3337 | Attack@0.267 through=0 opened=2861
 mystriosuchus  Heavy@0.5 through=0 opened=7716 | Ability@0.4 through=1 opened=7734 | Bite@0.1 through=1 opened=7577
 nothosaurus  Heavy@0.133 through=0 opened=0 | Bite@0.2 through=0 opened=0 | Attack@0.1 through=0 opened=0

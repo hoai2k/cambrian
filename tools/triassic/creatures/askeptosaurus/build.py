@@ -43,6 +43,38 @@ STRAIGHT='straight'    # the 19 September 2026 regeneration, drawn and generated
 FRONT=POSED            # <-- the swap is this one line. The other body becomes the backup.
 BACK=STRAIGHT if FRONT==POSED else POSED
 
+# ------------------------------------------------- the reviewer's own aim at the front (T3D-34) ---
+# **A reader aimed this by hand, and the file it was aimed on is part of the measurement.** T3D-26
+# brought the head onto the trunk's hip-to-shoulder chord and the head landed on it to 4.2 degrees
+# -- and the animal still read as turned from directly above, because on a body that is two thirds
+# tail the chord between two joints inside the front half is not what an eye calls "the body's
+# run". The chord is 15 to 31 degrees off every longer reading of the same trunk (`planViewReadings`
+# in `carry`), which is the 43-degree disagreement CLAUDE.md records, met again at the one place it
+# actually shows.
+#
+# So the reference is a human's: two planes aimed in the viewer's bend editor on this animal's
+# published original pose, exported as `bend-span/2`. The document says the head runs along
+# `tipNormal` and the trunk along `baseNormal`, and the correction is the rotation that carries the
+# first onto the second -- **whatever the builder's own reading of either happens to be**, which is
+# the whole point of taking it from a person. It is applied to the builder's own head direction, so
+# nothing here assumes the two agree about where the head points; what they must agree about is how
+# far it has to turn, and that is recorded against both references rather than one.
+AIMED_BEND='docs/triassic/bends/askeptosaurus-front-2026-09-21.json'
+
+def aimed_bend():
+ """Load the reviewer's export and check it is about the file this body is generated from.
+
+ The export names `askeptosaurus.origpose.glb`, which `tools/triassic/base-poses.mjs` publishes as
+ a byte copy of `tripo-raw/askeptosaurus.raw.glb`. Hash that and compare: a measurement is of a
+ file, and an aim taken on a different generation is not an aim at this one.
+ """
+ doc=json.loads((ROOT/AIMED_BEND).read_text())
+ assert doc['schema']=='bend-span/2',doc['schema']
+ assert doc['id']==ID and doc['appliesTo']=='origpose',(doc['id'],doc['appliesTo'])
+ raw=(HERE/'tripo-raw'/(ID+'.raw.glb')).read_bytes()
+ assert hashlib.sha256(raw).hexdigest()==doc['sha256'],'the aimed bend was measured on another file'
+ return doc
+
 def at(P,cum,s):
  s=max(0,min(cum[-1],s));i=min(len(P)-2,max(0,int(np.searchsorted(cum,s))-1));t=(s-cum[i])/max(cum[i+1]-cum[i],1e-8)
  return P[i].lerp(P[i+1],t)
@@ -74,7 +106,7 @@ REST={
   hind=(-.14,.09),
   uncurl=0.,       # nothing to open out: this body was generated straight
   level=0.,carry=0.,
-  aim=0.,fcarry=(0.,0.),  # and nothing to aim: its front already leaves the trunk along the trunk
+  aim=0.,fcarry=(0.,0.),aimcurve=1.,  # and nothing to aim: its front already leaves the trunk along the trunk
   step=.40,        # the wave's phase step -- see below
   vert=.26,        # the dorsoventral share of the lateral wave, a quarter beat behind
   amp={'Idle':.030,'Swim':.097,'Sprint':.142,'Guard':.027,'Eat':.036,'Grab':.034},act=.050),
@@ -109,6 +141,29 @@ REST={
   # for, exactly as the tail's .70 is, so the clips centre on the bind instead of all straightening
   # away from it.
   fcarry=(.70,1.),
+  # **How the aim is shared along the chain, swept rather than assumed** (T3D-34). The share is
+  # cumulative and ends at 1 so the last segment reaches the target exactly; the exponent is how it
+  # gets there. 1 is equal per joint, which is what T3D-26 shipped and was the right reading for its
+  # own arc -- a skin is asked to fold at a joint, and weighting by *segment length* hands the skull
+  # a third of the arc on its own because the head is two and a half cervicals long. The reviewer's
+  # aim is half as long an arc again (88 degrees against 55), and the one edge on this body that has
+  # ever been the worst is on `chest`, where a narrow neck meets a wide trunk -- so taking load off
+  # that joint and giving it to the cervical tube is worth measuring rather than assuming. Swept on
+  # the shipped file, each row a full rebuild and `skin-tears.mjs` on the result:
+  #
+  #   aimcurve | chest's share | worst joint | worst skin
+  #       1.00 |         0.167 |      22.8 d | 1.40x
+  #       1.10 |         0.139 |      23.2 d | 1.39x
+  #       1.20 |         0.117 |      23.6 d | 1.38x
+  #       1.35 |         0.089 |      24.0 d | 1.37x
+  #       1.50 |         0.068 |      24.2 d | 1.36x   <- shipped
+  #       1.70 |         0.049 |      25.5 d | refused: past the per-joint ceiling
+  #
+  # It falls monotonically until the ceiling stops it, and 1.50 is the last row under it: the skin
+  # comes out *better* than the 1.37x this animal shipped at with the shorter arc, which is what
+  # says the extra correction is free rather than paid for. `restHeadVsAimedDegrees` is 4.17 at
+  # every row -- where the head ends up is the target's business and not the share's.
+  aimcurve=1.50,
   step=.40,vert=.26,
   amp={'Idle':.030,'Swim':.097,'Sprint':.142,'Guard':.027,'Eat':.036,'Grab':.034},act=.050),
 }
@@ -306,6 +361,28 @@ def carry_rest(rig,objects,names,rots):
  assert worst<1e-5,('the carried rest is not parallel',worst)
  return carried_by,{'carriedSkinTravelMax':round(moved,5),'carriedRestFrameError':round(worst,9),
   'carriedBones':[n for n in names]}
+
+def frame_fit(before,after):
+ """The rotation that carries the imported file's coordinates into the builder's measured frame.
+
+ `T.measure_frame` and `posed_frame` both rewrite every vertex and neither returns the map, so a
+ direction handed in from outside -- a reviewer's aimed plane, measured on the published original
+ pose -- cannot be expressed in this builder's frame without one. Reconstructing the two rotations
+ from what they record would be a guess; **fitting them from the vertices they actually moved is a
+ measurement**, and it is exact: the map is a rigid rotation about the centroid with one uniform
+ scale, the correspondence is the vertex index, and the residual is asserted rather than hoped for.
+
+ `before`/`after` are the same vertices either side of the reframing. Returns (R, scale, residual).
+ """
+ bc,ac=before.mean(0),after.mean(0)
+ X,Y=before-bc,after-ac
+ U,S,Vt=np.linalg.svd(X.T@Y)
+ d=float(np.sign(np.linalg.det(Vt.T@U.T)))
+ R=Vt.T@np.diag([1.,1.,d])@U.T
+ s=float(np.trace(np.diag(S)@np.diag([1.,1.,d]))/float((X*X).sum()))
+ resid=float(np.abs((R@X.T).T*s+ac-after).max())
+ assert resid<1e-5,('the builder frame is not a similarity of the file frame',resid)
+ return R,s,resid
 
 def chain_dirs(pts):
  return [(pts[i+1]-pts[i]).normalized() for i in range(len(pts)-1)]
@@ -515,7 +592,7 @@ def paddle_audit(rig,obj,limb_defs,phases=5):
  scene.frame_set(0);bpy.context.view_layer.update()
  return out
 
-def measure(rig,body,front,shape,headref):
+def measure(rig,body,front,shape,headref,aimed,sockets=()):
  """"It moves" as a number, read back off the keyed actions rather than off the formulas.
 
  The swept angle is a joint's own peak-to-peak rotation over the clip -- the same figure the
@@ -542,6 +619,10 @@ def measure(rig,body,front,shape,headref):
  forty per cent high here and could not be compared with any other body on the roster.
  """
  scene=bpy.context.scene;out={};tips=('tail_11','skull','fore_upper_L')
+ # The sockets are measured here too, in the same unit as everything else (the bind box), because
+ # an anchor is a claim about where a blow lands and "the tail anchor moves" has to be a number.
+ socket_local={a['name']:(a['bone'],rig.data.bones[a['bone']].matrix_local.inverted()@Vector(a['point']))
+  for a in sockets}
  def skin():
   deps=bpy.context.evaluated_depsgraph_get()
   return np.concatenate([np.array([v.co[:] for v in o.evaluated_get(deps).data.vertices]) for o in shape])
@@ -552,11 +633,13 @@ def measure(rig,body,front,shape,headref):
  for clip in CLIPS:
   action=bpy.data.actions[clip];rig.animation_data.action=action
   if getattr(action,'slots',None):rig.animation_data.action_slot=action.slots[0]
-  end=round(CLIPS[clip]*30);rot={};pos={n:[] for n in tips};folds=[];spans=[];aims=[]
+  end=round(CLIPS[clip]*30);rot={};pos={n:[] for n in tips};folds=[];spans=[];aims=[];aimeds=[]
+  spos={n:[] for n in socket_local}
   for f in range(end+1):
    scene.frame_set(f);bpy.context.view_layer.update()
    for q in rig.pose.bones:rot.setdefault(q.name,[]).append(tuple(q.rotation_euler))
    for n in tips:pos[n].append(np.array(rig.pose.bones[n].tail[:]))
+   for n,(b,l) in socket_local.items():spos[n].append(np.array((rig.pose.bones[b].matrix@l)[:]))
    if f%max(1,end//4)==0 or f==end:spans.append(span())
    # Where the head is pointing against the trunk's own run, every frame. This is the number
    # T3D-26 exists for, and it is asked of the pose the clip actually produces rather than of the
@@ -567,6 +650,13 @@ def measure(rig,body,front,shape,headref):
    hd=((rig.pose.bones['skull'].matrix@rig.data.bones['skull'].matrix_local.inverted()@headref)-sk)
    tr=Vector(rig.pose.bones['chest'].head[:])-Vector(rig.pose.bones['tail_00'].head[:])
    aims.append(math.degrees(hd.angle(tr)) if hd.length>1e-6 and tr.length>1e-6 else 0.)
+   # And against the line the head is actually aimed at (T3D-34), carried by the body's own
+   # attitude. Every rest frame is parallel -- `carry_rest` asserts it -- so the `body` bone's
+   # world 3x3 *is* the map from the rest frame the aim was measured in to the frame this clip has
+   # put the animal in, which is a cleaner live reference than a chord between two joints whose
+   # own bow and lean move it.
+   la=(rig.pose.bones['body'].matrix.to_3x3()@aimed).normalized()
+   aimeds.append(math.degrees(hd.angle(la)) if hd.length>1e-6 else 0.)
    chain=[Vector(rig.pose.bones[n].head[:]) for n in TAIL]+[Vector(rig.pose.bones['tail_11'].head[:])+
     (Vector(rig.pose.bones['tail_11'].head[:])-Vector(rig.pose.bones['tail_10'].head[:]))]
    arc=sum((chain[i+1]-chain[i]).length for i in range(len(chain)-1))
@@ -581,8 +671,10 @@ def measure(rig,body,front,shape,headref):
   'jawSweptRadians':swept('jaw')[0],
   'tailArcOverChord':[round(float(min(folds)),4),round(float(max(folds)),4)],
   'headVsTrunkRunDegrees':[round(float(min(aims)),2),round(float(max(aims)),2)],
+  'headVsAimedTrunkDegrees':[round(float(min(aimeds)),2),round(float(max(aimeds)),2)],
   'posedExtentOverBind':[round(min(spans)/bind,4),round(max(spans)/bind,4)],
-  'tailTipTravel':travel('tail_11'),'skullTravel':travel('skull'),'forePaddleTravel':travel('fore_upper_L')}
+  'tailTipTravel':travel('tail_11'),'skullTravel':travel('skull'),'forePaddleTravel':travel('fore_upper_L'),
+  'anchorTravel':{n:round(float(max(np.linalg.norm(a-b) for a in v for b in v))/bind,4) for n,v in spos.items()}}
  out['bindBoxMax']=round(bind,4)
  # Clearing the action does **not** clear the pose, and the rig has just been stepped through
  # twenty-four clips: left posed, the mesh the exporter evaluates for normals is the posed one
@@ -598,6 +690,19 @@ def measure(rig,body,front,shape,headref):
   assert out['Idle']['tailTipTravel']>.04,out['Idle']['tailTipTravel']
   assert out['Swim']['tailTipTravel']>.12,out['Swim']['tailTipTravel']
   assert out['Sprint']['tailTipTravel']>out['Swim']['tailTipTravel'],'Sprint must out-travel Swim'
+  # **The weapon has to move, and it has to be the one the clip is named after** (T3D-32D). The
+  # two tail strikes swing the tail anchor a fifth of the animal or more, and in both of them it
+  # out-travels the anchor on the skull by a wide margin -- which is the whole reason the tail
+  # carries an anchor of its own, and is the number that says so rather than an impression.
+  if 'anchor_attack_tail' in out['TailWhip']['anchorTravel']:
+   for c in ('TailWhip','Heavy'):
+    tail,head=out[c]['anchorTravel']['anchor_attack_tail'],out[c]['anchorTravel']['anchor_attack_primary']
+    assert tail>.20,(c,'the tail strike must swing the tail',out[c]['anchorTravel'])
+    assert tail>head*3.,(c,'the blow must land from the tail rather than the head',out[c]['anchorTravel'])
+   # And it is not simply a tail that is always moving: the bite clips keep it near home.
+   for c in ('Attack','Bite'):
+    assert out[c]['anchorTravel']['anchor_attack_tail']<out['TailWhip']['anchorTravel']['anchor_attack_tail'],\
+     (c,'a bite must not swing the tail further than the whip does',out[c]['anchorTravel'])
   # The straight-line clips only. A turn bends the animal into a C and is honestly shorter --
   # `TurnRight`, into the generation's own hook, reads 0.84 -- and a coil shorter still.
   for c in ('Idle','Swim','Sprint','Dive','Rise','Grab'):
@@ -608,12 +713,15 @@ def measure(rig,body,front,shape,headref):
    # it swims: the locomotion clips hold the head within a gentle lean of the trunk's own run, and
    # the whole set -- the coil, which deliberately pulls the neck round, included -- stays far
    # inside the 67.7 degrees the uncorrected body stood at and the right angle it read as.
+   # **Asked against the line the head is aimed at**, which since T3D-34 is the reviewer's and not
+   # the hip-to-shoulder chord. The chord's own figures stay recorded beside these, unchanged in
+   # meaning, because they are what every earlier verdict on this animal was measured against.
    for c in ('Idle','Swim','Sprint','Dive','Rise','Grab','Breath','Growth','TurnLeft','TurnRight'):
-    assert out[c]['headVsTrunkRunDegrees'][1]<22.,(c,out[c]['headVsTrunkRunDegrees'])
-   worst=max((out[c]['headVsTrunkRunDegrees'][1],c) for c in CLIPS)
+    assert out[c]['headVsAimedTrunkDegrees'][1]<22.,(c,out[c]['headVsAimedTrunkDegrees'])
+   worst=max((out[c]['headVsAimedTrunkDegrees'][1],c) for c in CLIPS)
    assert worst[0]<40.,worst
    # And it has to still be an animal rather than a ruler: the head is never nailed to the axis.
-   assert out['Idle']['headVsTrunkRunDegrees'][1]>1.5,out['Idle']['headVsTrunkRunDegrees']
+   assert out['Idle']['headVsAimedTrunkDegrees'][1]>1.5,out['Idle']['headVsAimedTrunkDegrees']
   if REST[body]['uncurl']>0:
    # The point of the promotion, as numbers. The generation's own tail chain measures 1.66 arc
    # over chord and 180 degrees of turn: `Sprint` has to lay that out nearly flat, `Idle` has to
@@ -679,9 +787,17 @@ def build(body):
  auth,intake=T.load_raw(str(raw),NAME+tag)
  albedo,lum,albedo_sha,skin=T.retain_albedo(auth,NAME+(' posed' if posed else ' straight')+' pigmentation',.7)
  skin.use_backface_culling=False
+ prereframe=np.array([v.co[:] for v in auth.data.vertices])
  frame=T.measure_frame(auth,True,lum)
  axis_report={}
  if posed:posed_frame(auth)
+ into_frame=None
+ if posed:
+  Rfit,sfit,residfit=frame_fit(prereframe,np.array([v.co[:] for v in auth.data.vertices]))
+  frame['fileToMeasuredScale']=round(sfit,6);frame['fileToMeasuredResidual']=residfit
+  # The export's own `*BlenderZUp` fields are already [x, -z, y] of the file's glTF coordinates,
+  # which is exactly what the importer produced, so nothing here re-derives that convention.
+  into_frame=lambda v:Vector((Rfit@np.array(v,dtype=float)).tolist()).normalized()
  P=np.array([v.co[:] for v in auth.data.vertices]);Y0,Y1=float(P[:,1].min()),float(P[:,1].max())
  bvh=BVHTree.FromPolygons([v.co for v in auth.data.vertices],[p.vertices[:] for p in auth.data.polygons]);th=T.neighbourhood_minimum(auth.data,T.shell_thickness(auth.data,bvh))
  cx,cz,hw,hd,centre=T.measured_centreline(auth,th<(.025 if posed else .012),band=.009,smoothing=3)
@@ -784,8 +900,38 @@ def build(body):
  # exactly. Equal per *joint* rather than per unit length because a skin is asked to fold at a
  # joint: weighting by segment length instead hands the skull 0.34 of the arc, since the head is
  # two and a half cervicals long, and measures a larger residual at the snout besides.
- neck_share=[(i+1)/len(neck_d) for i in range(len(neck_d))]
- neckchain=(neck_d,trunk,neck_share)
+ neck_share=[((i+1)/len(neck_d))**REST[body]['aimcurve'] for i in range(len(neck_d))]
+ # **And where that share is aimed is the reviewer's, not the chord's** (T3D-34). `trunk` is one
+ # reading of the trunk and the head landed on it exactly; the animal still read as turned, because
+ # the chord runs between two joints inside the front half of a body that is two thirds tail. The
+ # aimed bend above says the head runs along `tipNormal` and the trunk along `baseNormal`, so the
+ # correction is the rotation carrying the first onto the second -- and it is applied to **this
+ # builder's own last neck segment**, so the two never have to agree about where the head points.
+ # `trunk` stays exactly as it was and every angle below is reported against both, because the one
+ # thing this animal's history proves is that an angle without its reference means nothing.
+ aimed=trunk;aim_report={}
+ if into_frame is not None and REST[body]['aim']>0:
+  doc=aimed_bend()
+  baseN=into_frame(doc['planes']['baseNormalBlenderZUp'])
+  tipN=into_frame(doc['planes']['tipNormalBlenderZUp'])
+  Qrev=tipN.rotation_difference(baseN)
+  aimed=(Qrev@neck_d[-1]).normalized()
+  aim_report={'document':AIMED_BEND,'sha256':doc['sha256'],'appliesTo':doc['appliesTo'],
+   'reviewerApartDegrees':doc['planes']['apartDegrees'],
+   'reviewerApartBeforeDegrees':doc['planes']['apartBeforeDegrees'],
+   'baseNormalInMeasuredFrame':[round(v,5) for v in baseN],
+   'tipNormalInMeasuredFrame':[round(v,5) for v in tipN],
+   'reviewerTurnDegrees':round(math.degrees(Qrev.angle),2),
+   'aimedTargetInMeasuredFrame':[round(v,5) for v in aimed],
+   'aimedVsTrunkRunDegrees':round(math.degrees(aimed.angle(trunk)),2),
+   'aimedVsBaseNormalDegrees':round(math.degrees(aimed.angle(baseN)),2),
+   'trunkRunVsBaseNormalDegrees':round(math.degrees(trunk.angle(baseN)),2),
+   'headVsAimedDegreesUncorrected':round(math.degrees(neck_d[-1].angle(aimed)),2)}
+  # The reviewer read the fault at 101 degrees where the chain reads it at 68, so the extra this
+  # asks for is about a third of a right angle. A document that asked for nothing, or for more than
+  # the fault itself, would be a document about some other body.
+  assert 15.<aim_report['aimedVsTrunkRunDegrees']<60.,aim_report
+ neckchain=(neck_d,aimed,neck_share)
  # Which way this body's own tail curls, as the signed total of its joint turns about the rig's
  # dorsoventral axis. It signs the coil and the tail strike (see `holdfor`). A body generated
  # straight has no answer and takes +1, which is the direction those clips have always gone.
@@ -795,7 +941,7 @@ def build(body):
  bodychest=(B['chest'][0]-B['body'][0]).normalized()
  axistan=(at(AP,AC,max(0.,shoulder-.03))-at(AP,AC,shoulder+.03)).normalized()
  cerv=chain_dirs([B[n][0] for n in NECK]+[B['skull'][0],snout])   # the cervicals alone, as T3D-25 read them
- aimarc=neck_d[0].rotation_difference(trunk)
+ aimarc=neck_d[0].rotation_difference(aimed)
  axis_report.update({'tailRestTurnDegrees':chain_bend(tail_d),'neckRestTurnDegrees':chain_bend(cerv),
   'tailHookSignedDegrees':round(math.degrees(signed),2),'tailHookSign':hook,
   'tailTakeoffVsTrunkDegrees':round(math.degrees(tail_d[0].angle((B['tail_00'][0]-B['body'][0]).normalized())),2),
@@ -816,7 +962,11 @@ def build(body):
    'takeoffVsTrunkRunDegrees':deg(neck_d[0],trunk),
    'headVsTrunkRunDegreesUncorrected':deg(neck_d[-1],trunk),
    'aimShare':[round(s,4) for s in neck_share],
-   'aimPerJointDegrees':round(math.degrees(aimarc.angle)/len(neck_d),2)}})
+   # T3D-26's figure, kept exactly as it was so the two are comparable, and T3D-34's beside it:
+   # the share is now aimed where the reviewer aimed it, so the arc it divides is a longer one.
+   'aimPerJointDegreesT26':round(math.degrees(neck_d[0].rotation_difference(trunk).angle)/len(neck_d),2),
+   'aimPerJointDegrees':round(math.degrees(aimarc.angle)/len(neck_d),2),
+   'aimedBend':aim_report}})
  limb_defs={}
  for kind,cs in [('fore',fore),('hind',hind)]:
   # Signs are relative to the local body's tangent, essential for the curled posed body.
@@ -906,7 +1056,7 @@ def build(body):
    # The aim is carried whole and the opening is carried to `fcarry[0]`, so the bind pose is the
    # animal looking where it swims. Nothing about that is a performance for a clip to hold.
    lv0,am0=REST[body]['fcarry']
-   frontrots=uncurl(neck_d,trunk,lv0,0.,neck_share,REST[body]['aim']*am0,0.)
+   frontrots=uncurl(neck_d,aimed,lv0,0.,neck_share,REST[body]['aim']*am0,0.)
    names+=NECKCHAIN;rots+=list(frontrots)
   carried_by,carry_report=carry_rest(rig,carried,names,rots)
   carry_report['carriedFraction']=REST[body]['carry']
@@ -918,19 +1068,47 @@ def build(body):
   if REST[body]['aim']>0:
    headref=carried_by['skull']@tx(snout)
    hd=(headref-Vector(rig.pose.bones['skull'].head[:])).normalized()
-   tr=(Vector(rig.pose.bones['chest'].head[:])-Vector(rig.pose.bones['tail_00'].head[:])).normalized()
+   RB={n:Vector(rig.pose.bones[n].head[:]) for n in list(rig.pose.bones.keys())}
+   tr=(RB['chest']-RB['tail_00']).normalized()
    perjoint=[round(math.degrees(e.to_quaternion().angle),2) for e in frontrots]
+   # **Where the head ends up, said against every reading of the trunk there is.** The hip-to-
+   # shoulder chord is the one T3D-26 aimed at and is kept unchanged so the two are comparable;
+   # the reviewer's aim is what T3D-34 aims at and is what is asserted; and the three longer runs
+   # are the ones an eye actually uses from above on a body that is two thirds tail -- they are the
+   # reason the head read as turned while sitting 4.2 degrees off the chord, so they are recorded
+   # rather than argued about. `plan` is the same angle in the dorsal view, which is the picture
+   # the correction is accepted on.
+   def plan(v):
+    w=Vector((v.x,v.y,0.))
+    return w.normalized() if w.length>1e-9 else w
+   reads={'hipToShoulder':tr,'bodyToChest':(RB['chest']-RB['body']).normalized(),
+    'midTailToShoulder':(RB['chest']-RB['tail_04']).normalized(),
+    'tailRunToShoulder':(RB['chest']-RB['tail_08']).normalized(),
+    'reviewerAimedTrunk':aimed}
    carry_report.update({'carriedAimFraction':REST[body]['aim']*REST[body]['fcarry'][1],
     'carriedLevelFraction':REST[body]['fcarry'][0],
     'frontCarryPerJointDegrees':dict(zip(NECKCHAIN,perjoint)),
-    'restHeadVsTrunkRunDegrees':round(math.degrees(hd.angle(tr)),2)})
+    'restHeadVsTrunkRunDegrees':round(math.degrees(hd.angle(tr)),2),
+    'restHeadVsAimedDegrees':round(math.degrees(hd.angle(aimed)),2),
+    'planViewReadings':{k:{'headVsDegrees':round(math.degrees(hd.angle(v)),2),
+     'headVsInPlanDegrees':round(math.degrees(plan(hd).angle(plan(v))),2)} for k,v in reads.items()}})
    # **The correction is distributed or it is not a correction.** A rigid swing at the neck root
    # is the fix T3D-25 measured at 2.62x skin and rejected, and it would show here as one joint
-   # holding most of the arc. Nothing may exceed a quarter turn.
-   assert max(perjoint)<25.,('the front carry is concentrated at one joint',carry_report['frontCarryPerJointDegrees'])
-   # And the head has to end up on the trunk's line. Not *on* it -- some residual is the animal --
-   # but nowhere near the right angle it left it at.
-   assert carry_report['restHeadVsTrunkRunDegrees']<12.,carry_report['restHeadVsTrunkRunDegrees']
+   # holding most of the arc. The bar is a *share* of the arc rather than an absolute angle -- the
+   # arc grew by half when T3D-34 re-aimed it, and a fixed ceiling would have failed a correction
+   # that is no more concentrated than the one it replaced. Six joints share it, so an even share
+   # is a sixth; the bar is twice that, which is what T3D-26's 25 degrees was against its own arc.
+   share=max(perjoint)/max(1e-6,math.degrees(aimarc.angle))
+   carry_report['frontCarryWorstJointShare']=round(share,4)
+   assert share<.34,('the front carry is concentrated at one joint',
+    carry_report['frontCarryPerJointDegrees'],share)
+   # T3D-26's own ceiling, kept: the longer arc still fits under it (22.8 degrees at the worst
+   # joint), so nothing had to be relaxed to aim the correction where the reviewer aimed it.
+   assert max(perjoint)<25.,('the front carry is concentrated at one joint',
+    carry_report['frontCarryPerJointDegrees'])
+   # And the head has to end up on the line it was aimed at. Not *on* it -- some residual is the
+   # animal -- but nowhere near the right angle it left it at.
+   assert carry_report['restHeadVsAimedDegrees']<12.,carry_report['restHeadVsAimedDegrees']
  # **The posterior cut is no longer square to the file's axes, because the bind has moved since
  # the jaw was cut.** The carry rotates the whole head, so the plane `bisect_on_curve` cut on --
  # raw y = hinge -- arrives in the shipped file tilted, and `auditCutAttachment`'s axis test
@@ -944,12 +1122,44 @@ def build(body):
  gltf=lambda v:[round(v.x,6),round(v.z,6),round(-v.y,6)]
  cut_plane={'point':gltf(cutp),'normal':gltf(cutn),'tolerance':.01,'frame':'glTF, +Y up'}
  place=lambda b,p:list((carried_by[b]@tx(p)) if b in carried_by else tx(p))
+ # **The tail is this animal's other weapon and it had no anchor at all** (T3D-23, closed by
+ # T3D-32D). `anchor_attack_primary` sits on the skull, which is right for `Attack` and `Bite` --
+ # a thalattosaur's light attack is a bite -- but `Heavy` and `TailWhip` strike with the tail, and
+ # measured over 41 phases of the packaged file the skull anchor moves 2.1 % of a body in them.
+ # That is not a clip that fails to use the animal: the tail is doing the work (`tailTipTravel`
+ # 0.30 in `TailWhip` against `Idle`'s 0.05) and the *anchor* was in the wrong place, so what the
+ # simulation could point at was a head standing still while the blow landed somewhere else.
+ #
+ # The rule is that the attack anchor belongs on the bone that delivers the blow, and this body
+ # delivers two different blows with two different ends of itself. The runtime already holds more
+ # than one: `CreatureAnchors` collects **every** `role: attack` socket and `nearestAttack` picks
+ # the one closest to the target, so a bite lands from the jaws and a whip from the tail with
+ # nothing having to name a clip. So the skull keeps the primary -- it is the bite, and it is the
+ # anchor every other body in the roster carries -- and the tail gains one of its own, at the end
+ # of the animal's own measured centreline, on the last control that swings it.
+ # **Where the tail ends is measured, not typed.** The centreline's last station is the end of a
+ # fitted polyline and not a point on the skin: on the posed generation it lands 0.0006 raw from
+ # the surface, and on the straight regeneration 0.068 outside it -- a seventh of the tail's own
+ # length out in open water, and walking back down the axis does not find the skin either, because
+ # a fitted axis and a thin tapering tail part company at the very end. So the anchor is **seated
+ # on the surface nearest the end of the animal's own centreline**, which needs no threshold and
+ # no search and is the same construction on both bodies; how far the axis end was from the skin
+ # is then a number each body records rather than a gate it has to pass.
+ tip_on_axis=at(AP,AC,float(tailstations[12]))
+ _hit,_,_,tail_anchor_gap=bvh.find_nearest(tip_on_axis)
+ tailtip=Vector(_hit);tail_anchor_gap=float(tail_anchor_gap)
+ tail_arc=float(T.project(AP,AC,tailtip)[1])
  anchorpts={'anchor_mouth':('jaw',(cx(front_y+.008),front_y+.008,seam(front_y+.008)-.002),'mouth'),
  'anchor_mouth_inside':('skull',(cx(hinge-.015),hinge-.015,seam(hinge-.015)),'swallow'),
- 'anchor_attack_primary':('skull',(cx(front_y+.002),front_y+.002,seam(front_y+.002)),'attack')}
+ 'anchor_attack_primary':('skull',(cx(front_y+.002),front_y+.002,seam(front_y+.002)),'attack'),
+ 'anchor_attack_tail':('tail_11',tuple(tailtip),'attack')}
  anchors=[{'name':n,'bone':b,'point':place(b,p),'role':r} for n,(b,p,r) in anchorpts.items()]
+ # The seated point is a *contact*, so it has to be at the far end of the tail rather than
+ # anywhere else the nearest-surface search could have landed: its own arc position along the
+ # centreline is inside the last control's station.
+ assert tail_arc>float(tailstations[11]),('the tail anchor is not on the last tail control',tail_arc,float(tailstations[11]))
  seams,holds=animate(rig,body,front,tailchain,neckchain,hook)
- motion=measure(rig,body,front,groups[0],headref);sockets=T.make_sockets(rig,anchors)
+ motion=measure(rig,body,front,groups[0],headref,aimed,anchors);sockets=T.make_sockets(rig,anchors)
  paddles=paddle_audit(rig,groups[0][0],limb_defs)
  if front:
   # The owner named the **right** pectoral, so the pair is measured rather than assumed: the skin
@@ -988,7 +1198,9 @@ def build(body):
   'waveStep':REST[body]['step'],'waveVerticalShare':REST[body]['vert'],
   'clipAmplitudes':REST[body]['amp'],'actAmplitude':REST[body]['act'],
   'bendRangeLimit':1.},
- 'anchors':anchors,'maxInfluences':4,'rootStable':True,'noScaleChannels':True,'carry':carry_report,**twin_report}
+ 'anchors':anchors,'tailAnchorSurfaceGapRaw':round(tail_anchor_gap,5),
+ 'tailAnchorArc':round(tail_arc,5),'tailAnchorArcOverBodyArc':round(tail_arc/AC[-1],4),
+ 'maxInfluences':4,'rootStable':True,'noScaleChannels':True,'carry':carry_report,**twin_report}
  if front:
   shutil.copyfile(OUT/(ID+'.puppet.glb'),OUT/(ID+'.lod1.glb'))
   profile,worst=T.paired_profile(groups[0],groups[1],(Y0+.01)*SCALE,(Y1-.01)*SCALE,.04*SCALE)

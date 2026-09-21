@@ -12,6 +12,7 @@ import { settleTranslucency } from '../render/translucency';
 import { DEFAULT_SCHEME, type Slot } from '../shared/palettes';
 import { appBase } from '../shared/base';
 import { resolveSelection, restingClip as restingClipOf, type ClipIntent } from './playback/selection';
+import { buttonRoles, type ButtonRole, type PointerScheme } from './pointer-scheme';
 
 /**
  * The viewer page lives one directory below the app, so `BASE_URL` ('./' in a built bundle)
@@ -192,6 +193,16 @@ export interface ViewerScene {
    * there must not spend it being recoloured into the next one's palette.
    */
   clear(): void;
+  /**
+   * The model path of the body **actually on stage**, or undefined while there is none.
+   *
+   * It exists because "the last load finished" is not the same question. The Bend button changes
+   * the mode and the body in one commit, and a child's effects run before its parent's, so an
+   * editor mounted in that commit measures whatever the scene is still holding — the previous
+   * body — and caches those numbers under the new body's key. Asking the scene what it is drawing
+   * answers synchronously and cannot be a commit behind.
+   */
+  loadedModel(): string | undefined;
   /** Plays a clip. One-shots fade back to the resting loop unless `loop` forces a repeat. */
   play(name: string, loop: boolean): void;
   setSpeed(s: number): void;
@@ -234,10 +245,29 @@ export interface ViewerScene {
   /** Lights the marked vertices (null clears the overlay). One mask per mesh, a byte per vertex. */
   showMarks(marks: readonly Uint8Array[] | null): void;
   /**
-   * Hands the left button to the brush and orbiting to the right, or gives the orbit its usual
-   * buttons back. The scene owns it because OrbitControls owns the canvas's pointer events.
+   * Which mouse button does what on the stage (`./pointer-scheme`). The scene owns it because
+   * OrbitControls owns the canvas's pointer events. Setting a scheme also hands the orbit back
+   * enabled, so an editor unmounted with the pointer sitting on a handle cannot leave the camera
+   * dead for the mode after it.
    */
-  setMarkInteraction(on: boolean): void;
+  setPointerScheme(scheme: PointerScheme): void;
+  /**
+   * Suspends the orbit entirely, which is how the mouth and bend editors keep a press on a handle
+   * from also swinging the camera.
+   *
+   * It cannot be done by the editor swallowing the event: OrbitControls is constructed with the
+   * canvas long before an editor mounts and registers its own `pointerdown`, and listeners on one
+   * target fire in registration order whatever the capture flag says — so `stopImmediatePropagation`
+   * from an editor arrives after the orbit has already taken the press. Disabling the orbit while
+   * the pointer is *over* a handle means the press never reaches an enabled orbit at all.
+   */
+  setOrbitEnabled(on: boolean): void;
+  /**
+   * Where the camera is, what it is looking at, and the scheme in force. Nothing in the page draws
+   * from it: it is what the browser harnesses read to tell an orbit (the position moves, the
+   * target does not) from a pan (both move together), which no headless test can see.
+   */
+  cameraState(): { position: [number, number, number]; target: [number, number, number]; scheme: PointerScheme; orbit: boolean };
   /**
    * Draws the mouth cut — the plane, the hinge line, the three handles — and lights every vertex
    * on the mandible side of it (null takes it all down). The test is the document's own, handed in
@@ -392,6 +422,8 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   scene.add(stage);
 
   let model: THREE.Object3D | undefined;
+  /** Which file `model` was built from — see `ViewerScene.loadedModel`. */
+  let loadedModelPath: string | undefined;
   /** Survives a change of specimen, because a reviewer comparing mouths is comparing across them. */
   let oralGeometry = false;
   let source: GLTF | undefined;
@@ -445,6 +477,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     if (source) disposeAsset(source);
     source = undefined;
     model = undefined; mixer = undefined; current = undefined;
+    loadedModelPath = undefined;
     sculptTarget = undefined;
     markTargetCache = undefined; markIndexOf = new Map(); markPoints.visible = false;
     mouthRootCache = undefined; mouthGroup.visible = false; mouthPoints.visible = false;
@@ -518,6 +551,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     recolor.setScheme(schemeId);
 
     model = src;
+    loadedModelPath = specimen.model;
     stage.add(model);
     applyOralGeometry();
     modelCenter = center.clone(); modelUnit = unit;
@@ -820,13 +854,28 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     markPoints.visible = n > 0;
   }
 
-  function setMarkInteraction(on: boolean) {
-    controls.mouseButtons = on
-      // Left paints, so the orbit must not have it. Right orbits (and, with a modifier, pans,
-      // which OrbitControls already does for whichever button it turns), middle dollies.
-      ? { LEFT: null, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE }
-      : { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
-    if (!on) { markPoints.visible = false; }
+  const MOUSE_ROLE: Record<Exclude<ButtonRole, null>, THREE.MOUSE> = {
+    rotate: THREE.MOUSE.ROTATE, pan: THREE.MOUSE.PAN, dolly: THREE.MOUSE.DOLLY,
+  };
+  let scheme: PointerScheme = 'view';
+  function setPointerScheme(next: PointerScheme) {
+    const r = buttonRoles(next);
+    const map = (role: ButtonRole) => (role === null ? null : MOUSE_ROLE[role]);
+    controls.mouseButtons = { LEFT: map(r.left), MIDDLE: map(r.middle), RIGHT: map(r.right) };
+    // The brush overlay is mark mode's alone — `showMarks` has exactly one caller — so it comes
+    // down when the paint scheme does rather than being cleared by a mode that never drew it.
+    if (scheme === 'paint' && next !== 'paint') markPoints.visible = false;
+    scheme = next;
+    // A mode change is also the moment to undo any hover-time suspension left behind it.
+    controls.enabled = true;
+  }
+  function setOrbitEnabled(on: boolean) { controls.enabled = on; }
+  function cameraState() {
+    return {
+      position: [camera.position.x, camera.position.y, camera.position.z] as [number, number, number],
+      target: [controls.target.x, controls.target.y, controls.target.z] as [number, number, number],
+      scheme, orbit: controls.enabled,
+    };
   }
 
   // ---- the mouth cut ----
@@ -1248,7 +1297,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   const ORTHO_BG = new THREE.Color('#0a2f38');
   tick();
 
-  return {
+  const api: ViewerScene = {
     show,
     // Bumping the token first drops anything already in flight; `show` takes a fresh one.
     clear() { token++; clearModel(); },
@@ -1268,6 +1317,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     activeSlots() { return recolor?.slots ?? []; },
     onClip(cb) { clipCb = cb; cb(currentName); },
     resetCamera: frame,
+    loadedModel() { return loadedModelPath; },
     sculptTarget() { return sculptTarget; },
     applySculpt,
     setMouthGape,
@@ -1281,7 +1331,9 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     markPick,
     markProject,
     showMarks,
-    setMarkInteraction,
+    setPointerScheme,
+    setOrbitEnabled,
+    cameraState,
     showMouthCut,
     mouthPick,
     showBend,
@@ -1298,6 +1350,14 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
       geometries.forEach((g) => g.dispose());
       materials.forEach((m) => m.dispose());
       renderer.dispose();
+      if ((window as Window & { __viewerScene?: ViewerScene }).__viewerScene === api) {
+        delete (window as Window & { __viewerScene?: ViewerScene }).__viewerScene;
+      }
     },
   };
+  // The browser harnesses' way in, as `__cambrian` is the game's: `tools/{mouth,bend,mark}-browser.mjs`
+  // read `cameraState()` through it, because whether a drag orbited or panned is not something the
+  // page draws anywhere and not something a headless test can be shown.
+  (window as Window & { __viewerScene?: ViewerScene }).__viewerScene = api;
+  return api;
 }

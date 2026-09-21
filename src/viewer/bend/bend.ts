@@ -1409,6 +1409,27 @@ export function setRef(doc: BendDoc, which: keyof BoneRefs, end: keyof BoneRef, 
  * negation — which end of the span the bend is anchored at is a real choice about which part of the
  * animal is held still, and it is one the reviewer already made by placing the two ends.
  */
+/**
+ * Whether anything actually decided **which end is the head**, as opposed to the axis.
+ *
+ * The box can only ever pick the axis. `frameFor` takes the longer horizontal side and then, with
+ * no mouth socket to read a sign off, returns `forward: 1` — the high end — as a *default*, not as
+ * a finding. Every one of the three editors reaches that fallback exactly when `frameSource` is
+ * `bounds`, because a mouth or an authored yaw would have won first, so the source is the whole
+ * test and no second field has to be kept in step with it.
+ *
+ * It is worth saying out loud because everything the frame is *for* inverts with it: `axisAt`,
+ * `headFractionAt`, "how far back from the nose", and the export's own claim about which end the
+ * head is at. Askeptosaurus' published original pose carries no rig, so no mouth socket, and the
+ * empty `preview-orientation.json` gives it no authored yaw either — so a reviewer aimed a bend on
+ * it under a panel that said the head was at high z while the snout sat at z 0.038 and the
+ * shoulders at 0.277, and the two head fractions in that export are both measured from the tail.
+ * The bend itself survived it (the rule is "turn about an axle through `base`", which names no
+ * end), but nothing that reads a fraction did, and the panel had stated a direction it never
+ * earned.
+ */
+export const forwardEarned = (doc: Pick<BendDoc, 'frameSource'>) => doc.frameSource !== 'bounds';
+
 export function flipForward(doc: BendDoc): BendDoc {
   const next = cloneDoc(doc);
   next.frame = { ...doc.frame, forward: doc.frame.forward === 1 ? -1 : 1 };
@@ -1510,7 +1531,8 @@ export function exportDoc(doc: BendDoc, input: BendExportInput) {
     creature: { key: doc.key, id: doc.id, collection: doc.collection, vertices: doc.vertices, rigged: doc.rigged },
     frame: {
       ...doc.frame, source: doc.frameSource,
-      note: `Model root frame, unscaled: the file's own coordinates with the scene graph flattened. The body runs along ${doc.frame.axis}; the head is at the ${doc.frame.forward === 1 ? 'high' : 'low'} end. The span does not have to follow that axis — it is two points on the animal — but "up", "lateral" and "how far back from the nose" are measured in this frame.`,
+      forwardEarned: forwardEarned(doc),
+      note: `Model root frame, unscaled: the file's own coordinates with the scene graph flattened. The body runs along ${doc.frame.axis}; the head is ${forwardEarned(doc) ? '' : 'ASSUMED to be '}at the ${doc.frame.forward === 1 ? 'high' : 'low'} end${forwardEarned(doc) ? '' : ' — the bounding box picks the axis and cannot pick the end, so nothing decided this and `forwardEarned` is false. Check it before reading any fraction below: `span.baseHeadFraction`, `span.tipHeadFraction` and every other "back from the nose" reading are measured from whichever end this names, and invert with it. The bend itself does not — it is a turn about an axle through `span.base` and names no end'}. The span does not have to follow that axis — it is two points on the animal — but "up", "lateral" and "how far back from the nose" are measured in this frame.`,
     },
     span: {
       base: r3(doc.base),
