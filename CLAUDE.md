@@ -53,7 +53,15 @@ unless the user explicitly asks for a PR. Steps:
   moving at all on the three bodies that hang both anchors off one bone.
   `tools/triassic/clip-contract.mjs` (in `npm run triassic`) holds both halves: no shipped Triassic
   body moves its root or animates scale, and every variant carries exactly the clips its era JSON
-  declares. After a run: the era JSON's `clips`/`looping` by hand,
+  declares — and the manifest is the family's **fourth file**, which `apply.mjs` now keeps in step
+  itself rather than leaving to a human, splicing the two arrays textually so nothing else in a
+  file written by another tool in another language is reserialised. Leaving it by hand is how a
+  per-body `audit.mjs` came to measure a rebuilt body against its own frozen `const CLIPS = 26`
+  while the body carried 27, and how a manifest in an era with no such guard simply drifts.
+  **An expected clip count is never a literal**: `declaredClips` in `_pipeline/paired-audit.mjs` is
+  the one place it comes from, and the frozen `LOOPS` lists beside those counts had already gone
+  quietly stale — Macrocnemus' had never heard of the `Peer` whose loop seam most needed checking.
+  After a run:
   `node tools/update-asset-sizes.mjs`, and the era's own check. Onychodus' performance file is stale
   against its rebuilt rig (`whorlL`) and fails to apply at all, so it carries no `Flop`.
 - Any change to a creature's model, colours or textures must go through

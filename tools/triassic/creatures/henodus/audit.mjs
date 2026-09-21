@@ -16,11 +16,12 @@ import { ALL_EXTENSIONS, EXTMeshoptCompression } from '@gltf-transform/extension
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { declaredClips } from '../_pipeline/paired-audit.mjs';
 await Promise.all([MeshoptDecoder.ready, MeshoptEncoder.ready]);
 const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({ 'meshopt.decoder': MeshoptDecoder, 'meshopt.encoder': MeshoptEncoder });
 const base = 'public/assets/triassic/creatures/henodus';
-const LOOPS = ['Idle', 'Swim', 'Sprint', 'Guard', 'Eat', 'Grab', 'Crawl', 'Graze', 'Breathe'];
-const CLIPS = 24, JOINTS = 25, SOCKETS = 3;
+const { CLIPS, LOOPS } = declaredClips(base);
+const JOINTS = 25, SOCKETS = 3;
 const hash = x => crypto.createHash('sha256').update(x).digest('hex');
 const data = a => a ? Array.from(a.getArray()) : null;
 const skeleton = d => d.getRoot().listSkins().map(s => ({ joints: s.listJoints().map(n => ({ name: n.getName(), parent: n.getParentNode()?.getName(), t: n.getTranslation(), r: n.getRotation(), s: n.getScale() })), bind: data(s.getInverseBindMatrices()) }));
@@ -45,7 +46,9 @@ for (const suffix of ['', '.puppet', '.lod1']) {
     fs.writeFileSync(file, bytes); d = after;
   }
   const c = clips(d), sk = skeleton(d), so = sockets(d);
-  assert.equal(c.length, CLIPS); assert.equal(sk[0].joints.length, JOINTS); assert.equal(so.length, SOCKETS);
+  assert.equal(c.length, CLIPS.length, `${suffix || 'authored'}: clip count`);
+  assert.deepEqual(c.map((a) => a.name).sort(), [...CLIPS].sort(), 'clip names');
+  assert.equal(sk[0].joints.length, JOINTS); assert.equal(so.length, SOCKETS);
   // The fused shell is a rigid part: its bone exists, is skinned, and is never animated.
   assert(sk[0].joints.some(j => j.name === 'carapace'), 'the carapace bone is in the skin');
   for (const a of c) for (const ch of a.channels) assert.notEqual(ch.node, 'carapace', a.name + ' animates the rigid carapace');

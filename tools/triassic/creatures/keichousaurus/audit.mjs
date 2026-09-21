@@ -15,11 +15,12 @@ import { ALL_EXTENSIONS, EXTMeshoptCompression } from '@gltf-transform/extension
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { declaredClips } from '../_pipeline/paired-audit.mjs';
 await Promise.all([MeshoptDecoder.ready, MeshoptEncoder.ready]);
 const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({ 'meshopt.decoder': MeshoptDecoder, 'meshopt.encoder': MeshoptEncoder });
 const base = 'public/assets/triassic/creatures/keichousaurus';
-const LOOPS = ['Idle', 'Swim', 'Sprint', 'Guard', 'Eat', 'Shoal', 'Breathe'];
-const CLIPS = 23, JOINTS = 27, SOCKETS = 3;
+const { CLIPS, LOOPS } = declaredClips(base);
+const JOINTS = 27, SOCKETS = 3;
 const hash = x => crypto.createHash('sha256').update(x).digest('hex');
 const data = a => a ? Array.from(a.getArray()) : null;
 const skeleton = d => d.getRoot().listSkins().map(s => ({ joints: s.listJoints().map(n => ({ name: n.getName(), parent: n.getParentNode()?.getName(), t: n.getTranslation(), r: n.getRotation(), s: n.getScale() })), bind: data(s.getInverseBindMatrices()) }));
@@ -44,7 +45,9 @@ for (const suffix of ['', '.puppet', '.lod1']) {
     fs.writeFileSync(file, bytes); d = after;
   }
   const c = clips(d), sk = skeleton(d), so = sockets(d);
-  assert.equal(c.length, CLIPS); assert.equal(sk[0].joints.length, JOINTS); assert.equal(so.length, SOCKETS);
+  assert.equal(c.length, CLIPS.length, `${suffix || 'authored'}: clip count`);
+  assert.deepEqual(c.map((a) => a.name).sort(), [...CLIPS].sort(), 'clip names');
+  assert.equal(sk[0].joints.length, JOINTS); assert.equal(so.length, SOCKETS);
   for (const n of ['neck_base', 'neck_01', 'neck_02', 'tail_06', 'fore_paddle_L', 'hind_paddle_R'])
     assert(sk[0].joints.some(j => j.name === n), n + ' is in the skin');
   if (!suffix) { report.rig = sk; report.sockets = so; report.clipSignatures = c.map(a => ({ name: a.name, sha256: hash(JSON.stringify(a)) })); }

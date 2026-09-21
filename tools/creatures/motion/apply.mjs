@@ -212,6 +212,54 @@ for (const { suffix, file } of family) {
   }
 }
 for (const s of skipped) console.log('  ' + s);
+// The era JSON is the family's fourth file. It is what the game loads, what `clip-contract.mjs`
+// holds every variant against and what the per-body audits take their expected clip set from, so
+// a tool that adds a clip to three GLBs and leaves the manifest to a human has left the family
+// half-written: an audit's own frozen count is then measured against a body that has a clip it has
+// never heard of (Macrocnemus, 27 against 26), and in an era with no such guard it simply drifts
+// (Cheirolepis' manifest has been a `Grab` short). This keeps it in step, and only ever *adds*.
+for (const line of await updateManifest(`${dest}/${id}.json`)) console.log('  ' + line);
+
+/**
+ * Add this run's clips to the era JSON's `clips`, and the looping ones to `looping`, by splicing
+ * the two arrays textually. The manifests are written by several tools in two languages — the
+ * Triassic's come out of Python with `\u00b7` escapes a `JSON.stringify` round-trip would silently
+ * un-escape — so nothing outside the two arrays is reserialised, and the result is re-parsed and
+ * compared key by key against the intended document before it is written.
+ */
+async function updateManifest(file) {
+  if (!existsSync(file)) return [`${path.basename(file)}: no era JSON beside the model — nothing to keep in step`];
+  const raw = await readFile(file, 'utf8');
+  const meta = JSON.parse(raw);
+  const want = { clips: authoredClips.map((c) => c.name), looping: authoredClips.filter((c) => c.loop).map((c) => c.name) };
+  let text = raw; const out = [];
+  for (const key of ['clips', 'looping']) {
+    const have = meta[key];
+    if (!Array.isArray(have)) { out.push(`${path.basename(file)}: no "${key}" array — left alone`); continue; }
+    const missing = want[key].filter((n) => !have.includes(n));
+    if (!missing.length) continue;
+    const at = text.indexOf(`"${key}"`);
+    assert(at >= 0, `${file}: cannot find "${key}"`);
+    const open = text.indexOf('[', at), close = text.indexOf(']', open);
+    assert(open > 0 && close > open && !text.slice(open + 1, close).includes('['), `${file}: "${key}" is not a flat array`);
+    const body = text.slice(open + 1, close);
+    const indent = /\n([^\S\n]+)"/.exec(body)?.[1] ?? '    ';           // however this file lays its items out
+    const added = missing.map((n) => `${indent}${JSON.stringify(n)}`).join(',\n');
+    // After the last item, never before the closing whitespace: the array's own layout up to and
+    // including the newline that precedes `]` is left exactly as it was found.
+    const end = open + 1 + (body.replace(/\s+$/, '').length);
+    text = text.slice(0, end) + (body.trim() ? `,\n${added}` : `\n${added}`) + text.slice(end);
+    meta[key] = [...have, ...missing];
+    out.push(`${path.basename(file)}: ${key} += ${missing.join(', ')} (${meta[key].length} now)`);
+  }
+  if (!out.length) return [`${path.basename(file)}: already declares every clip this run authored`];
+  // Prove the splice changed the two arrays and nothing else.
+  const after = JSON.parse(text);
+  assert.deepEqual(Object.keys(after), Object.keys(meta), 'manifest keys moved');
+  assert.deepEqual(after, meta, 'the splice changed more than clips/looping');
+  await writeFile(file, text);
+  return out;
+}
 
 function preserveNodeTransforms(bytes, d) {
   // NodeIO omits transforms within an epsilon of identity; restore every authored TRS exactly.

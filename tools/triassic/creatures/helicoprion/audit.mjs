@@ -14,7 +14,7 @@ import { ALL_EXTENSIONS, EXTMeshoptCompression } from '@gltf-transform/extension
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { assertRootStill } from '../_pipeline/paired-audit.mjs';
+import { assertRootStill, declaredClips } from '../_pipeline/paired-audit.mjs';
 
 await Promise.all([MeshoptDecoder.ready, MeshoptEncoder.ready]);
 const io = new NodeIO().registerExtensions(ALL_EXTENSIONS)
@@ -23,9 +23,8 @@ const io = new NodeIO().registerExtensions(ALL_EXTENSIONS)
 const base = 'public/assets/triassic/creatures/helicoprion';
 const here = 'tools/triassic/creatures/helicoprion';
 const local = 'local/triassic-authoring/helicoprion';
-const meta = JSON.parse(fs.readFileSync(base + '.json', 'utf8'));
 const validation = JSON.parse(fs.readFileSync(here + '/validation.json', 'utf8'));
-const CLIPS = meta.clips, LOOPS = meta.looping;
+const { CLIPS, LOOPS, meta } = declaredClips(base);
 const JOINTS = 23, SOCKETS = 3;
 
 const hash = x => crypto.createHash('sha256').update(x).digest('hex');

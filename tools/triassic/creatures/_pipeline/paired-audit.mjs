@@ -72,6 +72,27 @@ function rootDrift(path, values, rest) {
   }
   return worst;
 }
+/**
+ * What an era JSON says a body's clips are, and which of them loop.
+ *
+ * **Never a literal.** Five audits baked their own `const CLIPS = 26` and their own `LOOPS` list,
+ * and a number written when a body was built cannot know about a clip added to it afterwards: a
+ * rebuilt Macrocnemus audited end to end and then stopped at `27 !== 26` the moment its `Peer` was
+ * re-applied, having passed the root check and the family check on the way — a third place a shore
+ * gait is invisible to the body carrying it. The drift also ran the other way and silently: that
+ * same `LOOPS` had never heard of `Peer`, so the loop seam on the one clip most likely to have one
+ * was never checked, and Keichousaurus' list was missing a `Grab` its manifest declares.
+ *
+ * The era JSON is the manifest the game loads, `apply.mjs` keeps it in step with the files it
+ * writes, and `clip-contract.mjs` refuses any variant that disagrees with it — so it is the one
+ * thing to measure against, and the count and the loop list come from here or from nowhere.
+ */
+export function declaredClips(base) {
+  const meta = JSON.parse(fs.readFileSync(`${base}.json`, 'utf8'));
+  assert(Array.isArray(meta.clips) && meta.clips.length, `${base}.json declares no clips`);
+  assert(Array.isArray(meta.looping), `${base}.json declares no looping list`);
+  return { CLIPS: meta.clips, LOOPS: meta.looping, meta };
+}
 /** Refuse a channel that moves the rig's root. `rootRest` is `skeleton(d)[0].joints[0]`. */
 export function assertRootStill(rootRest, ch, clipName) {
   if (ch.node !== rootRest.name) return;
@@ -89,8 +110,7 @@ export async function auditPair({ id, base, here, local, joints, sockets: socket
   await Promise.all([MeshoptDecoder.ready, MeshoptEncoder.ready]);
   const io = new NodeIO().registerExtensions(ALL_EXTENSIONS)
     .registerDependencies({ 'meshopt.decoder': MeshoptDecoder, 'meshopt.encoder': MeshoptEncoder });
-  const meta = JSON.parse(fs.readFileSync(`${base}.json`, 'utf8'));
-  const CLIPS = meta.clips; const LOOPS = meta.looping;
+  const { CLIPS, LOOPS, meta } = declaredClips(base);
   const report = { id, models: [], clips: CLIPS.length, joints, sockets: socketCount };
 
   for (const suffix of ['', '.puppet', '.lod1']) {
