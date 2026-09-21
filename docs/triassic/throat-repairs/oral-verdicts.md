@@ -64,10 +64,10 @@ column to read.** Nothing here is a claim about every camera: it is one side-on 
 | Coelophysis | 3 | 7,276 | |
 | Mystriosuchus | 1 | 7,734 | |
 | Aphaneramma | 5 | 10,730 | |
+| Birgeria | 4 | **15,357** | measured at last in T3D-33 — the assertion that blocked it read a *constant* root channel as root motion. `Gape@0.467` 4/15,357, `Ability@0.467` 4/8,416, `Heavy@0.533` 2/7,239. The widest `opened` on the roster, and the widest gape on it: nothing through the head, a mouth a single-sided runtime draws as a hole |
 | Henodus | 407 | 462 | |
 | Dinocephalosaurus | **120** | 197 | its verdict was **neither**, and it is still right about the lining — but the `Seated jaw hinge tissue` that closes its hinge cross-section is hidden in play, so as drawn the head is open there |
 | Ceratites, Phragmoteuthis | — | — | no jaw and no mouth drawn; settled in T3D-02a and T3D-12B and unaffected by any of this |
-| Birgeria | — | — | **not measured**: its `audit.mjs --decode` fails on an unrelated pre-existing assertion (`no root motion`) without `--package`, so the sweep could not decode it. It does have a jaw and opening clips, so it belongs in the rollout. |
 | Shonisaurus | 13 | 1,943 | its verdict is **neither** and stays; the pixels are the generation's own open gape and the slivers at the tooth row this table already describes |
 | Tanystropheus | 142 | 1,388 | |
 
