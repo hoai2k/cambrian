@@ -558,3 +558,45 @@ None of it. This animal stands on the beach and reaches; it never enters the wat
   build's to change.
 - `Drag` has no caller yet: nothing in `shore.ts` takes a hold (see **Wiring** above).
 - Living colours, soft tissues and movements are artistic reconstruction.
+
+## The sideways sweep is the strike, not a recoil — T3D-23, decided and recorded
+
+T3D-23 measures an attack by how far `anchor_attack_primary` travels **forward** over body length:
+Phragmoteuthis' re-authored dart is +14 % against the 3–4 % it shipped with, and a clip that leaves
+the weapon hanging has not used the animal. Read that way both long-necked animals look like
+failures — Tanystropheus' snaps move that anchor 42-46 % of a body sideways, 47 % back and never forward of where it rests at all — and that reading is a category error, which
+`tools/triassic/attack-arc.py` exists to show.
+
+A point on an arm of length R swung through θ about its base moves R·sinθ sideways and **R·(1 −
+cosθ) back**. On a neck half a body long swung through sixty degrees, "back" is a quarter of a body
+before the animal has retreated by anything at all: it is the chord of the arc. And a neck already
+straight out at rest has spent its protraction — its tip is *at* its greatest distance along the
+body axis — so there is no forward reach left to measure and the sweep **is** the reach. That is
+also the anatomy: this neck is **stiff** — rib bundles blocking ventral flexion and overlapping zygapophyses limiting lateral bending (Renesto & Saller 2018; Spiekman et al. 2020) — so the boom swings as a unit from its base and the *skull* snaps sideways, which is what `shore.ts` drives and what this builder has modelled from the start.
+
+Measured at the frame of greatest lateral travel, against this animal's own neck (R = 0.549 of a
+body, from `neck_00` to the anchor at rest):
+
+| clip | peak | lateral | back | swept | the arc predicts back | excess |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `SnapLeft` | 0.23 | 0.457 | 0.472 | 79.6° | 0.450 | +0.022 |
+| `SnapRight` | 0.23 | 0.416 | 0.472 | 67.2° | 0.336 | +0.136 |
+| `Heavy` | 0.43 | 0.355 | 0.118 | 46.5° | 0.171 | -0.053 |
+| `Ability` | 0.50 | 0.391 | 0.208 | 49.0° | 0.189 | +0.019 |
+| `Attack` | 0.27 | 0.188 | 0.019 | 24.5° | 0.049 | -0.030 |
+| `Bite` | 0.17 | 0.031 | 0.005 | 9.2° | 0.007 | -0.002 |
+
+The last column is the test. A recoil is back travel with no lateral travel, and the worst such
+frame in any of these clips is 0.000-0.043 of a body. The clips also already carry the gather: the
+wind-up is a swing to the *opposite* side at u ≈ 0.1–0.2 before the strike goes through, which is
+Phragmoteuthis' `forwardAtPhase > rearBackAtPhase` rule expressed laterally because the weapon
+swings laterally.
+
+**Decision: recorded, not re-authored.** The rule a long neck is measured by is lateral sweep, not
+forward protraction, and these clips sweep 39-46 % of a body — against Ceratites' 14 % of forward
+reach, which is the number T3D-23 set as good.
+
+```sh
+/opt/blender/blender -b --factory-startup --python tools/triassic/attack-arc.py -- \
+    tanystropheus neck_00 SnapLeft SnapRight Heavy Attack Bite Ability
+```

@@ -545,3 +545,45 @@ writes only this species' asset family; it touches no shared registry and perfor
   That is visible in the mouth-closed pair on the volume sheet and is what a reduced model is for;
   it is recorded rather than hidden.
 - Living colours, soft tissues and movements are artistic reconstruction.
+
+## The sideways sweep is the strike, not a recoil — T3D-23, decided and recorded
+
+T3D-23 measures an attack by how far `anchor_attack_primary` travels **forward** over body length:
+Phragmoteuthis' re-authored dart is +14 % against the 3–4 % it shipped with, and a clip that leaves
+the weapon hanging has not used the animal. Read that way both long-necked animals look like
+failures — Dinocephalosaurus' `NeckStrike`, `Attack` and `Heavy` move that anchor 39-46 % of a body sideways, 19-37 % back and never as much as 2 % forward — and that reading is a category error, which
+`tools/triassic/attack-arc.py` exists to show.
+
+A point on an arm of length R swung through θ about its base moves R·sinθ sideways and **R·(1 −
+cosθ) back**. On a neck half a body long swung through sixty degrees, "back" is a quarter of a body
+before the animal has retreated by anything at all: it is the chord of the arc. And a neck already
+straight out at rest has spent its protraction — its tip is *at* its greatest distance along the
+body axis — so there is no forward reach left to measure and the sweep **is** the reach. That is
+also the anatomy: thirty-two hyperelongate cervicals are the opposite of a stiff boom and this animal is reconstructed as sweeping them laterally through a shoal, which is what `NeckStrike` is.
+
+Measured at the frame of greatest lateral travel, against this animal's own neck (R = 0.512 of a
+body, from `neck_00` to the anchor at rest):
+
+| clip | peak | lateral | back | swept | the arc predicts back | excess |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `NeckStrike` | 0.63 | 0.457 | 0.302 | 69.8° | 0.335 | -0.033 |
+| `Heavy` | 0.47 | 0.437 | 0.244 | 75.9° | 0.387 | -0.143 |
+| `Ability` | 0.40 | 0.443 | 0.238 | 65.3° | 0.298 | -0.060 |
+| `Attack` | 0.37 | 0.387 | 0.191 | 61.3° | 0.266 | -0.075 |
+| `Grab` | 0.13 | 0.323 | 0.106 | 39.3° | 0.116 | -0.009 |
+| `Bite` | 0.13 | 0.205 | 0.120 | 43.3° | 0.139 | -0.019 |
+
+The last column is the test. A recoil is back travel with no lateral travel, and the worst such
+frame in any of these clips is 0.000-0.029 in the strike clips (`Grab` 0.159 is the middle of a held loop rather than a strike) of a body. The clips also already carry the gather: the
+wind-up is a swing to the *opposite* side at u ≈ 0.1–0.2 before the strike goes through, which is
+Phragmoteuthis' `forwardAtPhase > rearBackAtPhase` rule expressed laterally because the weapon
+swings laterally.
+
+**Decision: recorded, not re-authored.** The rule a long neck is measured by is lateral sweep, not
+forward protraction, and these clips sweep 39-46 % of a body — against Ceratites' 14 % of forward
+reach, which is the number T3D-23 set as good.
+
+```sh
+/opt/blender/blender -b --factory-startup --python tools/triassic/attack-arc.py -- \
+    dinocephalosaurus neck_00 NeckStrike Attack Heavy Bite Ability Grab
+```
