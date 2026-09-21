@@ -4,7 +4,7 @@
   "species": "Askeptosaurus italicus",
   "provenance": "Middle Triassic \u00b7 Monte San Giorgio",
   "description": "Slender thalattosaur with a long lateral swimming tail. Authored body and volume twin share one rig; the straight regeneration is retained as an animated backup.",
-  "modelLength": 8.622,
+  "modelLength": 8.659,
   "lengthMeters": 2.5,
   "locomotion": "Swim",
   "clips": [

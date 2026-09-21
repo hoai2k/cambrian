@@ -77,7 +77,8 @@ info = {'tag': tag, 'file': str(source), 'clip': clip, 't': t,
 centre, size = R.subject_bounds()
 span = max(size) * 1.08
 d = span * 1.6
-loc, target, scale = R.fit_ortho((centre[0], centre[1], centre[2] + d), centre, R.posed_points(), 4 / 3)
+loc, target, scale = R.fit_ortho((centre[0], centre[1], centre[2] + d), centre, R.posed_points(), 4 / 3,
+                                 margin=float(opt('--margin', '1.30')))
 shot = out / ('%s-%s-%s-top.png' % (tag, clip, t))
 render(shot, 900, 675, loc=loc, target=target, scale=scale, roll=math.pi / 2)
 

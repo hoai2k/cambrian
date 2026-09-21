@@ -209,7 +209,9 @@
         0.8333,
         1.0
       ],
-      "aimPerJointDegrees": 0.0
+      "aimPerJointDegreesT26": 0.0,
+      "aimPerJointDegrees": 0.0,
+      "aimedBend": {}
     }
   },
   "bones": 33,
@@ -656,6 +658,10 @@
         6.53,
         6.6
       ],
+      "headVsAimedTrunkDegrees": [
+        6.53,
+        6.6
+      ],
       "posedExtentOverBind": [
         0.9808,
         0.9872
@@ -700,6 +706,10 @@
         1.0205
       ],
       "headVsTrunkRunDegrees": [
+        4.22,
+        5.24
+      ],
+      "headVsAimedTrunkDegrees": [
         4.22,
         5.24
       ],
@@ -750,6 +760,10 @@
         1.39,
         4.72
       ],
+      "headVsAimedTrunkDegrees": [
+        1.39,
+        4.72
+      ],
       "posedExtentOverBind": [
         0.98,
         0.9869
@@ -794,6 +808,10 @@
         1.0918
       ],
       "headVsTrunkRunDegrees": [
+        6.06,
+        11.17
+      ],
+      "headVsAimedTrunkDegrees": [
         6.06,
         11.17
       ],
@@ -844,6 +862,10 @@
         5.39,
         11.17
       ],
+      "headVsAimedTrunkDegrees": [
+        5.39,
+        11.17
+      ],
       "posedExtentOverBind": [
         0.9253,
         0.9595
@@ -888,6 +910,10 @@
         1.0131
       ],
       "headVsTrunkRunDegrees": [
+        7.05,
+        12.84
+      ],
+      "headVsAimedTrunkDegrees": [
         7.05,
         12.84
       ],
@@ -938,6 +964,10 @@
         1.65,
         7.0
       ],
+      "headVsAimedTrunkDegrees": [
+        1.65,
+        7.0
+      ],
       "posedExtentOverBind": [
         0.9733,
         0.979
@@ -982,6 +1012,10 @@
         1.0175
       ],
       "headVsTrunkRunDegrees": [
+        0.59,
+        10.81
+      ],
+      "headVsAimedTrunkDegrees": [
         0.59,
         10.81
       ],
@@ -1032,6 +1066,10 @@
         1.48,
         9.7
       ],
+      "headVsAimedTrunkDegrees": [
+        1.48,
+        9.7
+      ],
       "posedExtentOverBind": [
         0.9846,
         0.9958
@@ -1076,6 +1114,10 @@
         1.5984
       ],
       "headVsTrunkRunDegrees": [
+        6.53,
+        11.18
+      ],
+      "headVsAimedTrunkDegrees": [
         6.53,
         11.18
       ],
@@ -1126,6 +1168,10 @@
         6.53,
         18.21
       ],
+      "headVsAimedTrunkDegrees": [
+        6.53,
+        18.21
+      ],
       "posedExtentOverBind": [
         0.9491,
         0.9846
@@ -1170,6 +1216,10 @@
         1.0502
       ],
       "headVsTrunkRunDegrees": [
+        0.73,
+        6.53
+      ],
+      "headVsAimedTrunkDegrees": [
         0.73,
         6.53
       ],
@@ -1220,6 +1270,10 @@
         10.3,
         10.34
       ],
+      "headVsAimedTrunkDegrees": [
+        10.3,
+        10.34
+      ],
       "posedExtentOverBind": [
         0.9683,
         0.9758
@@ -1264,6 +1318,10 @@
         1.0305
       ],
       "headVsTrunkRunDegrees": [
+        6.53,
+        13.0
+      ],
+      "headVsAimedTrunkDegrees": [
         6.53,
         13.0
       ],
@@ -1314,6 +1372,10 @@
         1.87,
         6.53
       ],
+      "headVsAimedTrunkDegrees": [
+        1.87,
+        6.53
+      ],
       "posedExtentOverBind": [
         0.9846,
         0.9939
@@ -1358,6 +1420,10 @@
         1.0157
       ],
       "headVsTrunkRunDegrees": [
+        3.57,
+        5.29
+      ],
+      "headVsAimedTrunkDegrees": [
         3.57,
         5.29
       ],
@@ -1408,6 +1474,10 @@
         6.53,
         18.21
       ],
+      "headVsAimedTrunkDegrees": [
+        6.53,
+        18.21
+      ],
       "posedExtentOverBind": [
         0.9491,
         0.9846
@@ -1452,6 +1522,10 @@
         1.6526
       ],
       "headVsTrunkRunDegrees": [
+        6.53,
+        20.14
+      ],
+      "headVsAimedTrunkDegrees": [
         6.53,
         20.14
       ],
@@ -1502,6 +1576,10 @@
         1.58,
         10.73
       ],
+      "headVsAimedTrunkDegrees": [
+        1.58,
+        10.73
+      ],
       "posedExtentOverBind": [
         0.9808,
         0.987
@@ -1546,6 +1624,10 @@
         1.0213
       ],
       "headVsTrunkRunDegrees": [
+        1.35,
+        6.65
+      ],
+      "headVsAimedTrunkDegrees": [
         1.35,
         6.65
       ],
@@ -1596,6 +1678,10 @@
         0.49,
         3.77
       ],
+      "headVsAimedTrunkDegrees": [
+        0.49,
+        3.77
+      ],
       "posedExtentOverBind": [
         0.9922,
         0.9951
@@ -1640,6 +1726,10 @@
         1.5984
       ],
       "headVsTrunkRunDegrees": [
+        6.53,
+        11.18
+      ],
+      "headVsAimedTrunkDegrees": [
         6.53,
         11.18
       ],
@@ -1690,6 +1780,10 @@
         6.53,
         20.18
       ],
+      "headVsAimedTrunkDegrees": [
+        6.53,
+        20.18
+      ],
       "posedExtentOverBind": [
         0.5743,
         0.9846
@@ -1734,6 +1828,10 @@
         1.0104
       ],
       "headVsTrunkRunDegrees": [
+        1.86,
+        6.53
+      ],
+      "headVsAimedTrunkDegrees": [
         1.86,
         6.53
       ],
