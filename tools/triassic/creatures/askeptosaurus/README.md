@@ -179,12 +179,16 @@ correction.** `trunk` is the chord from the hip joint to the shoulder joint, and
 two thirds tail it is a line between two points inside the front half, which is not what an eye
 calls the run of the animal. Measured on the shipped body at rest, the head sat:
 
-| against | in space | in the dorsal view |
+| the head, against | in space | in the dorsal view |
 | --- | ---: | ---: |
-| the hip→shoulder chord (what T3D-26 aimed at) | 4.2° | — |
+| the hip→shoulder chord (what T3D-26 aimed at) | 0.6° | 0.6° |
 | `body`→`chest` | 16.5° | 15.7° |
 | mid-tail (`tail_04`)→shoulder | 16.8° | 15.4° |
 | the tail's own run (`tail_08`)→shoulder | **30.6°** | **28.7°** |
+
+(`plan-view.py` on the shipped T3D-26 file at `Idle` 0, where the head's direction is the skull's
+own dominantly weighted vertices rather than the bone chain — the two can disagree, which is half of
+what this animal has taught. At the bare rest the chord figure is `restHeadVsTrunkRunDegrees`, 4.2.)
 
 Three defensible readings of one trunk, 31° apart at the extremes. The reading the picture uses is
 the longest one, because that is the line the animal draws on the page.
@@ -215,10 +219,11 @@ by only 7.2°, so it is the *head* reading the two disagreed about, not the trun
 Nothing about the machinery changed: the aim is still shared over `NECKCHAIN`'s six joints by
 `uncurl`, still carried whole into the bind (`fcarry`'s second element), still leaves only the
 opening to the clips, and `restHeadVsAimedDegrees` is **4.17** — the same residual T3D-26 left
-against its own target. What moved is where the target is. In the dorsal view the head now sits
-**3.9°** off the reviewer's line and **6.7°** off the tail's own run, against 28.7° before;
-`askeptosaurus-aimed-front-plan.png` is the before and after, rendered from each file by
-`plan-view.py` with the angles under the pictures.
+against its own target. What moved is where the target is. In the dorsal view, against the
+tail's own run to the shoulder, the head reads **4.4°** at `Idle` where it read 28.6°, **3.4°** at
+`Swim` where it read 31.2° and **2.6°** at `Sprint` where it read 32.4°;
+`docs/triassic/verification/askeptosaurus-aimed-front-plan.png` is those six shots, each rendered
+from its own file by `plan-view.py` with its own angles under it.
 
 Two things follow through the file, and both are recorded rather than replaced. `carry` gains
 `planViewReadings`, which is the head against **every** reading of the trunk there is, in space and
@@ -452,6 +457,15 @@ blender -b --python tools/triassic/creatures/askeptosaurus/review-swap.py -- --f
 blender -b --python tools/triassic/creatures/askeptosaurus/review-swap.py -- --tag t26
 python3 tools/triassic/creatures/askeptosaurus/front-sheets.py
 python3 tools/triassic/creatures/askeptosaurus/contact-sheets.py
+# T3D-34's acceptance: the dorsal view, before and after, each from its own file. The `before` body
+# is the shipped GLB of the commit that precedes the fix, taken out of version control into
+# local/triassic-authoring/askeptosaurus/t26/askeptosaurus.glb:
+for clip in Idle Swim Sprint; do
+  blender -b --python tools/triassic/creatures/askeptosaurus/plan-view.py -- \
+    --file local/triassic-authoring/askeptosaurus/t26/askeptosaurus.glb --tag t26 --clip $clip --overlay
+  blender -b --python tools/triassic/creatures/askeptosaurus/plan-view.py -- --tag t33 --clip $clip --overlay
+done
+python3 tools/triassic/creatures/askeptosaurus/plan-sheet.py
 node tools/triassic/creatures/askeptosaurus/review-viewer.mjs   # with Vite on port 4179
 node tools/triassic/publish-portraits.mjs
 node tools/update-asset-sizes.mjs

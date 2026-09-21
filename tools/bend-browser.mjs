@@ -225,6 +225,13 @@ try {
   assert.equal(await page.locator('.bend-body-note').getAttribute('data-applies-to'), 'origpose', 'and says the same thing about it');
   const framed = await page.locator('.bend-frame-note').textContent();
   assert.ok(framed.trim().length > 0, `the panel says where the frame came from (${framed.replace(/\s+/g, ' ').trim().slice(0, 60)}…)`);
+  // **And where it has not earned which end is the head, it says so.** This is the body it went
+  // wrong on: the published original pose carries no rig and so no mouth socket, and there is no
+  // authored yaw for it, so the box is all there is — and the box picks the axis and never the end.
+  assert.equal(await page.locator('.bend-frame-note').getAttribute('data-forward-earned'), 'no',
+    'the box has not earned which end is the head on this body');
+  assert.match(await page.locator('.bend-frame-unearned').textContent(), /fallback and not a reading/,
+    'and the panel asks about the head end rather than stating it');
 
   // ---- the handles are on the stage: find one by hover, drag it, undo it ----
   const handle = await findHandle();
@@ -474,6 +481,10 @@ try {
   assert.equal(await rigNote.getAttribute('data-applies-to'), 'built', 'the panel knows it is on the shipped body');
   assert.equal(await rigNote.getAttribute('data-corrected'), 'no', 'and that this body\'s rest was never moved before binding');
   assert.match(await page.locator('.bend-frame-note').textContent(), /mouth socket/i, 'a body with a mouth socket is framed from it, not from its box');
+  // The other side of the pair: a socket *does* earn the head end, so no question is asked here.
+  assert.equal(await page.locator('.bend-frame-note').getAttribute('data-forward-earned'), 'yes',
+    'and that socket earns which end the head is at');
+  assert.equal(await page.locator('.bend-frame-unearned').count(), 0, 'so the panel asks nothing about it');
 
   // ---- both readings are on screen, each with the references it is between ----
   const geometry = await page.locator('.bend-reading[data-reading="geometry"]').textContent();
