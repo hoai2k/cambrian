@@ -25,10 +25,13 @@ import { bendKey, getBend, setBend } from './store';
  * lit as you go, and the two traced centrelines the geometry reading is taken from are drawn on
  * the body — so a trace that has set off down a flipper is seen rather than believed.
  *
- * Right-drag orbits, as in mark and mouth mode, because a mode where left-drag moves a handle has
- * to leave the model turnable without a modifier nobody would find. The rig goes to its bind pose:
- * a swimming body is drawn somewhere its vertex positions are not, and a span placed on the
- * swimming pose would bend the bind pose somewhere else.
+ * The stage keeps the ordinary pointer scheme (`../pointer-scheme`), as mouth mode does:
+ * **left-drag orbits** where it is not on a handle, **right-drag pans**, the wheel zooms. The
+ * handles take the left button only while the pointer is on one, and the orbit is *suspended*
+ * there rather than the press being swallowed — see `ViewerScene.setOrbitEnabled` for why the
+ * ordering leaves no other way. The rig goes to its bind pose: a swimming body is drawn somewhere
+ * its vertex positions are not, and a span placed on the swimming pose would bend the bind pose
+ * somewhere else.
  *
  * Nothing is saved. The document lives in the session's store so a trip through view mode does not
  * lose it, and a reload starts from the body's own guess. What leaves is the bend file, with the
@@ -299,7 +302,7 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
   return (
     <>
       <div className="mark-stage bend-stage">
-        <span className="mark-label">Bend · left-drag a handle · right-drag orbits · shift+right pans · scroll zooms</span>
+        <span className="mark-label">Bend · left-drag a handle, or the view to orbit · right-drag pans · scroll zooms</span>
         <ul className="mouth-legend bend-legend" aria-label="Handles">
           <li className={`base ${hover === 'base' ? 'hover' : ''}`}><i />base · the end the bend is anchored at</li>
           <li className={`tip ${hover === 'tip' ? 'hover' : ''}`}><i />tip · the end that is carried round</li>

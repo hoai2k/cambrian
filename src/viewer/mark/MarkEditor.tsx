@@ -13,9 +13,12 @@ import { useMeasuredHash } from '../file-hash';
  * script can find them and only a human can point at them (docs/triassic/preview-mesh-defects.md).
  * This is the pointing. The brush is a sphere in world space: drag across the body with the left
  * button and every vertex inside it is marked, which is why the ring is drawn at the size it
- * actually catches rather than a fixed cursor. Orbiting keeps the right button, because a mode
- * where dragging paints has to leave the model turnable without a modifier nobody would find —
- * and the stage says so in as many words.
+ * actually catches rather than a fixed cursor. The brush owning the left button is what makes this
+ * the one mode on the `paint` pointer scheme (`../pointer-scheme`): orbiting moves to the right
+ * button and panning to the middle one, since the wheel already zooms and a mode with no pan at
+ * all cannot be aimed once it is zoomed in. The mouth and bend editors keep the ordinary scheme,
+ * because their handles want the left button only while the pointer is on one. The stage says
+ * which in as many words.
  *
  * Nothing is saved: the marks live in the session's store so a trip through view mode does not
  * lose them, and a reload starts clean. What leaves is the region file.
@@ -222,7 +225,7 @@ export function MarkEditor({ scene, specimen, model, sha256: manifestSha, canvas
   return (
     <>
       <div className="mark-stage">
-        <span className="mark-label">Mark · left-drag paints · right-drag orbits · shift+right pans · scroll zooms</span>
+        <span className="mark-label">Mark · left-drag paints · right-drag orbits · middle-drag pans · scroll zooms</span>
         {/* The brush ring is drawn at the size it actually catches, at the depth of the surface
             under the pointer, so what is about to be marked is visible before the button goes down. */}
         <svg className="mark-svg" aria-hidden="true">

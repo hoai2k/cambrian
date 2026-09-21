@@ -9,6 +9,7 @@
  * it. The file it writes is the input to `tools/triassic/cut-region.py`.
  */
 import { chromium } from 'playwright-core';
+import { silenceCounter } from './qa-counter.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
@@ -19,6 +20,7 @@ fs.mkdirSync(out, { recursive: true });
 const key = 'triassic:atopodentatus';
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || '/opt/pw-browsers/chromium', args: ['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
+await silenceCounter(page);
 const errors = [];
 // The stats script is fetched from gc.zgo.at, which a headless container has no route to. That is
 // not this page failing, so a request that never reached our own origin is reported separately
@@ -30,6 +32,13 @@ page.on('requestfailed', (r) => (r.url().startsWith(base) ? errors : offsite).pu
 await page.addInitScript(() => localStorage.setItem('cambrian-settings', JSON.stringify({ quality: 'low', muted: true, music: false })));
 const loaded = () => page.waitForFunction((k) => document.querySelector('.clips')?.getAttribute('data-loaded-specimen') === k, key, { timeout: 90000 });
 const marked = async () => Number(await page.locator('.mark-count').getAttribute('data-marked'));
+/**
+ * Where the camera is and what it is looking at. An **orbit** swings the position about a target
+ * that stays put; a **pan** carries the two together. Neither number is drawn anywhere, so the
+ * scene hands them over on `window.__viewerScene`, the way the game does on `__cambrian`.
+ */
+const cam = () => page.evaluate(() => window.__viewerScene.cameraState());
+const apart = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 
 try {
   await page.goto(`${base}/viewer/?specimen=${encodeURIComponent(key)}`, { waitUntil: 'networkidle', timeout: 120000 });
@@ -114,7 +123,41 @@ try {
   await page.waitForSelector('.mark-panel', { timeout: 20000 });
   await page.waitForTimeout(1000);
   assert.equal(await marked(), 0, 'a reload starts clean');
+
+  // ---- the camera: what is left of the buttons once the brush has the left one ----
+  // Mark mode is the one mode that cannot orbit on the left, so it runs on the `paint` scheme: the
+  // orbit moves to the right button and the pan to the middle one, the wheel still zooming. Before
+  // this it had no pan on any button at all, and a zoomed-in fin could not be brought into view.
+  // Last in the drive, because an orbit and a pan leave the damping unwinding for many frames.
+  const scene = await cam();
+  assert.equal(scene.scheme, 'paint', 'mark mode runs on the paint scheme');
+  const box = await page.locator('.viewer-canvas').boundingBox();
+  const px = box.x + box.width * 0.18, py = box.y + box.height * 0.2;
+  await page.mouse.move(px, py);
+  const beforeOrbit = await cam();
+  await page.mouse.down({ button: 'right' });
+  await page.mouse.move(px + 150, py + 50, { steps: 10 });
+  await page.mouse.up({ button: 'right' });
+  await page.waitForTimeout(400);
+  const orbited = await cam();
+  assert.ok(apart(orbited.position, beforeOrbit.position) > 0.05,
+    `a right-drag orbits (the camera moved ${apart(orbited.position, beforeOrbit.position).toFixed(3)})`);
+  assert.ok(apart(orbited.target, beforeOrbit.target) < 0.02, 'about a target that stays where it is');
+  assert.equal(await marked(), 0, 'and the right button paints nothing');
+
+  await page.mouse.move(px, py); await page.waitForTimeout(200);
+  const beforePan = await cam();
+  await page.mouse.down({ button: 'middle' });
+  await page.mouse.move(px + 120, py - 60, { steps: 10 });
+  await page.mouse.up({ button: 'middle' });
+  await page.waitForTimeout(400);
+  const panned = await cam();
+  assert.ok(apart(panned.target, beforePan.target) > 0.05,
+    `a middle-drag pans: the camera's target moved ${apart(panned.target, beforePan.target).toFixed(3)}`);
+  assert.equal(await marked(), 0, 'and paints nothing either');
+  await page.screenshot({ path: path.join(out, 'mark-panned.png') });
+
   assert.deepEqual(errors, [], 'no page errors');
   if (offsite.length) console.log(`note: ${offsite.length} off-site request(s) failed (no route out of the container): ${offsite.join(', ')}`);
-  console.log(`PASS: mark mode — generated mesh on stage, brush paints ${painted} vertices, undo/redo, erase, export (${dest}), marks kept through view mode and forgotten on reload`);
+  console.log(`PASS: mark mode — generated mesh on stage, brush paints ${painted} vertices, undo/redo, erase, export (${dest}), marks kept through view mode and forgotten on reload, right-drag orbits and middle-drag pans`);
 } finally { await browser.close(); }

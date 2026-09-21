@@ -66,6 +66,23 @@ const findHandle = () => page.evaluate(() => {
   }
   return null;
 });
+/**
+ * Where the camera is and what it is looking at. An **orbit** swings the position about a target
+ * that does not move; a **pan** carries the two together. Nothing on the page draws either number,
+ * so the scene hands them over on `window.__viewerScene`, the way the game does on `__cambrian`.
+ */
+const cam = () => page.evaluate(() => window.__viewerScene.cameraState());
+const apart = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+/** A spot on the canvas with none of the editor's handles under it — where a press is the camera's. */
+const emptySpot = () => page.evaluate(() => {
+  const canvas = document.querySelector('.viewer-canvas');
+  const r = canvas.getBoundingClientRect();
+  for (const [fx, fy] of [[.14, .18], [.86, .18], [.14, .82], [.86, .82], [.5, .1]]) {
+    const x = r.width * fx, y = r.height * fy;
+    if (!window.__viewerScene.mouthPick(x, y)) return { x: r.left + x, y: r.top + y };
+  }
+  return null;
+});
 
 try {
   await page.goto(`${base}/viewer/?specimen=${encodeURIComponent(key)}`, { waitUntil: 'networkidle', timeout: 120000 });
@@ -93,6 +110,11 @@ try {
   handle.which = (await page.locator('.mouth-legend li.hover').getAttribute('class'))?.split(' ')[0] ?? '';
   assert.ok(['hinge', 'front', 'side'].includes(handle.which), `and the legend says which (${handle.which})`);
   const before = { depth: Number(await field('Depth').inputValue()), height: Number(await field('Height').inputValue()), pitch: Number(await field('Pitch').inputValue()), yaw: Number(await field('Yaw').inputValue()), roll: Number(await field('Roll').inputValue()) };
+  // The camera as the handle drag starts. Nothing has orbited yet, so it is at rest from framing
+  // and a difference afterwards is the drag's and nobody else's.
+  const stillCam = await cam();
+  assert.equal(stillCam.scheme, 'view', 'mouth mode runs on the view scheme: left orbits, right pans');
+  assert.equal(stillCam.orbit, false, 'and the orbit is suspended while the pointer sits on a handle');
   await page.mouse.move(handle.x, handle.y);
   await page.mouse.down();
   await page.mouse.move(handle.x + 30, handle.y - 24, { steps: 8 });
@@ -109,6 +131,14 @@ try {
   await page.keyboard.press('Control+z'); await page.waitForTimeout(300);
   assert.equal(Number(await field('Depth').inputValue()), before.depth, 'Ctrl+Z takes the whole drag back');
   assert.equal(Number(await field('Pitch').inputValue()), before.pitch, 'angles included');
+
+  // ---- the camera: a drag on a handle is not a drag on the view ----
+  // The handle drag above went 30 px across and 24 px up, which as an orbit would be plain to see.
+  const afterHandle = await cam();
+  assert.ok(apart(afterHandle.position, stillCam.position) < 1e-3,
+    `dragging a handle to the edge of the screen left the camera where it was (moved ${apart(afterHandle.position, stillCam.position).toExponential(2)})`);
+  assert.ok(apart(afterHandle.target, stillCam.target) < 1e-3, 'and looking at the same place');
+
 
   // ---- the numeric fields: Square levels the line, and a deeper level hinge takes more of the head ----
   // Level first: the plane passes through the hinge, so on a line pitched down towards the nose
@@ -273,12 +303,46 @@ try {
   assert.equal(raw.frame.source, 'bounds');
   assert.equal(check(rawFile).status, 0, 'and the consumer accepts it against that file');
 
+  // ---- the camera: what the left and right buttons do when they are not on a handle ----
+  // Last, deliberately: an orbit or a pan leaves OrbitControls' damping unwinding for many frames,
+  // and under the software renderer that is many seconds — so anything measured in screen pixels
+  // after one of these is measured on a camera that is still moving.
+
+  // Off a handle the left button is the orbit's: the position swings, the target stays put.
+  const empty = await emptySpot();
+  assert.ok(empty, 'there is a spot on the canvas with no handle under it');
+  await page.mouse.move(empty.x, empty.y); await page.waitForTimeout(200);
+  assert.equal((await cam()).orbit, true, 'the orbit comes back the moment the pointer leaves the handle');
+  const beforeOrbit = await cam();
+  await page.mouse.down();
+  await page.mouse.move(empty.x + 150, empty.y + 50, { steps: 10 });
+  await page.mouse.up();
+  await page.waitForTimeout(400);
+  const orbited = await cam();
+  assert.ok(apart(orbited.position, beforeOrbit.position) > 0.05,
+    `a left-drag on empty canvas orbits (the camera moved ${apart(orbited.position, beforeOrbit.position).toFixed(3)})`);
+  assert.ok(apart(orbited.target, beforeOrbit.target) < 0.02, 'about a target that stays where it is — which is what makes it an orbit and not a pan');
+
+  // The right button pans, which is the thing the editors had no button for at all: the target
+  // moves, and that is exactly what an orbit cannot do.
+  await page.mouse.move(empty.x, empty.y); await page.waitForTimeout(200);
+  const beforePan = await cam();
+  await page.mouse.down({ button: 'right' });
+  await page.mouse.move(empty.x + 120, empty.y - 60, { steps: 10 });
+  await page.mouse.up({ button: 'right' });
+  await page.waitForTimeout(400);
+  const panned = await cam();
+  assert.ok(apart(panned.target, beforePan.target) > 0.05,
+    `a right-drag pans: the camera's target moved ${apart(panned.target, beforePan.target).toFixed(3)}`);
+  await page.screenshot({ path: path.join(out, 'mouth-panned.png') });
+
   if (errors.length) console.error(`page errors:\n${errors.join('\n---\n')}`);
   assert.deepEqual(errors, [], 'no page errors');
   console.log(`PASS: mouth mode — seated on the jaw bone (${first} mandible vertices), a ${handle.which} handle found and dragged, undone, deepened to ${deepCount},`);
   console.log(`      the gape swung the jaw on stage (${swung} pixels) and hid the furniture while held, then shut and put the body back;`);
   console.log(`      exported with the measured hash ${hash.slice(0, 12)}…, accepted and refused by npm run triassic:mouth, kept through view mode, forgotten on reload;`);
-  console.log('      the original pose framed from its box and seated by a guess, exported as a cut on the generation');
+  console.log('      the original pose framed from its box and seated by a guess, exported as a cut on the generation;');
+  console.log('      and the pointer scheme: a handle drag that left the camera alone, a left-drag that orbits, a right-drag that pans');
 } finally {
   await browser.close();
 }
