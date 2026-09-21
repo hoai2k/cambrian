@@ -484,3 +484,64 @@ Honest limitations, worst first:
    is a redraw question rather than a mesh one.
 8. Living colours, soft tissue and movement are artistic reconstruction. Travel and the grip rules
    remain engine-owned.
+
+## T3D-32A — the head is not cut at all
+
+`T.cut_rim` and a pre-cut `T.seal_seams` between them settled what the cut on this fish was worth,
+and the answer is that it should not be there.
+
+**The generation's head is a closed surface.** `T.seal_seams` run over the whole head *before*
+anything was cut fills **nothing** — zero boundary edges, on the authored body and on the twin
+alike. So every boundary edge either half had afterwards was made by the cut, and `T.cut_rim` says
+what that came to on the skull: 271 boundary edges in the head in one component of 218 vertices, 94
+of them on the measured seam and the rest the rear of the labelled mandible window, which is not a
+plane at the hinge but a curve running 0.04 of a body *behind* it and dipping from the mouth line
+down under the gills — the same fact `T.jaw_junction`'s `rear` had already been widened for.
+
+**That rim was closed three ways and never closed.** A hinge cap, a rim fold, a post-cut seal and
+two oral shells stood at it, and measured **`--as-drawn`** — which hides everything
+`src/shared/oral-geometry.ts` matches, and is therefore the body a player sees — this fish still
+read **1,346 px of backdrop through its head** at `Heavy`, 1,261 at `Bite` and 875 at `Attack`.
+Every one of those parts closes a hole *next to* the rim rather than spanning it.
+
+**And spanning it is refused here, correctly.** `T.cap_mouth` closes by construction because it
+spans a closed curve; this lip rim **pinches**. Sixteen of its vertices carry four boundary edges
+rather than two, where the interlocking tooth roots bring two runs of the rim to a point, so it is
+not a set of closed curves and nothing spanning it would close anything. The helper declines rather
+than filling, which is its whole contract.
+
+So the head stays **one surface** (`T.jaw_field_uncut`, Mosasaurus' construction). The mouth
+opening is a bone turning inside skin, which is what every other joint on this animal already is:
+full `jaw` below the measured mouth line and forward of the hinge, full skull above it, and the
+commissure a band between them that stretches. Nothing is cut, so nothing can part. The
+generation's `restingGape` verdict — "arrived GAPING" — is about the *pose*: the jaws are modelled
+parted, but the slit is 0.006 to 0.015 thick on a body of 1.0 and its walls are a fold of the same
+closed shell.
+
+**The band, swept** (fraction of the head's half depth at the hinge):
+
+| band | worst skin | mandible follows its own joint (`Bite`/`Attack`/`Heavy`/`Eat`) |
+| ---: | ---: | --- |
+| 0.20 | 6.76× | 0.98 / 0.99 / 0.99 / 0.98 |
+| 0.30 | 5.93× | 0.98 / 0.99 / 0.99 / 0.98 |
+| 0.38 | 5.93× | 0.98 / 0.99 / 0.99 / 0.98 |
+| **0.50** | **5.93×** | 0.98 / 0.99 / 0.99 / 0.97 |
+
+**After.** `--as-drawn`: **0 through and 0 opened at every clip that moves the jaw** — `Heavy`,
+`Bite`, `Attack`, `Eat`, `Shake`, `Grab`, `Flop` and the shut clips. Plain run 0 as well. Skin
+**5.93× unchanged** (`Shake`, `skull` — the recorded opercular crack). `lag.mjs` has no seam to
+measure and says so. `idle-bones` every joint owns skin. `oral-shell-audit` reports no lining on
+authored, twin or LOD. `Flop` re-applied with `apply.mjs`.
+
+**A hidden part that wears the skin is freight on the twin.** The lining took a *copy of the body
+pigmentation material* — the right rule for an authored patch, and it carries the 2048² albedo and
+normal maps — and it was exported with the twin group as well. Retiring it took
+`hybodus.lod1.glb` (= the twin, byte for byte) from **1,315,816 to 672,796 bytes, −48.9 %**, on a
+body whose twin is vertex-coloured and needs no texture at all.
+
+**Known, and not this row's:** `audit.mjs --package --decode` cannot complete on this body once the
+`Flop` is applied. The shore gait is written to the authored body only, so authored/twin clip parity
+fails (24 against 23) before anything is audited; `_pipeline/paired-audit.mjs` also asserts that a
+`root` channel does not *exist* where `rig.mjs` only requires it not to move. Five Triassic bodies
+are affected and the fix is central. The audit was run and passed on the rebuilt triplet **before**
+the gait was re-applied.

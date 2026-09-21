@@ -837,9 +837,9 @@
       "radiusOuter": 0.07329064325738083
     }
   },
-  "authoredTriangles": 22886,
-  "twinTriangles": 7868,
-  "twinTriangleFraction": 0.34379096390806607,
+  "authoredTriangles": 32288,
+  "twinTriangles": 8226,
+  "twinTriangleFraction": 0.25476957383548066,
   "twinRemeshTriangles": 90428,
   "twinDecimateRatio": 0.06192772090435028,
   "twinVerticesHeldBackFromRelaxation": 14793,
@@ -1432,14 +1432,14 @@
     ],
     "Heavy": [
       [
-        -1.4677038192749023,
-        -2.1493701934814453,
-        -0.8357352614402771
+        -1.4666359424591064,
+        -2.3628482818603516,
+        -0.7683170437812805
       ],
       [
-        1.5363130569458008,
-        3.3359973430633545,
-        0.5995891094207764
+        1.5535627603530884,
+        3.3640999794006348,
+        0.5909318327903748
       ]
     ],
     "Hit": [
@@ -1602,15 +1602,15 @@
   "weights": {
     "Atopodentatus authored body": {
       "maxInfluences": 4,
-      "vertices": 11184,
+      "vertices": 16138,
       "verticesPerBone": {
         "tail_00": 2585,
-        "body": 3391,
-        "hind_upper_L": 822,
-        "tail_01": 1430,
+        "body": 3389,
+        "hind_upper_L": 808,
+        "tail_01": 1425,
         "chest": 2633,
         "fore_upper_L": 1476,
-        "hind_upper_R": 855,
+        "hind_upper_R": 843,
         "hind_mid_R": 452,
         "tail_05": 341,
         "tail_04": 508,
@@ -1619,8 +1619,8 @@
         "hind_outer_L": 387,
         "hind_mid_L": 454,
         "hind_tip_L": 286,
-        "skull": 2290,
-        "neck_02": 1027,
+        "skull": 4724,
+        "neck_02": 1201,
         "fore_outer_R": 562,
         "fore_tip_R": 414,
         "fore_mid_R": 603,
@@ -1630,27 +1630,27 @@
         "tail_03": 567,
         "tail_02": 702,
         "fore_upper_R": 721,
-        "neck_00": 1408,
-        "neck_01": 986,
-        "jaw": 505
+        "neck_00": 1414,
+        "neck_01": 975,
+        "jaw": 660
       },
       "jawJunction": {
-        "cutRimPairs": 68,
+        "cutRimPairs": 69,
         "lipPairs": 693,
         "rimReach": 0.05835228653476264,
         "rimDepth": 0.03361830487847328,
         "dz": 0.01120610162615776,
         "band": 0.015,
         "back": 0.06,
-        "throat": 0.6,
-        "shellVertices": 1959,
-        "shellFullJaw": 1822,
-        "bodyThroatVertices": 181
+        "throat": 1.0,
+        "shellVertices": 4436,
+        "shellFullJaw": 4323,
+        "bodyThroatVertices": 189
       }
     },
     "Atopodentatus procedural volume twin": {
       "maxInfluences": 4,
-      "vertices": 3155,
+      "vertices": 4117,
       "verticesPerBone": {
         "tail_04": 242,
         "tail_05": 172,
@@ -1674,31 +1674,31 @@
         "fore_upper_R": 277,
         "neck_00": 532,
         "fore_upper_L": 344,
-        "neck_01": 390,
-        "neck_02": 398,
-        "skull": 555,
-        "jaw": 250,
+        "neck_01": 377,
+        "neck_02": 457,
+        "skull": 1010,
+        "jaw": 334,
         "fore_mid_L": 311,
         "fore_outer_L": 246,
         "fore_tip_L": 185
       },
       "jawJunction": {
-        "cutRimPairs": 37,
+        "cutRimPairs": 38,
         "lipPairs": 120,
         "rimReach": 0.060458924132302305,
         "rimDepth": 0.03352425992488861,
         "dz": 0.011174753308296204,
         "band": 0.015,
         "back": 0.06,
-        "throat": 0.6,
-        "shellVertices": 386,
-        "shellFullJaw": 327,
-        "bodyThroatVertices": 75
+        "throat": 1.0,
+        "shellVertices": 867,
+        "shellFullJaw": 811,
+        "bodyThroatVertices": 81
       }
     }
   },
   "maxInfluences": 4,
-  "meanInfluences": 2.78485250017435,
+  "meanInfluences": 2.277906689706245,
   "mouth": {
     "method": "modelled cavity, measured by casting head vertex normals back into the mesh",
     "note": "The generation models a real slit with an interior: 634 cavity vertices at a 0.020 gap, running y -0.334 to -0.196. The seam is the cavity's own mid height per station, blurred once, fitted over the stations in front of the hinge and continued behind them -- the detector's last few stations climb onto the cheek as the lumen closes. Station-to-station roughness 0.0233 of the local radius.",
@@ -1972,253 +1972,555 @@
         -0.225
       ]
     ],
-    "liningCoverage": [
-      [
-        -0.3278,
-        0.88,
-        0.38
-      ],
-      [
-        -0.321,
-        0.88,
-        0.368
-      ],
-      [
-        -0.3142,
-        0.88,
-        0.337
-      ],
-      [
-        -0.3073,
-        0.88,
-        0.347
-      ],
-      [
-        -0.3005,
-        0.881,
-        0.342
-      ],
-      [
-        -0.2936,
-        0.888,
-        0.336
-      ],
-      [
-        -0.2868,
-        0.885,
-        0.348
-      ],
-      [
-        -0.2799,
-        0.899,
-        0.313
-      ],
-      [
-        -0.2731,
-        0.887,
-        0.262
-      ],
-      [
-        -0.2663,
-        0.852,
-        0.226
-      ],
-      [
-        -0.2594,
-        0.819,
-        0.179
-      ],
-      [
-        -0.2526,
-        0.766,
-        0.134
-      ],
-      [
-        -0.2457,
-        0.683,
-        0.11
-      ],
-      [
-        -0.2389,
-        0.711,
-        0.093
-      ],
-      [
-        -0.232,
-        0.761,
-        0.073
-      ],
-      [
-        -0.2252,
-        0.808,
-        0.067
-      ],
-      [
-        -0.2184,
-        0.847,
-        0.063
-      ],
-      [
-        -0.2115,
-        0.858,
-        0.069
-      ],
-      [
-        -0.2047,
-        0.858,
-        0.061
-      ],
-      [
-        -0.1978,
-        0.853,
-        0.062
-      ]
-    ],
-    "liningSection": {
-      "-0.18784": [
-        0.04553,
-        0.00193
-      ],
-      "-0.19812": [
-        0.05015,
-        0.0025
-      ],
-      "-0.20841": [
-        0.05041,
-        0.00254
-      ],
-      "-0.21869": [
-        0.04972,
-        0.00254
-      ],
-      "-0.22898": [
-        0.04728,
-        0.00257
-      ],
-      "-0.23926": [
-        0.04801,
-        0.00283
-      ],
-      "-0.24955": [
-        0.05313,
-        0.00356
-      ],
-      "-0.25984": [
-        0.06275,
-        0.00485
-      ],
-      "-0.27012": [
-        0.0755,
-        0.00616
-      ],
-      "-0.28041": [
-        0.08738,
-        0.00697
-      ],
-      "-0.29069": [
-        0.09592,
-        0.00723
-      ],
-      "-0.30098": [
-        0.09657,
-        0.00732
-      ],
-      "-0.31126": [
-        0.09432,
-        0.0075
-      ],
-      "-0.32155": [
-        0.09302,
-        0.00741
-      ],
-      "-0.33184": [
-        0.08648,
-        0.00548
-      ],
-      "-0.32784": [
-        0.0935,
-        0.00708
-      ],
-      "-0.32099": [
-        0.09305,
-        0.00742
-      ],
-      "-0.31415": [
-        0.0937,
-        0.0075
-      ],
-      "-0.30731": [
-        0.09528,
-        0.00746
-      ],
-      "-0.30047": [
-        0.09665,
-        0.00731
-      ],
-      "-0.29362": [
-        0.09665,
-        0.00725
-      ],
-      "-0.28678": [
-        0.09252,
-        0.00718
-      ],
-      "-0.27994": [
-        0.08723,
-        0.00695
-      ],
-      "-0.2731": [
-        0.07833,
-        0.00646
-      ],
-      "-0.26626": [
-        0.0689,
-        0.00571
-      ],
-      "-0.25941": [
-        0.06222,
-        0.0048
-      ],
-      "-0.25257": [
-        0.05612,
-        0.00391
-      ],
-      "-0.24573": [
-        0.0485,
-        0.00324
-      ],
-      "-0.23889": [
-        0.04809,
-        0.00281
-      ],
-      "-0.23205": [
-        0.04787,
-        0.0026
-      ],
-      "-0.2252": [
-        0.04748,
-        0.00254
-      ],
-      "-0.21836": [
-        0.04972,
-        0.00254
-      ],
-      "-0.21152": [
-        0.05041,
-        0.00254
-      ],
-      "-0.20468": [
-        0.0504,
-        0.00254
-      ],
-      "-0.19784": [
-        0.05007,
-        0.00249
-      ]
+    "oralGeometry": "none: the cut is capped with its own rim and domed (T.cap_mouth), and the lining and the hinge envelope this body shipped with are gone",
+    "cutRim": {
+      "Atopodentatus authored body": {
+        "skull": {
+          "boundaryEdgesInRegion": 761,
+          "boundaryEdgesElsewhere": 2,
+          "loops": [
+            {
+              "vertices": 153,
+              "closed": true,
+              "box": [
+                [
+                  -0.05031,
+                  0.05753
+                ],
+                [
+                  -0.27639,
+                  -0.21384
+                ],
+                [
+                  -0.01974,
+                  0.01988
+                ]
+              ],
+              "reach": 0.06256,
+              "verticesOnTheSeam": 87
+            },
+            {
+              "vertices": 44,
+              "closed": true,
+              "box": [
+                [
+                  -0.09123,
+                  -0.08507
+                ],
+                [
+                  -0.31585,
+                  -0.29464
+                ],
+                [
+                  0.00496,
+                  0.00553
+                ]
+              ],
+              "reach": 0.02121,
+              "verticesOnTheSeam": 44
+            },
+            {
+              "vertices": 30,
+              "closed": true,
+              "box": [
+                [
+                  -0.06381,
+                  -0.04913
+                ],
+                [
+                  -0.33548,
+                  -0.32985
+                ],
+                [
+                  0.00557,
+                  0.00558
+                ]
+              ],
+              "reach": 0.00564,
+              "verticesOnTheSeam": 30
+            },
+            {
+              "vertices": 28,
+              "closed": true,
+              "box": [
+                [
+                  0.0849,
+                  0.09437
+                ],
+                [
+                  -0.33034,
+                  -0.32322
+                ],
+                [
+                  0.00557,
+                  0.00558
+                ]
+              ],
+              "reach": 0.00712,
+              "verticesOnTheSeam": 28
+            },
+            {
+              "vertices": 20,
+              "closed": true,
+              "box": [
+                [
+                  0.09354,
+                  0.09869
+                ],
+                [
+                  -0.31743,
+                  -0.30979
+                ],
+                [
+                  0.00542,
+                  0.00554
+                ]
+              ],
+              "reach": 0.00764,
+              "verticesOnTheSeam": 20
+            },
+            {
+              "vertices": 20,
+              "closed": true,
+              "box": [
+                [
+                  0.02436,
+                  0.03172
+                ],
+                [
+                  -0.32825,
+                  -0.32355
+                ],
+                [
+                  0.00557,
+                  0.00558
+                ]
+              ],
+              "reach": 0.0047,
+              "verticesOnTheSeam": 20
+            },
+            {
+              "vertices": 19,
+              "closed": true,
+              "box": [
+                [
+                  0.05142,
+                  0.0596
+                ],
+                [
+                  -0.25975,
+                  -0.2487
+                ],
+                [
+                  0.00569,
+                  0.00812
+                ]
+              ],
+              "reach": 0.01105,
+              "verticesOnTheSeam": 19
+            },
+            {
+              "vertices": 18,
+              "closed": true,
+              "box": [
+                [
+                  0.05704,
+                  0.06698
+                ],
+                [
+                  -0.33385,
+                  -0.3292
+                ],
+                [
+                  0.00557,
+                  0.00558
+                ]
+              ],
+              "reach": 0.00465,
+              "verticesOnTheSeam": 18
+            }
+          ]
+        },
+        "jaw": {
+          "boundaryEdgesInRegion": 761,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 153,
+              "closed": true,
+              "box": [
+                [
+                  -0.05031,
+                  0.05753
+                ],
+                [
+                  -0.27639,
+                  -0.21384
+                ],
+                [
+                  -0.01974,
+                  0.01988
+                ]
+              ],
+              "reach": 0.06256,
+              "verticesOnTheSeam": 87
+            },
+            {
+              "vertices": 44,
+              "closed": true,
+              "box": [
+                [
+                  -0.09123,
+                  -0.08507
+                ],
+                [
+                  -0.31585,
+                  -0.29464
+                ],
+                [
+                  0.00496,
+                  0.00553
+                ]
+              ],
+              "reach": 0.02121,
+              "verticesOnTheSeam": 44
+            },
+            {
+              "vertices": 30,
+              "closed": true,
+              "box": [
+                [
+                  -0.06381,
+                  -0.04913
+                ],
+                [
+                  -0.33548,
+                  -0.32985
+                ],
+                [
+                  0.00557,
+                  0.00558
+                ]
+              ],
+              "reach": 0.00564,
+              "verticesOnTheSeam": 30
+            },
+            {
+              "vertices": 28,
+              "closed": true,
+              "box": [
+                [
+                  0.0849,
+                  0.09437
+                ],
+                [
+                  -0.33034,
+                  -0.32322
+                ],
+                [
+                  0.00557,
+                  0.00558
+                ]
+              ],
+              "reach": 0.00712,
+              "verticesOnTheSeam": 28
+            },
+            {
+              "vertices": 20,
+              "closed": true,
+              "box": [
+                [
+                  0.09354,
+                  0.09869
+                ],
+                [
+                  -0.31743,
+                  -0.30979
+                ],
+                [
+                  0.00542,
+                  0.00554
+                ]
+              ],
+              "reach": 0.00764,
+              "verticesOnTheSeam": 20
+            },
+            {
+              "vertices": 20,
+              "closed": true,
+              "box": [
+                [
+                  0.02436,
+                  0.03172
+                ],
+                [
+                  -0.32825,
+                  -0.32355
+                ],
+                [
+                  0.00557,
+                  0.00558
+                ]
+              ],
+              "reach": 0.0047,
+              "verticesOnTheSeam": 20
+            },
+            {
+              "vertices": 19,
+              "closed": true,
+              "box": [
+                [
+                  0.05142,
+                  0.0596
+                ],
+                [
+                  -0.25975,
+                  -0.2487
+                ],
+                [
+                  0.00569,
+                  0.00812
+                ]
+              ],
+              "reach": 0.01105,
+              "verticesOnTheSeam": 19
+            },
+            {
+              "vertices": 18,
+              "closed": true,
+              "box": [
+                [
+                  0.05704,
+                  0.06698
+                ],
+                [
+                  -0.33385,
+                  -0.3292
+                ],
+                [
+                  0.00557,
+                  0.00558
+                ]
+              ],
+              "reach": 0.00465,
+              "verticesOnTheSeam": 18
+            }
+          ]
+        }
+      },
+      "Atopodentatus procedural volume twin": {
+        "skull": {
+          "boundaryEdgesInRegion": 157,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 157,
+              "closed": true,
+              "box": [
+                [
+                  -0.09478,
+                  0.10185
+                ],
+                [
+                  -0.33835,
+                  -0.21384
+                ],
+                [
+                  -0.01964,
+                  0.02036
+                ]
+              ],
+              "reach": 0.12451,
+              "verticesOnTheSeam": 119
+            }
+          ]
+        },
+        "jaw": {
+          "boundaryEdgesInRegion": 157,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 157,
+              "closed": true,
+              "box": [
+                [
+                  -0.09478,
+                  0.10185
+                ],
+                [
+                  -0.33835,
+                  -0.21384
+                ],
+                [
+                  -0.01964,
+                  0.02036
+                ]
+              ],
+              "reach": 0.12451,
+              "verticesOnTheSeam": 119
+            }
+          ]
+        }
+      }
     },
-    "liningFittedPerVertex": true,
-    "liningWorstSectionHullClearance": 0.002513236544712057,
-    "liningVerticesOutsideTheSectionHull": 0,
+    "mouthCaps": {
+      "Atopodentatus authored body": {
+        "skullAtHinge": 68,
+        "jawAtHinge": 68,
+        "palate": {
+          "rimEdges": 695,
+          "capped": true,
+          "faces": 5571,
+          "domedVertices": 2476,
+          "deepestRaw": 0.015675,
+          "dome": 0.3,
+          "rounds": 2,
+          "firstNewVertex": 9226,
+          "rimVertices": 695,
+          "cycles": [
+            20,
+            13,
+            16,
+            17,
+            87,
+            17,
+            17,
+            16,
+            44,
+            15,
+            28,
+            12,
+            20,
+            14,
+            13,
+            17,
+            14,
+            13,
+            17,
+            13,
+            13,
+            17,
+            15,
+            18,
+            13,
+            30,
+            12,
+            12,
+            14,
+            17,
+            19,
+            15,
+            16,
+            13,
+            12,
+            18,
+            13,
+            5
+          ]
+        },
+        "floor": {
+          "rimEdges": 695,
+          "capped": true,
+          "faces": 5571,
+          "domedVertices": 2476,
+          "deepestRaw": 0.015675,
+          "dome": 0.3,
+          "rounds": 2,
+          "firstNewVertex": 1960,
+          "rimVertices": 695,
+          "cycles": [
+            20,
+            13,
+            16,
+            17,
+            87,
+            17,
+            17,
+            16,
+            44,
+            15,
+            28,
+            12,
+            20,
+            14,
+            13,
+            17,
+            14,
+            13,
+            17,
+            13,
+            13,
+            17,
+            15,
+            18,
+            13,
+            30,
+            12,
+            12,
+            14,
+            17,
+            19,
+            15,
+            16,
+            13,
+            12,
+            18,
+            13,
+            5
+          ]
+        }
+      },
+      "Atopodentatus procedural volume twin": {
+        "skullAtHinge": 37,
+        "jawAtHinge": 37,
+        "palate": {
+          "rimEdges": 122,
+          "capped": true,
+          "faces": 1080,
+          "domedVertices": 480,
+          "deepestRaw": 0.016639,
+          "dome": 0.3,
+          "rounds": 2,
+          "firstNewVertex": 2770,
+          "rimVertices": 122,
+          "cycles": [
+            122
+          ]
+        },
+        "floor": {
+          "rimEdges": 122,
+          "capped": true,
+          "faces": 1080,
+          "domedVertices": 480,
+          "deepestRaw": 0.016639,
+          "dome": 0.3,
+          "rounds": 2,
+          "firstNewVertex": 387,
+          "rimVertices": 122,
+          "cycles": [
+            122
+          ]
+        }
+      }
+    },
+    "mouthCapSeating": {
+      "Atopodentatus authored body": {
+        "capVertices": 4952,
+        "worstSectionHullClearance": 7.4e-05,
+        "outsideTheSectionHull": 0,
+        "outsideTheClosedIntakeByRayParity": 271,
+        "note": "parity counts a cap vertex inside the generation's own modelled slit as outside the solid, because a pocket in a closed shell is exterior space to a parity test; the hull is what this build asserts on."
+      },
+      "Atopodentatus procedural volume twin": {
+        "capVertices": 960,
+        "worstSectionHullClearance": -0.003405,
+        "outsideTheSectionHull": 54,
+        "outsideTheClosedIntakeByRayParity": 728,
+        "note": "parity counts a cap vertex inside the generation's own modelled slit as outside the solid, because a pocket in a closed shell is exterior space to a parity test; the hull is what this build asserts on."
+      }
+    },
+    "capDome": 0.3,
+    "capRoomFraction": 0.55,
     "toothPatches": [
       {
         "vertices": 40,
@@ -2292,27 +2594,13 @@
       }
     ],
     "toothPatchesStraddlingTheCut": [],
-    "authoredToothRows": [],
-    "oralPartSeating": [
-      {
-        "part": "Oral cavity lining",
-        "clearanceInsideSectionX": 0.008000000601310023,
-        "clearanceInsideSectionZ": 0.007518608910927975,
-        "signedDepthProbeMin": -0.008805341087281704
-      },
-      {
-        "part": "Seated jaw hinge tissue",
-        "clearanceInsideSectionX": 0.02183590244650121,
-        "clearanceInsideSectionZ": 0.003196124795590116,
-        "signedDepthProbeMin": -0.00023403413069900125
-      }
-    ]
+    "authoredToothRows": []
   },
   "envelope": {
     "maximumEnvelopeDifference": 0.05854237079620361,
     "maximumEnvelopeDifferenceFractionOfBodyLength": 0.011708474159240723,
-    "surfaceDistanceMax": 0.1516295075416565,
-    "surfaceDistanceP95": 0.036664315871894386,
+    "surfaceDistanceMax": 0.0673738345503807,
+    "surfaceDistanceP95": 0.016952987760305405,
     "envelopeTolerance": 0.2
   },
   "anchors": {

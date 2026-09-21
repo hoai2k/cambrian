@@ -45,8 +45,8 @@ so the roll correction is 4.5°. Countershading strength 0.47 over 24 stations.
 
 | | |
 |---|---:|
-| Authored triangles | 22,890 |
-| Twin triangles | 7,872 (**34.4 %**) |
+| Authored triangles | 32,288 |
+| Twin triangles | 8,226 (**25.5 %**) |
 | Joints | 30 |
 | Max influences / mean | 4 / 3.12 |
 | Envelope, worst of 21 stations | 0.0585 = **1.17 %** of body length (tolerance 4 %) |
@@ -54,8 +54,9 @@ so the roll correction is 4.5°. Countershading strength 0.47 over 24 stations.
 | Anchor surface distance, worst | 0.0163 of body length (tolerance 2 %, swallow 5 %) |
 | Paddle root seating inside the trunk | 0.0162 – 0.0168 |
 | Jaw hinge seating | 0.0306 |
-| Worst **skin** tear | **3.90×** (`Heavy`, `neck_02`/`jaw`) |
-| Gape solid | **9 px** of 378,000 (tolerance 12) |
+| Worst **skin** tear | **3.42×** (`Sprint`, `fore_upper_R`) |
+| Gape solid, **as drawn** | **0 px** through and **0** opened, at all sixteen clips that move the jaw (was 3,738 / 4,494) |
+| Oral geometry | none: the cut is capped with its own rim and domed (`T.cap_mouth`) |
 | Idle bones | every joint owns skin |
 
 ## The axis, checked rather than assumed
@@ -219,3 +220,55 @@ correctly and simply do not match each other at rest.
 - Not shipped: registered in `src/content/triassic/review-bodies.json` for the specimen viewer.
   `tools/triassic/shipped.json`, the roster stand-in and the preview badge are a separate human
   decision.
+
+## T3D-32A — the mouth is the cut's own rim, and the hammer is a quarter turn
+
+Two things changed and both were measured before anything was built.
+
+**The mouth.** `T.cut_rim` says this generation is *shut* over the back half of its mouth and
+*gaping* over the front. The cut leaves one closed loop of 153 vertices spanning y −0.276 to −0.214
+— 87 on the measured seam and 66 across the hinge cross-section — on a mouth 0.124 of a body long;
+forward of −0.276 the seam plane passes between surfaces the generation had already drawn apart,
+and all it leaves there is a few dozen small closed loops where it sawed across the needle comb.
+The leak was exactly the back half: measured `--as-drawn`, which is the body the game shows,
+**3,738 px of backdrop through the head** at `Attack`, every pixel of it in the throat between the
+upper tooth row and the mandible. Neither the 780-vertex sac nor the seated hinge ellipsoid was
+ever drawn, so neither was closing anything a player could see.
+
+Both are gone. `T.cap_cut` fans the hinge cross-section to its own centroid and `T.cap_mouth` spans
+what is left — the two lip runs and the chord the fan closed the hinge with, plus the tooth
+cross-sections — and domes each fill into its own half at 0.30 of its own distance from the rim,
+bounded by 0.55 of the room the head's measured section leaves above and below the mouth line. Each
+half is a closed solid by construction; every cap vertex is a convex combination of vertices the
+cut already made; the caps wear the head's own albedo off that rim; and each rides its own half's
+bone through the same weight field as the skin around it. **0 px through and 0 opened at all
+sixteen clips that move the jaw**, and 0 on the plain run too (was 9).
+
+Two things the rim selector had to learn. The corner of the mouth is on the lip *and* on the hinge
+cross-section, so a bound at `HINGE_Y − 1e-6` excluded it and the lip run stopped one edge short —
+`cap_mouth` correctly refused an arc. And the rim is a **band** rather than the line exactly:
+`bisect_on_curve` lands every vertex it makes on the measured line, but a bisect at `dist=1e-7`
+snaps a face it cannot cleanly cut and `split_part` then sends that face whole to one side, leaving
+four of the twin's vertices on the boundary up to 0.0017 off the line. `SEAM_TOL` is 0.0025, seven
+times the worst of them and a fourteenth of the head's own half depth.
+
+**The hammer.** T3D-23 recorded this body's `Heavy` as pulling the head 33.8 % of L back before
+reaching only 7.1 % forward. The cause was not a wind-up: the sweep was laid on four axial bones,
+the trunk and the skull at once — 0.22 + 4 × 0.30 + 0.55 = 1.97 rad per unit of an envelope running
+−1.0 through +1.9 — so the snout went 113° to one side and 214° to the other and travelled 10.4
+units on a body 5.0 long. What the measurement was reading is a head rotated so far round that its
+projection on the body axis went negative. `HAMMER_YAW` scales the three yaw gains together to
+about a quarter turn and `HAMMER_CARRY` walks the whole body forward on a plateau held through the
+follow, so the bar arrives in front of where it started.
+
+| `anchor_attack_primary` over L | back | forward | across | lateral swing | snout path |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| before | 33.8 % | 7.1 % | 28.6 % | 51.7 % | 10.37 |
+| after | **4.5 %** | **12.5 %** | **22.1 %** | **37.4 %** | **5.64** |
+
+`audit.mjs` asserts it rather than leaving it to a reading: the sweep must out-travel the wind-up.
+
+**And the 0.6 throat share goes with it.** `T.jaw_junction` ran at `throat=.6` here because a full
+share tore `neck_02` 4.31x in `Heavy` where the body read 3.90x. With the sweep re-authored, `Heavy`
+is not the worst clip on the animal at all and a full share reads **3.42×** — the same figure the
+lighter share gives, and the same worst edge (`Sprint`, `fore_upper_R`). Skin 3.90× → 3.42×.

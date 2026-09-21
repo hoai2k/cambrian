@@ -40,6 +40,8 @@ const AXIS = ['skull', 'neck_00', 'chest', 'body', 'tail_00', 'tail_02', 'tail_0
 const vertical = (rows, n) => Math.max(...rows.map((r) => r[n][1])) - Math.min(...rows.map((r) => r[n][1]));
 /** How far it travels along the body's own long axis, which after export is glTF z. */
 const along = (rows, n) => Math.max(...rows.map((r) => r[n][2])) - Math.min(...rows.map((r) => r[n][2]));
+/** The engine length this body is packaged at, so an excursion can be quoted as a fraction of it. */
+const BODY_LENGTH = 5.0;
 
 /**
  * The phase of a point's swing on one chosen component. `swingPhase` in the kit reads x, which is
@@ -120,10 +122,21 @@ for (const clip of ['Attack', 'Heavy', 'Bite']) {
   }
   const reachOf = (n) => Math.max(...rows.map((r) => Math.hypot(
     r[n][0] - rows[0][n][0], r[n][1] - rows[0][n][1], r[n][2] - rows[0][n][2])));
+  // **Signed, over body length, on the animal's own axis** -- the figure T3D-23 quotes for every
+  // attack clip in the era, so this animal's answer to it is measured here rather than argued
+  // about. `z` is along the body with the head at +z, so a negative excursion from the rest frame
+  // is the head drawn back. Recorded beside the lateral swing, because on this animal the lateral
+  // swing is the blow: the weapon is a bar and a bar is swung across, not pushed forward.
+  const ax = rows.map((r) => r.anchor_attack_primary[2]);
+  const lx = rows.map((r) => r.anchor_attack_primary[0]);
   report.strike.push({
     clip, snoutPathLength: total, snoutReach: reachOf('anchor_attack_primary'),
     lateralSwing: lateral(rows, 'anchor_attack_primary'),
     forwardReach: along(rows, 'anchor_attack_primary'),
+    backOverBodyLength: (ax[0] - Math.min(...ax)) / BODY_LENGTH,
+    aheadOverBodyLength: (Math.max(...ax) - ax[0]) / BODY_LENGTH,
+    acrossOverBodyLength: Math.max(Math.max(...lx) - lx[0], lx[0] - Math.min(...lx)) / BODY_LENGTH,
+    lateralSwingOverBodyLength: lateral(rows, 'anchor_attack_primary') / BODY_LENGTH,
     skullReach: reachOf('skull'), chestReach: reachOf('chest'),
     halfTravelInFractionOfClip: bestWindow / step.length,
   });
@@ -191,6 +204,15 @@ for (const g of report.rowing) {
     `Heavy must be the sweep and Attack the strike (${s('Heavy').lateralSwing.toFixed(3)} vs ${s('Attack').lateralSwing.toFixed(3)})`);
   need(s('Attack').forwardReach > s('Attack').lateralSwing,
     `Attack must be a forward strike (${s('Attack').forwardReach.toFixed(3)} vs ${s('Attack').lateralSwing.toFixed(3)})`);
+  // **T3D-23's question, asked as an assertion rather than left to a reading.** That row records
+  // this `Heavy` as pulling the head 33.8 % of a body back before reaching 7.1 % forward, and asks
+  // whether a sideways sweep is the strike or a recoil. On this animal it is the strike: the bar
+  // goes 51.7 % of a body *across*, which is half again the wind-up and more than seven times the
+  // forward reach, and it is the widest excursion of any clip this body has. What the clause is
+  // guarding against -- an attack whose largest motion is its own recoil -- is what this refuses.
+  need(s('Heavy').acrossOverBodyLength > s('Heavy').backOverBodyLength,
+    `Heavy's sweep must out-travel its wind-up (${s('Heavy').acrossOverBodyLength.toFixed(3)} across `
+    + `vs ${s('Heavy').backOverBodyLength.toFixed(3)} back, of a body length)`);
   for (const n of ['Attack', 'Heavy']) {
     need(s(n).halfTravelInFractionOfClip < 0.4,
       `${n}: half the blow's travel must fall in a short window (${s(n).halfTravelInFractionOfClip.toFixed(3)})`);

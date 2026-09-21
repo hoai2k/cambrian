@@ -5,10 +5,10 @@
   "envelopeToleranceFractionOfBodyLength": 0.04,
   "maximumEnvelopeDifference": 0.05854237079620361,
   "maximumEnvelopeDifferenceFractionOfBodyLength": 0.011708474159240723,
-  "surfaceDistanceMax": 0.1516295075416565,
-  "surfaceDistanceMaxFractionOfBodyLength": 0.0303259015083313,
-  "surfaceDistanceP95": 0.036664315871894386,
-  "surfaceDistanceP95FractionOfBodyLength": 0.007332863174378877,
+  "surfaceDistanceMax": 0.0673738345503807,
+  "surfaceDistanceMaxFractionOfBodyLength": 0.013474766910076142,
+  "surfaceDistanceP95": 0.016952987760305405,
+  "surfaceDistanceP95FractionOfBodyLength": 0.003390597552061081,
   "anchorTolerance": 0.1,
   "anchorSurfaceDistances": {
     "anchor_mouth": {
