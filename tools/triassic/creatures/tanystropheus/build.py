@@ -398,7 +398,12 @@ def ventral_edge(band):
     if hi - lo < .10:
         return None
     mid = (lo + hi) / 2
-    for i in range(1, len(band)):
+    # From the third sample in and stopping three short of the end, which is the guard this
+    # builder's first detector already had: a step needs a few samples on each side of it to be a
+    # step. Without it the crossing can settle on the chin, where there is nothing below it -- which
+    # is what the thin left flank at the front of this snout was reading (0.054-0.058 of the
+    # section at three consecutive stations, against a right flank still declining smoothly).
+    for i in range(3, max(4, len(band) - 3)):
         if band[i][1] < mid <= band[i - 1][1]:
             f0, L0 = band[i - 1]
             f1, L1 = band[i]
@@ -407,15 +412,29 @@ def ventral_edge(band):
     return None
 
 
+# **Each flank is read on its own, and a thin sample is refused.** This is the second form of
+# Keichousaurus' trap, and Macrocnemus is where it was found: a detector that pools both flanks
+# scores a single step against the *pair*, so where the two are painted differently the step lands
+# between them -- on neither animal's lip. Reading them separately is not enough by itself here,
+# because this generation is not meshed alike on its two sides: forward of x = 0.61 the left flank
+# carries 7 to 16 vertices in a station against the right's 17 to 29, and on that few the crossing
+# stops finding the lip and settles on the chin (0.058, 0.056, 0.054 of the section at three
+# consecutive stations, a flat floor where the right reads a lip still declining smoothly: 0.269,
+# 0.222, 0.140). So a flank is used only where it has `SEAM_MIN_BAND` vertices to have a profile,
+# and which flanks a station rests on is written down per station rather than averaged away.
+SEAM_MIN_BAND = 12
+
+
 def pigment_seam():
-    """The painted mouth line, per station, both flanks, as (x, fraction, contrast, disagreement)."""
+    """The painted mouth line per station: each flank read on its own, thin samples refused,
+    and what each station rests on recorded."""
     pts = flank_luminance()
     half = (SNOUT_FRONT - SNOUT_BACK) / SEAM_STATIONS * SEAM_WINDOW / 2.
     rows = []
     for k in range(SEAM_STATIONS):
         x = SNOUT_BACK + (SNOUT_FRONT - SNOUT_BACK) * (k + .5) / SEAM_STATIONS
-        sides, contrast = [], []
-        for sgn in (1, -1):
+        read = {}
+        for sgn, nm in ((1, 'left'), (-1, 'right')):
             band = []
             for px, py, pz, L in pts:
                 if abs(px - x) > half or py * sgn < .004:
@@ -426,13 +445,18 @@ def pigment_seam():
                 band.append(((pz - lo_) / (hi_ - lo_), L))
             band.sort()
             r = ventral_edge(band)
-            if r:
-                sides.append(r[0])
-                contrast.append(r[1])
-        if not sides:
+            read[nm] = None if (r is None or r[2] < SEAM_MIN_BAND) else r
+        used = [v for v in read.values() if v]
+        if not used:
             continue
-        rows.append((float(x), float(np.mean(sides)), float(np.mean(contrast)),
-                     float(abs(sides[0] - sides[1])) if len(sides) == 2 else None))
+        rows.append((float(x), float(np.mean([v[0] for v in used])),
+                     float(np.mean([v[1] for v in used])),
+                     (float(read['left'][0] - read['right'][0])
+                      if read['left'] and read['right'] else None),
+                     [nm for nm in ('left', 'right') if read[nm]],
+                     {nm: (None if not read[nm] else [round(read[nm][0], 4), round(read[nm][1], 4),
+                                                      int(read[nm][2])])
+                      for nm in ('left', 'right')}))
     return rows
 
 
@@ -474,6 +498,29 @@ PIGMENT_CONTRAST = float(np.median([r[2] for r in pigment_rows]))
 # thinks it is, and it should stop rather than cut at a guess.
 assert len(pigment_rows) >= SEAM_STATIONS - 2, ('the mouth line did not measure', len(pigment_rows))
 assert PIGMENT_CONTRAST > .04, ('no painted mouth line to read', PIGMENT_CONTRAST, pigment_rows)
+# **The fit is over the flanks' own readings, robustly.** Averaging the two flanks at a station
+# and fitting the averages hides exactly what has to be seen: where the two disagree, the average
+# is a line through neither of them, which is Keichousaurus' trap arriving by the back door. So
+# every flank reading is a point in the fit, and a reading whose residual is more than
+# `SEAM_ROBUST` times the median absolute residual is dropped and the line refitted (Nothosaurus'
+# robust refit). On this snout that is what answers the left flank's last two stations, where a
+# band of 15 and 16 vertices puts the crossing at 0.056 and 0.058 of the section while the right
+# flank, with 24 and 27, still reads a lip declining smoothly through 0.222 and 0.269.
+SEAM_ROBUST = 2.5
+_flank_pts = []
+for _r in pigment_rows:
+    for _nm in ('left', 'right'):
+        if _r[5][_nm]:
+            _flank_pts.append((float(_r[0]), _nm, float(_r[5][_nm][0])))
+_FX = np.array([q[0] for q in _flank_pts])
+_FZ = np.array([head_lo(x) + (head_hi(x) - head_lo(x)) * f for x, _n, f in _flank_pts])
+_fit0 = np.polyfit(_FX, _FZ, 1)
+_res0 = np.abs(np.polyval(_fit0, _FX) - _FZ)
+_mad = float(np.median(_res0)) or 1e-9
+SEAM_KEPT = _res0 <= SEAM_ROBUST * _mad
+SEAM_DROPPED = [[round(q[0], 5), q[1], round(q[2], 4)]
+                for q, k in zip(_flank_pts, SEAM_KEPT) if not k]
+assert SEAM_KEPT.sum() >= .75 * len(_flank_pts), ('the mouth line did not fit', SEAM_DROPPED)
 SEAM_X = np.array([r[0] for r in pigment_rows])
 SEAM_F = np.array([r[1] for r in pigment_rows])
 SEAM_Z = np.array([head_lo(x) + (head_hi(x) - head_lo(x)) * f for x, f in zip(SEAM_X, SEAM_F)])
@@ -485,7 +532,7 @@ assert .20 < float(np.median(SEAM_F)) < .62, (float(np.median(SEAM_F)), pigment_
 # is already in the measurement; and it is **clamped inside the head's own section** at the ends,
 # because a ramp extrapolated past the last station would run out under the snout tip and leave the
 # mandible with nothing in it.
-SEAM_FIT = np.polyfit(SEAM_X, SEAM_Z, 1)
+SEAM_FIT = np.polyfit(_FX[SEAM_KEPT], _FZ[SEAM_KEPT], 1)
 SEAM_MARGIN = .05
 MOUTH_BACK = X_SNOUT - .100
 MOUTH_FRONT = X_SNOUT - .004
@@ -499,14 +546,22 @@ def seam(x):
 
 JAW_FRACTION = float(np.mean([(seam(x) - head_lo(x)) / max(1e-9, head_hi(x) - head_lo(x))
                               for x in SEAM_X]))
-SEAM_DEVIATIONS = [abs(seam(x) - z) for x, z in zip(SEAM_X, SEAM_Z)]
+SEAM_DEVIATIONS = [abs(seam(x) - z) for x, z, k in zip(_FX, _FZ, SEAM_KEPT) if k]
 SEAM_DEV = float(max(SEAM_DEVIATIONS))
+_kept_pts = [(x, z, q) for x, z, q, k in zip(_FX, _FZ, _flank_pts, SEAM_KEPT) if k]
 SEAM_DEV_AT = int(np.argmax(SEAM_DEVIATIONS))
+SEAM_DEV_WHERE = {'x': round(float(_kept_pts[SEAM_DEV_AT][0]), 5),
+                  'flank': _kept_pts[SEAM_DEV_AT][2][1],
+                  'measuredFraction': round(float(_kept_pts[SEAM_DEV_AT][2][2]), 4),
+                  'measuredZ': round(float(_kept_pts[SEAM_DEV_AT][1]), 5),
+                  'cutZ': round(seam(float(_kept_pts[SEAM_DEV_AT][0])), 5)}
+# What the same readings would have cost averaged station by station rather than fitted per flank.
+SEAM_DEV_AVERAGED = float(max(abs(seam(x) - z) for x, z in zip(SEAM_X, SEAM_Z)))
 # What a constant fraction — the median of the same readings, which is what this builder took
 # before T3D-20 — would have cost, kept so the change is a comparison rather than a claim.
 _medf = float(np.median(SEAM_F))
 SEAM_DEV_MEDIAN = float(max(abs(head_lo(x) + (head_hi(x) - head_lo(x)) * _medf - z)
-                            for x, z in zip(SEAM_X, SEAM_Z)))
+                            for x, z, k in zip(_FX, _FZ, SEAM_KEPT) if k))
 assert SEAM_DEV < .005, ('the cut does not follow the mouth line it measured', SEAM_DEV, pigment_rows)
 
 
@@ -1387,12 +1442,8 @@ print('LIMB_SWEEP', json.dumps({k: v for k, v in limb_sweep.items() if k in ('Ru
 # different from the reverse -- and so is what the constant fraction this builder used to take
 # would have cost on exactly the same measurement, so the change is a comparison and not a claim.
 _fracs = [r[1] for r in pigment_rows]
-_worst = {'x': round(float(SEAM_X[SEAM_DEV_AT]), 4),
-          'measuredFraction': round(float(SEAM_F[SEAM_DEV_AT]), 4),
-          'measuredZ': round(float(SEAM_Z[SEAM_DEV_AT]), 5),
-          'cutZ': round(seam(float(SEAM_X[SEAM_DEV_AT])), 5),
-          'sectionHeight': round(head_hi(float(SEAM_X[SEAM_DEV_AT]))
-                                 - head_lo(float(SEAM_X[SEAM_DEV_AT])), 5)}
+_worst = dict(SEAM_DEV_WHERE,
+              sectionHeight=round(head_hi(SEAM_DEV_WHERE['x']) - head_lo(SEAM_DEV_WHERE['x']), 5))
 mouth_cut = {'maxDeviationRaw': round(SEAM_DEV, 5),
              'maxDeviationOverBodyLength': round(SEAM_DEV / RAW_LENGTH, 5),
              'worstStation': _worst, 'stations': len(pigment_rows),
@@ -1402,8 +1453,15 @@ mouth_cut = {'maxDeviationRaw': round(SEAM_DEV, 5),
              'measuredFractionAtTheBack': round(float(SEAM_F[0]), 4),
              'measuredFractionAtTheFront': round(float(SEAM_F[-1]), 4),
              'meanFractionOfTheCut': round(JAW_FRACTION, 4),
-             'flankDisagreementMax': round(max([r[3] or 0. for r in pigment_rows]), 4),
+             'flankDisagreementMaxSigned': round(max([r[3] or 0. for r in pigment_rows], key=abs), 4),
+             'stationsOnBothFlanks': sum(1 for r in pigment_rows if len(r[4]) == 2),
+             'stationsOnOneFlank': {nm: sum(1 for r in pigment_rows if r[4] == [nm])
+                                    for nm in ('left', 'right')},
+             'perFlank': [[round(r[0], 5), r[5]['left'], r[5]['right']] for r in pigment_rows],
              'fitSlopePerRawUnit': round(float(SEAM_FIT[0]), 4),
+             'flankReadingsFitted': int(SEAM_KEPT.sum()), 'flankReadingsOffered': len(_flank_pts),
+             'droppedByTheRobustRefit': SEAM_DROPPED,
+             'maxDeviationIfTheFlanksWereAveragedRaw': round(SEAM_DEV_AVERAGED, 5),
              'constantFractionWouldDeviateRaw': round(SEAM_DEV_MEDIAN, 5),
              'feature': 'the ventral edge of the painted mouth band -- the boundary between the pale '
                         'mandible and the dark, pale-streaked gape -- found by scanning up from the '
@@ -1509,7 +1567,8 @@ report = {
               'cavityVerticesFound': int(len(CAVITY)), 'jawFractionOfHeadSection': JAW_FRACTION,
               'pigmentContrast': PIGMENT_CONTRAST,
               'pigmentStations': [[round(r[0], 5), round(r[1], 4), round(r[2], 4),
-                                   None if r[3] is None else round(r[3], 4)] for r in pigment_rows],
+                                   None if r[3] is None else round(r[3], 4), r[4]]
+                                  for r in pigment_rows],
               'creaseFractionCrossCheck': CREASE_FRACTION, 'creaseIQR': CREASE_IQR,
               'creaseStations': CREASE_N,
               'modelledTeethFound': len(TEETH), 'proudPatches': len(PATCHES),

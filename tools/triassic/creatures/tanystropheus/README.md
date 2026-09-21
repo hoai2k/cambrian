@@ -2,7 +2,9 @@
 
 > **Current repair, 21 September 2026 (T3D-32C):** the mouth cut is a **fitted ramp** through the
 > painted lip line rather than the head's section at the median of it (0.01159 raw / 0.9 % of a body
-> from its own measurement at the worst station → **0.00082 raw / 0.064 %**), and the cut is now
+> from its own measurement at the worst station → **0.00198 raw / 0.154 %**, measured against every
+> individual flank reading the fit was taken over rather than against a station average), and the
+> cut is now
 > closed with **its own rim** — `T.cap_cut` over the head's cross-section at the hinge, then
 > `T.cap_mouth` over the lip, domed into each half. The `Oral cavity lining` and the
 > `Seated jaw hinge tissue` are both retired: each was closing a hole the cut had made and each is
