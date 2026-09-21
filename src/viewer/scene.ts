@@ -120,7 +120,20 @@ export interface BendSpan {
   tip: [number, number, number];
   forward: [number, number, number];
   baseNormal: [number, number, number];
+  /** The tip plane as the reviewer has *aimed* it: where the handle stands, and what it sets. */
   tipNormal: [number, number, number];
+  /**
+   * The tip plane where the **bend has carried it** — `tipNormal` turned by the applied rotation.
+   *
+   * The two are separate on purpose, and the separation is the whole readout of the slider. The
+   * magenta knob stands on `tipNormal`, which is a *statement about the animal* ("this is the way
+   * the head runs") and must sit still under the pointer while it is dragged; the lagoon cut plane
+   * is drawn here, which is where that plane has actually been swung to, and at a straighten of 1
+   * it lies parallel to the base plane with the geometry between them carried round with it. So
+   * the plane moving and the body moving are one thing on screen, and the handle never jumps out
+   * from under the hand holding it.
+   */
+  tipCarried: [number, number, number];
   /** The hinge the two planes imply. Drawn, never grabbed: it is derived from them. */
   axis: [number, number, number];
   /** Half the width the cut planes and the axle are drawn at. */
@@ -290,6 +303,17 @@ export interface ViewerScene {
   showBend(span: BendSpan | null, inSpan: ((x: number, y: number, z: number) => boolean) | null, warp?: WarpFn | null): void;
   /** Which of the bend span's handles is under the pointer, if any: canvas CSS pixels in. */
   bendPick(x: number, y: number): BendHandle | undefined;
+  /**
+   * Where the span's lit vertices have been carried to: their centroid in world space, and how
+   * many there are, or null while nothing is lit.
+   *
+   * The stage lights exactly the vertices between the two cuts and draws them **where the warp has
+   * put them**, so this is the part of the body a bend is about, measured off what is on screen.
+   * It exists for the browser drive: a bend has to be shown to have moved the *animal* and not
+   * only a number in the panel, and a page that draws about a frame a second under the software
+   * renderer cannot be asked that with a screenshot.
+   */
+  bendLitCentroid(): [number, number, number, number] | null;
   /**
    * Where the pointer's ray crosses the camera-facing plane through a root-frame anchor, in the
    * root frame — how a drag on a handle in the orbit view becomes a point a document can use. The
@@ -1028,11 +1052,11 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   // Each plane's own normal, drawn from the plane out to its knob, so what a handle is aiming is
   // visible as a line and not only as a floating sphere.
   const aimLine = (color: string) => new THREE.Line(G(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 0, 0)])), traceMat(color));
-  const bendAims = { base: aimLine('#ffd9a8'), tip: aimLine('#ff2fa8') };
+  const bendAims = { base: aimLine('#ffd9a8'), tip: aimLine('#ff2fa8'), carried: aimLine('#61f2d5') };
   for (const [name, h] of Object.entries(bendHandles)) { h.name = `bend-${name}`; h.renderOrder = 5; }
-  for (const o of [bendAxle, spanLine, bendTraces.base, bendTraces.tip, bendAims.base, bendAims.tip]) o.renderOrder = 5;
+  for (const o of [bendAxle, spanLine, bendTraces.base, bendTraces.tip, bendAims.base, bendAims.tip, bendAims.carried]) o.renderOrder = 5;
   bendGroup.add(bendPlanes.base, bendPlanes.tip, bendAxle, spanLine, bendTraces.base, bendTraces.tip,
-    bendAims.base, bendAims.tip,
+    bendAims.base, bendAims.tip, bendAims.carried,
     bendHandles.base, bendHandles.tip, bendHandles.baseAim, bendHandles.tipAim);
   // The span's own vertices, lit point by point — the same overlay mark mode and the mouth editor
   // use, so what the turn will actually carry is seen rather than inferred.
@@ -1072,6 +1096,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     const f = new THREE.Vector3(...span.forward), a = new THREE.Vector3(...span.axis);
     const bn = new THREE.Vector3(...span.baseNormal).normalize();
     const tn = new THREE.Vector3(...span.tipNormal).normalize();
+    const tc = new THREE.Vector3(...span.tipCarried).normalize();
     const base = new THREE.Vector3(...span.base), tip = new THREE.Vector3(...span.tip);
     const wide = span.reach * 2;
     const X = new THREE.Vector3(1, 0, 0);
@@ -1084,18 +1109,23 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
       o.scale.set(1, wide, wide);
     };
     placePlane(bendPlanes.base, base, bn);
-    placePlane(bendPlanes.tip, tip, tn);
+    // The *carried* direction, not the aimed one: this plane is the front of the span as the bend
+    // has left it, and watching it swing onto the base plane is what the straighten slider is for.
+    placePlane(bendPlanes.tip, tip, tc);
     // The axle is a line along its own x, so it is aimed at the axis directly: its length is all
     // that is left to give it.
     bendAxle.position.copy(base);
     bendAxle.quaternion.setFromUnitVectors(X, a);
     bendAxle.scale.setScalar(span.reach * 1.4);
-    for (const [end, normal, at] of [['base', bn, base], ['tip', tn, tip]] as const) {
+    for (const [end, normal, at] of [['base', bn, base], ['tip', tn, tip], ['carried', tc, tip]] as const) {
       const line = bendAims[end];
       line.position.copy(at);
       line.quaternion.setFromUnitVectors(X, normal);
       line.scale.setScalar(span.reach * 1.4);
     }
+    // Where the two coincide there is nothing to say and two lines drawn over each other read as
+    // one thicker one, so the carried line only appears once the slider has actually moved it.
+    bendAims.carried.visible = tc.angleTo(tn) > 1e-3;
     spanLine.position.copy(base);
     spanLine.quaternion.setFromUnitVectors(new THREE.Vector3(1, 0, 0), f);
     spanLine.scale.setScalar(base.distanceTo(tip));
@@ -1135,6 +1165,17 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     (bendGeo.getAttribute('position') as THREE.BufferAttribute).needsUpdate = true;
     bendGeo.setDrawRange(0, n);
     bendPoints.visible = n > 0;
+  }
+
+  function bendLitCentroid(): [number, number, number, number] | null {
+    if (!bendPoints.visible) return null;
+    const attr = bendGeo.getAttribute('position') as THREE.BufferAttribute;
+    const n = Math.min(bendGeo.drawRange.count, attr.count);
+    if (!Number.isFinite(n) || n <= 0) return null;
+    const a = attr.array as Float32Array;
+    let x = 0, y = 0, z = 0;
+    for (let i = 0; i < n; i++) { x += a[i * 3]; y += a[i * 3 + 1]; z += a[i * 3 + 2]; }
+    return [x / n, y / n, z / n, n];
   }
 
   function bendPick(x: number, y: number): BendHandle | undefined {
@@ -1338,6 +1379,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     mouthPick,
     showBend,
     bendPick,
+    bendLitCentroid,
     dragPoint,
     dispose() {
       if (disposed) return;

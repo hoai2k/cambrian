@@ -15,11 +15,14 @@
  */
 import assert from 'node:assert/strict';
 import {
-  DEFAULT_REACH, DEFAULT_WINDOW, MIN_SPAN, angleBetween, angleOf, bendBasis, bendRotation, boneStation,
-  chainPath, describeReadingText, exportDoc, flipForward, forwardEarned, fromExport, headFractionAt, isIdentity, jointTurns,
+  DEFAULT_REACH, DEFAULT_STRAIGHTEN, DEFAULT_WINDOW, MIN_SPAN, STRAIGHTEN_MAX, STRAIGHTEN_MIN,
+  angleBetween, angleOf, apartAfter, bendBasis, bendRotation, boneStation,
+  chainPath, describeReadingText, exportDoc, flipForward, forwardEarned, fromExport, fullStraightening,
+  headFractionAt, isIdentity, jointTurns,
   measureBend, moveEnd, normalWarp, pinch, readBend, readBones, readGeometry, refLabel, refMoves,
   reguessRefs, reseat, resetTurn, rotateAbout, seat, seatPlanes, seatPlanesFromBones, setAxis, setChain,
-  setEnd, setPlaneNormal, setReach, setRef, setWindow, spanDirection, spanLength, straighten, toBlender,
+  setEnd, setPlaneNormal, setReach, setRef, setStraighten, setWindow, spanDirection, spanLength,
+  straightenFully, tipCarried, toBlender,
   totalTurn, traceCentreline, traces, turnAt, twistAngle, warp, warpBones,
   type BendDoc, type BoneNode, type Vec3,
 } from '../src/viewer/bend/bend';
@@ -36,13 +39,19 @@ const deg = (r: number) => r * 180 / Math.PI;
 const rad = (d: number) => d * Math.PI / 180;
 
 /**
- * Aim the tip plane `radians` off the body's own heading there, about `axis`: the one act that
- * bends anything now. `[-1, 0, 0]` on this fixture lifts the tip the way up is.
+ * A document whose applied turn is exactly `radians` about `axis`: the tip plane set `radians` the
+ * *other* way off the base plane, and the slider at 1 so the whole of that straightening is taken.
+ *
+ * Which is the model in one line. The turn is a fraction of the angle between two planes that
+ * describe the body, so asking for a particular turn means saying where the two planes stand and
+ * how much of the way to go — and at a full straighten the bend is the rotation carrying the tip
+ * plane onto the base plane, which is `radians` about `axis` by construction.
+ * `[-1, 0, 0]` on this fixture lifts the tip the way up is.
  */
 function bendBy(doc: BendDoc, radians: number, axis: Vec3 = [-1, 0, 0]): BendDoc {
   const out: Vec3 = [0, 0, 0];
-  rotateAbout(doc.tipRest, axis, radians, out);
-  return setPlaneNormal(doc, 'tip', out);
+  rotateAbout(doc.baseNormal, axis, -radians, out);
+  return setStraighten(setPlaneNormal(doc, 'tip', out), 1);
 }
 
 /**
@@ -99,6 +108,8 @@ ok(guessed.vertices === chunks[0].length / 3, 'every vertex is counted, for a co
 near(guessed.bounds.length, 7, 1e-6, 'the body is as long as it is');
 ok(!guessed.rigged && guessed.bones.length === 0 && guessed.refs === null, 'a body with no rig has no chain and no bone reading');
 ok(guessed.window === DEFAULT_WINDOW && guessed.reach === DEFAULT_REACH, 'the reading\'s own settings are in the document, not hidden in a constant');
+ok(guessed.straighten === DEFAULT_STRAIGHTEN && DEFAULT_STRAIGHTEN === 0, 'and the slider starts at nothing: the editor opens on the animal as it stands');
+ok(guessed.version === 2, 'the document says which shape it is, because the tip plane changed meaning at schema 3');
 ok(measureBend({ chunks, mouth }, meta).frameSource === 'mouth', 'a mouth socket frames the body');
 ok(measureBend({ chunks, yaw: 180 }, meta).frame.forward === -1, 'and an authored yaw says which end the head was at');
 ok(measureBend({ chunks, yaw: 180, mouth }, meta).frameSource === 'mouth', 'the socket wins over the yaw');
@@ -122,6 +133,7 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
 {
   nearV(neck.baseNormal, [0, 0, 1], .02, 'seated on a straight body, the base plane says the axis runs in along the body');
   nearV(neck.tipRest, [0, 0, 1], .02, 'and the tip plane says it runs out the same way');
+  nearV(neck.tipNormal, neck.tipRest, 1e-12, 'a freshly seated tip plane is the body\'s own measured heading, not an aim');
   ok(isIdentity(neck), 'so the two agree and there is no bend at all');
   near(totalTurn(neck), 0, 1e-9, 'nor any turn');
   ok(neck.planeSource.base === 'trace' && neck.planeSource.tip === 'trace', 'both were measured rather than chosen, and the document says so');
@@ -141,9 +153,16 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
   // The axle is derived from the two planes and nothing else: no roll, no dial.
   const up30 = bendBy(neck, rad(30));
   nearV(bendRotation(up30).axis, [-1, 0, 0], .02, 'the axle is the hinge the two planes imply');
-  near(deg(bendRotation(up30).angle), 30, 1e-6, 'and the turn is the angle between them');
+  near(deg(bendRotation(up30).angle), 30, 1e-6, 'and at a full straighten the turn is the whole angle between them');
   near(deg(angleOf(up30.baseNormal, up30.tipNormal)), 30, 1e-6, 'which is what "the planes are N° apart" means');
+  near(deg(fullStraightening(up30)), 30, 1e-6, 'and is the straightening the slider is a fraction of');
   near(deg(twistAngle(up30)), 0, 1e-6, 'a hinge square to the span carries no twist');
+  // **The axle does not move with the amount.** It is a fact about the two planes, so every angle
+  // in the panel stays read in one plane while the slider is dragged through nothing and out the
+  // other side — which is exactly where a sign convention would otherwise flip under a reviewer.
+  for (const f of [0, .25, 1, 1.5, -.5]) {
+    nearV(bendRotation(setStraighten(up30, f)).axis, bendRotation(up30).axis, 1e-12, 'the axle is the planes\' and not the slider\'s');
+  }
 
   // A plane aimed at nothing is refused: a plane with no normal has no orientation, and every
   // angle taken against it would come back NaN and read as an answer.
@@ -153,6 +172,63 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
   near(Math.hypot(...aimed.tipNormal), 1, 1e-12, 'an aim is normalised, because a plane is a direction');
   ok(aimed.planeSource.tip === 'manual', 'and is then a person\'s answer rather than the tool\'s measurement');
   ok(aimed.planeSource.base === 'trace', 'the other plane is left alone');
+}
+
+// ------------------------------------------------------------------------------- the straighten
+
+{
+  // **The slider, and the contract it makes.** The two planes describe the body; this says how far
+  // of the way from the one to the other the run between them is carried. Everything here is the
+  // arithmetic of that, and the last two checks are the promise: at 1 the two planes finish
+  // parallel, measured over the warp rather than read back off the number that produced it.
+  const curve = bendBy(neck, rad(35));            // planes 35° apart, slider at 1
+  near(deg(fullStraightening(curve)), 35, 1e-9, 'the two planes stand 35° apart whatever the slider says');
+  for (const f of [0, .25, .5, 1]) {
+    near(deg(totalTurn(setStraighten(curve, f))), 35 * f, 1e-9, `the turn applied is exactly ${f} of the straightening`);
+    near(deg(fullStraightening(setStraighten(curve, f))), 35, 1e-9, 'and the planes never move when the slider does');
+  }
+  ok(isIdentity(setStraighten(curve, 0)), 'at nothing there is no bend at all');
+  const still: Vec3 = [0, 0, 0];
+  warp(setStraighten(curve, 0))(.1, .15, 1.2, still);
+  nearV(still, [.1, .15, 1.2], 0, 'and the body is left exactly where it stands, to the last decimal');
+  // Past 1 and below 0: the two ends of a control a reviewer walks past the answer and back with.
+  near(deg(totalTurn(setStraighten(curve, 1.5))), 52.5, 1e-9, 'past 1 it overshoots');
+  near(deg(totalTurn(setStraighten(curve, -.5))), -17.5, 1e-9, 'and below 0 it bends the other way, which is further the way the animal already goes');
+  ok(totalTurn(setStraighten(curve, -.5)) < 0 && totalTurn(setStraighten(curve, .5)) > 0, 'the sign of the turn is the slider\'s');
+  ok(setStraighten(curve, 9).straighten === STRAIGHTEN_MAX && setStraighten(curve, -9).straighten === STRAIGHTEN_MIN,
+    'a figure outside the range is held to it rather than taken');
+  ok(setStraighten(curve, NaN) === curve, 'and nonsense leaves the document exactly as it was');
+
+  // **The contract.** At 1 the two planes are parallel — and it is measured on the plane the warp
+  // actually carried, not worked back out of the rotation that was asked for.
+  const flat = setStraighten(curve, 1);
+  near(deg(apartAfter(flat)), 0, 1e-9, 'at 1 the tip plane finishes parallel to the base plane');
+  nearV(tipCarried(flat), flat.baseNormal, 1e-9, 'landing on it exactly');
+  // Measured again through the warp itself: two points on the tip plane's own normal, both past
+  // the tip cut where the body is carried rigidly, so the direction between them after the bend is
+  // where that plane has really gone.
+  {
+    const f = warp(flat);
+    const a: Vec3 = [0, 0, 0], b: Vec3 = [0, 0, 0];
+    const at = flat.tip, n = flat.tipNormal;
+    f(at[0], at[1], at[2], a);
+    f(at[0] + n[0] * .4, at[1] + n[1] * .4, at[2] + n[2] * .4, b);
+    const carried: Vec3 = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
+    near(deg(angleOf(carried, flat.baseNormal)), 0, 1e-6,
+      'and the warp itself carries that plane onto the base plane, measured through the map rather than predicted from it');
+  }
+  // Halfway is halfway, measured the same way.
+  const half = setStraighten(curve, .5);
+  near(deg(apartAfter(half)), 17.5, 1e-9, 'at a half the planes are left half the straightening apart');
+  ok(deg(apartAfter(setStraighten(curve, 0))) > 34.9, 'and at nothing they are as far apart as the body has them');
+  // The slider and the planes are separate answers, which is the whole of the split: re-seating
+  // the planes on the body does not throw the amount away, and it used to have to.
+  const reseated = seatPlanes(half, chunks, true);
+  near(reseated.straighten, .5, 1e-12, 'seating the planes again keeps the amount');
+  near(setEnd(half, 'tip', [0, 0, 1.4]).straighten, .5, 1e-12, 'and so does moving the span under it');
+  near(straightenFully(half).straighten, 1, 1e-12, 'Straighten it is the slider at one');
+  near(resetTurn(half).straighten, 0, 1e-12, 'and No bend is the slider at nothing');
+  nearV(resetTurn(half).tipNormal, half.tipNormal, 1e-12, 'neither of them moves a plane: the planes are what the body is, not what is wanted of it');
 }
 
 // ---------------------------------------------------------------------------------- the warp
@@ -197,18 +273,17 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
   }
   near(deg(turnAt(bendBy(neck, rad(30)), .5)), 15, 1e-9, 'the turn is spread linearly, so halfway along is half of it');
   near(deg(turnAt(bendBy(neck, rad(30)), 1)), 30, 1e-9, 'and all of it at the tip cut');
-  // Two unit vectors can be at most a half turn apart, so the span can never wrap round on itself
-  // — which the old rates had to be clamped to guarantee.
+  // Two unit vectors can be at most a half turn apart, so a full straightening can never wrap the
+  // span round on itself — which the old rates had to be clamped to guarantee.
   const back = bendBy(neck, rad(300));
-  ok(deg(totalTurn(back)) <= 180 + 1e-9, `a wild aim still turns at most half a turn (${deg(totalTurn(back)).toFixed(1)}°)`);
-  ok(isIdentity(neck) && !isIdentity(bendBy(neck, rad(6))), 'the planes agreeing is no edit');
-  ok(isIdentity(resetTurn(bendBy(neck, rad(60)))), 'and the tip plane goes back onto the body\'s own heading');
-  nearV(resetTurn(bendBy(neck, rad(60))).tipNormal, neck.tipRest, 1e-12, 'exactly onto it');
-  // Straightening is the whole point, and it is one act: aim the tip plane at the base plane.
+  ok(deg(totalTurn(back)) <= 180 + 1e-9, `a wild aim still straightens through at most half a turn (${deg(totalTurn(back)).toFixed(1)}°)`);
+  ok(isIdentity(neck) && !isIdentity(bendBy(neck, rad(6))), 'the slider at nothing is no edit, and a straightening of six degrees is');
+  ok(isIdentity(resetTurn(bendBy(neck, rad(60)))), 'and No bend puts the body back exactly as it stands');
+  // Straightening is the whole point, and it is one act: carry the run all of the way.
   const curved = setPlaneNormal(neck, 'base', [0, .5, 1]);
-  const flat = straighten(curved);
-  nearV(flat.tipNormal, flat.baseNormal, 1e-12, 'straightening aims the two planes the same way');
-  near(deg(angleOf(flat.baseNormal, flat.tipNormal)), 0, 1e-4, 'so they are no degrees apart');
+  const flat = straightenFully(curved);
+  near(flat.straighten, 1, 1e-12, 'straightening it is the slider at one');
+  near(deg(apartAfter(flat)), 0, 1e-9, 'so the two planes finish parallel, measured after the bend');
   ok(deg(totalTurn(flat)) > 20, 'and the turn that gets there is the angle the body was off by');
 }
 {
@@ -367,10 +442,10 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
 
 {
   const rigged = seat(setEnd(setEnd(measureBend({ chunks, mouth, bones, rigged: true }, meta), 'base', [0, 0, 0]), 'tip', [0, 0, 2]), chunks, true);
-  // An aim a person gave survives the span moving under it \u2014 a straightened tip plane has to stay
-  // aimed at the base plane while the ends are nudged about \u2014 but `tipRest` never does: it is the
-  // body's own heading where the span leaves it, and a turn measured from a stale one would be a
-  // rotation taken from a place the body never was.
+  // An aim a person gave survives the span moving under it \u2014 which direction they are calling
+  // the run the span leaves on is their answer, not the tool's \u2014 but `tipRest` never does: it is the
+  // the body's own heading where the span leaves it, and a stale one would be a measurement of a
+  // place the body never was.
   const aimed = setPlaneNormal(rigged, 'tip', [0, .5, 1]);
   const moved = seatPlanes(setEnd(aimed, 'tip', [0, 0, 1.4]), chunks);
   nearV(moved.tipNormal, aimed.tipNormal, 1e-12, 'an aim a person gave survives the span moving under it');
@@ -379,6 +454,11 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
   const forced = seatPlanes(aimed, chunks, true);
   nearV(forced.tipNormal, forced.tipRest, 1e-12, 'seating the planes on purpose hands both back to the body');
   ok(forced.planeSource.tip === 'trace', 'and says so');
+  // And the amount is untouched by either: the planes and the slider are separate answers, and
+  // neither takes the other back. Under the aim-only scheme they could not be, because the turn
+  // *was* where the tip plane had been dragged to, so re-seating that plane threw the bend away.
+  near(seatPlanes(setStraighten(aimed, .6), chunks).straighten, .6, 1e-12, 'seating the planes leaves the straighten amount alone');
+  near(seatPlanes(setStraighten(aimed, .6), chunks, true).straighten, .6, 1e-12, 'even when it is done on purpose');
 
   // The bone chords instead of the traced surface: the answer on a body whose trunk trace wanders.
   const fromBones = seatPlanesFromBones(rigged);
@@ -423,7 +503,7 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
     authoredAt: '2026-09-20T00:00:00.000Z', readings, pinch: pinch(doc, chunks),
     traceResidual: { base: t.base?.residual ?? null, tip: t.tip?.residual ?? null },
   });
-  ok(file.schema === 'bend-span/2' && file.id === 'test' && file.model === meta.model, 'the file says what it is and what it is about');
+  ok(file.schema === 'bend-span/3' && file.id === 'test' && file.model === meta.model, 'the file says what it is and what it is about');
   ok(file.sha256 === 'a'.repeat(64) && file.appliesTo === 'built' && file.use === 'builder-measurement', 'and which exact file, and that a rigged body is a measurement rather than an edit');
   ok(exportDoc({ ...doc, rigged: false }, { sha256: null, sha256Source: null, appliesTo: 'generation', note: '', authoredAt: '', readings, pinch: 1, traceResidual: { base: null, tip: null } }).use === 'mesh-edit',
     'while an unrigged one is the edit on stage');
@@ -450,10 +530,29 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
   nearV(file.planes.tipNormal, doc.tipNormal, 1e-5, 'aim and all');
   nearV(file.planes.tipRest, doc.tipRest, 1e-5, 'with the body\'s own heading there beside the aim');
   nearV(file.planes.baseNormalBlenderZUp, toBlender(doc.baseNormal), 1e-9, 'and in the builders\' own Z-up frame, so nobody re-derives them');
-  near(file.planes.apartDegrees, 20, 1e-3, 'how far apart the two planes are aimed');
-  near(file.planes.apartBeforeDegrees, 0, 1e-3, 'and how far apart they were before the bend \u2014 nothing, on a straight body');
+  near(file.planes.apartDegrees, 20, 1e-3, 'how far apart the two planes stand on the body');
+  near(file.planes.apartBeforeDegrees, 20, 1e-3, 'which is the same measurement under the name a reader comparing it with the one below looks for');
+  near(file.planes.apartAfterDegrees, 0, 1e-3, 'and how far apart they are once the bend has carried the tip plane: nothing, at a full straighten');
+  near(file.planes.restApartDegrees, 0, .5, 'with the body\'s own measured heading against the base plane beside them');
+  nearV(file.planes.tipCarried, tipCarried(doc), 1e-5, 'and the tip plane where the bend has put it');
+  near(file.straighten.amount, 1, 1e-9, 'the slider is in the file, because it is half of what the document says');
+  assert.deepEqual(file.straighten.range, [STRAIGHTEN_MIN, STRAIGHTEN_MAX]); passes++;
   ok(file.planes.baseSource === 'trace' && file.planes.tipSource === 'manual', 'each plane says where its aim came from');
+  near(file.turn.fullDegrees, 20, 1e-3, 'the whole straightening the two planes stand apart by');
+  near(file.turn.appliedDegrees, 20, 1e-3, 'and what was actually applied of it');
   near(file.turn.totalDegrees, 20, 1e-3, 'the turn in degrees for the reader');
+  {
+    // Half of it, in the file: the same two planes, a different amount, and every number that
+    // depends on the amount moving while every number that describes the body stays put.
+    const halfDoc = setStraighten(doc, .5);
+    const halfFile = exportDoc(halfDoc, {
+      sha256: null, sha256Source: null, appliesTo: 'built', note: '', authoredAt: '',
+      readings: readBend(halfDoc, chunks), pinch: pinch(halfDoc, chunks), traceResidual: { base: null, tip: null },
+    });
+    near(halfFile.planes.apartDegrees, file.planes.apartDegrees, 1e-9, 'the two planes are the same two planes at any amount');
+    near(halfFile.turn.appliedDegrees, 10, 1e-3, 'and half the straightening is half the turn');
+    near(halfFile.planes.apartAfterDegrees, 10, 1e-3, 'leaving them half of it apart afterwards');
+  }
   near(file.axis.twistDegrees, 0, 1e-3, 'and how much of the aim is a twist rather than a bend');
   nearV(file.axis.vectorBlenderZUp, toBlender(bendBasis(doc).axis), 1e-9, 'and the axle in the builders\' own frame, so nobody has to turn it round by hand');
   ok(file.reading.geometry.baseReference.includes('behind the base cut'), 'the file names the two references the geometry reading is between');
@@ -480,10 +579,19 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
   // The rates the planes replaced. A file written against them describes a shape this cannot make,
   // so it is refused by name rather than half-read \u2014 its turn numbers would simply be ignored.
   assert.throws(() => fromExport({ schema: 'bend-span/1', bend: { ...doc } }), /written before the two planes/, 'a file from before the planes is refused, and says why'); passes++;
-  assert.throws(() => fromExport({ schema: 'bend-span/2', bend: { ...doc, tipNormal: [0, 0, 0] } }), /"tipNormal"/, 'a plane with no orientation is refused by name'); passes++;
-  assert.throws(() => fromExport({ schema: 'bend-span/2', bend: { ...doc, baseNormal: 'up' } }), /"baseNormal"/, 'and so is one that is not a direction at all'); passes++;
-  assert.throws(() => fromExport({ schema: 'bend-span/2', bend: { ...doc, window: 'a lot' } }), /"window"/, 'a document missing a number is refused by name'); passes++;
-  assert.throws(() => fromExport({ schema: 'bend-span/2', bend: { ...doc, tip: [0, 0] } }), /"tip"/, 'and one missing an end'); passes++;
+  // **And so is the aim-only schema, for the same kind of reason and a sharper one.** In
+  // `bend-span/2` the tip plane was a *target* and the turn was however far it had been dragged
+  // off the body's own heading, about an axle that could be any direction square to that heading;
+  // here the tip plane describes the body and the axle is fixed by the two planes, so the
+  // rotations a v3 document can express are a strictly smaller set. A v2 file read as a v3 one
+  // would fail nowhere: it would quietly describe a different bend of a different part of the
+  // animal, which is the one thing this whole tool exists to stop happening.
+  assert.throws(() => fromExport({ schema: 'bend-span/2', bend: { ...doc } }), /target rather than a description/, 'an aim-only file is refused by name, and says why'); passes++;
+  assert.throws(() => fromExport({ schema: 'bend-span/3', bend: { ...doc, tipNormal: [0, 0, 0] } }), /"tipNormal"/, 'a plane with no orientation is refused by name'); passes++;
+  assert.throws(() => fromExport({ schema: 'bend-span/3', bend: { ...doc, baseNormal: 'up' } }), /"baseNormal"/, 'and so is one that is not a direction at all'); passes++;
+  assert.throws(() => fromExport({ schema: 'bend-span/3', bend: { ...doc, window: 'a lot' } }), /"window"/, 'a document missing a number is refused by name'); passes++;
+  assert.throws(() => fromExport({ schema: 'bend-span/3', bend: { ...doc, straighten: 'all of it' } }), /"straighten"/, 'and one with no usable amount, because the amount is half of what the document says'); passes++;
+  assert.throws(() => fromExport({ schema: 'bend-span/3', bend: { ...doc, tip: [0, 0] } }), /"tip"/, 'and one missing an end'); passes++;
   assert.throws(() => fromExport(null), /not a bend file/); passes++;
 }
 
@@ -516,16 +624,36 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
   const doc = seatPlanes(setEnd(setEnd(measureBend({ chunks: curved, mouth: [0, 2 * neckDir[1], 2 * neckDir[2]] }, meta), 'base', [0, 0, 0]), 'tip', [0, neckDir[1] * 1.6, neckDir[2] * 1.6]), curved);
   const before = readBend(doc, curved).geometry.before!;
   ok(deg(before.total) > 20, `the body's own curve is there to be read (${deg(before.total).toFixed(1)}\u00b0 between the two traced runs)`);
-  near(deg(angleOf(doc.baseNormal, doc.tipRest)), deg(before.total), 3,
+  near(deg(fullStraightening(doc)), deg(before.total), 3,
     'and the two planes, freshly seated, say the same thing the geometry reading does');
-  const flat = straighten(doc);
-  nearV(flat.tipNormal, flat.baseNormal, 1e-12, 'aiming both planes the same way is the whole act');
+  ok(isIdentity(doc), 'the editor opens on that curve with the slider at nothing, so nothing has been done to the animal yet');
+
+  // **The slider walked up, and the curve measured out of the body at every step.** This is the
+  // whole promise in one loop: drag it and the run between the two planes comes straight, with
+  // what is outside them left exactly where it stands. Every figure is measured over the warped
+  // mesh rather than worked back out of the amount that produced it.
+  let left = Infinity;
+  for (const f of [0, .25, .5, .75, 1]) {
+    const at = setStraighten(doc, f);
+    const g = readBend(at, curved);
+    const off = Math.abs(deg((f > 0 ? g.geometry.after! : g.geometry.before!).total));
+    ok(off < left - 3, `at ${f} of the straightening the run reads ${off.toFixed(1)} degrees off, less than the ${left === Infinity ? 'curve it started at' : left.toFixed(1)} before it`);
+    left = off;
+    near(deg(turnAt(at, 0)), 0, 1e-12, 'with nothing at all turned at the base cut');
+    const held: Vec3 = [0, 0, 0];
+    warp(at)(0, 0, -2, held);
+    nearV(held, [0, 0, -2], 0, 'and the trunk behind it untouched to the last decimal');
+  }
+  // Past the answer and back the other way, which is what the two ends of the slider are for.
+  const over = readBend(setStraighten(doc, 1.4), curved).geometry.after!;
+  ok(Math.abs(deg(over.total)) > 5, `past 1 the run is carried past straight and bends the other way (${deg(over.total).toFixed(1)} degrees)`);
+  const more = readBend(setStraighten(doc, -.5), curved).geometry.after!;
+  ok(deg(more.total) > deg(before.total) + 5, `and below 0 it bends further the way the animal already goes (${deg(more.total).toFixed(1)} against ${deg(before.total).toFixed(1)})`);
+
+  const flat = straightenFully(doc);
+  near(deg(apartAfter(flat)), 0, 1e-9, 'all of the way leaves the two planes parallel, measured after the bend');
   const after = readBend(flat, curved).geometry.after!;
   ok(Math.abs(deg(after.total)) < 5, `and the run between them comes straight, measured over the warped mesh (${deg(after.total).toFixed(1)}\u00b0)`);
-  near(deg(turnAt(flat, 0)), 0, 1e-12, 'with nothing at all turned at the base cut');
-  const out: Vec3 = [0, 0, 0];
-  warp(flat)(0, 0, -2, out);
-  nearV(out, [0, 0, -2], 0, 'and the trunk behind it untouched to the last decimal');
 }
 
 // ---------------------------------------------------------------------------------- history
@@ -533,7 +661,10 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
 {
   const doc = measureBend({ chunks, mouth }, meta);
   const h = new History<BendDoc>(doc);
-  h.replace(bendBy(doc, rad(5))); h.replace(bendBy(doc, rad(12))); h.commit();
+  // A drag of the straighten slider is exactly this: a run of replacements and one commit when the
+  // button comes up, so the whole sweep from nothing to the answer is one press of Undo.
+  const turned = bendBy(doc, rad(12));
+  h.replace(setStraighten(turned, .3)); h.replace(setStraighten(turned, 1)); h.commit();
   near(deg(totalTurn(h.present)), 12, 1e-6, 'a drag is a run of replacements and one commit');
   ok(h.undo() === doc, 'and one undo takes the whole drag back');
   near(deg(totalTurn(h.redo())), 12, 1e-6, 'and redo puts it back');

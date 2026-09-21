@@ -1,13 +1,13 @@
 {
-  "schema": "bend-span/2",
+  "schema": "bend-span/3",
   "id": "askeptosaurus",
   "model": "assets/triassic/creatures/askeptosaurus.origpose.glb",
   "sha256": "8348549043848ee2c71f109968b41a1d4f7fd3215cd1b65a916c32bad71f9a2c",
   "sha256Source": "measured",
   "appliesTo": "origpose",
   "use": "builder-measurement",
-  "authoredAt": "2026-09-21T21:22:37.182Z",
-  "note": "browser drive: both planes aimed the same way on the untouched generation",
+  "authoredAt": "2026-09-21T22:40:22.056Z",
+  "note": "browser drive: the two planes seated on the untouched generation and the straighten slider taken all of the way",
   "creature": {
     "key": "triassic:askeptosaurus",
     "id": "askeptosaurus",
@@ -65,19 +65,39 @@
       0.45198
     ],
     "tipNormal": [
+      0.607685,
+      -0.653019,
+      0.45198
+    ],
+    "tipNormalBlenderZUp": [
+      0.607685,
+      -0.45198,
+      -0.653019
+    ],
+    "tipCarried": [
       0.919709,
       -0.021444,
       0.392016
     ],
-    "tipNormalBlenderZUp": [
+    "tipCarriedBlenderZUp": [
       0.919709,
       -0.392016,
       -0.021444
     ],
-    "tipSource": "manual",
-    "apartDegrees": 0,
+    "tipSource": "trace",
+    "apartDegrees": 41.403,
     "apartBeforeDegrees": 41.403,
-    "note": "Two planes, one at each end of the span, each named by the direction the creature’s axis line runs through it. baseNormal is where it runs in and is a pure reference — nothing behind the base cut moves under any bend. tipRest is where it ran out when the plane was seated on the body, measured rather than chosen; tipNormal is where it is to run out. apartDegrees is how far the two planes are aimed apart now and apartBeforeDegrees how far they were before the bend, so a zero in the first and the animal’s own curve in the second is a run that has been straightened."
+    "apartAfterDegrees": 0,
+    "restApartDegrees": 41.403,
+    "note": "Two planes, one at each end of the span, each named by the direction the creature’s axis line runs through it **as the body actually is**. baseNormal is where it runs in and is a pure reference — nothing behind the base cut moves under any bend; tipNormal is where it runs out. apartDegrees (= apartBeforeDegrees, one measurement under the name a reader comparing it with the one below will look for) is how far apart the two stand before any bend, which is the whole of what straightening this run would turn through. apartAfterDegrees is how far apart they are once the bend has carried the tip plane, measured rather than assumed: it is nought at a straighten of 1, which is the contract. tipRest is the body’s own heading there as last measured off the trace, which differs from tipNormal only where a reviewer aimed the plane by hand; restApartDegrees is that heading against the base plane. tipCarried is tipNormal turned by the applied rotation — the front plane where the slider has put it."
+  },
+  "straighten": {
+    "amount": 1,
+    "range": [
+      -0.5,
+      1.5
+    ],
+    "note": "How much of the straightening is applied. 0 leaves the body as it is, 1 carries the tip plane onto the base plane so the two are parallel and the run between them is straight, past 1 overshoots and below 0 bends it further the way the animal already goes. turn.appliedDegrees is this times turn.fullDegrees, about axis.vector."
   },
   "axis": {
     "vector": [
@@ -96,11 +116,13 @@
       -0.126014
     ],
     "twistDegrees": 5.689,
-    "note": "The axle the span turns about, through span.base: the shortest rotation carrying planes.tipRest onto planes.tipNormal, so it is derived from the two planes rather than dialled. A positive turn carries the body towards axis.up. twistDegrees is how far it leans along the span, which is the share of an oblique aim that is a twist of the span about its own length rather than a bend; it is reported rather than clamped, because clamping it would mean the turn no longer carried the tip plane where it was aimed. vectorBlenderZUp is the same direction in a Z-up armature frame ([x, −z, y])."
+    "note": "The axle the span turns about, through span.base: the shortest rotation carrying planes.tipNormal onto planes.baseNormal, so it is derived from the two planes rather than dialled, and it does not change with straighten.amount. A positive turn carries the body towards axis.up. twistDegrees is how far it leans along the span, which is the share of an oblique aim that is a twist of the span about its own length rather than a bend; it is reported rather than clamped, because clamping it would mean the turn no longer carried the tip plane where it was aimed. vectorBlenderZUp is the same direction in a Z-up armature frame ([x, −z, y])."
   },
   "turn": {
+    "fullDegrees": 41.403,
+    "appliedDegrees": 41.403,
     "totalDegrees": 41.403,
-    "note": "The whole the span turns through: the angle between planes.tipRest and planes.tipNormal, spread linearly across the span so the rotation at the base cut is exactly identity and there is no kink there. It is never negative — which way the body goes is carried by axis.vector."
+    "note": "fullDegrees is the whole straightening the two planes stand apart by; appliedDegrees is straighten.amount of it, which is what the body was actually turned through, and totalDegrees is that same number under the name earlier schemas used. The turn is spread linearly across the span, so the rotation at the base cut is exactly identity and there is no kink there. Its sign is the slider’s; which way round the body goes at a positive amount is carried by axis.vector, which does not flip with it."
   },
   "reading": {
     "window": 0.26,
@@ -152,9 +174,9 @@
     "worst": 0.6254,
     "note": "The smallest the inside of the bend is squeezed to, as a fraction of its own length. 1 is no squeeze; below 0 the turn is tighter than the body is thick and the surface has folded through itself."
   },
-  "rule": "A vertex at fraction s through the span (its distance from span.base along span.direction, over span.length) is carried to the bent centreline at s and turned about axis.vector by turn.totalDegrees·s. Behind the base cut s is 0 and nothing moves; past the tip cut s is 1 and the far part is carried rigidly. See docs/viewer-bend.md.",
+  "rule": "A vertex at fraction s through the span (its distance from span.base along span.direction, over span.length) is carried to the bent centreline at s and turned about axis.vector by turn.appliedDegrees·s, which is straighten.amount times the angle the two planes stand apart. Behind the base cut s is 0 and nothing moves; past the tip cut s is 1 and the far part is carried rigidly. See docs/viewer-bend.md.",
   "bend": {
-    "version": 1,
+    "version": 2,
     "key": "triassic:askeptosaurus",
     "id": "askeptosaurus",
     "collection": "triassic",
@@ -212,13 +234,14 @@
       0.45197965282288405
     ],
     "tipNormal": [
-      0.9197085880097333,
-      -0.021444092039770712,
-      0.39201564261867483
+      0.6076845383084163,
+      -0.6530190619997185,
+      0.45197965282288405
     ],
+    "straighten": 1,
     "planeSource": {
       "base": "trace",
-      "tip": "manual"
+      "tip": "trace"
     },
     "window": 0.26,
     "reach": 0.02,

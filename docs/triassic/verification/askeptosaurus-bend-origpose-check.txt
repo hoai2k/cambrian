@@ -1,14 +1,15 @@
 askeptosaurus: public/assets/triassic/creatures/askeptosaurus.origpose.glb · origpose body · builder-measurement · sha256 834854904384… · 11128 vertices
   frame      body along z, head at the high end (bounds)
   span       [0.1010, -0.0070, 0.2630] → [0.3460, -0.0820, 0.4220] (manual/manual), 0.3015 long — 30.2% of the body, along [0.8125, -0.2487, 0.5273]
-  planes     in  [0.9197, -0.0214, 0.3920] (trace)   out [0.9197, -0.0214, 0.3920] (manual)
-             aimed 0.0° apart; the body's own heading there was [0.6077, -0.6530, 0.4520], 41.4° off the base plane
+  planes     in  [0.9197, -0.0214, 0.3920] (trace)   out [0.6077, -0.6530, 0.4520] (trace)
+             standing 41.4° apart on the body, 0.0° apart after the bend; the body's own traced heading there was [0.6077, -0.6530, 0.4520], 41.4° off the base plane
+  straighten 1.000 of the way from the tip plane to the base plane
   axle       [-0.3724, 0.2683, 0.8884] through the base end · Blender Z-up [-0.3724, -0.8884, 0.2683] · leaning 5.7° along the span
-  turn       41.4° across the span, spread linearly · inside squeezed to 0.625
+  turn       41.4° across the span of a possible 41.4°, spread linearly · inside squeezed to 0.625
   geometry   -41.4° in plane, 0.0° out → +1.0° in plane, 1.2° out
              between the traced centre over 26% of the body behind the base cut and the same ahead of the tip cut (reach 2.0%)
              trace residual 0.034 behind, 0.046 ahead
-  note       browser drive: both planes aimed the same way on the untouched generation
+  note       browser drive: the two planes seated on the untouched generation and the straighten slider taken all of the way
 
 OK: the file describes this body, and re-measuring it here gives the readings it recorded.
 The span, the axle and the angles above are in the model's root frame, unscaled.
