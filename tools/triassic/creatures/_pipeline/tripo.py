@@ -1380,6 +1380,7 @@ def cap_mouth(obj, rim, facing, dome=.30, rounds=2, limit=None, eps=1e-9):
     open -- both of which are the construction failing to be a construction.
     """
     facing = Vector(facing).normalized()
+    before = len(obj.data.vertices)
     bm = bmesh.new()
     bm.from_mesh(obj.data)
     border = [e for e in bm.edges
@@ -1488,9 +1489,11 @@ def cap_mouth(obj, rim, facing, dome=.30, rounds=2, limit=None, eps=1e-9):
     if left:
         bm.free()
         raise AssertionError(('the mouth cap left the half open', obj.name, len(left)))
+    # Where the cap's own vertices start in the mesh, so a builder can put them through its own
+    # containment test -- ray parity against the closed intake, which uses no normals and no table.
     report = {'rimEdges': len(border), 'capped': True, 'faces': len(made),
               'domedVertices': pushed, 'deepestRaw': round(deepest, 6),
-              'dome': dome, 'rounds': rounds, **shape}
+              'dome': dome, 'rounds': rounds, 'firstNewVertex': before, **shape}
     bm.to_mesh(obj.data)
     obj.data.update()
     bm.free()

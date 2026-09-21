@@ -4,42 +4,48 @@
   "method": "Three.js GLTFLoader/AnimationMixer; all shipped authored and puppet clips, 25 samples including clamped endpoints; skin and hidden oral surfaces recorded separately; mouth region selected by jaw/skull/neck/pouch influences. Strain flags require posed edge >1.5% body length and ratio >2. No automatic claim of intersection-free geometry.",
   "models": [
     {
-      "id": "mosasaurus",
+      "id": "nothosaurus",
       "variant": "authored",
-      "sha256": "2f64ea357717b1c93896176f9f65e381c64f25e16096b64e7bb9170b6c357b28",
-      "length": 4.999999563326137,
+      "sha256": "7d0f5b4e9d2b2ed3cd4c9696b9f1fee27487950790d212d3f081c9d50b894d69",
+      "length": 5.335749247596657,
       "meshes": [
         {
-          "name": "Mosasaurus_authored_body",
+          "name": "Nothosaurus_authored_body",
           "hiddenOral": false,
-          "vertices": 11562,
-          "mixedJawSkullVertices": 798
+          "vertices": 15702,
+          "mixedJawSkullVertices": 45
+        },
+        {
+          "name": "Nothosaurus_authored_body_lower_jaw",
+          "hiddenOral": false,
+          "vertices": 1453,
+          "mixedJawSkullVertices": 146
         }
       ],
       "clips": [
         {
           "name": "Ability",
-          "duration": 1.100000023841858,
+          "duration": 1,
           "skin": {
-            "ratio": 1.7337545766030862,
-            "rest": 0.04928819587680658,
-            "posed": 0.08545363517392277,
-            "phase": 0.7083333333333334,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.2461444268256017,
+            "rest": 0.06893438084621076,
+            "posed": 0.08590219450817904,
+            "phase": 0.125,
+            "mesh": "Nothosaurus_authored_body_lower_jaw",
             "vertices": [
-              6860,
-              8666
+              847,
+              1100
             ]
           },
           "mouthSkin": {
-            "ratio": 1.7337545766030862,
-            "rest": 0.04928819587680658,
-            "posed": 0.08545363517392277,
-            "phase": 0.7083333333333334,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.2461444268256017,
+            "rest": 0.06893438084621076,
+            "posed": 0.08590219450817904,
+            "phase": 0.125,
+            "mesh": "Nothosaurus_authored_body_lower_jaw",
             "vertices": [
-              6860,
-              8666
+              847,
+              1100
             ]
           },
           "hiddenOral": {
@@ -50,25 +56,25 @@
           "name": "Attack",
           "duration": 1,
           "skin": {
-            "ratio": 3.2258998393987777,
-            "rest": 0.030889808575394487,
-            "posed": 0.09964742852242406,
+            "ratio": 1.305215389553472,
+            "rest": 0.06449007532660572,
+            "posed": 0.08417343878974844,
             "phase": 0.4583333333333333,
-            "mesh": "Mosasaurus_authored_body",
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              8779,
-              10743
+              3398,
+              6034
             ]
           },
           "mouthSkin": {
-            "ratio": 3.2258998393987777,
-            "rest": 0.030889808575394487,
-            "posed": 0.09964742852242406,
-            "phase": 0.4583333333333333,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.2556948998106559,
+            "rest": 0.06893438084621076,
+            "posed": 0.08656055045019222,
+            "phase": 0.125,
+            "mesh": "Nothosaurus_authored_body_lower_jaw",
             "vertices": [
-              8779,
-              10743
+              847,
+              1100
             ]
           },
           "hiddenOral": {
@@ -79,25 +85,25 @@
           "name": "Bite",
           "duration": 0.5,
           "skin": {
-            "ratio": 3.432486173814902,
-            "rest": 0.030889808575394487,
-            "posed": 0.10602884084683056,
-            "phase": 0.20833333333333334,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.3167860923480723,
+            "rest": 0.06566627282308793,
+            "posed": 0.08646843478977638,
+            "phase": 0.5,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              8779,
-              10743
+              694,
+              8171
             ]
           },
           "mouthSkin": {
-            "ratio": 3.432486173814902,
-            "rest": 0.030889808575394487,
-            "posed": 0.10602884084683056,
-            "phase": 0.20833333333333334,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.3167860923480723,
+            "rest": 0.06566627282308793,
+            "posed": 0.08646843478977638,
+            "phase": 0.5,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              8779,
-              10743
+              694,
+              8171
             ]
           },
           "hiddenOral": {
@@ -108,54 +114,25 @@
           "name": "Breath",
           "duration": 2.4000000953674316,
           "skin": {
-            "ratio": 2.3702397306712877,
-            "rest": 0.03215667339402902,
-            "posed": 0.07621902488474791,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.2350571179380376,
+            "rest": 0.07156017791698958,
+            "posed": 0.08838090709729036,
+            "phase": 0.375,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              7884,
-              8211
+              6737,
+              4001
             ]
           },
           "mouthSkin": {
-            "ratio": 2.3702397306712877,
-            "rest": 0.03215667339402902,
-            "posed": 0.07621902488474791,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.1713535449171057,
+            "rest": 0.07200468561757593,
+            "posed": 0.08434294374878931,
+            "phase": 0.4583333333333333,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              7884,
-              8211
-            ]
-          },
-          "hiddenOral": {
-            "ratio": 1
-          }
-        },
-        {
-          "name": "Breathe",
-          "duration": 3,
-          "skin": {
-            "ratio": 2.376318832391948,
-            "rest": 0.03215667339402902,
-            "posed": 0.07641450857330827,
-            "phase": 0.25,
-            "mesh": "Mosasaurus_authored_body",
-            "vertices": [
-              7884,
-              8211
-            ]
-          },
-          "mouthSkin": {
-            "ratio": 2.376318832391948,
-            "rest": 0.03215667339402902,
-            "posed": 0.07641450857330827,
-            "phase": 0.25,
-            "mesh": "Mosasaurus_authored_body",
-            "vertices": [
-              7884,
-              8211
+              83,
+              10502
             ]
           },
           "hiddenOral": {
@@ -164,27 +141,27 @@
         },
         {
           "name": "Death",
-          "duration": 1.899999976158142,
+          "duration": 1.600000023841858,
           "skin": {
-            "ratio": 1.738250411384253,
-            "rest": 0.044147332485540994,
-            "posed": 0.07673911885450903,
+            "ratio": 1.5427650112093465,
+            "rest": 0.05353311756970738,
+            "posed": 0.08258902072750086,
             "phase": 1,
-            "mesh": "Mosasaurus_authored_body",
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              9208,
-              8666
+              3648,
+              9882
             ]
           },
           "mouthSkin": {
-            "ratio": 1.738250411384253,
-            "rest": 0.044147332485540994,
-            "posed": 0.07673911885450903,
+            "ratio": 1.1166835552916845,
+            "rest": 0.07200468561757593,
+            "posed": 0.08040644833309471,
             "phase": 1,
-            "mesh": "Mosasaurus_authored_body",
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              9208,
-              8666
+              83,
+              10502
             ]
           },
           "hiddenOral": {
@@ -195,25 +172,25 @@
           "name": "Dive",
           "duration": 1.399999976158142,
           "skin": {
-            "ratio": 1.7477060004319558,
-            "rest": 0.05323445142120362,
-            "posed": 0.09303817017854103,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.0664812477345238,
+            "rest": 0.0776289598126573,
+            "posed": 0.08278982992133596,
+            "phase": 0.5833333333333334,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              7047,
-              3556
+              9423,
+              3436
             ]
           },
           "mouthSkin": {
-            "ratio": 1.733754226560294,
-            "rest": 0.04928819587680658,
-            "posed": 0.08545361792094507,
-            "phase": 0,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.0520650858602685,
+            "rest": 0.08159680411813523,
+            "posed": 0.08584514873046944,
+            "phase": 0.4583333333333333,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              6860,
-              8666
+              10502,
+              9329
             ]
           },
           "hiddenOral": {
@@ -224,25 +201,25 @@
           "name": "Dodge",
           "duration": 0.5,
           "skin": {
-            "ratio": 2.547924026856802,
-            "rest": 0.03177201490489981,
-            "posed": 0.08095268015784667,
-            "phase": 0.5416666666666666,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 2.7704616575377283,
+            "rest": 0.0312302608117754,
+            "posed": 0.08652224013392683,
+            "phase": 0.375,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              5432,
-              3467
+              742,
+              8596
             ]
           },
           "mouthSkin": {
-            "ratio": 2.547924026856802,
-            "rest": 0.03177201490489981,
-            "posed": 0.08095268015784667,
-            "phase": 0.5416666666666666,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.5409659666456106,
+            "rest": 0.05698326785975083,
+            "posed": 0.08780927644012669,
+            "phase": 0.4583333333333333,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              5432,
-              3467
+              10781,
+              9391
             ]
           },
           "hiddenOral": {
@@ -251,27 +228,27 @@
         },
         {
           "name": "Eat",
-          "duration": 1.7999999523162842,
+          "duration": 1.600000023841858,
           "skin": {
-            "ratio": 2.931793080170161,
-            "rest": 0.030889808575394487,
-            "posed": 0.09056252702912246,
-            "phase": 0.75,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.2560069435162895,
+            "rest": 0.06893438084621076,
+            "posed": 0.08658206098983702,
+            "phase": 0.25,
+            "mesh": "Nothosaurus_authored_body_lower_jaw",
             "vertices": [
-              8779,
-              10743
+              847,
+              1100
             ]
           },
           "mouthSkin": {
-            "ratio": 2.931793080170161,
-            "rest": 0.030889808575394487,
-            "posed": 0.09056252702912246,
-            "phase": 0.75,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.2560069435162895,
+            "rest": 0.06893438084621076,
+            "posed": 0.08658206098983702,
+            "phase": 0.25,
+            "mesh": "Nothosaurus_authored_body_lower_jaw",
             "vertices": [
-              8779,
-              10743
+              847,
+              1100
             ]
           },
           "hiddenOral": {
@@ -280,27 +257,27 @@
         },
         {
           "name": "Grab",
-          "duration": 1.100000023841858,
+          "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 1.2965613484659586,
-            "rest": 0.06114920547439371,
-            "posed": 0.07928369630750189,
-            "phase": 0.75,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.0858027069612988,
+            "rest": 0.07376975524017827,
+            "posed": 0.08009939993165802,
+            "phase": 0.4166666666666667,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              7047,
-              2707
+              6762,
+              8929
             ]
           },
           "mouthSkin": {
-            "ratio": 1.2548243563455024,
-            "rest": 0.08182868400379222,
-            "posed": 0.10268062573565807,
-            "phase": 0.75,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.0858027069612988,
+            "rest": 0.07376975524017827,
+            "posed": 0.08009939993165802,
+            "phase": 0.4166666666666667,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              6962,
-              10456
+              6762,
+              8929
             ]
           },
           "hiddenOral": {
@@ -311,25 +288,25 @@
           "name": "Growth",
           "duration": 1.5,
           "skin": {
-            "ratio": 1.733754226560294,
-            "rest": 0.04928819587680658,
-            "posed": 0.08545361792094507,
-            "phase": 0,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.1841385448249204,
+            "rest": 0.06865757493749892,
+            "posed": 0.08130008087769791,
+            "phase": 0.5416666666666666,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              6860,
-              8666
+              7798,
+              5476
             ]
           },
           "mouthSkin": {
-            "ratio": 1.733754226560294,
-            "rest": 0.04928819587680658,
-            "posed": 0.08545361792094507,
-            "phase": 0,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.0599262211463756,
+            "rest": 0.08561315659854947,
+            "posed": 0.09074362955391344,
+            "phase": 0.5,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              6860,
-              8666
+              3799,
+              8832
             ]
           },
           "hiddenOral": {
@@ -338,27 +315,27 @@
         },
         {
           "name": "Guard",
-          "duration": 1.2000000476837158,
+          "duration": 1,
           "skin": {
-            "ratio": 1.7337539763086398,
-            "rest": 0.04928819587680658,
-            "posed": 0.08545360558649251,
-            "phase": 1,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 2.5845576781936157,
+            "rest": 0.035196189439814805,
+            "posed": 0.0909665816598304,
+            "phase": 0.5416666666666666,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              6860,
-              8666
+              8723,
+              6034
             ]
           },
           "mouthSkin": {
-            "ratio": 1.7337539763086398,
-            "rest": 0.04928819587680658,
-            "posed": 0.08545360558649251,
-            "phase": 1,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.0383307664698236,
+            "rest": 0.08561315659854947,
+            "posed": 0.08889477451087291,
+            "phase": 0.5,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              6860,
-              8666
+              3799,
+              8832
             ]
           },
           "hiddenOral": {
@@ -367,27 +344,27 @@
         },
         {
           "name": "Heavy",
-          "duration": 1.2000000476837158,
+          "duration": 1.100000023841858,
           "skin": {
-            "ratio": 3.6381388205745924,
-            "rest": 0.030889808575394487,
-            "posed": 0.11238141173826063,
-            "phase": 0.4583333333333333,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.3343949627841578,
+            "rest": 0.06566627282308793,
+            "posed": 0.08762474367993878,
+            "phase": 0.125,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              8779,
-              10743
+              694,
+              8171
             ]
           },
           "mouthSkin": {
-            "ratio": 3.6381388205745924,
-            "rest": 0.030889808575394487,
-            "posed": 0.11238141173826063,
-            "phase": 0.4583333333333333,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.3343949627841578,
+            "rest": 0.06566627282308793,
+            "posed": 0.08762474367993878,
+            "phase": 0.125,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              8779,
-              10743
+              694,
+              8171
             ]
           },
           "hiddenOral": {
@@ -398,25 +375,25 @@
           "name": "Hit",
           "duration": 0.6000000238418579,
           "skin": {
-            "ratio": 2.326328875983059,
-            "rest": 0.036021436520995834,
-            "posed": 0.08379770793318335,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.0655681115658573,
+            "rest": 0.0776289598126573,
+            "posed": 0.08271894411039507,
+            "phase": 0.625,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              9208,
-              4806
+              9423,
+              3436
             ]
           },
           "mouthSkin": {
-            "ratio": 2.326328875983059,
-            "rest": 0.036021436520995834,
-            "posed": 0.08379770793318335,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.051537643760663,
+            "rest": 0.08159680411813523,
+            "posed": 0.08580211114078429,
+            "phase": 0.4583333333333333,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              9208,
-              4806
+              10502,
+              9329
             ]
           },
           "hiddenOral": {
@@ -425,27 +402,27 @@
         },
         {
           "name": "Idle",
-          "duration": 3,
+          "duration": 2.4000000953674316,
           "skin": {
-            "ratio": 1.7337553827366905,
-            "rest": 0.04928819587680658,
-            "posed": 0.08545367490679376,
-            "phase": 1,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.0983114635527629,
+            "rest": 0.0776289598126573,
+            "posed": 0.08526077646591826,
+            "phase": 0.6666666666666666,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              6860,
-              8666
+              9423,
+              3436
             ]
           },
           "mouthSkin": {
-            "ratio": 1.7337553827366905,
-            "rest": 0.04928819587680658,
-            "posed": 0.08545367490679376,
-            "phase": 1,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.0763777720992218,
+            "rest": 0.09219216092244227,
+            "posed": 0.09923359277871134,
+            "phase": 0.2916666666666667,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              6860,
-              8666
+              5507,
+              7788
             ]
           },
           "hiddenOral": {
@@ -456,25 +433,25 @@
           "name": "Parry",
           "duration": 0.4000000059604645,
           "skin": {
-            "ratio": 1.7337542381473312,
-            "rest": 0.04928819587680658,
-            "posed": 0.08545361849204922,
-            "phase": 0.4166666666666667,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.0667287859259724,
+            "rest": 0.0776289598126573,
+            "posed": 0.08280904605365202,
+            "phase": 0.5833333333333334,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              6860,
-              8666
+              9423,
+              3436
             ]
           },
           "mouthSkin": {
-            "ratio": 1.7337542381473312,
-            "rest": 0.04928819587680658,
-            "posed": 0.08545361849204922,
+            "ratio": 1.0517756784490517,
+            "rest": 0.08159680411813523,
+            "posed": 0.08582153401062606,
             "phase": 0.4166666666666667,
-            "mesh": "Mosasaurus_authored_body",
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              6860,
-              8666
+              10502,
+              9329
             ]
           },
           "hiddenOral": {
@@ -485,25 +462,25 @@
           "name": "Rise",
           "duration": 1.399999976158142,
           "skin": {
-            "ratio": 1.7337542391973892,
-            "rest": 0.04928819587680658,
-            "posed": 0.08545361854380469,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.066481243677932,
+            "rest": 0.0776289598126573,
+            "posed": 0.08278982960642696,
+            "phase": 0.5833333333333334,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              6860,
-              8666
+              9423,
+              3436
             ]
           },
           "mouthSkin": {
-            "ratio": 1.7337542391973892,
-            "rest": 0.04928819587680658,
-            "posed": 0.08545361854380469,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.0520650869801653,
+            "rest": 0.08159680411813523,
+            "posed": 0.08584514882184946,
+            "phase": 0.4583333333333333,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              6860,
-              8666
+              10502,
+              9329
             ]
           },
           "hiddenOral": {
@@ -512,27 +489,27 @@
         },
         {
           "name": "Sprint",
-          "duration": 1,
+          "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 1.733755067497653,
-            "rest": 0.04928819587680658,
-            "posed": 0.08545365936923033,
-            "phase": 1,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 2.9848885846059066,
+            "rest": 0.02913277569087977,
+            "posed": 0.08695808959759148,
+            "phase": 0,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              6860,
-              8666
+              8983,
+              3542
             ]
           },
           "mouthSkin": {
-            "ratio": 1.733755067497653,
-            "rest": 0.04928819587680658,
-            "posed": 0.08545365936923033,
-            "phase": 1,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.3922365772378218,
+            "rest": 0.07207821149185191,
+            "posed": 0.10034992246083974,
+            "phase": 0.6666666666666666,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              6860,
-              8666
+              2141,
+              9754
             ]
           },
           "hiddenOral": {
@@ -543,25 +520,25 @@
           "name": "Stagger",
           "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 2.326328875983059,
-            "rest": 0.036021436520995834,
-            "posed": 0.08379770793318335,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.0667287940190724,
+            "rest": 0.0776289598126573,
+            "posed": 0.08280904668191096,
+            "phase": 0.5833333333333334,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              9208,
-              4806
+              9423,
+              3436
             ]
           },
           "mouthSkin": {
-            "ratio": 2.326328875983059,
-            "rest": 0.036021436520995834,
-            "posed": 0.08379770793318335,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.0519645260319914,
+            "rest": 0.08159680411813523,
+            "posed": 0.08583694336985938,
+            "phase": 0.4583333333333333,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              9208,
-              4806
+              10502,
+              9329
             ]
           },
           "hiddenOral": {
@@ -572,25 +549,25 @@
           "name": "Swim",
           "duration": 1.7999999523162842,
           "skin": {
-            "ratio": 1.7337515790498084,
-            "rest": 0.04928819587680658,
-            "posed": 0.08545348742992966,
+            "ratio": 1.7712207692708486,
+            "rest": 0.04675328706423106,
+            "posed": 0.08281039307984815,
             "phase": 1,
-            "mesh": "Mosasaurus_authored_body",
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              6860,
-              8666
+              3398,
+              5528
             ]
           },
           "mouthSkin": {
-            "ratio": 1.7337515790498084,
-            "rest": 0.04928819587680658,
-            "posed": 0.08545348742992966,
-            "phase": 1,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.263495274186432,
+            "rest": 0.07207821149185191,
+            "posed": 0.09107047959176506,
+            "phase": 0.6666666666666666,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              6860,
-              8666
+              2141,
+              9754
             ]
           },
           "hiddenOral": {
@@ -601,25 +578,25 @@
           "name": "TurnLeft",
           "duration": 1.600000023841858,
           "skin": {
-            "ratio": 1.771305267269944,
-            "rest": 0.05040096536791207,
-            "posed": 0.08927549543167268,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.067797546264891,
+            "rest": 0.0776289598126573,
+            "posed": 0.0828920128070513,
+            "phase": 0.5833333333333334,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              10448,
-              3193
+              9423,
+              3436
             ]
           },
           "mouthSkin": {
-            "ratio": 1.733754226560294,
-            "rest": 0.04928819587680658,
-            "posed": 0.08545361792094507,
-            "phase": 1,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.053582575823238,
+            "rest": 0.09219216092244227,
+            "posed": 0.0971320543753772,
+            "phase": 0.375,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              6860,
-              8666
+              5507,
+              7788
             ]
           },
           "hiddenOral": {
@@ -630,25 +607,25 @@
           "name": "TurnRight",
           "duration": 1.600000023841858,
           "skin": {
-            "ratio": 2.4994602192369664,
-            "rest": 0.03502169429715337,
-            "posed": 0.08753533170601298,
-            "phase": 0.5416666666666666,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.15783374573032,
+            "rest": 0.07156017791698958,
+            "posed": 0.08285478884275618,
+            "phase": 0.4166666666666667,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              2212,
-              11283
+              6737,
+              4001
             ]
           },
           "mouthSkin": {
-            "ratio": 1.7407498174265716,
-            "rest": 0.05523721899248538,
-            "posed": 0.09615417887632048,
-            "phase": 0.5416666666666666,
-            "mesh": "Mosasaurus_authored_body",
+            "ratio": 1.0628384720608528,
+            "rest": 0.08159680411813523,
+            "posed": 0.08672422261396755,
+            "phase": 0.4583333333333333,
+            "mesh": "Nothosaurus_authored_body",
             "vertices": [
-              10613,
-              314
+              10502,
+              9329
             ]
           },
           "hiddenOral": {
@@ -657,55 +634,61 @@
         }
       ],
       "worstMouth": {
-        "ratio": 3.6381388205745924,
-        "rest": 0.030889808575394487,
-        "posed": 0.11238141173826063,
+        "ratio": 1.5409659666456106,
+        "rest": 0.05698326785975083,
+        "posed": 0.08780927644012669,
         "phase": 0.4583333333333333,
-        "mesh": "Mosasaurus_authored_body",
+        "mesh": "Nothosaurus_authored_body",
         "vertices": [
-          8779,
-          10743
+          10781,
+          9391
         ],
-        "clip": "Heavy"
+        "clip": "Dodge"
       }
     },
     {
-      "id": "mosasaurus",
+      "id": "nothosaurus",
       "variant": "puppet",
-      "sha256": "f05b8bbbb4555b0faf7a8cf1fbbb437664c2df46e1ecbb946684ab1886b464a6",
-      "length": 5.026813665764745,
+      "sha256": "6ba00076f5ce179698e968ca38a0236b057878c7b28b21aea11956ae80c62932",
+      "length": 5.31730709542666,
       "meshes": [
         {
-          "name": "Mosasaurus_procedural_volume_twin",
+          "name": "Nothosaurus_procedural_volume_puppet",
           "hiddenOral": false,
-          "vertices": 2902,
-          "mixedJawSkullVertices": 283
+          "vertices": 4108,
+          "mixedJawSkullVertices": 17
+        },
+        {
+          "name": "Nothosaurus_procedural_volume_puppet_lower_jaw",
+          "hiddenOral": false,
+          "vertices": 453,
+          "mixedJawSkullVertices": 38
         }
       ],
       "clips": [
         {
           "name": "Ability",
-          "duration": 1.100000023841858,
+          "duration": 1,
           "skin": {
-            "ratio": 1.962152921271858,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944866872527761,
-            "phase": 0.9166666666666666,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.2030416866990965,
+            "rest": 0.09556615436321934,
+            "posed": 0.11497006753647361,
+            "phase": 0.125,
+            "mesh": "Nothosaurus_procedural_volume_puppet_lower_jaw",
             "vertices": [
-              2521,
-              2525
+              180,
+              221
             ]
           },
           "mouthSkin": {
-            "ratio": 1.962152921271858,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944866872527761,
-            "phase": 0.9166666666666666,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.2030416866990965,
+            "rest": 0.09556615436321934,
+            "posed": 0.11497006753647361,
+            "phase": 0.125,
+            "mesh": "Nothosaurus_procedural_volume_puppet_lower_jaw",
             "vertices": [
-              2521,
-              2525
+              180,
+              221
             ]
           },
           "hiddenOral": {
@@ -716,25 +699,25 @@
           "name": "Attack",
           "duration": 1,
           "skin": {
-            "ratio": 3.1764912717704035,
-            "rest": 0.029088983349565216,
-            "posed": 0.09240090171456851,
+            "ratio": 1.3822249570259524,
+            "rest": 0.06998709541243904,
+            "posed": 0.09673790994882978,
             "phase": 0.4583333333333333,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2530,
-              2531
+              1410,
+              1763
             ]
           },
           "mouthSkin": {
-            "ratio": 3.1764912717704035,
-            "rest": 0.029088983349565216,
-            "posed": 0.09240090171456851,
-            "phase": 0.4583333333333333,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.2108963804368125,
+            "rest": 0.09556615436321934,
+            "posed": 0.11572071041068799,
+            "phase": 0.125,
+            "mesh": "Nothosaurus_procedural_volume_puppet_lower_jaw",
             "vertices": [
-              2530,
-              2531
+              180,
+              221
             ]
           },
           "hiddenOral": {
@@ -745,25 +728,25 @@
           "name": "Bite",
           "duration": 0.5,
           "skin": {
-            "ratio": 3.3809116733473132,
-            "rest": 0.029088983349565216,
-            "posed": 0.09834728337235067,
-            "phase": 0.20833333333333334,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.3534741414954716,
+            "rest": 0.06114130501696135,
+            "posed": 0.08275317531774454,
+            "phase": 0.5,
+            "mesh": "Nothosaurus_procedural_volume_puppet_lower_jaw",
             "vertices": [
-              2530,
-              2531
+              221,
+              202
             ]
           },
           "mouthSkin": {
-            "ratio": 3.3809116733473132,
-            "rest": 0.029088983349565216,
-            "posed": 0.09834728337235067,
-            "phase": 0.20833333333333334,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.3534741414954716,
+            "rest": 0.06114130501696135,
+            "posed": 0.08275317531774454,
+            "phase": 0.5,
+            "mesh": "Nothosaurus_procedural_volume_puppet_lower_jaw",
             "vertices": [
-              2530,
-              2531
+              221,
+              202
             ]
           },
           "hiddenOral": {
@@ -774,54 +757,25 @@
           "name": "Breath",
           "duration": 2.4000000953674316,
           "skin": {
-            "ratio": 1.9621531060638082,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944867714938858,
-            "phase": 0.08333333333333333,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.32215089134772,
+            "rest": 0.06991896707376719,
+            "posed": 0.09244342463869318,
+            "phase": 0.625,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              1766,
+              1410
             ]
           },
           "mouthSkin": {
-            "ratio": 1.9621531060638082,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944867714938858,
-            "phase": 0.08333333333333333,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.1712057490100807,
+            "rest": 0.16059145692044127,
+            "posed": 0.18808563758712551,
+            "phase": 0.4583333333333333,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
-            ]
-          },
-          "hiddenOral": {
-            "ratio": 1
-          }
-        },
-        {
-          "name": "Breathe",
-          "duration": 3,
-          "skin": {
-            "ratio": 1.9621548121041248,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944875492265153,
-            "phase": 1,
-            "mesh": "Mosasaurus_procedural_volume_twin",
-            "vertices": [
-              2521,
-              2525
-            ]
-          },
-          "mouthSkin": {
-            "ratio": 1.9621548121041248,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944875492265153,
-            "phase": 1,
-            "mesh": "Mosasaurus_procedural_volume_twin",
-            "vertices": [
-              2521,
-              2525
+              614,
+              586
             ]
           },
           "hiddenOral": {
@@ -830,27 +784,27 @@
         },
         {
           "name": "Death",
-          "duration": 1.899999976158142,
+          "duration": 1.600000023841858,
           "skin": {
-            "ratio": 1.9621524754837159,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944864840313278,
-            "phase": 0,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.4185189557430826,
+            "rest": 0.06991896707376719,
+            "posed": 0.0991813801601152,
+            "phase": 1,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              1766,
+              1410
             ]
           },
           "mouthSkin": {
-            "ratio": 1.9621524754837159,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944864840313278,
-            "phase": 0,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.1223978168828714,
+            "rest": 0.1620590420390234,
+            "posed": 0.18189471499072937,
+            "phase": 1,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              586,
+              615
             ]
           },
           "hiddenOral": {
@@ -861,25 +815,25 @@
           "name": "Dive",
           "duration": 1.399999976158142,
           "skin": {
-            "ratio": 1.9621526884996923,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944865811389248,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.0686990627022164,
+            "rest": 0.10715640196073059,
+            "posed": 0.11451794633797471,
+            "phase": 0.5416666666666666,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              1580,
+              1599
             ]
           },
           "mouthSkin": {
-            "ratio": 1.9621526884996923,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944865811389248,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.0550663446141615,
+            "rest": 0.16059145692044127,
+            "posed": 0.16943464142931255,
+            "phase": 0.4583333333333333,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              614,
+              586
             ]
           },
           "hiddenOral": {
@@ -890,25 +844,25 @@
           "name": "Dodge",
           "duration": 0.5,
           "skin": {
-            "ratio": 1.9621527133080467,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944865924483097,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.6046759899739262,
+            "rest": 0.07882613494894875,
+            "posed": 0.12649040613502263,
+            "phase": 0.4166666666666667,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              2701,
+              2732
             ]
           },
           "mouthSkin": {
-            "ratio": 1.9621527133080467,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944865924483097,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.5448226224828787,
+            "rest": 0.1620590420390234,
+            "posed": 0.25035247431978724,
+            "phase": 0.4583333333333333,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              586,
+              615
             ]
           },
           "hiddenOral": {
@@ -917,27 +871,27 @@
         },
         {
           "name": "Eat",
-          "duration": 1.7999999523162842,
+          "duration": 1.600000023841858,
           "skin": {
-            "ratio": 2.885731248703505,
-            "rest": 0.029088983349565216,
-            "posed": 0.0839429882448563,
-            "phase": 0.75,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.2111529662365965,
+            "rest": 0.09556615436321934,
+            "posed": 0.11574523132883756,
+            "phase": 0.25,
+            "mesh": "Nothosaurus_procedural_volume_puppet_lower_jaw",
             "vertices": [
-              2530,
-              2531
+              180,
+              221
             ]
           },
           "mouthSkin": {
-            "ratio": 2.885731248703505,
-            "rest": 0.029088983349565216,
-            "posed": 0.0839429882448563,
-            "phase": 0.75,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.2111529662365965,
+            "rest": 0.09556615436321934,
+            "posed": 0.11574523132883756,
+            "phase": 0.25,
+            "mesh": "Nothosaurus_procedural_volume_puppet_lower_jaw",
             "vertices": [
-              2530,
-              2531
+              180,
+              221
             ]
           },
           "hiddenOral": {
@@ -946,27 +900,27 @@
         },
         {
           "name": "Grab",
-          "duration": 1.100000023841858,
+          "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 1.3800055826388933,
-            "rest": 0.07358885640156435,
-            "posed": 0.10155303265417065,
-            "phase": 0.75,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.0988605859696898,
+            "rest": 0.09112127300338217,
+            "posed": 0.10012957544680061,
+            "phase": 0.5833333333333334,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              1363,
-              1073
+              187,
+              198
             ]
           },
           "mouthSkin": {
-            "ratio": 1.3800055826388933,
-            "rest": 0.07358885640156435,
-            "posed": 0.10155303265417065,
-            "phase": 0.75,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.0988605859696898,
+            "rest": 0.09112127300338217,
+            "posed": 0.10012957544680061,
+            "phase": 0.5833333333333334,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              1363,
-              1073
+              187,
+              198
             ]
           },
           "hiddenOral": {
@@ -977,25 +931,25 @@
           "name": "Growth",
           "duration": 1.5,
           "skin": {
-            "ratio": 1.9621526653451424,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944865705834597,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.1972063844199607,
+            "rest": 0.07187941245056127,
+            "posed": 0.08605449149416758,
+            "phase": 0.4166666666666667,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              1764,
+              1410
             ]
           },
           "mouthSkin": {
-            "ratio": 1.9621526653451424,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944865705834597,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.070724284659535,
+            "rest": 0.11917840908884979,
+            "posed": 0.1276072168185201,
+            "phase": 0.4166666666666667,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              1485,
+              1503
             ]
           },
           "hiddenOral": {
@@ -1004,27 +958,27 @@
         },
         {
           "name": "Guard",
-          "duration": 1.2000000476837158,
+          "duration": 1,
           "skin": {
-            "ratio": 1.962152490176232,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944864907292054,
-            "phase": 1,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.771335145645151,
+            "rest": 0.0636243391264721,
+            "posed": 0.11270002801316593,
+            "phase": 0.5416666666666666,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              1469,
+              1764
             ]
           },
           "mouthSkin": {
-            "ratio": 1.962152490176232,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944864907292054,
-            "phase": 1,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.0542157107065377,
+            "rest": 0.10952229575315973,
+            "posed": 0.1154601248556289,
+            "phase": 0.5416666666666666,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              612,
+              574
             ]
           },
           "hiddenOral": {
@@ -1033,27 +987,27 @@
         },
         {
           "name": "Heavy",
-          "duration": 1.2000000476837158,
+          "duration": 1.100000023841858,
           "skin": {
-            "ratio": 3.5845339957519085,
-            "rest": 0.029088983349565216,
-            "posed": 0.10427044971837773,
+            "ratio": 1.3849095355894632,
+            "rest": 0.06998709541243904,
+            "posed": 0.0969257958048964,
             "phase": 0.4583333333333333,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2530,
-              2531
+              1410,
+              1763
             ]
           },
           "mouthSkin": {
-            "ratio": 3.5845339957519085,
-            "rest": 0.029088983349565216,
-            "posed": 0.10427044971837773,
-            "phase": 0.4583333333333333,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.3715993361179843,
+            "rest": 0.06114130501696135,
+            "posed": 0.08386137337065137,
+            "phase": 0.125,
+            "mesh": "Nothosaurus_procedural_volume_puppet_lower_jaw",
             "vertices": [
-              2530,
-              2531
+              221,
+              202
             ]
           },
           "hiddenOral": {
@@ -1064,25 +1018,25 @@
           "name": "Hit",
           "duration": 0.6000000238418579,
           "skin": {
-            "ratio": 2.2572574390629647,
-            "rest": 0.05049304236708165,
-            "posed": 0.1139757955040165,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.0680378614436936,
+            "rest": 0.10715640196073059,
+            "posed": 0.11444709439013952,
+            "phase": 0.5416666666666666,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              1556,
-              1557
+              1580,
+              1599
             ]
           },
           "mouthSkin": {
-            "ratio": 2.2572574390629647,
-            "rest": 0.05049304236708165,
-            "posed": 0.1139757955040165,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.0545151598797853,
+            "rest": 0.16059145692044127,
+            "posed": 0.16934612586978678,
+            "phase": 0.4583333333333333,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              1556,
-              1557
+              614,
+              586
             ]
           },
           "hiddenOral": {
@@ -1091,27 +1045,27 @@
         },
         {
           "name": "Idle",
-          "duration": 3,
+          "duration": 2.4000000953674316,
           "skin": {
-            "ratio": 1.962153882217746,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944871253191952,
-            "phase": 1,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.1660373381313434,
+            "rest": 0.06991896707376719,
+            "posed": 0.08152812625158853,
+            "phase": 0.7083333333333334,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              1766,
+              1410
             ]
           },
           "mouthSkin": {
-            "ratio": 1.962153882217746,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944871253191952,
-            "phase": 1,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.075688398243317,
+            "rest": 0.11593110394694973,
+            "posed": 0.12470574351127384,
+            "phase": 0.2916666666666667,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              598,
+              618
             ]
           },
           "hiddenOral": {
@@ -1122,25 +1076,25 @@
           "name": "Parry",
           "duration": 0.4000000059604645,
           "skin": {
-            "ratio": 1.9621526662698958,
-            "rest": 0.04558700178541508,
-            "posed": 0.0894486571005027,
-            "phase": 0.4166666666666667,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.06659732862716,
+            "rest": 0.10715640196073059,
+            "posed": 0.1142927320766134,
+            "phase": 0.5,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              1580,
+              1599
             ]
           },
           "mouthSkin": {
-            "ratio": 1.9621526662698958,
-            "rest": 0.04558700178541508,
-            "posed": 0.0894486571005027,
+            "ratio": 1.0546472094354988,
+            "rest": 0.10996267924825653,
+            "posed": 0.11597183281122458,
             "phase": 0.4166666666666667,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              1529,
+              1535
             ]
           },
           "hiddenOral": {
@@ -1151,25 +1105,25 @@
           "name": "Rise",
           "duration": 1.399999976158142,
           "skin": {
-            "ratio": 1.9621526611300264,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944865686619147,
-            "phase": 0,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.068699095378169,
+            "rest": 0.10715640196073059,
+            "posed": 0.11451794983941224,
+            "phase": 0.5416666666666666,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              1580,
+              1599
             ]
           },
           "mouthSkin": {
-            "ratio": 1.9621526611300264,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944865686619147,
-            "phase": 0,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.0550663407518706,
+            "rest": 0.16059145692044127,
+            "posed": 0.16943464080906165,
+            "phase": 0.4583333333333333,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              614,
+              586
             ]
           },
           "hiddenOral": {
@@ -1178,27 +1132,27 @@
         },
         {
           "name": "Sprint",
-          "duration": 1,
+          "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 1.9621535308695184,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944869651500724,
-            "phase": 1,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.8443014866542782,
+            "rest": 0.0636243391264721,
+            "posed": 0.11734246323834845,
+            "phase": 0,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              1469,
+              1764
             ]
           },
           "mouthSkin": {
-            "ratio": 1.9621535308695184,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944869651500724,
-            "phase": 1,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.3646690409230462,
+            "rest": 0.11593110394694973,
+            "posed": 0.15820758843643387,
+            "phase": 0.6666666666666666,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              598,
+              618
             ]
           },
           "hiddenOral": {
@@ -1209,25 +1163,25 @@
           "name": "Stagger",
           "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 2.2572574390629647,
-            "rest": 0.05049304236708165,
-            "posed": 0.1139757955040165,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.068576819119189,
+            "rest": 0.10715640196073059,
+            "posed": 0.11450484715545471,
+            "phase": 0.5416666666666666,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              1556,
-              1557
+              1580,
+              1599
             ]
           },
           "mouthSkin": {
-            "ratio": 2.2572574390629647,
-            "rest": 0.05049304236708165,
-            "posed": 0.1139757955040165,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.054962522402103,
+            "rest": 0.16059145692044127,
+            "posed": 0.16941796846901738,
+            "phase": 0.4583333333333333,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              1556,
-              1557
+              614,
+              586
             ]
           },
           "hiddenOral": {
@@ -1238,25 +1192,25 @@
           "name": "Swim",
           "duration": 1.7999999523162842,
           "skin": {
-            "ratio": 1.9621498396097692,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944852824154247,
+            "ratio": 1.5548303235803187,
+            "rest": 0.0636243391264721,
+            "posed": 0.09892505179159654,
             "phase": 1,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              1469,
+              1764
             ]
           },
           "mouthSkin": {
-            "ratio": 1.9621498396097692,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944852824154247,
-            "phase": 1,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.2488633380337015,
+            "rest": 0.07695052145879601,
+            "posed": 0.09610068509246597,
+            "phase": 0.6666666666666666,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              612,
+              580
             ]
           },
           "hiddenOral": {
@@ -1267,25 +1221,25 @@
           "name": "TurnLeft",
           "duration": 1.600000023841858,
           "skin": {
-            "ratio": 1.9621526611300264,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944865686619147,
-            "phase": 1,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.0823162775874786,
+            "rest": 0.0964213228682177,
+            "posed": 0.1043583672467898,
+            "phase": 0.5833333333333334,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              851,
+              474
             ]
           },
           "mouthSkin": {
-            "ratio": 1.9621526611300264,
-            "rest": 0.04558700178541508,
-            "posed": 0.08944865686619147,
-            "phase": 1,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.0568249372325538,
+            "rest": 0.08008497375600103,
+            "posed": 0.08463579736295651,
+            "phase": 0.4166666666666667,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              2521,
-              2525
+              595,
+              597
             ]
           },
           "hiddenOral": {
@@ -1296,25 +1250,25 @@
           "name": "TurnRight",
           "duration": 1.600000023841858,
           "skin": {
-            "ratio": 2.477561047536737,
-            "rest": 0.06212470009632378,
-            "posed": 0.15391773704855358,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.1684575954776417,
+            "rest": 0.06998709541243904,
+            "posed": 0.08177695322008281,
+            "phase": 0.625,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              1363,
-              1069
+              1410,
+              1763
             ]
           },
           "mouthSkin": {
-            "ratio": 2.477561047536737,
-            "rest": 0.06212470009632378,
-            "posed": 0.15391773704855358,
-            "phase": 0.5,
-            "mesh": "Mosasaurus_procedural_volume_twin",
+            "ratio": 1.0655934666054274,
+            "rest": 0.10996267924825653,
+            "posed": 0.11717551257737037,
+            "phase": 0.4166666666666667,
+            "mesh": "Nothosaurus_procedural_volume_puppet",
             "vertices": [
-              1363,
-              1069
+              1529,
+              1535
             ]
           },
           "hiddenOral": {
@@ -1323,16 +1277,16 @@
         }
       ],
       "worstMouth": {
-        "ratio": 3.5845339957519085,
-        "rest": 0.029088983349565216,
-        "posed": 0.10427044971837773,
+        "ratio": 1.5448226224828787,
+        "rest": 0.1620590420390234,
+        "posed": 0.25035247431978724,
         "phase": 0.4583333333333333,
-        "mesh": "Mosasaurus_procedural_volume_twin",
+        "mesh": "Nothosaurus_procedural_volume_puppet",
         "vertices": [
-          2530,
-          2531
+          586,
+          615
         ],
-        "clip": "Heavy"
+        "clip": "Dodge"
       }
     }
   ]

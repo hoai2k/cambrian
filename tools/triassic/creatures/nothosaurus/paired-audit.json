@@ -2,24 +2,24 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1994656,
-      "sha256": "f014437356006335f9a66010d22dbbc1a765b967882f54bcad973a26536bf8a3",
-      "triangles": 28830,
-      "vertices": 16615
+      "bytes": 2023984,
+      "sha256": "7d0f5b4e9d2b2ed3cd4c9696b9f1fee27487950790d212d3f081c9d50b894d69",
+      "triangles": 30248,
+      "vertices": 17155
     },
     {
       "suffix": ".puppet",
-      "bytes": 745456,
-      "sha256": "933e51cfe59bee2c068dc7c38c24bd93906ac60effb8d7368e3d7302ff0f10f2",
-      "triangles": 9450,
-      "vertices": 4823
+      "bytes": 745960,
+      "sha256": "6ba00076f5ce179698e968ca38a0236b057878c7b28b21aea11956ae80c62932",
+      "triangles": 9110,
+      "vertices": 4561
     },
     {
       "suffix": ".lod1",
-      "bytes": 745456,
-      "sha256": "933e51cfe59bee2c068dc7c38c24bd93906ac60effb8d7368e3d7302ff0f10f2",
-      "triangles": 9450,
-      "vertices": 4823
+      "bytes": 745960,
+      "sha256": "6ba00076f5ce179698e968ca38a0236b057878c7b28b21aea11956ae80c62932",
+      "triangles": 9110,
+      "vertices": 4561
     }
   ],
   "sockets": [

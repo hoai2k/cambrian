@@ -369,3 +369,39 @@ longer where the stretch alone would put them — those carry their UVs unchange
 the turn moves positions only.
 `docs/triassic/throat-repairs/nothosaurus-head-before.png` and `-after.png` are the same two
 cameras on the shipped file — from above, where the yaw shows, and from the animal's right.
+
+## T3D-28: the mouth is the cut, capped with its own rim and domed
+
+The `Oral floor`, the `Palate` and the two rigid hinge halves are retired. All four were closing
+holes this builder's own cut had made — the opening itself, the head's cross-section at the skull
+joint, and the mandible's rear face — and all three of those are now closed with the cut's own rim:
+`T.cap_cut` over the two cross-sections (64 faces authored / 31 twin per half) and `T.cap_mouth`
+over the lip (1,359 / 513 faces per half), each cap part of its own half and therefore rigid on that
+half's bone through the same weight field as the skin round it.
+
+**This body is the generalisation test for the construction**, because its cut is not a curve in one
+coordinate but a *plane fitted to the modelled lip on both flanks*, `z = a + b x + c y`, carrying the
+lip's pitch and its tilt across the head. Nothing in `cap_mouth` knows what shape the cut was: the
+rim is what bounds the cap, so a fitted, tilted cut is followed for free. `T.cut_rim` reports what
+the cut left open before anything is built — **225 boundary edges per half in six closed loops**: the
+lip (125 vertices) and five small loops this generation's own modelled slit contributes, at the
+snout, every one of them on the fitted plane. All six are capped, and the closure is asserted rather
+than rendered for: `cap_mouth` refuses a rim that is not closed curves and fails if any boundary it
+was given survives.
+
+The dome is 0.34 of each cap vertex's own distance from the nearest rim vertex, bounded at 0.55 of
+the head's own measured section above or below the lip plane; deepest push 0.0106 raw on a mouth
+0.13 long. Seating is asserted against that **section** — 0 of 604 palate vertices outside — and the
+ray-parity count is *recorded* beside it rather than asserted, because this generation models a slit
+and parity against a closed intake calls 58 of those 604 outside: they are in the lumen the
+generation drew, which is the case `CLAUDE.md` warns about.
+
+| Measurement | Before | After |
+| --- | --- | --- |
+| `gape-solid.py --as-drawn` opened, `Heavy`/`Bite`/`Attack`/`Eat` | 2,790 / 2,509 / 2,044 / 1,849 | **0 / 0 / 0 / 0** |
+| `gape-solid.py --as-drawn` through | 2 / 0 / 3 / 2 | **0 / 0 / 0 / 0** |
+| `skin-tears.mjs` | 2.98x | 2.98x |
+| `lag.mjs` | 1 pair open past 0.2 %, worst 0.28 % at `Heavy@0.13` | the same one pair, unchanged |
+| `oral-shell-audit.mjs` | palate + floor + two hinge halves | no oral lining on any variant |
+
+[The mouth as the game draws it, at `Heavy`'s widest](../../../../docs/triassic/verification/nothosaurus-mouth-after.png).

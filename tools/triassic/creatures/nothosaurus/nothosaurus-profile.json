@@ -608,7 +608,7 @@
       "maximumEnvelopeDifference": 0.006453871726989746
     }
   ],
-  "surfaceDistanceMax": 0.10911626368761063,
-  "surfaceDistanceP95": 0.015847685281187296,
+  "surfaceDistanceMax": 0.06606409698724747,
+  "surfaceDistanceP95": 0.014803607016801834,
   "surfaceTolerance": 0.2
 }

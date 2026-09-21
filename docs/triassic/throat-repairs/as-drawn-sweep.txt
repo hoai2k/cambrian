@@ -1,0 +1,25 @@
+aphaneramma  Bite@0.1 through=0 opened=10730 | Heavy@0.433 through=3 opened=10651 | Ability@0.267 through=5 opened=10091
+archelon  Bite@0.1 through=0 opened=1262 | Heavy@0.467 through=0 opened=1242 | Attack@0.367 through=1 opened=1151
+askeptosaurus  Attack@0.233 through=1 opened=193 | Bite@0.133 through=1 opened=173 | Eat@0.967 through=0 opened=177
+atopodentatus  Bite@0.1 through=0 opened=4494 | Attack@0.4 through=3738 opened=3893 | Eat@0.367 through=3726 opened=3885
+birgeria: no opening clips
+cartorhynchus  Ability@0.133 through=0 opened=693 | Heavy@0.4 through=1 opened=681 | Bite@0.1 through=2 opened=629
+ceratites: no opening clips
+coelophysis  Bite@0.167 through=1 opened=7189 | SnapRight@0.133 through=3 opened=7236 | SnapLeft@0.133 through=3 opened=7276
+cymbospondylus  Heavy@0.5 through=1 opened=894 | Lunge@0.6 through=4 opened=890 | Bite@0.133 through=0 opened=933
+dinocephalosaurus  Heavy@0.5 through=120 opened=197 | NeckStrike@0.567 through=107 opened=171 | Attack@0.367 through=94 opened=153
+helicoprion  Eat@0.333 through=0 opened=0 | Heavy@0.133 through=0 opened=0 | Bite@0.2 through=0 opened=0
+henodus  Bite@0.2 through=407 opened=455 | Heavy@0.133 through=404 opened=462 | Attack@0.1 through=242 opened=302
+hupehsuchus  Ability@0.667 through=4 opened=4784 | Gulp@0.467 through=38 opened=4444 | Heavy@0.467 through=32 opened=4215
+hybodus  Heavy@0.4 through=1346 opened=2833 | Bite@0.133 through=1261 opened=2670 | Attack@0.333 through=875 opened=1985
+keichousaurus  Bite@0.2 through=0 opened=4375 | Heavy@0.133 through=0 opened=4353 | Eat@0.967 through=2 opened=4267
+macrocnemus  Snatch@0.2 through=244 opened=2594 | Bite@0.167 through=343 opened=2307 | Heavy@0.1 through=210 opened=2141
+mixosaurus  Heavy@0.367 through=0 opened=3697 | Bite@0.067 through=0 opened=3337 | Attack@0.267 through=0 opened=2861
+mystriosuchus  Heavy@0.5 through=0 opened=7716 | Ability@0.4 through=1 opened=7734 | Bite@0.1 through=1 opened=7577
+nothosaurus  Heavy@0.133 through=0 opened=0 | Bite@0.2 through=0 opened=0 | Attack@0.1 through=0 opened=0
+odontochelys  Bite@0.1 through=6 opened=236 | Heavy@0.433 through=0 opened=194 | Attack@0.367 through=0 opened=185
+phragmoteuthis: no opening clips
+placodus  Bite@0.2 through=23 opened=453 | CrushBite@0.2 through=23 opened=451 | Heavy@0.133 through=23 opened=454
+saurichthys  Bite@0.133 through=89 opened=523 | Attack@0.267 through=123 opened=507 | Heavy@0.333 through=82 opened=451
+shonisaurus  Heavy@0.267 through=11 opened=1943 | Attack@0.2 through=13 opened=1483 | Bite@0.133 through=11 opened=733
+tanystropheus  Severed@1.733 through=0 opened=1388 | Bite@0.2 through=121 opened=1260 | SnapRight@0.167 through=142 opened=1364

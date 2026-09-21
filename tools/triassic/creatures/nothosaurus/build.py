@@ -8,7 +8,7 @@ from mathutils.bvhtree import BVHTree
 from mathutils.geometry import barycentric_transform
 from math import sin,cos,pi
 sys.path.insert(0,os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','_pipeline'))
-from tripo import jaw_junction                                                  # noqa: E402
+from tripo import jaw_junction, cut_rim, cap_cut, cap_mouth                     # noqa: E402
 HERE=os.path.dirname(os.path.abspath(__file__)); ROOT=os.path.abspath(os.path.join(HERE,'../../../..'))
 LOCAL=os.path.join(ROOT,'local/triassic-authoring/nothosaurus'); OUT=os.path.join(ROOT,'public/assets/triassic/creatures'); os.makedirs(LOCAL,exist_ok=True);os.makedirs(OUT,exist_ok=True)
 RAW=os.path.join(HERE,'tripo-raw/nothosaurus.raw.glb'); ID='nothosaurus'
@@ -583,6 +583,56 @@ def split_jaw(o):
   bm.to_mesh(target.data);bm.free()
  jawparts[o.name]=jaw
 for o in [auth,puppet]:split_jaw(o)
+# --------------------- the mouth is the cut, capped with its own rim and domed (T3D-28) ------
+# **This head arrived shut**: the lip is a modelled slit and the head behind it is one closed
+# solid, so nothing is open until the cut opens it and what the cut leaves is a hole in each half.
+# `cut_rim` measures that before anything is built -- one closed loop per half, every vertex of it
+# either on the fitted lip plane or on the head's cross-section at the skull joint.
+#
+# It is the *fitted* cut that makes this body the generalisation test: the seam here is a plane
+# `z = a + b x + c y` carrying the lip's pitch and its tilt across the head, not a curve in one
+# coordinate, and the cap follows it for free because the rim is what bounds the cap. Nothing in
+# `cap_mouth` knows what shape the cut was.
+CAP_DOME=.34
+CAP_ROOM=.55
+_capx=np.linspace(JAWCUT,HEAD_AFTER['snoutX'],40)
+def _headz(x0):
+ m=_PA[np.abs(_PA[:,0]-x0)<.008]
+ return (float(np.quantile(m[:,2],.02)),float(np.quantile(m[:,2],.98))) if len(m)>5 else (0.,0.)
+_capz=np.array([_headz(float(x)) for x in _capx])
+def _room(p,up):
+ """How much head there is over (or under) the lip plane at this station, from the head's own
+ measured section -- no normals, so a modelled slit cannot answer instead of the skull."""
+ lo=float(np.interp(p[0],_capx,_capz[:,0]));hi=float(np.interp(p[0],_capx,_capz[:,1]))
+ z=seam(p[0],p[1]);return max(.0004,(hi-z) if up else (z-lo))
+def on_lip(p):return p.x>=JAWCUT-1e-5 and abs(p.z-seam(p.x,p.y))<1e-5
+def in_head(p):return p.x>JAWCUT-.02
+CAPS={};CUT_RIM={}
+for o in [auth,puppet]:
+ jaw=jawparts[o.name]
+ CUT_RIM[o.name]={'skull':cut_rim(o,in_head,axis=0),'jaw':cut_rim(jaw,in_head,axis=0)}
+ at_cut=lambda p:abs(p.x-JAWCUT)<1e-5
+ CAPS[o.name]={'skullAtHinge':cap_cut(o,at_cut,Vector((1,0,0))),'jawAtHinge':cap_cut(jaw,at_cut,Vector((-1,0,0)))}
+ assert CAPS[o.name]['skullAtHinge']>0 and CAPS[o.name]['jawAtHinge']>0,('the hinge cross-section was left open',o.name,CAPS[o.name])
+ CAPS[o.name]['palate']=cap_mouth(o,on_lip,-Vector(SEAM_NO),dome=CAP_DOME,rounds=2,limit=lambda p:_room(p,True)*CAP_ROOM)
+ CAPS[o.name]['floor']=cap_mouth(jaw,on_lip,Vector(SEAM_NO),dome=CAP_DOME,rounds=2,limit=lambda p:_room(p,False)*CAP_ROOM)
+ # **Seated against the head's own measured section, and the parity test is recorded rather than
+ # asserted.** CLAUDE.md's rule: where a mouth is modelled, a normal-sign or parity test answers
+ # about the *lumen's* wall rather than the skull, because an invagination puts a point correctly
+ # inside the mouth outside the closed solid. This generation models a slit, and ray parity against
+ # the closed intake calls 58 of 604 palate vertices outside on a cap that is nowhere near the
+ # skin -- every one of them in the slit the generation drew. So the assertion is the section,
+ # which uses no normals, and the parity count is kept beside it as the diagnostic it is.
+ for part,key,up in ((o,'palate',True),(jaw,'floor',False)):
+  n0=CAPS[o.name][key]['firstNewVertex'];new_v=[part.data.vertices[i].co for i in range(n0,len(part.data.vertices))]
+  outside=[]
+  for c in new_v:
+   lo=float(np.interp(c.x,_capx,_capz[:,0]));hi=float(np.interp(c.x,_capx,_capz[:,1]))
+   if c.z<lo-1e-6 or c.z>hi+1e-6:outside.append(c)
+  CAPS[o.name][key].update({'capVertices':len(new_v),'outsideTheMeasuredSection':len(outside),
+   'outsideByRayParity':sum(1 for c in new_v if not inside_body(c))})
+  assert not outside,('a mouth cap left the head\'s own measured section',o.name,key,len(outside),len(new_v))
+print('NOTHO_CAPS',json.dumps({'cutRim':CUT_RIM,'caps':CAPS}))
 # Region-restricted skin: trunk blends longitudinally, limbs radially blend into their own root.
 # Every cervical needs its own station or the skin does not follow it. Each keeps the same small
 # lead ahead of its own head that the three used to carry, measured on the stretched chain; the
@@ -637,73 +687,14 @@ for o in [auth,puppet]:
   for v in part.data.vertices:v.co=tx(v.co)
   for p in part.data.polygons:p.use_smooth=True
   mod=part.modifiers.new('Shared articulated skeleton' if part is o else 'Mandible into the head','ARMATURE');mod.object=rig;part.parent=rig
-# Interior oral floor and roof close the visible opening; both copies share exact rigid placement.
-# Each is a closed thin shell rigid to its own bone -- the palate to the skull, the floor to the jaw
-# -- laid along the turned head's own measured centreline either side of the fitted lip plane.
-def oral(name,dz,bone_name,material):
- verts=[];faces=[];x0=JAWCUT+.006;x1=HEAD_AFTER['snoutX']-.016
- for i in range(18):
-  u=i/17;x=x0+(x1-x0)*u;cy=float(np.interp(x,_headmid[:,0],_headmid[:,1]));width=.021*(sin(pi*u)**.5)+.002
-  for j in range(12):
-   theta=j*2*pi/12;verts.append(tx((x,cy+width*cos(theta),seam(x,cy)+dz+.0015*sin(theta))))
- for i in range(17):
-  for j in range(12):a=i*12+j;b=i*12+(j+1)%12;faces.append((a,b,b+12,a+12))
- faces.append(tuple(reversed(range(12))));faces.append(tuple(range(17*12,18*12)))
- me=bpy.data.meshes.new(name);me.from_pydata(verts,[],faces);me.update();o=bpy.data.objects.new(name,me);bpy.context.collection.objects.link(o)
- o.location=(0,0,0);o.data.materials.append(material);g=o.vertex_groups.new(name=bone_name);g.add(list(range(len(o.data.vertices))),1,'REPLACE');o.parent=rig;mo=o.modifiers.new('Jaw articulation','ARMATURE');mo.object=rig
- for p in o.data.polygons:p.use_smooth=True
- return o
-mouthmat=bpy.data.materials.new('Nothosaurus mouth interior');mouthmat.diffuse_color=(.075,.032,.025,1);mouthmat.use_nodes=True;mouthmat.node_tree.nodes.get('Principled BSDF').inputs['Base Color'].default_value=(.075,.032,.025,1)
-oralparts=[oral('Oral floor',-.001,'jaw',mouthmat),oral('Palate',.001,'skull',mouthmat)]
-# The corner of the mouth: a closed envelope round the actual jaw hinge, which used to be one
-# ellipsoid with weights blended between skull and jaw -- a wall stretched between the jaws in
-# miniature, the form the mouth rule now forbids -- and which stood proud of the throat at the
-# mouth corner, a pale lump under the hinge in every side view. It is two rigid halves instead: an
-# ellipsoid cut at the lip plane a little either side of it, each half capped and closed, the
-# upper on the skull and the lower on the jaw, overlapping through the seam rather than joined,
-# so each stays closed whatever the jaw does and nothing stretches. It is seated by measurement:
-# centred on the head's own section at the cut and sized from that section's half-extents, and
-# every vertex is proved inside the closed intake surface by ray parity -- odd crossings on the
-# way out -- which uses no normals and no table, shrinking until all of them are. Built with
-# from_pydata like the shells: a bisected primitive left the exporter splitting the cap's vertices,
-# which read to oral-shell-audit.mjs as 148 open edges on a mesh Blender itself called closed.
-hm=bpy.data.materials.new('Nothosaurus jaw hinge body');hm.diffuse_color=(.28,.26,.20,1);hm.use_nodes=True;hbs=hm.node_tree.nodes.get('Principled BSDF');hbs.inputs['Base Color'].default_value=(.28,.26,.20,1);hbs.inputs['Roughness'].default_value=.7
-_sec=_PA[np.abs(_PA[:,0]-JAWCUT)<.006]
-HINGE_C=Vector((JAWCUT,float((_sec[:,1].min()+_sec[:,1].max())/2),float((_sec[:,2].min()+_sec[:,2].max())/2)))
-HINGE_R=Vector((.022,.55*float(_sec[:,1].max()-_sec[:,1].min())/2,.5*float(_sec[:,2].max()-_sec[:,2].min())/2))
-def hinge_points(c,r,keep):
- zcut=seam(c.x,c.y)-keep*.004;phi0=math.asin(max(-1.,min(1.,(zcut-c.z)/r.z)));phis=list(np.linspace(phi0,keep*pi/2,10))[:-1];pts=[]
- for phi in phis:
-  for j in range(16):th=2*pi*j/16;pts.append(Vector((c.x+r.x*cos(phi)*cos(th),c.y+r.y*cos(phi)*sin(th),c.z+r.z*sin(phi))))
- pts.append(Vector((c.x,c.y,c.z+keep*r.z)));return pts,len(phis)
-hinge_seat={'centre':[round(float(v),4)for v in HINGE_C],'radiiMeasured':[round(float(v),4)for v in HINGE_R],'shrinks':0}
-for _ in range(8):
- _all=hinge_points(HINGE_C,HINGE_R,1)[0]+hinge_points(HINGE_C,HINGE_R,-1)[0];_in=sum(inside_body(p)for p in _all)
- if _in==len(_all):break
- HINGE_R*=.9;hinge_seat['shrinks']+=1
-hinge_seat.update({'radii':[round(float(v),4)for v in HINGE_R],'vertices':len(_all),'inside':int(_in)});assert _in==len(_all),('the hinge envelope leaves the head',hinge_seat)
-for part,bone_name,keep in [('upper','skull',1),('lower','jaw',-1)]:
- pts,nring=hinge_points(HINGE_C,HINGE_R,keep);verts=[tx(p)for p in pts];faces=[]
- for i in range(nring-1):
-  for j in range(16):a=i*16+j;b=i*16+(j+1)%16;faces.append((a,b,b+16,a+16))
- last=(nring-1)*16;pole=len(verts)-1
- for j in range(16):faces.append((last+j,last+(j+1)%16,pole))
- faces.append(tuple(range(16)))
- me=bpy.data.meshes.new('Nothosaurus hinge '+part);me.from_pydata(verts,[],faces);me.update()
- bm=bmesh.new();bm.from_mesh(me);bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces));bm.to_mesh(me);bm.free()
- o=bpy.data.objects.new('Nothosaurus hinge '+part,me);bpy.context.collection.objects.link(o)
- o.location=(0,0,0);o.parent=rig;o.data.materials.append(hm);g=o.vertex_groups.new(name=bone_name);g.add(list(range(len(o.data.vertices))),1,'REPLACE')
- for p in o.data.polygons:p.use_smooth=True
- mo=o.modifiers.new('Jaw articulation','ARMATURE');mo.object=rig;oralparts.append(o)
-# One mesh, so the runtime's classifier hides it as one thing and oral-shell-audit.mjs can prove
-# the contract on it: every vertex on exactly one of skull or jaw, no triangle bridging the two,
-# every edge shared by two faces, both halves present.
-bpy.ops.object.select_all(action='DESELECT')
-for o in oralparts:o.select_set(True)
-bpy.context.view_layer.objects.active=oralparts[0];bpy.ops.object.join()
-lining=oralparts[0];lining.name='Nothosaurus oral lining';lining.data.name='Nothosaurus oral lining';oralparts=[lining]
-for v in lining.data.vertices:assert len(v.groups)==1 and abs(v.groups[0].weight-1)<1e-6,('lining vertex blends bones',v.index)
-bm=bmesh.new();bm.from_mesh(lining.data);_open=len([e for e in bm.edges if len(e.link_faces)!=2]);bm.free();assert _open==0,('the oral lining is open or non-manifold',_open)
+# **No oral geometry at all.** The `Oral floor`, the `Palate` and the two rigid hinge halves were
+# all closing holes this builder's own cut had made: the opening itself, the head's cross-section
+# at the skull joint and the mandible's rear face. Every one of those is now closed with the cut's
+# own rim -- `cap_cut` over the two cross-sections and `cap_mouth` over the lip, each cap part of
+# its own half and rigid on that half's bone through the same weight field as the skin round it --
+# so there is nothing left to place inside the mouth, nothing for the runtime classifier to hide,
+# and nothing blended between two bones anywhere in the head.
+oralparts=[]
 # Measured/profile evidence compares both surfaces in rest; nearest-distance works for asymmetry.
 rawco=np.array([v.co[:]for v in auth.data.vertices]);pco=np.array([v.co[:]for v in puppet.data.vertices]);pv=BVHTree.FromPolygons([v.co for v in puppet.data.vertices],[p.vertices[:]for p in puppet.data.polygons]);distances=[pv.find_nearest(v.co)[3]for v in auth.data.vertices]
 allco=np.concatenate([np.array([v.co[:]for v in o.data.vertices])for o in [auth,puppet]+list(jawparts.values())])
@@ -857,7 +848,7 @@ for o,suffix in [(auth,''),(puppet,'.puppet')]:
 shutil.copyfile(os.path.join(OUT,ID+'.puppet.glb'),os.path.join(OUT,ID+'.lod1.glb'))
 meta={'id':ID,'name':'Nothosaurus','species':'Nothosaurus giganteus','description':'Canonical Tripo body with its neck lengthened from the measured viewer stretch and unbent so the head faces straight forward, and a procedural volume twin resurfaced from the same mesh, sharing an articulated rowing, tail, six-joint cervical and jaw rig.','modelLength':round(MODEL_LENGTH,4),'lengthMeters':6,'locomotion':'Swim','clips':list(CLIPS),'looping':LOOPS,'anchors':[a['name']for a in anchors],'puppet':'nothosaurus.puppet.glb','notes':['The curved tail and asymmetric paddle stance are retained from the accepted Tripo volume.','The procedural twin resurfaces a 0.007-unit voxel occupancy field, relaxes it and reduces the new topology. It does not reuse source vertices or faces.','Same rest rig, inverse binds, sockets and all 21 action sample arrays are used for authored and puppet. LOD deliberately retains all clips.','The neck is lengthened by the measured stretch in neck-stretch-request.json, applied to the intake mesh before anything is derived from it, so the twin, the rig, the weights, the sockets and every clip follow it. Six cervical controls replace three; the albedo and UVs are the originals, so the neck pigment stretches with the neck.','The head faced about twenty degrees to the right as generated; the neck is unbent in the mesh before binding (each section carried rigidly from its measured frame onto a target axis of the same lengths) so the head faces straight forward, and the jaw cut is the plane fitted to the lip the generation modelled.','Original albedo retained with white COLOR_0; normal relief limited to 0.15 and skin set explicitly nonmetallic at roughness 0.7. Puppet pigment samples triangle-local UVs to avoid seam bleed. True jaw split and separate rigid palate, floor and hinge halves added; connected foot webbing retained.','Living colours, soft tissues and movements are artistic reconstruction. Ability performs the roster fang-trap clamp; Grab braces and tugs the held prey. Breath provides a separate in-place surface-breath/dive gesture. Locomotor translation remains engine-owned.']}
 open(os.path.join(OUT,ID+'.json'),'w').write(json.dumps(meta,indent=2))
-report={'sourceSha256':hashlib.sha256(open(RAW,'rb').read()).hexdigest(),'sourceTriangles':source_triangles,'removedFlakeVertices':removed,'fullTriangles':sum(len(p.vertices)-2 for p in auth.data.polygons)+sum(len(p.vertices)-2 for p in jawparts[auth.name].data.polygons)+sum(sum(len(p.vertices)-2 for p in o.data.polygons)for o in oralparts),'puppetTriangles':sum(len(p.vertices)-2 for p in puppet.data.polygons)+sum(len(p.vertices)-2 for p in jawparts[puppet.name].data.polygons)+sum(sum(len(p.vertices)-2 for p in o.data.polygons)for o in oralparts),'bones':len(B),'neckJoints':len(NECK),'neckStretch':neck_stretch,'neckUnbending':neck_turn,'hingeSeat':hinge_seat,'modelLength':MODEL_LENGTH,'clips':CLIPS,'loopSeams':seams,'boundsAt13Phases':bounds,'surfaceDistanceMax':max(distances),'surfaceDistanceP95':float(np.quantile(distances,.95)),'profileTolerance':.2,'normalizedWeights':True,'jawJunction':JUNCTION,'rootStable':True,'noScaleChannels':True}
+report={'sourceSha256':hashlib.sha256(open(RAW,'rb').read()).hexdigest(),'sourceTriangles':source_triangles,'removedFlakeVertices':removed,'fullTriangles':sum(len(p.vertices)-2 for p in auth.data.polygons)+sum(len(p.vertices)-2 for p in jawparts[auth.name].data.polygons)+sum(sum(len(p.vertices)-2 for p in o.data.polygons)for o in oralparts),'puppetTriangles':sum(len(p.vertices)-2 for p in puppet.data.polygons)+sum(len(p.vertices)-2 for p in jawparts[puppet.name].data.polygons)+sum(sum(len(p.vertices)-2 for p in o.data.polygons)for o in oralparts),'bones':len(B),'neckJoints':len(NECK),'neckStretch':neck_stretch,'neckUnbending':neck_turn,'oralGeometry':'none: the cut is capped with its own rim and domed (T.cap_mouth)','cutRim':CUT_RIM,'mouthCaps':CAPS,'modelLength':MODEL_LENGTH,'clips':CLIPS,'loopSeams':seams,'boundsAt13Phases':bounds,'surfaceDistanceMax':max(distances),'surfaceDistanceP95':float(np.quantile(distances,.95)),'profileTolerance':.2,'normalizedWeights':True,'jawJunction':JUNCTION,'rootStable':True,'noScaleChannels':True}
 open(os.path.join(HERE,'validation.json'),'w').write(json.dumps(report,indent=2))
 # Save editable source with both renderable bodies. Export selection is the only difference.
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(LOCAL,'nothosaurus-paired.blend'))

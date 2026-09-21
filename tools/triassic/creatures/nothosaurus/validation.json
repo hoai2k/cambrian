@@ -2,8 +2,8 @@
   "sourceSha256": "5cb48becbdcbbc3863519bca8a2bb99c5129c6a0e5b1affb6252e15e01c49604",
   "sourceTriangles": 19228,
   "removedFlakeVertices": 0,
-  "fullTriangles": 28830,
-  "puppetTriangles": 9450,
+  "fullTriangles": 30248,
+  "puppetTriangles": 9110,
   "bones": 30,
   "neckJoints": 6,
   "neckStretch": {
@@ -158,25 +158,390 @@
       "note": "the dark-back/pale-belly boundary per flank and the roll of the line between them; the cut follows the modelled lip, not this"
     }
   },
-  "hingeSeat": {
-    "centre": [
-      0.4104,
-      -0.036,
-      0.1251
-    ],
-    "radiiMeasured": [
-      0.022,
-      0.0194,
-      0.0245
-    ],
-    "shrinks": 0,
-    "radii": [
-      0.022,
-      0.0194,
-      0.0245
-    ],
-    "vertices": 290,
-    "inside": 290
+  "oralGeometry": "none: the cut is capped with its own rim and domed (T.cap_mouth)",
+  "cutRim": {
+    "Nothosaurus authored body": {
+      "skull": {
+        "boundaryEdgesInRegion": 225,
+        "boundaryEdgesElsewhere": 0,
+        "loops": [
+          {
+            "vertices": 187,
+            "closed": true,
+            "box": [
+              [
+                0.41042,
+                0.54535
+              ],
+              [
+                -0.0735,
+                0.00076
+              ],
+              [
+                0.07859,
+                0.14189
+              ]
+            ],
+            "reach": 0.13493
+          },
+          {
+            "vertices": 11,
+            "closed": true,
+            "box": [
+              [
+                0.55603,
+                0.56175
+              ],
+              [
+                -0.04087,
+                -0.03567
+              ],
+              [
+                0.12749,
+                0.12811
+              ]
+            ],
+            "reach": 0.00572
+          },
+          {
+            "vertices": 9,
+            "closed": true,
+            "box": [
+              [
+                0.53471,
+                0.54788
+              ],
+              [
+                -0.02559,
+                -0.01997
+              ],
+              [
+                0.12963,
+                0.13079
+              ]
+            ],
+            "reach": 0.01317
+          },
+          {
+            "vertices": 7,
+            "closed": true,
+            "box": [
+              [
+                0.48029,
+                0.48756
+              ],
+              [
+                -0.039,
+                -0.03574
+              ],
+              [
+                0.13353,
+                0.13423
+              ]
+            ],
+            "reach": 0.00727
+          },
+          {
+            "vertices": 6,
+            "closed": true,
+            "box": [
+              [
+                0.54815,
+                0.55602
+              ],
+              [
+                -0.02776,
+                -0.02326
+              ],
+              [
+                0.12869,
+                0.1296
+              ]
+            ],
+            "reach": 0.00787
+          },
+          {
+            "vertices": 5,
+            "closed": true,
+            "box": [
+              [
+                0.54611,
+                0.55492
+              ],
+              [
+                -0.05099,
+                -0.04611
+              ],
+              [
+                0.12737,
+                0.12806
+              ]
+            ],
+            "reach": 0.00881
+          }
+        ]
+      },
+      "jaw": {
+        "boundaryEdgesInRegion": 225,
+        "boundaryEdgesElsewhere": 0,
+        "loops": [
+          {
+            "vertices": 187,
+            "closed": true,
+            "box": [
+              [
+                0.41042,
+                0.54535
+              ],
+              [
+                -0.0735,
+                0.00076
+              ],
+              [
+                0.07859,
+                0.14189
+              ]
+            ],
+            "reach": 0.13493
+          },
+          {
+            "vertices": 11,
+            "closed": true,
+            "box": [
+              [
+                0.55603,
+                0.56175
+              ],
+              [
+                -0.04087,
+                -0.03567
+              ],
+              [
+                0.12749,
+                0.12811
+              ]
+            ],
+            "reach": 0.00572
+          },
+          {
+            "vertices": 9,
+            "closed": true,
+            "box": [
+              [
+                0.53471,
+                0.54788
+              ],
+              [
+                -0.02559,
+                -0.01997
+              ],
+              [
+                0.12963,
+                0.13079
+              ]
+            ],
+            "reach": 0.01317
+          },
+          {
+            "vertices": 7,
+            "closed": true,
+            "box": [
+              [
+                0.48029,
+                0.48756
+              ],
+              [
+                -0.039,
+                -0.03574
+              ],
+              [
+                0.13353,
+                0.13423
+              ]
+            ],
+            "reach": 0.00727
+          },
+          {
+            "vertices": 6,
+            "closed": true,
+            "box": [
+              [
+                0.54815,
+                0.55602
+              ],
+              [
+                -0.02776,
+                -0.02326
+              ],
+              [
+                0.12869,
+                0.1296
+              ]
+            ],
+            "reach": 0.00787
+          },
+          {
+            "vertices": 5,
+            "closed": true,
+            "box": [
+              [
+                0.54611,
+                0.55492
+              ],
+              [
+                -0.05099,
+                -0.04611
+              ],
+              [
+                0.12737,
+                0.12806
+              ]
+            ],
+            "reach": 0.00881
+          }
+        ]
+      }
+    },
+    "Nothosaurus procedural volume puppet": {
+      "skull": {
+        "boundaryEdgesInRegion": 88,
+        "boundaryEdgesElsewhere": 0,
+        "loops": [
+          {
+            "vertices": 88,
+            "closed": true,
+            "box": [
+              [
+                0.41042,
+                0.56339
+              ],
+              [
+                -0.0726,
+                0.00049
+              ],
+              [
+                0.07864,
+                0.14192
+              ]
+            ],
+            "reach": 0.15297
+          }
+        ]
+      },
+      "jaw": {
+        "boundaryEdgesInRegion": 88,
+        "boundaryEdgesElsewhere": 0,
+        "loops": [
+          {
+            "vertices": 88,
+            "closed": true,
+            "box": [
+              [
+                0.41042,
+                0.56339
+              ],
+              [
+                -0.0726,
+                0.00049
+              ],
+              [
+                0.07864,
+                0.14192
+              ]
+            ],
+            "reach": 0.15297
+          }
+        ]
+      }
+    }
+  },
+  "mouthCaps": {
+    "Nothosaurus authored body": {
+      "skullAtHinge": 64,
+      "jawAtHinge": 64,
+      "palate": {
+        "rimEdges": 163,
+        "capped": true,
+        "faces": 1359,
+        "domedVertices": 604,
+        "deepestRaw": 0.010604,
+        "dome": 0.34,
+        "rounds": 2,
+        "firstNewVertex": 13257,
+        "rimVertices": 163,
+        "cycles": [
+          125,
+          7,
+          6,
+          11,
+          5,
+          9
+        ],
+        "capVertices": 604,
+        "outsideTheMeasuredSection": 0,
+        "outsideByRayParity": 58
+      },
+      "floor": {
+        "rimEdges": 163,
+        "capped": true,
+        "faces": 1359,
+        "domedVertices": 604,
+        "deepestRaw": 0.010604,
+        "dome": 0.34,
+        "rounds": 2,
+        "firstNewVertex": 661,
+        "rimVertices": 163,
+        "cycles": [
+          125,
+          7,
+          6,
+          11,
+          5,
+          9
+        ],
+        "capVertices": 604,
+        "outsideTheMeasuredSection": 0,
+        "outsideByRayParity": 50
+      }
+    },
+    "Nothosaurus procedural volume puppet": {
+      "skullAtHinge": 31,
+      "jawAtHinge": 31,
+      "palate": {
+        "rimEdges": 59,
+        "capped": true,
+        "faces": 513,
+        "domedVertices": 228,
+        "deepestRaw": 0.012263,
+        "dome": 0.34,
+        "rounds": 2,
+        "firstNewVertex": 3879,
+        "rimVertices": 59,
+        "cycles": [
+          59
+        ],
+        "capVertices": 228,
+        "outsideTheMeasuredSection": 0,
+        "outsideByRayParity": 93
+      },
+      "floor": {
+        "rimEdges": 59,
+        "capped": true,
+        "faces": 513,
+        "domedVertices": 228,
+        "deepestRaw": 0.012263,
+        "dome": 0.34,
+        "rounds": 2,
+        "firstNewVertex": 224,
+        "rimVertices": 59,
+        "cycles": [
+          59
+        ],
+        "capVertices": 228,
+        "outsideTheMeasuredSection": 0,
+        "outsideByRayParity": 79
+      }
+    }
   },
   "modelLength": 5.335749387741089,
   "clips": {
@@ -479,13 +844,13 @@
       ]
     ]
   },
-  "surfaceDistanceMax": 0.10911626368761063,
-  "surfaceDistanceP95": 0.015847685281187296,
+  "surfaceDistanceMax": 0.06606409698724747,
+  "surfaceDistanceP95": 0.014803607016801834,
   "profileTolerance": 0.2,
   "normalizedWeights": true,
   "jawJunction": {
     "Nothosaurus authored body": {
-      "cutRimPairs": 64,
+      "cutRimPairs": 65,
       "lipPairs": 161,
       "rimReach": 0.052338372300567565,
       "rimDepth": 0.0506201907992363,
@@ -493,12 +858,12 @@
       "band": 0.015,
       "back": 0.06,
       "throat": 1.0,
-      "shellVertices": 660,
-      "shellFullJaw": 579,
-      "bodyThroatVertices": 168
+      "shellVertices": 1265,
+      "shellFullJaw": 1138,
+      "bodyThroatVertices": 169
     },
     "Nothosaurus procedural volume puppet": {
-      "cutRimPairs": 31,
+      "cutRimPairs": 32,
       "lipPairs": 57,
       "rimReach": 0.05196343509875962,
       "rimDepth": 0.05057026445865631,
@@ -506,9 +871,9 @@
       "band": 0.015,
       "back": 0.06,
       "throat": 1.0,
-      "shellVertices": 223,
-      "shellFullJaw": 195,
-      "bodyThroatVertices": 64
+      "shellVertices": 452,
+      "shellFullJaw": 411,
+      "bodyThroatVertices": 65
     }
   },
   "rootStable": true,
