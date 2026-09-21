@@ -916,6 +916,28 @@ def spike(u, a, b, p=1.):
     return (sin(pi * (u - a) / (b - a)) ** 2) ** p
 
 
+# -------------------------------------------------------------- the reach, measured ----
+# T3D-23's own instrument, brought into the builder: where the attack anchor stands against where
+# it rests, along the animal's own forward direction, in bodies. The verdict is taken off the
+# *packaged* file (`local/verify/attacks.mjs`, 41 phases) because the file is what the game loads;
+# this is the same quantity measured on the rig, so the builder can refuse a strike that does not
+# reach rather than leaving it to a sweep months later.
+STRIKE_CLIPS = ('Attack', 'Heavy', 'Ability')
+_ATTACK_BONE, _ATTACK_RAW, _ = ANCHOR_POINTS['anchor_attack_primary']
+ATTACK_LOCAL = rig.data.bones[_ATTACK_BONE].matrix_local.inverted() @ tx(_ATTACK_RAW)
+FORWARD = Vector((0., -1., 0.))   # this rig faces -Y; the exporter maps that to +Z in the file
+reach_track = {}
+
+
+def attack_anchor_now():
+    """The attack anchor in armature space at the pose the rig is holding."""
+    bpy.context.view_layer.update()
+    return rig.pose.bones[_ATTACK_BONE].matrix @ ATTACK_LOCAL
+
+
+reset()
+ATTACK_REST = attack_anchor_now()
+
 seams, bounds, gape_trace = {}, {}, {}
 for clip, duration in CLIPS.items():
     action = bpy.data.actions.new(clip)
@@ -940,16 +962,52 @@ for clip, duration in CLIPS.items():
         def wave(i, f_=1.):
             return (sin(p * f_ - LAG[i]) - (0. if loop else sin(-LAG[i]))) * env
 
-        cock = spike(u, .00, .40, 1.4) if clip in ('Attack', 'Heavy', 'Ability') else 0.
+        cock = spike(u, .00, .34, 1.4) if clip in ('Attack', 'Heavy', 'Ability') else 0.
         drive = (ramp(u, .30, .48, 2.2) * (1 - ramp(u, .64, 1., 1.))
                  if clip in ('Attack', 'Heavy', 'Ability') else 0.)
         snap = spike(u, .34, .58, 2.6) if clip in ('Attack', 'Heavy', 'Ability') else 0.
+        # **A strike reaches, and the gather is what was paying for it** (T3D-23, closed by
+        # T3D-32D). Measured on the *packaged* file at 41 phases, the attack anchor carried this
+        # animal's `Heavy` 18.0 % of a body **back** before it reached 11.5 % forward, and its
+        # `Ability` 24.9 % back for 9.8 % forward. The swipe itself was never the fault -- a
+        # trematosaur's rostrum goes across rather than forward, which is what `sway` is for and
+        # what the audit's lateral share checks -- but a clip that spends its first third taking
+        # the weapon away from the prey has not used the animal.
+        #
+        # Two changes, both Phragmoteuthis' dart one step along. The **gather is small and early**:
+        # the cock's own yaw ran to 0.84 rad summed over body, chest, neck and skull, which on a
+        # snout this long is most of the rear-back on its own, and it is now about a third of that
+        # (the cock still pitches the head and cocks the jaw, so there is still a windup to see).
+        # And the lunge is a **plateau** rather than a pulse that decays with the drive: `carry`
+        # rises with the drive and is *held* through the snap and the follow-through, so the
+        # rostrum sweeps across out in front of where it rested instead of back beside the
+        # shoulder. Numbers in `validation.json` `attackReach`, asserted below.
+        #
+        # **And the dart starts inside the gather, which is the part that took two passes.** With
+        # the lunge held back until the drive, the cocked head was still behind its own rest while
+        # it was cocked -- the yaw costs `(1 - cos)` of a rostrum that is a quarter of the body
+        # long -- so cutting the cock's yaw far enough to fix that took the *lateral* sweep down
+        # with it (0.08 of a body against 0.18), and this animal's heavy is the sweep. So the carry
+        # rises **through** the gather rather than after it: the head cocks to one side while the
+        # body is already going forward, which is what a long-snouted fish-eater does, and the
+        # swipe then crosses in front of where the animal stood rather than beside its shoulder.
+        carry = (ramp(u, .08, .20, 1.2) * (1 - ramp(u, .78, .92, 1.))
+                 if clip in ('Attack', 'Heavy', 'Ability') else 0.)
         # **Heavy and Ability are the side swipe, and they are not Attack with a bigger number.**
         # The animal's own kit calls the heavy a side swipe and its ability a sideways sweep of the
         # jaws; Attack is the forward snap. `sway` is what makes the difference measurable: the
         # snout goes across rather than forward, and the audit checks the lateral share.
         sway = {'Heavy': 1.0, 'Ability': 1.35}.get(clip, 0.)
         strike = {'Heavy': 1.35, 'Ability': 1.15}.get(clip, 1.0)
+        # **The gather does not scale with the sweep.** `sway` is how far the rostrum goes across,
+        # and it multiplied the windup as well as the drive -- so the ability, the widest sweep,
+        # cocked the head 53 degrees before it moved and stood a tenth of a body *behind* its own
+        # rest while it did. How far the head ends up across is the drive's business; how far back
+        # it draws first is not, and a bigger swipe is not a bigger retreat.
+        gather = min(sway, 1.)
+        # And what the body carries is set by whichever of the two is asking for more, since both
+        # the reach and the sweep are paid for out of the same dart.
+        lunge = max(strike, sway)
         dead = ramp(u, 0., 1., 1.) if clip == 'Death' else 0.
         turn = (-1 if clip == 'TurnLeft' else 1) * e if clip in ('TurnLeft', 'TurnRight') else 0.
         haul = max(0., sin(p * 3)) ** 2 if clip == 'Grab' else 0.
@@ -991,9 +1049,14 @@ for clip, duration in CLIPS.items():
         if clip in ('Dive', 'Rise'):
             body.rotation_euler.x = (1 if clip == 'Dive' else -1) * .30 * e
         if clip in ('Attack', 'Heavy', 'Ability'):
-            body.location.y = .10 * cock - .40 * drive * strike
-            body.rotation_euler.x = .08 * cock - .07 * drive
-            body.rotation_euler.z += .16 * sway * (-.6 * cock + 1.0 * drive)
+            body.location.y = .02 * cock - .60 * carry * lunge
+            # The head's dip rides the **carry** rather than the drive, so the reach and the pitch
+            # are one movement. Left on the drive they were half a clip apart -- the snout shot
+            # forward at 0.20 and then sank for the next half second -- and the audit sees that as
+            # a strike whose travel is spread out (half of `Attack`'s in 0.40 of the clip, its bar
+            # exactly), because a path with two separate bursts in it needs both to make half.
+            body.rotation_euler.x = .08 * cock - .07 * carry
+            body.rotation_euler.z += .16 * (-.50 * cock * gather + 1.0 * drive * sway)
         if clip == 'Bite':
             body.location.y = -.16 * ramp(u, .05, .24, 2.4) * (1 - ramp(u, .42, .78, 1.))
         if clip == 'Parry':
@@ -1041,7 +1104,7 @@ for clip, duration in CLIPS.items():
             z += .045 * dead * sin(i * .8)
             if clip in ('Attack', 'Heavy', 'Ability'):
                 if n in ('neck_00', 'chest'):
-                    z += (.22 * cock * -1. - .30 * drive) * sway
+                    z += -.18 * cock * gather - .30 * drive * sway
                 if n.startswith('tail'):
                     # The tail braces the other way through the sweep, which is what stops the
                     # whole animal simply spinning about its middle.
@@ -1056,15 +1119,15 @@ for clip, duration in CLIPS.items():
             if clip in ('Breath', 'Breathe') and n in ('neck_00', 'chest'):
                 q.rotation_euler.x = -.20 * (e if clip == 'Breath' else .5 + .5 * sin(p))
         if clip in ('Attack', 'Heavy', 'Ability'):
-            pb['skull'].rotation_euler.x += (-.14 * cock + .20 * drive) * strike
+            pb['skull'].rotation_euler.x += (-.14 * cock + .20 * carry) * strike
             # **The swipe is the neck's as much as the head's.** A first pass put 0.84 rad of yaw
             # on `skull` alone in Ability and `skin-tears.mjs` read 4.92x across the head/neck
             # junction (129 torn edges on `neck_00`). One joint cannot carry a sweep this wide on a
             # skull a quarter of the body long; spread over the three joints behind it the snout
             # goes just as far across and the skin holds.
-            pb['skull'].rotation_euler.z += (-.18 * cock + .34 * drive) * sway
-            pb['neck_00'].rotation_euler.z += (-.12 * cock + .22 * drive) * sway
-            pb['neck_00'].rotation_euler.x += (-.08 * cock + .12 * drive) * strike
+            pb['skull'].rotation_euler.z += -.145 * cock * gather + .34 * drive * sway
+            pb['neck_00'].rotation_euler.z += -.10 * cock * gather + .22 * drive * sway
+            pb['neck_00'].rotation_euler.x += (-.08 * cock + .12 * carry) * strike
         if clip == 'Eat':
             pb['skull'].rotation_euler.z += .12 * sin(p * 2)
             pb['neck_00'].rotation_euler.x += -.09 * sin(p * 2)
@@ -1135,6 +1198,11 @@ for clip, duration in CLIPS.items():
                 pb[names[j]].rotation_euler.z = share * up.rotation_euler.z + s * lagshare * travel * .5 * lag
                 pb[names[j]].rotation_euler.x = feather * up.rotation_euler.x
 
+        if clip in STRIKE_CLIPS:
+            d = attack_anchor_now() - ATTACK_REST
+            reach_track.setdefault(clip, []).append({
+                'u': round(u, 4), 'forward': d.dot(FORWARD) / BODY_LENGTH,
+                'lateral': abs(d.x) / BODY_LENGTH, 'lunge': -body.location.y / BODY_LENGTH})
         state = np.array([tuple(q.rotation_euler) + tuple(q.location) for q in pb])
         if f == 0:
             first = state.copy()
@@ -1161,6 +1229,36 @@ for clip, duration in CLIPS.items():
 
 for c in LOOPS:
     assert seams[c] < 1e-6, (c, seams[c])
+
+# **A strike reaches, and it does not spend its windup going the other way.** The floors are
+# T3D-23's: the attack anchor has to stand well forward of its rest at the blow, and must never be
+# far behind it (Phragmoteuthis, the worked example, asserts +0.12 and -0.04; this animal's swipe
+# is wider and carries more of the head round, so -0.06 is the bar here and is measured, not
+# guessed). `forwardAtPhase > rearBackAtPhase` is the shape of the thing: gather, then reach.
+ATTACK_REACH = {}
+for c in STRIKE_CLIPS:
+    rows = reach_track[c]
+    fwd = max(rows, key=lambda r: r['forward'])
+    back = min(rows, key=lambda r: r['forward'])
+    ATTACK_REACH[c] = {
+        'axis': 'the rig\'s own forward (-Y here, +Z in the packaged file), in bodies',
+        'anchorForwardOverL': round(fwd['forward'], 4), 'forwardAtPhase': fwd['u'],
+        'anchorRearBackOverL': round(back['forward'], 4), 'rearBackAtPhase': back['u'],
+        'anchorLateralOverL': round(max(r['lateral'] for r in rows), 4),
+        'bodyLungeOverL': round(max(r['lunge'] for r in rows), 4),
+        'anchorMinThroughTheSweepOverL': round(min(r['forward'] for r in rows if .46 < r['u'] < .72), 4),
+        'trace': [[r['u'], round(r['forward'], 3)] for r in rows[::max(1, len(rows) // 12)]],
+    }
+    assert ATTACK_REACH[c]['anchorForwardOverL'] >= .12, ('the strike does not reach in ' + c, ATTACK_REACH[c])
+    assert ATTACK_REACH[c]['anchorRearBackOverL'] >= -.06, ('the gather goes too far back in ' + c, ATTACK_REACH[c])
+    assert ATTACK_REACH[c]['forwardAtPhase'] > ATTACK_REACH[c]['rearBackAtPhase'], \
+        ('the gather must come first in ' + c, ATTACK_REACH[c])
+    # The swipe is still a swipe: the snout goes across as well as forward in the two clips whose
+    # whole character is the sideways sweep.
+    if c in ('Heavy', 'Ability'):
+        assert ATTACK_REACH[c]['anchorLateralOverL'] > .12, ('the swipe must sweep in ' + c, ATTACK_REACH[c])
+print('APH_REACH', json.dumps({c: {k: v for k, v in r.items() if k != 'trace'}
+                               for c, r in ATTACK_REACH.items()}))
 
 # --- the swept angle at each limb root, measured from the limb's own direction.
 # **Not read off an Euler channel.** A rotation written on one axis is a stroke on one body and a
@@ -1303,6 +1401,7 @@ report = {
     'limbSweepDegrees': limb_sweep,
     'limbSweepMethod': 'the largest angle between any two directions the limb points over the '
                        'cycle, taken from the root joint to the tip joint in world space',
+    'attackReach': ATTACK_REACH,
     'gapeMaximaRadians': {c: max(v) for c, v in gape_trace.items()},
     'mouthCutDeviation': {
         'cutFromMeasuredLineRaw': CUT_DEVIATION_RAW,
