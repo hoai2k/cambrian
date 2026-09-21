@@ -18,11 +18,63 @@
  * Every loop is a function of `2π·u` alone, so it closes on itself for every bone (a new clip has
  * no shipped source to carry, so the seam is checked on the whole rig).
  */
+import { Quaternion, Vector3 } from 'three';
 import { UP, DOWN, FWD, BACK } from './lib.mjs';
 import { wave, chain } from './common.mjs';
 
 const TAU = Math.PI * 2;
 const pos = (x) => Math.max(0, x);
+
+/**
+ * Which way this rig's jaw opens, read off the body's **own bite**.
+ *
+ * `P.bend` turns a bone so its *tip* moves toward a world direction, so "bend the jaw DOWN" opens a
+ * mandible whose bone runs forward from the hinge and **closes** one whose bone runs back toward it.
+ * Both conventions are shipped: eleven rigs run the jaw forward and four (Birgeria, Macrocnemus,
+ * Cartorhynchus, Tanystropheus) run it back, and a gait that named DOWN gaped every fish but
+ * Birgeria, whose `Flop` shipped with its mouth clamped 0.11–0.21 rad *past* the bind pose and was
+ * the first thing its own audit said once the audit could run at all.
+ *
+ * Two measurements were tried before this one and the first was wrong, in the roster's usual way:
+ * the separation of `anchor_mouth` from `anchor_mouth_inside` looks like a gape and is not — it
+ * grows under either rotation on Birgeria and does not move at all on the three bodies that hang
+ * both anchors off one bone. What answers exactly is the file's own statement: every one of these
+ * rigs carries Blender-authored clips that unambiguously open the mouth, so the widest jaw
+ * rotation in `Bite`/`Gape`/`Attack`/`Heavy`/`Eat` is asked which way it turns, and the gait turns
+ * the same way. Nothing to name per body, and a new rig is right by construction.
+ */
+const OPENERS = ['Bite', 'Gape', 'Attack', 'Heavy', 'Eat'];
+const opensCache = new WeakMap();
+function jawOpens(rig, name) {
+  let byBone = opensCache.get(rig);
+  if (!byBone) opensCache.set(rig, byBone = new Map());
+  if (byBone.has(name)) return byBone.get(name);
+  const j = rig.joint(name), rest = rig.rest.get(j);
+  let widest = null, widestAngle = 0;
+  for (const anim of rig.doc.getRoot().listAnimations()) {
+    if (!OPENERS.includes(anim.getName())) continue;
+    for (const ch of anim.listChannels()) {
+      if (ch.getTargetNode() !== j || ch.getTargetPath() !== 'rotation') continue;
+      const v = ch.getSampler().getOutput().getArray();
+      for (let k = 0; k + 3 < v.length; k += 4) {
+        const d = rest.r.clone().invert().multiply(new Quaternion(v[k], v[k + 1], v[k + 2], v[k + 3]));
+        const a = 2 * Math.acos(Math.min(1, Math.abs(d.w)));
+        if (a > widestAngle) { widestAngle = a; widest = d; }
+      }
+    }
+  }
+  // The local axis a DOWN bend turns about, so the bite's own axis can be compared with it.
+  const axis = new Vector3().crossVectors(rig.restDir(j), new Vector3(...DOWN))
+    .normalize().applyQuaternion(rig.restWorldRot(j).invert());
+  let dir = DOWN;                                   // no opening clip drives this jaw: keep the old default
+  if (widest && widestAngle > 0.05) {
+    const v = new Vector3(widest.x, widest.y, widest.z);
+    if (widest.w < 0) v.negate();
+    dir = v.normalize().dot(axis) < 0 ? UP : DOWN;
+  }
+  byBone.set(name, dir);
+  return dir;
+}
 
 /**
  * @param {object} o
@@ -44,7 +96,7 @@ export function flopClip({ tail, pectorals = [], skull, jaw, amp = 0.28, duratio
       const arch = 0.35 * pos(Math.sin(ph));
       chain(P, tail, UP, arch * 0.12, (i, n) => 0.4 + 0.6 * i / (n - 1));
       if (skull) { P.spin(skull, headAxis, -arch * 0.5); P.spin(skull, [0, 1, 0], 0.25 * Math.sin(ph)); }
-      if (jaw) P.bend(jaw, DOWN, 0.12 + 0.1 * pos(Math.sin(ph + 0.5)));
+      if (jaw) P.bend(jaw, jawOpens(P.rig, jaw), 0.12 + 0.1 * pos(Math.sin(ph + 0.5)));
       // Fins out and pressing against the sand, then folding as the body leaves it.
       for (const f of pectorals) { P.bend(f, DOWN, 0.35 * pos(-Math.cos(ph)) + 0.08); P.bend(f, BACK, 0.2 * pos(Math.sin(ph))); }
     },

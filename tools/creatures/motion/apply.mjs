@@ -10,10 +10,21 @@
  * swaps the new clip, so the tool can be replayed on top of whatever else has landed in
  * the GLB since — the same reason it edits the shipped file rather than a Blender source.
  *
+ * **A clip lands on the whole family, not on the authored body alone.** A Triassic delivery is a
+ * pair — the authored body and the procedural twin (and its LOD1, which *is* that twin) — and the
+ * pipeline's verification step is that the three play the same samples on the same rig. A tool
+ * that wrote only the authored file broke that parity itself, and broke every audit of that body
+ * with it. Which variants count as the family is *measured* rather than listed, because an LOD1
+ * means two different things in two eras: a Triassic LOD1 carries the whole clip set, and a
+ * Cambrian or Devonian one carries a deliberately reduced three (Death, Idle, Swim). So a variant
+ * joins the family when its clip set already matches the authored body's — ignoring the clips this
+ * run itself authors, so a family the tool has half-written before is re-joined rather than
+ * abandoned — and when it carries the same joints. Anything else is reported and left alone.
+ *
  * Everything but the animations round-trips exactly: meshes, skins, bind poses, sockets,
  * materials and embedded textures are re-encoded losslessly (same settings as
  * package-expansion.mjs) and verified against the input before the file is written.
- * --review additionally writes an uncompressed copy to the out dir for Blender.
+ * --review additionally writes an uncompressed copy of the authored body to the out dir for Blender.
  */
 import { PropertyType } from '@gltf-transform/core';
 import { EXTMeshoptCompression } from '@gltf-transform/extensions';
@@ -36,11 +47,7 @@ const io = await makeIO();
 // All three eras: a Cambrian id lives in creatures/, a Devonian one in devonian/creatures/, a Triassic one in triassic/creatures/.
 const { existsSync } = await import('node:fs');
 const assetDir = ['public/assets/creatures', 'public/assets/devonian/creatures', 'public/assets/triassic/creatures'].find((d) => existsSync(`${d}/${id}.glb`)) ?? 'public/assets/creatures';
-const file = `${assetDir}/${id}.glb`;
-const before = await readFile(file);
-const rig = await loadRig(io, file);
-const doc = rig.doc, root = doc.getRoot();
-const { clips, basePose, rebase, authored } = await import(`./performances/${id}.mjs`);
+const { clips: authoredClips, basePose, rebase, authored } = await import(`./performances/${id}.mjs`);
 
 const hash = (b) => createHash('sha256').update(b).digest('hex');
 const digest = (a) => a ? hash(new Uint8Array(new Float64Array(a.getArray()).buffer)) + ':' + a.getType() + ':' + a.getNormalized() : null;
@@ -64,7 +71,7 @@ function indexDigest(prim) {
   return hash(new Uint8Array(out.buffer)) + ':' + a.getType() + ':' + a.getNormalized() + ':rot';
 }
 /** Everything that is not an animation, as a comparable snapshot. */
-function snapshot(d) {
+function snapshot(d, mine) {
   const r = d.getRoot();
   return {
     nodes: r.listNodes().map((n) => [n.getName(), n.getTranslation(), n.getRotation(), n.getScale(), n.listChildren().map((c) => c.getName()), n.getExtras()]),
@@ -75,90 +82,184 @@ function snapshot(d) {
     meshes: r.listMeshes().map((m) => [m.getName(), m.listPrimitives().map((p) => { const sem = [...p.listSemantics()].sort(); return [sem, sem.map((s) => digest(p.getAttribute(s))), indexDigest(p), p.getMaterial()?.getName(), p.getMode()]; })]),
     materials: r.listMaterials().map((m) => [m.getName(), JSON.stringify(m.toJSON?.() ?? {}), m.getBaseColorFactor(), m.getBaseColorTexture()?.getName(), m.getNormalTexture()?.getName(), m.getMetallicRoughnessTexture()?.getName(), m.getAlphaMode(), m.getDoubleSided()]),
     textures: r.listTextures().map((t) => [t.getName(), t.getMimeType(), hash(t.getImage())]),
-    kept: r.listAnimations().filter((a) => !clips.some((c) => c.name === a.getName())).map((a) => [a.getName(), a.listChannels().map((c) => [c.getTargetNode().getName(), c.getTargetPath(), digest(c.getSampler().getInput()), digest(c.getSampler().getOutput()), c.getSampler().getInterpolation()])]),
+    kept: r.listAnimations().filter((a) => !mine.some((c) => c.name === a.getName())).map((a) => [a.getName(), a.listChannels().map((c) => [c.getTargetNode().getName(), c.getTargetPath(), digest(c.getSampler().getInput()), digest(c.getSampler().getOutput()), c.getSampler().getInterpolation()])]),
   };
 }
-const expected = snapshot(doc);
 
-// Swap the clips. The first run keeps the shipped clip as replaced/<Name>; later runs keep that.
-const byName = new Map(root.listAnimations().map((a) => [a.getName(), a]));
-const log = [];
-const added = new Set();
-const ours = (a) => a?.getExtras()?.cambrianClip?.pass === PASS;
-const drop = (a) => { for (const ch of a.listChannels()) ch.dispose(); for (const sm of a.listSamplers()) sm.dispose(); a.dispose(); };
-for (const def of clips) {
-  let old = byName.get(def.name), kept = byName.get(`replaced/${def.name}`);
-  // A clip this tool authored is never the shipped one: an earlier run's output is dropped, and
-  // an earlier run's output that a later run mistook for shipped (renamed to replaced/) likewise.
-  if (kept && ours(kept)) { drop(kept); kept = undefined; log.push(`${def.name}: dropped a replaced/ copy that was this tool's own output`); }
-  if (old && ours(old)) { drop(old); old = undefined; log.push(`${def.name}: previous ${PASS} clip dropped`); }
-  if (!old && !kept) added.add(def.name);        // a clip the model never had: nothing to keep beside it
-  let source = kept;
-  if (old && !kept) {
-    old.setName(`replaced/${def.name}`);
-    old.setExtras({ ...old.getExtras(), cambrianClip: { ...(old.getExtras()?.cambrianClip ?? {}), version: 1, replaced: def.name, replacedOn: authoredOn, by: PASS } });
-    log.push(`${def.name}: shipped clip kept as replaced/${def.name}`);
-    source = old;
-  } else if (old) {
-    drop(old);
-    log.push(`${def.name}: shipped clip dropped (replaced/${def.name} already kept)`);
-  } else log.push(`${def.name}: ${kept ? 'new clip beside the kept original' : 'new clip'}`);
-  // Everything the performance does not claim keeps the shipped clip's motion.
-  const carry = authored && source ? clipReader(rig, source) : undefined;
-  const { frames } = sampleClip(rig, def, { authoredOn, pass: PASS, basePose, carry, authored });
-  if (carry) log.push(`${def.name}: body motion carried from replaced/${def.name}`);
-  log.push(`${def.name}: ${frames} frames, ${def.duration}s, ${def.loop ? 'loop' : 'one-shot'}`);
-}
-// A base pose re-poses every other clip in the file onto the new resting shape; the shipped
-// version of each is kept as replaced/<Name> exactly like an authored replacement.
-if (basePose) {
-  const names = [...new Set(root.listAnimations().map((a) => a.getName().replace(/^replaced\//, '')))].filter((n) => !clips.some((c) => c.name === n));
-  for (const name of names) {
-    let old = byName.get(name), kept = byName.get(`replaced/${name}`);
-    if (kept && ours(kept)) { drop(kept); kept = undefined; }
-    if (old && ours(old)) { drop(old); old = undefined; }          // an earlier run's re-posed copy
+/** The clip names this run authors, plus the `replaced/` names it may create for them. */
+const ownNames = new Set(authoredClips.flatMap((c) => [c.name, `replaced/${c.name}`]));
+/** A clip set with this run's own clips taken out: what a variant looked like before the tool ever saw it. */
+const familyKey = (names) => [...new Set(names.filter((n) => !ownNames.has(n)))].sort().join('|');
+
+/** Re-author `file` in place (or into `dest`), returning the bytes written. */
+async function applyTo(file, dest) {
+  const before = await readFile(file);
+  const rig = await loadRig(io, file);
+  const doc = rig.doc, root = doc.getRoot();
+  const clips = [...authoredClips];              // basePose appends to this; never to the module's own array
+  const expected = snapshot(doc, clips);
+
+  // Swap the clips. The first run keeps the shipped clip as replaced/<Name>; later runs keep that.
+  const byName = new Map(root.listAnimations().map((a) => [a.getName(), a]));
+  const log = [];
+  const added = new Set();
+  const ours = (a) => a?.getExtras()?.cambrianClip?.pass === PASS;
+  const drop = (a) => { for (const ch of a.listChannels()) ch.dispose(); for (const sm of a.listSamplers()) sm.dispose(); a.dispose(); };
+  for (const def of clips) {
+    let old = byName.get(def.name), kept = byName.get(`replaced/${def.name}`);
+    // A clip this tool authored is never the shipped one: an earlier run's output is dropped, and
+    // an earlier run's output that a later run mistook for shipped (renamed to replaced/) likewise.
+    if (kept && ours(kept)) { drop(kept); kept = undefined; log.push(`${def.name}: dropped a replaced/ copy that was this tool's own output`); }
+    if (old && ours(old)) { drop(old); old = undefined; log.push(`${def.name}: previous ${PASS} clip dropped`); }
+    if (!old && !kept) added.add(def.name);        // a clip the model never had: nothing to keep beside it
     let source = kept;
-    if (!source && old) { old.setName(`replaced/${name}`); old.setExtras({ ...old.getExtras(), cambrianClip: { version: 1, replaced: name, replacedOn: authoredOn, by: PASS } }); source = old; }
-    else if (source && old) drop(old);
-    if (!source) continue;
-    rebaseAnimation(rig, source, name, basePose, { ...rebase, pass: PASS, authoredOn });
-    log.push(`${name}: re-posed onto the base pose (shipped clip kept as replaced/${name})`);
-    clips.push({ name });                        // so the checks below expect it beside its replaced/ copy
+    if (old && !kept) {
+      old.setName(`replaced/${def.name}`);
+      old.setExtras({ ...old.getExtras(), cambrianClip: { ...(old.getExtras()?.cambrianClip ?? {}), version: 1, replaced: def.name, replacedOn: authoredOn, by: PASS } });
+      log.push(`${def.name}: shipped clip kept as replaced/${def.name}`);
+      source = old;
+    } else if (old) {
+      drop(old);
+      log.push(`${def.name}: shipped clip dropped (replaced/${def.name} already kept)`);
+    } else log.push(`${def.name}: ${kept ? 'new clip beside the kept original' : 'new clip'}`);
+    // Everything the performance does not claim keeps the shipped clip's motion.
+    const carry = authored && source ? clipReader(rig, source) : undefined;
+    const { frames } = sampleClip(rig, def, { authoredOn, pass: PASS, basePose, carry, authored });
+    if (carry) log.push(`${def.name}: body motion carried from replaced/${def.name}`);
+    log.push(`${def.name}: ${frames} frames, ${def.duration}s, ${def.loop ? 'loop' : 'one-shot'}`);
   }
-}
-// Fresh Rig over the same doc so the kept-animation snapshot sees the renamed clips.
-expected.kept = snapshot(new Rig(doc).doc).kept.filter(([n]) => !clips.some((c) => c.name === n));
+  // A base pose re-poses every other clip in the file onto the new resting shape; the shipped
+  // version of each is kept as replaced/<Name> exactly like an authored replacement.
+  if (basePose) {
+    const names = [...new Set(root.listAnimations().map((a) => a.getName().replace(/^replaced\//, '')))].filter((n) => !clips.some((c) => c.name === n));
+    for (const name of names) {
+      let old = byName.get(name), kept = byName.get(`replaced/${name}`);
+      if (kept && ours(kept)) { drop(kept); kept = undefined; }
+      if (old && ours(old)) { drop(old); old = undefined; }          // an earlier run's re-posed copy
+      let source = kept;
+      if (!source && old) { old.setName(`replaced/${name}`); old.setExtras({ ...old.getExtras(), cambrianClip: { version: 1, replaced: name, replacedOn: authoredOn, by: PASS } }); source = old; }
+      else if (source && old) drop(old);
+      if (!source) continue;
+      rebaseAnimation(rig, source, name, basePose, { ...rebase, pass: PASS, authoredOn });
+      log.push(`${name}: re-posed onto the base pose (shipped clip kept as replaced/${name})`);
+      clips.push({ name });                        // so the checks below expect it beside its replaced/ copy
+    }
+  }
+  // Fresh Rig over the same doc so the kept-animation snapshot sees the renamed clips.
+  expected.kept = snapshot(new Rig(doc).doc, clips).kept.filter(([n]) => !clips.some((c) => c.name === n));
 
-await doc.transform(dedup({ propertyTypes: [PropertyType.ACCESSOR, PropertyType.TEXTURE], keepUniqueNames: true }));
-// A dropped clip leaves its samplers' accessors behind; without this every re-run grows the file.
-await doc.transform(prune({ propertyTypes: [PropertyType.ACCESSOR, PropertyType.BUFFER], keepLeaves: true, keepAttributes: true, keepExtras: true, keepSolidTextures: true }));
-doc.createExtension(EXTMeshoptCompression).setRequired(true).setEncoderOptions({ method: EXTMeshoptCompression.EncoderMethod.QUANTIZE });
-let bytes = preserveNodeTransforms(await io.writeBinary(doc), doc);
+  await doc.transform(dedup({ propertyTypes: [PropertyType.ACCESSOR, PropertyType.TEXTURE], keepUniqueNames: true }));
+  // A dropped clip leaves its samplers' accessors behind; without this every re-run grows the file.
+  await doc.transform(prune({ propertyTypes: [PropertyType.ACCESSOR, PropertyType.BUFFER], keepLeaves: true, keepAttributes: true, keepExtras: true, keepSolidTextures: true }));
+  doc.createExtension(EXTMeshoptCompression).setRequired(true).setEncoderOptions({ method: EXTMeshoptCompression.EncoderMethod.QUANTIZE });
+  const bytes = preserveNodeTransforms(await io.writeBinary(doc), doc);
 
-// Verify by reading the written bytes back.
-const check = await io.readBinary(bytes);
-const actual = snapshot(check);
-actual.kept = actual.kept.filter(([n]) => !clips.some((c) => c.name === n));
-assert.deepEqual(actual, expected, 'round trip changed something other than the replaced clips');
-const names = check.getRoot().listAnimations().map((a) => a.getName());
-for (const def of clips) {
-  assert(names.includes(def.name), def.name);
-  // A clip that is new to the model has no shipped version to keep; everything else must keep one.
-  if (!added.has(def.name)) assert(names.includes(`replaced/${def.name}`), `replaced/${def.name}`);
+  // Verify by reading the written bytes back.
+  const check = await io.readBinary(bytes);
+  const actual = snapshot(check, clips);
+  actual.kept = actual.kept.filter(([n]) => !clips.some((c) => c.name === n));
+  assert.deepEqual(actual, expected, 'round trip changed something other than the replaced clips');
+  const names = check.getRoot().listAnimations().map((a) => a.getName());
+  for (const def of clips) {
+    assert(names.includes(def.name), def.name);
+    // A clip that is new to the model has no shipped version to keep; everything else must keep one.
+    if (!added.has(def.name)) assert(names.includes(`replaced/${def.name}`), `replaced/${def.name}`);
+  }
+  assert.equal(new Set(names).size, names.length, 'duplicate clip names');
+  await mkdir(path.dirname(dest), { recursive: true });
+  await writeFile(dest, bytes);
+  return { bytes, before, check, names, log };
 }
-assert.equal(new Set(names).size, names.length, 'duplicate clip names');
+
+// --- The family -------------------------------------------------------------------------------
+const authoredFile = `${assetDir}/${id}.glb`;
+const authoredDoc = await io.read(authoredFile);
+const authoredKey = familyKey(authoredDoc.getRoot().listAnimations().map((a) => a.getName()));
+const authoredJoints = (authoredDoc.getRoot().listSkins()[0]?.listJoints() ?? []).map((j) => j.getName()).join('|');
+const family = [{ suffix: '', file: authoredFile }];
+const skipped = [];
+for (const suffix of ['.puppet', '.lod1']) {
+  const file = `${assetDir}/${id}${suffix}.glb`;
+  if (!existsSync(file)) continue;
+  const d = await io.read(file);
+  const key = familyKey(d.getRoot().listAnimations().map((a) => a.getName()));
+  const joints = (d.getRoot().listSkins()[0]?.listJoints() ?? []).map((j) => j.getName()).join('|');
+  if (key !== authoredKey) { skipped.push(`${id}${suffix}: a different clip set from the authored body (${d.getRoot().listAnimations().length} clips) — left alone`); continue; }
+  if (joints !== authoredJoints) { skipped.push(`${id}${suffix}: a different rig from the authored body — left alone`); continue; }
+  family.push({ suffix, file });
+}
 
 const dest = outDir ?? assetDir;
-await mkdir(dest, { recursive: true });
-const out = path.join(dest, `${id}.glb`);
-await writeFile(out, bytes);
-if (review) {
-  for (const ext of check.getRoot().listExtensionsUsed()) if (ext.extensionName === 'EXT_meshopt_compression') ext.dispose();
-  await writeFile(path.join(dest, `${id}.review.glb`), await io.writeBinary(check));
+const written = new Map();                        // input sha -> bytes, so a variant that *is* another stays byte-identical
+for (const { suffix, file } of family) {
+  const out = path.join(dest, `${id}${suffix}.glb`);
+  const sha = hash(await readFile(file));
+  const twin = written.get(sha);
+  if (twin) {
+    await mkdir(path.dirname(out), { recursive: true });
+    await writeFile(out, twin.bytes);
+    console.log(`${id}${suffix}: byte-identical to ${id}${twin.suffix || ''} — the same bytes written to ${out}`);
+    continue;
+  }
+  const { bytes, before, check, names, log } = await applyTo(file, out);
+  written.set(sha, { bytes, suffix });
+  console.log(`${id}${suffix || ''}: ${before.length.toLocaleString()} -> ${bytes.length.toLocaleString()} bytes -> ${out}`);
+  for (const l of log) console.log('  ' + l);
+  console.log('  clips now: ' + names.join(', '));
+  if (review && !suffix) {
+    for (const ext of check.getRoot().listExtensionsUsed()) if (ext.extensionName === 'EXT_meshopt_compression') ext.dispose();
+    await writeFile(path.join(dest, `${id}.review.glb`), await io.writeBinary(check));
+  }
 }
-console.log(`${id}: ${before.length.toLocaleString()} -> ${bytes.length.toLocaleString()} bytes -> ${out}`);
-for (const l of log) console.log('  ' + l);
-console.log('  clips now: ' + names.join(', '));
+for (const s of skipped) console.log('  ' + s);
+// The era JSON is the family's fourth file. It is what the game loads, what `clip-contract.mjs`
+// holds every variant against and what the per-body audits take their expected clip set from, so
+// a tool that adds a clip to three GLBs and leaves the manifest to a human has left the family
+// half-written: an audit's own frozen count is then measured against a body that has a clip it has
+// never heard of (Macrocnemus, 27 against 26), and in an era with no such guard it simply drifts
+// (Cheirolepis' manifest has been a `Grab` short). This keeps it in step, and only ever *adds*.
+for (const line of await updateManifest(`${dest}/${id}.json`)) console.log('  ' + line);
+
+/**
+ * Add this run's clips to the era JSON's `clips`, and the looping ones to `looping`, by splicing
+ * the two arrays textually. The manifests are written by several tools in two languages — the
+ * Triassic's come out of Python with `\u00b7` escapes a `JSON.stringify` round-trip would silently
+ * un-escape — so nothing outside the two arrays is reserialised, and the result is re-parsed and
+ * compared key by key against the intended document before it is written.
+ */
+async function updateManifest(file) {
+  if (!existsSync(file)) return [`${path.basename(file)}: no era JSON beside the model — nothing to keep in step`];
+  const raw = await readFile(file, 'utf8');
+  const meta = JSON.parse(raw);
+  const want = { clips: authoredClips.map((c) => c.name), looping: authoredClips.filter((c) => c.loop).map((c) => c.name) };
+  let text = raw; const out = [];
+  for (const key of ['clips', 'looping']) {
+    const have = meta[key];
+    if (!Array.isArray(have)) { out.push(`${path.basename(file)}: no "${key}" array — left alone`); continue; }
+    const missing = want[key].filter((n) => !have.includes(n));
+    if (!missing.length) continue;
+    const at = text.indexOf(`"${key}"`);
+    assert(at >= 0, `${file}: cannot find "${key}"`);
+    const open = text.indexOf('[', at), close = text.indexOf(']', open);
+    assert(open > 0 && close > open && !text.slice(open + 1, close).includes('['), `${file}: "${key}" is not a flat array`);
+    const body = text.slice(open + 1, close);
+    const indent = /\n([^\S\n]+)"/.exec(body)?.[1] ?? '    ';           // however this file lays its items out
+    const added = missing.map((n) => `${indent}${JSON.stringify(n)}`).join(',\n');
+    // After the last item, never before the closing whitespace: the array's own layout up to and
+    // including the newline that precedes `]` is left exactly as it was found.
+    const end = open + 1 + (body.replace(/\s+$/, '').length);
+    text = text.slice(0, end) + (body.trim() ? `,\n${added}` : `\n${added}`) + text.slice(end);
+    meta[key] = [...have, ...missing];
+    out.push(`${path.basename(file)}: ${key} += ${missing.join(', ')} (${meta[key].length} now)`);
+  }
+  if (!out.length) return [`${path.basename(file)}: already declares every clip this run authored`];
+  // Prove the splice changed the two arrays and nothing else.
+  const after = JSON.parse(text);
+  assert.deepEqual(Object.keys(after), Object.keys(meta), 'manifest keys moved');
+  assert.deepEqual(after, meta, 'the splice changed more than clips/looping');
+  await writeFile(file, text);
+  return out;
+}
 
 function preserveNodeTransforms(bytes, d) {
   // NodeIO omits transforms within an epsilon of identity; restore every authored TRS exactly.

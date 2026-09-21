@@ -3,27 +3,27 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1880692,
-      "sha256": "e443d92c0a9ad0d198951d8394b90fb9939619e3e732bc2abbfe6cec2c4f5308",
+      "bytes": 1890296,
+      "sha256": "134d7f01fd21e04cd01b62a36b30d537c49455e9bab335437e902c5df5f7da7d",
       "triangles": 22410,
       "vertices": 13287
     },
     {
       "suffix": ".puppet",
-      "bytes": 622460,
-      "sha256": "6bd04aa8d9aab6b15c0a8b332b3c6cf80483fb4fd98fd24cc9e0f99d182c1bd9",
+      "bytes": 632068,
+      "sha256": "ff712025260394314b12c165c62ab6e49e46bc36e940b76d11440ccd25de0396",
       "triangles": 7476,
       "vertices": 3894
     },
     {
       "suffix": ".lod1",
-      "bytes": 622460,
-      "sha256": "6bd04aa8d9aab6b15c0a8b332b3c6cf80483fb4fd98fd24cc9e0f99d182c1bd9",
+      "bytes": 632068,
+      "sha256": "ff712025260394314b12c165c62ab6e49e46bc36e940b76d11440ccd25de0396",
       "triangles": 7476,
       "vertices": 3894
     }
   ],
-  "clips": 23,
+  "clips": 24,
   "joints": 22,
   "sockets": 3,
   "socketTable": [
@@ -130,6 +130,10 @@
     {
       "name": "FastStart",
       "sha256": "fbc99c034ec7b8e6cf74dca2d83672a02efb66e196bed4559067782f55986c49"
+    },
+    {
+      "name": "Flop",
+      "sha256": "b84204f322d40e3356413f873ca4e76b581764a70bed0becb03c58d44e247a48"
     },
     {
       "name": "Gape",
@@ -330,6 +334,12 @@
           "duration": 1.399999976158142,
           "samples": 61,
           "maxVertexTravel": 1.612734057453797
+        },
+        {
+          "clip": "Flop",
+          "duration": 0.800000011920929,
+          "samples": 61,
+          "maxVertexTravel": 3.412278256912564
         }
       ]
     },
@@ -473,6 +483,12 @@
           "duration": 1.399999976158142,
           "samples": 61,
           "maxVertexTravel": 1.6198838706131622
+        },
+        {
+          "clip": "Flop",
+          "duration": 0.800000011920929,
+          "samples": 61,
+          "maxVertexTravel": 3.4088461146040263
         }
       ]
     }
@@ -750,6 +766,13 @@
       "minRadians": 0,
       "peakPhase": 0.375,
       "mouthSocketTravelInSkullFrame": 0.3789622528628729
+    },
+    {
+      "clip": "Flop",
+      "maxOpenRadians": 0.21023415093383793,
+      "minRadians": 0.11465944134867648,
+      "peakPhase": 0.16666666666666666,
+      "mouthSocketTravelInSkullFrame": 0.022128735168490305
     }
   ],
   "strike": [
@@ -922,6 +945,12 @@
       "anchor_mouth": 0.17798948046457583,
       "anchor_mouth_inside": 0.2096726610103932,
       "anchor_attack_primary": 0.23774284577348287
+    },
+    {
+      "clip": "Flop",
+      "anchor_mouth": 0.08886480316134578,
+      "anchor_mouth_inside": 0.02868195960226705,
+      "anchor_attack_primary": 0.10324226632179492
     }
   ]
 }

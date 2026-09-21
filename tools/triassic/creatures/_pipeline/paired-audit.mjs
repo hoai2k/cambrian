@@ -45,6 +45,61 @@ const socketsOf = (d) => d.getRoot().listNodes().filter((n) => n.getName().start
   .sort((a, b) => a.name.localeCompare(b.name));
 const meshValues = (d) => d.getRoot().listMeshes()
   .map((m) => m.listPrimitives().map((p) => p.listSemantics().sort().map((s) => [s, data(p.getAttribute(s))])));
+/**
+ * How far a channel's samples leave a rest transform. The root's contract is that it does not
+ * *move*, which is not the same question as whether a channel for it exists: a clip whose root
+ * keys are the rest transform restated on every frame honours the contract exactly, and this
+ * assertion used to fail it and say "no root motion" while doing so. Measured at the 1e-6 the
+ * motion library itself throws at (`tools/creatures/motion/rig.mjs`).
+ *
+ * Exported because three bodies (Helicoprion, Hybodus, Saurichthys) predate this module and carry
+ * their own copy of the whole audit — the drift this file's header warns about, which is why the
+ * check itself lives here and is imported rather than pasted a fourth time.
+ */
+const ROOT_TOL = 1e-6;
+function rootDrift(path, values, rest) {
+  let worst = 0;
+  if (path === 'rotation') {
+    for (let i = 0; i + 3 < values.length; i += 4) {
+      let dot = 0; for (let k = 0; k < 4; k++) dot += values[i + k] * rest[k];
+      worst = Math.max(worst, Math.abs(1 - Math.abs(dot)));
+    }
+  } else {
+    for (let i = 0; i + 2 < values.length; i += 3) {
+      let d = 0; for (let k = 0; k < 3; k++) d += (values[i + k] - rest[k]) ** 2;
+      worst = Math.max(worst, Math.sqrt(d));
+    }
+  }
+  return worst;
+}
+/**
+ * What an era JSON says a body's clips are, and which of them loop.
+ *
+ * **Never a literal.** Five audits baked their own `const CLIPS = 26` and their own `LOOPS` list,
+ * and a number written when a body was built cannot know about a clip added to it afterwards: a
+ * rebuilt Macrocnemus audited end to end and then stopped at `27 !== 26` the moment its `Peer` was
+ * re-applied, having passed the root check and the family check on the way — a third place a shore
+ * gait is invisible to the body carrying it. The drift also ran the other way and silently: that
+ * same `LOOPS` had never heard of `Peer`, so the loop seam on the one clip most likely to have one
+ * was never checked, and Keichousaurus' list was missing a `Grab` its manifest declares.
+ *
+ * The era JSON is the manifest the game loads, `apply.mjs` keeps it in step with the files it
+ * writes, and `clip-contract.mjs` refuses any variant that disagrees with it — so it is the one
+ * thing to measure against, and the count and the loop list come from here or from nowhere.
+ */
+export function declaredClips(base) {
+  const meta = JSON.parse(fs.readFileSync(`${base}.json`, 'utf8'));
+  assert(Array.isArray(meta.clips) && meta.clips.length, `${base}.json declares no clips`);
+  assert(Array.isArray(meta.looping), `${base}.json declares no looping list`);
+  return { CLIPS: meta.clips, LOOPS: meta.looping, meta };
+}
+/** Refuse a channel that moves the rig's root. `rootRest` is `skeleton(d)[0].joints[0]`. */
+export function assertRootStill(rootRest, ch, clipName) {
+  if (ch.node !== rootRest.name) return;
+  const d = rootDrift(ch.path, ch.values, ch.path === 'rotation' ? rootRest.r : rootRest.t);
+  assert(d <= ROOT_TOL,
+    `${clipName}: the root moves — ${ch.path} leaves its rest transform by ${d.toExponential(2)}`);
+}
 
 /**
  * Package, prove parity, play every clip on both bodies, and return the report plus the loaded
@@ -55,8 +110,7 @@ export async function auditPair({ id, base, here, local, joints, sockets: socket
   await Promise.all([MeshoptDecoder.ready, MeshoptEncoder.ready]);
   const io = new NodeIO().registerExtensions(ALL_EXTENSIONS)
     .registerDependencies({ 'meshopt.decoder': MeshoptDecoder, 'meshopt.encoder': MeshoptEncoder });
-  const meta = JSON.parse(fs.readFileSync(`${base}.json`, 'utf8'));
-  const CLIPS = meta.clips; const LOOPS = meta.looping;
+  const { CLIPS, LOOPS, meta } = declaredClips(base);
   const report = { id, models: [], clips: CLIPS.length, joints, sockets: socketCount };
 
   for (const suffix of ['', '.puppet', '.lod1']) {
@@ -90,13 +144,14 @@ export async function auditPair({ id, base, here, local, joints, sockets: socket
         report.clipSignatures, 'exact clip parity');
     }
     const signatures = new Set();
+    const rootRest = sk[0].joints[0];              // the skin's first joint is the rig's root
     for (const a of c) {
       let motion = 0;
       const sig = hash(JSON.stringify(a.channels));
       assert(!signatures.has(sig), `${a.name} duplicates another clip`);
       signatures.add(sig);
       for (const ch of a.channels) {
-        assert.notEqual(ch.node, 'root', 'no root motion');
+        assertRootStill(rootRest, ch, a.name);
         assert.notEqual(ch.path, 'scale', 'no scale channels');
         assert(ch.times.at(-1) > 0);
         const size = ch.path === 'rotation' ? 4 : 3;

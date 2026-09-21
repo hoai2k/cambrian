@@ -2,27 +2,27 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1778980,
-      "sha256": "bc2018703c388eee39469a2facd882604ea8ca0e3038ccf98746ed642fee58c9",
+      "bytes": 1789012,
+      "sha256": "cfad8caaaa68d496247ee541254933b14b0470743a98175c063bb3e389e00174",
       "triangles": 19402,
       "vertices": 11577
     },
     {
       "suffix": ".puppet",
-      "bytes": 672796,
-      "sha256": "0f536beee33f0817396a0d9d0cf7db9790560404b5ca4d2b6491c68a5d7ee8a8",
+      "bytes": 682828,
+      "sha256": "ca04f637d74f02000a91e2cee73601570115f7c52241f400f9b3380fa8c1bf91",
       "triangles": 6500,
       "vertices": 3252
     },
     {
       "suffix": ".lod1",
-      "bytes": 672796,
-      "sha256": "0f536beee33f0817396a0d9d0cf7db9790560404b5ca4d2b6491c68a5d7ee8a8",
+      "bytes": 682828,
+      "sha256": "ca04f637d74f02000a91e2cee73601570115f7c52241f400f9b3380fa8c1bf91",
       "triangles": 6500,
       "vertices": 3252
     }
   ],
-  "clips": 23,
+  "clips": 24,
   "joints": 24,
   "sockets": [
     {
@@ -124,6 +124,10 @@
     {
       "name": "Eat",
       "sha256": "d0e9349db58ed211ad664b2831813a5d9cfc2d918974e77d782b6abb57e42181"
+    },
+    {
+      "name": "Flop",
+      "sha256": "3f17ebdbcdb19846e328a183362243616395c57ca12b7c4f7060f7691cf898c3"
     },
     {
       "name": "Grab",
@@ -328,6 +332,12 @@
           "duration": 1.600000023841858,
           "samples": 61,
           "maxVertexTravel": 1.0891035824421205
+        },
+        {
+          "clip": "Flop",
+          "duration": 0.800000011920929,
+          "samples": 61,
+          "maxVertexTravel": 2.452147709955278
         }
       ]
     },
@@ -471,6 +481,12 @@
           "duration": 1.600000023841858,
           "samples": 61,
           "maxVertexTravel": 1.1008326325409483
+        },
+        {
+          "clip": "Flop",
+          "duration": 0.800000011920929,
+          "samples": 61,
+          "maxVertexTravel": 2.5240544425156495
         }
       ]
     }
@@ -685,6 +701,12 @@
       "maxOpenRadians": -0.23405307029947003,
       "minRadians": -0.3267257164898501,
       "mouthSocketTravelInSkullFrame": 0.03603516034480374
+    },
+    {
+      "clip": "Flop",
+      "maxOpenRadians": 0.21997215509177928,
+      "minRadians": 0.11999999735386133,
+      "mouthSocketTravelInSkullFrame": 0.02023633088037273
     }
   ],
   "skinTearsPerSurface": {
@@ -693,7 +715,7 @@
       "clip": "Shake",
       "grewFrom": 0.016669982290208534,
       "grewTo": 0.0988521860391917,
-      "edgesOver2x": 903
+      "edgesOver2x": 1133
     }
   },
   "worstSkinEdgeStretch": 5.929951473149112,

@@ -29,7 +29,39 @@ unless the user explicitly asks for a PR. Steps:
   fish's lash, one `FLOP_PERIOD` long so the loop *is* the flop), `Walk` (a sprawling
   lateral-sequence walk, lent to lobe fins, palms and paddles alike) and the lurkers' `Fish`/`Peer`,
   and each rig's file names its own bones. A new clip has no shipped source to carry, so it must
-  close its loop on every bone. After a run: the era JSON's `clips`/`looping` by hand,
+  close its loop on every bone.
+  **A clip lands on the whole family, and which files are the family is measured.** A Triassic
+  delivery is a pair — the authored body, the procedural twin and the LOD1 that *is* that twin — and
+  the tool wrote the authored file alone, so the parity that is the pipeline's own verification step
+  was broken by the tool and took five bodies' audits out with it. A variant joins the family when
+  its clip set already matches the authored body's (ignoring the clips the run itself authors, so a
+  half-written family is re-joined rather than abandoned) and its joints do; a Cambrian or Devonian
+  LOD1 carries a *deliberately reduced* three clips and is reported and left alone. **No clip
+  carries a root channel**: the contract is that the root does not move, so a channel for it only
+  restates the rest transform on every key — and the paired audit read that channel's mere
+  *existence* as motion, so a correct clip failed an assertion whose message said something it did
+  not test, which is the `np.interp` lesson in one line. It measures the drift from the root's own
+  rest transform now. That assertion lived in **four** files: Helicoprion, Hybodus and Saurichthys
+  predate `_pipeline/paired-audit.mjs` and carry their own copy of the whole audit, so fixing "the"
+  shared check fixed a quarter of it. **And a gait asks the body which way its jaw opens.** `P.bend`
+  turns a bone so its *tip* moves toward a world direction, so naming DOWN gapes the eleven rigs
+  whose jaw bone runs forward from the hinge and clamps the four that run it back — Birgeria's
+  `Flop` shipped with its mouth shut 0.21 rad past the bind pose. The widest jaw rotation in the
+  body's own `Bite`/`Gape`/`Attack`/`Heavy`/`Eat` is asked which way it turns, those clips being the
+  file's own unambiguous statement; the separation of `anchor_mouth` from `anchor_mouth_inside`
+  looks like the same measurement and is not, growing under *either* rotation on Birgeria and not
+  moving at all on the three bodies that hang both anchors off one bone.
+  `tools/triassic/clip-contract.mjs` (in `npm run triassic`) holds both halves: no shipped Triassic
+  body moves its root or animates scale, and every variant carries exactly the clips its era JSON
+  declares — and the manifest is the family's **fourth file**, which `apply.mjs` now keeps in step
+  itself rather than leaving to a human, splicing the two arrays textually so nothing else in a
+  file written by another tool in another language is reserialised. Leaving it by hand is how a
+  per-body `audit.mjs` came to measure a rebuilt body against its own frozen `const CLIPS = 26`
+  while the body carried 27, and how a manifest in an era with no such guard simply drifts.
+  **An expected clip count is never a literal**: `declaredClips` in `_pipeline/paired-audit.mjs` is
+  the one place it comes from, and the frozen `LOOPS` lists beside those counts had already gone
+  quietly stale — Macrocnemus' had never heard of the `Peer` whose loop seam most needed checking.
+  After a run:
   `node tools/update-asset-sizes.mjs`, and the era's own check. Onychodus' performance file is stale
   against its rebuilt rig (`whorlL`) and fails to apply at all, so it carries no `Flop`.
 - Any change to a creature's model, colours or textures must go through

@@ -23,13 +23,14 @@ import { ALL_EXTENSIONS, EXTMeshoptCompression } from '@gltf-transform/extension
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { declaredClips } from '../_pipeline/paired-audit.mjs';
 
 await Promise.all([MeshoptDecoder.ready, MeshoptEncoder.ready]);
 const io = new NodeIO().registerExtensions(ALL_EXTENSIONS)
   .registerDependencies({ 'meshopt.decoder': MeshoptDecoder, 'meshopt.encoder': MeshoptEncoder });
 const base = 'public/assets/triassic/creatures/coelophysis';
-const LOOPS = ['Idle', 'Swim', 'Sprint', 'Guard', 'Eat', 'Grab', 'Crawl', 'Run'];
-const CLIPS = 29, JOINTS = 35, SOCKETS = 3, CERVICALS = 8, CAUDALS = 10;
+const { CLIPS, LOOPS } = declaredClips(base);
+const JOINTS = 35, SOCKETS = 3, CERVICALS = 8, CAUDALS = 10;
 const hash = (x) => crypto.createHash('sha256').update(x).digest('hex');
 const data = (a) => (a ? Array.from(a.getArray()) : null);
 const skeleton = (d) => d.getRoot().listSkins().map((s) => ({
@@ -75,7 +76,8 @@ for (const suffix of ['', '.puppet', '.lod1']) {
     d = after;
   }
   const c = clips(d), sk = skeleton(d), so = sockets(d);
-  assert.equal(c.length, CLIPS);
+  assert.equal(c.length, CLIPS.length, `${suffix || 'authored'}: clip count`);
+  assert.deepEqual(c.map((a) => a.name).sort(), [...CLIPS].sort(), 'clip names');
   assert.equal(sk[0].joints.length, JOINTS);
   assert.equal(so.length, SOCKETS);
   // The cervicals are a chain, not a fan: each hangs off the one behind it and the skull off the last.

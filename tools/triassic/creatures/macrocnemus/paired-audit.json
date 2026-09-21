@@ -2,22 +2,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 2007000,
-      "sha256": "f3266ba16ebfa04b40de15066bef718211acb0efffa785785ae4d0240d4ab90b",
+      "bytes": 2022072,
+      "sha256": "8250cb6f875c6ad549972d98203e1ad3be5f13b4ecfd5b220be3f00e45ab13e7",
       "triangles": 21954,
       "vertices": 13077
     },
     {
       "suffix": ".puppet",
-      "bytes": 917048,
-      "sha256": "0701fd9ed4fd9e333ecd8180edc4a60f7ac17a443c0d7defc7c49ec1b0119f0b",
+      "bytes": 932124,
+      "sha256": "8001c290b08dd40df074e4626ddb7081be6be2b91ebc3258a8ae1fdc31db8ea2",
       "triangles": 8458,
       "vertices": 4307
     },
     {
       "suffix": ".lod1",
-      "bytes": 917048,
-      "sha256": "0701fd9ed4fd9e333ecd8180edc4a60f7ac17a443c0d7defc7c49ec1b0119f0b",
+      "bytes": 932124,
+      "sha256": "8001c290b08dd40df074e4626ddb7081be6be2b91ebc3258a8ae1fdc31db8ea2",
       "triangles": 8458,
       "vertices": 4307
     }
@@ -158,6 +158,10 @@
     {
       "name": "Parry",
       "sha256": "872103fb4274f3512b15726281d2fa7cb1306e81b9a0574ec8b1116d3797347a"
+    },
+    {
+      "name": "Peer",
+      "sha256": "f6a0d87745966c7e3f289ad6d74042dc730f98beb9c65b70a3f2966b46270e0e"
     },
     {
       "name": "Retreat",
@@ -356,6 +360,12 @@
           "duration": 1.399999976158142,
           "samples": 61,
           "maxVertexTravel": 1.1605512890602647
+        },
+        {
+          "clip": "Peer",
+          "duration": 4,
+          "samples": 61,
+          "maxVertexTravel": 0.02702510777996377
         }
       ]
     },
@@ -517,6 +527,12 @@
           "duration": 1.399999976158142,
           "samples": 61,
           "maxVertexTravel": 1.1611590780363532
+        },
+        {
+          "clip": "Peer",
+          "duration": 4,
+          "samples": 61,
+          "maxVertexTravel": 0.027605970534242862
         }
       ]
     }
@@ -555,14 +571,14 @@
   "posteriorJawAttachment": {
     "authored": {
       "pairedRimVertices": 57,
-      "clips": 26,
+      "clips": 27,
       "phasesPerClip": 61,
       "worstGap": 0,
       "worstAt": null
     },
     ".puppet": {
       "pairedRimVertices": 32,
-      "clips": 26,
+      "clips": 27,
       "phasesPerClip": 61,
       "worstGap": 0,
       "worstAt": null

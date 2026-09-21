@@ -2,27 +2,27 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1543016,
-      "sha256": "70fbfbf8ea25f46ddb999e1d57919aa3ebb549556c56189279ef204f2b521d62",
+      "bytes": 1552784,
+      "sha256": "e5ae1daf1ac273cc1505d25642c6fa3850c99da942ca8909236146d9d03e9153",
       "triangles": 19253,
       "vertices": 11619
     },
     {
       "suffix": ".puppet",
-      "bytes": 605080,
-      "sha256": "6e9870a5f9260596f8741ccf3b8d8eca849de0576b4fe3e2d44416126e7afe3f",
+      "bytes": 614844,
+      "sha256": "65ff3597f01b2b0a1b5a422340ba171eaa195a984924b94f7b4849bb5231f85d",
       "triangles": 7100,
       "vertices": 3548
     },
     {
       "suffix": ".lod1",
-      "bytes": 605080,
-      "sha256": "6e9870a5f9260596f8741ccf3b8d8eca849de0576b4fe3e2d44416126e7afe3f",
+      "bytes": 614844,
+      "sha256": "65ff3597f01b2b0a1b5a422340ba171eaa195a984924b94f7b4849bb5231f85d",
       "triangles": 7100,
       "vertices": 3548
     }
   ],
-  "clips": 21,
+  "clips": 22,
   "joints": 23,
   "sockets": [
     {
@@ -124,6 +124,10 @@
     {
       "name": "Eat",
       "sha256": "913b9f95f9d76b2a17c80b447bef719c97f4cb99d824f7a7823d1abd0a4cee35"
+    },
+    {
+      "name": "Flop",
+      "sha256": "5281f1d5a48bc4e4066c0394921c1b7397a366398a14c83f4dc4633394621abd"
     },
     {
       "name": "Grab",
@@ -308,6 +312,12 @@
           "duration": 1.600000023841858,
           "samples": 61,
           "maxVertexTravel": 1.5654773419212364
+        },
+        {
+          "clip": "Flop",
+          "duration": 0.800000011920929,
+          "samples": 61,
+          "maxVertexTravel": 2.843368890150205
         }
       ]
     },
@@ -439,6 +449,12 @@
           "duration": 1.600000023841858,
           "samples": 61,
           "maxVertexTravel": 1.644419765614031
+        },
+        {
+          "clip": "Flop",
+          "duration": 0.800000011920929,
+          "samples": 61,
+          "maxVertexTravel": 2.8629491047383984
         }
       ]
     }
@@ -624,6 +640,13 @@
       "minRadians": 0,
       "peakPhase": 0,
       "mouthSocketTravelInSkullFrame": 6.684478423521909e-16
+    },
+    {
+      "clip": "Flop",
+      "maxOpenRadians": 0.21997215509177928,
+      "minRadians": 0.11999999735386133,
+      "peakPhase": 0.16666666666666666,
+      "mouthSocketTravelInSkullFrame": 0.01987825648072314
     }
   ],
   "exactRigParity": true,

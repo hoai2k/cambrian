@@ -6,16 +6,21 @@
 # open from the side it is the larger and the more honest of the two.
 #
 # "no opening clips" means the sweep could not find a jaw channel to measure, which for Ceratites
-# and Phragmoteuthis is true (no jaw, no mouth drawn) and for Birgeria is not: its
-# `audit.mjs --decode` trips a pre-existing `no root motion` assertion without `--package`, so the
-# body was never decoded. Nothosaurus' row is *after* its port; Rhaeticosaurus and Mosasaurus were
-# measured separately and are in oral-verdicts.md.
+# and Phragmoteuthis is true: no jaw, no mouth drawn. Birgeria carried that line too and it was
+# never true of Birgeria -- its `audit.mjs --decode` tripped an assertion that read a *constant*
+# root channel as root motion, so the body was never decoded. Both faults behind that are fixed
+# (T3D-33) and its row below was measured on 21 September 2026 with the rest of the tooling green.
+# Nothosaurus' row is *after* its port; Rhaeticosaurus and Mosasaurus were measured separately and
+# are in oral-verdicts.md.
 
 aphaneramma  Bite@0.1 through=0 opened=10730 | Heavy@0.433 through=3 opened=10651 | Ability@0.267 through=5 opened=10091
 archelon  Bite@0.1 through=0 opened=1262 | Heavy@0.467 through=0 opened=1242 | Attack@0.367 through=1 opened=1151
 askeptosaurus  Attack@0.233 through=1 opened=193 | Bite@0.133 through=1 opened=173 | Eat@0.967 through=0 opened=177
 atopodentatus  Bite@0.1 through=0 opened=4494 | Attack@0.4 through=3738 opened=3893 | Eat@0.367 through=3726 opened=3885
-birgeria: no opening clips
+# birgeria's row was measured on birgeria.glb sha256 134d7f01..., which is still the file that ships:
+# its gait was re-applied and its family re-packaged after this was taken and the bytes came back
+# identical, which is the pipeline being idempotent. A measurement is of a file, so it names one.
+birgeria  Gape@0.467 through=4 opened=15357 | Ability@0.467 through=4 opened=8416 | Heavy@0.533 through=2 opened=7239
 cartorhynchus  Ability@0.133 through=0 opened=693 | Heavy@0.4 through=1 opened=681 | Bite@0.1 through=2 opened=629
 ceratites: no opening clips
 coelophysis  Bite@0.167 through=1 opened=7189 | SnapRight@0.133 through=3 opened=7236 | SnapLeft@0.133 through=3 opened=7276

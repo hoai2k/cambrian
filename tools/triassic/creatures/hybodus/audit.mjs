@@ -14,6 +14,7 @@ import { ALL_EXTENSIONS, EXTMeshoptCompression } from '@gltf-transform/extension
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { assertRootStill, declaredClips } from '../_pipeline/paired-audit.mjs';
 
 await Promise.all([MeshoptDecoder.ready, MeshoptEncoder.ready]);
 const io = new NodeIO().registerExtensions(ALL_EXTENSIONS)
@@ -23,8 +24,7 @@ const ID = 'hybodus';
 const base = `public/assets/triassic/creatures/${ID}`;
 const here = `tools/triassic/creatures/${ID}`;
 const local = `local/triassic-authoring/${ID}`;
-const meta = JSON.parse(fs.readFileSync(base + '.json', 'utf8'));
-const CLIPS = meta.clips, LOOPS = meta.looping;
+const { CLIPS, LOOPS, meta } = declaredClips(base);
 const JOINTS = 24, SOCKETS = 3;
 
 const hash = x => crypto.createHash('sha256').update(x).digest('hex');
@@ -86,13 +86,14 @@ for (const suffix of ['', '.puppet', '.lod1']) {
     assert.deepEqual(c.map(a => ({ name: a.name, sha256: hash(JSON.stringify(a)) })), report.clipSignatures, 'exact clip parity');
   }
   const signatures = new Set();
+  const rootRest = sk[0].joints[0];              // the skin's first joint is the rig's root
   for (const a of c) {
     let motion = 0;
     const sig = hash(JSON.stringify(a.channels));
     assert(!signatures.has(sig), `${a.name} duplicates another clip`);
     signatures.add(sig);
     for (const ch of a.channels) {
-      assert.notEqual(ch.node, 'root', 'no root motion');
+      assertRootStill(rootRest, ch, a.name);
       assert.notEqual(ch.path, 'scale', 'no scale channels');
       assert(ch.times.at(-1) > 0);
       const size = ch.path === 'rotation' ? 4 : 3;

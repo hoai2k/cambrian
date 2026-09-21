@@ -1,25 +1,25 @@
 {
-  "id": "macrocnemus",
+  "id": "helicoprion",
   "verdict": "no oral lining: nothing to be mixed",
   "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present. A body with no lining mesh is reported as such, with the hidden oral parts it does carry listed, and all three variants must agree.",
   "models": [
     {
       "variant": "authored",
-      "sha256": "8250cb6f875c6ad549972d98203e1ad3be5f13b4ecfd5b220be3f00e45ab13e7",
+      "sha256": "e5ae1daf1ac273cc1505d25642c6fa3850c99da942ca8909236146d9d03e9153",
       "meshes": [],
       "otherOralMeshes": [],
       "oralShells": "none"
     },
     {
       "variant": ".puppet",
-      "sha256": "8001c290b08dd40df074e4626ddb7081be6be2b91ebc3258a8ae1fdc31db8ea2",
+      "sha256": "65ff3597f01b2b0a1b5a422340ba171eaa195a984924b94f7b4849bb5231f85d",
       "meshes": [],
       "otherOralMeshes": [],
       "oralShells": "none"
     },
     {
       "variant": ".lod1",
-      "sha256": "8001c290b08dd40df074e4626ddb7081be6be2b91ebc3258a8ae1fdc31db8ea2",
+      "sha256": "65ff3597f01b2b0a1b5a422340ba171eaa195a984924b94f7b4849bb5231f85d",
       "meshes": [],
       "otherOralMeshes": [],
       "oralShells": "none"
