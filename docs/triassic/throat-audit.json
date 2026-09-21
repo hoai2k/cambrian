@@ -6394,7 +6394,7 @@
     {
       "id": "birgeria",
       "variant": "authored",
-      "sha256": "b8bcf8e90d589a5dd0322154f2a55a6c53ae480e138d3411d47ed97228861b03",
+      "sha256": "134d7f01fd21e04cd01b62a36b30d537c49455e9bab335437e902c5df5f7da7d",
       "length": 4.999999937196589,
       "meshes": [
         {
@@ -7289,46 +7289,46 @@
             ]
           },
           "mouthSkin": {
-            "ratio": 1.9494693771812046,
-            "rest": 0.04059102424815268,
-            "posed": 0.07913095876019338,
-            "phase": 0.25,
+            "ratio": 1.4074738659921084,
+            "rest": 0.06809129425914348,
+            "posed": 0.09583671717132293,
+            "phase": 0.75,
             "mesh": "Birgeria_authored_body",
             "vertices": [
-              6688,
-              2734
+              1983,
+              6435
             ]
           },
           "hiddenOral": {
-            "ratio": 1.089459451027247,
-            "rest": 0.07002857816393933,
-            "posed": 0.076293296322704,
+            "ratio": 1.0331623667369407,
+            "rest": 0.07494302953163473,
+            "posed": 0.07742831776134018,
             "phase": 0.16666666666666666,
             "mesh": "Seated_jaw_hinge_tissue",
             "vertices": [
-              194,
-              195
+              94,
+              95
             ]
           }
         }
       ],
       "worstMouth": {
-        "ratio": 1.9494693771812046,
-        "rest": 0.04059102424815268,
-        "posed": 0.07913095876019338,
-        "phase": 0.25,
+        "ratio": 1.622400158823139,
+        "rest": 0.06809129425914348,
+        "posed": 0.11047132662050747,
+        "phase": 0.20833333333333334,
         "mesh": "Birgeria_authored_body",
         "vertices": [
-          6688,
-          2734
+          1983,
+          6435
         ],
-        "clip": "Flop"
+        "clip": "FastStart"
       }
     },
     {
       "id": "birgeria",
       "variant": "puppet",
-      "sha256": "6bd04aa8d9aab6b15c0a8b332b3c6cf80483fb4fd98fd24cc9e0f99d182c1bd9",
+      "sha256": "ff712025260394314b12c165c62ab6e49e46bc36e940b76d11440ccd25de0396",
       "length": 5.019418989868931,
       "meshes": [
         {
@@ -8205,6 +8205,43 @@
             "vertices": [
               87,
               88
+            ]
+          }
+        },
+        {
+          "name": "Flop",
+          "duration": 0.800000011920929,
+          "skin": {
+            "ratio": 2.8424025331626743,
+            "rest": 0.027756221940575407,
+            "posed": 0.07889435555491693,
+            "phase": 0.9583333333333334,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              530,
+              532
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.492433725107671,
+            "rest": 0.05894669550795972,
+            "posed": 0.08797403635973194,
+            "phase": 0.25,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2016,
+              2015
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0331623667369407,
+            "rest": 0.07494302953163473,
+            "posed": 0.07742831776134018,
+            "phase": 0.16666666666666666,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              94,
+              95
             ]
           }
         }
@@ -16833,7 +16870,7 @@
     {
       "id": "helicoprion",
       "variant": "authored",
-      "sha256": "5acbca73001409230b922612a300772814033226ca53a5ea8dd73c77f51e5423",
+      "sha256": "e5ae1daf1ac273cc1505d25642c6fa3850c99da942ca8909236146d9d03e9153",
       "length": 4.99999989635082,
       "meshes": [
         {
@@ -17499,7 +17536,7 @@
     {
       "id": "helicoprion",
       "variant": "puppet",
-      "sha256": "6e9870a5f9260596f8741ccf3b8d8eca849de0576b4fe3e2d44416126e7afe3f",
+      "sha256": "65ff3597f01b2b0a1b5a422340ba171eaa195a984924b94f7b4849bb5231f85d",
       "length": 5.035837545810972,
       "meshes": [
         {
@@ -18113,6 +18150,35 @@
             "vertices": [
               3484,
               3477
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Flop",
+          "duration": 0.800000011920929,
+          "skin": {
+            "ratio": 4.305018414579305,
+            "rest": 0.0257877298010982,
+            "posed": 0.11101665166392326,
+            "phase": 0.16666666666666666,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 4.305018414579305,
+            "rest": 0.0257877298010982,
+            "posed": 0.11101665166392326,
+            "phase": 0.16666666666666666,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
             ]
           },
           "hiddenOral": {
@@ -21390,7 +21456,7 @@
     {
       "id": "hybodus",
       "variant": "authored",
-      "sha256": "8c47c375a1693405e78b2353b81453ccffa880e746872aa9804babe68a4c7f41",
+      "sha256": "cfad8caaaa68d496247ee541254933b14b0470743a98175c063bb3e389e00174",
       "length": 4.999999881416193,
       "meshes": [
         {
@@ -22114,7 +22180,7 @@
     {
       "id": "hybodus",
       "variant": "puppet",
-      "sha256": "0f536beee33f0817396a0d9d0cf7db9790560404b5ca4d2b6491c68a5d7ee8a8",
+      "sha256": "ca04f637d74f02000a91e2cee73601570115f7c52241f400f9b3380fa8c1bf91",
       "length": 5.010320911969931,
       "meshes": [
         {
@@ -22786,6 +22852,35 @@
             "vertices": [
               2083,
               2082
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Flop",
+          "duration": 0.800000011920929,
+          "skin": {
+            "ratio": 3.7648331604832697,
+            "rest": 0.027657986881786886,
+            "posed": 0.10412770616476254,
+            "phase": 0.25,
+            "mesh": "Hybodus_procedural_volume_twin",
+            "vertices": [
+              2775,
+              2756
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 3.303953606598273,
+            "rest": 0.03654304257726429,
+            "posed": 0.12073651731922659,
+            "phase": 0.2916666666666667,
+            "mesh": "Hybodus_procedural_volume_twin",
+            "vertices": [
+              2787,
+              2789
             ]
           },
           "hiddenOral": {
@@ -24603,7 +24698,7 @@
     {
       "id": "macrocnemus",
       "variant": "authored",
-      "sha256": "9ba77921f42a35f63f5c36d235541e2907f4dcb99a6a6da1c99d12aae8cc2420",
+      "sha256": "8250cb6f875c6ad549972d98203e1ad3be5f13b4ecfd5b220be3f00e45ab13e7",
       "length": 4.885642414673371,
       "meshes": [
         {
@@ -25432,7 +25527,7 @@
     {
       "id": "macrocnemus",
       "variant": "puppet",
-      "sha256": "0701fd9ed4fd9e333ecd8180edc4a60f7ac17a443c0d7defc7c49ec1b0119f0b",
+      "sha256": "8001c290b08dd40df074e4626ddb7081be6be2b91ebc3258a8ae1fdc31db8ea2",
       "length": 4.8824562347106575,
       "meshes": [
         {
@@ -26209,6 +26304,35 @@
             "vertices": [
               272,
               149
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Peer",
+          "duration": 4,
+          "skin": {
+            "ratio": 1.4728169645574305,
+            "rest": 0.06060657001773624,
+            "posed": 0.08926238448575967,
+            "phase": 0.9166666666666666,
+            "mesh": "Macrocnemus_procedural_volume_puppet",
+            "vertices": [
+              311,
+              307
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.4728169645574305,
+            "rest": 0.06060657001773624,
+            "posed": 0.08926238448575967,
+            "phase": 0.9166666666666666,
+            "mesh": "Macrocnemus_procedural_volume_puppet",
+            "vertices": [
+              311,
+              307
             ]
           },
           "hiddenOral": {
@@ -39170,7 +39294,7 @@
     {
       "id": "saurichthys",
       "variant": "authored",
-      "sha256": "53ca633acaf131a06b52bc0e4c424b5e24cbb2099f511285a4f33eda6e391706",
+      "sha256": "b6459078ff9b91ff137bebcb1a2f738b1c7311b3841f5c979e99e7afc0dbf012",
       "length": 4.9999998270635535,
       "meshes": [
         {
@@ -40098,7 +40222,7 @@
     {
       "id": "saurichthys",
       "variant": "puppet",
-      "sha256": "40dc4c748e933908b23c14a968cdb97402311695766ca7de59b864cd96eac0ef",
+      "sha256": "89946edd266befbe72561bc12ce2c5e5285f60c4048328e0dfcdc51d27c5ad8b",
       "length": 5.0360232160417855,
       "meshes": [
         {
@@ -40971,19 +41095,56 @@
               12
             ]
           }
+        },
+        {
+          "name": "Flop",
+          "duration": 0.800000011920929,
+          "skin": {
+            "ratio": 1.7309562416725588,
+            "rest": 0.0513287310838572,
+            "posed": 0.08884778744673491,
+            "phase": 0.5,
+            "mesh": "Saurichthys_procedural_volume_twin",
+            "vertices": [
+              2112,
+              2115
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.269356227282707,
+            "rest": 0.06905087112517505,
+            "posed": 0.08765015326203661,
+            "phase": 0.25,
+            "mesh": "Saurichthys_procedural_volume_twin",
+            "vertices": [
+              2439,
+              2412
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000084635823,
+            "rest": 0.1108393051583604,
+            "posed": 0.11083930609645797,
+            "phase": 0.75,
+            "mesh": "Mouth_lining_twin",
+            "vertices": [
+              68,
+              81
+            ]
+          }
         }
       ],
       "worstMouth": {
-        "ratio": 1.2447243325740365,
-        "rest": 0.06436817768175894,
-        "posed": 0.08012063700393439,
-        "phase": 0.3333333333333333,
+        "ratio": 1.269356227282707,
+        "rest": 0.06905087112517505,
+        "posed": 0.08765015326203661,
+        "phase": 0.25,
         "mesh": "Saurichthys_procedural_volume_twin",
         "vertices": [
-          2856,
-          2874
+          2439,
+          2412
         ],
-        "clip": "Bite"
+        "clip": "Flop"
       }
     },
     {
