@@ -252,9 +252,10 @@ reference sits well off the span's own line.
 
 `+54.6° in the bend plane · 12.1° out of it · 56.0° in all`
 
-Each hides the other two. The **in-plane** figure is the one an edit changes and the one a target is
-dialled to; the **out-of-plane** figure is the tell that the axle is aimed wrong rather than that the
-bend is small; the **total** is the number everybody quotes, which is exactly why it must not be the
+Each hides the other two. The **in-plane** figure is the one the slider changes, and it is signed
+about the axle — which is the direction a straightening turns, so a run still to be straightened
+reads negative and closes on zero as the amount rises; the **out-of-plane** figure is the tell that
+the axle is aimed wrong rather than that the bend is small; the **total** is the number everybody quotes, which is exactly why it must not be the
 only one shown. The out-of-plane figure is measured rather than subtracted — turn the base direction
 by the in-plane angle and see what is left — because projecting onto a plane can make an angle
 *larger* than it is in space, and the subtraction then silently reads zero.
@@ -281,10 +282,13 @@ Every vertex inside the span is **lit**, and both traced centrelines are **drawn
 a trace that has set off down a flipper is seen rather than believed. That is the single most
 useful thing on the screen.
 
-**Right-drag orbits**, shift+right-drag pans, scroll zooms, as in mark and mouth mode. The rig goes
-to its **bind pose**: a swimming body is drawn somewhere its vertex positions are not.
+**Left-drag orbits** where the pointer is not on a handle, **right-drag pans**, the wheel and the
+middle button dolly — the `view` scheme, as mouth mode uses (`src/viewer/pointer-scheme.ts`). The
+rig goes to its **bind pose**: a swimming body is drawn somewhere its vertex positions are not.
 
-The panel's numeric fields set every number exactly. A plane's three are the components of a
+The **Straighten slider** sits above the planes in the panel, because it is what a reviewer reaches
+for between every look: place the two planes once, then drag this. A whole drag is one undo step,
+and the number beside it can be typed exactly. The panel's numeric fields set every number exactly. A plane's three are the components of a
 direction, and the document keeps a plane as a unit vector — so setting one component re-normalises
 it with the other two, and typing a whole direction in takes a pass or two to land. The pointer,
 which drags the whole direction at once, has no such problem.
