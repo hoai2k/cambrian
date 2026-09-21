@@ -543,17 +543,122 @@ def is_jaw(c):
     return JAW_FRONT_Y - .004 < c.y < HINGE_Y and c.z < seam(c.y) - 1e-7
 
 
-parts, CUT_RIM = {}, {}
+# **Which of the three kinds of generation this is, measured before anything is built to close
+# it** (`T.cut_rim`). The answer on this head is *both*, along its length, and it decides the whole
+# construction:
+#
+#   * the main rim is **one closed loop of 153 vertices spanning y -0.276 to -0.214** -- the hinge
+#     cross-section (66 vertices across the head's full depth) and two lip runs (87 on the seam)
+#     that meet at y -0.276 and go no further forward. The mouth measures 0.124 long, so that is
+#     the **back half of it and nothing else**: behind -0.276 the generation is a closed head and
+#     the cut is what opens it. That is Mosasaurus' signature seen from the other end, and it is
+#     exactly where the as-drawn leak was -- 3,738 px at `Attack`, all of it in the throat between
+#     the upper tooth row and the mandible, which is the back wall of the mouth and was absent.
+#   * forward of -0.276 the seam plane passes between surfaces that were **already apart**: the
+#     T-bar carries a modelled slit with its own walls (`T.mouth_cavity` reads 634 vertices out to
+#     y -0.333, the tip of the rostrum), so the cut buys nothing there and leaves no rim to close.
+#     What it does leave is a few dozen small closed loops where it sawed across the generation's
+#     own needle teeth, each one a tooth's cross-section with every vertex of it on the seam.
+#
+# So the cut earns its place over the back half and is free over the front, and the construction is
+# the one T3D-31 established: **close each half with the cut's own rim** (`T.cap_cut` over the
+# hinge cross-section, then `T.cap_mouth` over what is left) and carry no shell in the lumen at
+# all. Each half is a closed solid again by construction; the palate and the floor follow the
+# measured seam exactly because the rim is what bounds them; they wear the head's own albedo off
+# that rim; and each is part of its own half, so it rides that half's bone through the same weight
+# field as the skin around it, with no second surface to keep coincident.
+#
+# The dome is `CAP_DOME` of each cap vertex's own distance from the rim -- zero on the rim, deepest
+# along the middle of the mouth, shallow at the lips and in the corners -- bounded by the room the
+# head's own measured section leaves above and below the mouth line, so a palate cannot reach the
+# scalp of a skull this shallow.
+CAP_DOME = .30
+CAP_ROOM = .55
+# **The rim is a band about the seam rather than the seam exactly, and the twin is why.**
+# `bisect_on_curve` lands every vertex it adds *on* the measured line, so on the authored body an
+# exact test finds the whole rim. The voxel twin has faces the bisect snapped rather than cut
+# (`dist=1e-7`), and `split_part` then sends such a face whole to one side by its centroid, leaving
+# four of its vertices on the boundary 0.0005-0.0017 off the line. An exact selector drops those,
+# the lip run stops one edge short of them, and `cap_mouth` correctly refuses an arc. 0.0025 is
+# seven times the worst of them and a fourteenth of the head's own half depth, and nothing else in
+# the head is open: the generation's only boundary edges away from the cut are two, and they are
+# behind the head altogether (`cutRim.boundaryEdgesElsewhere`).
+SEAM_TOL = .0025
+
+
+def on_seam(p):
+    # **The corner of the mouth is on both rims and has to be in this one.** Bounded at
+    # `HINGE_Y - 1e-6` the two vertices where the lip meets the hinge cross-section were excluded,
+    # so the lip run stopped one edge short of the corner and `cap_mouth` refused the selection as
+    # not a closed curve -- correctly, since it was an arc. The corner belongs to the seam and to
+    # the chord `cap_cut` closes the hinge fan with, and both are in the mouth's own surface.
+    return abs(p.z - seam(p.y)) < SEAM_TOL and p.y <= HINGE_Y + 1e-5
+
+
+def in_head(p):
+    return p.y < HINGE_Y + .02
+
+
+def cap_room(p):
+    zlo, zhi = head_z_range(float(p.y))
+    return max(.0004, min(zhi - seam(float(p.y)), seam(float(p.y)) - zlo)) * CAP_ROOM
+
+
+parts, CUT_RIM, CAPS, CAP_SEATING = {}, {}, {}, {}
 for o in (auth, puppet):
     T.bisect_on_curve(o, seam, HINGE_Y, JAW_FRONT_Y - .004, margin=.03)
     T.split_part(o, 'lower jaw', is_jaw, parts)
-    # **What the cut actually left open, measured before anything is built** (`T.cut_rim`). This is
-    # the question CLAUDE.md puts ahead of "how do we fill it": which of the three kinds of
-    # generation this is.
-    CUT_RIM[o.name] = {'skull': T.cut_rim(o, lambda p: p.y < HINGE_Y + .02, seam=seam),
-                       'jaw': T.cut_rim(parts['lower jaw'][o.name],
-                                        lambda p: p.y < HINGE_Y + .02, seam=seam)}
+    jaw = parts['lower jaw'][o.name]
+    CUT_RIM[o.name] = {'skull': T.cut_rim(o, in_head, seam=seam),
+                       'jaw': T.cut_rim(jaw, in_head, seam=seam)}
+    at_hinge = lambda p: abs(p.y - HINGE_Y) < 1e-5                          # noqa: E731
+    CAPS[o.name] = {'skullAtHinge': T.cap_cut(o, at_hinge, Vector((0, -1, 0))),
+                    'jawAtHinge': T.cap_cut(jaw, at_hinge, Vector((0, 1, 0)))}
+    assert CAPS[o.name]['skullAtHinge'] > 0 and CAPS[o.name]['jawAtHinge'] > 0, \
+        ('the hinge cross-section was left open', o.name, CAPS[o.name])
+    _n_skull, _n_jaw = len(o.data.vertices), len(jaw.data.vertices)
+    CAPS[o.name]['palate'] = T.cap_mouth(o, on_seam, Vector((0, 0, -1)),
+                                         dome=CAP_DOME, rounds=2, limit=cap_room)
+    CAPS[o.name]['floor'] = T.cap_mouth(jaw, on_seam, Vector((0, 0, 1)),
+                                        dome=CAP_DOME, rounds=2, limit=cap_room)
+    # **Every vertex the caps added is inside the animal, checked two ways that cannot both be
+    # fooled the same way.** The section hull is the instrument that a modelled lumen does not
+    # confuse (the signed depth probe answers about the lumen's own wall beside a modelled mouth --
+    # Birgeria's reading, and the reason this builder never used it on oral geometry); ray parity
+    # against the **closed intake surface, taken before the cut opened it** is the one that uses no
+    # table at all, and is the answer to the `np.interp` lesson. They disagree exactly where the
+    # generation's own slit runs, because a pocket in a closed shell is exterior space to parity,
+    # so parity is recorded rather than asserted and the hull is what the build refuses on.
+    _worst, _outside_hull, _outside_parity = 1e9, 0, 0
+    for _part, _first in ((o, _n_skull), (jaw, _n_jaw)):
+        for _v in _part.data.vertices[_first:]:
+            _c = _hull_clearance(Vector(_v.co[:]))
+            _worst = min(_worst, _c)
+            _outside_hull += 1 if _c < 0 else 0
+            _outside_parity += 0 if _parity_inside(Vector(_v.co[:])) else 1
+    CAP_SEATING[o.name] = {
+        'capVertices': (len(o.data.vertices) - _n_skull) + (len(jaw.data.vertices) - _n_jaw),
+        'worstSectionHullClearance': round(float(_worst), 6),
+        'outsideTheSectionHull': int(_outside_hull),
+        'outsideTheClosedIntakeByRayParity': int(_outside_parity),
+        'note': 'parity counts a cap vertex inside the generation\'s own modelled slit as outside '
+                'the solid, because a pocket in a closed shell is exterior space to a parity test; '
+                'the hull is what this build asserts on.'}
+    print('ATOPO_CAP_SEATING', o.name, json.dumps(CAP_SEATING[o.name]))
+    # **Asserted on the authored body and recorded on the twin**, because the hull is the authored
+    # generation's own section: the voxel twin is allowed to differ from it by the paired envelope
+    # tolerance (4 % of a body, and this pair's worst station is 1.17 %), so measuring the twin's
+    # caps against the authored hull is measuring the remesh, not the caps.
+    if o is auth:
+        assert _outside_hull == 0, ('a mouth cap left the head', o.name, CAP_SEATING[o.name])
+    else:
+        assert _worst > -ENVELOPE_TOLERANCE / SCALE, \
+            ('the twin\'s mouth caps are outside the paired envelope', o.name, CAP_SEATING[o.name])
 print('ATOPO_CUT_RIM', json.dumps(CUT_RIM))
+print('ATOPO_CAPS', json.dumps({k: {n: (v if not isinstance(v, dict) else
+                                        {a: b for a, b in v.items() if a != 'bad'})
+                                    for n, v in d.items()} for k, d in CAPS.items()}))
+print('ATOPO_CAP_SEATING', json.dumps(CAP_SEATING))
 
 tooth_report = []
 for g in PATCHES:
@@ -620,234 +725,22 @@ for o in (auth, puppet):
     weight_report[o.name] = {'maxInfluences': max(counts), 'vertices': len(counts),
                              'verticesPerBone': owners, 'jawJunction': JUNCTION[o.name]}
 
-# ------------------------------------------------------------ the mouth interior ----
-# One closed skinned sac, wound inwards and **not** backface culled: a sac buried inside a head is
-# never seen from outside whatever its winding, because the skin is in front of it, so culling it
-# buys nothing and costs the one thing it exists for -- from below, looking up into an open mouth,
-# the floor is backfacing and a cull takes it away.
+# ------------------------------------------------- no oral geometry, and why ----
+# **This animal carries no lining and no hinge plug.** It shipped with both: a closed skinned sac
+# fitted per vertex through the modelled slit, and a seated ellipsoid at the corner of the mouth.
+# The runtime hides everything `src/shared/oral-geometry.ts` matches, so neither was ever drawn --
+# and measured as drawn the body read **3,738 px of backdrop seen through the head** at `Attack`,
+# the worst on the roster, every pixel of it in the throat between the upper tooth row and the
+# mandible. Neither part was closing anything a player could see, because what was open was the
+# back wall of the mouth, which is the cut's own rim and is now spanned by it (`T.cap_mouth`
+# above). Two shells inside a lumen were a claim that had to be rendered to check; a surface
+# spanning a closed curve is a closed solid by construction.
 #
-# **Darker and rougher than the era's standard lining, because this mouth is seen from outside at
-# rest and none of the others are.** Every previous body's lining is hidden behind a shut lip and
-# only ever lit from inside an open mouth, where (0.30, 0.13, 0.115) at roughness 0.62 reads as a
-# dusty pink mouth. This generation's rostrum carries a comb of separate needle teeth with real
-# gaps between them, so at Idle the interior is *front lit through the fence* -- and the standard
-# colour read as a pink sausage lying along the bar. The raw generation shows the same slot as a
-# dark line, which is what a mouth behind a sieve of teeth looks like.
-mouth_mat = T.inward_material(NAME + ' mouth interior', (.15, .062, .055, 1), roughness=.82)
-mouth_mat.use_backface_culling = False
-MOUTH_BACK = HINGE_Y + .026
-MOUTH_FRONT = MOUTH_FRONT_Y
-
-LINING_FIT = {}
-LINING_POWER = 2.6      # a flat slot rather than an ellipse, but not a box: at 3.2 the
-                        # section's corners stand nearly as far out as its axes do, and on a
-                        # head this thin that is what reaches the cheek first.
-
-
-def mouth_section(y):
-    """The lining's half width and half height at station y.
-
-    **Sized from the measured cavity, never fitted per vertex.** Where a mouth is modelled, a point
-    in the lumen is *outside* the closed shell, so the depth probe reads backwards there and a fit
-    that pulls a vertex 'back inside the skin' pushes it out through the cheek instead. This is the
-    case Birgeria records; Rhaeticosaurus is the other one, where nothing is modelled and a fit is
-    the only way to size the sac.
-    """
-    e = T.smooth((MOUTH_BACK - y) / .012) * T.smooth((y - MOUTH_FRONT) / .004)
-    # A hair inside the measured lumen so the sac's wall sits in the flesh rather than stippling
-    # against the skin's own cut edge, and floored so the tube does not become a thread at the
-    # front of a rostrum that narrows to nothing.
-    #
-    # **And clamped to the head's own outer silhouette, which on this animal is the binding
-    # constraint at the front.** `cavity_profile`'s `wide` is the spread of the measured cavity
-    # points and those sit on both *lips*, so across a T-bar it is the span of the lip line: 0.108
-    # against a rostrum whose widest vertex at the same station is 0.096 from the axis. Unclamped,
-    # the sac came out through both corners of the hammer by 0.023 of a body length. This is the
-    # same trap Birgeria records, in the shape a hammerhead gives it.
-    zlo, zhi = head_z_range(y)
-    room = min(zhi - seam(y), seam(y) - zlo)
-    # **Set back from the palate along the comb, full size at the corner**, and the split is what
-    # this animal needs. At 1.05 of the measured cavity the sac filled the slit exactly, so every
-    # interdental gap in the needle comb was a window onto it and the shut mouth read as a pink
-    # sausage along the bar. Taken down to 0.78 *everywhere* it left the corner of the mouth --
-    # where the mandible's rear rim, the throat and the sac all meet -- 26 pixels open at full
-    # gape, which is the one place a lining may not be small. `front` is 1 along the comb and 0 at
-    # the corner, so the sac is pulled off the teeth in front and left at full section behind.
-    front = T.smooth(((HINGE_Y - .045) - y) / .045)
-    back = 1. - front
-    w = max(min(mouth_half_width(y) * (.88 + .06 * back),
-                head_half_width_at_the_mouth(y) - .008,
-                head_outer_width(y) - .008), .0018) * (.92 + .08 * e)
-    h = max(min(mouth_half_height(y) * (.78 + .30 * back),
-                head_half_depth(y) * (.38 + .16 * back), room * (.50 + .06 * back)), .0022) \
-        * (.76 + .24 * e)
-    LINING_FIT[round(float(y), 5)] = [round(w, 5), round(h, 5)]
-    return w, h
-
-
-def fit_lining_point(p, y):
-    """Pull one ring vertex radially in until it is inside the head's own section hull.
-
-    **A per-vertex fit, and against the hull rather than against the depth probe.** Rhaeticosaurus
-    established why the fit has to be per vertex -- shrinking a whole ring by one factor couples its
-    width to its height, and on a deep head that is a hole -- and said in the same breath that a
-    generation with a *modelled* mouth may be sized but never fitted, because the probe it used
-    reads backwards in a lumen. Both halves of that are right; what is wrong is treating the probe
-    as the only instrument. The section hull is not fooled by a pocket, so this body gets the per
-    vertex fit after all, on a reading that works where the mouth is modelled.
-    """
-    c = Vector((cx(y), y, seam(y)))
-    d = Vector(p) - c
-    for k in range(14):
-        q = c + d * (1. - k * .035)
-        if _hull_clearance(q) > .0025:
-            return q
-    # Clamped: a vertex allowed to collapse towards the axis crosses its neighbours, the quad
-    # between them inverts, and the tube's surface faces away from the camera right where the mouth
-    # is widest open.
-    return c + d * .545
-
-
-def lining_jaw_blend(p):
-    """Steep, and centred above the lip rather than on it: centred on the seam the ring's equator
-    takes half the jaw's rotation while the mandible's cut rim takes all of it, so the rim ends up
-    below the lining's widest point and a wedge opens between them. Everything at and below the
-    mouth line follows the mandible outright; the stretch is carried by the band above it, inside
-    the mouth where nothing can see it."""
-    _w, h = mouth_section(p.y)
-    return T.smooth(.5 + 1.6 * ((seam(p.y) + .45 * h) - p.z) / max(h, 1e-6))
-
-
-# The closed-mouth lumen understates the head volume that each rigid oral shell must fill.
-_room_cache = {}
-
-
-def mouth_room(_y):
-    k = round(_y, 5)
-    if k not in _room_cache:
-        _room_cache[k] = T.mouth_room(
-            bvh_auth, Vector((cx(_y), _y, seam(_y))), Vector((1, 0, 0)), Vector((0, 0, 1)),
-            limit=.20, fallback=.02,
-            cap=(head_half_width(_y),
-                 max(.002, head_half_depth(_y) - (seam(_y) - cz(_y))),
-                 max(.002, head_half_depth(_y) + (seam(_y) - cz(_y)))))
-    return _room_cache[k]
-
-
-lining, lining_raw = T.lining('Oral cavity lining', rig, tx, seam, mouth_section,
-                              MOUTH_BACK, MOUTH_FRONT, lining_jaw_blend, mouth_mat,
-                              rings=30, ring=26, centre_x=cx, power=LINING_POWER,
-                              fit=fit_lining_point, room=mouth_room)
-oralparts = [lining]
-mouth_cover = []
-for _y in np.linspace(MOUTH_FRONT + .004, MOUTH_BACK - .010, 20):
-    y = float(_y)
-    w, h = mouth_section(y)
-    mouth_cover.append([round(y, 4), round(w / max(mouth_half_width(y), 1e-9), 3),
-                        round(h / max(head_half_depth(y), 1e-9), 3)])
-    if y > MOUTH_FRONT + .020:
-        assert w >= mouth_half_width(y) * .45, \
-            ('the oral lining is narrower than the mouth', y, w, mouth_half_width(y))
-    assert h >= .0012, ('the oral lining is flat', y, h)
-
-# **No authored dentition.** The generation carries its own comb along the rostrum's front edge and
-# the only thing this build does about the teeth is check that the measured cut does not saw
-# through one, which is the fault Placodus shipped.
-hinge_mat = T.vertex_colour_material(NAME + ' jaw hinge body', roughness=.66)
-# The corner of the mouth is where the mandible's rear rim, the throat and the lining all meet, and
-# the wedge between them is what opens at full gape. A seated envelope on the head's own section,
-# weighted to the mandible below the mouth line and to the skull above it, closes it.
-#
-# **Sized off the head's own fine profile, not off the centreline table.** That table is 61
-# stations over a whole body with a 0.012 band, and behind a rostrum this narrow it is reading the
-# cheek and the neck together: it gave a half width of 0.053 where the head measures 0.055 and a
-# half depth of 0.036 against 0.0355, and with a 0.044 half length in y the envelope would not seat
-# past a fifth of its size.
-HINGE_CENTRE = (cx(HINGE_Y), HINGE_Y + .004, cz(HINGE_Y))
-HINGE_R = (head_half_width(HINGE_Y) * .95, .030, head_half_depth(HINGE_Y) * .95)
-HINGE_FIT = 0.
-
-
-def _in_head(q):
-    # Clearance inside the head's own silhouette at q's station, the smaller of the two axes.
-    #
-    # **Seated against the silhouette, not against the signed depth probe**, for the same reason
-    # the lining is: the probe's nearest surface to a point beside an open slit is the *lumen
-    # wall*, whose normal points at it, so a point in solid flesh reads as outside the animal.
-    # Sized that way this envelope fitted to only half its radius -- 0.025 against a head half
-    # width of 0.055 -- and so stopped well short of the sides, which is exactly where the corner
-    # of the mouth is. `gape-solid.py` then saw a 20-pixel sliver of backdrop at that corner in
-    # three clips out of four, and no change to the lining moved it, because it was never the
-    # lining.
-    zlo, zhi = head_z_range(float(q.y))
-    return min(head_outer_width(float(q.y)) - abs(q.x - cx(float(q.y))), q.z - zlo, zhi - q.z)
-
-
-for step in range(24):
-    k = 1. - step / 24
-    probe = [Vector((HINGE_CENTRE[0] + HINGE_R[0] * k * math.sin(b) * math.cos(a),
-                     HINGE_CENTRE[1] + HINGE_R[1] * k * math.sin(b) * math.sin(a),
-                     HINGE_CENTRE[2] + HINGE_R[2] * k * math.cos(b)))
-             for a in np.linspace(0, 2 * pi, 20) for b in np.linspace(0, pi, 11)]
-    if min(_in_head(q) for q in probe) > .0025:
-        HINGE_FIT = k
-        break
-assert HINGE_FIT > .6, ('the hinge envelope could not be seated', HINGE_FIT)
-print('ATOPO_HINGE', json.dumps({'fit': HINGE_FIT, 'r': list(HINGE_R), 'centre': list(HINGE_CENTRE)}))
-bpy.ops.mesh.primitive_uv_sphere_add(segments=18, ring_count=10, location=tx(HINGE_CENTRE))
-hinge = bpy.context.object
-hinge.name = 'Seated jaw hinge tissue'
-hinge.scale = tuple(r * HINGE_FIT * SCALE for r in HINGE_R)
-bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-for v in hinge.data.vertices:
-    v.co = hinge.matrix_world @ v.co
-hinge.location = (0, 0, 0)
-hinge.data.materials.clear()
-hinge.data.materials.append(hinge_mat)
-T.paint_from_source(hinge, pigment, SCALE)
-for n in ('skull', 'jaw'):
-    hinge.vertex_groups.new(name=n)
-for v in hinge.data.vertices:
-    t = max(0., min(1., (seam(HINGE_Y) * SCALE - v.co.z) / (.020 * SCALE)))
-    hinge.vertex_groups['jaw'].add([v.index], t, 'REPLACE')
-    hinge.vertex_groups['skull'].add([v.index], 1 - t, 'REPLACE')
-for p in hinge.data.polygons:
-    p.use_smooth = True
-mo = hinge.modifiers.new('Hinge skin', 'ARMATURE')
-mo.object = rig
-hinge.parent = rig
-oralparts.append(hinge)
-
-# **The depth probe cannot judge a lining inside a modelled mouth, and it is worth saying why.**
-# `depth_probe` signs a distance by the nearest triangle's normal, and a point in the lumen of a
-# modelled mouth has the *lumen wall* as its nearest surface, whose normal points at it -- so a
-# point correctly inside the mouth reads as outside the animal. That is the reading Birgeria
-# records. Containment is therefore measured against the head's own outer silhouette instead:
-# every oral vertex must lie inside the section the generation actually drew at its station.
-LINING_CLEARANCE = min(_hull_clearance(Vector(v.co[:]) / SCALE) for v in lining.data.vertices)
-LINING_OUTSIDE = sum(1 for v in lining.data.vertices
-                     if _hull_clearance(Vector(v.co[:]) / SCALE) < 0)
-print('ATOPO_LINING_HULL', json.dumps(
-    {'vertices': len(lining.data.vertices), 'outsideTheSectionHull': LINING_OUTSIDE,
-     'worstClearance': LINING_CLEARANCE}))
-assert LINING_OUTSIDE == 0, \
-    ('the oral lining leaves the head', LINING_OUTSIDE, len(lining.data.vertices),
-     LINING_CLEARANCE)
-
-oral_seating = []
-for o in oralparts:
-    worst_x, worst_z = 1e9, 1e9
-    for v in o.data.vertices:
-        p = Vector(v.co[:]) / SCALE
-        zlo, zhi = head_z_range(float(p.y))
-        worst_x = min(worst_x, head_outer_width(float(p.y)) - abs(p.x - cx(float(p.y))))
-        worst_z = min(worst_z, p.z - zlo, zhi - p.z)
-    oral_seating.append({'part': o.name, 'clearanceInsideSectionX': float(worst_x),
-                         'clearanceInsideSectionZ': float(worst_z),
-                         'signedDepthProbeMin': float(min(depth(Vector(v.co[:]) / SCALE)
-                                                          for v in o.data.vertices))})
-    assert worst_x > .0015 and worst_z > .0015, \
-        ('mouth geometry breaks the head silhouette', o.name, worst_x, worst_z)
+# What the caps cost against the old sac is worth writing down, because it is the whole argument
+# for the change: the sac was 780 vertices of invented shape sized by nine tuned factors against
+# five measured profiles, and the caps are convex combinations of vertices the cut already made,
+# with no size to tune anywhere.
+oralparts = []
 
 # ------------------------------------------------------- measured paired profile ----
 AUTH_GROUP = [auth, parts['lower jaw'][auth.name]]
@@ -1347,13 +1240,12 @@ report = {
         'headSectionMedianHalfDepth': float(np.median(_HD)),
         'paintedLineAgreementOverRadius': PAINTED_AGREEMENT,
         'paintedLine': [[round(r['y'], 4), round(r['z'], 5), round(r['u'], 3)] for r in PAINTED],
-        'liningCoverage': mouth_cover, 'liningSection': LINING_FIT,
-        'liningFittedPerVertex': True,
-        'liningWorstSectionHullClearance': float(LINING_CLEARANCE),
-        'liningVerticesOutsideTheSectionHull': int(LINING_OUTSIDE),
+        'oralGeometry': 'none: the cut is capped with its own rim and domed (T.cap_mouth), and '
+                        'the lining and the hinge envelope this body shipped with are gone',
+        'cutRim': CUT_RIM, 'mouthCaps': CAPS, 'mouthCapSeating': CAP_SEATING,
+        'capDome': CAP_DOME, 'capRoomFraction': CAP_ROOM,
         'toothPatches': tooth_report,
         'toothPatchesStraddlingTheCut': straddling, 'authoredToothRows': [],
-        'oralPartSeating': oral_seating,
     },
     'envelope': {k: profile_report[k] for k in
                  ('maximumEnvelopeDifference', 'maximumEnvelopeDifferenceFractionOfBodyLength',
