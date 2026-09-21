@@ -143,19 +143,27 @@ REST={
   fcarry=(.70,1.),
   # **How the aim is shared along the chain, swept rather than assumed** (T3D-33). The share is
   # cumulative and ends at 1 so the last segment reaches the target exactly; the exponent is how it
-  # gets there. 1 is equal per joint, which is what T3D-26 shipped and is still the right default
-  # reading -- a skin is asked to fold at a joint, and weighting by segment length hands the skull a
-  # third of the arc on its own because the head is two and a half cervicals long. Above 1 the
-  # shoulder takes less and the cervicals more, which matters here because the reviewer's aim is a
-  # longer arc than T3D-26's and the one edge on this body that has ever been the worst is on
-  # `chest`, where a narrow neck meets a wide trunk. Swept on the shipped file:
+  # gets there. 1 is equal per joint, which is what T3D-26 shipped and was the right reading for its
+  # own arc -- a skin is asked to fold at a joint, and weighting by *segment length* hands the skull
+  # a third of the arc on its own because the head is two and a half cervicals long. The reviewer's
+  # aim is half as long an arc again (88 degrees against 55), and the one edge on this body that has
+  # ever been the worst is on `chest`, where a narrow neck meets a wide trunk -- so taking load off
+  # that joint and giving it to the cervical tube is worth measuring rather than assuming. Swept on
+  # the shipped file, each row a full rebuild and `skin-tears.mjs` on the result:
   #
-  #   aimcurve | chest share | worst joint | skin (`skin-tears.mjs`)
-  #       1.00 |       0.167 |      22.8 d | 1.40x
-  #       1.35 |       0.099 |      25.1 d | (over the per-joint ceiling)
-  #       1.20 |       0.128 |      24.1 d | 1.38x
-  #       1.10 |       0.147 |      23.4 d | 1.39x
-  aimcurve=1.70,
+  #   aimcurve | chest's share | worst joint | worst skin
+  #       1.00 |         0.167 |      22.8 d | 1.40x
+  #       1.10 |         0.139 |      23.2 d | 1.39x
+  #       1.20 |         0.117 |      23.6 d | 1.38x
+  #       1.35 |         0.089 |      24.0 d | 1.37x
+  #       1.50 |         0.068 |      24.2 d | 1.36x   <- shipped
+  #       1.70 |         0.049 |      25.5 d | refused: past the per-joint ceiling
+  #
+  # It falls monotonically until the ceiling stops it, and 1.50 is the last row under it: the skin
+  # comes out *better* than the 1.37x this animal shipped at with the shorter arc, which is what
+  # says the extra correction is free rather than paid for. `restHeadVsAimedDegrees` is 4.17 at
+  # every row -- where the head ends up is the target's business and not the share's.
+  aimcurve=1.50,
   step=.40,vert=.26,
   amp={'Idle':.030,'Swim':.097,'Sprint':.142,'Guard':.027,'Eat':.036,'Grab':.034},act=.050),
 }

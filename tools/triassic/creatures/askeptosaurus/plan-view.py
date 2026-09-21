@@ -82,6 +82,11 @@ loc, target, scale = R.fit_ortho((centre[0], centre[1], centre[2] + d), centre, 
 shot = out / ('%s-%s-%s-top.png' % (tag, clip, t))
 render(shot, 900, 675, loc=loc, target=target, scale=scale, roll=math.pi / 2)
 
+index = out / 'readings.json'
+kept = json.loads(index.read_text()) if index.exists() else {}
+kept['%s-%s' % (tag, clip)] = info
+index.write_text(json.dumps(kept, indent=1))
+
 if '--overlay' in argv:
     scene.frame_set(scene.frame_current)
     bpy.context.view_layer.update()

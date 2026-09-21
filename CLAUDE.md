@@ -906,7 +906,7 @@ unless the user explicitly asks for a PR. Steps:
   Rhaeticosaurus 2.81x, Nothosaurus 2.99x, Tanystropheus 3.00x, Macrocnemus 3.41x, Birgeria 3.46x,
   Hupehsuchus 3.47x, Saurichthys 3.61x, Mixosaurus 3.62x, Cartorhynchus 3.72x, Archelon 3.86x,
   Atopodentatus 3.90x, Helicoprion 4.21x, Aphaneramma 4.43x, Mystriosuchus 4.48x, Henodus 4.81x,
-  Askeptosaurus 1.37x (the promoted posed generation; the straight regeneration it replaced reads 1.31x as the backup), Odontochelys 5.12x, Hybodus 5.93x (its opercular crack), Dinocephalosaurus 7.00x, Coelophysis 7.74x
+  Askeptosaurus 1.36x (the promoted posed generation; the straight regeneration it replaced reads 1.31x as the backup), Odontochelys 5.12x, Hybodus 5.93x (its opercular crack), Dinocephalosaurus 7.00x, Coelophysis 7.74x
   (SnapRight, skull/neck), Ceratites 7.73x, Placodus 12.36x. Placodus is the outstanding repair work:
   Coelophysis came down from 25.25x, Macrocnemus from 23.31x, Helicoprion from 14.33x, Tanystropheus
   from 6.09x and Cartorhynchus from 5.17x. `docs/triassic/jaw-skinning.md` is the per-body record of

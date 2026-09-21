@@ -265,6 +265,27 @@ own reason:
 The frame is **not** the span. It decides what "up", "lateral" and "how far back from the nose"
 mean; the span is two points and may run anywhere.
 
+### The box picks the axis and cannot pick the end
+
+A bounding box says which way a body is longest. It says **nothing** about which end of that is the
+head, and `frameFor` — with no mouth socket to read a sign off — returns "the high end" as a
+*default*. That is one half of a frame arrived at and one half assumed, and the panel used to state
+both the same way.
+
+So the document carries `forwardEarned`, which is simply `frameSource !== 'bounds'`, and three
+things follow from it: the panel prints an amber question above the **Head at …** button wherever
+nothing earned the direction, the export's `frame.note` says `ASSUMED` instead of asserting, and
+the note names what turns round with it. Everything measured *from the nose* does —
+`span.baseHeadFraction`, `span.tipHeadFraction`, `axisAt`, `headFractionAt`. The **bend does not**:
+its rule is a turn about an axle through `span.base`, which names no end of the body at all.
+
+It is written down because it has already cost a reviewer an export. Askeptosaurus' published
+original pose carries no rig, so no `anchor_mouth`, and `preview-orientation.json`'s yaw table is
+empty, so no authored turn either — the box was all there was. Its snout sits at z 0.038 and its
+shoulders at z 0.277, so the head is at **low** z; the panel said high, and the two head fractions
+in the file that came out of that session (0.2226 and 0.4615) are both measured from the tail. The
+bend in that same file was correct and was built from. `npm run bend` holds the distinction.
+
 ## The file
 
 **Export bend** writes `<id>-bend.json`:
