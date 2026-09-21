@@ -1581,6 +1581,7 @@ export class Engine {
         // was the single most repeated sound in the game.
         case 'burst': { const b = game.byId(e.actor); if (b && RULES?.jet(b)) { world('jet', e.pos); this.bubbles.emit(e.pos, 30, 0.9, 3, 0.1, 1.4); } break; }
         // Coming out of an egg: a wet tear as the soft shell opens.
+        case 'eggPoke': { if (e.player != null && e.player >= 0) audio.play('eggPoke', 0.7); else world('eggPoke', e.pos, 0.7, 0.5); break; }
         case 'hatch': { if (e.player != null && e.player >= 0) audio.play('hatch'); else world('hatch', e.pos, 1, 0.5); break; }
         // Hatching out of a nursery after a respawn (the moult state is reused for the hatch-in).
         case 'moult': { if (e.player != null && e.player >= 0) audio.play(e.strength === 1 && RULES ? 'moult' : 'respawn'); else world('respawn', e.pos, 1, 0.5); break; }
@@ -1618,7 +1619,9 @@ export class Engine {
           // under the waterline at all times (see the ceiling in `updateCamera`), so a breath took
           // place just off the top of the screen and the player's own view of it was the water.
           if (broken > 0 && e.player != null && e.player >= 0) { const cs = this.cams[e.player]; if (cs) cs.breathT = BREATH_PEEK; }
-          personal('gulp');
+          const sized = bl < 4 ? 'gulp-small' : bl >= hugeLength() ? 'gulp-giant' : 'gulp-mid';
+          const gulp = SAMPLES[sized] ? sized : 'gulp';
+          if (e.player != null && e.player >= 0) audio.play(gulp); else world(gulp, e.pos);
           break;
         }
         // The winded heartbeat, and a thin trickle of bubbles escaping with it: a body that
@@ -1632,6 +1635,7 @@ export class Engine {
           personal('winded', 0.18 + 0.22 * s);
           break;
         }
+        case 'shoreStrike': { world('shoreStrike', e.pos, 1, 1); break; }
         case 'anoxia': { personal('anoxia', 0.8); break; }
         case 'flop': { personal('flop', 0.75); break; }
         case 'beach': { if (e.strength) { this.bubbles.emit(e.pos, 12, 0.5, 2, 0.06, 1); personal('beach', 0.9); } break; }

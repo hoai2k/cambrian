@@ -1313,6 +1313,30 @@ unless the user explicitly asks for a PR. Steps:
   `tools/sculpt-browser.mjs` drives the mode in a browser; `npm run sculpt:measure -- <glb> [sculpt.json]`
   measures a model the same way and reports how far a rebuilt candidate is from a sculpt's target,
   which is how a port is checked.
+- **The Animations pane's selection is sticky across a change of creature, and the *intent* is kept
+  apart from *what is playing*.** The pane is for comparing one motion across bodies — how six
+  animals hold a `Heavy`, what each does at the top of a `Crawl` — so picking an animal must not
+  also pick the animation again: the clip, the position in it, the pause and the *Base pose* (a
+  selection like a clip is, and the one a reviewer comparing rest poses most wants kept) all cross
+  over. Not every body has every clip, and that is where the whole thing is won or lost: an animal
+  without the chosen clip plays its resting clip and **the choice still stands**, so the next animal
+  that does have it plays it again. Store what is *playing* and the choice is lost at the first
+  animal that lacks the clip and can never come back — which is why `ClipIntent` (what was asked
+  for) and `Selection` (what this body can give) are two types in `src/viewer/playback/selection.ts`
+  and why nothing in the scene may write the intent. The same split decides three smaller things,
+  each of which reads as a bug the other way round: a position is **clamped** to a shorter clip
+  rather than wrapped (Ottoia's `Crawl` is 1.4 s where Hallucigenia's is 2.0 s, and wrapping 1.8 s
+  to 0.4 s jumps to the start of a stride) and the clamp lands on what plays, never on the intent,
+  so a longer clip further along gives the full position back; a fall-back starts at **zero**,
+  because a time is a position in one particular clip; and a running clip's clock is written back
+  onto the intent **only while the intended clip is the one playing** (`tracksIntent`), or some
+  other animal's idle frame quietly becomes the position that was chosen. Pausing changes only the
+  pause — it does not re-aim the selection at the stand-in on screen — while picking a clip or
+  scrubbing names the clip it is done to. The pane says out loud when it is standing in for
+  something (`.clip-fallback`) and carries both facts as `data-clip-intent`/`data-clip-playing`.
+  Session-scoped like the editors' stores and deliberately not `localStorage`: a reload puts every
+  body back on its own `Idle`. `npm run playback` holds the decision and
+  `node tools/playback-browser.mjs` drives the whole journey in a browser.
 - The viewer also has a **mark mode** (`&mode=mark`, the *Mark region* button), which is the answer
   to geometry that is welded to the body and should not be there — the extra fins and spare tails on
   the raw generated meshes, where 19 of the 21 bodies are one connected surface and only a human can
@@ -1368,12 +1392,39 @@ unless the user explicitly asks for a PR. Steps:
   stretcher's coordinates-plus-tilts: both cuts are square to the line between them, that line is
   the direction and the length, and it has to be, because Askeptosaurus' neck leaves its shoulder at
   **61° to its own long axis** and cuts square to the frame's axis would swing the head rather than
-  bend the neck. The two angles are the turn at the base and at the tip, in degrees across the whole
-  span, interpolated linearly (the stretcher's reason: easing piles the change into the middle and
-  kinks both ends) — and they are **rates, not offsets**, so the rotation at the base cut is exactly
-  identity however large they are and no number can kink the body where the span begins. Behind the
-  base cut nothing moves at all, past the tip cut the far part is carried rigidly, and the span
+  bend the neck. The turn is spread linearly across the span (the stretcher's reason: easing piles
+  the change into the middle and kinks both ends). Behind the base cut nothing moves at all, past
+  the tip cut the far part is carried rigidly, and the span
   keeps its own length, because a rotation about one fixed pivot is a spiral and not a bend.
+  **The span's two ends are oriented planes, and the bend is whatever carries the creature's axis
+  line from the one to the other.** A plane's normal is the direction that axis line runs through
+  it: the base plane is where it runs **in** and is a pure reference (nothing behind the base cut
+  moves under any bend, so aiming it never moves the body — what it says is *which direction you
+  are calling the trunk*, which is the argument this tool was built out of made into a control);
+  the tip plane is where it is **to** run out, seated on the body's own measured heading there so
+  the editor opens on the animal as it stands. **Aim both planes the same way and the run between
+  them comes straight**, because the bend is then the rotation carrying the head's own heading onto
+  the trunk's. That replaced a pair of turn *rates* and keeps what they were for: the rates existed
+  because the obvious reading of two angles puts a kink at the base cut, and an orientation per
+  plane cannot — the rotation there is the one carrying the tip plane's rest onto itself, identity
+  by construction however far apart the planes are aimed. What is given up is a bend that starts
+  straight and tightens; two orientations are a circular arc, which is the shape straightening
+  wants. The **axle is derived** from the two planes rather than dialled, which is why there is no
+  bend-plane roll and no *Aim the plane* button: the old roll swept the creature's own long axis —
+  a twist — while the body it bent went ninety degrees the other way, so the control's motion was
+  not the bend it produced, and a plane's is. Where an aim is oblique the hinge leans a little along
+  the span, which really is a twist; that is reported (`axis.twistDegrees`) rather than clamped,
+  because clamping it would mean the turn no longer carried the tip plane where it was aimed.
+  **And which body the numbers describe is said out loud, in the panel and in `appliesTo`.** Bend
+  mode holds a rigged body at rest, and Askeptosaurus' rest already carries T3D-26's whole
+  correction (`carry`: the head 4.17° off the trunk's run where the generation had it at 67.68°),
+  so on the shipped body there is nothing left to aim. The pre-carry body is reached by the route
+  that already existed: `tools/triassic/base-poses.mjs` republishes the untouched generation of any
+  body whose builder moved its rest, and a **rest-pose carry is such a move** — not a mesh
+  unbending, so it carries no `applied` flag and is told by there being bones in `carriedBones` with
+  some share of the aim in them. `appliesTo: 'origpose'` is its own value beside `generation`,
+  because `built` and `origpose` on this animal are opposite claims about one creature; it is still
+  `use: 'builder-measurement'`, since the file on stage is a published *copy* of `tripo-raw/`.
   The geometry reading **traces the body rather than binning a coordinate**, and that is Askeptosaurus
   again: its left paddle reaches *further forward than its own snout*, so an axial slab ahead of the
   neck averages the head with a flipper and reports the head running backwards. Each step takes the
@@ -1383,13 +1434,18 @@ unless the user explicitly asks for a PR. Steps:
   wandered, and the angle it gives is between two directions nothing in the animal runs in. On that
   animal it reads 0.009 ahead of the span and 0.062 behind it — excellent at the head, unusable at
   the curled limb-crossed trunk — which is a judgement for the reviewer rather than a number to
-  hide. Which bone chords a reading is between, and which run of the rig the joint table follows,
+  hide, and the answer to it is *Window* and *Reach* (on the original pose's neck, 26 % and 2 %
+  bring both residuals under the bar and the planes then read the animal's 41.40° curve, which
+  straightens to 1.05° measured over the warped mesh). Which bone chords a reading is between, and
+  which run of the rig the joint table follows,
   are **dropdowns**: guessed from where the span is, re-guessed whenever it moves (a stale default
   left the tip chord at `skull → jaw`, pointing at the chin, reading that head as 97° off its trunk)
-  and never re-guessed once a person has named one. The export carries the span, the axle in the
-  root frame *and* in the builders' Z-up one, both readings before and after, and a **per-joint
+  and never re-guessed once a person has named one. The export carries the span, the two planes and
+  the axle in the root frame *and* in the builders' Z-up one, both readings before and after, and a **per-joint
   table of local rotations in chain order** — which is exactly what `uncurl` returns and `carry_rest`
-  consumes in that animal's builder. `npm run bend` and `node tools/bend-browser.mjs` check it,
+  consumes in that animal's builder. It is `bend-span/2`, and a `bend-span/1` file is refused by
+  name rather than half-read: it carries turn rates and a plane roll, which no longer describe a
+  bend at all. `npm run bend` and `node tools/bend-browser.mjs` check it,
   `npm run triassic:bend -- <file>` is the consumer and **re-measures rather than reprinting**,
   failing loudly where it disagrees with what the viewer recorded. There is no bake in either
   direction: a rigged body cannot have one (a bent bind pose flails the moment a clip plays) and a

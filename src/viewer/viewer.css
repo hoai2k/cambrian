@@ -161,6 +161,10 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .clip-replaced { opacity: .7; border-style: dashed; font-weight: 500; }
 .clip-replaced.active { opacity: 1; }
 
+/* Said quietly and in the pane's own voice: the selection stands, this animal cannot meet it. */
+.clips .hint { color: var(--dim); font-size: 12px; margin: 0 0 10px; }
+.clip-fallback strong { color: var(--mist); font-weight: 600; }
+
 /* Matches the game's portrait spinner (src/app/styles.css): only drawn once a thumbnail is slow. */
 .portrait-wait { position: absolute; inset: 0; margin: auto; width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(238, 250, 246, .18); border-top-color: var(--foam); animation: portrait-spin .9s linear infinite; pointer-events: none; }
 @keyframes portrait-spin { to { transform: rotate(1turn); } }
@@ -351,7 +355,8 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
  */
 .bend-legend .base i { background: var(--ember); }
 .bend-legend .tip i { background: var(--lagoon); }
-.bend-legend .axis i { background: #ff2fa8; }
+.bend-legend .baseAim i { background: #ffd9a8; }
+.bend-legend .tipAim i { background: #ff2fa8; }
 .bend-panel .bend-reading { display: flex; flex-direction: column; gap: 2px; padding: 8px 0; border-top: 1px solid var(--line); }
 .bend-panel .bend-reading h4 { margin: 0; font: 700 10px var(--font-display); letter-spacing: .14em; color: var(--dim); text-transform: uppercase; }
 .bend-panel .bend-reading-value { margin: 0; font: 700 14px var(--font-body); color: var(--foam); font-variant-numeric: tabular-nums; }
@@ -370,3 +375,9 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .bend-joints li b { color: var(--foam); }
 .bend-joints li small { grid-column: 1 / -1; color: var(--dim); font-size: 10px; }
 .bend-panel code { font-size: 11px; color: var(--lagoon); overflow-wrap: anywhere; }
+/* Which body the numbers describe. It is a warning wherever the body on stage already carries its
+   builder's own correction, because aiming a correction on top of one is the mistake this mode
+   makes easy and the reason the original pose is published at all. */
+.bend-body-note { border-left: 2px solid var(--line); padding-left: 8px; }
+.bend-body-note[data-corrected="yes"] { border-left-color: var(--ember); color: var(--mist); }
+.bend-plane[data-source="manual"] > label:first-child > small { color: var(--lagoon); }
