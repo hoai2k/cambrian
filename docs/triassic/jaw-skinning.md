@@ -143,11 +143,11 @@ edge dominated by `jaw` and by `skull`.
 | cymbospondylus | yes | 1.14 % → 0.01 % | 1.03 (1.00) → 1.03 (1.00) | 2.48x → 2.48x | 1.00x → 1.15x | 1.15x → 1.15x |
 | dinocephalosaurus | yes | 0.67 % → 0.01 % | 1.01 (1.00) → 1.01 (1.00) | 7.00x → 7.00x | 1.00x → 1.00x | 1.00x → 1.00x |
 | helicoprion | no | no shell → no shell | 1.01 (0.99) → 1.01 (0.99) | 14.33x → 14.33x | 3.76x → 3.76x | 4.21x → 4.21x |
-| henodus | yes | 0.00 % → 0.00 % | 1.02 (1.00) → 1.02 (1.00) | 4.81x → 4.81x | 1.04x → 1.21x | 1.22x → 1.22x |
+| henodus | yes | 0.00 % → 0.00 % | 1.02 (1.00) → 1.02 (1.00) | 4.81x → 4.81x | 1.04x → 1.21x | 1.22x → 1.22x |   <!-- T3D-32B: lining and hinge plug removed, cut capped with its own rim; skin still 4.81x, mouth-region jaw 1.21x / skull 1.22x -->
 | hupehsuchus | no | 0.00 % → 0.00 % | 0.93 (0.98) → 0.93 (0.98) | 3.47x → 3.47x | 2.70x → 2.70x | 2.81x → 2.81x |
 | hybodus | yes | 6.05 % → 0.00 % | 1.10 (1.00) → 1.10 (1.00) | 5.93x → 5.93x | 1.00x → 2.55x | 5.93x → 5.93x |
 | keichousaurus | yes | 0.54 % → 0.33 % | 0.99 (1.00) → 0.99 (1.00) | 2.34x → 2.34x | 1.00x → 1.14x | 1.07x → 1.08x |
-| macrocnemus | no | 0.00 % → 0.00 % | 1.01 (1.02) → 1.01 (1.02) | 3.41x → 3.41x | 2.39x → 2.39x | 3.41x → 3.41x |
+| macrocnemus | no | 0.00 % → 0.00 % | 1.01 (1.02) → 1.01 (1.02) | 3.41x → **3.18x** | 2.39x → 2.46x | 3.41x → 3.18x |   <!-- T3D-32B: lining, hinge plug and rim flange removed, cut fitted to the painted lip and capped with its own rim -->
 | mixosaurus | yes | 1.64 % → 0.00 % | 1.01 (1.00) → 1.02 (1.00) | 3.62x → 3.62x | 1.00x → 1.88x | 1.65x → 1.81x |
 | mosasaurus | yes | 0.04 % → 0.00 % | 1.00 (1.00) → 1.00 (1.00) | 2.54x → 2.54x | 1.45x → 1.83x | 1.28x → 1.28x |
 | mystriosuchus | yes | 1.80 % → 0.00 % | 0.99 (1.00) → 0.98 (1.00) | 4.48x → 4.48x | 1.66x → 2.21x | 1.33x → 1.33x |
