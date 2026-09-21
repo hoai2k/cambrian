@@ -1465,7 +1465,8 @@ unless the user explicitly asks for a PR. Steps:
   to geometry that is welded to the body and should not be there — the extra fins and spare tails on
   the raw generated meshes, where 19 of the 21 bodies are one connected surface and only a human can
   say which fin is wanted (`docs/triassic/preview-mesh-defects.md`). Left-drag paints a world-space
-  brush over the vertices and right-drag orbits; *Export region* writes `<id>-region.json`: vertex
+  brush over the vertices, right-drag orbits and middle-drag pans (`npm run mark`'s `paint` scheme —
+  see the pointer bullet below); *Export region* writes `<id>-region.json`: vertex
   indices into one exact file, with that file's sha256 and the box the marked vertices occupy, so
   `tools/triassic/cut-region.py` can refuse a region marked on a mesh that has since changed rather
   than delete geometry at random. It marks on **whatever body is on stage**, the generated mesh
@@ -1569,7 +1570,25 @@ unless the user explicitly asks for a PR. Steps:
   table of local rotations in chain order** — which is exactly what `uncurl` returns and `carry_rest`
   consumes in that animal's builder. It is `bend-span/2`, and a `bend-span/1` file is refused by
   name rather than half-read: it carries turn rates and a plane roll, which no longer describe a
-  bend at all. `npm run bend` and `node tools/bend-browser.mjs` check it,
+  bend at all. **Bend mode opens on the body a bend is aimed on** — the original pose where the
+  specimen publishes one, else the raw generation (`opening()` in `Viewer.tsx`, the Bend button and
+  a `?mode=bend` link alike) — because on an animal whose builder carried a correction into the
+  bind there is nothing left to aim on the shipped one. Two things follow and both were found by
+  running the drive. The button changes the **mode and the model in one commit**, and a child's
+  effects run before its parent's, so the editor mounted while the scene still held the *previous*
+  body, measured that, and cached those numbers under the new body's key where nothing re-measured
+  them: the panel said `origpose` over the built body's angles. `ViewerScene.loadedModel()` answers
+  what is actually on stage, synchronously, and `ready` in `Viewer.tsx` now means *the body on
+  stage is the body this UI describes* rather than "the last load finished". And a specimen that
+  publishes an original pose can no longer reach its **built** body in bend mode at all — the Model
+  control lives on the info card, which an editing mode replaces — so the rig-only half of
+  `tools/bend-browser.mjs` (both readings, the chain, the references changing the answer, the
+  per-joint table, an export that says `built`) runs on **Mixosaurus**, which publishes neither.
+  Its three trunk readings disagree by 43°, the same finding on a different animal.
+  The per-joint table's local steps add up to the whole turn only where the chain carries the
+  *whole span* — the turn is spread along the span, so any part of it with no joint under it is a
+  share the bone table honestly cannot account for (four joints, 54° of an 83° turn on Mixosaurus).
+  `npm run bend` and `node tools/bend-browser.mjs` check it,
   `npm run triassic:bend -- <file>` is the consumer and **re-measures rather than reprinting**,
   failing loudly where it disagrees with what the viewer recorded. There is no bake in either
   direction: a rigged body cannot have one (a bent bind pose flails the moment a clip plays) and a
@@ -1585,8 +1604,9 @@ unless the user explicitly asks for a PR. Steps:
   what stops the cut running back through the neck, and it is also the editor's honest limit — a
   paddle tucked forward under the snout falls inside it, as Aphaneramma's did in a builder's own
   cut, and the count says so rather than the tool hiding it. Three handles on the orbit view
-  (hinge moves the cut in the camera's plane, front aims the line, side tips it), right-drag
-  orbits as in mark mode, every mandible vertex is lit with the same overlay mark mode uses — a
+  (hinge moves the cut in the camera's plane, front aims the line, side tips it) on the ordinary
+  `view` pointer scheme — left-drag orbits off a handle, right-drag pans; see the pointer bullet
+  below — and every mandible vertex is lit with the same overlay mark mode uses: a
   vertex-colour tint was the obvious alternative and would have broken the recolour hook, which
   reads COLOR_0 as its mask. The first guess follows the stretcher's precedence: a rigged body's
   `jaw` bone *is* its hinge and `anchor_mouth` sets the pitch, a socket alone sets the height, a
@@ -1614,6 +1634,32 @@ unless the user explicitly asks for a PR. Steps:
   the four frames a document can be in, so turning about it would have shut the mouth on half the
   bodies — and shut is where the slider starts, so that reads as a control that does nothing rather
   than as a bug.
+- **Which mouse button does what on the viewer's stage is a named scheme, and the three editors
+  differ over buttons rather than over what they edit** (`src/viewer/pointer-scheme.ts`, pure).
+  `view` is the default and is what the **mouth** and **bend** editors use — left-drag orbits,
+  right-drag **pans**, the wheel and the middle button dolly — because their handles claim the left
+  button only while the pointer is actually on one. `paint` is **mark** mode's, whose brush owns the
+  left button outright: the orbit moves to the right button and the pan to the middle one, since
+  the wheel already dollies. The thing that was wrong for months is that the editors ran on one
+  boolean whose "on" state bound `LEFT: null, MIDDLE: DOLLY, RIGHT: ROTATE` — **no pan on any
+  button at all** — so a zoomed-in head could not be brought into the middle of the view, which is
+  exactly what zooming in on a jaw is for.
+  **The orbit is suspended while the pointer is over a handle** (`ViewerScene.setOrbitEnabled`,
+  driven off the hover hit-test the editors already do every `pointermove`), and it has to be done
+  that way round: OrbitControls is constructed with the canvas in `createViewerScene`, long before
+  an editor mounts and registers its own `pointerdown`, and listeners on one target fire in
+  **registration order whatever the capture flag says** — so `stopImmediatePropagation` from an
+  editor arrives after the orbit has already taken the press. Disabling on hover means the press
+  never reaches an enabled orbit. A disable at drag start and a re-enable on `pointerup` (only
+  where the pointer is not *still* on a handle) are the belt-and-braces path for a press that
+  arrives with no move before it, and a change of scheme hands the orbit back enabled so an editor
+  unmounted mid-hover cannot leave the camera dead. `npm run mouth`/`bend`/`mark` hold the schemes;
+  the three browser drives hold the rest, reading the camera through `cameraState()` on
+  `window.__viewerScene` (the viewer's `__cambrian`) because **an orbit and a pan are told apart by
+  what moves** — an orbit swings the position about a fixed target, a pan carries both — and the
+  page draws neither number. Those camera checks run **last** in each drive: OrbitControls' damping
+  unwinds for many frames after a drag, which under the software renderer is several seconds, and
+  anything measured in screen pixels meanwhile is measured on a camera that is still moving.
 - A bare `?debug` on the site root (`/?debug`) opens the index of every one of these tools —
   `src/ancientseas/DebugIndex.tsx`, data in `src/ancientseas/debug-index.ts`, mounted by
   `src/ancientseas/main.tsx` the way `Root.tsx` mounts the state editor. It is the trilogy page's
