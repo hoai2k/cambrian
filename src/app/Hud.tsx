@@ -154,7 +154,16 @@ function SensePanel({ p }: { p: PlayerHud }) {
       {p.ashore && p.alive && <ShoreStatus stranded={p.strandLeft != null} low={!!p.strandLow} />}
       {p.era && <EraStatus era={p.era} alive={p.alive} ashore={p.ashore} />}
       {p.aim && (
-        <div className={`aim ${p.aim.hasTarget ? 'on-target' : ''} ${p.aim.inRange ? 'in-range' : ''} ${p.aim.ready ? '' : 'cooling'}`} style={{ color: p.aim.color }}>
+        // `left`/`top` are the CSS default of 50% unless the snapshot names a point: touch takes the
+        // reticle to wherever the player last tapped, because there that is the aim axis. NDC is
+        // y-up and the screen is y-down, hence the flip.
+        <div
+          className={`aim ${p.aim.hasTarget ? 'on-target' : ''} ${p.aim.inRange ? 'in-range' : ''} ${p.aim.ready ? '' : 'cooling'} ${p.aim.at ? 'aim-pointed' : ''}`}
+          style={{
+            color: p.aim.color,
+            ...(p.aim.at ? { left: `${(p.aim.at.x + 1) * 50}%`, top: `${(1 - p.aim.at.y) * 50}%` } : null),
+          }}
+        >
           <i /><i /><i /><i /><b />
           <span className="aim-label">{p.aim.inRange ? (p.aim.ready ? `${key('heavy', s)} · ${p.aim.action}` : COPY.aimCooling) : p.aim.name ?? ''}</span>
         </div>

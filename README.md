@@ -35,8 +35,8 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 | --- | --- |
 | `src/sim/` | Pure TypeScript simulation: world, creatures, movement, combat, growth, AI, modes, seeded landmarks, the day/night cycle. No Three.js. |
 | `src/render/` | Three.js: sea environment, creature views and animation layering, effects, cameras, split-screen engine. |
-| `src/app/` | React shell: title, creature select, HUD, pause/results, help and settings. |
-| `src/input/`, `src/audio/` | Gamepad/keyboard reading; the WebAudio graph, its sample library and the distance falloff for world sounds. |
+| `src/app/` | React shell: title, creature select, HUD, pause/results, help and settings, plus the on-screen pads a touch player holds and the one place that measures the window (`use-small-screen.ts`). |
+| `src/input/`, `src/audio/` | Gamepad, keyboard, mouse and touchscreen reading (`touch.ts` is the finger scheme's DOM adapter; the scheme itself is `src/shared/touch-play.ts`); the WebAudio graph, its sample library and the distance falloff for world sounds. |
 | `src/ancientseas/` | The trilogy's page, which the site root serves: one engraved plate with the three games on it as links. `?version=1` is the first draft (the three title paintings on a dark ground) kept for comparison. |
 | `src/cambrian/`, `src/devonian/`, `src/triassic/` | The three game entry pages: each selects its era and points the asset base one level up before importing the app. |
 | `stats/`, `src/shared/config-stats.ts` | Visitor stats at `/stats/`: one GoatCounter site, a chip row that filters the dashboard per game, and the setup steps until a site code is set. |
@@ -44,7 +44,7 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 | `src/shared/palettes.ts` | Creature colour schemes and the material-name to slot mapping they apply through (`src/render/recolor.ts`). |
 | `public/assets/creatures/` | 21 rigged full models, reduced LODs, anatomical anchors, studio renders, hero cards, thumbnails and transparent `.select.png` portraits. |
 | `docs/redesign/` | Design and technical plan. |
-| `tools/` | Headless sim tests (`harness.ts`, `controls-test.ts`, `hunt-test.ts`, `fight-test.ts`, `corpse-test.ts`, `respawn-test.ts`, `flora-test.ts`, `world-test.ts`, `environment-test.ts`, `expansion-test.ts`, `motion-test.ts`, `modes-test.ts`, `assets-test.ts`, `ecology-test.ts`), asset tests (`anchors-test.mjs`, `feeding-test.mjs`, `hallucigenia-test.mjs`, `asset-audit.ts`, `portrait-test.mjs`), browser smoke tests (`smoke.mjs`, `viewer-smoke.mjs`, `workbench-smoke.mjs`, `biome-tour.mjs`, `expansion-browser.mjs`), menu button-binding check (`menu-bindings-test.ts`), creature image intake (`make-cards.mjs`, `check-creature-assets.mjs`), colour-slot check (`palette-test.mjs`), audio density check (`audio-mix-test.ts`), LOD generator (`make-lods.mjs`), SFX generator (`gen-sfx.mjs`). |
+| `tools/` | Headless sim tests (`harness.ts`, `controls-test.ts`, `hunt-test.ts`, `fight-test.ts`, `corpse-test.ts`, `respawn-test.ts`, `flora-test.ts`, `world-test.ts`, `environment-test.ts`, `expansion-test.ts`, `motion-test.ts`, `modes-test.ts`, `assets-test.ts`, `ecology-test.ts`), asset tests (`anchors-test.mjs`, `feeding-test.mjs`, `hallucigenia-test.mjs`, `asset-audit.ts`, `portrait-test.mjs`), browser smoke tests (`smoke.mjs`, `viewer-smoke.mjs`, `workbench-smoke.mjs`, `biome-tour.mjs`, `expansion-browser.mjs`), menu button-binding check (`menu-bindings-test.ts`), the touch scheme and the small-window layout (`touch-test.ts`, and `touch-browser.mjs` for real touches in a real browser), creature image intake (`make-cards.mjs`, `check-creature-assets.mjs`), colour-slot check (`palette-test.mjs`), audio density check (`audio-mix-test.ts`), LOD generator (`make-lods.mjs`), SFX generator (`gen-sfx.mjs`). |
 | `public/assets/brand/`, `public/assets/ui/` | Delivered art: logo and key art, tier and band glyphs, mode panels, loading motif. |
 | `tools/art/` | How that art was made: generation prompts, the Blender portrait render, vector export and review scripts. |
 | `docs/` | Everything written down. See the index below. |
@@ -53,7 +53,7 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 
 | Doc | What |
 | --- | --- |
-| [`docs/redesign/`](docs/redesign/) | The design and technical plan, and the implementation status against it: [current-state audit](docs/redesign/00-current-state.md), [game design](docs/redesign/01-game-design.md), [technical plan](docs/redesign/02-technical-plan.md), [creature expansion](docs/redesign/03-creature-expansion.md), [the endless sea](docs/redesign/04-infinite-ocean.md). |
+| [`docs/redesign/`](docs/redesign/) | The design and technical plan, and the implementation status against it: [current-state audit](docs/redesign/00-current-state.md), [game design](docs/redesign/01-game-design.md), [technical plan](docs/redesign/02-technical-plan.md), [creature expansion](docs/redesign/03-creature-expansion.md), [the endless sea](docs/redesign/04-infinite-ocean.md), [the shore](docs/redesign/10-the-shore.md), [touch and small screens](docs/redesign/11-touch-and-small-screens.md). |
 | [`docs/creature-intake.md`](docs/creature-intake.md) | How to add a creature or change its look; `node tools/check-creature-assets.mjs --strict` enforces it. |
 | [`docs/creature-anchors.md`](docs/creature-anchors.md) | The attachment-socket contract every rig ships with, and the feeding/attack solver that uses it. |
 | [`docs/animation-brief.md`](docs/animation-brief.md) | The clip set, names and timings a rig must deliver; [`docs/animation-delivery/`](docs/animation-delivery/) records the delivery that satisfied it. |

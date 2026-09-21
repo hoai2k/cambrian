@@ -4,6 +4,9 @@ import * as THREE from 'three';
 import { audio, SAMPLES } from '../audio/audio';
 import { distanceAtten, hugeLength } from '../audio/mix';
 import { applyMouse, emptyControls, gamepads, KeyboardInput, MousePlay, readGamepad, rumble, type RawControls } from '../input/input';
+import { applyTouch, TouchPlay } from '../input/touch';
+import { splitAxis } from '../shared/small-screen';
+import type { Secondary } from '../shared/touch-play';
 import { cursorFor, cursorState } from '../shared/cursors';
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
 import { bandOf, comingFor, floorClearance, isAlive, isHidden, lengthOf } from '../sim/actors';
@@ -37,7 +40,18 @@ export interface PlayerHud {
   tier: number; tierName: string; progress: number; scale: number;
   abilityName: string; abilityReady: number; abilityActive: boolean; abilityUnlocked: boolean;
   lock?: { name: string; kind?: string; band: Band; hp: number; color: string };
-  aim?: { hasTarget: boolean; inRange: boolean; name?: string; color: string; ready: boolean; /** What RT does for this creature: POUNCE, or the special's own name. */ action: string };
+  aim?: {
+    hasTarget: boolean; inRange: boolean; name?: string; color: string; ready: boolean;
+    /** What RT does for this creature: POUNCE, or the special's own name. */ action: string;
+    /**
+     * Where to draw it, in normalised device coordinates (-1..1, y up), when that is not the middle
+     * of the screen. Only touch sets it: the reticle belongs dead centre for a pad, because the
+     * centre of the camera *is* the aim axis, and it belongs under the finger for a touch player,
+     * because there the last tap is the aim axis (`cursorDir`). Absent means the middle, which is
+     * what every other scheme means.
+     */
+    at?: { x: number; y: number };
+  };
   /** Sense is on: the band glyphs and the radar are drawn. */
   senseOn: boolean;
   hunted: number; hunterAngle: number | null; hunterName?: string; hunterState: 'none' | 'noticed' | 'hunting'; inCover: boolean; still: boolean;
@@ -112,6 +126,12 @@ export interface EngineCallbacks {
   onProgress?(p: AssetProgress): void;
   /** The pointer lock went away on its own (Escape, alt-tab). The match should pause. */
   onPointerLost?(): void;
+  /**
+   * A swipe on the secondary pad chose a different action. The shell remembers it, so the choice
+   * outlives the match — a player who plays as a hider should not have to swipe back to it every
+   * time they hatch.
+   */
+  onSecondary?(s: Secondary): void;
 }
 
 export const PLAYER_COLORS = ['#61f2d5', '#ffb457', '#c7a3ff', '#ff86a4'];
@@ -337,9 +357,22 @@ export function climbAimHold(hold: number, pitch: number, dashCd: number, dt: nu
   return Math.max(0, Math.max(hold, armed) - dt);
 }
 
+/**
+ * Where each seat's view goes.
+ *
+ * Two players are halved across the **longer** axis rather than always left and right
+ * (`splitAxis`): on a tablet held upright, two windows 400 across and 1100 down are two slots and
+ * not two views, and every HUD panel in them hangs off a corner that is now a long way from the
+ * middle. Four are a grid either way, and one takes the window, so two is the only case with a
+ * choice to make. The HUD follows these rects by percentage, so it needs no telling.
+ */
 export function layoutRects(n: number, w: number, h: number): Rect[] {
   if (n <= 1) return [{ x: 0, y: 0, w, h }];
-  if (n === 2) return [{ x: 0, y: 0, w: w / 2, h }, { x: w / 2, y: 0, w: w / 2, h }];
+  if (n === 2) {
+    return splitAxis(w, h) === 'down'
+      ? [{ x: 0, y: 0, w, h: h / 2 }, { x: 0, y: h / 2, w, h: h / 2 }]
+      : [{ x: 0, y: 0, w: w / 2, h }, { x: w / 2, y: 0, w: w / 2, h }];
+  }
   return Array.from({ length: n }, (_, i) => ({ x: (i % 2) * w / 2, y: Math.floor(i / 2) * h / 2, w: w / 2, h: h / 2 }));
 }
 
@@ -369,6 +402,7 @@ export class Engine {
   private eggs = new Eggs();
   private keyboard = new KeyboardInput();
   private mouse = new MousePlay();
+  private touch = new TouchPlay();
   /**
    * Whether the mouse is steering the camera. Decided once per match, at `startMatch`: with no
    * controller anywhere the game is a mouse-and-keyboard game, and with even one pad in the
@@ -386,6 +420,17 @@ export class Engine {
   private pointerWanted = false;
   /** What the mouse did this frame, kept between `controlsFor` and the camera. */
   private mouseFrame: ReturnType<MousePlay['read']> | undefined;
+  /**
+   * Whether a finger is playing this match: true when a seat joined on `'touch'`. Kept apart from
+   * `mouseLook` rather than folded into it, because the two schemes want *different* halves of what
+   * that flag gates. Both want the follow camera, since neither has a second stick to steer the view
+   * with. Only the mouse wants the CSS cursor and the reticle switched off, because only the mouse
+   * has a crosshair on screen at all times — a finger is usually not touching the glass, so touch
+   * keeps the reticle and moves it to wherever the last tap was.
+   */
+  private touchPlay = false;
+  /** What the fingers did this frame, kept between `controlsFor` and the camera, as the mouse's is. */
+  private touchFrame: ReturnType<TouchPlay['read']> | undefined;
   /** Scratch for the ray from the camera through the cursor. */
   private tmpRay = new THREE.Vector3();
   /** The CSS cursor currently set, so the style is only written when it changes. */
@@ -433,6 +478,10 @@ export class Engine {
     this.mouse.attach(container);
     // Nothing to lose: without pointer lock there is no lock to be taken away.
     this.mouse.onLost = null;
+    // The fingers listen on the window rather than on this element (see `TouchPlay.attach`), but the
+    // element is still what a touch's position is measured against, so it is handed over the same way.
+    this.touch.attach(container);
+    this.touch.onSwap = (sec) => { this.cb.onSecondary?.(sec); audio.play('ui-move'); };
     this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.sand.points, this.tracks.mesh, this.splash.group, this.mouthfuls.group, this.eggs.group);
     (window as any).__cambrian = this;
     this.resize = new ResizeObserver(() => this.onResize());
@@ -472,6 +521,9 @@ export class Engine {
   private syncPointer() {
     const playing = this.pointerWanted && !this.paused && !this.attract;
     this.mouse.want(playing);
+    // The fingers stand down for exactly the same reasons the mouse does: paused, in a dialog, on
+    // the results screen or back at the menus, a tap belongs to whatever button it landed on.
+    this.touch.want(this.touchPlay && !this.paused && !this.attract);
     // Paused, in a dialog, on the results screen or back at the menus, the cursor belongs to the
     // buttons again: a targeting reticle over a *Quit to title* is a lie about what a click does.
     if (!playing) { this.cursorNow = ''; this.container.style.cursor = ''; }
@@ -480,6 +532,10 @@ export class Engine {
   releasePointer() { this.pointerWanted = false; this.syncPointer(); }
   /** Whether this match is being played on mouse and keyboard, so the HUD can name the buttons. */
   get usingMouse() { return this.mouseLook; }
+  /** Whether a finger is playing it, so the shell knows to draw the pads. */
+  get usingTouch() { return this.touchPlay; }
+  /** Put the secondary pad back where the player left it last time. */
+  setSecondary(s: Secondary) { this.touch.setSecondary(s); }
 
   /**
    * Carry a finished co-op match on rather than restarting it: same world, same bodies, same
@@ -531,7 +587,11 @@ export class Engine {
     this.paused = false;
     // Mouse and keyboard, or pads. Not both: a session with a controller in it is a controller
     // game, and stealing the pointer there would only take the cursor away from the other player.
-    this.mouseLook = gamepads().length === 0 && !setups.some((s) => typeof s.device === 'number');
+    this.touchPlay = setups.some((s) => s.device === 'touch');
+    // A finger and a mouse are not both playing: a session that joined on the glass is a touch
+    // session, and leaving the mouse in charge as well would have two schemes fighting over the
+    // camera. The mouse stays a perfectly good pointer for the menus either way.
+    this.mouseLook = gamepads().length === 0 && !this.touchPlay && !setups.some((s) => typeof s.device === 'number');
     this.pointerWanted = this.mouseLook;
     this.syncPointer();
     // The button that started the match is almost certainly still held right now. Seed the menu
@@ -554,6 +614,19 @@ export class Engine {
   }
 
   private controlsFor(setup: PlayerSetup, index: number): RawControls {
+    if (setup.device === 'touch') {
+      // The keyboard is read underneath the fingers rather than instead of them. A tablet with a
+      // keyboard case is still a tablet, and a player who has one should not have to choose: every
+      // key binding stays live, and the pads are added beside them.
+      const c = this.keyboard.read(1);
+      // One read per frame, for the mouse's reason: `read()` drains the swipes and the taps, so the
+      // frame holds on to them for the camera and the aim after the controls have been folded.
+      // Unscaled by the camera-speed setting on purpose: the engine applies `lookSpeed` to
+      // `lookDX`/`lookDY` below, exactly as it does for the mouse, and scaling here as well would
+      // square it.
+      this.touchFrame = this.touch.read();
+      return applyTouch(c, this.touchFrame);
+    }
     if (setup.device === 'keyboard') {
       const c = this.keyboard.read(1);
       if (!this.mouseLook) return c;
@@ -563,6 +636,7 @@ export class Engine {
       return applyMouse(c, this.mouseFrame);
     }
     if (setup.device === 'keyboard2') return this.keyboard.read(2);
+    if (typeof setup.device !== 'number') return emptyControls();
     const gp = navigator.getGamepads?.()[setup.device];
     if (!gp || !gp.connected) return emptyControls();
     void index;
@@ -585,11 +659,12 @@ export class Engine {
     // separate thing the middle button asks for (`updateAim` still blends on `c.aim`).
     const cursor = this.cursorDir(cs);
     if (cursor) { f.aim = true; f.aimTarget = cs.aimTarget; }
-    // The right button dashes at what the cursor is over: the dash takes its direction from the
-    // stick through the camera, so for those frames the camera's forward *is* the cursor's ray and
-    // a neutral stick is pushed forward along it. Held, the body keeps going that way, which is
-    // what a dash as long as it is held should do.
-    if (cursor && this.mouseFrame?.right) {
+    // The right button — or a double-tap on the water — dashes at what is being pointed at: the dash
+    // takes its direction from the stick through the camera, so for those frames the camera's forward
+    // *is* the pointing ray and a neutral stick is pushed forward along it. Held, the body keeps
+    // going that way, which is what a dash as long as it is held should do. A finger is the same
+    // gesture with the same answer, and re-aims as it moves.
+    if (cursor && (this.mouseFrame?.right || this.touchFrame?.dash)) {
       f.camYaw = Math.atan2(cursor.x, cursor.z);
       f.camPitch = swimPitch(-Math.asin(clamp(cursor.y, -1, 1)));
       if (Math.hypot(f.mx, f.my) < 0.3) { f.mx = 0; f.my = 1; }
@@ -634,6 +709,10 @@ export class Engine {
           // chain of them climbs instead of flattening out between presses.
           cs.climbHold = climbAimHold(cs.climbHold, cs.pitch, p?.dashCd ?? 0, dt);
           if (this.mouseLook && this.mouseFrame) this.showCursor(this.mouseFrame, game, p, cs);
+          // The fingers need the same fact and draw no cursor with it: whether there is something
+          // worth attacking where the player is pointing is what decides, at the *next* down, whether
+          // a double-tap is a pounce or a dash.
+          if (this.touchPlay) this.touch.aimingAt(this.pointingAt(game, p, cs) !== 'none');
           if (c.rsClick) {
             // Right stick pressed in: up/down zooms instead of pitching.
             cs.zoom = clamp(cs.zoom * Math.exp(c.lookY * dt * 1.6), 0.55, 2.2);
@@ -643,22 +722,29 @@ export class Engine {
             cs.yaw = wrapAngle(cs.yaw - (c.lookX * dt * 2.6 + c.lookDX) * this.lookSpeed);
             cs.pitch = clamp(cs.pitch + (c.lookY * dt * 1.6 + c.lookDY) * this.lookSpeed * (this.invertY ? -1 : 1), PITCH_UP, PITCH_DOWN);
             // Pitch drifts back to level when a stick is let go, which is what makes a pad feel
-            // like it is swimming for you. A mouse holds where it was put: the same drift there
-            // would fight the hand every frame.
-            if (!this.mouseLook && Math.abs(c.lookY) < 0.05 && cs.climbHold === 0) cs.pitch = damp(cs.pitch, 0.2, 0.6, dt);
-            // On a mouse the camera *follows the body* unless a hand is on it. There is no second
-            // stick and no pointer lock, so nothing is steering the view frame to frame: left to
-            // itself it would stay pointing wherever the animal last turned away from. It eases
-            // round behind the creature and back to the resting pitch, and stands aside for
-            // `FOLLOW_HOLD` after a drag so a player who has just looked somewhere on purpose is
-            // not immediately turned away from it.
-            if (this.mouseLook && p) {
+            // like it is swimming for you. A mouse holds where it was put and so does a finger: the
+            // same drift under either would fight the hand every frame. Both of them get the *follow*
+            // camera's gentler return instead, just below.
+            if (!this.mouseLook && !this.touchPlay && Math.abs(c.lookY) < 0.05 && cs.climbHold === 0) cs.pitch = damp(cs.pitch, 0.2, 0.6, dt);
+            // On a mouse or a finger the camera *follows the body* unless a hand is on it. There is
+            // no second stick and no pointer lock, so nothing is steering the view frame to frame:
+            // left to itself it would stay pointing wherever the animal last turned away from. It
+            // eases round behind the creature and back to the resting pitch, and stands aside for
+            // `FOLLOW_HOLD` after a drag or a swipe so a player who has just looked somewhere on
+            // purpose is not immediately turned away from it.
+            if ((this.mouseLook || this.touchPlay) && p) {
               // The cursor's height is a second way of aiming the view, and it is *asking* for
               // something just as a drag is — so it holds the follow off while it pushes, or the
               // two would pull against each other and the pitch would sit wherever they balanced.
-              const edge = this.mouseFrame?.ndc && !this.mouseFrame.dragging ? edgePitch(this.mouseFrame.ndc.y) : 0;
+              //
+              // Only the *mouse* gets it. A hovering cursor is otherwise idle information — it is
+              // somewhere whether or not the player is doing anything with it — and a finger is the
+              // opposite: it is only on the glass while it is being used, and while it is, its travel
+              // is already the camera. Reading its height as a tilt as well would have one gesture
+              // pulling the pitch two ways.
+              const edge = this.mouseLook && this.mouseFrame?.ndc && !this.mouseFrame.dragging ? edgePitch(this.mouseFrame.ndc.y) : 0;
               if (edge !== 0) cs.pitch = clamp(cs.pitch + edge * dt, PITCH_UP, PITCH_DOWN);
-              if (this.mouseFrame?.dragging || Math.abs(c.lookX) > 0.05 || Math.abs(c.lookY) > 0.05) cs.followHold = FOLLOW_HOLD;
+              if (this.mouseFrame?.dragging || this.touchFrame?.dragging || Math.abs(c.lookX) > 0.05 || Math.abs(c.lookY) > 0.05) cs.followHold = FOLLOW_HOLD;
               else cs.followHold = Math.max(0, cs.followHold - dt);
               if (cs.followHold === 0 && cs.climbHold === 0) {
                 cs.yaw = wrapAngle(cs.yaw + wrapAngle(p.yaw - cs.yaw) * (1 - Math.exp(-FOLLOW_RATE * dt)));
@@ -880,8 +966,12 @@ export class Engine {
    * and every caller then falls back to the way it worked before.
    */
   private cursorDir(cs: CamState): THREE.Vector3 | undefined {
-    const ndc = this.mouseFrame?.ndc;
-    if (!this.mouseLook || !ndc) return undefined;
+    // Either pointer will do, because the rule is about pointing rather than about hardware:
+    // whatever the player has aimed at is what the attacks go to. The mouse's cursor is always
+    // somewhere; a finger's aim point lapses a moment after the hand comes off the glass, and then
+    // there is nothing pointing and aiming goes back to the middle of the screen.
+    const ndc = this.mouseFrame?.ndc ?? this.touchFrame?.ndc;
+    if ((!this.mouseLook && !this.touchPlay) || !ndc) return undefined;
     return this.tmpRay.set(ndc.x, ndc.y, 0.5).unproject(cs.camera).sub(cs.camera.position).normalize();
   }
 
@@ -893,10 +983,22 @@ export class Engine {
    * Edible or a fight is the size band, the same one every other readout in the game uses: what you
    * could swallow or chase down is green, what would be a fight is red.
    */
-  private showCursor(m: ReturnType<MousePlay['read']>, game: Game, p: Actor | undefined, cs: CamState) {
+  /**
+   * What is where the player is pointing: nothing, something edible, or a fight.
+   *
+   * The size band, the same one every other readout in the game uses. Both pointing schemes want
+   * this and want it for the same reason — it is what decides whether the *next* press or tap is an
+   * attack or a look — so it is asked once here rather than twice in two places that could drift
+   * apart.
+   */
+  private pointingAt(game: Game, p: Actor | undefined, cs: CamState): 'none' | 'edible' | 'attack' {
     const t = p && cs.aimTarget >= 0 ? game.byId(cs.aimTarget) : undefined;
     const band = t && p && isAlive(t) ? bandOf(p, t) : undefined;
-    const over = !band ? 'none' : band === 'snack' || band === 'prey' ? 'edible' : 'attack';
+    return !band ? 'none' : band === 'snack' || band === 'prey' ? 'edible' : 'attack';
+  }
+
+  private showCursor(m: ReturnType<MousePlay['read']>, game: Game, p: Actor | undefined, cs: CamState) {
+    const over = this.pointingAt(game, p, cs);
     this.mouse.aimingAt(over !== 'none');
     const want = cursorFor(cursorState(m, over));
     if (want !== this.cursorNow) { this.cursorNow = want; this.container.style.cursor = want; }
@@ -1768,7 +1870,12 @@ export class Engine {
       if (p.aiming && cs && !this.mouseLook) {
         const t = lockA && isAlive(lockA) ? lockA : undefined;
         const heavyMove = game.heavyMove(p);
-        aim = { hasTarget: !!t, inRange: !!t && p.aimInRange, name: t ? creature(t.creature).name : undefined, color: t ? BAND_COLOR[bandOf(p, t)] : '#eefaf6', ready: heavyMove.ready, action: heavyMove.name };
+        // A finger keeps the reticle and takes it *with* it. The mouse has a cursor doing this job
+        // and so draws none; a pad has no pointer at all and so draws it in the middle, which is
+        // where its aim axis is. Touch is the third case and needs both halves: a mark to aim by,
+        // standing where the player last pointed, and back in the middle once that has lapsed.
+        const at = this.touchPlay ? this.touchFrame?.ndc : undefined;
+        aim = { hasTarget: !!t, inRange: !!t && p.aimInRange, name: t ? creature(t.creature).name : undefined, color: t ? BAND_COLOR[bandOf(p, t)] : '#eefaf6', ready: heavyMove.ready, action: heavyMove.name, at: at ? { x: at.x, y: at.y } : undefined };
       }
       return {
         index: i, creature: p.creature, color: PLAYER_COLORS[i % 4], alive: p.state !== 'dead', aim,
@@ -1816,6 +1923,7 @@ export class Engine {
     this.resize.disconnect();
     this.keyboard.dispose();
     this.mouse.dispose();
+    this.touch.dispose();
     this.assets.dispose();
     this.clearMatch();
     this.sea?.dispose();

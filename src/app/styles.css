@@ -855,3 +855,227 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .icon-button.pad-focus { outline-offset: 2px; }
 .mode-chip.pad-focus { outline-offset: 2px; }
 .era-switch.pad-focus { outline-offset: 4px; }
+
+/* =======================================================================================
+ * Touch, and small windows
+ * ---------------------------------------------------------------------------------------
+ * Two separate questions, deliberately keyed on two separate classes, because they are not the
+ * same thing and answering them together would be wrong in both directions. `.is-touch` is set when
+ * a finger is what is working the page (`touchFirst`), and `.layout-compact` when the window is
+ * small (`layoutFor`) — a narrow desktop window is compact and gets no thumb pads, and a tablet
+ * held upright is roomy and still gets them.
+ *
+ * Everything before this point in the file may be re-declared later, so this block is last on
+ * purpose: several selectors above are declared twice already and the later one wins.
+ * ======================================================================================= */
+
+/* The browser's own gestures — scroll, rubber-band, double-tap zoom — are the game's gestures here,
+   and double-tap is a *move*, so a page that zoomed on it would take the pounce away. `TouchPlay`
+   also calls `preventDefault`, and this is the half that has to be declarative: a passive listener
+   cannot stop a scroll that has already started. */
+.is-touch, .is-touch .sea-canvas, .is-touch .hud-layer { touch-action: none; }
+/* A long press on glass raises a selection or a context menu over the sea. Only inside the game:
+   the dialogs have real text in them that a player may well want to copy. */
+.is-touch .shell > .sea-canvas, .is-touch .touch-pads { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+
+/* ---------- The pads ---------- */
+/*
+ * One layer, above the HUD and below the menus, click-through except for the controls themselves —
+ * so the sea underneath is still the water a tap lands in. `env(safe-area-inset-*)` keeps the pads
+ * clear of a notch and a home bar; the entry pages carry `viewport-fit=cover`, without which those
+ * insets are always zero.
+ */
+.touch-pads {
+  position: absolute; inset: 0; z-index: 6; pointer-events: none;
+  padding: calc(.6rem + env(safe-area-inset-top)) calc(.6rem + env(safe-area-inset-right))
+           calc(.6rem + env(safe-area-inset-bottom)) calc(.6rem + env(safe-area-inset-left));
+  font-family: var(--font-display);
+}
+.touch-left { position: absolute; left: calc(.9rem + env(safe-area-inset-left)); bottom: calc(1rem + env(safe-area-inset-bottom)); display: flex; align-items: flex-end; gap: .7rem; }
+.touch-right { position: absolute; right: calc(.9rem + env(safe-area-inset-right)); top: calc(.9rem + env(safe-area-inset-top)); display: flex; flex-direction: column; gap: .5rem; align-items: flex-end; }
+
+/*
+ * A pad is round, big enough for a thumb, and see-through enough to be stood on top of the sea.
+ * 68px is the floor: below about 44 a thumb misses, and these are held rather than tapped, so they
+ * are larger than the minimum rather than at it.
+ */
+.touch-pad {
+  pointer-events: auto; touch-action: none;
+  width: 68px; height: 68px; border-radius: 50%;
+  display: grid; place-items: center; gap: 0;
+  border: 1.5px solid rgba(238, 250, 246, .34);
+  background: radial-gradient(circle at 50% 38%, rgba(238, 250, 246, .16), rgba(6, 22, 28, .48) 72%);
+  backdrop-filter: blur(6px);
+  color: var(--foam);
+  font: 700 10px/1 var(--font-display); letter-spacing: .1em; text-align: center;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, .85);
+  /* No transition on the press: a held control has to answer on the frame it is touched, and 150ms
+     of ease reads as lag on something you are steering with. */
+  transition: none;
+}
+/* `:active` never fires on these — they carry no event handlers and `TouchPlay` calls
+   `preventDefault` on the touch that lands on them — so the lit state is drawn by the pad being
+   held in the game's own state, not by CSS. What is left here is the resting drawing. */
+.touch-swim { border-color: rgba(159, 246, 255, .5); }
+.touch-secondary { position: relative; width: 62px; height: 62px; font-size: 9.5px; }
+.touch-secondary.just-swapped { border-color: var(--ember); color: var(--ember); box-shadow: 0 0 0 1px var(--ember), 0 0 20px color-mix(in srgb, var(--ember) 45%, transparent); }
+
+/* The arrows that say the pad can be swiped. Part of the drawing rather than a hint that goes away,
+   because a control that can be changed and never looks it is a control nobody changes. */
+.swipe-mark { position: absolute; top: 50%; width: 0; height: 0; margin-top: -3.5px; opacity: .5; border-top: 3.5px solid transparent; border-bottom: 3.5px solid transparent; }
+.swipe-mark.left { left: 5px; border-right: 5px solid currentColor; }
+.swipe-mark.right { right: 5px; border-left: 5px solid currentColor; }
+
+.touch-hint { pointer-events: none; margin: 0 0 .2rem; max-width: 9rem; font: 600 10.5px/1.35 var(--font-body); color: var(--mist); text-shadow: 0 1px 4px rgba(0, 0, 0, .85); animation: fade-in .4s both; }
+
+/* The small buttons: pause, travel, scores, and the four that walk the travel menu. Rectangular
+   rather than round, so they never read as something to hold the way the pads do. */
+.touch-btn {
+  pointer-events: auto; touch-action: none;
+  min-width: 46px; min-height: 34px; padding: 0 .55rem;
+  display: grid; place-items: center;
+  border-radius: 10px; border: 1px solid rgba(238, 250, 246, .22);
+  background: rgba(6, 22, 28, .5); backdrop-filter: blur(6px);
+  color: var(--mist); font: 700 10px/1 var(--font-display); letter-spacing: .09em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .8);
+}
+.touch-pause { color: var(--foam); }
+.touch-menu { position: absolute; right: calc(.9rem + env(safe-area-inset-right)); bottom: calc(1rem + env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(2, auto); gap: .45rem; }
+.touch-take { color: var(--lagoon); border-color: color-mix(in srgb, var(--lagoon) 55%, transparent); }
+
+/* The reticle follows the finger in touch play (`PlayerHud.aim.at`), so it is no longer a drawing of
+   the camera's own axis and should not pretend to be one — it is dimmer and carries no label, because
+   a label under a mark that moves with a thumb is a label under the thumb. */
+.aim.aim-pointed { opacity: .85; }
+.aim.aim-pointed .aim-label { display: none; }
+
+/* Asked once, and it goes away by itself. Over the sea rather than in front of it: the game runs in
+   portrait, and a screen that refused to draw until it was turned round would be worse. */
+.rotate-hint {
+  position: absolute; left: 50%; bottom: calc(6rem + env(safe-area-inset-bottom)); transform: translateX(-50%);
+  z-index: 7; margin: 0; padding: .5rem .85rem; max-width: 78%;
+  border-radius: 12px; background: rgba(6, 22, 28, .68); backdrop-filter: blur(8px);
+  border: 1px solid rgba(238, 250, 246, .16);
+  color: var(--foam); font: 600 12px/1.35 var(--font-body); text-align: center;
+  animation: fade-in .5s both;
+}
+
+/* ---------- The compact layout ---------- */
+/*
+ * The whole in-match HUD is drawn in `em` off one font-size (`.hud`, and the two split-screen
+ * variants), which makes this the cheapest correct lever there is: one number and every panel,
+ * gauge, marker and menu in it comes down together and keeps its proportions. It is not the whole
+ * job — a few things have to move rather than shrink — but it is most of it.
+ */
+.layout-compact .hud { font-size: 11px; }
+.layout-compact .hud-half { font-size: 10px; }
+.layout-compact .hud-quarter { font-size: 9px; }
+/* The pads own the bottom-left corner, so what used to live there goes above them. */
+.is-touch .hud-bottom { bottom: 6.8em; }
+.is-touch .grip-panel { bottom: 12.5em; }
+.is-touch .hint { bottom: 10.5em; }
+.is-touch .death-note { bottom: 9.5em; }
+/* And the small buttons own the top-right, where the radar is. */
+.is-touch .radar { top: 3.6em; }
+.is-touch .day-phase { bottom: 1.4em; }
+
+/*
+ * Below this the menus reflow. The breakpoints match `COMPACT_W`/`COMPACT_H` in
+ * `src/shared/small-screen.ts` and must keep matching them: the React side sets `.layout-compact`
+ * from those numbers, so a media query at a different figure would give a window one half of the
+ * compact layout and not the other. Written as a media query as well as a class because the
+ * *standalone* pages (the viewer, the trilogy page) have no React shell setting the class, and
+ * because a stylesheet that only reflows when JavaScript says so flashes the wide layout first.
+ */
+@media (max-width: 759px), (max-height: 539px) {
+  /* The title. The painting stays full-bleed; the type comes down and the tagline goes, because on a
+     phone the picture is doing that job better than a sentence can. */
+  .logo-line-1 { font-size: clamp(30px, 11vw, 60px); }
+  .logo-line-2 { font-size: clamp(26px, 10vw, 54px); }
+  .title-tag { display: none; }
+  .press-start { font-size: clamp(13px, 4.4vw, 18px); letter-spacing: .22em; margin-bottom: 8px; }
+  .title-hint { font-size: 11px; }
+  .title-inner { padding-bottom: calc(1rem + env(safe-area-inset-bottom)); }
+
+  /* The pick screen. It already goes to one column under 1000px; what is left is the padding, the
+     header's own furniture and the crew card, which is the tallest thing on the screen. */
+  .select { padding: 10px 12px 64px; gap: 8px; }
+  .select-header { gap: 8px; }
+  .mode-blurb { display: none; }
+  .header-logo { width: 104px; }
+  .brand-name { font-size: 11px; }
+  .mode-chip { min-height: 52px; padding: 5px 8px; }
+  .mode-chip small { display: none; }
+  .pick-layout { gap: 8px; }
+  .roster-grid { max-width: none; }
+  .cell { padding: 3px; }
+  .cell-kind { display: none; }
+  .crew-card { padding: 8px 10px 10px; gap: 5px 8px; }
+  .creature-copy .kit { display: none; }
+  .creature-copy .tagline { display: none; }
+  .select-footer { gap: 8px; }
+  .start-button { padding: 11px 18px; font-size: 13px; letter-spacing: .12em; }
+  .feedback-button { display: none; }
+
+  /* Overlays. `min(94vw, …)` already fits; what does not is the padding inside it and the fixed
+     200px range inputs in the settings panel. */
+  .panel, .tools-dialog { padding: 14px 14px 12px; border-radius: 14px; }
+  .panel.results { max-height: 94vh; }
+  .result-grid { grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); }
+  .help-columns { grid-template-columns: 1fr; }
+  .setting-row { grid-template-columns: 1fr; gap: 4px; }
+  input[type='range'] { width: 100%; }
+  .xbox-diagram, .kbm-diagram { max-height: 30vh; }
+
+  /* Menu buttons are tapped, so they get a thumb's worth of height wherever they are. */
+  .menu-buttons button, .ghost, .icon-button { min-height: 44px; }
+  .icon-button { width: 44px; }
+}
+
+/* A window that is short *and* narrow — a phone on its side — has the least room of anything, and
+   the things that go here are the ones that were still just fitting at one of the two. */
+@media (max-width: 759px) and (max-height: 449px) {
+  .title-inner .press-start { margin-bottom: 4px; }
+  .era-switches { display: none; }
+  .crew-card { grid-template-rows: auto minmax(64px, 40%) minmax(0, 1fr); }
+  .creature-copy h2 { font-size: 15px; }
+  .biome-banner b { font-size: 1.5em; }
+  .scoreboard { max-height: 88%; }
+}
+
+/* A phone held upright. The pick screen's one column has to become a *short* one column, because
+   the roster and the crew card are stacked and the window is 844 tall with a 390 waist. */
+@media (max-width: 559px) and (min-aspect-ratio: 1/2) and (orientation: portrait) {
+  .pick-layout { grid-template-rows: minmax(0, 1.15fr) minmax(0, 1fr); }
+  .crew { grid-auto-flow: row; grid-auto-columns: auto; }
+}
+
+/*
+ * A short *wide* window — a phone on its side, which is how this game is meant to be held — is the
+ * one case the stack above gets backwards. Every rule up to here treats "not wide" as "stack the
+ * picker into a column and scroll it", which is right at 900x1200 and wrong at 780x360: there the
+ * window has 360 pixels of height and no amount of scrolling makes a stacked roster and a stacked
+ * crew card fit, so the card ends up laid over the roster it is supposed to sit beside. With more
+ * width than height the answer is the one the wide layout already gives — roster on the left, crew
+ * on the right, nothing scrolling — just smaller.
+ *
+ * Keyed on the aspect ratio rather than on a width, because it is the *shape* that decides: 780x360
+ * and 1400x420 want the same thing and no single width tells them apart from 820x1180.
+ */
+@media (max-height: 539px) and (min-aspect-ratio: 1/1) {
+  .select { grid-template-rows: auto minmax(0, 1fr) auto; }
+  .pick-layout {
+    grid-template-columns: minmax(0, 1.45fr) minmax(210px, 0.85fr);
+    grid-template-rows: minmax(0, 1fr);
+    overflow: hidden;
+  }
+  .crew, .crew-1 { min-height: 0; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+  .crew.compact { grid-template-columns: none; grid-auto-rows: auto; }
+  .roster-grid { align-self: stretch; max-width: none; }
+  /* Three bands of tiles into 300-odd pixels: the picture is what gives, and the name stays. */
+  .cell img { aspect-ratio: 4 / 1.7; }
+  .crew-card { grid-template-areas: 'top top' 'hero btn' 'copy copy'; grid-template-rows: auto minmax(44px, 32%) minmax(0, 1fr); }
+  .creature-copy h2 { font-size: 14px; }
+  .creature-copy .stats { display: none; }
+  .ready-button { padding: 7px 9px; font-size: 11px; letter-spacing: .08em; }
+}

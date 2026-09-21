@@ -261,7 +261,13 @@ export interface SiltCloud { pos: Vec3; radius: number; t: number; }
 
 export interface PlayerSetup {
   creature: CreatureId;
-  device: number | 'keyboard' | 'keyboard2';
+  /**
+   * Which physical thing steers this seat: a pad index, one of the two keyboard halves, or the
+   * glass. `'touch'` is a seat like any other here — `src/sim` never reads it beyond telling seats
+   * apart — but it is the one device that can only ever hold a single seat, because there is one
+   * screen and a finger has nowhere else to go.
+   */
+  device: number | 'keyboard' | 'keyboard2' | 'touch';
   ready: boolean;
   /**
    * Rise only: the rung of the growth ladder to hatch on, instead of rung 0. This is how a player

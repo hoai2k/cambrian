@@ -28,6 +28,9 @@ import { TitleScreen } from './Title';
 import { Toolbar } from './Toolbar';
 import { toolbarPlace } from './toolbar-place';
 import { menuScheme } from '../shared/controls';
+import { SECONDARY, type Secondary } from '../shared/touch-play';
+import { RotateHint, TouchPads } from './TouchPads';
+import { useSmallScreen } from './use-small-screen';
 import { assignSeatSchemes } from '../shared/seat-schemes';
 import { freshCursor, menuPress, MENU_LOCKOUT, type MenuCursor, type MenuEvent } from './menu-cursor';
 
@@ -40,7 +43,20 @@ export type DialogKind = null | 'help' | 'settings';
  * input to almost everything in the simulation, and `src/sim` has to replay the same way from the
  * same inputs.
  */
-export interface Settings { quality: Quality; lookSpeed: number; invertY: boolean; volume: number; muted: boolean; music: boolean; equivalentSizing: boolean; shoreAnimals: boolean; }
+export interface Settings {
+  quality: Quality; lookSpeed: number; invertY: boolean; volume: number; muted: boolean; music: boolean;
+  equivalentSizing: boolean; shoreAnimals: boolean;
+  /**
+   * What the touch player's secondary pad is set to, and how many touch matches they have played.
+   *
+   * Both live here because both have to outlast a match: a player who plays as a hider should not
+   * have to swipe back to it every time they hatch, and the nudge that says the pad *can* be swiped
+   * has to stop appearing once they know. Not settings anybody edits in the settings panel — they are
+   * written by playing — but this is the one thing this game already persists, and giving them their
+   * own key would mean a second thing to keep in step.
+   */
+  secondary: Secondary; touchMatches: number;
+}
 
 /** The active era's modes, in its order; the first is the default selection. */
 /**
@@ -58,8 +74,8 @@ const startScale = (v: Visitor) => (v.standing ? undefined : v.scale);
 const MODES: Mode[] = ACTIVE_ERA.modes.map((m) => m.id);
 const SETTINGS_KEY = ACTIVE_ERA.copy.settingsKey;
 const defaultSettings = (): Settings => {
-  try { const s = localStorage.getItem(SETTINGS_KEY); if (s) return { ...{ quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false, shoreAnimals: false }, ...JSON.parse(s) }; } catch { /* ignore */ }
-  return { quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false, shoreAnimals: false };
+  try { const s = localStorage.getItem(SETTINGS_KEY); if (s) return { ...{ quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false, shoreAnimals: false, secondary: 'aim' as Secondary, touchMatches: 0 }, ...JSON.parse(s) }; } catch { /* ignore */ }
+  return { quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false, shoreAnimals: false, secondary: 'aim' as Secondary, touchMatches: 0 };
 };
 
 /**
@@ -151,6 +167,35 @@ export function App() {
   const [isFs, setIsFs] = useState(false);
   const [padIndices, setPadIndices] = useState<number[]>([]);
   const padCount = padIndices.length;
+  /** How much room this window has, and whether a finger is what is working it. */
+  const small = useSmallScreen(padCount);
+  /**
+   * Which device the one local seat joins on.
+   *
+   * There is exactly one of them either way — the keyboard has always joined once and only once, and
+   * a screen has one pair of hands — so this is a *renaming* of that seat rather than a new kind of
+   * player: `'touch'` reads the keyboard underneath it too (`controlsFor`), every key binding stays
+   * live, and `typeof device === 'string'` still means "the local seat" everywhere it is asked.
+   */
+  const hand: PlayerSetup['device'] = small.touch ? 'touch' : 'keyboard';
+  const handRef = useRef(hand);
+  useEffect(() => { handRef.current = hand; }, [hand]);
+  /** The secondary pad, mirrored into state so the pad's label re-renders when a swipe lands. */
+  const [secondary, setSecondary] = useState<Secondary>('aim');
+  /**
+   * Set for a moment after a swipe, so the pad can say what it has become and then go back to being
+   * a pad. It clears itself on a timer rather than on the next frame: the swap is a thing the player
+   * did on purpose and is worth acknowledging for long enough to read.
+   */
+  const [swapped, setSwapped] = useState(false);
+  /** Counted rather than flagged, so a second swipe restarts the moment instead of being swallowed. */
+  const [swapTick, setSwapTick] = useState(0);
+  useEffect(() => {
+    if (!swapTick) return;
+    setSwapped(true);
+    const t = setTimeout(() => setSwapped(false), 900);
+    return () => clearTimeout(t);
+  }, [swapTick]);
   /** When the player last touched anything. Drives the idle gate on the asset loader. */
   const lastInputRef = useRef(0);
   /**
@@ -252,6 +297,14 @@ export function App() {
       onPointerLost: () => { if (screenRef.current === 'playing' && !pausedRef.current && !dialogRef.current) { setPausedBoth(true); audio.play('ui-back'); } },
       onLoaded: () => setLoaded(true),
       onProgress: (p) => setProgress(p),
+      // A swipe on the secondary pad. Remembered, so the choice outlasts the match, and flagged for a
+      // moment so the pad can say what it has become — a control that changes silently reads as one
+      // that did not change.
+      onSecondary: (sec) => {
+        setSecondary(sec);
+        setSettings((x) => ({ ...x, secondary: sec }));
+        setSwapTick((n) => n + 1);
+      },
     });
     engineRef.current = engine;
     // Visitors stream like anything else. Queued here rather than where they are registered,
@@ -382,6 +435,13 @@ export function App() {
     // Fixed for the length of the match, whatever the settings panel does while it runs.
     setEquivalentSizing(settingsRef.current.equivalentSizing);
     RULES?.settings?.shoreAnimals?.(settingsRef.current.shoreAnimals);
+    // The pad goes back where the player left it before the first frame, or the match opens holding
+    // something they did not choose.
+    engineRef.current.setSecondary(settingsRef.current.secondary);
+    setSecondary(settingsRef.current.secondary);
+    // Count the touch matches, which is what retires the swipe nudge. Only the ones actually played
+    // on glass: a player who has only ever used a keyboard has not learned about the pad.
+    if (handRef.current === 'touch') setSettings((x) => ({ ...x, touchMatches: x.touchMatches + 1 }));
     engineRef.current.startMatch(modeRef.current, withCarry(ps));
     setPausedBoth(false);
     go('playing');
@@ -545,7 +605,7 @@ export function App() {
     // creature is exactly the gesture that should open one — on the animal they clicked, rather
     // than on a default somebody has to correct.
     if (!ps.length && index === 0) {
-      updatePlayers([{ creature: c, device: 'keyboard', ready: false }]);
+      updatePlayers([{ creature: c, device: handRef.current, ready: false }]);
       audio.init(); audio.resume(); audio.play('ui-join');
       return;
     }
@@ -626,10 +686,14 @@ export function App() {
     updatePlayers([...ps, { creature: CREATURE_IDS[ps.length % CREATURE_IDS.length], device, ready: false }]);
     audio.play('ui-join');
   }, [updatePlayers]);
-  /** The keyboard joins once and only once: two players never share one. */
+  /**
+   * The local seat joins once and only once: two players never share the keyboard, and there is one
+   * screen to put fingers on. `typeof device === 'string'` is what "local" means here, and it covers
+   * the glass as well as the two keyboard halves.
+   */
   const addKeyboard = useCallback(() => {
     if (playersRef.current.some((p) => typeof p.device === 'string')) return;
-    addPlayer('keyboard');
+    addPlayer(handRef.current);
   }, [addPlayer]);
   const changeMode = useCallback((m: Mode) => { modeRef.current = m; setMode(m); audio.play('ui-move'); updatePlayers(playersRef.current.map((p) => ({ ...p, ready: false }))); }, [updatePlayers]);
 
@@ -774,10 +838,11 @@ export function App() {
       if ((e.target as HTMLElement | null)?.matches?.('input,textarea,select')) return;
       const s = screenRef.current;
       if (dialogRef.current) { if (e.code === 'Escape') openDialog(null); return; }
-      if (s === 'title') { if (!e.metaKey && !e.ctrlKey && e.code !== 'F11') startFromTitle('keyboard'); return; }
+      if (s === 'title') { if (!e.metaKey && !e.ctrlKey && e.code !== 'F11') startFromTitle(handRef.current); return; }
       if (s === 'select') {
         const ps = playersRef.current;
-        const idx = ps.findIndex((x) => x.device === 'keyboard');
+        // The local seat, whichever it joined on: a tablet with a keyboard case still answers keys.
+        const idx = ps.findIndex((x) => x.device === 'keyboard' || x.device === 'touch');
         if (idx >= 0) {
           if (e.code === 'ArrowRight' || e.code === 'KeyD') moveCursor(idx, 1, 0);
           if (e.code === 'ArrowLeft' || e.code === 'KeyA') moveCursor(idx, -1, 0);
@@ -836,7 +901,7 @@ export function App() {
   // Menus are shared, so they speak whichever device is in the room. A pad the browser has not
   // seen a button from yet does not count — it cannot, the Gamepad API hides it until then — which
   // is why the title screen keeps its own copy about connecting one.
-  const scheme = menuScheme(padCount);
+  const scheme = menuScheme(padCount, small.touch);
   const modeInfo = useMemo(() => MODE_INFO, []);
 
   /**
@@ -927,7 +992,7 @@ export function App() {
   }, [menuOpen, screen]);
 
   return (
-    <main className={`shell screen-${screen}`}>
+    <main className={`shell screen-${screen} layout-${small.layout} ${small.touch ? 'is-touch' : ''}`}>
       {/* Named for whichever game this is, not for the one it was written in. */}
       <div className="sea-canvas" ref={canvasRef} aria-label={ACTIVE_ERA.title} />
       <div className="vignette" />
@@ -949,7 +1014,7 @@ export function App() {
         */}
       {screen === 'title' && (
         <TitleScreen
-          loaded={loaded} onStart={() => startFromTitle('keyboard')} padCount={padCount} eraFocused={focus.group === 'era'}
+          loaded={loaded} onStart={() => startFromTitle(handRef.current)} padCount={padCount} eraFocused={focus.group === 'era'}
           progress={bootSlow ? bootFraction : null} status={bootSlow ? bootStatus : undefined}
         />
       )}
@@ -967,6 +1032,25 @@ export function App() {
       )}
 
       {(screen === 'playing' || screen === 'results') && hud && <Hud snapshot={hud} />}
+      {/*
+        * The pads are drawn only while the game is actually being played: paused, on the results
+        * screen or in a dialog the fingers belong to the buttons, which is the same rule the mouse
+        * follows (`syncPointer`). They are also the one thing on screen that must not be drawn for a
+        * player who is not using them, so `small.touch` gates them rather than the window size —
+        * a narrow desktop window gets the compact layout and no pads at all.
+        */}
+      {screen === 'playing' && !paused && !dialog && small.touch && (
+        <TouchPads
+          secondary={secondary}
+          // The nudge is worth one or two matches and then it is in the way. It also stands down the
+          // moment the player swipes, because at that point they have plainly found it.
+          hint={settings.touchMatches <= 2 && settings.secondary === SECONDARY[0] && !swapped}
+          swapped={swapped}
+          teleportOpen={!!hud?.players.some((p) => p.teleport)}
+          onPause={() => { setPausedBoth(true); audio.play('ui-confirm'); }}
+        />
+      )}
+      {screen === 'playing' && small.rotate && <RotateHint />}
       {screen === 'playing' && paused && <PauseMenu items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
       {screen === 'results' && hud && <Results snapshot={hud} players={players} record={record} fresh={fresh} items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
 

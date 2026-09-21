@@ -408,6 +408,35 @@ export interface GameStrings {
       readonly outOfAir: string;
       readonly airRunningOut: string;
     };
+    /**
+     * The on-screen pads a touch player holds, and the lines that explain the swap.
+     *
+     * The pads are drawn over the sea, so every label here is one or two words: the button *is* the
+     * explanation, and anything longer would be covering the game in order to describe itself.
+     */
+    readonly pads: {
+      readonly swim: string;
+      readonly swimAria: string;
+      /** The swappable pad, once per action it can be set to. Keyed by the action's own name. */
+      readonly aim: string;
+      readonly guard: string;
+      readonly ability: string;
+      readonly sense: string;
+      /** Spoken, and the title: what the pad does and how to change it. */
+      readonly secondaryAria: (action: string) => string;
+      /**
+       * The one-off nudge that says the pad can be swiped, shown for the first few touch matches and
+       * never again. A control that can be changed and never says so is a control nobody changes.
+       */
+      readonly swapHint: string;
+      /** Shown for a moment after a swipe lands, naming what the pad is now. */
+      readonly swapped: (action: string) => string;
+      readonly pause: string;
+      readonly travel: string;
+      readonly scores: string;
+    };
+    /** Asked once, on a phone held upright: the sea is a wide thing to look at. */
+    readonly rotate: string;
   };
 
   /** The Send Feedback button on the pick screen, and the dialog behind it. */
@@ -893,6 +922,21 @@ export const SHARED_STRINGS: GameStrings = {
       outOfAir: 'OUT OF AIR · nothing comes back until you breathe',
       airRunningOut: 'AIR RUNNING OUT · start for the surface',
     },
+    pads: {
+      swim: 'SWIM',
+      swimAria: 'Hold to swim forward, wherever the view is pointing',
+      aim: 'AIM',
+      guard: 'GUARD',
+      ability: 'HIDE',
+      sense: 'SENSE',
+      secondaryAria: (action) => `Hold for ${action}. Swipe the pad sideways to change it.`,
+      swapHint: 'Swipe this pad to change it',
+      swapped: (action) => action,
+      pause: 'Pause',
+      travel: 'Travel',
+      scores: 'Scores',
+    },
+    rotate: 'Turn your device sideways for the whole sea',
   },
 
   feedback: {

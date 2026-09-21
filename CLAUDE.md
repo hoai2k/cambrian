@@ -226,6 +226,106 @@ unless the user explicitly asks for a PR. Steps:
   are the heavy. `npm run mouse` drives the whole of it in a real browser, where every part of it is something a headless test cannot vouch for. That harness
   waits on the *game's own state and frames*, never on the clock: this page draws about a frame a
   second under the software renderer, so a wait in seconds measures the renderer.
+- **A finger is the third way to play, and it is the mouse scheme's argument carried one step
+  further.** `src/shared/touch-play.ts` is the whole of it as a state machine over touch events —
+  pure, no DOM, no clock of its own — and `src/input/touch.ts` is the adapter, split that way so
+  `npm run touch` drives every gesture with the clock passed in. The mouse already answered the hard
+  question: tell presses apart by **what they did**, not by which button they were on. So a touch is
+  classified at its **down**, from the zone it landed in (`water`, the `swim` pad, the `secondary`
+  pad, or a drawn button), and keeps that job until it lifts — which is the whole reason multi-touch
+  costs nothing here: both pads held while another hand swipes and a third finger taps compose with no
+  special handling anywhere, because each finger was answered when it arrived.
+  Over the water a **tap is the bite**, fired on the *lift* for the mouse's own reason (until the
+  finger comes up it is not known to have stayed still), and it bites wherever it lands. A
+  **double-tap** is the mouse's own rule about needing something to pounce *at*: on an animal it is
+  the heavy, on open water it is the **dash**, aimed at that water and running as long as the finger
+  stays down — and moving that finger re-aims the dash rather than turning the camera, which is the
+  right button verbatim. The first tap of a double **still bites**, deliberately: the alternative is
+  sitting on every bite for `DOUBLE` to find out whether a second is coming, which taxes the common
+  move to pay for the rare one, and a bite a quarter-second late is a bite that missed. A **swipe**
+  past `DRAG` is the camera and only the camera, vertical included — forward is camera-relative, so a
+  lifted view and a held swim pad *are* the climb, which is why there is no up or down pad. A
+  **pinch** is the one gesture about a *pair* rather than either finger, and exists because zoom is
+  otherwise unreachable: separation is the zoom, **centroid** is the camera, and two fingers merely
+  resting are not a pinch but two taps that have not happened yet. There is deliberately **no
+  hold-to-heavy** though the mouse has one — the mouse needs it (no double-click in its vocabulary, a
+  cursor that sits exactly still) and a finger has neither property, so a hold threshold would turn
+  the start of every careful look into a pounce.
+  **The secondary pad is one pad holding one of four things** — aim, guard, hide, sense — swiped
+  sideways to change, because four buttons would cost four times the glass for a choice made once and
+  kept, and because travel changing what a touch means is the same rule as everywhere else in the
+  scheme. The ring is the **same four on every animal**: all four mean something for every body in all
+  three games (what *changes* is the guard and the hide, which is the point of them), and a ring whose
+  length depends on the animal is a ring whose muscle memory resets with every pick. The choice is
+  remembered in `Settings.secondary`.
+  **A live finger is the crosshair**, so the last water touch is the aim point and it **outlives the
+  finger** by `AIM_HOLD` — the bite fires on the lift, when the finger is already gone, so a point
+  that vanished with it would aim every tap at nothing. Which is why touch *keeps* the reticle where
+  the mouse switches it off, and moves it: the mouse has a cursor doing that job, a pad has no pointer
+  and draws it dead centre where its aim axis is, and touch needs a mark standing where the player
+  pointed and back in the middle once it has lapsed. Touch takes the **follow camera** (no second
+  stick steers the view) but **not** `edgePitch` and not the pad's pitch drift: a hovering cursor is
+  idle information and a finger is the opposite — it is only on the glass while it is being used, and
+  while it is, its travel is *already* the camera.
+  **Gestures and drawn buttons are two channels and the split is load-bearing.** No gesture may reach
+  a menu action — a tap aimed at the sea must not also answer what a menu is asking, which is the line
+  `tools/menu-bindings-test.ts` already held for the mouse. But travel opens a *menu* that has to be
+  walked and the scoreboard is a hold, so those are `ButtonZone`s: an explicitly enumerated channel,
+  only drawn when it applies, with what it does written on it, and the four buttons that walk the
+  travel menu appear and go away with it, because a menu that opens and cannot be walked is worse than
+  no menu. Unlike the mouse a finger *does* reach `ability`, `guard` and `sense`, because a mouse plays
+  beside a keyboard and those have keys while a finger has nothing to fall back on; `rise`/`sink` stay
+  out of reach because the camera covers them, as on a mouse.
+  **A gesture is timed by when it happened, never by when the handler ran.** `TouchPlay` reads each
+  event's own `timeStamp`, and this is not a nicety: a tap is measured against `TAP_TIME` and a double
+  against `DOUBLE`, both a few hundred milliseconds, so timing from the handler makes any frame longer
+  than that a frame in which the player's taps are silently reclassified as fingers resting. A stall of
+  half a second is not hypothetical on a phone and is the *normal* case under a software renderer,
+  where a tap dispatched into one measured **2.4 seconds** long and was thrown away. Found by the
+  browser harness; it would have been a real dropped-input bug on a real slow device. The same fact
+  bites the harness from the other side, and is the one thing to know before touching it: Chromium
+  stamps a touch when it *processes* it, so a `touchStart` whose round-trip is awaited before the
+  `touchEnd` puts a whole blocked frame between them — every gesture with a time threshold in it goes
+  out as one queued **batch** (`gesture`/`tap`/`doubleTapDown` in `tools/touch-browser.mjs`), while a
+  swipe and a pinch are measured in pixels and are better off awaited one move at a time.
+  `npm run touch` is the scheme and the thresholds, `node tools/touch-browser.mjs` is real touches in
+  a real browser, and `docs/redesign/11-touch-and-small-screens.md` is the whole of it.
+- **How small the window is, and whether a finger is working it, are two questions.** `.is-touch` and
+  `.layout-compact` are two classes on the shell for that reason: a desktop window dragged narrow is
+  compact and gets no thumb pads, a tablet held upright is roomy and still gets them, and answering
+  the two together is wrong in both directions. `src/shared/small-screen.ts` holds both, pure;
+  `src/app/use-small-screen.ts` is the one place in `src/app` that measures the window at all.
+  `layoutFor` is compact below `COMPACT_W` (760) or `COMPACT_H` (540), and **each axis catches a
+  different shape**: a phone held up is caught by its width, a phone on its side is 780 across and
+  over the line so it is caught by its *height* at 360 — between them that is every phone, without the
+  width creeping past a small tablet. Both sit clear of the breakpoints the stylesheet already used
+  (900 and 1000 across, 640 down) so the two reflows never fight. It asks about the **window and not
+  the device**, which is what makes it checkable and is also true: a pulled-down desktop window wants
+  the same layout for the same reasons. `touchFirst` is the other question and wants all three of
+  coarse pointer, **no hover** (a touch laptop being used with its trackpad reports a coarse pointer
+  *available* and a fine primary one) and no pad connected — the same stand-down the mouse already
+  makes for a controller.
+  The cheapest correct lever on the HUD is that **all of it is drawn in `em` off one font size**
+  (`.hud`, plus the two split-screen variants), so one number brings every panel, gauge, marker and
+  menu down together with its proportions intact; what is left is the few things that have to *move*
+  rather than shrink, because the pads own the bottom-left corner and the drawn buttons the top-right.
+  The menus reflow in CSS at the same two figures and **the media query has to keep matching the
+  constants**, or a window gets one half of the compact layout and not the other; it is a query as
+  well as a class because the standalone pages have no React shell to set one and because a stylesheet
+  that only reflows once JavaScript says so flashes the wide layout first.
+  One old breakpoint was backwards rather than merely tight: every rule under 1000px read "not wide"
+  as "stack the picker and scroll it", which is right at 900x1200 and wrong at 780x360 — 360 pixels of
+  height is not something scrolling fixes, and the crew card ended up laid *over* the roster. That one
+  is keyed on the **aspect ratio**, because it is the shape that decides and no single width tells
+  780x360 apart from 820x1180. Two players on a tall window are now cut top and bottom (`splitAxis`,
+  read by `layoutRects`); the HUD follows the rects by percentage and needed no telling. Portrait is
+  never *blocked* — `rotateHint` asks once, past 3:2, so a phone held up (2.16) is asked and every
+  tablet upright (1.33) is left alone.
+  The four game entries gained `viewport-fit=cover` (without which `env(safe-area-inset-*)` is always
+  zero and the pads sit under a notch) and `maximum-scale=1, user-scalable=no` — a real accessibility
+  cost taken knowingly, because **double-tap is a move in this game** and a browser that answered it
+  with its own zoom would take the pounce away. Paid on the game pages only: the trilogy page, the
+  viewer and the stats page stay pinchable, and the view has its own pinch-to-zoom on the camera.
 - **A seat is a claim, and arriving at a screen claims nothing.** Reaching the roster from another
   game's picker (`deepLinkedToSelect`) used to open a keyboard seat on the era's default animal, so
   the screen showed somebody playing before anybody had pressed anything. The keyboard now takes its
