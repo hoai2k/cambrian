@@ -120,7 +120,20 @@ export interface BendSpan {
   tip: [number, number, number];
   forward: [number, number, number];
   baseNormal: [number, number, number];
+  /** The tip plane as the reviewer has *aimed* it: where the handle stands, and what it sets. */
   tipNormal: [number, number, number];
+  /**
+   * The tip plane where the **bend has carried it** — `tipNormal` turned by the applied rotation.
+   *
+   * The two are separate on purpose, and the separation is the whole readout of the slider. The
+   * magenta knob stands on `tipNormal`, which is a *statement about the animal* ("this is the way
+   * the head runs") and must sit still under the pointer while it is dragged; the lagoon cut plane
+   * is drawn here, which is where that plane has actually been swung to, and at a straighten of 1
+   * it lies parallel to the base plane with the geometry between them carried round with it. So
+   * the plane moving and the body moving are one thing on screen, and the handle never jumps out
+   * from under the hand holding it.
+   */
+  tipCarried: [number, number, number];
   /** The hinge the two planes imply. Drawn, never grabbed: it is derived from them. */
   axis: [number, number, number];
   /** Half the width the cut planes and the axle are drawn at. */
@@ -1028,11 +1041,11 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   // Each plane's own normal, drawn from the plane out to its knob, so what a handle is aiming is
   // visible as a line and not only as a floating sphere.
   const aimLine = (color: string) => new THREE.Line(G(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 0, 0)])), traceMat(color));
-  const bendAims = { base: aimLine('#ffd9a8'), tip: aimLine('#ff2fa8') };
+  const bendAims = { base: aimLine('#ffd9a8'), tip: aimLine('#ff2fa8'), carried: aimLine('#61f2d5') };
   for (const [name, h] of Object.entries(bendHandles)) { h.name = `bend-${name}`; h.renderOrder = 5; }
-  for (const o of [bendAxle, spanLine, bendTraces.base, bendTraces.tip, bendAims.base, bendAims.tip]) o.renderOrder = 5;
+  for (const o of [bendAxle, spanLine, bendTraces.base, bendTraces.tip, bendAims.base, bendAims.tip, bendAims.carried]) o.renderOrder = 5;
   bendGroup.add(bendPlanes.base, bendPlanes.tip, bendAxle, spanLine, bendTraces.base, bendTraces.tip,
-    bendAims.base, bendAims.tip,
+    bendAims.base, bendAims.tip, bendAims.carried,
     bendHandles.base, bendHandles.tip, bendHandles.baseAim, bendHandles.tipAim);
   // The span's own vertices, lit point by point — the same overlay mark mode and the mouth editor
   // use, so what the turn will actually carry is seen rather than inferred.
@@ -1072,6 +1085,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     const f = new THREE.Vector3(...span.forward), a = new THREE.Vector3(...span.axis);
     const bn = new THREE.Vector3(...span.baseNormal).normalize();
     const tn = new THREE.Vector3(...span.tipNormal).normalize();
+    const tc = new THREE.Vector3(...span.tipCarried).normalize();
     const base = new THREE.Vector3(...span.base), tip = new THREE.Vector3(...span.tip);
     const wide = span.reach * 2;
     const X = new THREE.Vector3(1, 0, 0);
@@ -1084,18 +1098,23 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
       o.scale.set(1, wide, wide);
     };
     placePlane(bendPlanes.base, base, bn);
-    placePlane(bendPlanes.tip, tip, tn);
+    // The *carried* direction, not the aimed one: this plane is the front of the span as the bend
+    // has left it, and watching it swing onto the base plane is what the straighten slider is for.
+    placePlane(bendPlanes.tip, tip, tc);
     // The axle is a line along its own x, so it is aimed at the axis directly: its length is all
     // that is left to give it.
     bendAxle.position.copy(base);
     bendAxle.quaternion.setFromUnitVectors(X, a);
     bendAxle.scale.setScalar(span.reach * 1.4);
-    for (const [end, normal, at] of [['base', bn, base], ['tip', tn, tip]] as const) {
+    for (const [end, normal, at] of [['base', bn, base], ['tip', tn, tip], ['carried', tc, tip]] as const) {
       const line = bendAims[end];
       line.position.copy(at);
       line.quaternion.setFromUnitVectors(X, normal);
       line.scale.setScalar(span.reach * 1.4);
     }
+    // Where the two coincide there is nothing to say and two lines drawn over each other read as
+    // one thicker one, so the carried line only appears once the slider has actually moved it.
+    bendAims.carried.visible = tc.angleTo(tn) > 1e-3;
     spanLine.position.copy(base);
     spanLine.quaternion.setFromUnitVectors(new THREE.Vector3(1, 0, 0), f);
     spanLine.scale.setScalar(base.distanceTo(tip));
