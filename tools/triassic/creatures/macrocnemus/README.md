@@ -236,6 +236,15 @@ all — the lip is where two closed surfaces meet.
 neither `Upper tooth row` nor the `Macrocnemus teeth` material matches
 `src/shared/oral-geometry.ts`. Nothing on this body is hidden in play any more.
 
+**And the LOD lost 580 KB it had no business carrying.** `macrocnemus.lod1.glb` (which *is* the
+twin, byte for byte) went 1,496,524 → 917,048 bytes on a mesh whose triangle count barely moved,
+8,574 → 8,458. The reason is worth knowing, because it was invisible: the hinge plug wore the
+body's own pigmentation material (`K.wear_the_skin`, which is the right rule for an authored
+patch), that material carries this animal's 2048² albedo and normal maps, and the plug was
+exported **with the twin group** — so the twin, whose own surface is vertex-coloured and needs no
+texture at all, was dragging 578 KB of JPEG along for an 86-vertex ellipsoid. Removing the plug
+removed the twin's only user of that material.
+
 ### The gape, before and after
 
 `gape-solid.py` at the measured peak of **every** opening clip. The `--as-drawn` column is the one
@@ -263,6 +272,25 @@ Whether it reads as a mouth rather than as a closed hole is a picture:
 Skin: **3.41× → 3.18×** (`Ability`, `hind_upper_L`). `lag.mjs` 0 rim points open past 0.2 %, worst
 0.01 % of a body at `Snatch`@0.38. `idle-bones.mjs`, `oral-shell-audit.mjs` ("no oral lining on
 authored, puppet or LOD") and `hidden-parts.mjs --check` clean.
+
+### `hind_foot_L` (T3D-23) — recorded, not repaired, because the instrument does not see it
+
+T3D-23 lists this body's `hind_foot_L` as travelling **0.88 of its own joint where every other foot
+is 0.98–1.13**. `tools/triassic/lag.mjs --verbose` is the tool that measures exactly that — skin
+travel round a joint over that joint's own travel — and it does not reproduce the figure, on the
+shipped file or on this rebuild:
+
+| joint | shipped | after |
+| --- | --- | --- |
+| `fore_foot_L` | 1.03 lag / **1.00** follows (`Death`) | 1.03 / **1.00** |
+| `fore_foot_R` | 1.05 / **1.00** (`Retreat`) | 1.05 / **1.00** |
+| `hind_foot_L` | 1.06 / **1.00** (`Death`) | 1.06 / **1.00** |
+| `hind_foot_R` | 1.04 / **1.00** (`Sprint`) | 1.04 / **1.00** |
+
+All four feet follow their own joints exactly, before and after, and the mouth work did not touch
+the limb weighting. Whatever produced 0.88 is not `lag.mjs` and the row does not name it, so this
+is left as a measurement that disagrees with its own instrument rather than repaired by guesswork
+on a body whose limbs read clean.
 
 ### One thing that does not pass, and it is not this body's
 
