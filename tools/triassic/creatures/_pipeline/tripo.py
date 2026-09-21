@@ -1437,7 +1437,11 @@ def cap_mouth(obj, rim, facing, dome=.30, rounds=2, limit=None, eps=1e-9):
         made = bmesh.ops.poke(bm, faces=made)['faces']
 
     # The dome. Every vertex the fill and the pokes added is inside the rim; the rim itself does
-    # not move, which is what keeps the cap and the skin one surface.
+    # not move, which is what keeps the cap and the skin one surface. A vertex is reached from
+    # several faces, so `tag` marks the ones already pushed -- cleared first as well as after,
+    # because a bmesh's tags are whatever the last operator left on them.
+    for v in bm.verts:
+        v.tag = False
     pushed, deepest = 0, 0.
     for f in made:
         for v in f.verts:

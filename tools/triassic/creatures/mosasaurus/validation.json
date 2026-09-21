@@ -1473,16 +1473,13 @@
   },
   "jawClosedCost": {
     "closingRotationDegrees": 32.55,
-    "mandibleVerticesMeasured": 9930,
-    "verticesInsideTheSkullSurface": 0,
-    "fractionOfMandibleInsideTheSkull": 0.0,
-    "maxPenetrationUnits": 0.0,
-    "maxPenetrationOverBodyLength": 0.0,
-    "meanPenetrationOverBodyLength": 0.0,
-    "verticesOutsideTheHeadSection": 1534,
-    "maxOutsideTheHeadSectionUnits": 0.46263,
-    "maxOutsideTheHeadSectionOverBodyLength": 0.09253,
-    "note": "the mandible posed at the measured closing rotation. The first figures are against the skull's own surface with a normal sign test, which beside a modelled oral cavity counts a mouth floor correctly inside the mouth as inside the skull -- so they are an upper bound. The `OutsideTheHeadSection` figures use no normals and are what the question actually is: how far the shut jaw pushes out through the head's own measured section. Anything above zero in the first set is also the generation's two tooth rows, modelled apart, meeting for the first time."
+    "mandibleVerticesMeasured": 783,
+    "mandibleIs": "the vertices the jaw field carries outright (weight > 0.99); there is no cut and so no mandible object to ask",
+    "verticesInsideTheSkullSurface": null,
+    "verticesOutsideTheHeadSection": 128,
+    "maxOutsideTheHeadSectionUnits": 0.0358,
+    "maxOutsideTheHeadSectionOverBodyLength": 0.00716,
+    "note": "the mandible posed at the measured closing rotation, measured against the head's own section, which uses no normals: how far the shut jaw pushes out through the outside of the head. The normal-sign figure against the skull's own surface that this body recorded while its jaw was a separate object is null now: there is no cut, so there is nothing to cast against but the animal itself. Anything above zero here is the generation's two tooth rows, modelled apart, meeting for the first time."
   },
   "mouthCutDeviation": {
     "aStraightCutWouldHaveDeviatedRaw": 0.010323043483304588,

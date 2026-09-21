@@ -773,6 +773,8 @@ for o in (auth, puppet):
     body_w, JUNCTION[o.name] = T.jaw_field_uncut(
         o, relaxed, B['jaw'][0], below_mouth_line, axis=(0., -1., 0.),
         band=JAW_BAND, behind=JAW_BEHIND)
+    if o is auth:
+        AUTH_JAW = [w.get('jaw', 0.) for w in body_w]
     counts, owners = [], {}
     for part, field in ((o, body_w),):
         for v in part.data.vertices:
@@ -1151,62 +1153,50 @@ for key, names in LIMB_NAMES.items():
 # ------------------------------------- what closing the generation's gape costs ----
 # Teeth modelled apart interpenetrate the first time they are brought together, and the honest
 # thing is to measure it rather than to leave the jaw where the generation left it.
+#
+# **With no cut there is no mandible object to ask, so the mandible is the weight field's own
+# answer**: the vertices the jaw carries outright. Measuring the whole body instead would compare
+# the animal with itself -- 0 penetration by construction, and a "vertices outside the head's
+# section" count made almost entirely of its tail.
+MANDIBLE = [i for i, j in enumerate(AUTH_JAW) if j > .99]
+assert len(MANDIBLE) > 200, ('the jaw field carries almost nothing outright', len(MANDIBLE))
 reset()
 rig.pose.bones['jaw'].rotation_euler.x = JAW_SHUT
 bpy.context.view_layer.update()
+# **The normal-sign figure this body used to record is not defined any more, and dropping it is
+# the honest move.** It asked how far the mandible's vertices lie inside the *skull's own surface*,
+# which needed the mandible to be a separate object: with one surface there is nothing to cast
+# against but the animal itself, and every vertex finds itself at distance zero. What survives is
+# the measurement `CLAUDE.md` calls the one that matters anyway -- how far the shut jaw pushes out
+# through the head's **own measured section**, which uses no normals at all.
 _dg = bpy.context.evaluated_depsgraph_get()
-_skull_eval = auth.evaluated_get(_dg)
-_skull_mesh = _skull_eval.to_mesh()
-_skull_bvh = BVHTree.FromPolygons([v.co.copy() for v in _skull_mesh.vertices],
-                                  [pp.vertices[:] for pp in _skull_mesh.polygons],
-                                  all_triangles=False)
-_skull_eval.to_mesh_clear()
 _jaw_eval = auth.evaluated_get(_dg)
-_jaw_mesh = _jaw_eval.to_mesh()
-_pen = []
-for v in _jaw_mesh.vertices:
-    loc, nor, idx, dist = _skull_bvh.find_nearest(v.co)
-    if loc is None:
-        continue
-    _pen.append(dist if (Vector(v.co[:]) - loc).dot(nor) < 0 else 0.)
-# **And the same measurement again without a normal, because the first one over-reports.** A
-# `find_nearest` sign test beside a modelled oral cavity answers about the cavity's own wall, so a
-# mandible vertex that is correctly inside the *mouth* -- which is where a mouth floor belongs --
-# counts as inside the skull. What actually matters is whether the shut jaw pushes out through the
-# head's outer surface, and the head's own measured section answers that with no normals at all.
+_jm = _jaw_eval.to_mesh()
 _out = []
-for v in _jaw_mesh.vertices if False else []:
-    pass
-_jaw_eval2 = auth.evaluated_get(_dg)
-_jm = _jaw_eval2.to_mesh()
-for v in _jm.vertices:
-    q = Vector(v.co[:]) / SCALE
+for i in MANDIBLE:
+    q = Vector(_jm.vertices[i].co[:]) / SCALE
     _out.append(max(abs(q.x - cx(q.y)) - head_half_width(q.y),
                     abs(q.z - cz(q.y)) - head_half_depth(q.y)))
-_jaw_eval2.to_mesh_clear()
 _jaw_eval.to_mesh_clear()
 reset()
 scene.frame_set(0)
 bpy.context.view_layer.update()
 jaw_closed_cost = {
     'closingRotationDegrees': RESTING_GAPE['closingRotationDegrees'],
-    'mandibleVerticesMeasured': len(_pen),
-    'verticesInsideTheSkullSurface': int(sum(1 for d in _pen if d > 1e-4)),
-    'fractionOfMandibleInsideTheSkull': (float(sum(1 for d in _pen if d > 1e-4)) / max(1, len(_pen))),
-    'maxPenetrationUnits': round(float(max(_pen)) if _pen else 0., 5),
-    'maxPenetrationOverBodyLength': round((float(max(_pen)) if _pen else 0.) / BODY_LENGTH, 5),
-    'meanPenetrationOverBodyLength': round((float(np.mean(_pen)) if _pen else 0.) / BODY_LENGTH, 6),
+    'mandibleVerticesMeasured': len(_out),
+    'mandibleIs': 'the vertices the jaw field carries outright (weight > 0.99); there is no cut '
+                  'and so no mandible object to ask',
+    'verticesInsideTheSkullSurface': None,
     'verticesOutsideTheHeadSection': int(sum(1 for d in _out if d > 0)),
     'maxOutsideTheHeadSectionUnits': round(float(max(_out)) * SCALE if _out else 0., 5),
     'maxOutsideTheHeadSectionOverBodyLength':
         round((float(max(_out)) * SCALE if _out else 0.) / BODY_LENGTH, 5),
-    'note': 'the mandible posed at the measured closing rotation. The first figures are against '
-            'the skull\'s own surface with a normal sign test, which beside a modelled oral cavity '
-            'counts a mouth floor correctly inside the mouth as inside the skull -- so they are an '
-            'upper bound. The `OutsideTheHeadSection` figures use no normals and are what the '
-            'question actually is: how far the shut jaw pushes out through the head\'s own '
-            'measured section. Anything above zero in the first set is also the generation\'s two '
-            'tooth rows, modelled apart, meeting for the first time.',
+    'note': 'the mandible posed at the measured closing rotation, measured against the head\'s own '
+            'section, which uses no normals: how far the shut jaw pushes out through the outside '
+            'of the head. The normal-sign figure against the skull\'s own surface that this body '
+            'recorded while its jaw was a separate object is null now: there is no cut, so there '
+            'is nothing to cast against but the animal itself. Anything above zero here is the '
+            'generation\'s two tooth rows, modelled apart, meeting for the first time.',
 }
 
 # -------------------------------------------------------------------------- export ----

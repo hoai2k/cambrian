@@ -82,19 +82,19 @@ came through the top of the snout as a pink slab the length of the head.
 The closing rotation is defined as the one that carries the mandible's dorsal margin at the snout
 onto the palate's ventral margin at the same station: **32.55°**.
 
-| | |
-|---|---|
-| closing rotation | 32.55° |
-| mandible vertices measured | 1,275 |
-| inside the skull's surface, by normal sign | 346 (27 %), max 0.224 units = **4.5 %** of body length |
-| **outside the head's own measured section** | 170, max 0.036 units = **0.72 %** of body length |
+| | with the cut (historical) | uncut, as it ships |
+|---|---|---|
+| closing rotation | 32.55° | 32.55° |
+| mandible vertices measured | 1,275 (the cut shell) | 783 (the vertices the jaw field carries outright) |
+| inside the skull's surface, by normal sign | 346 (27 %), max 0.224 units = **4.5 %** of body length | **not defined**: with one surface there is nothing to cast against but the animal itself |
+| **outside the head's own measured section** | 170, max 0.036 units = **0.72 %** of body length | 128, max 0.0358 units = **0.72 %** of body length |
 
-The two rows measure different things and the second is the one that matters. A `find_nearest` sign
-test beside a modelled oral cavity counts a mouth floor *correctly* inside the mouth as inside the
-skull, so the first row is an upper bound; what the question actually is — does the shut jaw push out
-through the outside of the head — uses no normals at all and answers **0.72 % of a body length, on
-13 % of the mandible**. At gameplay scale that is a lip fold, and it is visible as one small pink
-sliver at the corner of the mouth in the `Idle` mouth sheet.
+The second row measured a *cut shell* against a *skull surface*, and neither of those exists any
+more, so it is null rather than zero — reporting a figure that is trivially 0 by construction would
+be worse than reporting none. What the question actually is — does the shut jaw push out through the
+outside of the head — uses no normals at all, needs no cut, and answers the same **0.72 % of a body
+length** either way. At gameplay scale that is a lip fold, and it is visible as one small pink sliver
+at the corner of the mouth in the `Idle` mouth sheet.
 
 That is the price. It is much smaller than the rule warns it can be, and the reason is that this
 generation's gape is a third of the one its reference draws: the jaws part over 0.176 of a body and
