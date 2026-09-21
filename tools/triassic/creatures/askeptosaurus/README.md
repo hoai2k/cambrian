@@ -177,7 +177,7 @@ which is a number that could not be argued with — and the animal still read as
 above. That is this file's own lesson met a third time. **The reference was the argument, not the
 correction.** `trunk` is the chord from the hip joint to the shoulder joint, and on a body that is
 two thirds tail it is a line between two points inside the front half, which is not what an eye
-calls the run of the animal. Measured on the shipped body at rest, the head sat:
+calls the run of the animal. Measured on the shipped body, the head sat:
 
 | the head, against | in space | in the dorsal view |
 | --- | ---: | ---: |
@@ -190,7 +190,7 @@ calls the run of the animal. Measured on the shipped body at rest, the head sat:
 own dominantly weighted vertices rather than the bone chain — the two can disagree, which is half of
 what this animal has taught. At the bare rest the chord figure is `restHeadVsTrunkRunDegrees`, 4.2.)
 
-Three defensible readings of one trunk, 31° apart at the extremes. The reading the picture uses is
+Four defensible readings of one trunk, 30° apart at the extremes. The reading the picture uses is
 the longest one, because that is the line the animal draws on the page.
 
 **So the reference is a human's.** A reviewer aimed two planes by hand in the viewer's bend editor,
