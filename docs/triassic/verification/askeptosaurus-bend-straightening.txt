@@ -7,12 +7,25 @@ for that reason, from the Bend button and from a ?mode=bend link alike.
   reading               window 26% of the body, reach 2% — at the defaults both traces wandered
                         on this curled generation and the panel said so in orange
   planes as seated      41.40° apart — the animal's own curve across this span
-  geometry, as seated   41.4° in plane, 41.4° in all
-  planes aimed by hand  0.00° apart, geometry 1.05° in plane
-  the Straighten button 0.00° apart, turn 41.40°,
+  geometry, as seated   -41.4° in plane, 41.4° in all
+
+  the straighten slider, walked up   (the planes never move; only the amount does)
+    amount   planes apart after   turn applied   geometry over the warped mesh   span moved
+    0.00      41.40°                0.00°          -41.4°                        —
+    0.25      31.05°               10.35°         -29.99°                  0.0527
+    0.50      20.70°               20.70°         -19.64°                  0.1049
+    0.75      10.35°               31.05°           -9.3°                  0.1564
+    1.00       0.00°               41.40°           1.05°                  0.2071
+    1.40      16.56°               57.96°        (past straight, the other way)
+   -0.50      62.10°              -20.70°        (further the way it already goes)
+
+  the Straighten button 0.00° apart after, turn 41.40°,
                         geometry -41.4° → 1.05° in plane, measured over the warped mesh
 
-Aiming both planes the same way is the whole act: the bend is the rotation carrying the tip
-end's own heading onto the tip plane's aim, so with the two aimed alike the head's heading is
-turned onto the trunk's and the run between them comes straight. Nothing at the base cut
-moves, whatever the planes are aimed at, because the rotation there is identity by construction.
+The two planes describe the animal and never move; the slider says how much of the way from
+the one to the other to carry the run between them. At 1 the front plane finishes parallel to
+the back one — measured after the warp, not worked back out of the amount — and the run is
+straight. Nothing at the base cut moves at any amount, because the rotation there is identity
+by construction. "span moved" is how far the centroid of the lit vertices — the part of the
+body between the two cuts, drawn where the bend has put it — has travelled from where it
+stood at nothing, which is the animal moving rather than a number in a panel changing.

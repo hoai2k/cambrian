@@ -304,6 +304,17 @@ export interface ViewerScene {
   /** Which of the bend span's handles is under the pointer, if any: canvas CSS pixels in. */
   bendPick(x: number, y: number): BendHandle | undefined;
   /**
+   * Where the span's lit vertices have been carried to: their centroid in world space, and how
+   * many there are, or null while nothing is lit.
+   *
+   * The stage lights exactly the vertices between the two cuts and draws them **where the warp has
+   * put them**, so this is the part of the body a bend is about, measured off what is on screen.
+   * It exists for the browser drive: a bend has to be shown to have moved the *animal* and not
+   * only a number in the panel, and a page that draws about a frame a second under the software
+   * renderer cannot be asked that with a screenshot.
+   */
+  bendLitCentroid(): [number, number, number, number] | null;
+  /**
    * Where the pointer's ray crosses the camera-facing plane through a root-frame anchor, in the
    * root frame — how a drag on a handle in the orbit view becomes a point a document can use. The
    * mouth editor and the bend editor both drag handles this way, so there is one of it.
@@ -1156,6 +1167,17 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     bendPoints.visible = n > 0;
   }
 
+  function bendLitCentroid(): [number, number, number, number] | null {
+    if (!bendPoints.visible) return null;
+    const attr = bendGeo.getAttribute('position') as THREE.BufferAttribute;
+    const n = Math.min(bendGeo.drawRange.count, attr.count);
+    if (!Number.isFinite(n) || n <= 0) return null;
+    const a = attr.array as Float32Array;
+    let x = 0, y = 0, z = 0;
+    for (let i = 0; i < n; i++) { x += a[i * 3]; y += a[i * 3 + 1]; z += a[i * 3 + 2]; }
+    return [x / n, y / n, z / n, n];
+  }
+
   function bendPick(x: number, y: number): BendHandle | undefined {
     if (!bendGroup.visible) return undefined;
     const w = canvas.clientWidth || 1, h = canvas.clientHeight || 1;
@@ -1357,6 +1379,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     mouthPick,
     showBend,
     bendPick,
+    bendLitCentroid,
     dragPoint,
     dispose() {
       if (disposed) return;

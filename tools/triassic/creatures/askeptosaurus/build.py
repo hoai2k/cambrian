@@ -53,12 +53,22 @@ BACK=STRAIGHT if FRONT==POSED else POSED
 # actually shows.
 #
 # So the reference is a human's: two planes aimed in the viewer's bend editor on this animal's
-# published original pose, exported as `bend-span/2`. The document says the head runs along
-# `tipNormal` and the trunk along `baseNormal`, and the correction is the rotation that carries the
-# first onto the second -- **whatever the builder's own reading of either happens to be**, which is
-# the whole point of taking it from a person. It is applied to the builder's own head direction, so
-# nothing here assumes the two agree about where the head points; what they must agree about is how
-# far it has to turn, and that is recorded against both references rather than one.
+# published original pose. The document says the head runs along `tipNormal` and the trunk along
+# `baseNormal`, and the correction is the rotation that carries the first onto the second --
+# **whatever the builder's own reading of either happens to be**, which is the whole point of taking
+# it from a person. It is applied to the builder's own head direction, so nothing here assumes the
+# two agree about where the head points; what they must agree about is how far it has to turn, and
+# that is recorded against both references rather than one.
+#
+# **Which reading of `tipNormal` that is, is the whole of the `bend-span/2` to `/3` change**, and
+# this builder has always been on the far side of it. In v2 `tipNormal` was a *target* -- where a
+# reviewer wanted the axis to run out -- and the file's own `turn` was the distance it had been
+# dragged from the measured `tipRest`. This code never read it that way: it takes `tipNormal` as
+# *the head's run* and `baseNormal` as *the trunk's*, and turns the one onto the other, which is
+# exactly a v3 document at a straighten of 1. So the file on disk stays as it was exported and the
+# rotation it yields here is unchanged, and a v3 export of the same aim would be read identically.
+# The viewer refuses a v2 file by name now, because a *bend* written under the old reading cannot
+# be re-expressed under the new one; the two directions this takes out of it can.
 AIMED_BEND='docs/triassic/bends/askeptosaurus-front-2026-09-21.json'
 
 def aimed_bend():
@@ -69,7 +79,9 @@ def aimed_bend():
  file, and an aim taken on a different generation is not an aim at this one.
  """
  doc=json.loads((ROOT/AIMED_BEND).read_text())
- assert doc['schema']=='bend-span/2',doc['schema']
+ # Either schema: what is taken from the file is the two plane normals, and `tipNormal` means the
+ # same thing to this code under both (see the note above).
+ assert doc['schema'] in ('bend-span/2','bend-span/3'),doc['schema']
  assert doc['id']==ID and doc['appliesTo']=='origpose',(doc['id'],doc['appliesTo'])
  raw=(HERE/'tripo-raw'/(ID+'.raw.glb')).read_bytes()
  assert hashlib.sha256(raw).hexdigest()==doc['sha256'],'the aimed bend was measured on another file'

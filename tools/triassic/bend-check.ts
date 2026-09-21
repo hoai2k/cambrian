@@ -29,9 +29,9 @@ import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import {
-  angleOf, bendBasis, fromExport, jointTurns, pinch, readBend, refLabel, refMoves, spanDirection,
-  spanLength, toBlender, totalTurn, traces, twistAngle, type BendExport, type BoneNode, type Reading,
-  type Vec3,
+  angleOf, apartAfter, bendBasis, fromExport, fullStraightening, jointTurns, pinch, readBend, refLabel,
+  refMoves, spanDirection, spanLength, toBlender, totalTurn, traces, twistAngle,
+  type BendExport, type BoneNode, type Reading, type Vec3,
 } from '../../src/viewer/bend/bend';
 
 const argv = process.argv.slice(2);
@@ -127,9 +127,10 @@ console.log(`${doc.id}: ${source} · ${payload.appliesTo ?? 'unknown'} body · $
 console.log(`  frame      body along ${doc.frame.axis}, head at the ${doc.frame.forward === 1 ? 'high' : 'low'} end (${doc.frameSource})`);
 console.log(`  span       ${v4(doc.base)} → ${v4(doc.tip)} (${doc.baseSource}/${doc.tipSource}), ${f4(spanLength(doc))} long — ${(spanLength(doc) / doc.bounds.length * 100).toFixed(1)}% of the body, along ${v4(spanDirection(doc))}`);
 console.log(`  planes     in  ${v4(doc.baseNormal)} (${doc.planeSource.base})   out ${v4(doc.tipNormal)} (${doc.planeSource.tip})`);
-console.log(`             aimed ${deg(angleOf(doc.baseNormal, doc.tipNormal))} apart; the body's own heading there was ${v4(doc.tipRest)}, ${deg(angleOf(doc.baseNormal, doc.tipRest))} off the base plane`);
+console.log(`             standing ${deg(fullStraightening(doc))} apart on the body, ${deg(apartAfter(doc))} apart after the bend; the body's own traced heading there was ${v4(doc.tipRest)}, ${deg(angleOf(doc.baseNormal, doc.tipRest))} off the base plane`);
+console.log(`  straighten ${doc.straighten.toFixed(3)} of the way from the tip plane to the base plane`);
 console.log(`  axle       ${v4(basis.axis)} through the base end · Blender Z-up ${v4(toBlender(basis.axis))} · leaning ${deg(twistAngle(doc))} along the span`);
-console.log(`  turn       ${deg(totalTurn(doc))} across the span, spread linearly · inside squeezed to ${pinch(doc, chunks).toFixed(3)}`);
+console.log(`  turn       ${deg(totalTurn(doc))} across the span of a possible ${deg(fullStraightening(doc))}, spread linearly · inside squeezed to ${pinch(doc, chunks).toFixed(3)}`);
 console.log(`  geometry   ${say(readings.geometry.before)} → ${say(readings.geometry.after)}`);
 console.log(`             between the traced centre over ${(doc.window * 100).toFixed(0)}% of the body behind the base cut and the same ahead of the tip cut (reach ${(doc.reach * 100).toFixed(1)}%)`);
 console.log(`             trace residual ${t.base ? t.base.residual.toFixed(3) : '—'} behind, ${t.tip ? t.tip.residual.toFixed(3) : '—'} ahead${Math.max(t.base?.residual ?? 0, t.tip?.residual ?? 0) > 0.05 ? '  ← one of them wandered; that reading is about two directions nothing in the animal runs in' : ''}`);
@@ -173,9 +174,18 @@ const planeCompare = (name: string, recorded: number | null | undefined, mine: n
   console.error(`! the viewer recorded ${name} at ${recorded.toFixed(2)}° and this reads ${mine.toFixed(2)}°`);
   bad = true;
 };
-planeCompare('the two planes as aimed', payload.planes?.apartDegrees, angleOf(doc.baseNormal, doc.tipNormal) * 180 / Math.PI);
-planeCompare('the two planes before the bend', payload.planes?.apartBeforeDegrees, angleOf(doc.baseNormal, doc.tipRest) * 180 / Math.PI);
+planeCompare('the two planes as they stand on the body', payload.planes?.apartDegrees, fullStraightening(doc) * 180 / Math.PI);
+// **The contract of the slider, re-taken here rather than reprinted.** At a straighten of 1 this
+// is nought; at anything else it is what is left of the straightening. It is measured off the
+// plane the rotation actually carries rather than worked back out of the amount, which is the same
+// discipline the two readings are held to and for the same reason.
+planeCompare('the two planes after the bend', payload.planes?.apartAfterDegrees, apartAfter(doc) * 180 / Math.PI);
+planeCompare('the whole straightening available', payload.turn?.fullDegrees, fullStraightening(doc) * 180 / Math.PI);
 planeCompare('the turn across the span', payload.turn?.totalDegrees, totalTurn(doc) * 180 / Math.PI);
+if (typeof payload.straighten?.amount === 'number' && Math.abs(payload.straighten.amount - doc.straighten) > 1e-6) {
+  console.error(`! the viewer recorded a straighten of ${payload.straighten.amount} and the document carries ${doc.straighten}`);
+  bad = true;
+}
 compare('the geometry reading before', payload.reading?.geometry?.before?.inPlaneDegrees, readings.geometry.before);
 compare('the geometry reading after', payload.reading?.geometry?.after?.inPlaneDegrees, readings.geometry.after);
 compare('the bone reading before', payload.reading?.bones?.before?.inPlaneDegrees, readings.bones.before);
