@@ -240,7 +240,17 @@ export function Viewer() {
   // Not on the twin: a sculpt is the hand-off that goes into a builder's profile rows for the body
   // that ships, and one exported off the comparison body would name the right creature and describe
   // the wrong mesh.
-  const ready = !loading && !error && loadedId === id;
+  /**
+   * Ready means **the body on stage is the body this UI is describing**, which is stricter than
+   * "the last load finished" and has to be. The Bend button changes the mode and the model in one
+   * commit (`opening()`), a child's effects run before its parent's, and the load effect below is
+   * the parent's — so an editor mounted in that commit measures whatever the scene is still
+   * holding. On Askeptosaurus that is the shipped body, and because the bend document is cached
+   * under the *new* model's key, the panel then said `origpose` over numbers taken from the built
+   * body and never re-measured. Asking the scene what it is drawing is answered synchronously and
+   * cannot be a commit behind.
+   */
+  const ready = !loading && !error && loadedId === id && sceneRef.current?.loadedModel() === modelPath;
   /**
    * Sculpting is for a body a *builder* draws from profile rows. Its export is a hand-off into
    * those rows (docs/viewer-sculpt.md) — the change goes into the builder, never into the GLB — so
@@ -438,6 +448,15 @@ export function Viewer() {
         <BendEditor key={`${id}|${modelPath}|bend`} scene={sceneRef.current} specimen={def} model={modelPath}
           sha256={showGenerated ? def.generatedSha256 : undefined} appliesTo={bendAppliesTo}
           stageLabel={stage.label} origPose={origPoseNote}
+          /* The mode *opens* on the unbent body and must not be a cage: the info card carries the
+             Model control and an editing mode replaces it, so bend mode carries its own. The twin
+             is left out because `canBend` refuses it anyway (the effect above drops straight back
+             to the view), and offering a choice that quietly ends the mode is worse than not
+             offering it. Everything the panel says about which body it is describing follows the
+             swap for free: the editor is keyed by the model, and `appliesTo`, `stageLabel` and the
+             corrected-body warning are all derived from the stage. */
+          stages={choices.filter(o => o.kind !== 'twin').map(o => ({ id: o.id, label: o.label }))}
+          stageId={stage.id} onStage={setStageId}
           canvas={canvasRef.current} onExit={() => setMode('view')} />
       )}
 

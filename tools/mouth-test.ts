@@ -15,6 +15,7 @@ import {
   cutBasis, describeSides, exportDoc, flipForward, fromExport, gapeAxis, gapeWarp, levelCut, mandibleTest, measureHead,
   measureMouth, moveHinge, setAngle, setAxis, setDepth, setLateral, setUp, type MouthDoc, type Vec3,
 } from '../src/viewer/mouth/mouth';
+import { buttonRoles, schemeIsUsable } from '../src/viewer/pointer-scheme';
 import { History } from '../src/viewer/sculpt/history';
 
 let passes = 0;
@@ -328,4 +329,16 @@ ok(setUp(rigged, NaN).up === rigged.up && setLateral(rigged, NaN).lateral === ri
 ok(describeSides({ mandible: 1204, skull: 10855, total: 12059 }) === '1,204 of 12,059 vertices on the mandible · 10.0%', 'the readout');
 ok(describeSides({ mandible: 0, skull: 0, total: 0 }) === '0 of 0 vertices on the mandible · 0.00%', 'even of nothing');
 
-console.log(`PASS: mouth cut — ${passes} checks: the guess from rig, socket or section; the basis; the test; the three handles; flipping; the file and its refusals; the gape preview`);
+// ---- the pointer scheme the mode runs under ----
+// Mouth mode leaves the left button alone except where the pointer is on a handle, so it takes the
+// ordinary view scheme — and the thing that matters is that the scheme has a pan at all, which the
+// old mark-interaction flag did not: a zoomed-in head could not be aimed at.
+{
+  const r = buttonRoles('view');
+  ok(r.left === 'rotate', 'mouth mode orbits on the left button');
+  ok(r.right === 'pan', 'and pans on the right');
+  ok(r.middle === 'dolly', 'the middle button dollies');
+  ok(schemeIsUsable('view'), 'the view scheme answers both of the camera\'s questions, once each');
+}
+
+console.log(`PASS: mouth cut — ${passes} checks: the guess from rig, socket or section; the basis; the test; the three handles; flipping; the file and its refusals; the gape preview; the pointer scheme`);

@@ -23,6 +23,7 @@ import {
   totalTurn, traceCentreline, traces, turnAt, twistAngle, warp, warpBones,
   type BendDoc, type BoneNode, type Vec3,
 } from '../src/viewer/bend/bend';
+import { buttonRoles, schemeIsUsable } from '../src/viewer/pointer-scheme';
 import { History } from '../src/viewer/sculpt/history';
 
 let passes = 0;
@@ -527,6 +528,17 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
   ok(t.count > 0 && t.residual < .02, 'with a count and its own opinion of how straight it was');
   ok(traceCentreline(chunks, { bounds: { length: 7, height: 2, width: 2, axisMin: -4, axisMax: 3, lateralMid: 0, upMid: 0 }, reach: DEFAULT_REACH }, [0, 40, 0], [0, 0, 1], 1.5) === null,
     'and nothing at all where there is no body');
+}
+
+// ---- the pointer scheme the mode runs under ----
+// Bend mode's handles take the left button only where the pointer is on one, so the stage keeps the
+// view scheme — left orbits, right pans. The pan is the point: the old editor scheme bound none at
+// all, so a zoomed-in neck could not be brought into the middle of the view.
+{
+  const r = buttonRoles('view');
+  ok(r.left === 'rotate' && r.right === 'pan' && r.middle === 'dolly', 'bend mode runs on the view scheme');
+  ok(schemeIsUsable('view'), 'which binds a rotate and a pan, to one button each');
+  ok(buttonRoles('paint').left === null, 'and is not the paint scheme, whose left button is the brush\'s');
 }
 
 console.log(`bend: ${passes} checks passed`);

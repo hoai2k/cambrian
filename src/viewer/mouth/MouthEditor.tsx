@@ -23,9 +23,14 @@ import { getMouth, mouthKey, setMouth } from './store';
  * them, so what the jaw would carry is seen rather than inferred. The panel's numeric fields set
  * the same six numbers exactly.
  *
- * Right-drag orbits, as in mark mode, because a mode where left-drag moves a handle has to leave
- * the model turnable without a modifier nobody would find. The rig goes to its bind pose while the
- * cut is aimed: a swimming body is drawn somewhere its vertex positions are not.
+ * The stage keeps the ordinary pointer scheme (`../pointer-scheme`): **left-drag orbits** where it
+ * is not on a handle, **right-drag pans**, the wheel zooms. The handles claim the left button only
+ * while the pointer is actually on one, which is what leaves it free the rest of the time — and
+ * the orbit is *suspended* over a handle rather than the press being swallowed, because
+ * OrbitControls is given this canvas before any editor mounts and sees every press first
+ * (`ViewerScene.setOrbitEnabled`). Mark mode is the one that cannot do this: its brush owns the
+ * left button outright. The rig goes to its bind pose while the cut is aimed: a swimming body is
+ * drawn somewhere its vertex positions are not.
  *
  * **Gape** is the preview, and it is a preview of the cut rather than of the animal. Playing the
  * body's own clips would answer the wrong question — they open the jaw the file was *built* with,
@@ -119,12 +124,15 @@ export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas,
     historyRef.current = new History(d);
     setDocState(d);
     scene.setRestPose(true);
-    scene.setMarkInteraction(true);
+    // The handles only claim the left button while the pointer is on one, so the stage keeps the
+    // ordinary scheme: left orbits, right pans, the wheel and the middle button dolly.
+    scene.setPointerScheme('view');
     show(d);
     return () => {
       scene.showMouthCut(null, null);
       scene.setMouthGape(null);
-      scene.setMarkInteraction(false);
+      // This also hands the orbit back enabled, whatever the pointer was sitting on on the way out.
+      scene.setPointerScheme('view');
       scene.setRestPose(false);
       canvas.style.cursor = '';
     };
@@ -210,7 +218,12 @@ export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas,
       const h = historyRef.current;
       if (!h) return;
       const handle = scene.mouthPick(e.offsetX, e.offsetY);
-      if (!handle) return;
+      if (!handle) return;            // off a handle the press is the orbit's, and the orbit has it
+      // Belt and braces beside the hover suspension below: a press can arrive with no move before
+      // it (a tap, a pointer that entered already down, a synthetic event out of a harness), and
+      // OrbitControls checks `enabled` again in its own move handler, so a disable that lands
+      // after its `pointerdown` still keeps the camera still.
+      scene.setOrbitEnabled(false);
       e.preventDefault();
       canvas.setPointerCapture(e.pointerId);
       const anchor = handleAnchor(h.present, handle);
@@ -223,6 +236,10 @@ export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas,
         const over = scene.mouthPick(e.offsetX, e.offsetY) ?? null;
         setHover(over);
         canvas.style.cursor = over ? 'grab' : '';
+        // The orbit is suspended for as long as the pointer is over a handle, which is what keeps
+        // a press on one from also swinging the camera — see `ViewerScene.setOrbitEnabled` for why
+        // it cannot be done by swallowing the event instead.
+        scene.setOrbitEnabled(!over);
         return;
       }
       const p = scene.dragPoint(e.offsetX, e.offsetY, d.anchor);
@@ -240,6 +257,9 @@ export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas,
       const d = dragRef.current;
       dragRef.current = null;
       try { canvas.releasePointerCapture(e.pointerId); } catch { /* already released */ }
+      // Back to whatever the pointer is now over: a drag that ends on a handle must not re-arm the
+      // orbit under it, or the next press there would swing the camera as well as the handle.
+      scene.setOrbitEnabled(!scene.mouthPick(e.offsetX, e.offsetY));
       if (d) endDrag();
     };
     canvas.addEventListener('pointerdown', onDown);
@@ -293,7 +313,7 @@ export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas,
   return (
     <>
       <div className={`mark-stage mouth-stage ${previewing ? 'previewing' : ''}`}>
-        <span className="mark-label">Mouth · left-drag a handle · right-drag orbits · shift+right pans · scroll zooms</span>
+        <span className="mark-label">Mouth · left-drag a handle, or the view to orbit · right-drag pans · scroll zooms</span>
         <ul className="mouth-legend" aria-label="Handles">
           <li className={`hinge ${hover === 'hinge' ? 'hover' : ''}`}><i />hinge · drag to move the cut</li>
           <li className={`front ${hover === 'front' ? 'hover' : ''}`}><i />front · drag to pitch and turn the line</li>
