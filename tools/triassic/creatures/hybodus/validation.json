@@ -990,10 +990,10 @@
   "jawShutFromTheGenerationsPartedPose": {
     "closingRotationDegrees": 18.72,
     "mandibleVerticesMeasured": 849,
-    "verticesInsideTheSkullSurface": 584,
+    "verticesInsideTheSkullSurface": 587,
     "maxPenetrationUnits": 0.1996,
     "maxPenetrationOverBodyLength": 0.03992,
-    "meanPenetrationOverBodyLength": 0.007619,
+    "meanPenetrationOverBodyLength": 0.007737,
     "note": "the mandible posed at the measured closing rotation, against the skull's own surface in the same pose. Anything above zero is the generation's two tooth rows, modelled apart, meeting for the first time."
   },
   "authoredVerticesFarthestFromTheTwin": [

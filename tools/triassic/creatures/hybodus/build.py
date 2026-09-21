@@ -1006,6 +1006,15 @@ split(puppet, 'lower jaw', is_jaw)
 AUTH_JAW = parts['lower jaw'][auth.name]
 PUP_JAW = parts['lower jaw'][puppet.name]
 
+# **What the cut actually left open, measured before anything is built to close it** -- the
+# question CLAUDE.md puts ahead of "how do we fill it". The mandible is filled inside `split`
+# above, so this is asked of the skull half, and `seam` marks which of the boundary this
+# generation already had.
+CUT_RIM = {o.name: T.cut_rim(o, lambda p: p[1] < JAW_BACK + .04 * RAW_LENGTH,
+                             seam=lambda y: seam_z(y))
+           for o in (auth, puppet)}
+print('HYBODUS_CUT_RIM', json.dumps(CUT_RIM))
+
 # ------------------------------------------- close what the cut leaves open on the skull ----
 # The mandible was closed above by filling its own boundary. The skull half was not, and what it
 # is left open along is two different things, closed two different ways.

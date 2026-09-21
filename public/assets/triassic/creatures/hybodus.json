@@ -30,8 +30,7 @@
     "Breath",
     "Growth",
     "Shake",
-    "SpineBrace",
-    "Flop"
+    "SpineBrace"
   ],
   "looping": [
     "Idle",
@@ -40,8 +39,7 @@
     "Guard",
     "Eat",
     "Grab",
-    "SpineBrace",
-    "Flop"
+    "SpineBrace"
   ],
   "anchors": [
     "anchor_mouth",

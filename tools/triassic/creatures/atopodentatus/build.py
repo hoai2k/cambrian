@@ -543,10 +543,17 @@ def is_jaw(c):
     return JAW_FRONT_Y - .004 < c.y < HINGE_Y and c.z < seam(c.y) - 1e-7
 
 
-parts = {}
+parts, CUT_RIM = {}, {}
 for o in (auth, puppet):
     T.bisect_on_curve(o, seam, HINGE_Y, JAW_FRONT_Y - .004, margin=.03)
     T.split_part(o, 'lower jaw', is_jaw, parts)
+    # **What the cut actually left open, measured before anything is built** (`T.cut_rim`). This is
+    # the question CLAUDE.md puts ahead of "how do we fill it": which of the three kinds of
+    # generation this is.
+    CUT_RIM[o.name] = {'skull': T.cut_rim(o, lambda p: p.y < HINGE_Y + .02, seam=seam),
+                       'jaw': T.cut_rim(parts['lower jaw'][o.name],
+                                        lambda p: p.y < HINGE_Y + .02, seam=seam)}
+print('ATOPO_CUT_RIM', json.dumps(CUT_RIM))
 
 tooth_report = []
 for g in PATCHES:
