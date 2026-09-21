@@ -231,8 +231,8 @@ direction, over body length:
 
 | clip | before | after |
 | --- | --- | --- |
-| `Heavy` | −18.0 % back, +11.5 % forward | **−4.7 % / +17.1 %** |
-| `Ability` | −24.9 % back, +9.8 % forward | **−4.8 % / +17.0 %** |
+| `Heavy` | −18.0 % back, +11.5 % forward | **−4.7 % / +16.9 %** |
+| `Ability` | −24.9 % back, +9.8 % forward | **−4.8 % / +16.9 %** |
 | `Attack` | −2.9 % back, +8.4 % forward | **−0.3 % / +12.4 %** |
 
 Three changes, and the argument for each is in `build.py` beside it. The **gather no longer scales
