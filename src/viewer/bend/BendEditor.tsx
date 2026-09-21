@@ -124,7 +124,9 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
     historyRef.current = new History(d);
     setDocState(d);
     scene.setRestPose(true);
-    scene.setMarkInteraction(true);
+    // The handles only claim the left button while the pointer is on one, so the stage keeps the
+    // ordinary scheme: left orbits, right pans, the wheel and the middle button dolly.
+    scene.setPointerScheme('view');
     show(d);
     const rigged = target.skinned;
     return () => {
@@ -134,7 +136,8 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
       // about joints that were left where they were — a neck that bends correctly at rest and
       // flails the moment it moves. It is put back on the way out.
       if (rigged) scene.applySculpt(null, true);
-      scene.setMarkInteraction(false);
+      // This also hands the orbit back enabled, whatever the pointer was sitting on on the way out.
+      scene.setPointerScheme('view');
       scene.setRestPose(false);
       canvas.style.cursor = '';
     };
@@ -178,7 +181,12 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
       const h = historyRef.current;
       if (!h) return;
       const handle = scene.bendPick(e.offsetX, e.offsetY);
-      if (!handle) return;
+      if (!handle) return;            // off a handle the press is the orbit's, and the orbit has it
+      // Belt and braces beside the hover suspension below: a press can arrive with no move before
+      // it (a tap, a pointer that entered already down, a synthetic event out of a harness), and
+      // OrbitControls checks `enabled` again in its own move handler, so a disable that lands
+      // after its `pointerdown` still keeps the camera still.
+      scene.setOrbitEnabled(false);
       e.preventDefault();
       canvas.setPointerCapture(e.pointerId);
       const anchor = handleAnchor(h.present, handle);
@@ -191,6 +199,10 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
         const over = scene.bendPick(e.offsetX, e.offsetY) ?? null;
         setHover(over);
         canvas.style.cursor = over ? 'grab' : '';
+        // The orbit is suspended for as long as the pointer is over a handle, which is what keeps
+        // a press on one from also swinging the camera — see `ViewerScene.setOrbitEnabled` for why
+        // it cannot be done by swallowing the event instead.
+        scene.setOrbitEnabled(!over);
         return;
       }
       const p = scene.dragPoint(e.offsetX, e.offsetY, d.anchor);
@@ -212,6 +224,9 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
       const d = dragRef.current;
       dragRef.current = null;
       try { canvas.releasePointerCapture(e.pointerId); } catch { /* already released */ }
+      // Back to whatever the pointer is now over: a drag that ends on a handle must not re-arm the
+      // orbit under it, or the next press there would swing the camera as well as the handle.
+      scene.setOrbitEnabled(!scene.bendPick(e.offsetX, e.offsetY));
       if (d) endDrag();
     };
     canvas.addEventListener('pointerdown', onDown);

@@ -75,10 +75,11 @@ export function MarkEditor({ scene, specimen, model, sha256: manifestSha, canvas
     // not, and a brush that marks the bind pose while the reviewer paints the swimming one marks
     // the wrong fin. A generated mesh has no rig and never moves anyway.
     scene.setRestPose(true);
-    scene.setMarkInteraction(true);
+    // The brush takes the left button, so the orbit moves to the right and the pan to the middle.
+    scene.setPointerScheme('paint');
     scene.showMarks(marks);
     return () => {
-      scene.setMarkInteraction(false);
+      scene.setPointerScheme('view');
       scene.showMarks(null);
       scene.setRestPose(false);
     };
