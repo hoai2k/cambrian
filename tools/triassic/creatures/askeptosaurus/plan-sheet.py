@@ -64,7 +64,7 @@ head, label, gap = 66, 70, 18
 sheet = Image.new('RGB', (CELL * 2 + gap * 3, head + (cellh + label) * len(CLIPS) + gap * len(CLIPS)), PAPER)
 d = ImageDraw.Draw(sheet)
 d.text((gap, 13), 'Askeptosaurus · the front brought into line, from directly above', INK, font=TITLE)
-d.text((gap, 40), 'left: aimed at the hip→shoulder chord (T3D-26).    right: the reviewer’s own aim (T3D-33).',
+d.text((gap, 40), 'left: aimed at the hip→shoulder chord (T3D-26).    right: the reviewer’s own aim (T3D-34).',
        DIM, font=SMALL)
 y = head
 for clip in CLIPS:

@@ -43,7 +43,7 @@ STRAIGHT='straight'    # the 19 September 2026 regeneration, drawn and generated
 FRONT=POSED            # <-- the swap is this one line. The other body becomes the backup.
 BACK=STRAIGHT if FRONT==POSED else POSED
 
-# ------------------------------------------------- the reviewer's own aim at the front (T3D-33) ---
+# ------------------------------------------------- the reviewer's own aim at the front (T3D-34) ---
 # **A reader aimed this by hand, and the file it was aimed on is part of the measurement.** T3D-26
 # brought the head onto the trunk's hip-to-shoulder chord and the head landed on it to 4.2 degrees
 # -- and the animal still read as turned from directly above, because on a body that is two thirds
@@ -141,7 +141,7 @@ REST={
   # for, exactly as the tail's .70 is, so the clips centre on the bind instead of all straightening
   # away from it.
   fcarry=(.70,1.),
-  # **How the aim is shared along the chain, swept rather than assumed** (T3D-33). The share is
+  # **How the aim is shared along the chain, swept rather than assumed** (T3D-34). The share is
   # cumulative and ends at 1 so the last segment reaches the target exactly; the exponent is how it
   # gets there. 1 is equal per joint, which is what T3D-26 shipped and was the right reading for its
   # own arc -- a skin is asked to fold at a joint, and weighting by *segment length* hands the skull
@@ -650,7 +650,7 @@ def measure(rig,body,front,shape,headref,aimed,sockets=()):
    hd=((rig.pose.bones['skull'].matrix@rig.data.bones['skull'].matrix_local.inverted()@headref)-sk)
    tr=Vector(rig.pose.bones['chest'].head[:])-Vector(rig.pose.bones['tail_00'].head[:])
    aims.append(math.degrees(hd.angle(tr)) if hd.length>1e-6 and tr.length>1e-6 else 0.)
-   # And against the line the head is actually aimed at (T3D-33), carried by the body's own
+   # And against the line the head is actually aimed at (T3D-34), carried by the body's own
    # attitude. Every rest frame is parallel -- `carry_rest` asserts it -- so the `body` bone's
    # world 3x3 *is* the map from the rest frame the aim was measured in to the frame this clip has
    # put the animal in, which is a cleaner live reference than a chord between two joints whose
@@ -713,7 +713,7 @@ def measure(rig,body,front,shape,headref,aimed,sockets=()):
    # it swims: the locomotion clips hold the head within a gentle lean of the trunk's own run, and
    # the whole set -- the coil, which deliberately pulls the neck round, included -- stays far
    # inside the 67.7 degrees the uncorrected body stood at and the right angle it read as.
-   # **Asked against the line the head is aimed at**, which since T3D-33 is the reviewer's and not
+   # **Asked against the line the head is aimed at**, which since T3D-34 is the reviewer's and not
    # the hip-to-shoulder chord. The chord's own figures stay recorded beside these, unchanged in
    # meaning, because they are what every earlier verdict on this animal was measured against.
    for c in ('Idle','Swim','Sprint','Dive','Rise','Grab','Breath','Growth','TurnLeft','TurnRight'):
@@ -901,7 +901,7 @@ def build(body):
  # joint: weighting by segment length instead hands the skull 0.34 of the arc, since the head is
  # two and a half cervicals long, and measures a larger residual at the snout besides.
  neck_share=[((i+1)/len(neck_d))**REST[body]['aimcurve'] for i in range(len(neck_d))]
- # **And where that share is aimed is the reviewer's, not the chord's** (T3D-33). `trunk` is one
+ # **And where that share is aimed is the reviewer's, not the chord's** (T3D-34). `trunk` is one
  # reading of the trunk and the head landed on it exactly; the animal still read as turned, because
  # the chord runs between two joints inside the front half of a body that is two thirds tail. The
  # aimed bend above says the head runs along `tipNormal` and the trunk along `baseNormal`, so the
@@ -962,7 +962,7 @@ def build(body):
    'takeoffVsTrunkRunDegrees':deg(neck_d[0],trunk),
    'headVsTrunkRunDegreesUncorrected':deg(neck_d[-1],trunk),
    'aimShare':[round(s,4) for s in neck_share],
-   # T3D-26's figure, kept exactly as it was so the two are comparable, and T3D-33's beside it:
+   # T3D-26's figure, kept exactly as it was so the two are comparable, and T3D-34's beside it:
    # the share is now aimed where the reviewer aimed it, so the arc it divides is a longer one.
    'aimPerJointDegreesT26':round(math.degrees(neck_d[0].rotation_difference(trunk).angle)/len(neck_d),2),
    'aimPerJointDegrees':round(math.degrees(aimarc.angle)/len(neck_d),2),
@@ -1073,7 +1073,7 @@ def build(body):
    perjoint=[round(math.degrees(e.to_quaternion().angle),2) for e in frontrots]
    # **Where the head ends up, said against every reading of the trunk there is.** The hip-to-
    # shoulder chord is the one T3D-26 aimed at and is kept unchanged so the two are comparable;
-   # the reviewer's aim is what T3D-33 aims at and is what is asserted; and the three longer runs
+   # the reviewer's aim is what T3D-34 aims at and is what is asserted; and the three longer runs
    # are the ones an eye actually uses from above on a body that is two thirds tail -- they are the
    # reason the head read as turned while sitting 4.2 degrees off the chord, so they are recorded
    # rather than argued about. `plan` is the same angle in the dorsal view, which is the picture
@@ -1095,7 +1095,7 @@ def build(body):
    # **The correction is distributed or it is not a correction.** A rigid swing at the neck root
    # is the fix T3D-25 measured at 2.62x skin and rejected, and it would show here as one joint
    # holding most of the arc. The bar is a *share* of the arc rather than an absolute angle -- the
-   # arc grew by half when T3D-33 re-aimed it, and a fixed ceiling would have failed a correction
+   # arc grew by half when T3D-34 re-aimed it, and a fixed ceiling would have failed a correction
    # that is no more concentrated than the one it replaced. Six joints share it, so an even share
    # is a sixth; the bar is twice that, which is what T3D-26's 25 degrees was against its own arc.
    share=max(perjoint)/max(1e-6,math.degrees(aimarc.angle))

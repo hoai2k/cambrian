@@ -170,7 +170,7 @@ box measures **8.726** where the straight regeneration's is 6.000 — so every t
 only divisor that makes the two bodies' numbers comparable. `askeptosaurus.json` reports that as
 `modelLength`.
 
-## Where the aim points (T3D-33)
+## Where the aim points (T3D-34)
 
 T3D-26 brought the head onto the trunk and the head landed on it: `restHeadVsTrunkRunDegrees` 4.17,
 which is a number that could not be argued with — and the animal still read as turned from directly
@@ -346,7 +346,7 @@ has **zero gap** at all 61 phases of all 24 clips on all three variants.
 1.36x is the best figure on the roster, ahead of this animal's own other body at 1.31 — the backup
 is a *different body*, so the two are not ranked against each other — and of Shonisaurus at 1.44.
 The carry is most of why: with the whole straightening in the clips it read 1.51x. T3D-26 cost three
-hundredths to bring the front into line against a chord, and T3D-33 **gave them back** while aiming
+hundredths to bring the front into line against a chord, and T3D-34 **gave them back** while aiming
 it 34 degrees further, by sweeping how the arc is shared rather than how long it
 is (`aimcurve`; equal per joint it read 1.40x). Against 2.62x for the same correction swung at the
 neck root, which is still the measurement that says the sharing is doing the work rather than the
@@ -375,7 +375,7 @@ and `auditCutAttachment` are what prove this mouth, and none of them frames a ca
 
 `posedExtentOverBind` stays centred on the bind the renderer sizes by — `Idle` 0.94–0.97, `Swim`
 1.01–1.05, `Sprint` 1.03–1.06, `Dive` 1.01–1.02, `Rise` 0.96–0.98, `Grab` 0.96–0.98 — and the
-carried bind box measures 8.660 (8.622 before T3D-33, 8.726 before T3D-26), which is `modelLength`
+carried bind box measures 8.660 (8.622 before T3D-34, 8.726 before T3D-26), which is `modelLength`
 in `askeptosaurus.json`.
 
 ## The two pectorals, measured
