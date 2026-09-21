@@ -97,3 +97,40 @@ export const rotateHint = (w: number, h: number, touch: boolean): boolean =>
  * quadrants whatever its shape.
  */
 export const splitAxis = (w: number, h: number): 'across' | 'down' => (h > w ? 'down' : 'across');
+
+/**
+ * The narrowest a roster tile may be drawn, in CSS pixels.
+ *
+ * Not a tap target — the tile is a whole cell with a picture and a name in it, and below about this
+ * the name is an ellipsis and the animal is a smudge. It is what the *cap* below is measured in.
+ */
+export const MIN_TILE = 86;
+
+/**
+ * How much of the picker's width the roster column gets when the two are side by side.
+ *
+ * `.pick-layout` is `1.45fr / 0.85fr` in a compact landscape window, so the roster has a little
+ * under two thirds of it. Stacked — which is what a portrait window does — it has all of it.
+ */
+export const ROSTER_SHARE = 0.62;
+
+/**
+ * The most columns the roster may use in this window, or `Infinity` where it should use as many as
+ * the roster wants.
+ *
+ * `gridColumns` packs the whole roster into three rows, which is right on a laptop and absurd on a
+ * phone: the Triassic's 26 animals come to nine columns, and nine columns of a 390-pixel window is a
+ * 36-pixel tile — a smudge under an ellipsis. Capping the columns turns the overflow into *rows*
+ * instead, which a phone can scroll and a three-row grid cannot.
+ *
+ * A cap and not a count: it never *adds* columns, so a short roster still lays out the way it always
+ * did and a full window is untouched. And it is returned from here rather than worked out in the
+ * pick screen because three places have to agree about the number — the screen that draws the grid,
+ * the cursor that walks it, and the loader that guesses which portraits are wanted next.
+ */
+export const rosterCap = (w: number, h: number, layout: Layout): number => {
+  if (layout === 'full') return Infinity;
+  // Beside the crew card, or stacked above it. The 24 is the picker's own side padding.
+  const room = w * (w > h ? ROSTER_SHARE : 1) - 24;
+  return Math.max(3, Math.floor(room / MIN_TILE));
+};

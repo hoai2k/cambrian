@@ -25,6 +25,35 @@ const show = (s: Slot) => `${s.kind}:${s.id}`;
   }
 }
 
+// --- a narrow window caps the columns, and the overflow becomes rows ---
+{
+  // Three rows is a rule about a laptop. The Triassic's 26 animals come to nine columns, which on a
+  // phone is a 36-pixel tile; capped, the same roster is four columns and seven scrollable rows.
+  check('uncapped, the roster packs into three rows', gridColumns(26) === 9);
+  check('capped, it takes the cap', gridColumns(26, 4) === 4);
+  const capped = rosterGrid(ids(26), [], 4);
+  check('...and the overflow becomes rows', capped.cols === 4 && capped.rows === 7, `${capped.cols}x${capped.rows}`);
+  check('...with every creature still placed exactly once', capped.cells.length === 26
+    && new Set(capped.cells.map((c) => c.slot.id)).size === 26);
+  check('...in reading order', capped.cells.every((c, i) => c.row === Math.floor(i / 4) && c.col === i % 4));
+
+  // A cap only ever takes columns away, so a roomy window is untouched and a short roster cannot be
+  // stretched into a grid wider than it wants.
+  check('a cap above what the roster wants changes nothing', gridColumns(21, 99) === gridColumns(21));
+  check('...and no cap at all is the same again', gridColumns(21, Infinity) === gridColumns(21));
+  check('a short roster is not widened by a large cap', gridColumns(8, 12) === 4);
+  // Four is the floor under the cap: nothing may ask for a grid too narrow to be a grid.
+  check('the cap cannot go below three', gridColumns(26, 1) === 3 && gridColumns(26, 0) === 3);
+
+  // And the cursor walks the capped grid, because it is the same model the screen draws from —
+  // which is the whole reason the cap is a parameter here rather than a number in the stylesheet.
+  const from = creature('c3');
+  const down = gridStep(capped, from, 0, 1);
+  check('the cursor steps down a capped row', sameSlot(down, creature('c7')), show(down));
+  const right = gridStep(capped, creature('c3'), 1, 0);
+  check('...and right, wrapping onto the next row', sameSlot(right, creature('c4')), show(right));
+}
+
 // --- the extras sit at the right, on the last row when it has room and below it when it has not ---
 {
   // 21 in 7x3 is exactly full, so there is no room on the last row.

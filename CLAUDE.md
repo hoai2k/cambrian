@@ -326,6 +326,30 @@ unless the user explicitly asks for a PR. Steps:
   cost taken knowingly, because **double-tap is a move in this game** and a browser that answered it
   with its own zoom would take the pounce away. Paid on the game pages only: the trilogy page, the
   viewer and the stats page stay pinchable, and the view has its own pinch-to-zoom on the camera.
+- **`gridColumns` packs the roster into three rows, and three rows is a rule about a laptop.** The
+  Triassic's 26 animals are nine columns, and nine columns of a 390-pixel window is a 36-pixel tile —
+  a smudge under an ellipsis. `rosterCap` caps them so the overflow becomes **rows**, which a phone
+  can scroll and a three-row grid cannot. A cap and never a count: it only ever takes columns away,
+  so a short roster lays out exactly as it always did and a roomy window gets `Infinity`. It is
+  threaded through the pure model rather than done in CSS because **three places have to agree about
+  the number** — the screen that draws the grid, the cursor that walks it and the loader that guesses
+  which portraits are wanted next — which is the whole reason `roster-grid.ts` is a model.
+- **A narrow window is where you finally see the bugs a wide one hides.** Two of the worst things the
+  compact layout turned up were not about touch at all. **Every centred HUD panel was off-centre**:
+  `.hint`, `.grip-panel`, `.notice`, `.threat-alert` and `.death-note` are `left: 50%` plus
+  `transform: translateX(-50%)` and animate in with `rise-in`, whose last keyframe is `transform:
+  none` — and under `fill-mode: both` that keyframe goes on applying after the animation ends, so the
+  centring is destroyed for good. They had all been sitting with their *left edge* on the middle of
+  the screen since they were written, which on a 1440-pixel window looks vaguely central and on a
+  390-pixel one runs off the edge. `rise-in-centred` carries the static transform through the
+  keyframes: **animating a property an element also sets statically means the keyframes have to
+  include it.** And the pick screen **stacked where it should have columned** — every rule under
+  1000px read "not wide" as "stack the picker and scroll it", which is right at 900x1200 and wrong at
+  780x360, where 360 pixels of height is not something scrolling fixes and the crew card ended up laid
+  over the roster; that one is keyed on the **aspect ratio**, because it is the shape that decides and
+  no single width tells 780x360 apart from 820x1180. In portrait the crew card is then **sticky** at
+  the bottom of the scroll, because stacked it is simply the second block and the Lock In that is the
+  only way on sits below the fold.
 - **A seat is a claim, and arriving at a screen claims nothing.** Reaching the roster from another
   game's picker (`deepLinkedToSelect`) used to open a keyboard seat on the era's default animal, so
   the screen showed somebody playing before anybody had pressed anything. The keyboard now takes its

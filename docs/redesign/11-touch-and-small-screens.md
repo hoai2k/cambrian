@@ -167,6 +167,43 @@ window one half of the compact layout and not the other. It is written as a quer
 because the standalone pages have no React shell to set one, and because a stylesheet that only
 reflows once JavaScript says so flashes the wide layout first.
 
+### The roster's columns
+
+`gridColumns` packs the whole roster into three rows, which is right on a laptop and absurd on a
+phone: the Triassic's 26 animals come to nine columns, and nine columns of a 390-pixel window is a
+36-pixel tile — a smudge under an ellipsis. `rosterCap` caps them instead, so the overflow becomes
+**rows**, which a phone can scroll and a three-row grid cannot.
+
+A cap and never a count: it only takes columns away, so a short roster lays out exactly as it always
+did and a roomy window gets `Infinity`. And it is threaded through the pure grid model rather than
+done in CSS, because three places have to agree about the number — the screen that draws the grid,
+the cursor that walks it and the loader that guesses which portraits are wanted next. That
+equivalence is the whole reason `roster-grid.ts` is a model in the first place.
+
+### Things that only showed on a narrow window
+
+Two of these were not touch bugs at all; a phone is just the first place anyone could see them.
+
+**Every centred HUD panel was off-centre.** `.hint`, `.grip-panel`, `.notice`, `.threat-alert` and
+`.death-note` are positioned `left: 50%` with `transform: translateX(-50%)`, and they animate in with
+`rise-in`, whose last keyframe is `transform: none` — under `fill-mode: both` that keyframe keeps
+applying after the animation ends, and the centring is gone for good. Every one of them has been
+sitting with its *left edge* on the middle of the screen since it was written. On a wide window a
+300-pixel hint half a screen to the right still looks vaguely central; on a 390-pixel phone it runs
+straight off the edge. The fix is `rise-in-centred`, keyframes that carry the static transform too:
+animating a property an element also sets statically means the keyframes have to include it.
+
+**The picker stacked when it should have columned.** Every rule under 1000px read "not wide" as
+"stack the picker into a column and scroll it", which is right at 900×1200 and wrong at 780×360 —
+360 pixels of height is not something scrolling fixes, and the crew card ended up laid over the
+roster. That case is keyed on the **aspect ratio**, because it is the shape that decides and no
+single width tells 780×360 apart from 820×1180.
+
+And one that was a touch bug: `.crew` is a **sticky** block at the bottom of the scrolling picker in
+portrait. Stacked, it is simply the second thing in the column, so the name of what you picked and
+the Lock In that is the only way on both sit below the fold — a player tapped a creature and nothing
+they could see changed.
+
 One case the old breakpoints got backwards is worth naming, because it was a real overlap rather than
 a tightness: every rule below 1000px treated "not wide" as "stack the picker into a column and scroll
 it", which is right at 900×1200 and wrong at 780×360 — there the window has 360 pixels of height and
@@ -208,6 +245,7 @@ pinch-to-zoom on the camera.
 | `src/app/TouchPads.tsx` | The pads, the drawn buttons and the rotate line. |
 | `src/app/use-small-screen.ts` | The one place in `src/app` that measures the window. |
 | `src/app/styles.css` | The `.is-touch` and `.layout-compact` layer, appended last. |
+| `src/app/roster-grid.ts` | `gridColumns(n, cap)`: the same model the screen and the cursor read, now with a ceiling. |
 | `src/shared/controls.ts` | The `touch` scheme: every action named as a gesture. |
 | `tools/touch-test.ts` | `npm run touch`. Every gesture, in order, with the clock passed in. |
 | `tools/touch-browser.mjs` | Real touches in a real browser: the parts a headless test cannot vouch for. |

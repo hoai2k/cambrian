@@ -13,7 +13,7 @@ import {
   BUTTON_ZONES, clear, down, freshTouch, isButtonZone, meterEdge, move, read, secondaryOf, stepSlot, toNdc, up,
   type ButtonZone,
 } from '../src/shared/touch-play';
-import { COMPACT_H, COMPACT_W, layoutFor, rotateHint, splitAxis, touchFirst } from '../src/shared/small-screen';
+import { COMPACT_H, COMPACT_W, MIN_TILE, layoutFor, rosterCap, rotateHint, splitAxis, touchFirst } from '../src/shared/small-screen';
 import { applyTouch } from '../src/input/touch';
 import { emptyControls, type RawControls } from '../src/input/input';
 import { btn, key, menuScheme, schemeForDevice, type Action } from '../src/shared/controls';
@@ -471,6 +471,20 @@ check('a 4:3 tablet upright is not nagged', rotateHint(820, 1093, true) === fals
 check('...nor a 3:2 one', rotateHint(800, 1200, true) === false);
 check('a big phone held up is', rotateHint(430, 932, true) === true);
 check('and a desktop window is never asked', rotateHint(390, 844, false) === false);
+
+// The roster's columns. `gridColumns` packs the whole roster into three rows, which is a rule about
+// a laptop: the Triassic's 26 animals are nine columns, and nine columns of a phone is a 36-pixel
+// tile. The cap turns the overflow into rows, which a phone can scroll.
+check('a roomy window caps nothing at all', rosterCap(1440, 900, 'full') === Infinity);
+check('a phone held up has room for four tiles', rosterCap(390, 844, 'compact') === 4, `${rosterCap(390, 844, 'compact')}`);
+check('a bigger phone held up has five', rosterCap(430, 932, 'compact') === 4 || rosterCap(430, 932, 'compact') === 5);
+// On its side the roster is beside the crew card, so it gets a share of the width rather than all.
+check('a phone on its side has more, but not the whole width', rosterCap(780, 360, 'compact') === 5,
+  `${rosterCap(780, 360, 'compact')}`);
+check('...which is fewer than the width alone would allow', rosterCap(780, 360, 'compact') < Math.floor(780 / MIN_TILE));
+check('nothing ever falls below three columns', rosterCap(200, 200, 'compact') >= 3);
+check('every capped tile is at least MIN_TILE across', [[390, 844], [430, 932], [780, 360], [820, 500]]
+  .every(([w, h]) => (w * (w > h ? 0.62 : 1) - 24) / rosterCap(w, h, 'compact') >= MIN_TILE - 1));
 
 check('two players on a wide screen are cut side by side', splitAxis(1440, 900) === 'across');
 check('two on a tall one are cut top and bottom', splitAxis(820, 1180) === 'down');

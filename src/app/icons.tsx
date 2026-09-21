@@ -34,6 +34,10 @@ export const PadIcon = (p: SVGProps<SVGSVGElement>) => (
 export const KeyboardIcon = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M18 13h.01M9 13h6" /></svg>
 );
+/** A hand with one finger out, over a mark: the glass, in the same stroked 24-box as the other two. */
+export const TouchIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11m0-2v-.5a1.5 1.5 0 0 1 3 0V11m0-1.5a1.5 1.5 0 0 1 3 0V16a5 5 0 0 1-5 5h-1.6a5 5 0 0 1-4.1-2.2l-2.6-3.8a1.6 1.6 0 0 1 2.5-2L9 14.5" /></svg>
+);
 export const CheckIcon = (p: SVGProps<SVGSVGElement>) => (<svg {...base(p)}><path d="m5 12 5 5L20 7" /></svg>);
 
 /** Shared production emblem. */

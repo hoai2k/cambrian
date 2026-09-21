@@ -28,11 +28,21 @@ export interface GridModel {
   cells: Placed[];
 }
 
-/** Grid columns: three rows at most, so 21 creatures sit in 7 x 3 and 8 sit in 4 x 2. */
-export const gridColumns = (n: number) => Math.max(4, Math.ceil(n / 3));
+/**
+ * Grid columns: three rows at most, so 21 creatures sit in 7 x 3 and 8 sit in 4 x 2 — unless the
+ * window says it has room for fewer, in which case the overflow becomes *rows*.
+ *
+ * `cap` only ever takes columns away (`rosterCap` in `src/shared/small-screen.ts` is `Infinity` on
+ * any window with room), so a short roster lays out exactly as it always did. It exists because
+ * three rows is a rule about a laptop: the Triassic's 26 animals come to nine columns, and nine
+ * columns of a phone is a 36-pixel tile. Four is a floor under the cap so nothing can ask for a
+ * grid too narrow to be a grid.
+ */
+export const gridColumns = (n: number, cap = Infinity) =>
+  Math.max(1, Math.min(Math.max(4, Math.ceil(n / 3)), Math.max(3, cap)));
 
-export function rosterGrid(ids: readonly string[], extras: readonly ExtraId[] = []): GridModel {
-  const n = ids.length, cols = gridColumns(n);
+export function rosterGrid(ids: readonly string[], extras: readonly ExtraId[] = [], cap = Infinity): GridModel {
+  const n = ids.length, cols = gridColumns(n, cap);
   const cells: Placed[] = [];
   for (let i = 0; i < n; i++) cells.push({ slot: { kind: 'creature', id: ids[i] }, row: Math.floor(i / cols), col: i % cols });
   const full = Math.ceil(n / cols);

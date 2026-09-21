@@ -8,7 +8,7 @@ import { FeedbackButton } from './Feedback';
 import { PLAYER_COLORS } from '../render/engine';
 import { PLAYABLE as CREATURES, authoredCreature, creature, naturalSizing, realCm, type CreatureId } from '../sim/creatures';
 import type { Mode, PlayerSetup } from '../sim/types';
-import { CheckIcon, ChevronDown, Emblem, KeyboardIcon, PadIcon } from './icons';
+import { CheckIcon, ChevronDown, Emblem, KeyboardIcon, PadIcon, TouchIcon } from './icons';
 import { appBase } from '../shared/base';
 import { btn, fillControls, key, type Scheme } from '../shared/controls';
 import { fillOf, ladderName, rungOf } from '../sim/ladder';
@@ -34,6 +34,12 @@ interface Props {
   extras: ExtraId[];
   /** Press one of them, for the seat that is on it. */
   onExtra: (i: number, id: ExtraId) => void;
+  /**
+   * The most columns this window has room for (`rosterCap`). `Infinity` on anything roomy, so the
+   * grid lays out exactly as it always did; on a phone it turns the overflow into scrollable rows
+   * rather than into tiles too small to read.
+   */
+  maxCols: number;
   /** How many animals this device has earned from the other games. */
   visitorCount: number;
   /**
@@ -196,7 +202,7 @@ const EXTRA_LABEL: Record<ExtraId, { name: string; glyph: string; title: string 
 
 export function SelectScreen(p: Props) {
   const s = p.scheme;
-  const grid = rosterGrid(CREATURES.map((c) => c.id), p.extras);
+  const grid = rosterGrid(CREATURES.map((c) => c.id), p.extras, p.maxCols);
   const cols = grid.cols;
   const compact = p.players.length >= 3;
   // Controllers the game can see that have not joined yet, and joined players whose controller
@@ -290,7 +296,16 @@ export function SelectScreen(p: Props) {
                 {pl.ready && <span key={'fx' + pl.creature} className="lock-fx" aria-hidden="true" />}
                 <div className="crew-top">
                   <span className="player-chip">{TEXT.common.playerChip(i + 1)}</span>
-                  <span className="device">{pl.device === 'keyboard' ? <><KeyboardIcon width={16} height={16} /> {C.keyboard1}</> : pl.device === 'keyboard2' ? <><KeyboardIcon width={16} height={16} /> {C.keyboard2}</> : <><PadIcon width={16} height={16} /> {C.controller((pl.device as number) + 1)}{!p.padIndices.includes(pl.device as number) && <em className="gone">{C.disconnected}</em>}</>}</span>
+                  {/* Which thing this seat is steered by. The touch seat has to be named as itself:
+                      it used to fall through to the controller branch, which drew a pad icon, called
+                      it "Controller touch1" and — since `padIndices` never contains a string — marked
+                      it *disconnected*, on the one device that cannot be. */}
+                  <span className="device">{
+                    pl.device === 'keyboard' ? <><KeyboardIcon width={16} height={16} /> {C.keyboard1}</>
+                      : pl.device === 'keyboard2' ? <><KeyboardIcon width={16} height={16} /> {C.keyboard2}</>
+                      : pl.device === 'touch' ? <><TouchIcon width={16} height={16} /> {C.touch}</>
+                      : <><PadIcon width={16} height={16} /> {C.controller((pl.device as number) + 1)}{!p.padIndices.includes(pl.device as number) && <em className="gone">{C.disconnected}</em>}</>
+                  }</span>
                   <button className="remove" aria-label={C.removePlayer(i + 1)} onClick={() => p.onRemove(i)}>×</button>
                 </div>
                 <div className="hero">

@@ -29,6 +29,7 @@ import { Toolbar } from './Toolbar';
 import { toolbarPlace } from './toolbar-place';
 import { menuScheme } from '../shared/controls';
 import { SECONDARY, type Secondary } from '../shared/touch-play';
+import { rosterCap } from '../shared/small-screen';
 import { RotateHint, TouchPads } from './TouchPads';
 import { useSmallScreen } from './use-small-screen';
 import { assignSeatSchemes } from '../shared/seat-schemes';
@@ -180,6 +181,14 @@ export function App() {
   const hand: PlayerSetup['device'] = small.touch ? 'touch' : 'keyboard';
   const handRef = useRef(hand);
   useEffect(() => { handRef.current = hand; }, [hand]);
+  /**
+   * The most roster columns this window has room for. One number, read by the screen that draws the
+   * grid, the cursor that walks it and the loader that guesses which portraits are next — the three
+   * have to agree or the cursor lands on one tile while another lights up.
+   */
+  const cols = rosterCap(small.width, small.height, small.layout);
+  const colsRef = useRef(cols);
+  useEffect(() => { colsRef.current = cols; }, [cols]);
   /** The secondary pad, mirrored into state so the pad's label re-renders when a swipe lands. */
   const [secondary, setSecondary] = useState<Secondary>('aim');
   /**
@@ -588,7 +597,7 @@ export function App() {
       return;
     }
     if (p.ready) return;
-    const model = rosterGrid(CREATURE_IDS, extrasRef.current);
+    const model = rosterGrid(CREATURE_IDS, extrasRef.current, colsRef.current);
     const from: Slot = p.cursor ? { kind: 'extra', id: p.cursor } : { kind: 'creature', id: p.creature };
     const to = gridStep(model, from, dx, dy);
     if (sameSlot(to, from)) return;
@@ -889,7 +898,7 @@ export function App() {
     const e = engineRef.current; if (!e) return;
     if (screen === 'title') e.prioritize([...ACTIVE_ERA.defaults.title], 'title');
     else if (screen === 'select') {
-      const n = CREATURE_IDS.length, cols = gridColumns(n);
+      const n = CREATURE_IDS.length, cols = gridColumns(n, colsRef.current);
       const committed = players.filter((p) => p.ready).map((p) => p.creature);
       const hovered = players.filter((p) => !p.ready).map((p) => p.creature);
       const neighbours = players.flatMap((p) => { const i = CREATURE_IDS.indexOf(p.creature); return [i + 1, i - 1, i + cols, i - cols].filter((j) => j >= 0 && j < n).map((j) => CREATURE_IDS[j]); });
@@ -1024,7 +1033,7 @@ export function App() {
           players={players} mode={mode} modes={MODES} modeInfo={modeInfo} allReady={allReady} padIndices={padIndices}
           scheme={scheme}
           best={best} carry={carry} modeFocus={focus.group === 'modes' ? focus.index : -1}
-          extras={extras} onExtra={pressExtra}
+          extras={extras} onExtra={pressExtra} maxCols={cols}
           visitorCount={visitors.length} visitorOrigin={(id) => visitors.find((v) => v.id === id)?.origin}
           onPick={setCreature} onReady={toggleReady} onRemove={removePlayer}
           onMode={changeMode} onStart={startMatch} onBack={backToTitle} onCarry={toggleCarry}

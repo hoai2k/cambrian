@@ -103,6 +103,8 @@ export interface GameStrings {
     readonly crew: {
       readonly keyboard1: string;
       readonly keyboard2: string;
+      /** The one seat a phone or a tablet has. There is one screen, so there is never a second. */
+      readonly touch: string;
       readonly controller: (n: number) => string;
       readonly disconnected: string;
       readonly removePlayer: (seat: number) => string;
@@ -664,6 +666,7 @@ export const SHARED_STRINGS: GameStrings = {
     crew: {
       keyboard1: 'Keyboard 1',
       keyboard2: 'Keyboard 2',
+      touch: 'Touchscreen',
       controller: (n) => `Controller ${n}`,
       disconnected: ' · disconnected',
       removePlayer: (seat) => `Remove player ${seat}`,

@@ -41,23 +41,28 @@ export function TouchPads({ secondary, hint, swapped, teleportOpen, onPause }: {
   const label = COPY[secondary];
   return (
     <div className="touch-pads">
+      {/* A column: the nudge stands *above* the pads rather than beside them. Beside them it was in
+          the toolbar's corner, clipped and unreadable, which is a poor advertisement for a control
+          nobody has found yet. */}
       <div className="touch-left">
-        <div className="touch-pad touch-swim" data-touch-zone="swim" aria-hidden="true">
-          <span>{COPY.swim}</span>
-        </div>
-        <div
-          className={`touch-pad touch-secondary ${swapped ? 'just-swapped' : ''}`}
-          data-touch-zone="secondary"
-          aria-hidden="true"
-          title={COPY.secondaryAria(label)}
-        >
-          {/* The arrows are the affordance: a pad that can be swiped and does not look it is a pad
-              nobody swipes. They are part of the drawing rather than a hint that goes away. */}
-          <i className="swipe-mark left" />
-          <span>{label}</span>
-          <i className="swipe-mark right" />
-        </div>
         {hint && <p className="touch-hint">{COPY.swapHint}</p>}
+        <div className="touch-pad-row">
+          <div className="touch-pad touch-swim" data-touch-zone="swim" aria-hidden="true">
+            <span>{COPY.swim}</span>
+          </div>
+          <div
+            className={`touch-pad touch-secondary ${swapped ? 'just-swapped' : ''}`}
+            data-touch-zone="secondary"
+            aria-hidden="true"
+            title={COPY.secondaryAria(label)}
+          >
+            {/* The arrows are the affordance: a pad that can be swiped and does not look it is a pad
+                nobody swipes. They are part of the drawing rather than a hint that goes away. */}
+            <i className="swipe-mark left" />
+            <span>{label}</span>
+            <i className="swipe-mark right" />
+          </div>
+        </div>
       </div>
 
       <div className="touch-right">
