@@ -17,6 +17,9 @@ aphaneramma  Bite@0.1 through=0 opened=10730 | Heavy@0.433 through=3 opened=1065
 archelon  Bite@0.1 through=0 opened=1262 | Heavy@0.467 through=0 opened=1242 | Attack@0.367 through=1 opened=1151
 askeptosaurus  Attack@0.233 through=1 opened=193 | Bite@0.133 through=1 opened=173 | Eat@0.967 through=0 opened=177
 atopodentatus  Bite@0.1 through=0 opened=4494 | Attack@0.4 through=3738 opened=3893 | Eat@0.367 through=3726 opened=3885
+# birgeria's row was measured on birgeria.glb sha256 134d7f01..., which is still the file that ships:
+# its gait was re-applied and its family re-packaged after this was taken and the bytes came back
+# identical, which is the pipeline being idempotent. A measurement is of a file, so it names one.
 birgeria  Gape@0.467 through=4 opened=15357 | Ability@0.467 through=4 opened=8416 | Heavy@0.533 through=2 opened=7239
 cartorhynchus  Ability@0.133 through=0 opened=693 | Heavy@0.4 through=1 opened=681 | Bite@0.1 through=2 opened=629
 ceratites: no opening clips
