@@ -586,8 +586,9 @@ unless the user explicitly asks for a PR. Steps:
   and there is no wall anywhere to stretch. The warning the old rule carried — that two separate
   tubes part when the jaw swings, which is how Placodus came to open onto transparency — was true of
   two *tubes* sharing a seam, and is answered by closing each half rather than by joining them.
-  **And the first question is whether a mouth needs filling at all.** Several do not: Shonisaurus and
-  Dinocephalosaurus among them. A generation that models no cavity, or whose head is closed behind
+  **And the first question is whether a mouth needs filling at all** — and the question ahead of
+  even that is whether the *cut* is earning its place, which is the next bullet. Several need no
+  filling: Shonisaurus and Dinocephalosaurus among them. A generation that models no cavity, or whose head is closed behind
   the lip, needs an anchor and nothing else — and a beak inside an arm crown needs an anchor and
   nothing else in every case, which is why both cephalopods have none. Authored geometry in a mouth
   is a cost (it is invented shape on a Tripo body, against the simplicity bar), so it is justified
@@ -639,6 +640,75 @@ unless the user explicitly asks for a PR. Steps:
   interpenetrate when they are first brought together, the oral cavity Tripo modelled has to fold
   rather than be built, and closing is a large jaw rotation, so the pose the animal spends almost
   all its time in becomes the most deformed one.
+- **The first question about a mouth is whether the cut is earning its place, and there are three
+  kinds of generation.** This is ahead of "how do we fill it", because two of the three answers are
+  not "fill it" at all. `T.cut_rim` measures which kind a body is, by reporting what the cut
+  actually left open in each half — how many loops, how long, and how much of each is on the seam
+  rather than pre-existing rim.
+  1. **The generation arrived shut**, with no interior at all — the commonest, and Dinocephalosaurus
+     is the extreme, where the lip is *painted* on a closed snout. Turning the jaw bone opens
+     nothing, because there is no aperture: the cut is what makes one, and what it leaves is a hole
+     in each half. **This is where capping applies.**
+  2. **The generation modelled a slit or a shallow cavity.** Judge per body; the cut usually still
+     makes most of the aperture.
+  3. **The generation arrived gaping, with a real lumen** — a palate, a floor, a commissure, all
+     modelled. Here the aperture and its walls already exist, and a cut makes a **boundary where
+     the surface was continuous** and then has to close it again. The right construction is **no
+     cut at all**.
+- **A cut mouth is closed with the cut's own rim, not with a shell placed inside it** (`T.cap_mouth`).
+  Span each half's boundary and each half is a closed solid again, and the two surfaces that span
+  them *are* the roof and the floor of the mouth, following the measured seam exactly because the
+  rim is what bounds them. Four things follow, and they are the whole argument: it **closes by
+  construction** (a surface spanning a closed curve leaves no hole, where a shell in the lumen has
+  to be *rendered* to find out — which is how Cartorhynchus shipped leaking 51 px with nobody
+  knowing); the geometry is the **body's own**, every vertex a convex combination of rim vertices,
+  so nothing is invented and a fitted or curved cut is followed for free; it **wears the skin it
+  closes**, UVs and vertex colours inverse-distance weighted off the rim; and each cap is **part of
+  its own half**, rigid to that half's bone through the same weight field as the skin around it,
+  with no second surface to keep coincident — the failure that cost Mosasaurus four rebuilds.
+  The lip run is what must *not* be filled, and the answer is not to separate it from the rest
+  (which cannot be done robustly on a curved cut): it is to fill the whole loop on **each half
+  separately** and dome each fill into its own half, so the two plates part and what is between
+  them is the cavity. The order is `T.cap_cut` over the transverse cross-sections at the ends of
+  the cut first — they dip out of the mouth's plane and would fold under a planar fill — then
+  `T.cap_mouth` over what is left, which lies in the mouth's own surface. **The dome's depth is
+  measured, not chosen**: each cap vertex is pushed into its half by a fixed fraction of *its own
+  distance from the nearest rim vertex*, which is exactly zero on the rim, deepest along the middle
+  of the mouth, shallow at the lips and in the corners, and scaled to the local mouth size by
+  construction — the distance from a point on the midline to the rim *is* the half-width there — with
+  an optional ceiling off the head's own measured section so a palate cannot reach the scalp.
+  Rhaeticosaurus is the worked example.
+- **A generation that arrived gaping is not cut** (`T.jaw_field_uncut`). Mosasaurus' cut left one
+  closed loop of 156 vertices per half spanning 0.057 of a body behind the hinge, on a gape 0.176
+  of a body long: the *back third* of the mouth and nothing else, because forward of that the jaws
+  are already apart and the seam plane passes between them without touching either. So the cut
+  bought nothing at the front and paid for a rim at the back, and the lining and the hinge plug
+  existed to close that rim. Uncut, the body is one surface, the mouth opening is a bone turning
+  inside skin like every other joint, and the weighting is full `jaw` below the mouth line and
+  forward of the hinge, full skull above it, and a band at the commissure that stretches. **The
+  band is the one number with a cost either way** — too wide and the front of the mandible takes
+  only part of the jaw's rotation, so the lower tooth row lags the bone it is drawn on; too narrow
+  and the whole swing is carried by a strip of skin at the corner, where linear blend skinning
+  pinches — so sweep it and record the sweep. Mosasaurus ran 3.62x / 2.81x / 2.54x / 2.54x of skin
+  at 0.20 / 0.30 / 0.38 / 0.50 of the head's half depth at the hinge, with the mandible still
+  travelling 0.96–1.00 of its own joint at every one; it ships at 0.50, where the worst edge is no
+  longer in the mouth at all and the figure is exactly the 2.54x the cut body shipped.
+- **`gape-solid.py` was proving a body the game does not draw, and `--as-drawn` is the fix.** The
+  runtime hides everything `src/shared/oral-geometry.ts` matches — every lining, every hinge plug —
+  so a gape closed *by* one of those parts passes the proof and still shows a hole to a player.
+  That is not hypothetical: Mosasaurus measured 0 px through the body at every opening clip while
+  its owner was looking at holes in its mouth, and measured as drawn it reads 71 / 292 / 0 / 222 px
+  at `Attack` / `Bite` / `Heavy` / `Eat`, every one of them at the corner of the mouth where the cut
+  rim parts. Rhaeticosaurus read 0 px plain and **4,626 px** at `Heavy` as drawn. Both are 0 as
+  drawn now. Any verdict about a mouth is about the body on screen, so it is `--as-drawn` that
+  settles it; the plain run stays, because it is what the file contains and it is what every
+  earlier verdict measured.
+- **Whether a mouth reads as a mouth is a picture, and `tools/triassic/mouth-space.py` takes it.**
+  Three views of one posed gape, framed on the animal's own `anchor_mouth` and `anchor_mouth_inside`
+  and lit from inside: into the gape from in front and above the lip, square down the mouth's own
+  axis, and a cutaway whose near clipping plane is the animal's midline so the roof and the floor
+  are two surfaces with room between them rather than one silhouette. It applies the runtime's own
+  oral classifier, so the picture is what a player sees.
 - **Ask what an oral part is doing by taking it out, before building anything in its place.** A
   named mesh can be stripped from the unpacked packaged GLB and `gape-solid.py` run on what is left
   in half a minute, with no rebuild; that is how Dinocephalosaurus' verdict was measured and it

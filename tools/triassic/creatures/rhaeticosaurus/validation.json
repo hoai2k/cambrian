@@ -798,9 +798,9 @@
       "radiusOuter": 0.09512995119797532
     }
   },
-  "authoredTriangles": 21316,
-  "twinTriangles": 7578,
-  "twinTriangleFraction": 0.355507599924939,
+  "authoredTriangles": 20848,
+  "twinTriangles": 6568,
+  "twinTriangleFraction": 0.31504221028396007,
   "twinRemeshTriangles": 110256,
   "twinDecimateRatio": 0.05079088732600212,
   "twinVerticesHeldBackFromRelaxation": 20570,
@@ -1312,7 +1312,7 @@
   "weights": {
     "Rhaeticosaurus authored body": {
       "maxInfluences": 4,
-      "vertices": 9898,
+      "vertices": 10428,
       "verticesPerBone": {
         "body": 4349,
         "chest": 3350,
@@ -1326,7 +1326,7 @@
         "fore_mid_R": 658,
         "hind_mid_R": 787,
         "hind_upper_R": 932,
-        "skull": 917,
+        "skull": 1181,
         "fore_upper_L": 937,
         "tail_02": 1163,
         "tail_03": 629,
@@ -1336,16 +1336,16 @@
         "fore_mid_L": 746,
         "neck_01": 597,
         "neck_00": 762,
-        "neck_02": 766,
+        "neck_02": 765,
         "fore_outer_L": 599,
         "fore_tip_L": 387,
         "tail_04": 410,
         "fore_upper_R": 934,
-        "neck_03": 1044,
-        "jaw": 496
+        "neck_03": 1148,
+        "jaw": 585
       },
       "jawJunction": {
-        "cutRimPairs": 50,
+        "cutRimPairs": 51,
         "lipPairs": 66,
         "rimReach": 0.05811512064509993,
         "rimDepth": 0.033428583294153214,
@@ -1353,14 +1353,14 @@
         "band": 0.015,
         "back": 0.06,
         "throat": 1.0,
-        "shellVertices": 376,
-        "shellFullJaw": 324,
-        "bodyThroatVertices": 160
+        "shellVertices": 641,
+        "shellFullJaw": 564,
+        "bodyThroatVertices": 161
       }
     },
     "Rhaeticosaurus procedural volume twin": {
       "maxInfluences": 4,
-      "vertices": 2982,
+      "vertices": 3288,
       "verticesPerBone": {
         "tail_01": 615,
         "tail_02": 273,
@@ -1387,13 +1387,13 @@
         "fore_mid_L": 317,
         "fore_upper_L": 383,
         "neck_01": 325,
-        "neck_02": 350,
-        "neck_03": 374,
-        "jaw": 219,
-        "skull": 303
+        "neck_02": 351,
+        "neck_03": 440,
+        "jaw": 290,
+        "skull": 455
       },
       "jawJunction": {
-        "cutRimPairs": 31,
+        "cutRimPairs": 32,
         "lipPairs": 38,
         "rimReach": 0.057953071443265454,
         "rimDepth": 0.03319404274225235,
@@ -1401,14 +1401,14 @@
         "band": 0.015,
         "back": 0.06,
         "throat": 1.0,
-        "shellVertices": 130,
-        "shellFullJaw": 103,
-        "bodyThroatVertices": 55
+        "shellVertices": 283,
+        "shellFullJaw": 237,
+        "bodyThroatVertices": 56
       }
     }
   },
   "maxInfluences": 4,
-  "meanInfluences": 3.165527950310559,
+  "meanInfluences": 3.064814814814815,
   "mouth": {
     "method": "painted line, read as a continuous curve (the geometric method found no cavity)",
     "note": "Placodus' geometric method was tried first and does not reach this animal: over the whole front third it returns 3 vertices. The painted line was then read as a continuous curve rather than station by station -- a matched filter for a thin dark line between lighter skin, resolved as the best path along the head -- because this hide is white with black speckles and a per-station walk stops at the first speckle. Station-to-station roughness 0.017 of the local radius; flanks disagree by 0.358 on average and 0.450 at worst.",
@@ -1612,321 +1612,178 @@
     "paintedLineRoughnessOverRadius": 0.016935483870967733,
     "paintedLineFlankDisagreementMeanOverRadius": 0.3578125,
     "paintedLineFlankDisagreementMaxOverRadius": 0.44999999999999996,
-    "liningCoverage": [
-      [
-        -0.5525,
-        0.982,
-        0.52
-      ],
-      [
-        -0.5495,
-        0.982,
-        0.52
-      ],
-      [
-        -0.5466,
-        0.983,
-        0.52
-      ],
-      [
-        -0.5436,
-        0.984,
-        0.52
-      ],
-      [
-        -0.5406,
-        0.985,
-        0.52
-      ],
-      [
-        -0.5376,
-        0.985,
-        0.52
-      ],
-      [
-        -0.5347,
-        0.986,
-        0.52
-      ],
-      [
-        -0.5317,
-        0.987,
-        0.52
-      ],
-      [
-        -0.5287,
-        0.987,
-        0.52
-      ],
-      [
-        -0.5258,
-        0.988,
-        0.52
-      ],
-      [
-        -0.5228,
-        0.988,
-        0.52
-      ],
-      [
-        -0.5198,
-        0.989,
-        0.52
-      ],
-      [
-        -0.5169,
-        0.989,
-        0.52
-      ],
-      [
-        -0.5139,
-        0.989,
-        0.52
-      ],
-      [
-        -0.5109,
-        0.989,
-        0.52
-      ],
-      [
-        -0.508,
-        0.989,
-        0.52
-      ],
-      [
-        -0.505,
-        0.989,
-        0.52
-      ],
-      [
-        -0.502,
-        0.989,
-        0.52
-      ],
-      [
-        -0.4991,
-        0.989,
-        0.52
-      ],
-      [
-        -0.4961,
-        0.989,
-        0.52
-      ],
-      [
-        -0.4931,
-        0.989,
-        0.52
-      ],
-      [
-        -0.4902,
-        0.989,
-        0.52
-      ],
-      [
-        -0.4872,
-        0.989,
-        0.52
-      ],
-      [
-        -0.4842,
-        0.989,
-        0.52
-      ],
-      [
-        -0.4813,
-        0.99,
-        0.52
-      ],
-      [
-        -0.4783,
-        0.99,
-        0.52
-      ],
-      [
-        -0.4753,
-        0.99,
-        0.52
-      ],
-      [
-        -0.4724,
-        0.99,
-        0.52
-      ]
-    ],
-    "liningFitFactors": {
-      "-0.45436": [
-        0.03924,
-        0.01796
-      ],
-      "-0.46193": [
-        0.03989,
-        0.02223
-      ],
-      "-0.4695": [
-        0.03957,
-        0.02266
-      ],
-      "-0.47707": [
-        0.03863,
-        0.02088
-      ],
-      "-0.48464": [
-        0.03722,
-        0.0216
-      ],
-      "-0.49222": [
-        0.03689,
-        0.01961
-      ],
-      "-0.49979": [
-        0.03582,
-        0.01983
-      ],
-      "-0.50736": [
-        0.03494,
-        0.01851
-      ],
-      "-0.51493": [
-        0.03601,
-        0.01663
-      ],
-      "-0.5225": [
-        0.03434,
-        0.0174
-      ],
-      "-0.53007": [
-        0.03098,
-        0.01624
-      ],
-      "-0.53764": [
-        0.02697,
-        0.01479
-      ],
-      "-0.54522": [
-        0.02372,
-        0.01303
-      ],
-      "-0.55279": [
-        0.02116,
-        0.01059
-      ],
-      "-0.56036": [
-        0.01613,
-        0.00655
-      ],
-      "-0.55249": [
-        0.02127,
-        0.01072
-      ],
-      "-0.54952": [
-        0.02232,
-        0.01191
-      ],
-      "-0.54655": [
-        0.02328,
-        0.0128
-      ],
-      "-0.54358": [
-        0.02432,
-        0.01335
-      ],
-      "-0.54062": [
-        0.02556,
-        0.01399
-      ],
-      "-0.53765": [
-        0.02697,
-        0.01479
-      ],
-      "-0.53468": [
-        0.02859,
-        0.01555
-      ],
-      "-0.53171": [
-        0.03019,
-        0.01589
-      ],
-      "-0.52874": [
-        0.03156,
-        0.01672
-      ],
-      "-0.52578": [
-        0.03303,
-        0.01773
-      ],
-      "-0.52281": [
-        0.03422,
-        0.01743
-      ],
-      "-0.51984": [
-        0.03534,
-        0.01813
-      ],
-      "-0.51687": [
-        0.03598,
-        0.01762
-      ],
-      "-0.51391": [
-        0.03596,
-        0.01665
-      ],
-      "-0.51094": [
-        0.03546,
-        0.01875
-      ],
-      "-0.50797": [
-        0.03499,
-        0.0183
-      ],
-      "-0.505": [
-        0.03497,
-        0.01967
-      ],
-      "-0.50204": [
-        0.03542,
-        0.02048
-      ],
-      "-0.49907": [
-        0.03595,
-        0.01976
-      ],
-      "-0.4961": [
-        0.03648,
-        0.0195
-      ],
-      "-0.49313": [
-        0.03682,
-        0.01954
-      ],
-      "-0.49016": [
-        0.03687,
-        0.02004
-      ],
-      "-0.4872": [
-        0.03694,
-        0.02091
-      ],
-      "-0.48423": [
-        0.03728,
-        0.0217
-      ],
-      "-0.48126": [
-        0.03786,
-        0.02148
-      ],
-      "-0.47829": [
-        0.03851,
-        0.02073
-      ],
-      "-0.47533": [
-        0.03881,
-        0.02113
-      ],
-      "-0.47236": [
-        0.0392,
-        0.02186
-      ]
+    "oralGeometry": "none: the cut is capped with its own rim and domed (T.cap_mouth)",
+    "cutRim": {
+      "Rhaeticosaurus authored body": {
+        "skull": {
+          "boundaryEdgesInRegion": 116,
+          "boundaryEdgesElsewhere": 16,
+          "loops": [
+            {
+              "vertices": 116,
+              "closed": true,
+              "box": [
+                [
+                  -0.02975,
+                  0.07052
+                ],
+                [
+                  -0.57419,
+                  -0.47236
+                ],
+                [
+                  -0.00706,
+                  0.03666
+                ]
+              ],
+              "reach": 0.10184,
+              "verticesOnTheSeam": 68
+            }
+          ]
+        },
+        "jaw": {
+          "boundaryEdgesInRegion": 116,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 116,
+              "closed": true,
+              "box": [
+                [
+                  -0.02975,
+                  0.07052
+                ],
+                [
+                  -0.57419,
+                  -0.47236
+                ],
+                [
+                  -0.00706,
+                  0.03666
+                ]
+              ],
+              "reach": 0.10184,
+              "verticesOnTheSeam": 68
+            }
+          ]
+        }
+      },
+      "Rhaeticosaurus procedural volume twin": {
+        "skull": {
+          "boundaryEdgesInRegion": 69,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 69,
+              "closed": true,
+              "box": [
+                [
+                  -0.02934,
+                  0.0704
+                ],
+                [
+                  -0.57328,
+                  -0.47236
+                ],
+                [
+                  -0.00682,
+                  0.03625
+                ]
+              ],
+              "reach": 0.10092,
+              "verticesOnTheSeam": 40
+            }
+          ]
+        },
+        "jaw": {
+          "boundaryEdgesInRegion": 69,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 69,
+              "closed": true,
+              "box": [
+                [
+                  -0.02934,
+                  0.0704
+                ],
+                [
+                  -0.57328,
+                  -0.47236
+                ],
+                [
+                  -0.00682,
+                  0.03625
+                ]
+              ],
+              "reach": 0.10092,
+              "verticesOnTheSeam": 40
+            }
+          ]
+        }
+      }
+    },
+    "mouthCaps": {
+      "Rhaeticosaurus authored body": {
+        "skullAtHinge": 50,
+        "jawAtHinge": 50,
+        "palate": {
+          "rimEdges": 68,
+          "capped": true,
+          "faces": 594,
+          "domedVertices": 264,
+          "deepestRaw": 0.016004,
+          "dome": 0.34,
+          "rounds": 2,
+          "rimVertices": 68,
+          "cycles": [
+            68
+          ]
+        },
+        "floor": {
+          "rimEdges": 68,
+          "capped": true,
+          "faces": 594,
+          "domedVertices": 264,
+          "deepestRaw": 0.016004,
+          "dome": 0.34,
+          "rounds": 2,
+          "rimVertices": 68,
+          "cycles": [
+            68
+          ]
+        }
+      },
+      "Rhaeticosaurus procedural volume twin": {
+        "skullAtHinge": 31,
+        "jawAtHinge": 31,
+        "palate": {
+          "rimEdges": 40,
+          "capped": true,
+          "faces": 342,
+          "domedVertices": 152,
+          "deepestRaw": 0.016179,
+          "dome": 0.34,
+          "rounds": 2,
+          "rimVertices": 40,
+          "cycles": [
+            40
+          ]
+        },
+        "floor": {
+          "rimEdges": 40,
+          "capped": true,
+          "faces": 342,
+          "domedVertices": 152,
+          "deepestRaw": 0.016179,
+          "dome": 0.34,
+          "rounds": 2,
+          "rimVertices": 40,
+          "cycles": [
+            40
+          ]
+        }
+      }
     },
     "toothPatches": [
       {
@@ -2002,22 +1859,13 @@
     ],
     "toothPatchesStraddlingTheCut": [],
     "authoredToothRows": [],
-    "oralPartSeating": [
-      {
-        "part": "Oral cavity lining",
-        "worstDepthRaw": 0.0006000953144393861
-      },
-      {
-        "part": "Seated jaw hinge tissue",
-        "worstDepthRaw": 0.00478049973025918
-      }
-    ]
+    "oralPartSeating": []
   },
   "envelope": {
     "maximumEnvelopeDifference": 0.061998605728149414,
     "maximumEnvelopeDifferenceFractionOfBodyLength": 0.012399721145629882,
     "surfaceDistanceMax": 0.031030602753162384,
-    "surfaceDistanceP95": 0.01662945710122585,
+    "surfaceDistanceP95": 0.01656900430098176,
     "envelopeTolerance": 0.2
   },
   "anchors": {

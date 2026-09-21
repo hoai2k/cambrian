@@ -27,8 +27,7 @@
     "Ability",
     "Grab",
     "Breath",
-    "Growth",
-    "Walk"
+    "Growth"
   ],
   "looping": [
     "Idle",
@@ -36,8 +35,7 @@
     "Sprint",
     "Guard",
     "Eat",
-    "Grab",
-    "Walk"
+    "Grab"
   ],
   "anchors": [
     "anchor_mouth",
