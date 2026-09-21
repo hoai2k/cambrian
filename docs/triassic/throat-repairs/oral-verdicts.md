@@ -56,9 +56,9 @@ column to read.** Nothing here is a claim about every camera: it is one side-on 
 | Cymbospondylus | 4 | 933 | |
 | Archelon | 1 | 1,262 | |
 | Macrocnemus | 343 | 2,594 | |
-| Hybodus | 1,346 | 2,833 | |
+| **Hybodus** | **0** | **0** | ported in T3D-32A: not cut at all (was 1,346 / 2,833) |
 | Mixosaurus | 0 | 3,697 | |
-| Atopodentatus | 3,738 | 4,494 | |
+| **Atopodentatus** | **0** | **0** | ported in T3D-32A: capped with its own rim (was 3,738 / 4,494) |
 | Keichousaurus | 2 | 4,375 | |
 | Hupehsuchus | 38 | 4,784 | |
 | Coelophysis | 3 | 7,276 | |
