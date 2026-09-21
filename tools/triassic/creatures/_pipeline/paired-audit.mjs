@@ -51,6 +51,10 @@ const meshValues = (d) => d.getRoot().listMeshes()
  * keys are the rest transform restated on every frame honours the contract exactly, and this
  * assertion used to fail it and say "no root motion" while doing so. Measured at the 1e-6 the
  * motion library itself throws at (`tools/creatures/motion/rig.mjs`).
+ *
+ * Exported because three bodies (Helicoprion, Hybodus, Saurichthys) predate this module and carry
+ * their own copy of the whole audit — the drift this file's header warns about, which is why the
+ * check itself lives here and is imported rather than pasted a fourth time.
  */
 const ROOT_TOL = 1e-6;
 function rootDrift(path, values, rest) {
@@ -67,6 +71,13 @@ function rootDrift(path, values, rest) {
     }
   }
   return worst;
+}
+/** Refuse a channel that moves the rig's root. `rootRest` is `skeleton(d)[0].joints[0]`. */
+export function assertRootStill(rootRest, ch, clipName) {
+  if (ch.node !== rootRest.name) return;
+  const d = rootDrift(ch.path, ch.values, ch.path === 'rotation' ? rootRest.r : rootRest.t);
+  assert(d <= ROOT_TOL,
+    `${clipName}: the root moves — ${ch.path} leaves its rest transform by ${d.toExponential(2)}`);
 }
 
 /**
@@ -120,11 +131,7 @@ export async function auditPair({ id, base, here, local, joints, sockets: socket
       assert(!signatures.has(sig), `${a.name} duplicates another clip`);
       signatures.add(sig);
       for (const ch of a.channels) {
-        if (ch.node === rootRest.name) {
-          const d = rootDrift(ch.path, ch.values, ch.path === 'rotation' ? rootRest.r : rootRest.t);
-          assert(d <= ROOT_TOL,
-            `${a.name}: the root moves — ${ch.path} leaves its rest transform by ${d.toExponential(2)}`);
-        }
+        assertRootStill(rootRest, ch, a.name);
         assert.notEqual(ch.path, 'scale', 'no scale channels');
         assert(ch.times.at(-1) > 0);
         const size = ch.path === 'rotation' ? 4 : 3;
