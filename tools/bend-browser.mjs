@@ -409,7 +409,19 @@ try {
   // corrected, measured on *this* body rather than carried over from the generation, and the
   // reading is taken three times against three chords a person could reasonably call "the trunk".
   // Nothing here asserts a number — what it asserts is that they *differ*, which is the finding.
-  const neck = { base: [-0.1182, 0.0659, -1.2490], tip: [-0.5114, 0.1603, -0.5430] };
+  // **The span is asked of the body on stage, never typed from an older one.** These two points
+  // used to be literals — the `chest` and `skull` heads of the shipped rest as it stood in T3D-26 —
+  // and that rest is exactly the thing this animal's builders keep moving: T3D-34 aimed the front
+  // 34° further and carried it into the bind, which slid the skull 12 % of the span away from the
+  // number written here. The span then landed off the neck, the panel re-guessed its reference
+  // chords against it, and the three readings below came out of a different question. So the drive
+  // asks the scene where those two bones actually are, the way a reviewer's eye would.
+  const boneHead = async (name) => page.evaluate((n) => {
+    const b = window.__viewerScene.sculptTarget()?.bones?.find((x) => x.name === n);
+    return b ? [...b.head] : null;
+  }, name);
+  const neck = { base: await boneHead('chest'), tip: await boneHead('skull') };
+  assert.ok(neck.base && neck.tip, 'the scene says where this body\'s own shoulder and skull are');
   await typeSpan(neck);
   const refPickA = (side, end) => page.locator('.bend-refs label', { hasText: `${side} reference ${end}` }).locator('select');
   const trunkRows = [];
