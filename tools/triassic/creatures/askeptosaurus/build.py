@@ -515,7 +515,7 @@ def paddle_audit(rig,obj,limb_defs,phases=5):
  scene.frame_set(0);bpy.context.view_layer.update()
  return out
 
-def measure(rig,body,front,shape,headref):
+def measure(rig,body,front,shape,headref,sockets=()):
  """"It moves" as a number, read back off the keyed actions rather than off the formulas.
 
  The swept angle is a joint's own peak-to-peak rotation over the clip -- the same figure the
@@ -542,6 +542,10 @@ def measure(rig,body,front,shape,headref):
  forty per cent high here and could not be compared with any other body on the roster.
  """
  scene=bpy.context.scene;out={};tips=('tail_11','skull','fore_upper_L')
+ # The sockets are measured here too, in the same unit as everything else (the bind box), because
+ # an anchor is a claim about where a blow lands and "the tail anchor moves" has to be a number.
+ socket_local={a['name']:(a['bone'],rig.data.bones[a['bone']].matrix_local.inverted()@Vector(a['point']))
+  for a in sockets}
  def skin():
   deps=bpy.context.evaluated_depsgraph_get()
   return np.concatenate([np.array([v.co[:] for v in o.evaluated_get(deps).data.vertices]) for o in shape])
@@ -553,10 +557,12 @@ def measure(rig,body,front,shape,headref):
   action=bpy.data.actions[clip];rig.animation_data.action=action
   if getattr(action,'slots',None):rig.animation_data.action_slot=action.slots[0]
   end=round(CLIPS[clip]*30);rot={};pos={n:[] for n in tips};folds=[];spans=[];aims=[]
+  spos={n:[] for n in socket_local}
   for f in range(end+1):
    scene.frame_set(f);bpy.context.view_layer.update()
    for q in rig.pose.bones:rot.setdefault(q.name,[]).append(tuple(q.rotation_euler))
    for n in tips:pos[n].append(np.array(rig.pose.bones[n].tail[:]))
+   for n,(b,l) in socket_local.items():spos[n].append(np.array((rig.pose.bones[b].matrix@l)[:]))
    if f%max(1,end//4)==0 or f==end:spans.append(span())
    # Where the head is pointing against the trunk's own run, every frame. This is the number
    # T3D-26 exists for, and it is asked of the pose the clip actually produces rather than of the
@@ -582,7 +588,8 @@ def measure(rig,body,front,shape,headref):
   'tailArcOverChord':[round(float(min(folds)),4),round(float(max(folds)),4)],
   'headVsTrunkRunDegrees':[round(float(min(aims)),2),round(float(max(aims)),2)],
   'posedExtentOverBind':[round(min(spans)/bind,4),round(max(spans)/bind,4)],
-  'tailTipTravel':travel('tail_11'),'skullTravel':travel('skull'),'forePaddleTravel':travel('fore_upper_L')}
+  'tailTipTravel':travel('tail_11'),'skullTravel':travel('skull'),'forePaddleTravel':travel('fore_upper_L'),
+  'anchorTravel':{n:round(float(max(np.linalg.norm(a-b) for a in v for b in v))/bind,4) for n,v in spos.items()}}
  out['bindBoxMax']=round(bind,4)
  # Clearing the action does **not** clear the pose, and the rig has just been stepped through
  # twenty-four clips: left posed, the mesh the exporter evaluates for normals is the posed one
@@ -598,6 +605,19 @@ def measure(rig,body,front,shape,headref):
   assert out['Idle']['tailTipTravel']>.04,out['Idle']['tailTipTravel']
   assert out['Swim']['tailTipTravel']>.12,out['Swim']['tailTipTravel']
   assert out['Sprint']['tailTipTravel']>out['Swim']['tailTipTravel'],'Sprint must out-travel Swim'
+  # **The weapon has to move, and it has to be the one the clip is named after** (T3D-32D). The
+  # two tail strikes swing the tail anchor a fifth of the animal or more, and in both of them it
+  # out-travels the anchor on the skull by a wide margin -- which is the whole reason the tail
+  # carries an anchor of its own, and is the number that says so rather than an impression.
+  if 'anchor_attack_tail' in out['TailWhip']['anchorTravel']:
+   for c in ('TailWhip','Heavy'):
+    tail,head=out[c]['anchorTravel']['anchor_attack_tail'],out[c]['anchorTravel']['anchor_attack_primary']
+    assert tail>.20,(c,'the tail strike must swing the tail',out[c]['anchorTravel'])
+    assert tail>head*3.,(c,'the blow must land from the tail rather than the head',out[c]['anchorTravel'])
+   # And it is not simply a tail that is always moving: the bite clips keep it near home.
+   for c in ('Attack','Bite'):
+    assert out[c]['anchorTravel']['anchor_attack_tail']<out['TailWhip']['anchorTravel']['anchor_attack_tail'],\
+     (c,'a bite must not swing the tail further than the whip does',out[c]['anchorTravel'])
   # The straight-line clips only. A turn bends the animal into a C and is honestly shorter --
   # `TurnRight`, into the generation's own hook, reads 0.84 -- and a coil shorter still.
   for c in ('Idle','Swim','Sprint','Dive','Rise','Grab'):
@@ -944,12 +964,44 @@ def build(body):
  gltf=lambda v:[round(v.x,6),round(v.z,6),round(-v.y,6)]
  cut_plane={'point':gltf(cutp),'normal':gltf(cutn),'tolerance':.01,'frame':'glTF, +Y up'}
  place=lambda b,p:list((carried_by[b]@tx(p)) if b in carried_by else tx(p))
+ # **The tail is this animal's other weapon and it had no anchor at all** (T3D-23, closed by
+ # T3D-32D). `anchor_attack_primary` sits on the skull, which is right for `Attack` and `Bite` --
+ # a thalattosaur's light attack is a bite -- but `Heavy` and `TailWhip` strike with the tail, and
+ # measured over 41 phases of the packaged file the skull anchor moves 2.1 % of a body in them.
+ # That is not a clip that fails to use the animal: the tail is doing the work (`tailTipTravel`
+ # 0.30 in `TailWhip` against `Idle`'s 0.05) and the *anchor* was in the wrong place, so what the
+ # simulation could point at was a head standing still while the blow landed somewhere else.
+ #
+ # The rule is that the attack anchor belongs on the bone that delivers the blow, and this body
+ # delivers two different blows with two different ends of itself. The runtime already holds more
+ # than one: `CreatureAnchors` collects **every** `role: attack` socket and `nearestAttack` picks
+ # the one closest to the target, so a bite lands from the jaws and a whip from the tail with
+ # nothing having to name a clip. So the skull keeps the primary -- it is the bite, and it is the
+ # anchor every other body in the roster carries -- and the tail gains one of its own, at the end
+ # of the animal's own measured centreline, on the last control that swings it.
+ # **Where the tail ends is measured, not typed.** The centreline's last station is the end of a
+ # fitted polyline and not a point on the skin: on the posed generation it lands 0.0006 raw from
+ # the surface, and on the straight regeneration 0.068 outside it -- a seventh of the tail's own
+ # length out in open water, and walking back down the axis does not find the skin either, because
+ # a fitted axis and a thin tapering tail part company at the very end. So the anchor is **seated
+ # on the surface nearest the end of the animal's own centreline**, which needs no threshold and
+ # no search and is the same construction on both bodies; how far the axis end was from the skin
+ # is then a number each body records rather than a gate it has to pass.
+ tip_on_axis=at(AP,AC,float(tailstations[12]))
+ _hit,_,_,tail_anchor_gap=bvh.find_nearest(tip_on_axis)
+ tailtip=Vector(_hit);tail_anchor_gap=float(tail_anchor_gap)
+ tail_arc=float(T.project(AP,AC,tailtip)[1])
  anchorpts={'anchor_mouth':('jaw',(cx(front_y+.008),front_y+.008,seam(front_y+.008)-.002),'mouth'),
  'anchor_mouth_inside':('skull',(cx(hinge-.015),hinge-.015,seam(hinge-.015)),'swallow'),
- 'anchor_attack_primary':('skull',(cx(front_y+.002),front_y+.002,seam(front_y+.002)),'attack')}
+ 'anchor_attack_primary':('skull',(cx(front_y+.002),front_y+.002,seam(front_y+.002)),'attack'),
+ 'anchor_attack_tail':('tail_11',tuple(tailtip),'attack')}
  anchors=[{'name':n,'bone':b,'point':place(b,p),'role':r} for n,(b,p,r) in anchorpts.items()]
+ # The seated point is a *contact*, so it has to be at the far end of the tail rather than
+ # anywhere else the nearest-surface search could have landed: its own arc position along the
+ # centreline is inside the last control's station.
+ assert tail_arc>float(tailstations[11]),('the tail anchor is not on the last tail control',tail_arc,float(tailstations[11]))
  seams,holds=animate(rig,body,front,tailchain,neckchain,hook)
- motion=measure(rig,body,front,groups[0],headref);sockets=T.make_sockets(rig,anchors)
+ motion=measure(rig,body,front,groups[0],headref,anchors);sockets=T.make_sockets(rig,anchors)
  paddles=paddle_audit(rig,groups[0][0],limb_defs)
  if front:
   # The owner named the **right** pectoral, so the pair is measured rather than assumed: the skin
@@ -988,7 +1040,9 @@ def build(body):
   'waveStep':REST[body]['step'],'waveVerticalShare':REST[body]['vert'],
   'clipAmplitudes':REST[body]['amp'],'actAmplitude':REST[body]['act'],
   'bendRangeLimit':1.},
- 'anchors':anchors,'maxInfluences':4,'rootStable':True,'noScaleChannels':True,'carry':carry_report,**twin_report}
+ 'anchors':anchors,'tailAnchorSurfaceGapRaw':round(tail_anchor_gap,5),
+ 'tailAnchorArc':round(tail_arc,5),'tailAnchorArcOverBodyArc':round(tail_arc/AC[-1],4),
+ 'maxInfluences':4,'rootStable':True,'noScaleChannels':True,'carry':carry_report,**twin_report}
  if front:
   shutil.copyfile(OUT/(ID+'.puppet.glb'),OUT/(ID+'.lod1.glb'))
   profile,worst=T.paired_profile(groups[0],groups[1],(Y0+.01)*SCALE,(Y1-.01)*SCALE,.04*SCALE)

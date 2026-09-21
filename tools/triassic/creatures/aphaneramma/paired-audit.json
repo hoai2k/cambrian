@@ -3,22 +3,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1907612,
-      "sha256": "ed7d40d7ed85f2c44ec2fce28578d714e3fc2c5ae78756064eb4d13a868ad54f",
+      "bytes": 1907332,
+      "sha256": "ad7ebb007e3cbf2e5d26fbb0093a8d68408f980887591f637f108d23a6c83e92",
       "triangles": 22473,
       "vertices": 13446
     },
     {
       "suffix": ".puppet",
-      "bytes": 713956,
-      "sha256": "12cf60f097e3518823d243ad86d2440321b6c1e9ae7f1b37d010037895bbbe5f",
+      "bytes": 713676,
+      "sha256": "1570d56b2e7750d8bfbd8d6d19d4650605f21b65cd39b3205d91bfd997e1bf70",
       "triangles": 7762,
       "vertices": 4033
     },
     {
       "suffix": ".lod1",
-      "bytes": 713956,
-      "sha256": "12cf60f097e3518823d243ad86d2440321b6c1e9ae7f1b37d010037895bbbe5f",
+      "bytes": 713676,
+      "sha256": "1570d56b2e7750d8bfbd8d6d19d4650605f21b65cd39b3205d91bfd997e1bf70",
       "triangles": 7762,
       "vertices": 4033
     }
@@ -97,11 +97,11 @@
   "clipSignatures": [
     {
       "name": "Ability",
-      "sha256": "e11d421f1422624c13bba30b02473187f0cc08e97807f6eb23a3534a9d2ba866"
+      "sha256": "74ecbb2e5c13aa5e2a80a9b2f7addc699bc48b1006a1184d78989d0a0e4e82e6"
     },
     {
       "name": "Attack",
-      "sha256": "9229357ede7375f618fff4fb485ca33b627b5249cbf3d799000ca9407ed6a56f"
+      "sha256": "5b429cb2600bef53d4706ee9e2395e14a194c9eb17e4a909c494ac045b91a195"
     },
     {
       "name": "Bite",
@@ -149,7 +149,7 @@
     },
     {
       "name": "Heavy",
-      "sha256": "443caefa56d6f047853ca7386ef92e88edb8219c3418bcc6e1e1b64912f2e1cd"
+      "sha256": "4be651b9777a3b59358422cecfc846d7d3fd3b4fc4a3428abb3f2c7a751ab4fc"
     },
     {
       "name": "Hit",
@@ -197,13 +197,13 @@
           "clip": "Ability",
           "duration": 0.800000011920929,
           "samples": 61,
-          "maxVertexTravel": 1.912621241827301
+          "maxVertexTravel": 2.2563583040071173
         },
         {
           "clip": "Attack",
           "duration": 0.8999999761581421,
           "samples": 61,
-          "maxVertexTravel": 0.9237333081514524
+          "maxVertexTravel": 1.117197838857306
         },
         {
           "clip": "Bite",
@@ -275,7 +275,7 @@
           "clip": "Heavy",
           "duration": 1.100000023841858,
           "samples": 61,
-          "maxVertexTravel": 1.5603014844322287
+          "maxVertexTravel": 1.8237952549388123
         },
         {
           "clip": "Hit",
@@ -340,13 +340,13 @@
           "clip": "Ability",
           "duration": 0.800000011920929,
           "samples": 61,
-          "maxVertexTravel": 1.9253147499087868
+          "maxVertexTravel": 2.2703699943791498
         },
         {
           "clip": "Attack",
           "duration": 0.8999999761581421,
           "samples": 61,
-          "maxVertexTravel": 0.9106693941178818
+          "maxVertexTravel": 1.102999540839509
         },
         {
           "clip": "Bite",
@@ -418,7 +418,7 @@
           "clip": "Heavy",
           "duration": 1.100000023841858,
           "samples": 61,
-          "maxVertexTravel": 1.5705984701230864
+          "maxVertexTravel": 1.8339895896878968
         },
         {
           "clip": "Hit",
@@ -580,30 +580,30 @@
   "strike": [
     {
       "clip": "Attack",
-      "snoutPathLength": 1.2773155282500521,
-      "snoutReach": 0.46327780056524853,
-      "skullReach": 0.3973349269357149,
-      "chestReach": 0.40058374158985355,
-      "lateralOverForward": 0.031094117284772127,
-      "halfTravelInFractionOfClip": 0.3333333333333333
+      "snoutPathLength": 1.4644427970240133,
+      "snoutReach": 0.6532490612096729,
+      "skullReach": 0.5956160769530636,
+      "chestReach": 0.5997983326508783,
+      "lateralOverForward": 0.027342274109251066,
+      "halfTravelInFractionOfClip": 0.3229166666666667
     },
     {
       "clip": "Heavy",
-      "snoutPathLength": 4.057937674604145,
-      "snoutReach": 1.297406829423555,
-      "skullReach": 0.522709762469286,
-      "chestReach": 0.5752441776661934,
-      "lateralOverForward": 0.755842900106275,
-      "halfTravelInFractionOfClip": 0.25
+      "snoutPathLength": 3.664157507531568,
+      "snoutReach": 0.9347140252279049,
+      "skullReach": 0.8044965974571704,
+      "chestReach": 0.8372704026364638,
+      "lateralOverForward": 0.9956528877377501,
+      "halfTravelInFractionOfClip": 0.19791666666666666
     },
     {
       "clip": "Ability",
-      "snoutPathLength": 4.725870062232058,
-      "snoutReach": 1.6851222287026755,
-      "skullReach": 0.4602243676071503,
-      "chestReach": 0.515630107328825,
-      "lateralOverForward": 0.7694343746263947,
-      "halfTravelInFractionOfClip": 0.21875
+      "snoutPathLength": 3.670695708088689,
+      "snoutReach": 0.9137392107582603,
+      "skullReach": 0.8043892512886228,
+      "chestReach": 0.8470554358386093,
+      "lateralOverForward": 1.0535036477346293,
+      "halfTravelInFractionOfClip": 0.20833333333333334
     },
     {
       "clip": "Bite",
@@ -667,10 +667,10 @@
     },
     {
       "clip": "Attack",
-      "maxOpenRadians": 0.43999887959087186,
-      "minRadians": -4.656605184769853e-9,
+      "maxOpenRadians": 0.43999877052573677,
+      "minRadians": -6.98490873476992e-9,
       "peakPhase": 0.4583333333333333,
-      "mouthSocketTravelInSkullFrame": 0.5552476146001447
+      "mouthSocketTravelInSkullFrame": 0.5552474791840105
     },
     {
       "clip": "Bite",
@@ -682,9 +682,9 @@
     {
       "clip": "Heavy",
       "maxOpenRadians": 0.4600000523470488,
-      "minRadians": -1.363696023074666e-8,
+      "minRadians": -1.1263175987367545e-8,
       "peakPhase": 0.5,
-      "mouthSocketTravelInSkullFrame": 0.580050983500654
+      "mouthSocketTravelInSkullFrame": 0.5800509835006541
     },
     {
       "clip": "Hit",
@@ -738,8 +738,8 @@
     {
       "clip": "Ability",
       "maxOpenRadians": 0.4500001670875387,
-      "minRadians": -3.725289853153573e-9,
-      "peakPhase": 0.4791666666666667,
+      "minRadians": -7.092686933819636e-15,
+      "peakPhase": 0.5,
       "mouthSocketTravelInSkullFrame": 0.567657265235225
     },
     {
@@ -823,9 +823,9 @@
     },
     {
       "clip": "Attack",
-      "anchor_mouth": 0.7567377180902871,
-      "anchor_mouth_inside": 0.3931768606224427,
-      "anchor_attack_primary": 0.46327780056524853
+      "anchor_mouth": 0.8577378459289656,
+      "anchor_mouth_inside": 0.592444259617964,
+      "anchor_attack_primary": 0.6532490612096729
     },
     {
       "clip": "Bite",
@@ -835,9 +835,9 @@
     },
     {
       "clip": "Heavy",
-      "anchor_mouth": 1.2894874552672269,
-      "anchor_mouth_inside": 0.5211338725433255,
-      "anchor_attack_primary": 1.297406829423555
+      "anchor_mouth": 1.0942099985205107,
+      "anchor_mouth_inside": 0.7998163219701275,
+      "anchor_attack_primary": 0.934658647867705
     },
     {
       "clip": "Hit",
@@ -883,9 +883,9 @@
     },
     {
       "clip": "Ability",
-      "anchor_mouth": 1.710394477955105,
-      "anchor_mouth_inside": 0.5502090436888237,
-      "anchor_attack_primary": 1.6851222287026755
+      "anchor_mouth": 1.0747828388101202,
+      "anchor_mouth_inside": 0.8011613065792833,
+      "anchor_attack_primary": 0.9137392107582603
     },
     {
       "clip": "Grab",

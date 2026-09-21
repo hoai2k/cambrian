@@ -14,7 +14,10 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { auditCutAttachment } from '../_pipeline/cut-attachment.mjs';
 import { auditPair, tracker, lateral, anchorTravel, hash } from '../_pipeline/paired-audit.mjs';
 const id='askeptosaurus',base=`public/assets/triassic/creatures/${id}`,here=`tools/triassic/creatures/${id}`,local=`local/triassic-authoring/${id}`;
-const {report,CLIPS,LOOPS,authored,write}=await auditPair({id,base,here,local,joints:33,sockets:3});
+// Four sockets, not three: the mouth, the swallow, the bite's anchor on the skull and the tail's
+// own (T3D-32D). `Heavy` and `TailWhip` strike with the tail, and the runtime keeps every
+// `role: attack` socket and lands a blow from whichever is nearest the target.
+const {report,CLIPS,LOOPS,authored,write}=await auditPair({id,base,here,local,joints:33,sockets:4});
 const track=tracker(authored);
 report.gait=['Swim','Sprint'].map(clip=>{
  const rows=track(clip,['skull','tail_05','tail_11','fore_upper_L:tip','fore_upper_R:tip']);
@@ -47,7 +50,7 @@ for (const row of JSON.parse(fs.readFileSync(`${here}/backup-source-manifest.jso
  if(row.retiredFromPublic)continue;assert.equal(hash(fs.readFileSync(row.path)),row.sha256,'original source remains unchanged');
 }
 const sockets=backup.getRoot().listNodes().filter(n=>n.getName().startsWith('anchor_'));
-assert.equal(sockets.length,3);for(const n of sockets)assert(n.getExtras().cambrianAnchor?.version===1);
+assert.equal(sockets.length,4);for(const n of sockets)assert(n.getExtras().cambrianAnchor?.version===1);
 for(const a of backup.getRoot().listAnimations())for(const c of a.listChannels()){
  assert(c.getTargetNode().getName()!=='root');assert(c.getTargetPath()!=='scale');
  const arr=c.getSampler().getOutput().getArray();assert([...arr].every(Number.isFinite));
