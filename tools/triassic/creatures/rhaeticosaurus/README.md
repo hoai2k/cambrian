@@ -18,6 +18,9 @@ python3 tools/triassic/creatures/rhaeticosaurus/contact-sheets.py
 /opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- rhaeticosaurus Heavy@0.45 Heavy@0.5 Bite@0.1 Attack@0.45 Eat@0.4
 node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/rhaeticosaurus.glb
 node tools/triassic/idle-bones.mjs public/assets/triassic/creatures/rhaeticosaurus.glb
+# T3D-31: the proof that is about the body the game draws, and the picture of it
+/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- rhaeticosaurus --as-drawn Attack@0.458 Bite@0.104 Heavy@0.575 Eat@0.400
+/opt/blender/blender -b --factory-startup --python tools/triassic/mouth-space.py -- rhaeticosaurus Heavy@0.575 docs/triassic/verification/rhaeticosaurus-mouth-after.png
 ```
 
 ## The source, and what has already been done to it
