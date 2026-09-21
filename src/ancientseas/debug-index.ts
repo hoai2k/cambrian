@@ -70,7 +70,7 @@ export const DEBUG_PAGES: readonly DebugPage[] = [
       },
       {
         name: 'Bend', query: 'specimen=triassic:askeptosaurus&mode=bend', reads: 'src/viewer/Viewer.tsx',
-        blurb: 'Turn a run of a body between two points placed on it — a neck off its trunk — and, which is the point of it, measure the turn: the span’s angle before and after, taken both off the body’s own traced centre and off the bone chain, with the two references each reading is between named on the screen. Exports the span, the axle and a per-joint table a builder poses a rig with.',
+        blurb: 'Turn a run of a body between two points placed on it — a neck off its trunk — by aiming an oriented plane at each end at the direction the creature’s axis line runs through it; aim both the same way and the run between them comes straight. And, which is the point of it, measure the turn: the span’s angle before and after, taken both off the body’s own traced centre and off the bone chain, with the two references each reading is between named on the screen, and the body the numbers describe said out loud. Exports the two planes, the axle they imply and a per-joint table a builder poses a rig with.',
       },
     ],
   },

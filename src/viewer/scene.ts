@@ -95,19 +95,32 @@ export interface MouthCut {
   halfWidth: number;
   height: number;
 }
-/** Which handle of the bend span the pointer is on. */
-export type BendHandle = 'base' | 'tip' | 'axis';
 /**
- * The bend span as the stage draws it, in the model's root frame: the two ends, the three
- * directions of the bend, how wide to draw the cut planes, and the two traced centrelines — which
- * are drawn because the geometry reading is only as good as the run it followed, and a reviewer who
- * cannot see the trace cannot see it set off down a flipper.
+ * Which handle of the bend span the pointer is on: the two ends of the span, and the two **plane
+ * aims** — each a knob standing out along its plane's own normal, which is turned by dragging it.
+ *
+ * There used to be one magenta handle here for the bend *plane*, dragged round an axle. That swept
+ * the creature's own long axis while the body it bent went ninety degrees the other way, so the
+ * control's motion was not the bend it produced. A plane's aim is: tip it back to front and the
+ * body under it goes back to front.
+ */
+export type BendHandle = 'base' | 'tip' | 'baseAim' | 'tipAim';
+/**
+ * The bend span as the stage draws it, in the model's root frame: the two ends, each end's own
+ * plane normal, the derived axle, how wide to draw the planes, and the two traced centrelines —
+ * which are drawn because the geometry reading is only as good as the run it followed, and a
+ * reviewer who cannot see the trace cannot see it set off down a flipper.
+ *
+ * Each cut plane is drawn square to **its own** normal rather than to the span, because that is
+ * what the plane now is: a statement about which way the creature's axis line runs through it.
  */
 export interface BendSpan {
   base: [number, number, number];
   tip: [number, number, number];
   forward: [number, number, number];
-  up: [number, number, number];
+  baseNormal: [number, number, number];
+  tipNormal: [number, number, number];
+  /** The hinge the two planes imply. Drawn, never grabbed: it is derived from them. */
   axis: [number, number, number];
   /** Half the width the cut planes and the axle are drawn at. */
   reach: number;
@@ -244,7 +257,7 @@ export interface ViewerScene {
    * "inside" test is the document's own, handed in as a closure so the scene knows nothing about
    * how a bend is aimed.
    */
-  showBend(span: BendSpan | null, inSpan: ((x: number, y: number, z: number) => boolean) | null): void;
+  showBend(span: BendSpan | null, inSpan: ((x: number, y: number, z: number) => boolean) | null, warp?: WarpFn | null): void;
   /** Which of the bend span's handles is under the pointer, if any: canvas CSS pixels in. */
   bendPick(x: number, y: number): BendHandle | undefined;
   /**
@@ -960,12 +973,18 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   const bendHandles: Record<BendHandle, THREE.Mesh> = {
     base: new THREE.Mesh(handleGeo, helperMat('#ffb36b', 0.95)),
     tip: new THREE.Mesh(handleGeo, helperMat('#61f2d5', 0.95)),
-    axis: new THREE.Mesh(handleGeo, helperMat('#ff2fa8', 0.95)),
+    baseAim: new THREE.Mesh(handleGeo, helperMat('#ffd9a8', 0.95)),
+    tipAim: new THREE.Mesh(handleGeo, helperMat('#ff2fa8', 0.95)),
   };
+  // Each plane's own normal, drawn from the plane out to its knob, so what a handle is aiming is
+  // visible as a line and not only as a floating sphere.
+  const aimLine = (color: string) => new THREE.Line(G(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 0, 0)])), traceMat(color));
+  const bendAims = { base: aimLine('#ffd9a8'), tip: aimLine('#ff2fa8') };
   for (const [name, h] of Object.entries(bendHandles)) { h.name = `bend-${name}`; h.renderOrder = 5; }
-  for (const o of [bendAxle, spanLine, bendTraces.base, bendTraces.tip]) o.renderOrder = 5;
+  for (const o of [bendAxle, spanLine, bendTraces.base, bendTraces.tip, bendAims.base, bendAims.tip]) o.renderOrder = 5;
   bendGroup.add(bendPlanes.base, bendPlanes.tip, bendAxle, spanLine, bendTraces.base, bendTraces.tip,
-    bendHandles.base, bendHandles.tip, bendHandles.axis);
+    bendAims.base, bendAims.tip,
+    bendHandles.base, bendHandles.tip, bendHandles.baseAim, bendHandles.tipAim);
   // The span's own vertices, lit point by point — the same overlay mark mode and the mouth editor
   // use, so what the turn will actually carry is seen rather than inferred.
   const bendGeo = G(new THREE.BufferGeometry());
@@ -996,25 +1015,38 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     line.visible = true;
   }
 
-  function showBend(span: BendSpan | null, inSpan: ((x: number, y: number, z: number) => boolean) | null) {
+  function showBend(span: BendSpan | null, inSpan: ((x: number, y: number, z: number) => boolean) | null, warp?: WarpFn | null) {
     if (!span || !inSpan || !model || !sculptTarget) { bendGroup.visible = false; bendPoints.visible = false; return; }
     model.updateMatrixWorld();
     bendGroup.matrix.copy(model.matrixWorld);
     bendGroup.matrixWorldNeedsUpdate = true;
-    const f = new THREE.Vector3(...span.forward), u = new THREE.Vector3(...span.up), a = new THREE.Vector3(...span.axis);
-    const q = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(f, u, a));
+    const f = new THREE.Vector3(...span.forward), a = new THREE.Vector3(...span.axis);
+    const bn = new THREE.Vector3(...span.baseNormal).normalize();
+    const tn = new THREE.Vector3(...span.tipNormal).normalize();
     const base = new THREE.Vector3(...span.base), tip = new THREE.Vector3(...span.tip);
     const wide = span.reach * 2;
-    const place = (o: THREE.Object3D, at: THREE.Vector3, scale: THREE.Vector3) => { o.position.copy(at); o.quaternion.copy(q); o.scale.copy(scale); };
-    // The plane geometry is rotated onto the y–z face, so its x is the basis' forward: a cut square
-    // to the span is that face scaled across up and axis.
-    place(bendPlanes.base, base, new THREE.Vector3(1, wide, wide));
-    place(bendPlanes.tip, tip, new THREE.Vector3(1, wide, wide));
-    // The axle is a line along its own x, so it is aimed at the axis directly rather than through
-    // the span's basis: its length is the only thing the basis would have given it.
+    const X = new THREE.Vector3(1, 0, 0);
+    // The plane geometry is rotated onto the y–z face, so its own x is its normal: a plane is
+    // placed by turning that x onto the normal it is square to. Each end gets its own, because the
+    // two planes are two separate statements about where the creature's axis line runs.
+    const placePlane = (o: THREE.Object3D, at: THREE.Vector3, normal: THREE.Vector3) => {
+      o.position.copy(at);
+      o.quaternion.setFromUnitVectors(X, normal);
+      o.scale.set(1, wide, wide);
+    };
+    placePlane(bendPlanes.base, base, bn);
+    placePlane(bendPlanes.tip, tip, tn);
+    // The axle is a line along its own x, so it is aimed at the axis directly: its length is all
+    // that is left to give it.
     bendAxle.position.copy(base);
-    bendAxle.quaternion.setFromUnitVectors(new THREE.Vector3(1, 0, 0), a);
+    bendAxle.quaternion.setFromUnitVectors(X, a);
     bendAxle.scale.setScalar(span.reach * 1.4);
+    for (const [end, normal, at] of [['base', bn, base], ['tip', tn, tip]] as const) {
+      const line = bendAims[end];
+      line.position.copy(at);
+      line.quaternion.setFromUnitVectors(X, normal);
+      line.scale.setScalar(span.reach * 1.4);
+    }
     spanLine.position.copy(base);
     spanLine.quaternion.setFromUnitVectors(new THREE.Vector3(1, 0, 0), f);
     spanLine.scale.setScalar(base.distanceTo(tip));
@@ -1022,9 +1054,11 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     setPolyline(bendTraces.tip, span.tipTrace);
     const r = span.reach * 0.14;
     const rs = new THREE.Vector3(r, r, r);
-    place(bendHandles.base, base, rs);
-    place(bendHandles.tip, tip, rs);
-    place(bendHandles.axis, base.clone().addScaledVector(a, span.reach * 1.4), rs);
+    const put = (o: THREE.Object3D, at: THREE.Vector3) => { o.position.copy(at); o.quaternion.identity(); o.scale.copy(rs); };
+    put(bendHandles.base, base);
+    put(bendHandles.tip, tip);
+    put(bendHandles.baseAim, base.clone().addScaledVector(bn, span.reach * 1.4));
+    put(bendHandles.tipAim, tip.clone().addScaledVector(tn, span.reach * 1.4));
     bendGroup.visible = true;
 
     if (!bendRootCache) bendRootCache = sculptTarget.meshes.map((mesh) => ({ mesh, root: rootFramePositions(mesh.base, mesh.toRoot) }));
@@ -1036,10 +1070,17 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     }
     const dst = (bendGeo.getAttribute('position') as THREE.BufferAttribute).array as Float32Array;
     const v = new THREE.Vector3();
+    // Which vertices the span carries is asked of where they *are* — the shipped positions — and
+    // each one is then drawn where the bend has *put* it. Lighting the unwarped positions instead
+    // leaves the overlay standing where the body was while the body swings out from under it, and
+    // a render of a straightened run then shows the mesh beside its own marks.
+    const moved: [number, number, number] = [0, 0, 0];
     let w = 0;
     for (const { root } of bendRootCache) for (let i = 0; i < root.length; i += 3) {
       if (!inSpan(root[i], root[i + 1], root[i + 2])) continue;
-      v.set(root[i], root[i + 1], root[i + 2]).applyMatrix4(model.matrixWorld);
+      if (warp) { warp(root[i], root[i + 1], root[i + 2], moved); v.set(moved[0], moved[1], moved[2]); }
+      else v.set(root[i], root[i + 1], root[i + 2]);
+      v.applyMatrix4(model.matrixWorld);
       dst[w++] = v.x; dst[w++] = v.y; dst[w++] = v.z;
     }
     (bendGeo.getAttribute('position') as THREE.BufferAttribute).needsUpdate = true;
