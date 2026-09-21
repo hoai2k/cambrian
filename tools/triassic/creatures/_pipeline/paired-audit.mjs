@@ -45,6 +45,29 @@ const socketsOf = (d) => d.getRoot().listNodes().filter((n) => n.getName().start
   .sort((a, b) => a.name.localeCompare(b.name));
 const meshValues = (d) => d.getRoot().listMeshes()
   .map((m) => m.listPrimitives().map((p) => p.listSemantics().sort().map((s) => [s, data(p.getAttribute(s))])));
+/**
+ * How far a channel's samples leave a rest transform. The root's contract is that it does not
+ * *move*, which is not the same question as whether a channel for it exists: a clip whose root
+ * keys are the rest transform restated on every frame honours the contract exactly, and this
+ * assertion used to fail it and say "no root motion" while doing so. Measured at the 1e-6 the
+ * motion library itself throws at (`tools/creatures/motion/rig.mjs`).
+ */
+const ROOT_TOL = 1e-6;
+function rootDrift(path, values, rest) {
+  let worst = 0;
+  if (path === 'rotation') {
+    for (let i = 0; i + 3 < values.length; i += 4) {
+      let dot = 0; for (let k = 0; k < 4; k++) dot += values[i + k] * rest[k];
+      worst = Math.max(worst, Math.abs(1 - Math.abs(dot)));
+    }
+  } else {
+    for (let i = 0; i + 2 < values.length; i += 3) {
+      let d = 0; for (let k = 0; k < 3; k++) d += (values[i + k] - rest[k]) ** 2;
+      worst = Math.max(worst, Math.sqrt(d));
+    }
+  }
+  return worst;
+}
 
 /**
  * Package, prove parity, play every clip on both bodies, and return the report plus the loaded
@@ -90,13 +113,18 @@ export async function auditPair({ id, base, here, local, joints, sockets: socket
         report.clipSignatures, 'exact clip parity');
     }
     const signatures = new Set();
+    const rootRest = sk[0].joints[0];              // the skin's first joint is the rig's root
     for (const a of c) {
       let motion = 0;
       const sig = hash(JSON.stringify(a.channels));
       assert(!signatures.has(sig), `${a.name} duplicates another clip`);
       signatures.add(sig);
       for (const ch of a.channels) {
-        assert.notEqual(ch.node, 'root', 'no root motion');
+        if (ch.node === rootRest.name) {
+          const d = rootDrift(ch.path, ch.values, ch.path === 'rotation' ? rootRest.r : rootRest.t);
+          assert(d <= ROOT_TOL,
+            `${a.name}: the root moves — ${ch.path} leaves its rest transform by ${d.toExponential(2)}`);
+        }
         assert.notEqual(ch.path, 'scale', 'no scale channels');
         assert(ch.times.at(-1) > 0);
         const size = ch.path === 'rotation' ? 4 : 3;

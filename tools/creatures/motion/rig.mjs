@@ -222,6 +222,11 @@ export function sampleClip(rig, def, { authoredOn, pass, basePose, carry, author
     anim.addSampler(sampler).addChannel(ch);
   };
   for (const [ji, j] of rig.joints.entries()) {
+    // No channel for the root. The contract below is that it does not move, so anything written
+    // for it would be the rest transform restated on every key — no information, a little more
+    // file, and the one thing that made a correct clip unauditable: the paired audit reads a root
+    // channel's *existence* as root motion. A clip that carries none cannot be misread.
+    if (ji === 0) continue;
     const rest = rig.rest.get(j);
     const rot = new Float32Array((frames + 1) * 4);
     let prev = null;
