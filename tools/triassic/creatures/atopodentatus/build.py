@@ -699,12 +699,17 @@ for o in (auth, puppet):
     body_w, shell_w, JUNCTION[o.name] = T.jaw_junction(
         o, shell, relaxed, B['jaw'][0], rear=lambda p: abs(p.y - HINGE_Y) < 1e-5,
         upper_jaw=lambda p: p.y < HINGE_Y and p.z >= seam(p.y) - 1e-6, axis=(0., -1., 0.),
-        # A lighter throat share here: this head's `Heavy` pulls the neck back a third of a body
-        # while the jaw opens, and at a full share the gradient of jaw weight across the throat
-        # behind the corner of the mouth tore `neck_02` skin 4.31x where the body had read 3.90x
-        # (its own jaw's edge in the same clip). At 0.6 the rim still closes and the shell's short
-        # band carries the rest of the ramp where a point barely moves.
-        throat=.6)
+        # **A full throat share, and the 0.6 it used to run at was a symptom rather than a
+        # setting.** This body took a lighter share because its `Heavy` pulled the neck back a
+        # third of a body while the jaw opened, and at a full share the gradient of jaw weight
+        # across the throat behind the corner of the mouth tore `neck_02` skin 4.31x where the body
+        # read 3.90x. What was actually wrong was the clip: the hammer swung the snout through 327
+        # degrees (`HAMMER_YAW` above), and the "pull back" was a head rotated so far round that its
+        # projection on the body axis went negative. With the sweep re-authored to a quarter turn
+        # the `Heavy` is no longer the worst clip on the animal at all, and a full share now reads
+        # 3.42x -- the same figure the lighter share gives, and the same worst edge (`Sprint`,
+        # `fore_upper_R`), so nothing is being bought by holding the throat back.
+        throat=1.)
     counts, owners = [], {}
     for part, field in ((o, body_w), (shell, shell_w)):
         for v in part.data.vertices:
@@ -814,6 +819,22 @@ SIDE = {k: (1. if k.endswith('R') else -1.) for k in LIMB_NAMES}
 STROKE_LAG = {'fore': 0., 'hind': pi * .5}
 
 
+# **The hammer's swing is an angle, and it was 327 degrees of one.** `Heavy` laid its sweep on
+# four axial bones, the trunk and the skull at once -- 0.22 + 4 x 0.30 + 0.55 = 1.97 rad per unit
+# of the `hammer` envelope, which runs -1.0 through +1.9 -- so the snout went 113 degrees to one
+# side and then 214 to the other, and travelled 10.4 units on a body 5.0 long. What that read as
+# in T3D-23's own measurement is a clip that "pulls the head 33.8 % of L back before reaching only
+# 7.1 % forward": the head was not being pulled back, it was being swung so far round that its
+# projection on the body axis went negative. A bar is swung through a quarter turn, not round the
+# animal. `HAMMER_YAW` scales the three yaw gains together so the cumulative swing at the snout is
+# about 75 degrees with a 39-degree wind-up, which is a shovel-headed animal putting its rostrum
+# through the water sideways; `HAMMER_CARRY` walks the whole body forward on a plateau that rises
+# with the sweep and is held through it, so the bar arrives in *front* of where it started rather
+# than back at rest -- the same shape Phragmoteuthis' dart uses, and for the same reason.
+HAMMER_YAW = .45
+HAMMER_CARRY = .26
+
+
 def ramp(u, a, b, p=1.):
     return T.smooth((u - a) / max(b - a, 1e-6)) ** p
 
@@ -908,8 +929,11 @@ for clip, duration in CLIPS.items():
             body.rotation_euler.x = .09 * cock - .08 * drive
         if clip == 'Heavy':
             # The whole animal leans into the sweep, which is where its weight comes from.
-            body.rotation_euler.z += .22 * hammer
-            body.rotation_euler.y += .14 * hammer
+            body.rotation_euler.z += .22 * HAMMER_YAW * hammer
+            body.rotation_euler.y += .14 * HAMMER_YAW * hammer
+            # The carry: a plateau that rises with the sweep and is held through the follow, so the
+            # blow lands ahead of the animal instead of back where it wound up from.
+            body.location.y -= HAMMER_CARRY * ramp(u, .34, .56, 1.3) * (1 - ramp(u, .84, 1., 1.))
         if clip == 'Bite':
             body.location.y = -.16 * ramp(u, .05, .24, 2.4) * (1 - ramp(u, .42, .78, 1.))
         if clip == 'Parry':
@@ -957,7 +981,7 @@ for clip, duration in CLIPS.items():
                     z += .07 * cock * (1 if i % 2 == 0 else -.6)
                     z -= .05 * drive
             if clip == 'Heavy' and (n.startswith('neck') or n in ('chest',)):
-                z += .30 * hammer
+                z += .30 * HAMMER_YAW * hammer
             if clip == 'Dodge':
                 z += .16 * e * sin(i * .55 + .6)
             if graze and n.startswith('neck'):
@@ -973,8 +997,8 @@ for clip, duration in CLIPS.items():
             if graze and n.startswith('neck'):
                 q.rotation_euler.x = .15
         if clip == 'Heavy':
-            pb['skull'].rotation_euler.z += .55 * hammer
-            pb['skull'].rotation_euler.y += .18 * hammer
+            pb['skull'].rotation_euler.z += .55 * HAMMER_YAW * hammer
+            pb['skull'].rotation_euler.y += .18 * HAMMER_YAW * hammer
         if clip in ('Attack',):
             pb['skull'].rotation_euler.x += -.14 * cock + .22 * drive
             for n in ('neck_00', 'neck_01', 'neck_02'):

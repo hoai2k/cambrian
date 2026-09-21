@@ -1432,14 +1432,14 @@
     ],
     "Heavy": [
       [
-        -1.4677038192749023,
-        -2.1493701934814453,
-        -0.8357352614402771
+        -1.4666359424591064,
+        -2.3628482818603516,
+        -0.7683170437812805
       ],
       [
-        1.5363130569458008,
-        3.3359973430633545,
-        0.5995891094207764
+        1.5535627603530884,
+        3.3640999794006348,
+        0.5909318327903748
       ]
     ],
     "Hit": [
@@ -1619,8 +1619,8 @@
         "hind_outer_L": 387,
         "hind_mid_L": 454,
         "hind_tip_L": 286,
-        "skull": 4766,
-        "neck_02": 1243,
+        "skull": 4724,
+        "neck_02": 1201,
         "fore_outer_R": 562,
         "fore_tip_R": 414,
         "fore_mid_R": 603,
@@ -1631,7 +1631,7 @@
         "tail_02": 702,
         "fore_upper_R": 721,
         "neck_00": 1414,
-        "neck_01": 984,
+        "neck_01": 975,
         "jaw": 660
       },
       "jawJunction": {
@@ -1642,10 +1642,10 @@
         "dz": 0.01120610162615776,
         "band": 0.015,
         "back": 0.06,
-        "throat": 0.6,
+        "throat": 1.0,
         "shellVertices": 4436,
-        "shellFullJaw": 4277,
-        "bodyThroatVertices": 182
+        "shellFullJaw": 4323,
+        "bodyThroatVertices": 189
       }
     },
     "Atopodentatus procedural volume twin": {
@@ -1674,9 +1674,9 @@
         "fore_upper_R": 277,
         "neck_00": 532,
         "fore_upper_L": 344,
-        "neck_01": 396,
-        "neck_02": 483,
-        "skull": 1036,
+        "neck_01": 377,
+        "neck_02": 457,
+        "skull": 1010,
         "jaw": 334,
         "fore_mid_L": 311,
         "fore_outer_L": 246,
@@ -1690,15 +1690,15 @@
         "dz": 0.011174753308296204,
         "band": 0.015,
         "back": 0.06,
-        "throat": 0.6,
+        "throat": 1.0,
         "shellVertices": 867,
-        "shellFullJaw": 783,
-        "bodyThroatVertices": 76
+        "shellFullJaw": 811,
+        "bodyThroatVertices": 81
       }
     }
   },
   "maxInfluences": 4,
-  "meanInfluences": 2.294198963218958,
+  "meanInfluences": 2.277906689706245,
   "mouth": {
     "method": "modelled cavity, measured by casting head vertex normals back into the mesh",
     "note": "The generation models a real slit with an interior: 634 cavity vertices at a 0.020 gap, running y -0.334 to -0.196. The seam is the cavity's own mid height per station, blurred once, fitted over the stations in front of the hinge and continued behind them -- the detector's last few stations climb onto the cheek as the lumen closes. Station-to-station roughness 0.0233 of the local radius.",

@@ -3,22 +3,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 2268000,
-      "sha256": "3f7c607699dc915cde27fad84406ec27f3d71f50def62dd6be1c06c14937b15e",
+      "bytes": 2266888,
+      "sha256": "934212b8e236278831c2866a77d45b40d955ed80fdce9f993952d1ffaae206e4",
       "triangles": 32288,
       "vertices": 19047
     },
     {
       "suffix": ".puppet",
-      "bytes": 891788,
-      "sha256": "a960eb1e66dc053becfe5e54a13d4640f11b25e4d88493ca58b7f00fba7a1a77",
+      "bytes": 891384,
+      "sha256": "e04d4e4406c4a68c1f2b7cc9f3762414f8db6eff081cdd8ddd012412cf617569",
       "triangles": 8226,
       "vertices": 4120
     },
     {
       "suffix": ".lod1",
-      "bytes": 891788,
-      "sha256": "a960eb1e66dc053becfe5e54a13d4640f11b25e4d88493ca58b7f00fba7a1a77",
+      "bytes": 891384,
+      "sha256": "e04d4e4406c4a68c1f2b7cc9f3762414f8db6eff081cdd8ddd012412cf617569",
       "triangles": 8226,
       "vertices": 4120
     }
@@ -149,7 +149,7 @@
     },
     {
       "name": "Heavy",
-      "sha256": "f0e3b08637818e85f17ff4792d583f426ca32a418853c9f1ef34f06186e922ab"
+      "sha256": "5056513d79d7fa13c389405beba53064d02187a22bf0d700c9f6ace59c86526e"
     },
     {
       "name": "Hit",
@@ -275,7 +275,7 @@
           "clip": "Heavy",
           "duration": 1.2999999523162842,
           "samples": 61,
-          "maxVertexTravel": 2.465026500115346
+          "maxVertexTravel": 1.8887278859209973
         },
         {
           "clip": "Hit",
@@ -418,7 +418,7 @@
           "clip": "Heavy",
           "duration": 1.2999999523162842,
           "samples": 61,
-          "maxVertexTravel": 2.493589951264597
+          "maxVertexTravel": 1.9174958247539122
         },
         {
           "clip": "Hit",
@@ -589,19 +589,27 @@
       "snoutReach": 0.4178586664258983,
       "lateralSwing": 0.23176025692650282,
       "forwardReach": 0.45570600421102725,
+      "backOverBodyLength": 0.02430595268316784,
+      "aheadOverBodyLength": 0.0668352481590376,
+      "acrossOverBodyLength": 0.02719671457740757,
+      "lateralSwingOverBodyLength": 0.04635205138530056,
       "skullReach": 0.3899804693563281,
       "chestReach": 0.40837775609712884,
       "halfTravelInFractionOfClip": 0.2916666666666667
     },
     {
       "clip": "Heavy",
-      "snoutPathLength": 10.365280753888722,
-      "snoutReach": 1.7808953143414263,
-      "lateralSwing": 2.5842580870160052,
-      "forwardReach": 2.045931902194801,
-      "skullReach": 1.1951382019393422,
-      "chestReach": 0.5010622173864636,
-      "halfTravelInFractionOfClip": 0.23958333333333334
+      "snoutPathLength": 5.642265198666852,
+      "snoutReach": 1.1284792953050293,
+      "lateralSwing": 1.8692187497935877,
+      "forwardReach": 0.8538389944697915,
+      "backOverBodyLength": 0.04533491785446588,
+      "aheadOverBodyLength": 0.1254328810394924,
+      "acrossOverBodyLength": 0.22107203026605218,
+      "lateralSwingOverBodyLength": 0.37384374995871755,
+      "skullReach": 0.7829113693754699,
+      "chestReach": 0.693445064276438,
+      "halfTravelInFractionOfClip": 0.2604166666666667
     },
     {
       "clip": "Bite",
@@ -609,6 +617,10 @@
       "snoutReach": 0.16207655942701502,
       "lateralSwing": 0.011842958019338323,
       "forwardReach": 0.16079467752569054,
+      "backOverBodyLength": 0,
+      "aheadOverBodyLength": 0.03215893550513811,
+      "acrossOverBodyLength": 0.0018478530543927286,
+      "lateralSwingOverBodyLength": 0.002368591603867665,
       "skullReach": 0.15984038938606843,
       "chestReach": 0.16021481784457223,
       "halfTravelInFractionOfClip": 0.2604166666666667
@@ -686,10 +698,10 @@
     },
     {
       "clip": "Heavy",
-      "maxOpenRadians": 0.13770172510868556,
-      "minRadians": -4.423777621993064e-9,
+      "maxOpenRadians": 0.13770174369102822,
+      "minRadians": -6.519255912882746e-9,
       "peakPhase": 0.2916666666666667,
-      "mouthSocketTravelInSkullFrame": 0.07888347465426067
+      "mouthSocketTravelInSkullFrame": 0.07888348548341385
     },
     {
       "clip": "Hit",
@@ -840,9 +852,9 @@
     },
     {
       "clip": "Heavy",
-      "anchor_mouth": 1.7585040352623216,
-      "anchor_mouth_inside": 1.237462185722927,
-      "anchor_attack_primary": 1.776677651832344
+      "anchor_mouth": 1.1092370154225921,
+      "anchor_mouth_inside": 0.7985435187981216,
+      "anchor_attack_primary": 1.1284792953050293
     },
     {
       "clip": "Hit",
