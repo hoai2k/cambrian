@@ -551,10 +551,26 @@ def split(o, label, test, mouth=False):
     return part
 
 
+def in_head(p):
+    return p.x > HINGE_X - .02
+
+
+def on_seam(p):
+    return p.x > HINGE_X - 1e-5 and abs(p.z - cut_height(p)) < 1e-5
+
+
+CUT_RIM = {}
 for o in [auth, puppet]:
     split(o, 'lower jaw', is_jaw, mouth=True)
+    jaw = parts['lower jaw'][o.name]
+    CUT_RIM[o.name] = {'skull': T.cut_rim(o, in_head, axis=0),
+                       'jaw': T.cut_rim(jaw, in_head, axis=0)}
+    for half, rows in CUT_RIM[o.name].items():
+        for row in rows['loops']:
+            row['verticesOnTheSeam'] = 'n/a'
     T.cap_cut(o, lambda p: abs(p.x - HINGE_X) < 1e-5, Vector((1, 0, 0)))
     T.cap_cut(parts['lower jaw'][o.name], lambda p: abs(p.x - HINGE_X) < 1e-5, Vector((-1, 0, 0)))
+print('CUT_RIM', json.dumps(CUT_RIM))
 
 arm = bpy.data.armatures.new('Henodus shared skeleton'); rig = bpy.data.objects.new('Henodus_Rig', arm)
 bpy.context.collection.objects.link(rig); bpy.context.view_layer.objects.active = rig; rig.select_set(True)

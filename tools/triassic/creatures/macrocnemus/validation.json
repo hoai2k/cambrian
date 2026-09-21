@@ -10,14 +10,14 @@
   "remeshTriangles": 78028,
   "puppetBudget": 7000,
   "voxel": 0.0034,
-  "fullTriangles": 21828,
-  "puppetTriangles": 8574,
+  "fullTriangles": 21954,
+  "puppetTriangles": 8458,
   "parts": {
-    "authoredBody": 20288,
-    "authoredJaw": 532,
-    "puppetBody": 7243,
-    "puppetJaw": 323,
-    "sharedOral": 1008
+    "authoredBody": 20560,
+    "authoredJaw": 1106,
+    "puppetBody": 7474,
+    "puppetJaw": 696,
+    "sharedOral": 288
   },
   "bones": 33,
   "cervicals": 6,
@@ -104,11 +104,11 @@
     "Swim": [
       [
         -0.867182731628418,
-        -2.371778964996338,
+        -2.375847339630127,
         -1.3726699352264404
       ],
       [
-        0.8942135572433472,
+        0.8942134976387024,
         2.3844149112701416,
         1.1443194150924683
       ]
@@ -116,8 +116,8 @@
     "Sprint": [
       [
         -1.1202532052993774,
-        -2.3739120960235596,
-        -1.3975616693496704
+        -2.3778562545776367,
+        -1.3975615501403809
       ],
       [
         1.1456488370895386,
@@ -139,7 +139,7 @@
     ],
     "TurnRight": [
       [
-        -1.1247550249099731,
+        -1.1247551441192627,
         -2.4428212642669678,
         -1.1677641868591309
       ],
@@ -153,7 +153,7 @@
       [
         -0.9565110802650452,
         -2.6827232837677,
-        -1.3659394979476929
+        -1.3659393787384033
       ],
       [
         0.9608571529388428,
@@ -165,7 +165,7 @@
       [
         -0.9566808938980103,
         -2.4428212642669678,
-        -1.2509509325027466
+        -1.250950813293457
       ],
       [
         0.9605163931846619,
@@ -223,7 +223,7 @@
     ],
     "Death": [
       [
-        -1.387333631515503,
+        -1.3873333930969238,
         -2.610011100769043,
         -1.6716125011444092
       ],
@@ -236,18 +236,18 @@
     "Guard": [
       [
         -0.951198399066925,
-        -2.366178512573242,
-        -1.3607728481292725
+        -2.3692843914031982,
+        -1.360772967338562
       ],
       [
-        0.9564123153686523,
+        0.9564122557640076,
         2.4430081844329834,
         0.9734209179878235
       ]
     ],
     "Parry": [
       [
-        -1.1580368280410767,
+        -1.1580369472503662,
         -2.4428212642669678,
         -1.24495267868042
       ],
@@ -264,7 +264,7 @@
         -1.3020333051681519
       ],
       [
-        1.1403930187225342,
+        1.1403928995132446,
         2.4428212642669678,
         1.081999659538269
       ]
@@ -273,12 +273,12 @@
       [
         -0.9619999527931213,
         -2.6641407012939453,
-        -1.3849612474441528
+        -1.3849611282348633
       ],
       [
         0.965339720249176,
         2.4246394634246826,
-        0.6304000616073608
+        0.6304000020027161
       ]
     ],
     "Stagger": [
@@ -296,7 +296,7 @@
     "Ability": [
       [
         -0.932574450969696,
-        -2.720743179321289,
+        -2.720743417739868,
         -1.4933041334152222
       ],
       [
@@ -308,8 +308,8 @@
     "Grab": [
       [
         -0.9620950222015381,
-        -2.3560006618499756,
-        -1.1186103820800781
+        -2.3636460304260254,
+        -1.1186105012893677
       ],
       [
         0.9653605222702026,
@@ -321,7 +321,7 @@
       [
         -0.9836092591285706,
         -2.4428212642669678,
-        -1.1269919872283936
+        -1.1269922256469727
       ],
       [
         0.9824382662773132,
@@ -356,7 +356,7 @@
     "Run": [
       [
         -0.9569789171218872,
-        -2.620689630508423,
+        -2.6215806007385254,
         -1.3917381763458252
       ],
       [
@@ -381,22 +381,22 @@
       [
         -0.952705979347229,
         -2.855062484741211,
-        -1.3751457929611206
+        -1.3751460313796997
       ],
       [
-        0.9604419469833374,
+        0.9604418873786926,
         2.491201162338257,
         1.081999659538269
       ]
     ],
     "Retreat": [
       [
-        -2.8150744438171387,
+        -2.8150742053985596,
         -2.4737606048583984,
-        -1.3299167156219482
+        -1.3299165964126587
       ],
       [
-        1.4712367057800293,
+        1.4819741249084473,
         2.4428212642669678,
         1.3030924797058105
       ]
@@ -404,14 +404,14 @@
   },
   "modelLength": 4.8856425285339355,
   "rawLength": 0.9771285057067871,
-  "maximumEnvelopeDifference": 0.04972189664840698,
+  "maximumEnvelopeDifference": 0.04972177743911743,
   "envelopeTolerance": 0.19542570114135743,
   "envelopeTolerancePercent": 4.0,
   "surfaceDistanceMax": 0.15205222368240356,
-  "surfaceDistanceP95": 0.017074479907750958,
-  "surfaceDistanceP99": 0.08527924954891208,
+  "surfaceDistanceP95": 0.015887895971536378,
+  "surfaceDistanceP99": 0.08494207799434662,
   "surfaceOutliersOverThreePercent": 1,
-  "surfaceVertices": 10517,
+  "surfaceVertices": 10837,
   "seatingDepthRaw": {
     "fore_upper_L": 0.017384666949510574,
     "fore_upper_R": 0.01929374225437641,
@@ -441,15 +441,13 @@
   "jawHingeHeadRadius": 0.033916642054059996,
   "headLateralOffset": 0.013911303468977114,
   "jawHingeDepthAsFractionOfHeadRadius": 0.3834627788576666,
-  "oralInteriorDepthRaw": 0.00012034643441438675,
+  "oralInteriorDepthRaw": 0.0012866464676335454,
   "oralSeatingCorrection": {
-    "Oral cavity lining": 0.008417234435249865,
-    "Upper tooth row": 0.0025432465658884115,
-    "Lower tooth row": 0.0018737601449019506,
-    "Seated jaw hinge tissue": 0.0
+    "Upper tooth row": 0.0033452309389740134,
+    "Lower tooth row": 0.006240121522926875
   },
   "maxInfluences": 4,
-  "meanInfluences": 3.323289958945098,
+  "meanInfluences": 3.2701996516146323,
   "trunkYawCorrectionDegrees": -83.327,
   "unbending": {
     "applied": true,
@@ -599,8 +597,8 @@
           0.4623205065727234,
           0.48818325996398926
         ],
-        "onJaw": 9,
-        "onSkull": 7
+        "onJaw": 16,
+        "onSkull": 0
       },
       {
         "vertices": 7,
@@ -626,9 +624,9 @@
     "hingeX": 0.40117341817855834,
     "mouthBackX": 0.39317341817855833,
     "mouthFrontX": 0.48056425285339355,
-    "liningInset": 0.94,
-    "liningCullsBackfaces": true,
-    "skinDoubleSided": true
+    "toothInset": 0.94,
+    "skinDoubleSided": true,
+    "oralGeometry": "the tooth rows only: the cut is capped with its own rim and domed (T.cap_mouth), so there is no lining and no hinge plug"
   },
   "gait": {
     "Run": {
@@ -684,7 +682,7 @@
       ],
       "flooded": 441,
       "reach": 0.1213,
-      "seedVertex": 2573,
+      "seedVertex": 2556,
       "tFloor": 0.48
     },
     "foreR": {
@@ -726,7 +724,7 @@
       ],
       "flooded": 558,
       "reach": 0.1232,
-      "seedVertex": 6542,
+      "seedVertex": 6499,
       "tFloor": 0.48
     },
     "hindL": {
@@ -763,7 +761,7 @@
       ],
       "flooded": 681,
       "reach": 0.1226,
-      "seedVertex": 4515,
+      "seedVertex": 4485,
       "tFloor": 0.48
     },
     "hindR": {
@@ -805,7 +803,7 @@
       ],
       "flooded": 623,
       "reach": 0.1243,
-      "seedVertex": 960,
+      "seedVertex": 957,
       "tFloor": 0.48
     }
   },
@@ -825,53 +823,218 @@
   },
   "weightRelaxationPasses": 14,
   "throatRegion": {
-    "vertices": 191,
+    "vertices": 206,
     "box": [
-      0.0343,
-      0.0542,
-      0.043
+      0.0384,
+      0.0668,
+      0.0434
     ],
     "span": 0.034,
     "reach": 0.048,
-    "seam": 0.15779
+    "seam": 0.17114
   },
   "mandible": {
     "Macrocnemus authored body": {
-      "vertices": 317,
-      "polygons": 384,
+      "vertices": 555,
+      "polygons": 1050,
       "box": [
-        0.0853,
-        0.0625,
-        0.0353
+        0.087,
+        0.065,
+        0.0428
       ],
       "xRange": [
         0.4012,
-        0.4864
+        0.4882
       ]
     },
     "Macrocnemus procedural volume puppet": {
-      "vertices": 197,
-      "polygons": 220,
+      "vertices": 350,
+      "polygons": 652,
       "box": [
-        0.0853,
-        0.0615,
-        0.0354
+        0.0869,
+        0.0646,
+        0.0428
       ],
       "xRange": [
         0.4012,
-        0.4865
+        0.4881
       ]
     }
   },
-  "rimFlangeVertices": {
-    "Macrocnemus authored body": 115,
-    "Macrocnemus procedural volume puppet": 69,
-    "Macrocnemus authored body lower jaw": 100,
-    "Macrocnemus procedural volume puppet lower jaw": 69
+  "cutRim": {
+    "Macrocnemus authored body": {
+      "skull": {
+        "boundaryEdgesInRegion": 110,
+        "boundaryEdgesElsewhere": 10,
+        "loops": [
+          {
+            "vertices": 110,
+            "closed": true,
+            "box": [
+              [
+                0.40117,
+                0.48811
+              ],
+              [
+                -0.01337,
+                0.05159
+              ],
+              [
+                0.14414,
+                0.18691
+              ]
+            ],
+            "reach": 0.08693
+          }
+        ]
+      },
+      "jaw": {
+        "boundaryEdgesInRegion": 110,
+        "boundaryEdgesElsewhere": 0,
+        "loops": [
+          {
+            "vertices": 110,
+            "closed": true,
+            "box": [
+              [
+                0.40117,
+                0.48811
+              ],
+              [
+                -0.01337,
+                0.05159
+              ],
+              [
+                0.14414,
+                0.18691
+              ]
+            ],
+            "reach": 0.08693
+          }
+        ]
+      }
+    },
+    "Macrocnemus procedural volume puppet": {
+      "skull": {
+        "boundaryEdgesInRegion": 76,
+        "boundaryEdgesElsewhere": 0,
+        "loops": [
+          {
+            "vertices": 76,
+            "closed": true,
+            "box": [
+              [
+                0.40117,
+                0.48811
+              ],
+              [
+                -0.01337,
+                0.05119
+              ],
+              [
+                0.14409,
+                0.18692
+              ]
+            ],
+            "reach": 0.08694
+          }
+        ]
+      },
+      "jaw": {
+        "boundaryEdgesInRegion": 76,
+        "boundaryEdgesElsewhere": 0,
+        "loops": [
+          {
+            "vertices": 76,
+            "closed": true,
+            "box": [
+              [
+                0.40117,
+                0.48811
+              ],
+              [
+                -0.01337,
+                0.05119
+              ],
+              [
+                0.14409,
+                0.18692
+              ]
+            ],
+            "reach": 0.08694
+          }
+        ]
+      }
+    }
   },
-  "hingePlugFit": 0.4517,
-  "liningPower": 3.0,
-  "liningInset": 0.94,
+  "mouthCaps": {
+    "Macrocnemus authored body": {
+      "skullAtHinge": 45,
+      "jawAtHinge": 45,
+      "palate": {
+        "rimEdges": 67,
+        "capped": true,
+        "faces": 585,
+        "domedVertices": 260,
+        "deepestRaw": 0.010471,
+        "dome": 0.34,
+        "rounds": 2,
+        "firstNewVertex": 10022,
+        "rimVertices": 67,
+        "cycles": [
+          67
+        ]
+      },
+      "floor": {
+        "rimEdges": 67,
+        "capped": true,
+        "faces": 585,
+        "domedVertices": 260,
+        "deepestRaw": 0.009927,
+        "dome": 0.34,
+        "rounds": 2,
+        "firstNewVertex": 295,
+        "rimVertices": 67,
+        "cycles": [
+          67
+        ]
+      }
+    },
+    "Macrocnemus procedural volume puppet": {
+      "skullAtHinge": 30,
+      "jawAtHinge": 30,
+      "palate": {
+        "rimEdges": 48,
+        "capped": true,
+        "faces": 414,
+        "domedVertices": 184,
+        "deepestRaw": 0.010408,
+        "dome": 0.34,
+        "rounds": 2,
+        "firstNewVertex": 3555,
+        "rimVertices": 48,
+        "cycles": [
+          48
+        ]
+      },
+      "floor": {
+        "rimEdges": 48,
+        "capped": true,
+        "faces": 414,
+        "domedVertices": 184,
+        "deepestRaw": 0.010226,
+        "dome": 0.34,
+        "rounds": 2,
+        "firstNewVertex": 166,
+        "rimVertices": 48,
+        "cycles": [
+          48
+        ]
+      }
+    }
+  },
+  "capDome": 0.34,
+  "capRoom": 0.55,
   "limbSweep": {
     "Idle": {
       "fore_upper_L": {
@@ -1759,19 +1922,301 @@
     }
   },
   "mouthCut": {
-    "maxDeviationRaw": 0.03043,
-    "maxDeviationOverBodyLength": 0.03114,
+    "measuredAgainst": "the step detector's twelve readings over the whole head, which is the comparison the shipped build made and is kept so the change is a number; the cut now follows the painted lip instead, and its deviation from *that* is `mouthCutFit`",
+    "maxDeviationRaw": 0.02798,
+    "maxDeviationOverBodyLength": 0.02863,
     "worstStation": {
-      "x": 0.3956,
-      "measuredFraction": 0.6601,
-      "usedFraction": 0.229,
-      "sectionHeight": 0.07058
+      "x": 0.3854,
+      "stepReadingFraction": 0.0888,
+      "contrast": 0.1719,
+      "cutFraction": 0.4914,
+      "behindTheHinge": true,
+      "sectionHeight": 0.0695
     },
     "stations": 12,
     "measuredFractionMin": 0.0888,
     "measuredFractionMax": 0.6601,
-    "measuredFractionMedianUsed": 0.229,
-    "method": "no modelled mouth slit on this head (the cavity instrument finds no cavity), so the lip line is read off the albedo per station and the cut is the head section at the median of those readings"
+    "stepReadingMedian": 0.229,
+    "fittedCutDeviationFromThePaintedLipRaw": {
+      "worst": 0.00398,
+      "rms": 0.00167,
+      "overBodyLength": 0.00408
+    },
+    "method": "no modelled mouth slit on this head (the cavity instrument finds nine vertices on the whole head), so the lip line is read off the albedo with T.painted_line's matched filter on both flanks and the cut is a least-squares line fitted through those readings"
+  },
+  "mouthCutFit": {
+    "method": "a least-squares line through the painted lip read with T.painted_line's matched filter on both flanks, refit with hits over 2.5 rms dropped; the median of the step readings it replaces is recorded beside it",
+    "fit": {
+      "a": 0.09835521588489872,
+      "b": 0.18143475973128304,
+      "pitchDeg": 10.284,
+      "stations": 20,
+      "stationsKept": 20
+    },
+    "deviationFromTheMeasuredLineRaw": {
+      "worst": 0.00398,
+      "rms": 0.00167,
+      "overBodyLength": 0.00408
+    },
+    "medianCutDeviationFromTheSameLineRaw": {
+      "worst": 0.00739,
+      "rms": 0.00573,
+      "overBodyLength": 0.00757
+    },
+    "shippedMedianCutVsItsOwnTwelveStepReadings": {
+      "worst": 0.03043,
+      "overBodyLength": 0.03114,
+      "atStation": 0.39557,
+      "hingeX": 0.40117
+    },
+    "whatEachDetectorFound": {
+      "matchedFilter": "the painted lip: a dark minimum at 0.31-0.40 of the section at every station of the snout, with pale skin below it and mid skin above",
+      "stepDetector": "the countershading boundary on the right flank, because `pigment_seam` pools the two flanks and this head is not painted alike on both"
+    },
+    "worstFlankDisagreementOverRadius": 0.25,
+    "modelledSlitVerticesOnTheWholeHead": 9,
+    "stations": [
+      {
+        "x": 0.40517,
+        "lipZ": 0.16788,
+        "lipFractionOfSection": 0.3375,
+        "flankDisagreementOverRadius": 0.25,
+        "stepReadingFractionOfSection": 0.5191,
+        "stepReadingZ": 0.17974,
+        "stepMinusLipOverRadius": 0.3632,
+        "stepReadingFound": "the countershading boundary, 0.36 of a radius above the lip",
+        "modelledSlitHitsHere": 1,
+        "usedInTheFit": true
+      },
+      {
+        "x": 0.40925,
+        "lipZ": 0.16874,
+        "lipFractionOfSection": 0.3125,
+        "flankDisagreementOverRadius": 0.25,
+        "stepReadingFractionOfSection": 0.4081,
+        "stepReadingZ": 0.17476,
+        "stepMinusLipOverRadius": 0.1911,
+        "stepReadingFound": "the countershading boundary, 0.19 of a radius above the lip",
+        "modelledSlitHitsHere": 0,
+        "usedInTheFit": true
+      },
+      {
+        "x": 0.41332,
+        "lipZ": 0.17324,
+        "lipFractionOfSection": 0.35,
+        "flankDisagreementOverRadius": 0.1,
+        "stepReadingFractionOfSection": 0.2897,
+        "stepReadingZ": 0.16956,
+        "stepMinusLipOverRadius": -0.1206,
+        "stepReadingFound": "a darker feature 0.12 of a radius below the lip",
+        "modelledSlitHitsHere": 0,
+        "usedInTheFit": true
+      },
+      {
+        "x": 0.41739,
+        "lipZ": 0.17506,
+        "lipFractionOfSection": 0.35,
+        "flankDisagreementOverRadius": 0.2,
+        "stepReadingFractionOfSection": 0.2097,
+        "stepReadingZ": 0.16672,
+        "stepMinusLipOverRadius": -0.2805,
+        "stepReadingFound": "a darker feature 0.28 of a radius below the lip",
+        "modelledSlitHitsHere": 0,
+        "usedInTheFit": true
+      },
+      {
+        "x": 0.42147,
+        "lipZ": 0.1765,
+        "lipFractionOfSection": 0.35,
+        "flankDisagreementOverRadius": 0.2,
+        "stepReadingFractionOfSection": 0.1895,
+        "stepReadingZ": 0.16715,
+        "stepMinusLipOverRadius": -0.321,
+        "stepReadingFound": "a darker feature 0.32 of a radius below the lip",
+        "modelledSlitHitsHere": 0,
+        "usedInTheFit": true
+      },
+      {
+        "x": 0.42554,
+        "lipZ": 0.17702,
+        "lipFractionOfSection": 0.3375,
+        "flankDisagreementOverRadius": 0.15,
+        "stepReadingFractionOfSection": 0.1693,
+        "stepReadingZ": 0.1674,
+        "stepMinusLipOverRadius": -0.3364,
+        "stepReadingFound": "a darker feature 0.34 of a radius below the lip",
+        "modelledSlitHitsHere": 0,
+        "usedInTheFit": true
+      },
+      {
+        "x": 0.42961,
+        "lipZ": 0.178,
+        "lipFractionOfSection": 0.3375,
+        "flankDisagreementOverRadius": 0.15,
+        "stepReadingFractionOfSection": 0.194,
+        "stepReadingZ": 0.16993,
+        "stepMinusLipOverRadius": -0.2869,
+        "stepReadingFound": "a darker feature 0.29 of a radius below the lip",
+        "modelledSlitHitsHere": 0,
+        "usedInTheFit": true
+      },
+      {
+        "x": 0.43369,
+        "lipZ": 0.17864,
+        "lipFractionOfSection": 0.3375,
+        "flankDisagreementOverRadius": 0.15,
+        "stepReadingFractionOfSection": 0.2234,
+        "stepReadingZ": 0.17234,
+        "stepMinusLipOverRadius": -0.2282,
+        "stepReadingFound": "a darker feature 0.23 of a radius below the lip",
+        "modelledSlitHitsHere": 0,
+        "usedInTheFit": true
+      },
+      {
+        "x": 0.43776,
+        "lipZ": 0.17918,
+        "lipFractionOfSection": 0.3375,
+        "flankDisagreementOverRadius": 0.15,
+        "stepReadingFractionOfSection": 0.243,
+        "stepReadingZ": 0.17409,
+        "stepMinusLipOverRadius": -0.1889,
+        "stepReadingFound": "a darker feature 0.19 of a radius below the lip",
+        "modelledSlitHitsHere": 0,
+        "usedInTheFit": true
+      },
+      {
+        "x": 0.44183,
+        "lipZ": 0.17963,
+        "lipFractionOfSection": 0.3375,
+        "flankDisagreementOverRadius": 0.15,
+        "stepReadingFractionOfSection": 0.2494,
+        "stepReadingZ": 0.17503,
+        "stepMinusLipOverRadius": -0.1761,
+        "stepReadingFound": "a darker feature 0.18 of a radius below the lip",
+        "modelledSlitHitsHere": 0,
+        "usedInTheFit": true
+      },
+      {
+        "x": 0.44591,
+        "lipZ": 0.18012,
+        "lipFractionOfSection": 0.3375,
+        "flankDisagreementOverRadius": 0.15,
+        "stepReadingFractionOfSection": 0.2558,
+        "stepReadingZ": 0.17603,
+        "stepMinusLipOverRadius": -0.1633,
+        "stepReadingFound": "a darker feature 0.16 of a radius below the lip",
+        "modelledSlitHitsHere": 0,
+        "usedInTheFit": true
+      },
+      {
+        "x": 0.44998,
+        "lipZ": 0.18064,
+        "lipFractionOfSection": 0.3375,
+        "flankDisagreementOverRadius": 0.15,
+        "stepReadingFractionOfSection": 0.2226,
+        "stepReadingZ": 0.17514,
+        "stepMinusLipOverRadius": -0.2297,
+        "stepReadingFound": "a darker feature 0.23 of a radius below the lip",
+        "modelledSlitHitsHere": 0,
+        "usedInTheFit": true
+      },
+      {
+        "x": 0.45405,
+        "lipZ": 0.18178,
+        "lipFractionOfSection": 0.35,
+        "flankDisagreementOverRadius": 0.1,
+        "stepReadingFractionOfSection": 0.1869,
+        "stepReadingZ": 0.17435,
+        "stepMinusLipOverRadius": -0.3262,
+        "stepReadingFound": "a darker feature 0.33 of a radius below the lip",
+        "modelledSlitHitsHere": 2,
+        "usedInTheFit": true
+      },
+      {
+        "x": 0.45813,
+        "lipZ": 0.18223,
+        "lipFractionOfSection": 0.35,
+        "flankDisagreementOverRadius": 0.1,
+        "stepReadingFractionOfSection": 0.1822,
+        "stepReadingZ": 0.17501,
+        "stepMinusLipOverRadius": -0.3357,
+        "stepReadingFound": "a darker feature 0.34 of a radius below the lip",
+        "modelledSlitHitsHere": 3,
+        "usedInTheFit": true
+      },
+      {
+        "x": 0.4622,
+        "lipZ": 0.18257,
+        "lipFractionOfSection": 0.35,
+        "flankDisagreementOverRadius": 0.1,
+        "stepReadingFractionOfSection": 0.2146,
+        "stepReadingZ": 0.1771,
+        "stepMinusLipOverRadius": -0.2708,
+        "stepReadingFound": "a darker feature 0.27 of a radius below the lip",
+        "modelledSlitHitsHere": 4,
+        "usedInTheFit": true
+      },
+      {
+        "x": 0.46627,
+        "lipZ": 0.18223,
+        "lipFractionOfSection": 0.3375,
+        "flankDisagreementOverRadius": 0.15,
+        "stepReadingFractionOfSection": 0.247,
+        "stepReadingZ": 0.17882,
+        "stepMinusLipOverRadius": -0.181,
+        "stepReadingFound": "a darker feature 0.18 of a radius below the lip",
+        "modelledSlitHitsHere": 4,
+        "usedInTheFit": true
+      },
+      {
+        "x": 0.47034,
+        "lipZ": 0.18267,
+        "lipFractionOfSection": 0.35,
+        "flankDisagreementOverRadius": 0.2,
+        "stepReadingFractionOfSection": 0.2212,
+        "stepReadingZ": 0.17816,
+        "stepMinusLipOverRadius": -0.2575,
+        "stepReadingFound": "a darker feature 0.26 of a radius below the lip",
+        "modelledSlitHitsHere": 5,
+        "usedInTheFit": true
+      },
+      {
+        "x": 0.47442,
+        "lipZ": 0.18383,
+        "lipFractionOfSection": 0.3875,
+        "flankDisagreementOverRadius": 0.05,
+        "stepReadingFractionOfSection": 0.1937,
+        "stepReadingZ": 0.17753,
+        "stepMinusLipOverRadius": -0.3875,
+        "stepReadingFound": "a darker feature 0.39 of a radius below the lip",
+        "modelledSlitHitsHere": 4,
+        "usedInTheFit": true
+      },
+      {
+        "x": 0.47849,
+        "lipZ": 0.18372,
+        "lipFractionOfSection": 0.3875,
+        "flankDisagreementOverRadius": 0.05,
+        "stepReadingFractionOfSection": 0.1797,
+        "stepReadingZ": 0.17745,
+        "stepMinusLipOverRadius": -0.4157,
+        "stepReadingFound": "a darker feature 0.42 of a radius below the lip",
+        "modelledSlitHitsHere": 2,
+        "usedInTheFit": true
+      },
+      {
+        "x": 0.48256,
+        "lipZ": 0.18407,
+        "lipFractionOfSection": 0.4,
+        "flankDisagreementOverRadius": 0.1,
+        "stepReadingFractionOfSection": 0.1797,
+        "stepReadingZ": 0.17784,
+        "stepMinusLipOverRadius": -0.4407,
+        "stepReadingFound": "a darker feature 0.44 of a radius below the lip",
+        "modelledSlitHitsHere": 0,
+        "usedInTheFit": true
+      }
+    ]
   },
   "normalizedWeights": true,
   "rootStable": true,
