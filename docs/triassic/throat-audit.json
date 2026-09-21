@@ -4,22 +4,34 @@
   "method": "Three.js GLTFLoader/AnimationMixer; all shipped authored and puppet clips, 25 samples including clamped endpoints; skin and hidden oral surfaces recorded separately; mouth region selected by jaw/skull/neck/pouch influences. Strain flags require posed edge >1.5% body length and ratio >2. No automatic claim of intersection-free geometry.",
   "models": [
     {
-      "id": "nothosaurus",
+      "id": "birgeria",
       "variant": "authored",
-      "sha256": "7d0f5b4e9d2b2ed3cd4c9696b9f1fee27487950790d212d3f081c9d50b894d69",
-      "length": 5.335749247596657,
+      "sha256": "134d7f01fd21e04cd01b62a36b30d537c49455e9bab335437e902c5df5f7da7d",
+      "length": 4.999999937196589,
       "meshes": [
         {
-          "name": "Nothosaurus_authored_body",
+          "name": "Birgeria_authored_body",
           "hiddenOral": false,
-          "vertices": 15702,
-          "mixedJawSkullVertices": 45
+          "vertices": 11687,
+          "mixedJawSkullVertices": 948
         },
         {
-          "name": "Nothosaurus_authored_body_lower_jaw",
+          "name": "Birgeria_authored_body_lower_jaw",
           "hiddenOral": false,
-          "vertices": 1453,
-          "mixedJawSkullVertices": 146
+          "vertices": 577,
+          "mixedJawSkullVertices": 92
+        },
+        {
+          "name": "Oral_cavity_lining",
+          "hiddenOral": true,
+          "vertices": 816,
+          "mixedJawSkullVertices": 0
+        },
+        {
+          "name": "Seated_jaw_hinge_tissue",
+          "hiddenOral": true,
+          "vertices": 207,
+          "mixedJawSkullVertices": 94
         }
       ],
       "clips": [
@@ -27,642 +39,933 @@
           "name": "Ability",
           "duration": 1,
           "skin": {
-            "ratio": 1.2461444268256017,
-            "rest": 0.06893438084621076,
-            "posed": 0.08590219450817904,
-            "phase": 0.125,
-            "mesh": "Nothosaurus_authored_body_lower_jaw",
+            "ratio": 1.753576198495771,
+            "rest": 0.0436493434473787,
+            "posed": 0.07654244974929063,
+            "phase": 0.20833333333333334,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              847,
-              1100
+              3164,
+              11151
             ]
           },
           "mouthSkin": {
-            "ratio": 1.2461444268256017,
-            "rest": 0.06893438084621076,
-            "posed": 0.08590219450817904,
-            "phase": 0.125,
-            "mesh": "Nothosaurus_authored_body_lower_jaw",
+            "ratio": 1.5590042456108415,
+            "rest": 0.06013235037941886,
+            "posed": 0.0937465895400727,
+            "phase": 0.5,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              847,
-              1100
+              8662,
+              5848
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0616174938199405,
+            "rest": 0.0745205496250661,
+            "posed": 0.07911231913104719,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
           }
         },
         {
           "name": "Attack",
-          "duration": 1,
+          "duration": 0.8999999761581421,
           "skin": {
-            "ratio": 1.305215389553472,
-            "rest": 0.06449007532660572,
-            "posed": 0.08417343878974844,
-            "phase": 0.4583333333333333,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.6039187583747025,
+            "rest": 0.05991362704556546,
+            "posed": 0.09609659030064835,
+            "phase": 0.20833333333333334,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              3398,
-              6034
+              10972,
+              1758
             ]
           },
           "mouthSkin": {
-            "ratio": 1.2556948998106559,
-            "rest": 0.06893438084621076,
-            "posed": 0.08656055045019222,
-            "phase": 0.125,
-            "mesh": "Nothosaurus_authored_body_lower_jaw",
+            "ratio": 1.332867679676662,
+            "rest": 0.06722375729700605,
+            "posed": 0.08960037340760754,
+            "phase": 0.4583333333333333,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              847,
-              1100
+              4973,
+              10822
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0503836182903143,
+            "rest": 0.0745205496250661,
+            "posed": 0.07827516455215985,
+            "phase": 0.4583333333333333,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
           }
         },
         {
           "name": "Bite",
-          "duration": 0.5,
+          "duration": 0.46666666865348816,
           "skin": {
-            "ratio": 1.3167860923480723,
-            "rest": 0.06566627282308793,
-            "posed": 0.08646843478977638,
-            "phase": 0.5,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.2599441311189299,
+            "rest": 0.06722375729700605,
+            "posed": 0.08469817847812612,
+            "phase": 0.25,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              694,
-              8171
+              4973,
+              10822
             ]
           },
           "mouthSkin": {
-            "ratio": 1.3167860923480723,
-            "rest": 0.06566627282308793,
-            "posed": 0.08646843478977638,
-            "phase": 0.5,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.2599441311189299,
+            "rest": 0.06722375729700605,
+            "posed": 0.08469817847812612,
+            "phase": 0.25,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              694,
-              8171
+              4973,
+              10822
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0543451650951283,
+            "rest": 0.0745205496250661,
+            "posed": 0.07857038119742002,
+            "phase": 0.25,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
           }
         },
         {
           "name": "Breath",
           "duration": 2.4000000953674316,
           "skin": {
-            "ratio": 1.2350571179380376,
-            "rest": 0.07156017791698958,
-            "posed": 0.08838090709729036,
-            "phase": 0.375,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.601581349849997,
+            "rest": 0.05991362704556546,
+            "posed": 0.09595654767804601,
+            "phase": 0.4583333333333333,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              6737,
-              4001
+              10972,
+              1758
             ]
           },
           "mouthSkin": {
-            "ratio": 1.1713535449171057,
-            "rest": 0.07200468561757593,
-            "posed": 0.08434294374878931,
-            "phase": 0.4583333333333333,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.0242161724329528,
+            "rest": 0.07550089098999006,
+            "posed": 0.07732923358504523,
+            "phase": 0.5,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              83,
-              10502
+              5163,
+              8739
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.012390523937657,
+            "rest": 0.0745205496250661,
+            "posed": 0.07544389827904284,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
           }
         },
         {
           "name": "Death",
-          "duration": 1.600000023841858,
+          "duration": 1.7999999523162842,
           "skin": {
-            "ratio": 1.5427650112093465,
-            "rest": 0.05353311756970738,
-            "posed": 0.08258902072750086,
+            "ratio": 2.931710946618579,
+            "rest": 0.029409235244918643,
+            "posed": 0.08621937689920892,
             "phase": 1,
-            "mesh": "Nothosaurus_authored_body",
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              3648,
-              9882
+              9933,
+              7372
             ]
           },
           "mouthSkin": {
-            "ratio": 1.1166835552916845,
-            "rest": 0.07200468561757593,
-            "posed": 0.08040644833309471,
+            "ratio": 1.0544766229284608,
+            "rest": 0.08795296985946091,
+            "posed": 0.09274435063393305,
             "phase": 1,
-            "mesh": "Nothosaurus_authored_body",
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              83,
-              10502
+              8878,
+              5371
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0258872164780777,
+            "rest": 0.0745205496250661,
+            "posed": 0.07644967922527551,
+            "phase": 1,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
           }
         },
         {
           "name": "Dive",
-          "duration": 1.399999976158142,
+          "duration": 1.2999999523162842,
           "skin": {
-            "ratio": 1.0664812477345238,
-            "rest": 0.0776289598126573,
-            "posed": 0.08278982992133596,
-            "phase": 0.5833333333333334,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 2.5520732706917397,
+            "rest": 0.029409235244918643,
+            "posed": 0.07505452318004231,
+            "phase": 0.5,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              9423,
-              3436
+              9933,
+              7372
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0520650858602685,
-            "rest": 0.08159680411813523,
-            "posed": 0.08584514873046944,
-            "phase": 0.4583333333333333,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.001816042991001,
+            "rest": 0.08706879078747767,
+            "posed": 0.08722691145472221,
+            "phase": 0.3333333333333333,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              10502,
-              9329
+              8098,
+              6864
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000025436393,
+            "rest": 0.0761653976918162,
+            "posed": 0.0761653978855535,
+            "phase": 0.375,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              87,
+              88
+            ]
           }
         },
         {
           "name": "Dodge",
-          "duration": 0.5,
+          "duration": 0.46666666865348816,
           "skin": {
-            "ratio": 2.7704616575377283,
-            "rest": 0.0312302608117754,
-            "posed": 0.08652224013392683,
-            "phase": 0.375,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 3.449152865655335,
+            "rest": 0.029409235244918643,
+            "posed": 0.10143694802174302,
+            "phase": 0.4583333333333333,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              742,
-              8596
+              9933,
+              7372
             ]
           },
           "mouthSkin": {
-            "ratio": 1.5409659666456106,
-            "rest": 0.05698326785975083,
-            "posed": 0.08780927644012669,
-            "phase": 0.4583333333333333,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.2314549886314055,
+            "rest": 0.06459948717909529,
+            "posed": 0.07955136074972742,
+            "phase": 0.5,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              10781,
-              9391
+              8478,
+              6227
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000001735021489,
+            "rest": 0.07616534724216352,
+            "posed": 0.07616536045701494,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              177,
+              178
+            ]
           }
         },
         {
           "name": "Eat",
-          "duration": 1.600000023841858,
+          "duration": 1.5,
           "skin": {
-            "ratio": 1.2560069435162895,
-            "rest": 0.06893438084621076,
-            "posed": 0.08658206098983702,
-            "phase": 0.25,
-            "mesh": "Nothosaurus_authored_body_lower_jaw",
+            "ratio": 1.3504074262532055,
+            "rest": 0.05991362704556546,
+            "posed": 0.0809078068960965,
+            "phase": 0.125,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              847,
-              1100
+              10972,
+              1758
             ]
           },
           "mouthSkin": {
-            "ratio": 1.2560069435162895,
-            "rest": 0.06893438084621076,
-            "posed": 0.08658206098983702,
-            "phase": 0.25,
-            "mesh": "Nothosaurus_authored_body_lower_jaw",
+            "ratio": 1.212343388672117,
+            "rest": 0.06722375729700605,
+            "posed": 0.08149827772072428,
+            "phase": 0.2916666666666667,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              847,
-              1100
+              4973,
+              10822
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0459197335697916,
+            "rest": 0.0745205496250661,
+            "posed": 0.07794251340932358,
+            "phase": 0.75,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
+          }
+        },
+        {
+          "name": "FastStart",
+          "duration": 0.699999988079071,
+          "skin": {
+            "ratio": 2.6682092633724683,
+            "rest": 0.040924669999266514,
+            "posed": 0.10919558359250425,
+            "phase": 0.20833333333333334,
+            "mesh": "Birgeria_authored_body",
+            "vertices": [
+              921,
+              151
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.622400158823139,
+            "rest": 0.06809129425914348,
+            "posed": 0.11047132662050747,
+            "phase": 0.20833333333333334,
+            "mesh": "Birgeria_authored_body",
+            "vertices": [
+              1983,
+              6435
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0295242094151995,
+            "rest": 0.0745205496250661,
+            "posed": 0.07672070993793233,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
+          }
+        },
+        {
+          "name": "Gape",
+          "duration": 1.2999999523162842,
+          "skin": {
+            "ratio": 2.7037092482803087,
+            "rest": 0.029409235244918643,
+            "posed": 0.07951402131653774,
+            "phase": 0.5,
+            "mesh": "Birgeria_authored_body",
+            "vertices": [
+              9933,
+              7372
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.4905877053351577,
+            "rest": 0.06013235037941886,
+            "posed": 0.08963254216846765,
+            "phase": 0.5833333333333334,
+            "mesh": "Birgeria_authored_body",
+            "vertices": [
+              8662,
+              5848
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0699028227567893,
+            "rest": 0.0745205496250661,
+            "posed": 0.07972974639724562,
+            "phase": 0.375,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
           }
         },
         {
           "name": "Grab",
-          "duration": 1.2000000476837158,
+          "duration": 1.100000023841858,
           "skin": {
-            "ratio": 1.0858027069612988,
-            "rest": 0.07376975524017827,
-            "posed": 0.08009939993165802,
+            "ratio": 2.4181896897461908,
+            "rest": 0.03368929461899539,
+            "posed": 0.08146710490247648,
             "phase": 0.4166666666666667,
-            "mesh": "Nothosaurus_authored_body",
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              6762,
-              8929
+              3251,
+              5207
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0858027069612988,
-            "rest": 0.07376975524017827,
-            "posed": 0.08009939993165802,
-            "phase": 0.4166666666666667,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.0861693590911683,
+            "rest": 0.06953229660136892,
+            "posed": 0.0755238500356459,
+            "phase": 0.75,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              6762,
-              8929
+              6454,
+              4057
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0170550224018162,
+            "rest": 0.0745205496250661,
+            "posed": 0.07579149926831727,
+            "phase": 0.75,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
           }
         },
         {
           "name": "Growth",
           "duration": 1.5,
           "skin": {
-            "ratio": 1.1841385448249204,
-            "rest": 0.06865757493749892,
-            "posed": 0.08130008087769791,
-            "phase": 0.5416666666666666,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.4761634973970337,
+            "rest": 0.05991362704556546,
+            "posed": 0.08844230924132342,
+            "phase": 0.4583333333333333,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              7798,
-              5476
+              10972,
+              1758
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0599262211463756,
-            "rest": 0.08561315659854947,
-            "posed": 0.09074362955391344,
+            "ratio": 1.0688770740862448,
+            "rest": 0.08706879078747767,
+            "posed": 0.09306583434114653,
             "phase": 0.5,
-            "mesh": "Nothosaurus_authored_body",
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              3799,
-              8832
+              8098,
+              6864
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.000000049203899,
+            "rest": 0.0761653976918162,
+            "posed": 0.07616540143945073,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              87,
+              88
+            ]
           }
         },
         {
           "name": "Guard",
-          "duration": 1,
+          "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 2.5845576781936157,
-            "rest": 0.035196189439814805,
-            "posed": 0.0909665816598304,
-            "phase": 0.5416666666666666,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.098660696934874,
+            "rest": 0.07054705936691427,
+            "posed": 0.07750728141075997,
+            "phase": 0.4583333333333333,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              8723,
-              6034
+              8956,
+              284
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0383307664698236,
-            "rest": 0.08561315659854947,
-            "posed": 0.08889477451087291,
+            "ratio": 1.011440348053089,
+            "rest": 0.07550089098999006,
+            "posed": 0.07636464746123388,
             "phase": 0.5,
-            "mesh": "Nothosaurus_authored_body",
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              3799,
-              8832
+              5163,
+              8739
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0054130683793687,
+            "rest": 0.07464040599385412,
+            "posed": 0.0750444396153627,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              121,
+              122
+            ]
           }
         },
         {
           "name": "Heavy",
           "duration": 1.100000023841858,
           "skin": {
-            "ratio": 1.3343949627841578,
-            "rest": 0.06566627282308793,
-            "posed": 0.08762474367993878,
-            "phase": 0.125,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.61462349340306,
+            "rest": 0.05991362704556546,
+            "posed": 0.09673794980275896,
+            "phase": 0.20833333333333334,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              694,
-              8171
+              10972,
+              1758
             ]
           },
           "mouthSkin": {
-            "ratio": 1.3343949627841578,
-            "rest": 0.06566627282308793,
-            "posed": 0.08762474367993878,
-            "phase": 0.125,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.5084139864787507,
+            "rest": 0.06013235037941886,
+            "posed": 0.09070447835215621,
+            "phase": 0.5,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              694,
-              8171
+              8662,
+              5848
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.059303356171562,
+            "rest": 0.0745205496250661,
+            "posed": 0.07893986832158195,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
           }
         },
         {
           "name": "Hit",
-          "duration": 0.6000000238418579,
+          "duration": 0.5333333611488342,
           "skin": {
-            "ratio": 1.0655681115658573,
-            "rest": 0.0776289598126573,
-            "posed": 0.08271894411039507,
-            "phase": 0.625,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.4055486951863332,
+            "rest": 0.05991362704556546,
+            "posed": 0.08421152031777514,
+            "phase": 0.375,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              9423,
-              3436
+              10972,
+              1758
             ]
           },
           "mouthSkin": {
-            "ratio": 1.051537643760663,
-            "rest": 0.08159680411813523,
-            "posed": 0.08580211114078429,
-            "phase": 0.4583333333333333,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.155888983205676,
+            "rest": 0.06722375729700605,
+            "posed": 0.07770320046930147,
+            "phase": 0.375,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              10502,
-              9329
+              4973,
+              10822
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0295242237805777,
+            "rest": 0.0745205496250661,
+            "posed": 0.0767207110084482,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
           }
         },
         {
           "name": "Idle",
-          "duration": 2.4000000953674316,
+          "duration": 2.5999999046325684,
           "skin": {
-            "ratio": 1.0983114635527629,
-            "rest": 0.0776289598126573,
-            "posed": 0.08526077646591826,
-            "phase": 0.6666666666666666,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.0472378357662804,
+            "rest": 0.08662991729820801,
+            "posed": 0.09072212710398721,
+            "phase": 0.3333333333333333,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              9423,
-              3436
+              10972,
+              7372
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0763777720992218,
-            "rest": 0.09219216092244227,
-            "posed": 0.09923359277871134,
-            "phase": 0.2916666666666667,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.0056612936129121,
+            "rest": 0.08795296985946091,
+            "posed": 0.08845089744596293,
+            "phase": 0.4583333333333333,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              5507,
-              7788
+              8878,
+              5371
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0024952149579167,
+            "rest": 0.08230665482843103,
+            "posed": 0.082512027624695,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              114,
+              106
+            ]
           }
         },
         {
           "name": "Parry",
-          "duration": 0.4000000059604645,
+          "duration": 0.3333333432674408,
           "skin": {
-            "ratio": 1.0667287859259724,
-            "rest": 0.0776289598126573,
-            "posed": 0.08280904605365202,
-            "phase": 0.5833333333333334,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.9364227037377946,
+            "rest": 0.0436493434473787,
+            "posed": 0.08452357965475264,
+            "phase": 0.5,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              9423,
-              3436
+              3164,
+              11151
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0517756784490517,
-            "rest": 0.08159680411813523,
-            "posed": 0.08582153401062606,
-            "phase": 0.4166666666666667,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.2326886389139697,
+            "rest": 0.06809129425914348,
+            "posed": 0.08393536484219417,
+            "phase": 0.5,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              10502,
-              9329
+              1983,
+              6435
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000001291744716,
+            "rest": 0.08054602615891225,
+            "posed": 0.08054603656340262,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              78,
+              79
+            ]
           }
         },
         {
           "name": "Rise",
-          "duration": 1.399999976158142,
+          "duration": 1.2999999523162842,
           "skin": {
-            "ratio": 1.066481243677932,
-            "rest": 0.0776289598126573,
-            "posed": 0.08278982960642696,
-            "phase": 0.5833333333333334,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.4626660788432024,
+            "rest": 0.053523287335765356,
+            "posed": 0.07828669681420194,
+            "phase": 0.5416666666666666,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              9423,
-              3436
+              685,
+              2361
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0520650869801653,
-            "rest": 0.08159680411813523,
-            "posed": 0.08584514882184946,
-            "phase": 0.4583333333333333,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.001816043132668,
+            "rest": 0.08706879078747767,
+            "posed": 0.08722691146705698,
+            "phase": 0.3333333333333333,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              10502,
-              9329
+              8098,
+              6864
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000022721858,
+            "rest": 0.0761653976918162,
+            "posed": 0.07616539786487812,
+            "phase": 0.375,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              87,
+              88
+            ]
           }
         },
         {
           "name": "Sprint",
-          "duration": 1.2000000476837158,
+          "duration": 0.9333333373069763,
           "skin": {
-            "ratio": 2.9848885846059066,
-            "rest": 0.02913277569087977,
-            "posed": 0.08695808959759148,
-            "phase": 0,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 2.328835513550481,
+            "rest": 0.04016764757271295,
+            "posed": 0.09354384416311369,
+            "phase": 0.08333333333333333,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              8983,
-              3542
+              5612,
+              7693
             ]
           },
           "mouthSkin": {
-            "ratio": 1.3922365772378218,
-            "rest": 0.07207821149185191,
-            "posed": 0.10034992246083974,
-            "phase": 0.6666666666666666,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.0095422089876511,
+            "rest": 0.07550089098999006,
+            "posed": 0.07622133627057041,
+            "phase": 0.4166666666666667,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              2141,
-              9754
+              5163,
+              8739
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0024951463210812,
+            "rest": 0.08230665482843103,
+            "posed": 0.08251202197542667,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              114,
+              106
+            ]
           }
         },
         {
           "name": "Stagger",
           "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 1.0667287940190724,
-            "rest": 0.0776289598126573,
-            "posed": 0.08280904668191096,
-            "phase": 0.5833333333333334,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.4157139707439754,
+            "rest": 0.05991362704556546,
+            "posed": 0.08482055884635112,
+            "phase": 0.3333333333333333,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              9423,
-              3436
+              10972,
+              1758
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0519645260319914,
-            "rest": 0.08159680411813523,
-            "posed": 0.08583694336985938,
-            "phase": 0.4583333333333333,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.191869648447614,
+            "rest": 0.06722375729700605,
+            "posed": 0.08012195597691033,
+            "phase": 0.5833333333333334,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              10502,
-              9329
+              4973,
+              10822
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.029524223756937,
+            "rest": 0.0745205496250661,
+            "posed": 0.07672071100668648,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
           }
         },
         {
           "name": "Swim",
-          "duration": 1.7999999523162842,
+          "duration": 1.5,
           "skin": {
-            "ratio": 1.7712207692708486,
-            "rest": 0.04675328706423106,
-            "posed": 0.08281039307984815,
-            "phase": 1,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.784751122617627,
+            "rest": 0.044288601147610636,
+            "posed": 0.0790441306173624,
+            "phase": 0.3333333333333333,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              3398,
-              5528
+              10257,
+              6060
             ]
           },
           "mouthSkin": {
-            "ratio": 1.263495274186432,
-            "rest": 0.07207821149185191,
-            "posed": 0.09107047959176506,
-            "phase": 0.6666666666666666,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.008125815538315,
+            "rest": 0.07550089098999006,
+            "posed": 0.07611439730315316,
+            "phase": 0.4166666666666667,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              2141,
-              9754
+              5163,
+              8739
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.002492278134637,
+            "rest": 0.08230665482843103,
+            "posed": 0.08251178590459504,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              114,
+              106
+            ]
           }
         },
         {
           "name": "TurnLeft",
-          "duration": 1.600000023841858,
+          "duration": 1.399999976158142,
           "skin": {
-            "ratio": 1.067797546264891,
-            "rest": 0.0776289598126573,
-            "posed": 0.0828920128070513,
-            "phase": 0.5833333333333334,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 2.1385577564891323,
+            "rest": 0.04191498932623392,
+            "posed": 0.08963762553677675,
+            "phase": 0.5,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              9423,
-              3436
+              3392,
+              4169
             ]
           },
           "mouthSkin": {
-            "ratio": 1.053582575823238,
-            "rest": 0.09219216092244227,
-            "posed": 0.0971320543753772,
-            "phase": 0.375,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.1246368906974635,
+            "rest": 0.07021391057732942,
+            "posed": 0.07896515407539752,
+            "phase": 0.5,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              5507,
-              7788
+              11300,
+              2821
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.000000070445969,
+            "rest": 0.08054598633513317,
+            "posed": 0.08054599200927323,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              168,
+              169
+            ]
           }
         },
         {
           "name": "TurnRight",
-          "duration": 1.600000023841858,
+          "duration": 1.399999976158142,
           "skin": {
-            "ratio": 1.15783374573032,
-            "rest": 0.07156017791698958,
-            "posed": 0.08285478884275618,
-            "phase": 0.4166666666666667,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 2.7156872165026016,
+            "rest": 0.029409235244918643,
+            "posed": 0.07986628420174331,
+            "phase": 0.5,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              6737,
-              4001
+              9933,
+              7372
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0628384720608528,
-            "rest": 0.08159680411813523,
-            "posed": 0.08672422261396755,
-            "phase": 0.4583333333333333,
-            "mesh": "Nothosaurus_authored_body",
+            "ratio": 1.1459962459874289,
+            "rest": 0.08706879078747767,
+            "posed": 0.09978050738511425,
+            "phase": 0.5,
+            "mesh": "Birgeria_authored_body",
             "vertices": [
-              10502,
-              9329
+              8098,
+              6864
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.000000098734763,
+            "rest": 0.0761653976918162,
+            "posed": 0.07616540521198868,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              87,
+              88
+            ]
+          }
+        },
+        {
+          "name": "Flop",
+          "duration": 0.800000011920929,
+          "skin": {
+            "ratio": 2.73937286661657,
+            "rest": 0.040924669999266514,
+            "posed": 0.11210793057122785,
+            "phase": 0.9583333333333334,
+            "mesh": "Birgeria_authored_body",
+            "vertices": [
+              921,
+              151
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.4074738659921084,
+            "rest": 0.06809129425914348,
+            "posed": 0.09583671717132293,
+            "phase": 0.75,
+            "mesh": "Birgeria_authored_body",
+            "vertices": [
+              1983,
+              6435
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0331623667369407,
+            "rest": 0.07494302953163473,
+            "posed": 0.07742831776134018,
+            "phase": 0.16666666666666666,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              94,
+              95
+            ]
           }
         }
       ],
       "worstMouth": {
-        "ratio": 1.5409659666456106,
-        "rest": 0.05698326785975083,
-        "posed": 0.08780927644012669,
-        "phase": 0.4583333333333333,
-        "mesh": "Nothosaurus_authored_body",
+        "ratio": 1.622400158823139,
+        "rest": 0.06809129425914348,
+        "posed": 0.11047132662050747,
+        "phase": 0.20833333333333334,
+        "mesh": "Birgeria_authored_body",
         "vertices": [
-          10781,
-          9391
+          1983,
+          6435
         ],
-        "clip": "Dodge"
+        "clip": "FastStart"
       }
     },
     {
-      "id": "nothosaurus",
+      "id": "birgeria",
       "variant": "puppet",
-      "sha256": "6ba00076f5ce179698e968ca38a0236b057878c7b28b21aea11956ae80c62932",
-      "length": 5.31730709542666,
+      "sha256": "ff712025260394314b12c165c62ab6e49e46bc36e940b76d11440ccd25de0396",
+      "length": 5.019418989868931,
       "meshes": [
         {
-          "name": "Nothosaurus_procedural_volume_puppet",
+          "name": "Birgeria_procedural_volume_twin",
           "hiddenOral": false,
-          "vertices": 4108,
-          "mixedJawSkullVertices": 17
+          "vertices": 2656,
+          "mixedJawSkullVertices": 342
         },
         {
-          "name": "Nothosaurus_procedural_volume_puppet_lower_jaw",
+          "name": "Birgeria_procedural_volume_twin_lower_jaw",
           "hiddenOral": false,
-          "vertices": 453,
-          "mixedJawSkullVertices": 38
+          "vertices": 215,
+          "mixedJawSkullVertices": 42
+        },
+        {
+          "name": "Oral_cavity_lining",
+          "hiddenOral": true,
+          "vertices": 816,
+          "mixedJawSkullVertices": 0
+        },
+        {
+          "name": "Seated_jaw_hinge_tissue",
+          "hiddenOral": true,
+          "vertices": 207,
+          "mixedJawSkullVertices": 94
         }
       ],
       "clips": [
@@ -670,25 +973,941 @@
           "name": "Ability",
           "duration": 1,
           "skin": {
-            "ratio": 1.2030416866990965,
-            "rest": 0.09556615436321934,
-            "posed": 0.11497006753647361,
-            "phase": 0.125,
-            "mesh": "Nothosaurus_procedural_volume_puppet_lower_jaw",
+            "ratio": 1.5836854615438498,
+            "rest": 0.06819926134279426,
+            "posed": 0.10800617867661276,
+            "phase": 0.5,
+            "mesh": "Birgeria_procedural_volume_twin",
             "vertices": [
-              180,
-              221
+              2483,
+              2479
             ]
           },
           "mouthSkin": {
-            "ratio": 1.2030416866990965,
-            "rest": 0.09556615436321934,
-            "posed": 0.11497006753647361,
-            "phase": 0.125,
-            "mesh": "Nothosaurus_procedural_volume_puppet_lower_jaw",
+            "ratio": 1.5836854615438498,
+            "rest": 0.06819926134279426,
+            "posed": 0.10800617867661276,
+            "phase": 0.5,
+            "mesh": "Birgeria_procedural_volume_twin",
             "vertices": [
-              180,
-              221
+              2483,
+              2479
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0616174938199405,
+            "rest": 0.0745205496250661,
+            "posed": 0.07911231913104719,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
+          }
+        },
+        {
+          "name": "Attack",
+          "duration": 0.8999999761581421,
+          "skin": {
+            "ratio": 1.4566662211892298,
+            "rest": 0.0526905589274773,
+            "posed": 0.0767525573652368,
+            "phase": 0.20833333333333334,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2357,
+              1203
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2934585074554703,
+            "rest": 0.06819926134279426,
+            "posed": 0.08821291478601623,
+            "phase": 0.4583333333333333,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2483,
+              2479
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0503836182903143,
+            "rest": 0.0745205496250661,
+            "posed": 0.07827516455215985,
+            "phase": 0.4583333333333333,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
+          }
+        },
+        {
+          "name": "Bite",
+          "duration": 0.46666666865348816,
+          "skin": {
+            "ratio": 1.1928267180103649,
+            "rest": 0.06346435261085878,
+            "posed": 0.07570197543546321,
+            "phase": 0.25,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2272,
+              2274
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1928267180103649,
+            "rest": 0.06346435261085878,
+            "posed": 0.07570197543546321,
+            "phase": 0.25,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2272,
+              2274
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0543451650951283,
+            "rest": 0.0745205496250661,
+            "posed": 0.07857038119742002,
+            "phase": 0.25,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
+          }
+        },
+        {
+          "name": "Breath",
+          "duration": 2.4000000953674316,
+          "skin": {
+            "ratio": 1.4707962023925787,
+            "rest": 0.0526905589274773,
+            "posed": 0.077497073972476,
+            "phase": 0.4583333333333333,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2357,
+              1203
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0268832959212815,
+            "rest": 0.07782980827091456,
+            "posed": 0.07992213003815815,
+            "phase": 0.5,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              1845,
+              1843
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.012390523937657,
+            "rest": 0.0745205496250661,
+            "posed": 0.07544389827904284,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
+          }
+        },
+        {
+          "name": "Death",
+          "duration": 1.7999999523162842,
+          "skin": {
+            "ratio": 2.24240203271152,
+            "rest": 0.0526905589274773,
+            "posed": 0.11815341644368121,
+            "phase": 1,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2357,
+              1203
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0733261772453868,
+            "rest": 0.07782980827091456,
+            "posed": 0.0835367705871621,
+            "phase": 1,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              1845,
+              1843
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0258872164780777,
+            "rest": 0.0745205496250661,
+            "posed": 0.07644967922527551,
+            "phase": 1,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
+          }
+        },
+        {
+          "name": "Dive",
+          "duration": 1.2999999523162842,
+          "skin": {
+            "ratio": 1.8831530958847145,
+            "rest": 0.049988127596542524,
+            "posed": 0.09413529724090919,
+            "phase": 0.4583333333333333,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2357,
+              2353
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0017794753867706,
+            "rest": 0.09683158769987496,
+            "posed": 0.0970038971268488,
+            "phase": 0.3333333333333333,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2248,
+              2263
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000025436393,
+            "rest": 0.0761653976918162,
+            "posed": 0.0761653978855535,
+            "phase": 0.375,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              87,
+              88
+            ]
+          }
+        },
+        {
+          "name": "Dodge",
+          "duration": 0.46666666865348816,
+          "skin": {
+            "ratio": 2.419602355909226,
+            "rest": 0.049988127596542524,
+            "posed": 0.12095139130008528,
+            "phase": 0.4583333333333333,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2357,
+              2353
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.221194573342108,
+            "rest": 0.11639811140338512,
+            "posed": 0.14214474199308402,
+            "phase": 0.5,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              1981,
+              1989
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000001735021489,
+            "rest": 0.07616534724216352,
+            "posed": 0.07616536045701494,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              177,
+              178
+            ]
+          }
+        },
+        {
+          "name": "Eat",
+          "duration": 1.5,
+          "skin": {
+            "ratio": 1.263881764291947,
+            "rest": 0.07765348630762013,
+            "posed": 0.09814482527789549,
+            "phase": 0.125,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2330,
+              2338
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1445255990548353,
+            "rest": 0.09522041292751689,
+            "posed": 0.10898220014811505,
+            "phase": 0.3333333333333333,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              1841,
+              1842
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0459197335697916,
+            "rest": 0.0745205496250661,
+            "posed": 0.07794251340932358,
+            "phase": 0.75,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
+          }
+        },
+        {
+          "name": "FastStart",
+          "duration": 0.699999988079071,
+          "skin": {
+            "ratio": 2.8711103021600164,
+            "rest": 0.027756221940575407,
+            "posed": 0.07969117476262594,
+            "phase": 0.20833333333333334,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              530,
+              532
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.645250107866584,
+            "rest": 0.05503346998835774,
+            "posed": 0.09054382243461798,
+            "phase": 0.20833333333333334,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2264,
+              2265
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0295242094151995,
+            "rest": 0.0745205496250661,
+            "posed": 0.07672070993793233,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
+          }
+        },
+        {
+          "name": "Gape",
+          "duration": 1.2999999523162842,
+          "skin": {
+            "ratio": 2.085386996923489,
+            "rest": 0.0526905589274773,
+            "posed": 0.10988020644799203,
+            "phase": 0.5,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2357,
+              1203
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.4864595952913355,
+            "rest": 0.06819926134279426,
+            "posed": 0.10137544641477798,
+            "phase": 0.5833333333333334,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2483,
+              2479
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0699028227567893,
+            "rest": 0.0745205496250661,
+            "posed": 0.07972974639724562,
+            "phase": 0.375,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
+          }
+        },
+        {
+          "name": "Grab",
+          "duration": 1.100000023841858,
+          "skin": {
+            "ratio": 1.907656917795171,
+            "rest": 0.0526905589274773,
+            "posed": 0.10051550924049618,
+            "phase": 0.4166666666666667,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2357,
+              1203
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0628392019234947,
+            "rest": 0.11734821949975227,
+            "posed": 0.12472228796025979,
+            "phase": 0.75,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              1992,
+              1997
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0170550224018162,
+            "rest": 0.0745205496250661,
+            "posed": 0.07579149926831727,
+            "phase": 0.75,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
+          }
+        },
+        {
+          "name": "Growth",
+          "duration": 1.5,
+          "skin": {
+            "ratio": 1.5918574510089998,
+            "rest": 0.0526905589274773,
+            "posed": 0.08387585882653352,
+            "phase": 0.4583333333333333,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2357,
+              1203
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0662404341301444,
+            "rest": 0.09683158769987496,
+            "posed": 0.10324575410662583,
+            "phase": 0.5,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2248,
+              2263
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.000000049203899,
+            "rest": 0.0761653976918162,
+            "posed": 0.07616540143945073,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              87,
+              88
+            ]
+          }
+        },
+        {
+          "name": "Guard",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 1.0900617766969167,
+            "rest": 0.0914230535379,
+            "posed": 0.09965677617058062,
+            "phase": 0.5,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              1748,
+              1725
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0131873376680014,
+            "rest": 0.07782980827091456,
+            "posed": 0.07885617623321892,
+            "phase": 0.5,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              1845,
+              1843
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.004877490150325,
+            "rest": 0.08230665482843103,
+            "posed": 0.0827081047266629,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              114,
+              106
+            ]
+          }
+        },
+        {
+          "name": "Heavy",
+          "duration": 1.100000023841858,
+          "skin": {
+            "ratio": 1.5231253354337637,
+            "rest": 0.06819926134279426,
+            "posed": 0.10387602280907843,
+            "phase": 0.5,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2483,
+              2479
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.5231253354337637,
+            "rest": 0.06819926134279426,
+            "posed": 0.10387602280907843,
+            "phase": 0.5,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2483,
+              2479
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.059303356171562,
+            "rest": 0.0745205496250661,
+            "posed": 0.07893986832158195,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
+          }
+        },
+        {
+          "name": "Hit",
+          "duration": 0.5333333611488342,
+          "skin": {
+            "ratio": 1.4990069391172003,
+            "rest": 0.0526905589274773,
+            "posed": 0.07898351345825222,
+            "phase": 0.3333333333333333,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2357,
+              1203
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1241248470230552,
+            "rest": 0.09522041292751689,
+            "posed": 0.10703963211561705,
+            "phase": 0.375,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              1841,
+              1842
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0295242237805777,
+            "rest": 0.0745205496250661,
+            "posed": 0.0767207110084482,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
+          }
+        },
+        {
+          "name": "Idle",
+          "duration": 2.5999999046325684,
+          "skin": {
+            "ratio": 1.0762077082046975,
+            "rest": 0.09586801664202096,
+            "posed": 0.10317389848043917,
+            "phase": 0.6666666666666666,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              185,
+              241
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.006690245793105,
+            "rest": 0.07782980827091456,
+            "posed": 0.07835050881827722,
+            "phase": 0.4583333333333333,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              1845,
+              1843
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0024952149579167,
+            "rest": 0.08230665482843103,
+            "posed": 0.082512027624695,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              114,
+              106
+            ]
+          }
+        },
+        {
+          "name": "Parry",
+          "duration": 0.3333333432674408,
+          "skin": {
+            "ratio": 1.9107866832007194,
+            "rest": 0.0526905589274773,
+            "posed": 0.10068041832902641,
+            "phase": 0.5,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2357,
+              1203
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2002844086446864,
+            "rest": 0.09683158769987496,
+            "posed": 0.11622544498047051,
+            "phase": 0.5,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2248,
+              2263
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000001291744716,
+            "rest": 0.08054602615891225,
+            "posed": 0.08054603656340262,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              78,
+              79
+            ]
+          }
+        },
+        {
+          "name": "Rise",
+          "duration": 1.2999999523162842,
+          "skin": {
+            "ratio": 1.411796636191955,
+            "rest": 0.08168182631204457,
+            "posed": 0.11531812762536003,
+            "phase": 0.5416666666666666,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              1601,
+              1600
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0017794755759057,
+            "rest": 0.09683158769987496,
+            "posed": 0.09700389714516305,
+            "phase": 0.3333333333333333,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2248,
+              2263
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000022721858,
+            "rest": 0.0761653976918162,
+            "posed": 0.07616539786487812,
+            "phase": 0.375,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              87,
+              88
+            ]
+          }
+        },
+        {
+          "name": "Sprint",
+          "duration": 0.9333333373069763,
+          "skin": {
+            "ratio": 2.0020100610125704,
+            "rest": 0.049929061180896905,
+            "posed": 0.09995848282106777,
+            "phase": 0.8333333333333334,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              213,
+              212
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0108494017482745,
+            "rest": 0.07782980827091456,
+            "posed": 0.07867421512883689,
+            "phase": 0.625,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              1845,
+              1843
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0024951463210812,
+            "rest": 0.08230665482843103,
+            "posed": 0.08251202197542667,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              114,
+              106
+            ]
+          }
+        },
+        {
+          "name": "Stagger",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 1.5151854041473793,
+            "rest": 0.0526905589274773,
+            "posed": 0.07983596582328101,
+            "phase": 0.3333333333333333,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2357,
+              1203
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1598120656255744,
+            "rest": 0.09522041292751689,
+            "posed": 0.1104377838071835,
+            "phase": 0.5833333333333334,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              1841,
+              1842
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.029524223756937,
+            "rest": 0.0745205496250661,
+            "posed": 0.07672071100668648,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              112,
+              113
+            ]
+          }
+        },
+        {
+          "name": "Swim",
+          "duration": 1.5,
+          "skin": {
+            "ratio": 1.6252320210903972,
+            "rest": 0.049929061180896905,
+            "posed": 0.08114630901417517,
+            "phase": 0.3333333333333333,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              213,
+              212
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0091535688119124,
+            "rest": 0.07782980827091456,
+            "posed": 0.07854222877654032,
+            "phase": 0.625,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              1845,
+              1843
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.002492278134637,
+            "rest": 0.08230665482843103,
+            "posed": 0.08251178590459504,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              114,
+              106
+            ]
+          }
+        },
+        {
+          "name": "TurnLeft",
+          "duration": 1.399999976158142,
+          "skin": {
+            "ratio": 1.7443531269129615,
+            "rest": 0.05915883595715226,
+            "posed": 0.10319390048638949,
+            "phase": 0.5,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              769,
+              735
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1397526373462112,
+            "rest": 0.11639811140338512,
+            "posed": 0.1326650544541263,
+            "phase": 0.5,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              1981,
+              1989
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.000000070445969,
+            "rest": 0.08054598633513317,
+            "posed": 0.08054599200927323,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              168,
+              169
+            ]
+          }
+        },
+        {
+          "name": "TurnRight",
+          "duration": 1.399999976158142,
+          "skin": {
+            "ratio": 1.974288396398877,
+            "rest": 0.049988127596542524,
+            "posed": 0.0986909802715604,
+            "phase": 0.5,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2357,
+              2353
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1379891366108201,
+            "rest": 0.09683158769987496,
+            "posed": 0.11019329488323562,
+            "phase": 0.5,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2248,
+              2263
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.000000098734763,
+            "rest": 0.0761653976918162,
+            "posed": 0.07616540521198868,
+            "phase": 0.5,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              87,
+              88
+            ]
+          }
+        },
+        {
+          "name": "Flop",
+          "duration": 0.800000011920929,
+          "skin": {
+            "ratio": 2.8424025331626743,
+            "rest": 0.027756221940575407,
+            "posed": 0.07889435555491693,
+            "phase": 0.9583333333333334,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              530,
+              532
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.492433725107671,
+            "rest": 0.05894669550795972,
+            "posed": 0.08797403635973194,
+            "phase": 0.25,
+            "mesh": "Birgeria_procedural_volume_twin",
+            "vertices": [
+              2016,
+              2015
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0331623667369407,
+            "rest": 0.07494302953163473,
+            "posed": 0.07742831776134018,
+            "phase": 0.16666666666666666,
+            "mesh": "Seated_jaw_hinge_tissue",
+            "vertices": [
+              94,
+              95
+            ]
+          }
+        }
+      ],
+      "worstMouth": {
+        "ratio": 1.645250107866584,
+        "rest": 0.05503346998835774,
+        "posed": 0.09054382243461798,
+        "phase": 0.20833333333333334,
+        "mesh": "Birgeria_procedural_volume_twin",
+        "vertices": [
+          2264,
+          2265
+        ],
+        "clip": "FastStart"
+      }
+    },
+    {
+      "id": "helicoprion",
+      "variant": "authored",
+      "sha256": "e5ae1daf1ac273cc1505d25642c6fa3850c99da942ca8909236146d9d03e9153",
+      "length": 4.99999989635082,
+      "meshes": [
+        {
+          "name": "Helicoprion_authored_body",
+          "hiddenOral": false,
+          "vertices": 11619,
+          "mixedJawSkullVertices": 220
+        }
+      ],
+      "clips": [
+        {
+          "name": "Ability",
+          "duration": 1,
+          "skin": {
+            "ratio": 2.544856204565608,
+            "rest": 0.02974388901018493,
+            "posed": 0.0756939204954799,
+            "phase": 0.125,
+            "mesh": "Helicoprion_authored_body",
+            "vertices": [
+              1311,
+              6477
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 2.544856204565608,
+            "rest": 0.02974388901018493,
+            "posed": 0.0756939204954799,
+            "phase": 0.125,
+            "mesh": "Helicoprion_authored_body",
+            "vertices": [
+              1311,
+              6477
             ]
           },
           "hiddenOral": {
@@ -699,25 +1918,25 @@
           "name": "Attack",
           "duration": 1,
           "skin": {
-            "ratio": 1.3822249570259524,
-            "rest": 0.06998709541243904,
-            "posed": 0.09673790994882978,
-            "phase": 0.4583333333333333,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 3.0537486077815696,
+            "rest": 0.02598119932897664,
+            "posed": 0.07934005127935786,
+            "phase": 0.125,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              1410,
-              1763
+              5092,
+              10002
             ]
           },
           "mouthSkin": {
-            "ratio": 1.2108963804368125,
-            "rest": 0.09556615436321934,
-            "posed": 0.11572071041068799,
+            "ratio": 3.0537486077815696,
+            "rest": 0.02598119932897664,
+            "posed": 0.07934005127935786,
             "phase": 0.125,
-            "mesh": "Nothosaurus_procedural_volume_puppet_lower_jaw",
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              180,
-              221
+              5092,
+              10002
             ]
           },
           "hiddenOral": {
@@ -728,25 +1947,25 @@
           "name": "Bite",
           "duration": 0.5,
           "skin": {
-            "ratio": 1.3534741414954716,
-            "rest": 0.06114130501696135,
-            "posed": 0.08275317531774454,
+            "ratio": 3.5404317155345635,
+            "rest": 0.02598119932897664,
+            "posed": 0.09198466211193422,
             "phase": 0.5,
-            "mesh": "Nothosaurus_procedural_volume_puppet_lower_jaw",
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              221,
-              202
+              5092,
+              10002
             ]
           },
           "mouthSkin": {
-            "ratio": 1.3534741414954716,
-            "rest": 0.06114130501696135,
-            "posed": 0.08275317531774454,
+            "ratio": 3.5404317155345635,
+            "rest": 0.02598119932897664,
+            "posed": 0.09198466211193422,
             "phase": 0.5,
-            "mesh": "Nothosaurus_procedural_volume_puppet_lower_jaw",
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              221,
-              202
+              5092,
+              10002
             ]
           },
           "hiddenOral": {
@@ -757,25 +1976,25 @@
           "name": "Breath",
           "duration": 2.4000000953674316,
           "skin": {
-            "ratio": 1.32215089134772,
-            "rest": 0.06991896707376719,
-            "posed": 0.09244342463869318,
-            "phase": 0.625,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.3007200882665086,
+            "rest": 0.06331505368564869,
+            "posed": 0.08235516221859569,
+            "phase": 0.5,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              1766,
-              1410
+              3792,
+              8810
             ]
           },
           "mouthSkin": {
-            "ratio": 1.1712057490100807,
-            "rest": 0.16059145692044127,
-            "posed": 0.18808563758712551,
-            "phase": 0.4583333333333333,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.3007200882665086,
+            "rest": 0.06331505368564869,
+            "posed": 0.08235516221859569,
+            "phase": 0.5,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              614,
-              586
+              3792,
+              8810
             ]
           },
           "hiddenOral": {
@@ -786,25 +2005,25 @@
           "name": "Death",
           "duration": 1.600000023841858,
           "skin": {
-            "ratio": 1.4185189557430826,
-            "rest": 0.06991896707376719,
-            "posed": 0.0991813801601152,
+            "ratio": 1.4006236898207143,
+            "rest": 0.06331505368564869,
+            "posed": 0.08868056411438988,
             "phase": 1,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              1766,
-              1410
+              3792,
+              8810
             ]
           },
           "mouthSkin": {
-            "ratio": 1.1223978168828714,
-            "rest": 0.1620590420390234,
-            "posed": 0.18189471499072937,
+            "ratio": 1.4006236898207143,
+            "rest": 0.06331505368564869,
+            "posed": 0.08868056411438988,
             "phase": 1,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              586,
-              615
+              3792,
+              8810
             ]
           },
           "hiddenOral": {
@@ -815,25 +2034,25 @@
           "name": "Dive",
           "duration": 1.399999976158142,
           "skin": {
-            "ratio": 1.0686990627022164,
-            "rest": 0.10715640196073059,
-            "posed": 0.11451794633797471,
-            "phase": 0.5416666666666666,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.3031095032622835,
+            "rest": 0.08067619233792774,
+            "posed": 0.10512991292256946,
+            "phase": 0.5,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              1580,
-              1599
+              4080,
+              11588
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0550663446141615,
-            "rest": 0.16059145692044127,
-            "posed": 0.16943464142931255,
-            "phase": 0.4583333333333333,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.1410919083416067,
+            "rest": 0.08601912146848081,
+            "posed": 0.09815572347033724,
+            "phase": 0.5,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              614,
-              586
+              1377,
+              3266
             ]
           },
           "hiddenOral": {
@@ -844,25 +2063,25 @@
           "name": "Dodge",
           "duration": 0.5,
           "skin": {
-            "ratio": 1.6046759899739262,
-            "rest": 0.07882613494894875,
-            "posed": 0.12649040613502263,
-            "phase": 0.4166666666666667,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.3672028395820088,
+            "rest": 0.06305633752950562,
+            "posed": 0.08621080372398168,
+            "phase": 0.5416666666666666,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              2701,
-              2732
+              154,
+              6790
             ]
           },
           "mouthSkin": {
-            "ratio": 1.5448226224828787,
-            "rest": 0.1620590420390234,
-            "posed": 0.25035247431978724,
-            "phase": 0.4583333333333333,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.216278252627111,
+            "rest": 0.06257438341020792,
+            "posed": 0.07610786171338657,
+            "phase": 0.5416666666666666,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              586,
-              615
+              6609,
+              10907
             ]
           },
           "hiddenOral": {
@@ -873,25 +2092,25 @@
           "name": "Eat",
           "duration": 1.600000023841858,
           "skin": {
-            "ratio": 1.2111529662365965,
-            "rest": 0.09556615436321934,
-            "posed": 0.11574523132883756,
+            "ratio": 4.20959788336927,
+            "rest": 0.0206237992539748,
+            "posed": 0.08681790168656504,
             "phase": 0.25,
-            "mesh": "Nothosaurus_procedural_volume_puppet_lower_jaw",
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              180,
-              221
+              2595,
+              1523
             ]
           },
           "mouthSkin": {
-            "ratio": 1.2111529662365965,
-            "rest": 0.09556615436321934,
-            "posed": 0.11574523132883756,
+            "ratio": 4.20959788336927,
+            "rest": 0.0206237992539748,
+            "posed": 0.08681790168656504,
             "phase": 0.25,
-            "mesh": "Nothosaurus_procedural_volume_puppet_lower_jaw",
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              180,
-              221
+              2595,
+              1523
             ]
           },
           "hiddenOral": {
@@ -900,27 +2119,27 @@
         },
         {
           "name": "Grab",
-          "duration": 1.2000000476837158,
+          "duration": 1.100000023841858,
           "skin": {
-            "ratio": 1.0988605859696898,
-            "rest": 0.09112127300338217,
-            "posed": 0.10012957544680061,
-            "phase": 0.5833333333333334,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.838065275176721,
+            "rest": 0.04814228660321471,
+            "posed": 0.08848866527297441,
+            "phase": 0.75,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              187,
-              198
+              10721,
+              2069
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0988605859696898,
-            "rest": 0.09112127300338217,
-            "posed": 0.10012957544680061,
-            "phase": 0.5833333333333334,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.838065275176721,
+            "rest": 0.04814228660321471,
+            "posed": 0.08848866527297441,
+            "phase": 0.75,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              187,
-              198
+              10721,
+              2069
             ]
           },
           "hiddenOral": {
@@ -931,25 +2150,25 @@
           "name": "Growth",
           "duration": 1.5,
           "skin": {
-            "ratio": 1.1972063844199607,
-            "rest": 0.07187941245056127,
-            "posed": 0.08605449149416758,
-            "phase": 0.4166666666666667,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.1195362315774495,
+            "rest": 0.08284265697580533,
+            "posed": 0.0927453560045564,
+            "phase": 0.5,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              1764,
-              1410
+              448,
+              2803
             ]
           },
           "mouthSkin": {
-            "ratio": 1.070724284659535,
-            "rest": 0.11917840908884979,
-            "posed": 0.1276072168185201,
-            "phase": 0.4166666666666667,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.1195362315774495,
+            "rest": 0.08284265697580533,
+            "posed": 0.0927453560045564,
+            "phase": 0.5,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              1485,
-              1503
+              448,
+              2803
             ]
           },
           "hiddenOral": {
@@ -960,25 +2179,25 @@
           "name": "Guard",
           "duration": 1,
           "skin": {
-            "ratio": 1.771335145645151,
-            "rest": 0.0636243391264721,
-            "posed": 0.11270002801316593,
-            "phase": 0.5416666666666666,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.888457317324445,
+            "rest": 0.0451087637427798,
+            "posed": 0.08518597496551213,
+            "phase": 1,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              1469,
-              1764
+              660,
+              6624
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0542157107065377,
-            "rest": 0.10952229575315973,
-            "posed": 0.1154601248556289,
-            "phase": 0.5416666666666666,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.888457317324445,
+            "rest": 0.0451087637427798,
+            "posed": 0.08518597496551213,
+            "phase": 1,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              612,
-              574
+              660,
+              6624
             ]
           },
           "hiddenOral": {
@@ -989,25 +2208,25 @@
           "name": "Heavy",
           "duration": 1.100000023841858,
           "skin": {
-            "ratio": 1.3849095355894632,
-            "rest": 0.06998709541243904,
-            "posed": 0.0969257958048964,
-            "phase": 0.4583333333333333,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 3.7177527437770754,
+            "rest": 0.0206237992539748,
+            "posed": 0.07667418626357242,
+            "phase": 0.125,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              1410,
-              1763
+              2595,
+              1523
             ]
           },
           "mouthSkin": {
-            "ratio": 1.3715993361179843,
-            "rest": 0.06114130501696135,
-            "posed": 0.08386137337065137,
+            "ratio": 3.7177527437770754,
+            "rest": 0.0206237992539748,
+            "posed": 0.07667418626357242,
             "phase": 0.125,
-            "mesh": "Nothosaurus_procedural_volume_puppet_lower_jaw",
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              221,
-              202
+              2595,
+              1523
             ]
           },
           "hiddenOral": {
@@ -1018,25 +2237,25 @@
           "name": "Hit",
           "duration": 0.6000000238418579,
           "skin": {
-            "ratio": 1.0680378614436936,
-            "rest": 0.10715640196073059,
-            "posed": 0.11444709439013952,
+            "ratio": 1.0481175462740808,
+            "rest": 0.07573380508436697,
+            "posed": 0.07937792995502622,
             "phase": 0.5416666666666666,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              1580,
-              1599
+              5261,
+              8657
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0545151598797853,
-            "rest": 0.16059145692044127,
-            "posed": 0.16934612586978678,
-            "phase": 0.4583333333333333,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.0081190222632237,
+            "rest": 0.07813182111354779,
+            "posed": 0.07876617510863489,
+            "phase": 0.4166666666666667,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              614,
-              586
+              11345,
+              1300
             ]
           },
           "hiddenOral": {
@@ -1047,25 +2266,25 @@
           "name": "Idle",
           "duration": 2.4000000953674316,
           "skin": {
-            "ratio": 1.1660373381313434,
-            "rest": 0.06991896707376719,
-            "posed": 0.08152812625158853,
-            "phase": 0.7083333333333334,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.888737878880237,
+            "rest": 0.0451087637427798,
+            "posed": 0.08519863075044766,
+            "phase": 0.9583333333333334,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              1766,
-              1410
+              660,
+              6624
             ]
           },
           "mouthSkin": {
-            "ratio": 1.075688398243317,
-            "rest": 0.11593110394694973,
-            "posed": 0.12470574351127384,
-            "phase": 0.2916666666666667,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.888737878880237,
+            "rest": 0.0451087637427798,
+            "posed": 0.08519863075044766,
+            "phase": 0.9583333333333334,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              598,
-              618
+              660,
+              6624
             ]
           },
           "hiddenOral": {
@@ -1076,25 +2295,25 @@
           "name": "Parry",
           "duration": 0.4000000059604645,
           "skin": {
-            "ratio": 1.06659732862716,
-            "rest": 0.10715640196073059,
-            "posed": 0.1142927320766134,
+            "ratio": 1.156375869728601,
+            "rest": 0.08284265697580533,
+            "posed": 0.09579724951102504,
             "phase": 0.5,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              1580,
-              1599
+              448,
+              2803
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0546472094354988,
-            "rest": 0.10996267924825653,
-            "posed": 0.11597183281122458,
-            "phase": 0.4166666666666667,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.156375869728601,
+            "rest": 0.08284265697580533,
+            "posed": 0.09579724951102504,
+            "phase": 0.5,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              1529,
-              1535
+              448,
+              2803
             ]
           },
           "hiddenOral": {
@@ -1105,25 +2324,25 @@
           "name": "Rise",
           "duration": 1.399999976158142,
           "skin": {
-            "ratio": 1.068699095378169,
-            "rest": 0.10715640196073059,
-            "posed": 0.11451794983941224,
-            "phase": 0.5416666666666666,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.5794379631058524,
+            "rest": 0.047670945932085325,
+            "posed": 0.07529330174230206,
+            "phase": 0.5,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              1580,
-              1599
+              5055,
+              463
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0550663407518706,
-            "rest": 0.16059145692044127,
-            "posed": 0.16943464080906165,
-            "phase": 0.4583333333333333,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.0914935702162734,
+            "rest": 0.08284265697580533,
+            "posed": 0.09042222742872381,
+            "phase": 0.5,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              614,
-              586
+              448,
+              2803
             ]
           },
           "hiddenOral": {
@@ -1132,27 +2351,27 @@
         },
         {
           "name": "Sprint",
-          "duration": 1.2000000476837158,
+          "duration": 1,
           "skin": {
-            "ratio": 1.8443014866542782,
-            "rest": 0.0636243391264721,
-            "posed": 0.11734246323834845,
-            "phase": 0,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.292988495655679,
+            "rest": 0.07005053460486961,
+            "posed": 0.09057453535862645,
+            "phase": 0.7916666666666666,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              1469,
-              1764
+              5261,
+              10947
             ]
           },
           "mouthSkin": {
-            "ratio": 1.3646690409230462,
-            "rest": 0.11593110394694973,
-            "posed": 0.15820758843643387,
+            "ratio": 1.0447862138125457,
+            "rest": 0.07813182111354779,
+            "posed": 0.0816310495595027,
             "phase": 0.6666666666666666,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              598,
-              618
+              11345,
+              1300
             ]
           },
           "hiddenOral": {
@@ -1163,25 +2382,25 @@
           "name": "Stagger",
           "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 1.068576819119189,
-            "rest": 0.10715640196073059,
-            "posed": 0.11450484715545471,
-            "phase": 0.5416666666666666,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.508558505893871,
+            "rest": 0.049828333435918866,
+            "posed": 0.07516895623927139,
+            "phase": 0.6666666666666666,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              1580,
-              1599
+              9315,
+              2756
             ]
           },
           "mouthSkin": {
-            "ratio": 1.054962522402103,
-            "rest": 0.16059145692044127,
-            "posed": 0.16941796846901738,
-            "phase": 0.4583333333333333,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.088476956760244,
+            "rest": 0.08284265697580533,
+            "posed": 0.09017232315495738,
+            "phase": 0.3333333333333333,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              614,
-              586
+              448,
+              2803
             ]
           },
           "hiddenOral": {
@@ -1190,27 +2409,27 @@
         },
         {
           "name": "Swim",
-          "duration": 1.7999999523162842,
+          "duration": 1.600000023841858,
           "skin": {
-            "ratio": 1.5548303235803187,
-            "rest": 0.0636243391264721,
-            "posed": 0.09892505179159654,
-            "phase": 1,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.1874508967700472,
+            "rest": 0.07005053460486961,
+            "posed": 0.08318157013577364,
+            "phase": 0.2916666666666667,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              1469,
-              1764
+              5261,
+              10947
             ]
           },
           "mouthSkin": {
-            "ratio": 1.2488633380337015,
-            "rest": 0.07695052145879601,
-            "posed": 0.09610068509246597,
-            "phase": 0.6666666666666666,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.0353949317141151,
+            "rest": 0.07269649613396022,
+            "posed": 0.07526958365047717,
+            "phase": 0.5,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              612,
-              580
+              2517,
+              10981
             ]
           },
           "hiddenOral": {
@@ -1221,25 +2440,25 @@
           "name": "TurnLeft",
           "duration": 1.600000023841858,
           "skin": {
-            "ratio": 1.0823162775874786,
-            "rest": 0.0964213228682177,
-            "posed": 0.1043583672467898,
-            "phase": 0.5833333333333334,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.6964889623738921,
+            "rest": 0.047670945932085325,
+            "posed": 0.08087323359970534,
+            "phase": 0.5,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              851,
-              474
+              5055,
+              463
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0568249372325538,
-            "rest": 0.08008497375600103,
-            "posed": 0.08463579736295651,
-            "phase": 0.4166666666666667,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.1706183073141814,
+            "rest": 0.08284265697580533,
+            "posed": 0.0969771308824266,
+            "phase": 0.5,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              595,
-              597
+              448,
+              2803
             ]
           },
           "hiddenOral": {
@@ -1250,25 +2469,54 @@
           "name": "TurnRight",
           "duration": 1.600000023841858,
           "skin": {
-            "ratio": 1.1684575954776417,
-            "rest": 0.06998709541243904,
-            "posed": 0.08177695322008281,
-            "phase": 0.625,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.8583758892756426,
+            "rest": 0.04198938251323131,
+            "posed": 0.07803205606816135,
+            "phase": 0.5,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              1410,
-              1763
+              1964,
+              1323
             ]
           },
           "mouthSkin": {
-            "ratio": 1.0655934666054274,
-            "rest": 0.10996267924825653,
-            "posed": 0.11717551257737037,
-            "phase": 0.4166666666666667,
-            "mesh": "Nothosaurus_procedural_volume_puppet",
+            "ratio": 1.236065329877314,
+            "rest": 0.06257438341020792,
+            "posed": 0.07734602587180818,
+            "phase": 0.5,
+            "mesh": "Helicoprion_authored_body",
             "vertices": [
-              1529,
-              1535
+              6609,
+              10907
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Flop",
+          "duration": 0.800000011920929,
+          "skin": {
+            "ratio": 2.0117579187137262,
+            "rest": 0.04198938251323131,
+            "posed": 0.08447247277289274,
+            "phase": 0.5,
+            "mesh": "Helicoprion_authored_body",
+            "vertices": [
+              1964,
+              1323
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.6921039018087536,
+            "rest": 0.04814228660321471,
+            "posed": 0.08146175100329489,
+            "phase": 0.16666666666666666,
+            "mesh": "Helicoprion_authored_body",
+            "vertices": [
+              10721,
+              2069
             ]
           },
           "hiddenOral": {
@@ -1277,16 +2525,682 @@
         }
       ],
       "worstMouth": {
-        "ratio": 1.5448226224828787,
-        "rest": 0.1620590420390234,
-        "posed": 0.25035247431978724,
-        "phase": 0.4583333333333333,
-        "mesh": "Nothosaurus_procedural_volume_puppet",
+        "ratio": 4.20959788336927,
+        "rest": 0.0206237992539748,
+        "posed": 0.08681790168656504,
+        "phase": 0.25,
+        "mesh": "Helicoprion_authored_body",
         "vertices": [
-          586,
-          615
+          2595,
+          1523
         ],
-        "clip": "Dodge"
+        "clip": "Eat"
+      }
+    },
+    {
+      "id": "helicoprion",
+      "variant": "puppet",
+      "sha256": "65ff3597f01b2b0a1b5a422340ba171eaa195a984924b94f7b4849bb5231f85d",
+      "length": 5.035837545810972,
+      "meshes": [
+        {
+          "name": "Helicoprion_procedural_volume_twin",
+          "hiddenOral": false,
+          "vertices": 3548,
+          "mixedJawSkullVertices": 100
+        }
+      ],
+      "clips": [
+        {
+          "name": "Ability",
+          "duration": 1,
+          "skin": {
+            "ratio": 6.270986985247614,
+            "rest": 0.0257877298010982,
+            "posed": 0.16171451796176886,
+            "phase": 0.125,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 6.270986985247614,
+            "rest": 0.0257877298010982,
+            "posed": 0.16171451796176886,
+            "phase": 0.125,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Attack",
+          "duration": 1,
+          "skin": {
+            "ratio": 7.146401003905662,
+            "rest": 0.0257877298010982,
+            "posed": 0.18428945813901612,
+            "phase": 0.125,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 7.146401003905662,
+            "rest": 0.0257877298010982,
+            "posed": 0.18428945813901612,
+            "phase": 0.125,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Bite",
+          "duration": 0.5,
+          "skin": {
+            "ratio": 8.660813964059475,
+            "rest": 0.0257877298010982,
+            "posed": 0.22334273036274396,
+            "phase": 0.5,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 8.660813964059475,
+            "rest": 0.0257877298010982,
+            "posed": 0.22334273036274396,
+            "phase": 0.5,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Breath",
+          "duration": 2.4000000953674316,
+          "skin": {
+            "ratio": 2.328449359266576,
+            "rest": 0.03636714899836831,
+            "posed": 0.08467906478360278,
+            "phase": 0.5,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2369,
+              2368
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 2.328449359266576,
+            "rest": 0.03636714899836831,
+            "posed": 0.08467906478360278,
+            "phase": 0.5,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2369,
+              2368
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 3.3519639085340236,
+            "rest": 0.0257877298010982,
+            "posed": 0.08643953957630844,
+            "phase": 1,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 3.3519639085340236,
+            "rest": 0.0257877298010982,
+            "posed": 0.08643953957630844,
+            "phase": 1,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Dive",
+          "duration": 1.399999976158142,
+          "skin": {
+            "ratio": 1.201884111879987,
+            "rest": 0.06874201453931109,
+            "posed": 0.08261993509342105,
+            "phase": 0.5,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2026,
+              2028
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1471553138623185,
+            "rest": 0.06875947837609314,
+            "posed": 0.07887780099753643,
+            "phase": 0.5,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              3429,
+              3430
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Dodge",
+          "duration": 0.5,
+          "skin": {
+            "ratio": 1.2625019553552492,
+            "rest": 0.0657912060434534,
+            "posed": 0.08306152627504,
+            "phase": 0.5416666666666666,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              1496,
+              1470
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0853172872061108,
+            "rest": 0.07865319157856362,
+            "posed": 0.08536366851414919,
+            "phase": 0.4583333333333333,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2863,
+              2830
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Eat",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 10.553425556190888,
+            "rest": 0.0257877298010982,
+            "posed": 0.2721488867190551,
+            "phase": 0.25,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 10.553425556190888,
+            "rest": 0.0257877298010982,
+            "posed": 0.2721488867190551,
+            "phase": 0.25,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Grab",
+          "duration": 1.100000023841858,
+          "skin": {
+            "ratio": 5.056208217003006,
+            "rest": 0.0257877298010982,
+            "posed": 0.130388131318166,
+            "phase": 0.75,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 5.056208217003006,
+            "rest": 0.0257877298010982,
+            "posed": 0.130388131318166,
+            "phase": 0.75,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Growth",
+          "duration": 1.5,
+          "skin": {
+            "ratio": 1.1633858961810766,
+            "rest": 0.0846814361783388,
+            "posed": 0.09851718851823733,
+            "phase": 0.5,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              3465,
+              3430
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1633858961810766,
+            "rest": 0.0846814361783388,
+            "posed": 0.09851718851823733,
+            "phase": 0.5,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              3465,
+              3430
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Guard",
+          "duration": 1,
+          "skin": {
+            "ratio": 6.042504528071017,
+            "rest": 0.0257877298010982,
+            "posed": 0.1558224740918078,
+            "phase": 1,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 6.042504528071017,
+            "rest": 0.0257877298010982,
+            "posed": 0.1558224740918078,
+            "phase": 1,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Heavy",
+          "duration": 1.100000023841858,
+          "skin": {
+            "ratio": 9.031187235392174,
+            "rest": 0.0257877298010982,
+            "posed": 0.23289381620942046,
+            "phase": 0.125,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 9.031187235392174,
+            "rest": 0.0257877298010982,
+            "posed": 0.23289381620942046,
+            "phase": 0.125,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Hit",
+          "duration": 0.6000000238418579,
+          "skin": {
+            "ratio": 1.0553230564535294,
+            "rest": 0.07375914285504878,
+            "posed": 0.07783972407918259,
+            "phase": 0.5,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              789,
+              790
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0145157841243526,
+            "rest": 0.0846814361783388,
+            "posed": 0.08591065362524371,
+            "phase": 0.4166666666666667,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              3465,
+              3430
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "skin": {
+            "ratio": 6.042504528071017,
+            "rest": 0.0257877298010982,
+            "posed": 0.1558224740918078,
+            "phase": 1,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 6.042504528071017,
+            "rest": 0.0257877298010982,
+            "posed": 0.1558224740918078,
+            "phase": 1,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Parry",
+          "duration": 0.4000000059604645,
+          "skin": {
+            "ratio": 1.2110559012782431,
+            "rest": 0.0846814361783388,
+            "posed": 0.10255395301249412,
+            "phase": 0.5,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              3465,
+              3430
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2110559012782431,
+            "rest": 0.0846814361783388,
+            "posed": 0.10255395301249412,
+            "phase": 0.5,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              3465,
+              3430
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Rise",
+          "duration": 1.399999976158142,
+          "skin": {
+            "ratio": 1.9437939865908391,
+            "rest": 0.04329469172044038,
+            "posed": 0.08415596141749619,
+            "phase": 0.5,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              1725,
+              1493
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1123565320540896,
+            "rest": 0.07523346140780732,
+            "posed": 0.08368643222601373,
+            "phase": 0.5,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              3484,
+              3477
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Sprint",
+          "duration": 1,
+          "skin": {
+            "ratio": 1.378579773564581,
+            "rest": 0.06348968086280976,
+            "posed": 0.08752558986753979,
+            "phase": 0.7916666666666666,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              504,
+              505
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1067343821647704,
+            "rest": 0.07273371406107973,
+            "posed": 0.08049690209393814,
+            "phase": 0.5,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              3041,
+              3048
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Stagger",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 1.4339109477785918,
+            "rest": 0.06230311969052434,
+            "posed": 0.08933712540500281,
+            "phase": 0.6666666666666666,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2043,
+              2304
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1267795860403615,
+            "rest": 0.0846814361783388,
+            "posed": 0.0954173136023319,
+            "phase": 0.3333333333333333,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              3465,
+              3430
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Swim",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 1.2459449130691787,
+            "rest": 0.06348968086280976,
+            "posed": 0.07910464490340341,
+            "phase": 0.2916666666666667,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              504,
+              505
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1067343821647704,
+            "rest": 0.07273371406107973,
+            "posed": 0.08049690209393814,
+            "phase": 0.5,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              3041,
+              3048
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "TurnLeft",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 2.128245148749816,
+            "rest": 0.04329469172044038,
+            "posed": 0.09214171762064607,
+            "phase": 0.5,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              1725,
+              1493
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2145250881568606,
+            "rest": 0.10003671121568272,
+            "posed": 0.12149709550814945,
+            "phase": 0.5,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2839,
+              2845
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "TurnRight",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 1.7941651069559599,
+            "rest": 0.045891827190982025,
+            "posed": 0.08233751504051269,
+            "phase": 0.5,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2304,
+              2305
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2785265171621463,
+            "rest": 0.07523346140780732,
+            "posed": 0.09618797538777664,
+            "phase": 0.5,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              3484,
+              3477
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Flop",
+          "duration": 0.800000011920929,
+          "skin": {
+            "ratio": 4.305018414579305,
+            "rest": 0.0257877298010982,
+            "posed": 0.11101665166392326,
+            "phase": 0.16666666666666666,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 4.305018414579305,
+            "rest": 0.0257877298010982,
+            "posed": 0.11101665166392326,
+            "phase": 0.16666666666666666,
+            "mesh": "Helicoprion_procedural_volume_twin",
+            "vertices": [
+              2368,
+              2366
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        }
+      ],
+      "worstMouth": {
+        "ratio": 10.553425556190888,
+        "rest": 0.0257877298010982,
+        "posed": 0.2721488867190551,
+        "phase": 0.25,
+        "mesh": "Helicoprion_procedural_volume_twin",
+        "vertices": [
+          2368,
+          2366
+        ],
+        "clip": "Eat"
       }
     }
   ]
