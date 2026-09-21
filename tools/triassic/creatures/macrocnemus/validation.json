@@ -396,7 +396,7 @@
         -1.3299167156219482
       ],
       [
-        1.4712364673614502,
+        1.4712367057800293,
         2.4428212642669678,
         1.3030924797058105
       ]
@@ -404,12 +404,12 @@
   },
   "modelLength": 4.8856425285339355,
   "rawLength": 0.9771285057067871,
-  "maximumEnvelopeDifference": 0.04972201585769653,
+  "maximumEnvelopeDifference": 0.04972189664840698,
   "envelopeTolerance": 0.19542570114135743,
   "envelopeTolerancePercent": 4.0,
   "surfaceDistanceMax": 0.15205222368240356,
-  "surfaceDistanceP95": 0.017074478417634837,
-  "surfaceDistanceP99": 0.08527925580739978,
+  "surfaceDistanceP95": 0.017074479907750958,
+  "surfaceDistanceP99": 0.08527924954891208,
   "surfaceOutliersOverThreePercent": 1,
   "surfaceVertices": 10517,
   "seatingDepthRaw": {
@@ -512,12 +512,12 @@
       "overBodyLength": 0.04077
     }
   },
-  "caudalChainStart": 0.16999999999999998,
+  "caudalChainStart": 0.16999999999999996,
   "pelvisFractionOfTrunk": 0.2,
   "mouth": {
     "method": "no modelled cavity on this head; the seam follows the head's own measured section at the painted mouth line's measured height, and the teeth are authored",
     "cavityVerticesFound": 9,
-    "jawFractionOfHeadSection": 0.2289839935175053,
+    "jawFractionOfHeadSection": 0.22898399351750554,
     "pigmentContrast": 0.2925887526722335,
     "pigmentStations": [
       [
@@ -552,12 +552,12 @@
       ],
       [
         0.42591783988475795,
-        0.16740791313794928,
+        0.16740791313794967,
         0.28321460815789273
       ],
       [
         0.436035369515419,
-        0.24032870689536925,
+        0.24032870689536964,
         0.34880663598374306
       ],
       [
@@ -584,7 +584,7 @@
     "proudPatches": [
       {
         "vertices": 18,
-        "proudMax": 0.004397829994559288,
+        "proudMax": 0.004397829063236713,
         "x": [
           0.4571416974067688,
           0.48856425285339355
@@ -594,7 +594,7 @@
       },
       {
         "vertices": 16,
-        "proudMax": 0.0035087165888398886,
+        "proudMax": 0.0035087112337350845,
         "x": [
           0.4623205065727234,
           0.48818325996398926
@@ -614,7 +614,7 @@
       },
       {
         "vertices": 6,
-        "proudMax": 0.0033101963344961405,
+        "proudMax": 0.0033101870212703943,
         "x": [
           0.4231894016265869,
           0.44326746463775635
