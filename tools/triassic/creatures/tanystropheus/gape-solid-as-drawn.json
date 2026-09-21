@@ -1,0 +1,168 @@
+{
+  "id": "tanystropheus",
+  "backdrop": [
+    1.0,
+    0.0,
+    1.0,
+    1.0
+  ],
+  "asDrawn": true,
+  "shots": [
+    {
+      "clip": "Severed",
+      "t": 1.733,
+      "pixels": 378000,
+      "differingPixels": 308,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 30,
+      "markedImage": null,
+      "solid": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Severed-1.733-solid.png",
+      "culled": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Severed-1.733-culled.png"
+    },
+    {
+      "clip": "SnapLeft",
+      "t": 0.167,
+      "pixels": 378000,
+      "differingPixels": 353,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 9,
+      "markedImage": null,
+      "solid": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/SnapLeft-0.167-solid.png",
+      "culled": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/SnapLeft-0.167-culled.png"
+    },
+    {
+      "clip": "SnapRight",
+      "t": 0.167,
+      "pixels": 378000,
+      "differingPixels": 392,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 12,
+      "markedImage": null,
+      "solid": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/SnapRight-0.167-solid.png",
+      "culled": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/SnapRight-0.167-culled.png"
+    },
+    {
+      "clip": "Bite",
+      "t": 0.2,
+      "pixels": 378000,
+      "differingPixels": 268,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 1,
+      "markedImage": null,
+      "solid": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Bite-0.2-solid.png",
+      "culled": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Bite-0.2-culled.png"
+    },
+    {
+      "clip": "Heavy",
+      "t": 0.133,
+      "pixels": 378000,
+      "differingPixels": 256,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 1,
+      "markedImage": null,
+      "solid": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Heavy-0.133-solid.png",
+      "culled": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Heavy-0.133-culled.png"
+    },
+    {
+      "clip": "Ability",
+      "t": 0.4,
+      "pixels": 378000,
+      "differingPixels": 293,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0,
+      "markedImage": null,
+      "solid": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Ability-0.4-solid.png",
+      "culled": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Ability-0.4-culled.png"
+    },
+    {
+      "clip": "Drag",
+      "t": 0.8,
+      "pixels": 378000,
+      "differingPixels": 238,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0,
+      "markedImage": null,
+      "solid": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Drag-0.8-solid.png",
+      "culled": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Drag-0.8-culled.png"
+    },
+    {
+      "clip": "Attack",
+      "t": 0.133,
+      "pixels": 378000,
+      "differingPixels": 239,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 2,
+      "markedImage": null,
+      "solid": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Attack-0.133-solid.png",
+      "culled": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Attack-0.133-culled.png"
+    },
+    {
+      "clip": "Eat",
+      "t": 0.367,
+      "pixels": 378000,
+      "differingPixels": 253,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0,
+      "markedImage": null,
+      "solid": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Eat-0.367-solid.png",
+      "culled": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Eat-0.367-culled.png"
+    },
+    {
+      "clip": "Death",
+      "t": 1.6,
+      "pixels": 378000,
+      "differingPixels": 272,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 57,
+      "markedImage": null,
+      "solid": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Death-1.6-solid.png",
+      "culled": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Death-1.6-culled.png"
+    },
+    {
+      "clip": "Grab",
+      "t": 0.533,
+      "pixels": 378000,
+      "differingPixels": 229,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 30,
+      "markedImage": null,
+      "solid": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Grab-0.533-solid.png",
+      "culled": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Grab-0.533-culled.png"
+    },
+    {
+      "clip": "Breath",
+      "t": 0.967,
+      "pixels": 378000,
+      "differingPixels": 193,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 158,
+      "markedImage": null,
+      "solid": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Breath-0.967-solid.png",
+      "culled": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Breath-0.967-culled.png"
+    },
+    {
+      "clip": "Retract",
+      "t": 0.5,
+      "pixels": 378000,
+      "differingPixels": 193,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 79,
+      "markedImage": null,
+      "solid": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Retract-0.5-solid.png",
+      "culled": "local/triassic-authoring/tanystropheus/gape-solid-as-drawn/Retract-0.5-culled.png"
+    }
+  ]
+}

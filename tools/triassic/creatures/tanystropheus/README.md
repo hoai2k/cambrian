@@ -1,5 +1,17 @@
 # Tanystropheus — the boom, unbent, and the clip set `shore.ts` was waiting for
 
+> **Current repair, 21 September 2026 (T3D-32C):** the mouth cut is a **fitted ramp** through the
+> painted lip line rather than the head's section at the median of it (0.01159 raw / 0.9 % of a body
+> from its own measurement at the worst station → **0.00082 raw / 0.064 %**), and the cut is now
+> closed with **its own rim** — `T.cap_cut` over the head's cross-section at the hinge, then
+> `T.cap_mouth` over the lip, domed into each half. The `Oral cavity lining` and the
+> `Seated jaw hinge tissue` are both retired: each was closing a hole the cut had made and each is
+> hidden in play, so *as drawn* this head stood open — 142 px seen through the body and 1,388 opened
+> at `SnapRight`. It now reads **0 through and 0 opened at all thirteen opening clips**, plain and as
+> drawn. Skin 3.00x unchanged. The fish-trap fangs are kept: they are anatomy the generation does not
+> model rather than a hole being covered. The lining passages below are kept as history.
+
+
 The delivered Tripo body and its procedural twin share one **38-joint skeleton**, the same three
 mouth/attack sockets and **28 byte-for-byte equivalent decoded animation performances**. The twin is
 also the runtime LOD, with every clip retained so either model can perform the same gameplay.
