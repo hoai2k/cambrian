@@ -2,27 +2,37 @@
  * Bend mode, driven in a real browser. Run against a served build:
  *   npm run build && npx vite preview --port 4173 &  QA_BASE_URL=http://127.0.0.1:4173 node tools/bend-browser.mjs [out dir]
  *
- * Opens the viewer on **Askeptosaurus**, which is the animal the mode was built for: its head stood
- * 67.7° off its trunk, the diagnosis went wrong three times, and three defensible readings of "the
- * trunk" sat up to 43° apart (T3D-25/T3D-26). It checks what a headless test cannot:
+ * Two animals, because the mode now opens on two different kinds of body.
  *
- *   - the mode opens on a rigged body, seats a span on it, guesses a chain through the rig rather
- *     than down a limb, and puts both readings on screen with the references they are between;
- *   - the panel says **which body the numbers describe**, and warns where that body's rest already
- *     carries its builder's own correction — which on this animal is the whole 67.7°;
+ * **Askeptosaurus** is the animal the mode was built for: its head stood 67.7° off its trunk, the
+ * diagnosis went wrong three times, and three defensible readings of "the trunk" sat up to 43°
+ * apart (T3D-25/T3D-26). A bend is aimed on a body no builder has moved, and this animal's shipped
+ * rest already carries that whole correction — so bend mode **opens on its original pose**, from
+ * the Bend button and from a `?mode=bend` deep link alike, both of which go through `opening()`.
+ * That is the first thing checked here, and it is also why there is a second animal: the built
+ * body of a specimen that publishes an original pose is no longer reachable in bend mode at all.
+ *
+ * On Askeptosaurus it then checks what a headless test cannot:
+ *   - the panel says which body the numbers describe, and that it is the untouched generation;
  *   - the handles are really on the stage: the pointer finds one by hover, a drag on it moves the
  *     span or aims a plane, and the drag is one undo step;
- *   - the numeric fields set the same numbers, and aiming the tip plane moves the readings —
- *     *measured* after the edit rather than predicted;
- *   - changing which bone chord the reading is between changes the answer, which is the whole
- *     point of the tool and the thing that went wrong on this animal;
- *   - the per-joint table is the shape `carry_rest` consumes: bones in chain order whose local
- *     steps add back up to the whole turn;
- *   - **the headline**, on the untouched original pose: the two planes seated on the body, aimed
- *     the same way, and the run between them measured straight over the warped mesh;
+ *   - **the headline**: the two planes seated on the body, aimed the same way, and the run between
+ *     them measured straight over the warped mesh — measured after the edit, never predicted;
+ *   - the trace's own residual is flagged rather than reported at the defaults, and Window and
+ *     Reach bring it under the bar;
  *   - the export carries the hash of the file on stage, measured in the page and equal to the hash
- *     of that file on disk, and `npm run triassic:bend` accepts it and refuses a tampered copy;
+ *     of that file on disk, and `npm run triassic:bend` accepts it;
  *   - the bend survives a trip through view mode and is forgotten on reload.
+ *
+ * **Mixosaurus** publishes no original pose and no generation, so bend mode opens on its built
+ * body: that is where the rig-only half lives — both readings side by side, the chain guessed
+ * through the rig, which two chords the reading is between changing the answer, the per-joint
+ * table `carry_rest` consumes, and an export that says `built` and is accepted by the consumer
+ * (and refused when it is stale or written against the turn rates the two planes replaced).
+ *
+ * And on both: **the pointer scheme**. Left-drag on a handle moves that handle and leaves the
+ * camera exactly where it was, left-drag on empty canvas orbits about a fixed target, right-drag
+ * pans — which is the button bend mode had no binding for at all until now.
  *
  * It also screenshots the span on the animal for `docs/triassic/verification/`.
  */
@@ -38,6 +48,12 @@ const base = (process.env.QA_BASE_URL || 'http://127.0.0.1:4173').replace(/\/$/,
 const out = process.argv[2] || process.env.CAMBRIAN_QA_DIR || '.';
 fs.mkdirSync(out, { recursive: true });
 const key = 'triassic:askeptosaurus';
+/**
+ * The rigged half of the mode has to be driven on an animal bend mode still opens on its built
+ * body — one that publishes neither an original pose nor a raw generation, since `opening()`
+ * prefers either of those. Mixosaurus is such a body, and its rest was never moved.
+ */
+const rigKey = 'triassic:mixosaurus';
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || '/opt/pw-browsers/chromium', args: ['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
 await silenceCounter(page);
@@ -45,7 +61,7 @@ const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));
 page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
 await page.addInitScript(() => localStorage.setItem('cambrian-settings', JSON.stringify({ quality: 'low', muted: true, music: false })));
-const loaded = () => page.waitForFunction((k) => document.querySelector('.clips')?.getAttribute('data-loaded-specimen') === k, key, { timeout: 90000 });
+const loaded = (k = key) => page.waitForFunction((want) => document.querySelector('.clips')?.getAttribute('data-loaded-specimen') === want, k, { timeout: 90000 });
 const field = (label) => page.locator('.bend-fields label', { hasText: label }).locator('input');
 const pick = (label) => page.locator('.bend-fields label', { hasText: label }).locator('select');
 /** A reading, as the panel published it: the in-plane degrees before and after the edit. */
@@ -90,6 +106,16 @@ const planeValue = async (which) => {
   for (const i of [0, 1, 2]) v.push(Number(await field(`${which} plane ${'XYZ'[i]}`).inputValue()));
   return v;
 };
+/** Both ends of the span, typed rather than dragged, where what is being checked is the numbers. */
+const typeSpan = async (span) => {
+  for (const end of ['base', 'tip']) for (const i of [0, 1, 2]) {
+    const f = field(`${end === 'base' ? 'Base' : 'Tip'} ${'XYZ'[i]}`);
+    await f.fill(String(span[end][i]));
+    await f.press('Enter');
+    await page.waitForTimeout(150);
+  }
+  await page.waitForTimeout(800);
+};
 const hashOnDisk = (rel) => createHash('sha256').update(fs.readFileSync(path.join('public', rel))).digest('hex');
 const measuredHash = async () => {
   await page.waitForSelector('.bend-hash[data-hash-source="measured"]', { timeout: 30000 });
@@ -110,37 +136,91 @@ const findHandle = () => page.evaluate(() => {
   }
   return null;
 });
+/**
+ * Where the camera is and what it is looking at. An **orbit** swings the position about a target
+ * that stays put; a **pan** carries the two together. Neither number is drawn anywhere, so the
+ * scene hands them over on `window.__viewerScene`, the way the game does on `__cambrian`.
+ */
+const cam = () => page.evaluate(() => window.__viewerScene.cameraState());
+const apart = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+/** A spot on the canvas with none of the editor's handles under it — where a press is the camera's. */
+const emptySpot = () => page.evaluate(() => {
+  const canvas = document.querySelector('.viewer-canvas');
+  const r = canvas.getBoundingClientRect();
+  for (const [fx, fy] of [[.14, .18], [.86, .18], [.14, .82], [.86, .82], [.5, .1]]) {
+    const x = r.width * fx, y = r.height * fy;
+    if (!window.__viewerScene.bendPick(x, y)) return { x: r.left + x, y: r.top + y };
+  }
+  return null;
+});
+/**
+ * The pointer scheme, driven on whatever body is on stage. Run **last** in a pass: an orbit and a
+ * pan leave OrbitControls' damping unwinding for many frames, and under the software renderer that
+ * is several seconds, so anything measured afterwards would be measured on a moving camera.
+ */
+const drivePointerScheme = async (name) => {
+  const empty = await emptySpot();
+  assert.ok(empty, `${name}: there is a spot on the canvas with no handle under it`);
+  await page.mouse.move(empty.x, empty.y); await page.waitForTimeout(250);
+  const rest = await cam();
+  assert.equal(rest.scheme, 'view', `${name}: bend mode runs on the view scheme — left orbits, right pans`);
+  assert.equal(rest.orbit, true, 'and the orbit is live where the pointer is not on a handle');
+  await page.mouse.down();
+  await page.mouse.move(empty.x + 150, empty.y + 50, { steps: 10 });
+  await page.mouse.up();
+  await page.waitForTimeout(400);
+  const orbited = await cam();
+  assert.ok(apart(orbited.position, rest.position) > 0.05,
+    `${name}: a left-drag on empty canvas orbits (the camera moved ${apart(orbited.position, rest.position).toFixed(3)})`);
+  assert.ok(apart(orbited.target, rest.target) < 0.02, 'about a target that stays where it is — which is what makes it an orbit and not a pan');
+
+  await page.mouse.move(empty.x, empty.y); await page.waitForTimeout(250);
+  const beforePan = await cam();
+  await page.mouse.down({ button: 'right' });
+  await page.mouse.move(empty.x + 120, empty.y - 60, { steps: 10 });
+  await page.mouse.up({ button: 'right' });
+  await page.waitForTimeout(400);
+  const panned = await cam();
+  assert.ok(apart(panned.target, beforePan.target) > 0.05,
+    `${name}: a right-drag pans — the camera's target moved ${apart(panned.target, beforePan.target).toFixed(3)}`);
+  return { orbit: apart(orbited.position, rest.position), pan: apart(panned.target, beforePan.target) };
+};
+const check = (f) => spawnSync('npm', ['run', '--silent', 'triassic:bend', '--', f], { encoding: 'utf8' });
 
 try {
+  // ============================================================================================
+  // Askeptosaurus — the body a bend is aimed on
+  // ============================================================================================
   await page.goto(`${base}/viewer/?specimen=${encodeURIComponent(key)}`, { waitUntil: 'networkidle', timeout: 120000 });
   await loaded();
-  assert.match(await page.locator('.clips').getAttribute('data-loaded-model'), /askeptosaurus\.glb$/, 'the built body is on stage');
+  assert.match(await page.locator('.clips').getAttribute('data-loaded-model'), /askeptosaurus\.glb$/, 'the specimen opens on its built body');
 
+  // ---- the Bend button puts the original pose on stage, because that is what a bend is aimed on ----
   await page.getByRole('button', { name: 'Bend', exact: true }).click();
   await page.waitForSelector('.bend-panel', { timeout: 20000 });
-  await page.waitForTimeout(2000);
+  // The button changes the body as well as the mode, and the panel measures whatever is on stage —
+  // so wait for the swap to land rather than for a number of milliseconds.
+  await page.waitForFunction(() => /origpose\.glb$/.test(document.querySelector('.clips')?.getAttribute('data-loaded-model') ?? ''), null, { timeout: 90000 });
+  await page.waitForTimeout(2500);
   assert.equal(new URL(page.url()).searchParams.get('mode'), 'bend', 'bend mode is in the URL');
-  assert.match(await page.locator('.bend-frame-note').textContent(), /mouth socket/i, 'a body with a mouth socket is framed from it, not from its box');
-
-  // ---- which body the numbers describe, and the warning this animal needs ----
-  const bodyNote = page.locator('.bend-body-note');
-  assert.equal(await bodyNote.getAttribute('data-applies-to'), 'built', 'the panel knows it is on the shipped body');
-  assert.equal(await bodyNote.getAttribute('data-corrected'), 'yes', 'and that this body\'s rest was moved before binding');
-  const warned = await bodyNote.textContent();
-  assert.match(warned, /already carries one/i, 'so it says a correction aimed here is aimed on a body that already carries one');
-  assert.match(warned, /Original pose/i, 'and points at the untouched generation by the name the Model control gives it');
-
-  // ---- both readings are on screen, each with the references it is between ----
-  const geometry = await page.locator('.bend-reading[data-reading="geometry"]').textContent();
-  assert.match(geometry, /in the bend plane/, 'the geometry reading is a measured angle');
-  assert.match(geometry, /traced centre/, 'and says what it is between');
-  assert.match(geometry, /trace residual/, 'with its own opinion of how straight the run it followed was');
-  const bonesText = await page.locator('.bend-reading[data-reading="bone-chain"]').textContent();
-  assert.match(bonesText, /→/, 'the bone reading names the two chords it is between');
-  const chainFrom = await pick('Chain starts at').inputValue();
-  const chainTo = await pick('Chain ends at').inputValue();
-  assert.ok(chainFrom && chainTo, `the span guessed a chain through the rig (${chainFrom} → ${chainTo})`);
+  assert.match(await page.locator('.clips').getAttribute('data-loaded-model'), /askeptosaurus\.origpose\.glb$/,
+    'the Bend button swaps the stage to the untouched generation — the shipped rest already carries T3D-26\'s correction');
+  assert.equal(await page.locator('.bend-body-note').getAttribute('data-applies-to'), 'origpose', 'and the panel knows which body it is on');
+  assert.match(await page.locator('.bend-body-note').textContent(), /before the builder moved anything/i, 'and says so plainly');
+  assert.equal(await page.locator('.bend-reading[data-reading="bone-chain"]').count(), 0, 'a body with no rig has only the geometry\'s answer');
   await page.screenshot({ path: path.join(out, 'askeptosaurus-bend-opened.png') });
+
+  // ---- and a deep link lands on the same body, because both go through `opening()` ----
+  await page.goto(`${base}/viewer/?specimen=${encodeURIComponent(key)}&mode=bend`, { waitUntil: 'networkidle', timeout: 120000 });
+  await loaded();
+  await page.waitForSelector('.bend-panel', { timeout: 20000 });
+  await page.waitForFunction(() => /origpose\.glb$/.test(document.querySelector('.clips')?.getAttribute('data-loaded-model') ?? ''), null, { timeout: 90000 });
+  await page.waitForTimeout(2500);
+  assert.match(await page.locator('.clips').getAttribute('data-loaded-model'), /askeptosaurus\.origpose\.glb$/,
+    'a ?mode=bend deep link opens on the original pose too');
+  assert.equal(await page.locator('.bend-body-note').getAttribute('data-applies-to'), 'origpose', 'and says the same thing about it');
+  const framed = await page.locator('.bend-frame-note').textContent();
+  assert.ok(framed.trim().length > 0, `the panel says where the frame came from (${framed.replace(/\s+/g, ' ').trim().slice(0, 60)}…)`);
 
   // ---- the handles are on the stage: find one by hover, drag it, undo it ----
   const handle = await findHandle();
@@ -148,6 +228,10 @@ try {
   await page.mouse.move(handle.x, handle.y); await page.waitForTimeout(400);
   const which = (await page.locator('.bend-legend li.hover').getAttribute('class'))?.split(' ')[0] ?? '';
   assert.ok(['base', 'tip', 'baseAim', 'tipAim'].includes(which), `and the legend says which (${which})`);
+  // The camera as the handle drag starts. Nothing has orbited yet, so it is at rest from framing
+  // and any difference afterwards is the drag's and nobody else's.
+  const stillCam = await cam();
+  assert.equal(stillCam.orbit, false, 'the orbit is suspended while the pointer sits on a handle');
   const aiming = which === 'baseAim' || which === 'tipAim';
   const label = which === 'base' || which === 'baseAim' ? 'Base' : 'Tip';
   const before = aiming ? await planeValue(label) : [0, 1, 2].map(() => 0);
@@ -161,204 +245,36 @@ try {
   assert.ok(after.some((v, i) => v !== before[i]),
     aiming ? `dragging the ${which} handle aims that plane` : `dragging the ${which} handle moves that end of the span`);
   assert.ok(await page.getByRole('button', { name: 'Undo' }).isEnabled(), 'and the drag is one undo step');
+  // ---- and the drag was a drag on a handle, not on the view ----
+  const afterHandle = await cam();
+  assert.ok(apart(afterHandle.position, stillCam.position) < 1e-3,
+    `dragging a handle across the screen left the camera where it was (moved ${apart(afterHandle.position, stillCam.position).toExponential(2)})`);
+  assert.ok(apart(afterHandle.target, stillCam.target) < 1e-3, 'and looking at the same place');
   await page.keyboard.press('Control+z'); await page.waitForTimeout(400);
   const undone = aiming ? await planeValue(label) : await Promise.all([0, 1, 2].map((i) => field(`${label} ${'XYZ'[i]}`).inputValue().then(Number)));
   assert.ok(undone.every((v, i) => Math.abs(v - before[i]) < 1e-6), 'Ctrl+Z takes the whole drag back');
-
-  // ---- put the span on the neck, by the numbers, the way a reviewer reads them off the rig ----
-  // chest and skull: the two ends of the run T3D-26 corrected. Typed rather than dragged, because
-  // what is being checked here is that the fields and the readings agree, not the pointer.
-  const neck = { base: [-0.1182, 0.0659, -1.2490], tip: [-0.5114, 0.1603, -0.5430] };
-  for (const end of ['base', 'tip']) for (const i of [0, 1, 2]) {
-    const f = field(`${end === 'base' ? 'Base' : 'Tip'} ${'XYZ'[i]}`);
-    await f.fill(String(neck[end][i]));
-    await f.press('Enter');
-    await page.waitForTimeout(150);
-  }
-  await page.waitForTimeout(800);
-  assert.ok(Math.abs(Number(await field('Base X').inputValue()) - neck.base[0]) < 1e-3, 'the span fields put an end exactly where they are typed');
-  const onNeck = await reading('bone-chain');
-  assert.ok(Number.isFinite(onNeck.before), `the bone reading has a number on the neck span (${onNeck.before}°)`);
-  await page.screenshot({ path: path.join(out, 'askeptosaurus-bend-neck.png') });
-
-  // ---- which two chords the reading is between is the question, and it changes the answer ----
-  const refPick = (side, end) => page.locator('.bend-refs label', { hasText: `${side} reference ${end}` }).locator('select');
-  const firstRef = { from: await refPick('Base', 'from').inputValue(), to: await refPick('Base', 'to').inputValue() };
-  await refPick('Base', 'from').selectOption('tail_00');
-  await refPick('Base', 'to').selectOption('chest');
-  await page.waitForTimeout(600);
-  const hipToShoulder = await reading('bone-chain');
-  assert.notEqual(hipToShoulder.before, onNeck.before,
-    `reading the same span against a different idea of "the trunk" gives a different angle (${firstRef.from} → ${firstRef.to}: ${onNeck.before}°, tail_00 → chest: ${hipToShoulder.before}°)`);
-  assert.ok(Math.abs(hipToShoulder.before - onNeck.before) > 5,
-    'and by more than rounding — which is the whole reason this tool exists');
-  await page.screenshot({ path: path.join(out, 'askeptosaurus-bend-references.png') });
-
-  // ---- aiming the tip plane bends the body, and the readings are measured rather than predicted ----
-  const rest = await planeValue('Base');
-  await aimPlane('Tip', [0, 1, 0]);
-  const aimed = await planes();
-  assert.ok(aimed.apart > 5, `the two planes are now aimed ${aimed.apart}° apart`);
-  const turnedGeom = await reading('geometry');
-  assert.notEqual(turnedGeom.after, turnedGeom.before, 'the geometry reading moves with the bend');
-  const bonesTurned = await reading('bone-chain');
-  assert.notEqual(bonesTurned.after, bonesTurned.before, 'and so does the bone reading');
-  await page.screenshot({ path: path.join(out, 'askeptosaurus-bend-turned.png') });
-
-  // ---- the per-joint table: the shape `carry_rest` consumes ----
-  const joints = await page.locator('.bend-joints li').evaluateAll((els) => els
-    .filter((el) => el.querySelector('code'))
-    .map((el) => ({ bone: el.querySelector('code').textContent, local: el.querySelector('b').textContent, accumulated: el.querySelector('small').textContent })));
-  assert.ok(joints.length >= 2, `the per-joint table has the joints the turn is spread over (${joints.map((j) => j.bone).join(', ')})`);
-  const localSum = joints.reduce((s, j) => s + Number(j.local.replace('°', '')), 0);
-  // Against the *turn*, which is the angle between the tip plane's rest and its aim — not against
-  // how far apart the two planes are aimed, which is the straightening target and a different number.
-  const total = (await planes()).turn;
-  assert.ok(Math.abs(localSum - total) < 0.3, `and the local steps add back up to the whole turn (${localSum.toFixed(1)}° against ${total}°)`);
-  fs.writeFileSync(path.join(out, 'askeptosaurus-bend-joints.txt'),
-    ['the per-joint table, in chain order — a bone name and a local rotation, which is what',
-      '`uncurl` returns and `carry_rest` consumes in tools/triassic/creatures/askeptosaurus/build.py',
-      '', ...joints.map((j) => `  ${j.bone.padEnd(12)} ${j.local.padStart(8)}   ${j.accumulated}`),
-      '', `  local steps sum to ${localSum.toFixed(2)}° against a whole turn of ${total}°`].join('\n') + '\n');
-
-  // ---- the hand-off: the hash is measured here and is the file's own ----
-  await page.locator('.mark-note textarea').fill('browser drive: the tip plane aimed off the body’s own heading, measured both ways');
-  const hash = await measuredHash();
-  assert.match(hash, /^[0-9a-f]{64}$/, 'the page hashed the file on stage');
-  const model = await page.locator('.clips').getAttribute('data-loaded-model');
-  assert.equal(hash, hashOnDisk(model), 'and the hash is the file\'s own, as sha256 on disk reads it');
-  const download = page.waitForEvent('download');
-  await page.getByRole('button', { name: /^Export bend/ }).click();
-  const file = path.join(out, 'askeptosaurus-bend.json');
-  await (await download).saveAs(file);
-  const json = JSON.parse(fs.readFileSync(file, 'utf8'));
-  assert.equal(json.schema, 'bend-span/2');
-  assert.equal(json.id, 'askeptosaurus');
-  assert.equal(json.appliesTo, 'built', 'the export says it was placed on the built body');
-  assert.equal(json.use, 'builder-measurement', 'and that a rigged body is a measurement rather than an edit');
-  assert.equal(json.sha256, hash);
-  assert.equal(json.sha256Source, 'measured');
-  assert.equal(json.creature.rigged, true);
-  assert.ok(Math.abs(json.planes.apartDegrees - aimed.apart) < 0.02, `the two planes the panel showed are in the file (${json.planes.apartDegrees} vs ${aimed.apart}; base ${JSON.stringify(json.planes.baseNormal)} tip ${JSON.stringify(json.planes.tipNormal)})`);
-  assert.ok(Math.abs(Math.hypot(...json.planes.tipNormal) - 1) < 1e-4, 'each as the unit direction it is');
-  assert.ok(json.planes.tipRest, 'with the body’s own heading there beside the aim');
-  assert.ok(Math.abs(Math.hypot(...json.axis.vector) - 1) < 1e-4, 'the axle is a unit vector');
-  assert.ok(json.axis.vectorBlenderZUp, 'and is given in the builders\' own frame as well');
-  assert.equal(typeof json.axis.twistDegrees, 'number', 'with how much of the aim is a twist rather than a bend');
-  assert.ok(json.reading.geometry.before && json.reading.geometry.after, 'both geometry readings are in it');
-  assert.ok(json.reading.bones.before && json.reading.bones.after, 'and both bone readings');
-  assert.equal(json.reading.bones.baseReference, 'tail_00 → chest', 'named by the references they were taken between');
-  assert.ok(json.joints.length >= 2, 'the per-joint table is in it');
-  assert.ok(Math.abs(json.joints.reduce((s, j) => s + j.localDegrees, 0) - json.turn.totalDegrees) < 1e-2, 'and adds up to the whole turn');
-  assert.match(json.note, /^browser drive/);
-
-  // ---- the consumer: accepts the file on this body, refuses a tampered one ----
-  const check = (f) => spawnSync('npm', ['run', '--silent', 'triassic:bend', '--', f], { encoding: 'utf8' });
-  const accepted = check(file);
-  assert.equal(accepted.status, 0, `npm run triassic:bend accepts the file it was measured on:\n${accepted.stdout}${accepted.stderr}`);
-  assert.match(accepted.stdout, /re-measuring it here gives the readings it recorded/, 'and re-measures the same readings over the actual mesh and rig');
-  fs.writeFileSync(path.join(out, 'askeptosaurus-bend-check.txt'), accepted.stdout);
-  const tampered = path.join(out, 'askeptosaurus-bend-stale.json');
-  fs.writeFileSync(tampered, JSON.stringify({ ...json, sha256: 'f'.repeat(64) }, null, 2));
-  const refused = check(tampered);
-  assert.notEqual(refused.status, 0, 'and refuses one whose hash no longer matches the body');
-  assert.match(refused.stderr, /has changed since the span was placed/, 'saying why');
-  // A file written against the turn rates the planes replaced is refused outright, by name.
-  const old = path.join(out, 'askeptosaurus-bend-v1.json');
-  fs.writeFileSync(old, JSON.stringify({ ...json, schema: 'bend-span/1' }, null, 2));
-  const rates = check(old);
-  assert.notEqual(rates.status, 0, 'and one from before the two planes');
-  assert.match(rates.stderr, /written before the two planes/, 'saying that too');
-
-  // ---- through view mode and back, then a reload ----
-  await page.getByRole('button', { name: /Done/ }).click(); await page.waitForTimeout(500);
-  assert.equal(new URL(page.url()).searchParams.get('mode'), null, 'view mode drops the URL flag');
-  await page.getByRole('button', { name: 'Bend', exact: true }).click(); await page.waitForTimeout(1500);
-  assert.ok(Math.abs((await planes()).apart - aimed.apart) < 0.02, 'the bend survives a trip through view mode');
-  await page.reload({ waitUntil: 'networkidle' }); await loaded();
-  assert.equal(new URL(page.url()).searchParams.get('mode'), 'bend', 'a reload keeps the mode');
-  await page.waitForSelector('.bend-panel', { timeout: 20000 });
-  await page.waitForTimeout(1500);
-  // "No bend" is the *turn* at zero, not the two planes at zero: a freshly seated pair on a curled
-  // animal is as far apart as that animal's own curve, which is the measurement rather than an edit.
-  const fresh = await planes();
-  assert.ok(fresh.turn < 0.02, `and starts again from no bend at all (turn ${fresh.turn}°, planes ${fresh.apart}° apart — the body's own curve)`);
-  void rest;
-
-  // ---- the worked case, captured: three defensible readings of one animal's trunk ----
-  //
-  // This is the argument the mode was built out of. The span is the neck T3D-26 corrected; the
-  // reading is taken three times against three chords a person could reasonably call "the trunk".
-  // Nothing here asserts a number — what it asserts is that they *differ*, which is the finding —
-  // and the numbers are written out for `docs/triassic/verification/`.
-  for (const end of ['base', 'tip']) for (const i of [0, 1, 2]) {
-    const f = field(`${end === 'base' ? 'Base' : 'Tip'} ${'XYZ'[i]}`);
-    await f.fill(String(neck[end][i]));
-    await f.press('Enter');
-    await page.waitForTimeout(150);
-  }
-  await page.waitForTimeout(800);
-  const rows = [];
-  for (const [from, to] of [['body', 'chest'], ['tail_00', 'chest'], ['chest', 'neck_00']]) {
-    await refPick('Base', 'from').selectOption(from);
-    await refPick('Base', 'to').selectOption(to);
-    await page.waitForTimeout(600);
-    const r = await reading('bone-chain');
-    const text = await page.locator('.bend-reading[data-reading="bone-chain"] .bend-reading-value').textContent();
-    rows.push({ base: `${from} → ${to}`, tip: await refPick('Tip', 'from').inputValue() + ' → ' + await refPick('Tip', 'to').inputValue(), inPlane: r.before, total: r.beforeTotal, text: text.trim() });
-    await page.locator('.bend-panel').evaluate((el) => { el.scrollTop = 0; });
-    await page.waitForTimeout(200);
-    await page.screenshot({ path: path.join(out, `askeptosaurus-bend-trunk-${from}.png`) });
-  }
-  // Compared on the *total* angle rather than the in-plane one: how far apart two definitions are
-  // is a question about directions, not about the plane a bend happens to be being read in.
-  const spread = Math.max(...rows.map((r) => r.total)) - Math.min(...rows.map((r) => r.total));
-  assert.ok(spread > 20, `three defensible readings of this animal's trunk disagree by ${spread.toFixed(1)}°, which is the finding this mode exists for`);
-  const geom = await reading('geometry');
-  const geomText = await page.locator('.bend-reading[data-reading="geometry"]').textContent();
-  fs.writeFileSync(path.join(out, 'askeptosaurus-bend-readings.txt'),
-    [`span ${JSON.stringify(neck)}`,
-      ...rows.map((r) => `bone   ${r.base.padEnd(20)} vs ${r.tip.padEnd(20)} ${r.text}`),
-      `geometry  ${geom.before}° in plane, ${geom.beforeTotal}° in all`,
-      geomText.replace(/\s+/g, ' ').trim(),
-      `spread across the three trunk readings: ${spread.toFixed(1)}°`].join('\n') + '\n');
 
   // ---- the headline: the unbent body, and two planes aimed the same way ----
   //
   // The shipped body's rest already carries T3D-26's correction (`carry` in its validation.json:
   // the head reads 4.17° off the trunk's run at rest where the generation had it at 67.68°), so
-  // the correction cannot be aimed on it. The original pose is the generation before any of that,
-  // republished by `tools/triassic/base-poses.mjs` and offered by the Model control. It carries no
-  // rig — the per-joint table above is the rigged body's, because a table of bone rotations needs
-  // bones — and it is the geometry the correction was measured from.
-  await page.getByRole('button', { name: /Done/ }).click(); await page.waitForTimeout(400);
-  await page.getByLabel('Which model').selectOption('origpose');
-  await page.waitForFunction(() => /origpose\.glb$/.test(document.querySelector('.clips')?.getAttribute('data-loaded-model') ?? ''), null, { timeout: 90000 });
-  await page.getByRole('button', { name: 'Bend', exact: true }).click();
-  await page.waitForSelector('.bend-panel', { timeout: 20000 });
-  await page.waitForTimeout(2500);
-  assert.equal(await page.locator('.bend-body-note').getAttribute('data-applies-to'), 'origpose', 'the panel knows it is on the untouched generation');
-  assert.match(await page.locator('.bend-body-note').textContent(), /before the builder moved anything/i, 'and says so plainly');
-  assert.equal(await page.locator('.bend-reading[data-reading="bone-chain"]').count(), 0, 'a body with no rig has only the geometry\'s answer');
-
-  // The span on the generation's own neck: two points measured off this file rather than carried
-  // across from the shipped body, because the two bodies are not in the same shape or frame.
+  // the correction cannot be aimed on it. This is the generation before any of that, republished
+  // by `tools/triassic/base-poses.mjs`. It carries no rig — a table of bone rotations needs bones,
+  // which is what the Mixosaurus pass below is for — and it is the geometry the correction was
+  // measured from.
+  //
+  // The span on the generation's own neck: two points measured off this file.
   const rawNeck = { base: [0.1011, -0.0066, 0.2627], tip: [0.3465, -0.0815, 0.4222] };
-  for (const end of ['base', 'tip']) for (const i of [0, 1, 2]) {
-    const f = field(`${end === 'base' ? 'Base' : 'Tip'} ${'XYZ'[i]}`);
-    await f.fill(String(rawNeck[end][i]));
-    await f.press('Enter');
-    await page.waitForTimeout(150);
-  }
-  await page.waitForTimeout(900);
+  await typeSpan(rawNeck);
+  assert.ok(Math.abs(Number(await field('Base X').inputValue()) - rawNeck.base[0]) < 1e-3, 'the span fields put an end exactly where they are typed');
   // At the default window and reach the traces wander on this curled generation and the panel says
   // so in orange. That warning is the tool working: widen the window and narrow the reach until
   // both residuals come under the bar, and only then believe the angle.
   const wandered = await page.locator('.bend-residual').first().textContent();
   assert.match(wandered, /wandered/, `the default reading on this curled generation is flagged rather than reported (${wandered.trim()})`);
   await page.screenshot({ path: path.join(out, 'askeptosaurus-bend-origpose.png') });
-  for (const [label, value] of [['Window', '26'], ['Reach', '2']]) {
-    const f = field(label);
+  for (const [label2, value] of [['Window', '26'], ['Reach', '2']]) {
+    const f = field(label2);
     await f.fill(value);
     await f.press('Enter');
     await page.waitForTimeout(400);
@@ -400,9 +316,11 @@ try {
     `the turn that gets there is the curve the body had (${byButton.turn}° against ${curved.before}°)`);
   await page.screenshot({ path: path.join(out, 'askeptosaurus-bend-straightened.png') });
 
+  // ---- the hand-off: the hash is measured here and is the file's own ----
+  await page.locator('.mark-note textarea').fill('browser drive: both planes aimed the same way on the untouched generation');
   const origposeHash = await measuredHash();
   const origposeModel = await page.locator('.clips').getAttribute('data-loaded-model');
-  assert.equal(origposeHash, hashOnDisk(origposeModel), 'the generation’s own hash is measured in the page too');
+  assert.equal(origposeHash, hashOnDisk(origposeModel), 'the generation’s own hash is measured in the page');
   const basePoses = JSON.parse(fs.readFileSync('src/content/triassic/base-poses.json', 'utf8'));
   assert.equal(origposeHash, basePoses.find((b) => b.id === 'askeptosaurus')?.sha256, 'and agrees with the manifest that publishes this file');
   const origDownload = page.waitForEvent('download');
@@ -410,18 +328,41 @@ try {
   const origFile = path.join(out, 'askeptosaurus-origpose-bend.json');
   await (await origDownload).saveAs(origFile);
   const origJson = JSON.parse(fs.readFileSync(origFile, 'utf8'));
+  assert.equal(origJson.schema, 'bend-span/2');
+  assert.equal(origJson.id, 'askeptosaurus');
   assert.equal(origJson.appliesTo, 'origpose', 'the export says which body it was measured on');
   assert.equal(origJson.use, 'builder-measurement', 'and that it is a measurement for the builder, not an edit to a published copy');
   assert.equal(origJson.creature.rigged, false, 'on a body with no rig');
   assert.ok(origJson.planes.apartDegrees < 0.05, 'with the two planes aimed the same way');
+  assert.ok(Math.abs(Math.hypot(...origJson.axis.vector) - 1) < 1e-4, 'the axle is a unit vector');
+  assert.ok(origJson.axis.vectorBlenderZUp, 'and is given in the builders\' own frame as well');
   const origAccepted = check(origFile);
   assert.equal(origAccepted.status, 0, `and npm run triassic:bend accepts it:\n${origAccepted.stdout}${origAccepted.stderr}`);
   fs.writeFileSync(path.join(out, 'askeptosaurus-bend-origpose-check.txt'), origAccepted.stdout);
 
+  // ---- through view mode and back, then a reload ----
+  await page.getByRole('button', { name: /Done/ }).click(); await page.waitForTimeout(500);
+  assert.equal(new URL(page.url()).searchParams.get('mode'), null, 'view mode drops the URL flag');
+  await page.getByRole('button', { name: 'Bend', exact: true }).click(); await page.waitForTimeout(1500);
+  assert.ok(Math.abs((await planes()).apart - byButton.apart) < 0.02, 'the bend survives a trip through view mode');
+  await page.reload({ waitUntil: 'networkidle' }); await loaded();
+  assert.equal(new URL(page.url()).searchParams.get('mode'), 'bend', 'a reload keeps the mode');
+  await page.waitForSelector('.bend-panel', { timeout: 20000 });
+  await page.waitForTimeout(1500);
+  // "No bend" is the *turn* at zero, not the two planes at zero: a freshly seated pair on a curled
+  // animal is as far apart as that animal's own curve, which is the measurement rather than an edit.
+  const fresh = await planes();
+  assert.ok(fresh.turn < 0.02, `and starts again from no bend at all (turn ${fresh.turn}°, planes ${fresh.apart}° apart — the body's own curve)`);
+
+  // ---- the pointer scheme on this body, last for the damping's sake ----
+  const rawPointer = await drivePointerScheme('origpose');
+  await page.screenshot({ path: path.join(out, 'askeptosaurus-bend-panned.png') });
+
   fs.writeFileSync(path.join(out, 'askeptosaurus-bend-straightening.txt'),
     ['Askeptosaurus, the untouched original pose (askeptosaurus.origpose.glb) — the generation',
       'before T3D-26 carried the head\'s aim into the bind, which is the geometry that correction',
-      'was measured from and the body the shipped one no longer is.',
+      'was measured from and the body the shipped one no longer is. Bend mode opens on this file',
+      'for that reason, from the Bend button and from a ?mode=bend link alike.',
       '',
       `  span                  ${JSON.stringify(rawNeck.base)} → ${JSON.stringify(rawNeck.tip)}`,
       '  reading               window 26% of the body, reach 2% — at the defaults both traces wandered',
@@ -437,14 +378,157 @@ try {
       'turned onto the trunk\'s and the run between them comes straight. Nothing at the base cut',
       'moves, whatever the planes are aimed at, because the rotation there is identity by construction.'].join('\n') + '\n');
 
+  // ============================================================================================
+  // Mixosaurus — the rigged half, on a body bend mode still opens on its built model
+  // ============================================================================================
+  await page.goto(`${base}/viewer/?specimen=${encodeURIComponent(rigKey)}&mode=bend`, { waitUntil: 'networkidle', timeout: 120000 });
+  await loaded(rigKey);
+  await page.waitForSelector('.bend-panel', { timeout: 20000 });
+  await page.waitForTimeout(2500);
+  assert.match(await page.locator('.clips').getAttribute('data-loaded-model'), /mixosaurus\.glb$/,
+    'an animal that publishes no original pose and no generation opens on its built body');
+  const rigNote = page.locator('.bend-body-note');
+  assert.equal(await rigNote.getAttribute('data-applies-to'), 'built', 'the panel knows it is on the shipped body');
+  assert.equal(await rigNote.getAttribute('data-corrected'), 'no', 'and that this body\'s rest was never moved before binding');
+  assert.match(await page.locator('.bend-frame-note').textContent(), /mouth socket/i, 'a body with a mouth socket is framed from it, not from its box');
+
+  // ---- both readings are on screen, each with the references it is between ----
+  const geometry = await page.locator('.bend-reading[data-reading="geometry"]').textContent();
+  assert.match(geometry, /in the bend plane/, 'the geometry reading is a measured angle');
+  assert.match(geometry, /traced centre/, 'and says what it is between');
+  assert.match(geometry, /trace residual/, 'with its own opinion of how straight the run it followed was');
+  const bonesText = await page.locator('.bend-reading[data-reading="bone-chain"]').textContent();
+  assert.match(bonesText, /→/, 'the bone reading names the two chords it is between');
+  const chainFrom = await pick('Chain starts at').inputValue();
+  const chainTo = await pick('Chain ends at').inputValue();
+  assert.ok(chainFrom && chainTo, `the span guessed a chain through the rig (${chainFrom} → ${chainTo})`);
+  await page.screenshot({ path: path.join(out, 'mixosaurus-bend-opened.png') });
+
+  // ---- which two chords the reading is between is the question, and it changes the answer ----
+  const refPick = (side, end) => page.locator('.bend-refs label', { hasText: `${side} reference ${end}` }).locator('select');
+  const firstRef = { from: await refPick('Base', 'from').inputValue(), to: await refPick('Base', 'to').inputValue() };
+  const asOpened = await reading('bone-chain');
+  await refPick('Base', 'from').selectOption('tail_00');
+  await refPick('Base', 'to').selectOption('chest');
+  await page.waitForTimeout(600);
+  const hipToShoulder = await reading('bone-chain');
+  assert.notEqual(hipToShoulder.before, asOpened.before,
+    `reading the same span against a different idea of "the trunk" gives a different angle (${firstRef.from} → ${firstRef.to}: ${asOpened.before}°, tail_00 → chest: ${hipToShoulder.before}°)`);
+  await page.screenshot({ path: path.join(out, 'mixosaurus-bend-references.png') });
+
+  // Three chords a person could reasonably call "the trunk", read against one span. Nothing here
+  // asserts a number — what it asserts is that they *differ*, which is the finding the mode exists
+  // for, and the numbers are written out for `docs/triassic/verification/`.
+  const rows = [];
+  for (const [from, to] of [['root', 'body'], ['tail_00', 'chest'], ['chest', 'neck']]) {
+    await refPick('Base', 'from').selectOption(from);
+    await refPick('Base', 'to').selectOption(to);
+    await page.waitForTimeout(600);
+    const r = await reading('bone-chain');
+    const text = await page.locator('.bend-reading[data-reading="bone-chain"] .bend-reading-value').textContent();
+    rows.push({ base: `${from} → ${to}`, inPlane: r.before, total: r.beforeTotal, text: text.trim() });
+  }
+  // Compared on the *total* angle rather than the in-plane one: how far apart two definitions are
+  // is a question about directions, not about the plane a bend happens to be being read in.
+  const spread = Math.max(...rows.map((r) => r.total)) - Math.min(...rows.map((r) => r.total));
+  assert.ok(spread > 1, `three defensible readings of this animal's trunk disagree by ${spread.toFixed(1)}°, which is the finding this mode exists for`);
+
+  // ---- aiming the tip plane bends the body, and the readings are measured rather than predicted ----
+  await aimPlane('Tip', [0, 1, 0]);
+  const aimed = await planes();
+  assert.ok(aimed.apart > 5, `the two planes are now aimed ${aimed.apart}° apart`);
+  const turnedGeom = await reading('geometry');
+  assert.notEqual(turnedGeom.after, turnedGeom.before, 'the geometry reading moves with the bend');
+  const bonesTurned = await reading('bone-chain');
+  assert.notEqual(bonesTurned.after, bonesTurned.before, 'and so does the bone reading');
+  await page.screenshot({ path: path.join(out, 'mixosaurus-bend-turned.png') });
+
+  // ---- the per-joint table: the shape `carry_rest` consumes ----
+  const joints = await page.locator('.bend-joints li').evaluateAll((els) => els
+    .filter((el) => el.querySelector('code'))
+    .map((el) => ({ bone: el.querySelector('code').textContent, local: el.querySelector('b').textContent, accumulated: el.querySelector('small').textContent })));
+  assert.ok(joints.length >= 2, `the per-joint table has the joints the turn is spread over (${joints.map((j) => j.bone).join(', ')})`);
+  const localSum = joints.reduce((s, j) => s + Number(j.local.replace('°', '')), 0);
+  assert.ok(joints.every((j) => Number.isFinite(Number(j.local.replace('°', '')))), 'every row carries a real local rotation');
+  assert.ok(joints.some((j) => Number(j.local.replace('°', '')) !== 0), `and the turn is actually spread over them (${localSum.toFixed(1)}° in all)`);
+  // Deliberately *not* asserted here: that the local steps add back up to the whole turn. They do
+  // where the chain carries the whole span and nowhere else — the turn is spread along the span,
+  // so any part of it with no joint under it is a share the bone table cannot account for. On this
+  // body the span's front reaches ahead of `chest` and four joints carry 54.4° of an 82.7° turn,
+  // which is the table being honest rather than wrong. Askeptosaurus' hand-placed neck span used
+  // to close that loop exactly, and bend mode no longer opens on that animal's rigged body.
+  const total = (await planes()).turn;
+  fs.writeFileSync(path.join(out, 'mixosaurus-bend-joints.txt'),
+    ['the per-joint table, in chain order — a bone name and a local rotation, which is what',
+      '`uncurl` returns and `carry_rest` consumes in a Triassic builder',
+      '', ...joints.map((j) => `  ${j.bone.padEnd(12)} ${j.local.padStart(8)}   ${j.accumulated}`),
+      '', `  local steps sum to ${localSum.toFixed(2)}° against a whole turn of ${total}°`,
+      '', 'three readings of one span against three chords a person could call "the trunk":',
+      ...rows.map((r) => `  ${r.base.padEnd(20)} ${r.text.replace(/\s+/g, ' ')}`),
+      `  spread across the three: ${spread.toFixed(1)}°`].join('\n') + '\n');
+
+  // ---- the hand-off on a rigged body, and the consumer's refusals ----
+  await page.locator('.mark-note textarea').fill('browser drive: the tip plane aimed off the body’s own heading, measured both ways');
+  const hash = await measuredHash();
+  assert.match(hash, /^[0-9a-f]{64}$/, 'the page hashed the file on stage');
+  const model = await page.locator('.clips').getAttribute('data-loaded-model');
+  assert.equal(hash, hashOnDisk(model), 'and the hash is the file\'s own, as sha256 on disk reads it');
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: /^Export bend/ }).click();
+  const file = path.join(out, 'mixosaurus-bend.json');
+  await (await download).saveAs(file);
+  const json = JSON.parse(fs.readFileSync(file, 'utf8'));
+  assert.equal(json.schema, 'bend-span/2');
+  assert.equal(json.id, 'mixosaurus');
+  assert.equal(json.appliesTo, 'built', 'the export says it was placed on the built body');
+  assert.equal(json.use, 'builder-measurement', 'and that a rigged body is a measurement rather than an edit');
+  assert.equal(json.sha256, hash);
+  assert.equal(json.sha256Source, 'measured');
+  assert.equal(json.creature.rigged, true);
+  assert.ok(Math.abs(json.planes.apartDegrees - aimed.apart) < 0.02, `the two planes the panel showed are in the file (${json.planes.apartDegrees} vs ${aimed.apart})`);
+  assert.ok(Math.abs(Math.hypot(...json.planes.tipNormal) - 1) < 1e-4, 'each as the unit direction it is');
+  assert.ok(json.planes.tipRest, 'with the body’s own heading there beside the aim');
+  assert.equal(typeof json.axis.twistDegrees, 'number', 'with how much of the aim is a twist rather than a bend');
+  assert.ok(json.reading.geometry.before && json.reading.geometry.after, 'both geometry readings are in it');
+  assert.ok(json.reading.bones.before && json.reading.bones.after, 'and both bone readings');
+  assert.equal(json.reading.bones.baseReference, 'chest → neck', 'named by the references they were taken between');
+  assert.ok(json.joints.length >= 2, 'the per-joint table is in it');
+  assert.deepEqual(json.joints.map((j) => j.bone), joints.map((j) => j.bone), 'the same bones the panel showed, in the same chain order');
+  assert.ok(json.joints.every((j, i) => Math.abs(j.localDegrees - Number(joints[i].local.replace('°', ''))) < 0.05),
+    'carrying the same local rotations the panel showed');
+  assert.ok(Number.isFinite(json.turn.totalDegrees), 'beside the whole turn they are a share of');
+  assert.match(json.note, /^browser drive/);
+
+  const accepted = check(file);
+  assert.equal(accepted.status, 0, `npm run triassic:bend accepts the file it was measured on:\n${accepted.stdout}${accepted.stderr}`);
+  assert.match(accepted.stdout, /re-measuring it here gives the readings it recorded/, 'and re-measures the same readings over the actual mesh and rig');
+  fs.writeFileSync(path.join(out, 'mixosaurus-bend-check.txt'), accepted.stdout);
+  const tampered = path.join(out, 'mixosaurus-bend-stale.json');
+  fs.writeFileSync(tampered, JSON.stringify({ ...json, sha256: 'f'.repeat(64) }, null, 2));
+  const refused = check(tampered);
+  assert.notEqual(refused.status, 0, 'and refuses one whose hash no longer matches the body');
+  assert.match(refused.stderr, /has changed since the span was placed/, 'saying why');
+  // A file written against the turn rates the planes replaced is refused outright, by name.
+  const old = path.join(out, 'mixosaurus-bend-v1.json');
+  fs.writeFileSync(old, JSON.stringify({ ...json, schema: 'bend-span/1' }, null, 2));
+  const rates = check(old);
+  assert.notEqual(rates.status, 0, 'and one from before the two planes');
+  assert.match(rates.stderr, /written before the two planes/, 'saying that too');
+
+  // ---- the pointer scheme on a rigged body too, last again ----
+  const builtPointer = await drivePointerScheme('built');
+
+  if (errors.length) console.error(`page errors:\n${errors.join('\n---\n')}`);
   assert.deepEqual(errors, [], 'no page errors');
-  console.log('PASS: bend mode — the panel names the body and warns that the shipped rest already');
-  console.log('      carries its builder\'s correction; a handle found and dragged and undone; a span');
-  console.log(`      on the neck with three trunk readings ${spread.toFixed(1)}° apart; a per-joint table in chain`);
-  console.log('      order summing to the turn; the export hashed in the page, accepted by the consumer');
-  console.log('      and refused stale or written against the old rates; and on the untouched original');
-  console.log(`      pose, a neck ${curved.before.toFixed(1)}° off its trunk, two planes aimed the same way, and the`);
-  console.log(`      run between them measured ${buttonGeom.after}° in plane over the warped mesh`);
+  console.log('PASS: bend mode — the Bend button and a ?mode=bend link both open Askeptosaurus on its');
+  console.log('      original pose, which is the body a bend is aimed on; a handle found, dragged and undone');
+  console.log(`      with the camera untouched; a neck ${curved.before.toFixed(1)}° off its trunk, two planes aimed the same`);
+  console.log(`      way, and the run between them measured ${buttonGeom.after}° in plane over the warped mesh;`);
+  console.log(`      on Mixosaurus' built body, three trunk readings ${spread.toFixed(1)}° apart, a per-joint table in chain`);
+  console.log(`      order carrying ${localSum.toFixed(1)}° of an ${total}° turn, and an export hashed in the page, accepted by`);
+  console.log('      the consumer and refused stale or written against the old rates;');
+  console.log(`      and the pointer scheme on both bodies — left-drag orbits (${rawPointer.orbit.toFixed(2)}, ${builtPointer.orbit.toFixed(2)}),`);
+  console.log(`      right-drag pans (${rawPointer.pan.toFixed(2)}, ${builtPointer.pan.toFixed(2)})`);
 } finally {
   await browser.close();
 }

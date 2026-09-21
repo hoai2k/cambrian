@@ -240,7 +240,17 @@ export function Viewer() {
   // Not on the twin: a sculpt is the hand-off that goes into a builder's profile rows for the body
   // that ships, and one exported off the comparison body would name the right creature and describe
   // the wrong mesh.
-  const ready = !loading && !error && loadedId === id;
+  /**
+   * Ready means **the body on stage is the body this UI is describing**, which is stricter than
+   * "the last load finished" and has to be. The Bend button changes the mode and the model in one
+   * commit (`opening()`), a child's effects run before its parent's, and the load effect below is
+   * the parent's — so an editor mounted in that commit measures whatever the scene is still
+   * holding. On Askeptosaurus that is the shipped body, and because the bend document is cached
+   * under the *new* model's key, the panel then said `origpose` over numbers taken from the built
+   * body and never re-measured. Asking the scene what it is drawing is answered synchronously and
+   * cannot be a commit behind.
+   */
+  const ready = !loading && !error && loadedId === id && sceneRef.current?.loadedModel() === modelPath;
   /**
    * Sculpting is for a body a *builder* draws from profile rows. Its export is a hand-off into
    * those rows (docs/viewer-sculpt.md) — the change goes into the builder, never into the GLB — so

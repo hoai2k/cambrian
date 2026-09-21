@@ -193,6 +193,16 @@ export interface ViewerScene {
    * there must not spend it being recoloured into the next one's palette.
    */
   clear(): void;
+  /**
+   * The model path of the body **actually on stage**, or undefined while there is none.
+   *
+   * It exists because "the last load finished" is not the same question. The Bend button changes
+   * the mode and the body in one commit, and a child's effects run before its parent's, so an
+   * editor mounted in that commit measures whatever the scene is still holding — the previous
+   * body — and caches those numbers under the new body's key. Asking the scene what it is drawing
+   * answers synchronously and cannot be a commit behind.
+   */
+  loadedModel(): string | undefined;
   /** Plays a clip. One-shots fade back to the resting loop unless `loop` forces a repeat. */
   play(name: string, loop: boolean): void;
   setSpeed(s: number): void;
@@ -412,6 +422,8 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
   scene.add(stage);
 
   let model: THREE.Object3D | undefined;
+  /** Which file `model` was built from — see `ViewerScene.loadedModel`. */
+  let loadedModelPath: string | undefined;
   /** Survives a change of specimen, because a reviewer comparing mouths is comparing across them. */
   let oralGeometry = false;
   let source: GLTF | undefined;
@@ -465,6 +477,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     if (source) disposeAsset(source);
     source = undefined;
     model = undefined; mixer = undefined; current = undefined;
+    loadedModelPath = undefined;
     sculptTarget = undefined;
     markTargetCache = undefined; markIndexOf = new Map(); markPoints.visible = false;
     mouthRootCache = undefined; mouthGroup.visible = false; mouthPoints.visible = false;
@@ -538,6 +551,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     recolor.setScheme(schemeId);
 
     model = src;
+    loadedModelPath = specimen.model;
     stage.add(model);
     applyOralGeometry();
     modelCenter = center.clone(); modelUnit = unit;
@@ -1303,6 +1317,7 @@ export function createViewerScene(canvas: HTMLCanvasElement): ViewerScene {
     activeSlots() { return recolor?.slots ?? []; },
     onClip(cb) { clipCb = cb; cb(currentName); },
     resetCamera: frame,
+    loadedModel() { return loadedModelPath; },
     sculptTarget() { return sculptTarget; },
     applySculpt,
     setMouthGape,
