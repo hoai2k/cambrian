@@ -322,6 +322,14 @@ before anything is built.
    is the back third of the mouth and nothing else. Cymbospondylus measures the same way (a loop
    0.042 of a body behind the hinge on a mouth 0.14 long) and is not ported here.
 
+The measurement is per half and per body, and it is cheap: no render, no rebuild beyond the
+cut the builder was taking anyway. Nothosaurus is the case that shows why it is a *report*
+rather than a number: its cut leaves 225 boundary edges per half, 62 of them the head's
+cross-section at the skull joint and the other 163 in six closed curves — the lip and five
+small loops the generation's own modelled slit contributes at the snout. All six are filled
+in one pass, because `triangle_fill` over the whole selection in the mouth's own plane does
+not care how many curves it was given.
+
 ### 1 — the cut is capped with its own rim, and domed (`T.cap_mouth`)
 
 Span a cut half's boundary and that half is a closed solid again, and the surface that spans it

@@ -383,9 +383,10 @@ half's bone through the same weight field as the skin round it.
 coordinate but a *plane fitted to the modelled lip on both flanks*, `z = a + b x + c y`, carrying the
 lip's pitch and its tilt across the head. Nothing in `cap_mouth` knows what shape the cut was: the
 rim is what bounds the cap, so a fitted, tilted cut is followed for free. `T.cut_rim` reports what
-the cut left open before anything is built — **225 boundary edges per half in six closed loops**: the
-lip (125 vertices) and five small loops this generation's own modelled slit contributes, at the
-snout, every one of them on the fitted plane. All six are capped, and the closure is asserted rather
+the cut left open before anything is built — **225 boundary edges per half**: the head's
+cross-section at the skull joint (62 edges, which `cap_cut` fans first) and then **163 in six
+closed curves** — the lip (125 vertices) and five small loops this generation's own modelled slit
+contributes at the snout, every one of them on the fitted plane. All six are capped, and the closure is asserted rather
 than rendered for: `cap_mouth` refuses a rim that is not closed curves and fails if any boundary it
 was given survives.
 
