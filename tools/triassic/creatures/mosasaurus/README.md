@@ -103,7 +103,7 @@ were all paid too — the oral cavity had to fold rather than be built, the lini
 three times to stop it inverting at the shut pose, and the pose the animal spends nearly all its time
 in is now its most deformed one.
 
-### T3D-28: this mouth is not cut, and that is what closed the holes
+### T3D-31: this mouth is not cut, and that is what closed the holes
 
 Everything in the next section is history, and so is the cut it depended on. The owner, looking at
 this animal: *"when his mouth opens I see some holes — shouldn't we just be stretching the geometry

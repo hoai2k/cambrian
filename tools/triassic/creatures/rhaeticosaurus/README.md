@@ -146,7 +146,7 @@ mouth's section is not an ellipse and an ellipse narrows towards its floor; and 
 to sit inside the mandible rather than stipple against it took the *width* down to 0.68 of the
 mouth's own and the far wall then stopped short of the mandible's rim.
 
-### T3D-28: the mouth is the cut, capped and domed — and the lining is gone
+### T3D-31: the mouth is the cut, capped and domed — and the lining is gone
 
 Everything above about the lining is history. This head **arrived shut** — one closed solid with
 the lip painted on it, which is exactly what the geometric method returning three vertices means —

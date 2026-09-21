@@ -583,7 +583,7 @@ def split_jaw(o):
   bm.to_mesh(target.data);bm.free()
  jawparts[o.name]=jaw
 for o in [auth,puppet]:split_jaw(o)
-# --------------------- the mouth is the cut, capped with its own rim and domed (T3D-28) ------
+# --------------------- the mouth is the cut, capped with its own rim and domed (T3D-31) ------
 # **This head arrived shut**: the lip is a modelled slit and the head behind it is one closed
 # solid, so nothing is open until the cut opens it and what the cut leaves is a hole in each half.
 # `cut_rim` measures that before anything is built -- one closed loop per half, every vertex of it

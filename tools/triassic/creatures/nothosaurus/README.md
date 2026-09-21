@@ -370,7 +370,7 @@ the turn moves positions only.
 `docs/triassic/throat-repairs/nothosaurus-head-before.png` and `-after.png` are the same two
 cameras on the shipped file — from above, where the yaw shows, and from the animal's right.
 
-## T3D-28: the mouth is the cut, capped with its own rim and domed
+## T3D-31: the mouth is the cut, capped with its own rim and domed
 
 The `Oral floor`, the `Palate` and the two rigid hinge halves are retired. All four were closing
 holes this builder's own cut had made — the opening itself, the head's cross-section at the skull

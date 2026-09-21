@@ -5,12 +5,12 @@ and that authored geometry inside one is justified per animal by a gape that act
 never added as a matter of course. This table is that question answered per body, so the answer is a
 decision on the record rather than an absence of work.
 
-**T3D-28, 21 September 2026, changed what the question is** and re-opened every answer below it.
+**T3D-31, 21 September 2026, changed what the question is** and re-opened every answer below it.
 Two things:
 
 - There is a question **ahead** of "does this mouth need filling": *does this head need cutting at
   all?* Three kinds of generation arrive, and only one of them wants a cut. See
-  [the README](README.md#the-mouth-is-the-cut-or-there-is-no-cut--t3d-28-21-september-2026).
+  [the README](README.md#the-mouth-is-the-cut-or-there-is-no-cut--t3d-31-21-september-2026).
 - **The instrument was measuring a body the game does not draw.** `gape-solid.py` rendered the
   packaged file as it is, and the runtime hides everything `src/shared/oral-geometry.ts` matches —
   every `Oral cavity lining`, every `Seated jaw hinge tissue`. So a gape closed *by* one of those
@@ -44,9 +44,9 @@ column to read.** Nothing here is a claim about every camera: it is one side-on 
 
 | Body | worst `through` | worst `opened` | note |
 | --- | ---: | ---: | --- |
-| **Nothosaurus** | **0** | **0** | ported in T3D-28: capped with its own rim |
-| **Rhaeticosaurus** | **0** | **0** | ported in T3D-28: capped with its own rim |
-| **Mosasaurus** | **0** | **0** | ported in T3D-28: not cut at all |
+| **Nothosaurus** | **0** | **0** | ported in T3D-31: capped with its own rim |
+| **Rhaeticosaurus** | **0** | **0** | ported in T3D-31: capped with its own rim |
+| **Mosasaurus** | **0** | **0** | ported in T3D-31: not cut at all |
 | Helicoprion | 0 | 0 | already clean; no legacy lining |
 | Askeptosaurus | 1 | 193 | |
 | Odontochelys | 6 | 236 | |
@@ -77,7 +77,7 @@ not already closing; what nobody asked was whether the hinge plug is drawn. It i
 verdict "neither" is right about a *lining* and wrong about the mouth: what that head needs is its
 hinge cross-section capped with its own vertices, which is `T.cap_cut`, and no lining at all.
 
-## T3D-28: the three ported bodies
+## T3D-31: the three ported bodies
 
 | Body | Kind | What ships | Measurement |
 | --- | --- | --- | --- |
@@ -103,21 +103,21 @@ they are the record of what was measured when. Every figure is a plain (not `--a
 | --- | --- | --- | --- | --- | --- |
 | **Dinocephalosaurus** | **neither** | — | — | Peak gape of `Bite`, `Attack`, `Heavy`, `Eat`, `NeckStrike`. Shipped with the one-sac `Mouth_lining`: 0, 0, 0, 0, 0 px through the head. **Sac stripped, everything else as it was: 0, 2, 3, 1, 1 px.** Sac *and* seated hinge tissue stripped: 98, 87, 113, 50, 101 px. The sac closed nothing the hinge plug was not already closing; the generation paints its lip on a closed snout and models no cavity, so there is no lumen wall for a gape to open onto. | Delivered: sac removed from the builder, no palate or floor built. **Superseded in part**: the hinge plug is hidden in play, so as drawn this head is open at the hinge (120 px). The repair is `T.cap_cut`, not a lining. |
 | **Keichousaurus** | **palate + floor** | rigid `skull`, 100 vertices | rigid `jaw`, 100 vertices | Peak gape of `Bite`, `Heavy`, `Attack`, `Eat`, `Ability`. The 180-vertex sac (132 mixed): 0 px through the body; the palate/floor pair (`T.oral_shells`, 0.84 of the measured room): 0 px, and 55–62 silhouette pixels opened against the sac's 76–84. Oral strain 6.57× → 2.34×. | Delivered. As drawn it opens 4,267–4,375 px, so it is a candidate for the cap. |
-| **Phragmoteuthis** | **neither** | — | — | `Bite@0.22`, `Attack@0.4`, `Eat@0.37`. With the peristome cut, the sewn lining and the two mandibles: 0 px. With the crown closed as delivered: 0 px, passes differing by 0–1 px. A beak inside an arm crown is never in frame. | Delivered; unaffected by T3D-28 (no jaw, no cut). |
-| Ceratites | neither | — | — | Settled by T3D-02a; re-measured at `Bite@0.25`, `Attack@0.44`, `Eat@0.4`: 0, 0, 0 px through the body. | Delivered; unaffected by T3D-28. |
-| **Shonisaurus** | **neither** | — | — | T3D-14. Rebuilt with the palate, floor, throat tube and both tooth rows removed. `Bite@0.3`, `Attack@0.5`, `Heavy@0.35`, `Eat@1.433`: **0, 0, 6, 87 px**. The `Eat` pixels are slivers along the tooth row at the commissure, between the generation's own tooth crowns and the lip, not a hole into the head. | Delivered: no oral geometry. Not re-measured as drawn in T3D-28's sweep. |
-| **Nothosaurus** | superseded | — | — | T3D-14: `Bite@0.25`, `Heavy@0.3`, `Attack@0.25`: 53, 43, 47 px before, 1, 0, 0 after, with the head unbent and the cut fitted to the modelled lip on both flanks. | **Superseded by T3D-28**: the fitted cut stays, the shells and the hinge halves are gone and the cut is capped with its own rim. |
+| **Phragmoteuthis** | **neither** | — | — | `Bite@0.22`, `Attack@0.4`, `Eat@0.37`. With the peristome cut, the sewn lining and the two mandibles: 0 px. With the crown closed as delivered: 0 px, passes differing by 0–1 px. A beak inside an arm crown is never in frame. | Delivered; unaffected by T3D-31 (no jaw, no cut). |
+| Ceratites | neither | — | — | Settled by T3D-02a; re-measured at `Bite@0.25`, `Attack@0.44`, `Eat@0.4`: 0, 0, 0 px through the body. | Delivered; unaffected by T3D-31. |
+| **Shonisaurus** | **neither** | — | — | T3D-14. Rebuilt with the palate, floor, throat tube and both tooth rows removed. `Bite@0.3`, `Attack@0.5`, `Heavy@0.35`, `Eat@1.433`: **0, 0, 6, 87 px**. The `Eat` pixels are slivers along the tooth row at the commissure, between the generation's own tooth crowns and the lip, not a hole into the head. | Delivered: no oral geometry. Not re-measured as drawn in T3D-31's sweep. |
+| **Nothosaurus** | superseded | — | — | T3D-14: `Bite@0.25`, `Heavy@0.3`, `Attack@0.25`: 53, 43, 47 px before, 1, 0, 0 after, with the head unbent and the cut fitted to the modelled lip on both flanks. | **Superseded by T3D-31**: the fitted cut stays, the shells and the hinge halves are gone and the cut is capped with its own rim. |
 
 ## What decided each one
 
 **A plane cut through a closed head is open at the hinge, and the hinge plug is what closes it.**
 Dinocephalosaurus' three renders separated the sac from the hinge tissue: stripping the sac moved
 the count from 0 to 3; stripping the hinge tissue as well moved it to 113. That is still the right
-reading, and T3D-28 adds the half of it nobody asked: the hinge plug is hidden in play, so it is
+reading, and T3D-31 adds the half of it nobody asked: the hinge plug is hidden in play, so it is
 closing the hole for the audit and not for the player. What closes it for both is the cut's own
 cross-section, fanned with its own vertices.
 
-**A filled mouth is justified by a leak** — and by T3D-28 the leak has to be measured on the body
+**A filled mouth is justified by a leak** — and by T3D-31 the leak has to be measured on the body
 the game draws.
 
 **A crown with no mouth modelled gets none.** Unchanged.
