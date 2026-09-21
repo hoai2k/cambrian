@@ -6,8 +6,8 @@ Blender 5.2. Geometry coordinates are raw Tripo metres (X snoutward, Y left, Z u
 Henodus is built to Placodus' pattern, because it is the same kind of animal and the same kind of
 generation: a closed shell with a real modelled mouth slit, whose seam is found by casting head
 vertex normals back into the mesh and fitting the cavity's mid height per station, and whose open
-mouth is closed by ONE skinned lining -- roof on the skull, floor on the jaw, wall stretching
-between them -- wound inwards with the skin double-sided behind it. The measurements differ
+mouth is the cut's own rim, spanned and domed into each half (`T.cap_mouth`), which closes it by
+construction rather than by a shell placed in the opening. The measurements differ
 because the animal does: Henodus is a disc, not a barrel. Its carapace is 0.50 of body length wide
 against a 0.25 depth, its mouth is the front 0.04 of the body rather than a long tooth row, and the
 one thing Placodus does not have at all is a fused dorsal shell, which is a rigid part here in the
@@ -551,26 +551,402 @@ def split(o, label, test, mouth=False):
     return part
 
 
+# ---- the mouth, closed by the cut's own rim (T3D-32) --------------------------------------------
+#
+# **This head arrived very nearly shut, and the cut makes almost all of the aperture.** The
+# generation models a slit: `mouth_cavity` finds 78 vertices over the front 0.03 of the body, a
+# cavity whose measured half height runs 0.0085 to 0.0124 on a head 0.07 deep -- a crease, not a
+# lumen, with no palate, no floor and no commissure behind it. `T.cut_rim` says the same from the
+# other side and is the measurement that decides it: the cut leaves **one closed loop per half**,
+# 98 vertices on the authored body and 72 on its twin, running the whole length of the beak from
+# the hinge forward, with **no boundary edge anywhere else in the head**. So this is CLAUDE.md's
+# first case in all but name, and the answer is to cap the cut with its own rim rather than to
+# place a shell in the opening and render to find out whether it covers it.
+#
+# What that replaces is an `Oral cavity lining` -- a palate and a floor drawn to the cavity's own
+# measured section and inset -- and a `Seated jaw hinge tissue` ellipsoid blended between `skull`
+# and `jaw`. Both were closing holes this cut had made, and both were hidden in play, so what a
+# player saw at a gape was 407 px of backdrop through the head. A surface spanning the cut's own
+# rim closes by construction, is made of the body's own vertices, wears the skin it closes, and is
+# rigid to its own half's bone through the same weight field as the skin around it.
+#
+# The order: `cap_cut` over the head's cross-section at the hinge first, then `cap_mouth` over what
+# is left. The dome is bounded by how much head there is over (or under) the cut, read off a
+# **measured section table** and never off `depth()` -- this generation models a slit, so a
+# nearest-surface probe beside the mouth answers about the mouth's own inner wall rather than
+# about the skull (Archelon's lesson, and Placodus' before it).
+CAP_DOME = .34
+CAP_ROOM = .55
+_HEAD_P = np.array([v.co[:] for v in auth.data.vertices])
+_CAP_X = np.arange(HINGE_X - .01, JAW_FRONT_X + .01, .004)
+_CAP_LO, _CAP_HI = [], []
+for _x in _CAP_X:
+    _m = (np.abs(_HEAD_P[:, 0] - _x) < .006) & (np.abs(_HEAD_P[:, 1]) < .12)
+    _q = _HEAD_P[_m]
+    _CAP_LO.append(float(np.percentile(_q[:, 2], 3)) if _m.sum() >= 6 else float(seam(float(_x))) - .01)
+    _CAP_HI.append(float(np.percentile(_q[:, 2], 97)) if _m.sum() >= 6 else float(seam(float(_x))) + .01)
+_CAP_LO, _CAP_HI = np.array(_CAP_LO), np.array(_CAP_HI)
+
+
+def _cap_room(q, up):
+    """How much head there is over (or under) the cut at this station, from the measured section."""
+    lo = float(np.interp(q[0], _CAP_X, _CAP_LO))
+    hi = float(np.interp(q[0], _CAP_X, _CAP_HI))
+    z = cut_height(Vector(q))
+    return max(.0004, (hi - z) if up else (z - lo))
+
+
 def in_head(p):
     return p.x > HINGE_X - .02
 
 
 def on_seam(p):
-    return p.x > HINGE_X - 1e-5 and abs(p.z - cut_height(p)) < 1e-5
+    """What `cap_mouth` spans: **the boundary the cut left in the head**, not the cut plane.
+
+    Rhaeticosaurus and Nothosaurus can ask "is this vertex exactly on the seam", because on those
+    two bodies every rim vertex is one the bisection made. Here two are not: this generation models
+    a slit, and where the cut runs out through it the loop picks up a pair of the slit's own rim
+    vertices -- at raw (0.4629, -0.0429, -0.0554) and its mirror -- which sit a few thousandths off
+    `cut_height` and which a strict test drops, leaving the curve open at two places and the cap
+    refusing to fill it. The honest selector is the region: `cut_rim` has already measured that the
+    head holds **one closed loop and no other boundary at all** once the hinge cross-section is
+    fanned, so "every boundary vertex in the head" names that loop exactly, and `cap_mouth`'s
+    closing assertion -- that no boundary edge matching this predicate survives the fill -- then
+    proves the whole head closed rather than just the plane.
+    """
+    return in_head(p)
 
 
-CUT_RIM = {}
+def at_hinge(p):
+    return abs(p.x - HINGE_X) < 1e-5
+
+
+def shear_to_the_cut(obj, sign):
+    """Carry the cut onto the plane z = 0 and back, so the caps are filled in the mouth's frame.
+
+    **This cut is not a graph over the world's horizontal plane.** `cut_height` descends outboard
+    of the beak's measured inner width, by up to 0.038 raw, so that the hanging upper denticles
+    stay on the skull -- which is T3D-02c's correction and is not negotiable. What it costs is
+    that the rim has two near-vertical runs down the sides of the beak, and `cap_mouth` fills by
+    projecting the rim along `facing` and triangulating in that plane: a near-vertical run projects
+    to nearly a point, the projected polygon doubles back on itself, and the fill silently drops
+    the spans it cannot resolve. On the puppet's mandible that left five boundary edges out of
+    forty-five with a triangulation that was otherwise the right size -- forty-three faces for a
+    forty-five-gon -- which is the tell that the *polygon* was wrong rather than the fill.
+
+    The answer is the one `bisect_mouth` already uses to take the cut in the first place: shear the
+    half vertically by `-cut_height`, which carries the cut exactly onto z = 0, do the work there,
+    and shear back. `cut_height` depends only on x and y, so the map is exactly invertible vertex
+    by vertex, every vertex the cap adds comes back onto the cut's own curved surface, and the
+    dome -- which runs along z either way, because a vertical shear takes vertical lines to
+    vertical lines -- is measured within the mouth's own surface rather than across it.
+
+    `_cap_room` is unaffected: it reads the head's measured section table and `cut_height`, both of
+    which are functions of x and y alone.
+    """
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    for v in bm.verts:
+        v.co.z += sign * cut_height(v.co)
+    bm.to_mesh(obj.data)
+    obj.data.update()
+    bm.free()
+
+
+def dish_cap(obj, rim, into):
+    """Close one half of the cut **with the cut's own rim**, fanned to a hub sunk into that half.
+
+    This is T3D-31's construction and `T.cap_mouth` is its general form: span each half's boundary
+    and each half is a closed solid again, and the two surfaces that span them *are* the roof and
+    the floor of the mouth, following the cut exactly because the rim is what bounds them. What is
+    different here is only *how* the span is triangulated, and the reason is this body's rim.
+
+    `T.cap_mouth` fills by projecting the rim along one direction and triangulating in that plane.
+    That is right where the cut is a graph over such a plane, and this one is not: `cut_height`
+    descends outboard of the beak's measured inner width so the hanging upper denticles stay on
+    the skull (T3D-02c), and the split then returns disconnected fringe pieces to the skull along
+    an edge path that is not the cut at all -- so the loop carries near-vertical runs and, on the
+    coarse twin, a chain of corner triangles. Shearing the half onto the cut's own plane first
+    (`shear_to_the_cut`, this builder's own trick for taking the cut) fixes the near-vertical runs
+    and is kept, and it is enough for the authored body; it is not enough for the twin, whose 45
+    rim edges triangulated to a correct-sized 43 faces and still left 5 of them on the boundary --
+    the tell that the *polygon* is wrong rather than the fill.
+
+    So the span here is the **fan** `T.cap_cut` already uses at this body's hinge and has shipped
+    with for months: every triangle is two neighbouring rim vertices and one hub, the hub is their
+    mean, and it closes **any** closed curve by construction with no projection to go wrong. The
+    hub is then sunk into its own half by `CAP_ROOM` of how much head there is there, read off the
+    measured section table -- so the two hubs part, the space between the caps is the mouth, and
+    the depth is zero at the lip and deepest in the middle, which is the shape a palate has. On a
+    beak 0.044 long and 0.17 across a single hub is a shallow dish, not a tent.
+
+    Every vertex but the hub is one the cut already made, and the hub carries the rim's UVs and
+    vertex colours, so the roof of the mouth is the head's own albedo rather than a flat island.
+    Each cap is part of its own half and is weighted with the skin around it.
+    """
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    border = [e for e in bm.edges
+              if len(e.link_faces) == 1 and rim(e.verts[0].co) and rim(e.verts[1].co)]
+    cycles, shape = T._rim_cycles(border)
+    assert cycles is not None, ('the mouth rim is not a closed curve', obj.name, shape)
+    uv_layer = bm.loops.layers.uv.active
+    colour_layers = [l for layers in (bm.verts.layers.float_color, bm.verts.layers.color)
+                     for l in layers.values()]
+    report = {'rimEdges': len(border), 'cycles': [], 'deepestRaw': 0.}
+    for cyc in cycles:
+        centre = sum((v.co for v in cyc), Vector()) / len(cyc)
+        # **The depth is measured, not chosen**, and it is `T.cap_mouth`'s own rule read at the one
+        # interior vertex this cap has: `CAP_DOME` of the hub's own distance from the nearest rim
+        # vertex -- which on a mouth is the half width across it, so the dish scales with the mouth
+        # by construction -- and then bounded by how much head there actually is on that side of
+        # the cut, so a palate cannot reach the scalp. Taking `CAP_ROOM` of the room outright put
+        # this hub 0.037 raw up into a head 0.07 deep.
+        room = _cap_room((centre.x, centre.y, centre.z), into > 0)
+        sink = min(CAP_DOME * min((centre - v.co).length for v in cyc), CAP_ROOM * room)
+        rim_uv = {}
+        if uv_layer is not None:
+            for v in cyc:
+                loops = list(v.link_loops)
+                if loops:
+                    rim_uv[v] = sum((l[uv_layer].uv for l in loops), Vector((0., 0.))) / len(loops)
+        hub = bm.verts.new(centre + Vector((0., 0., into * sink)))
+        for layer in colour_layers:
+            hub[layer] = cyc[0][layer]
+        hub_uv = (sum(rim_uv.values(), Vector((0., 0.))) / len(rim_uv)) if rim_uv else None
+        made = []
+        for k in range(len(cyc)):
+            a, b = cyc[k], cyc[(k + 1) % len(cyc)]
+            try:
+                f = bm.faces.new((a, b, hub))
+            except ValueError:
+                continue
+            made.append(f)
+            if uv_layer is not None:
+                for l in f.loops:
+                    l[uv_layer].uv = hub_uv if l.vert is hub else rim_uv.get(l.vert, hub_uv)
+        for f in made:
+            f.smooth = True
+            f.normal_update()
+            if f.normal.z * into > 0:                # face into the mouth, not out of the half
+                f.normal_flip()
+        report['cycles'].append({'vertices': len(cyc), 'faces': len(made),
+                                 'sinkRaw': round(sink, 6)})
+        report['deepestRaw'] = max(report['deepestRaw'], round(sink, 6))
+    bm.normal_update()
+    left = [e for e in bm.edges
+            if len(e.link_faces) == 1 and rim(e.verts[0].co) and rim(e.verts[1].co)]
+    assert not left, ('the mouth cap left the half open', obj.name, len(left))
+    bm.to_mesh(obj.data)
+    obj.data.update()
+    bm.free()
+    report['capped'] = True
+    return report
+
+
+def in_head(p):
+    return p.x > HINGE_X - .02
+
+
+def on_seam(p):
+    """What `cap_mouth` spans: **the boundary the cut left in the head**, not the cut plane.
+
+    Rhaeticosaurus and Nothosaurus can ask "is this vertex exactly on the seam", because on those
+    two bodies every rim vertex is one the bisection made. Here two are not: this generation models
+    a slit, and where the cut runs out through it the loop picks up a pair of the slit's own rim
+    vertices -- at raw (0.4629, -0.0429, -0.0554) and its mirror -- which sit a few thousandths off
+    `cut_height` and which a strict test drops, leaving the curve open at two places and the cap
+    refusing to fill it. The honest selector is the region: `cut_rim` has already measured that the
+    head holds **one closed loop and no other boundary at all** once the hinge cross-section is
+    fanned, so "every boundary vertex in the head" names that loop exactly, and `cap_mouth`'s
+    closing assertion -- that no boundary edge matching this predicate survives the fill -- then
+    proves the whole head closed rather than just the plane.
+    """
+    return in_head(p)
+
+
+def at_hinge(p):
+    return abs(p.x - HINGE_X) < 1e-5
+
+
+def shear_to_the_cut(obj, sign):
+    """Carry the cut onto the plane z = 0 and back, so the caps are filled in the mouth's frame.
+
+    **This cut is not a graph over the world's horizontal plane.** `cut_height` descends outboard
+    of the beak's measured inner width, by up to 0.038 raw, so that the hanging upper denticles
+    stay on the skull -- which is T3D-02c's correction and is not negotiable. What it costs is
+    that the rim has two near-vertical runs down the sides of the beak, and `cap_mouth` fills by
+    projecting the rim along `facing` and triangulating in that plane: a near-vertical run projects
+    to nearly a point, the projected polygon doubles back on itself, and the fill silently drops
+    the spans it cannot resolve. On the puppet's mandible that left five boundary edges out of
+    forty-five with a triangulation that was otherwise the right size -- forty-three faces for a
+    forty-five-gon -- which is the tell that the *polygon* was wrong rather than the fill.
+
+    The answer is the one `bisect_mouth` already uses to take the cut in the first place: shear the
+    half vertically by `-cut_height`, which carries the cut exactly onto z = 0, do the work there,
+    and shear back. `cut_height` depends only on x and y, so the map is exactly invertible vertex
+    by vertex, every vertex the cap adds comes back onto the cut's own curved surface, and the
+    dome -- which runs along z either way, because a vertical shear takes vertical lines to
+    vertical lines -- is measured within the mouth's own surface rather than across it.
+
+    `_cap_room` is unaffected: it reads the head's measured section table and `cut_height`, both of
+    which are functions of x and y alone.
+    """
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    for v in bm.verts:
+        v.co.z += sign * cut_height(v.co)
+    bm.to_mesh(obj.data)
+    obj.data.update()
+    bm.free()
+
+
+def dish_cap(obj, rim, into):
+    """Close one half of the cut **with the cut's own rim**, fanned to a hub sunk into that half.
+
+    This is T3D-31's construction and `T.cap_mouth` is its general form: span each half's boundary
+    and each half is a closed solid again, and the two surfaces that span them *are* the roof and
+    the floor of the mouth, following the cut exactly because the rim is what bounds them. What is
+    different here is only *how* the span is triangulated, and the reason is this body's rim.
+
+    `T.cap_mouth` fills by projecting the rim along one direction and triangulating in that plane.
+    That is right where the cut is a graph over such a plane, and this one is not: `cut_height`
+    descends outboard of the beak's measured inner width so the hanging upper denticles stay on
+    the skull (T3D-02c), and the split then returns disconnected fringe pieces to the skull along
+    an edge path that is not the cut at all -- so the loop carries near-vertical runs and, on the
+    coarse twin, a chain of corner triangles. Shearing the half onto the cut's own plane first
+    (`shear_to_the_cut`, this builder's own trick for taking the cut) fixes the near-vertical runs
+    and is kept, and it is enough for the authored body; it is not enough for the twin, whose 45
+    rim edges triangulated to a correct-sized 43 faces and still left 5 of them on the boundary --
+    the tell that the *polygon* is wrong rather than the fill.
+
+    So the span here is the **fan** `T.cap_cut` already uses at this body's hinge and has shipped
+    with for months: every triangle is two neighbouring rim vertices and one hub, the hub is their
+    mean, and it closes **any** closed curve by construction with no projection to go wrong. The
+    hub is then sunk into its own half by `CAP_ROOM` of how much head there is there, read off the
+    measured section table -- so the two hubs part, the space between the caps is the mouth, and
+    the depth is zero at the lip and deepest in the middle, which is the shape a palate has. On a
+    beak 0.044 long and 0.17 across a single hub is a shallow dish, not a tent.
+
+    Every vertex but the hub is one the cut already made, and the hub carries the rim's UVs and
+    vertex colours, so the roof of the mouth is the head's own albedo rather than a flat island.
+    Each cap is part of its own half and is weighted with the skin around it.
+    """
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    border = [e for e in bm.edges
+              if len(e.link_faces) == 1 and rim(e.verts[0].co) and rim(e.verts[1].co)]
+    cycles, shape = T._rim_cycles(border)
+    assert cycles is not None, ('the mouth rim is not a closed curve', obj.name, shape)
+    uv_layer = bm.loops.layers.uv.active
+    colour_layers = [l for layers in (bm.verts.layers.float_color, bm.verts.layers.color)
+                     for l in layers.values()]
+    report = {'rimEdges': len(border), 'cycles': [], 'deepestRaw': 0.}
+    for cyc in cycles:
+        centre = sum((v.co for v in cyc), Vector()) / len(cyc)
+        # **The depth is measured, not chosen**, and it is `T.cap_mouth`'s own rule read at the one
+        # interior vertex this cap has: `CAP_DOME` of the hub's own distance from the nearest rim
+        # vertex -- which on a mouth is the half width across it, so the dish scales with the mouth
+        # by construction -- and then bounded by how much head there actually is on that side of
+        # the cut, so a palate cannot reach the scalp. Taking `CAP_ROOM` of the room outright put
+        # this hub 0.037 raw up into a head 0.07 deep.
+        room = _cap_room((centre.x, centre.y, centre.z), into > 0)
+        sink = min(CAP_DOME * min((centre - v.co).length for v in cyc), CAP_ROOM * room)
+        rim_uv = {}
+        if uv_layer is not None:
+            for v in cyc:
+                loops = list(v.link_loops)
+                if loops:
+                    rim_uv[v] = sum((l[uv_layer].uv for l in loops), Vector((0., 0.))) / len(loops)
+        hub = bm.verts.new(centre + Vector((0., 0., into * sink)))
+        for layer in colour_layers:
+            hub[layer] = cyc[0][layer]
+        hub_uv = (sum(rim_uv.values(), Vector((0., 0.))) / len(rim_uv)) if rim_uv else None
+        made = []
+        for k in range(len(cyc)):
+            a, b = cyc[k], cyc[(k + 1) % len(cyc)]
+            try:
+                f = bm.faces.new((a, b, hub))
+            except ValueError:
+                continue
+            made.append(f)
+            if uv_layer is not None:
+                for l in f.loops:
+                    l[uv_layer].uv = hub_uv if l.vert is hub else rim_uv.get(l.vert, hub_uv)
+        for f in made:
+            f.smooth = True
+            f.normal_update()
+            if f.normal.z * into > 0:                # face into the mouth, not out of the half
+                f.normal_flip()
+        report['cycles'].append({'vertices': len(cyc), 'faces': len(made),
+                                 'sinkRaw': round(sink, 6)})
+        report['deepestRaw'] = max(report['deepestRaw'], round(sink, 6))
+    bm.normal_update()
+    left = [e for e in bm.edges
+            if len(e.link_faces) == 1 and rim(e.verts[0].co) and rim(e.verts[1].co)]
+    assert not left, ('the mouth cap left the half open', obj.name, len(left))
+    bm.to_mesh(obj.data)
+    obj.data.update()
+    bm.free()
+    report['capped'] = True
+    return report
+
+
+def shave_ears(obj):
+    """Take the one-triangle ears off the cut rim, because an ear is a hole and not anatomy.
+
+    The mandible's rim came off the cut carrying a **single triangle hanging by two of its edges**
+    -- raw (0.4629, -0.0429, -0.0554) on the authored body, one vertex of the whole mesh with
+    exactly one face on it -- where the cut ran out through the tip of an upper denticle. A planar
+    fill over the rim then triangulates the 63-gon correctly, 61 triangles for 63 edges, and those
+    two edges stay boundary, because there is nothing on their far side for them to be interior
+    *to*: the ear is a zero-thickness flap.
+
+    A flap is exactly the fault `gape-solid.py` is looking for -- from behind it is a back face and
+    a single-sided pass shows the world through it -- so it is removed rather than preserved, which
+    is the same judgement this builder's intake already makes about detached flakes. One pass, in
+    the head only, on vertices that are actually on the open boundary, and the count and the
+    positions are reported.
+    """
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    out = []
+    for _ in range(1):
+        ears = [v for v in bm.verts
+                if len(v.link_faces) == 1 and in_head(v.co)
+                and any(len(e.link_faces) == 1 for e in v.link_edges)]
+        if not ears:
+            break
+        out.extend([round(c, 5) for c in v.co] for v in ears)
+        bmesh.ops.delete(bm, geom=ears, context='VERTS')
+        bm.verts.ensure_lookup_table()
+    if out:
+        bm.to_mesh(obj.data)
+        obj.data.update()
+    bm.free()
+    assert len(out) < 24, ('the ear shave is eating the mandible', obj.name, len(out))
+    return out
+
+
+CUT_RIM, CAPS = {}, {}
 for o in [auth, puppet]:
     split(o, 'lower jaw', is_jaw, mouth=True)
     jaw = parts['lower jaw'][o.name]
     CUT_RIM[o.name] = {'skull': T.cut_rim(o, in_head, axis=0),
                        'jaw': T.cut_rim(jaw, in_head, axis=0)}
-    for half, rows in CUT_RIM[o.name].items():
-        for row in rows['loops']:
-            row['verticesOnTheSeam'] = 'n/a'
-    T.cap_cut(o, lambda p: abs(p.x - HINGE_X) < 1e-5, Vector((1, 0, 0)))
-    T.cap_cut(parts['lower jaw'][o.name], lambda p: abs(p.x - HINGE_X) < 1e-5, Vector((-1, 0, 0)))
+    CAPS[o.name] = {'skullAtHinge': T.cap_cut(o, at_hinge, Vector((1, 0, 0))),
+                    'jawAtHinge': T.cap_cut(jaw, at_hinge, Vector((-1, 0, 0))),
+                    }
+    assert CAPS[o.name]['skullAtHinge'] > 0 and CAPS[o.name]['jawAtHinge'] > 0, \
+        ('the hinge cross-section was left open', o.name, CAPS[o.name])
+    for part in (o, jaw):
+        shear_to_the_cut(part, -1)
+    CAPS[o.name]['palate'] = dish_cap(o, on_seam, +1)
+    CAPS[o.name]['floor'] = dish_cap(jaw, on_seam, -1)
+    for part in (o, jaw):
+        shear_to_the_cut(part, +1)
 print('CUT_RIM', json.dumps(CUT_RIM))
+print('CAPS', json.dumps(CAPS))
 
 arm = bpy.data.armatures.new('Henodus shared skeleton'); rig = bpy.data.objects.new('Henodus_Rig', arm)
 bpy.context.collection.objects.link(rig); bpy.context.view_layer.objects.active = rig; rig.select_set(True)
@@ -605,94 +981,14 @@ for o in [auth, puppet]:
         for p in part.data.polygons: p.use_smooth = True
         mod = part.modifiers.new('Shared articulated skeleton' if part is o else 'Mandible into the head', 'ARMATURE'); mod.object = rig; part.parent = rig
 
-# ---- mouth interior: separate rigid palate and floor ---------------------------------------------
+# ---- the mouth interior -------------------------------------------------------------------------
 #
-# A palate rigid on the skull and a floor rigid on the jaw, each closed on its own and each filling
-# its own jaw's interior out to the head's measured room, overlapping rather than joining at the
-# corner of the mouth where the jaw's rotation is zero (`T.oral_shells`). One sac whose wall
-# stretched between the two bones stood here; the wall could not part, which is what it was written
-# for, and it still photographs as a mouth webbed shut.
-mouthmat = bpy.data.materials.new('Henodus mouth interior'); mouthmat.use_nodes = True
-mouthmat.use_backface_culling = True
-mbs = mouthmat.node_tree.nodes.get('Principled BSDF')
-MOUTH_COLOUR = (.24, .105, .095, 1)
-mbs.inputs['Base Color'].default_value = MOUTH_COLOUR; mbs.inputs['Roughness'].default_value = .62
-mouthmat.diffuse_color = MOUTH_COLOUR
+# **There is none, and that is the whole change.** The lining and the hinge ellipsoid that stood
+# here are gone: the holes they were covering are closed above by the cut's own rim, each cap part
+# of its own half and rigid on that half's bone. Nothing is left for the runtime classifier to
+# hide, so what `gape-solid.py --as-drawn` renders is the body the file contains.
 oralparts = []
-MOUTH_BACK = HINGE_X - .048
-MOUTH_FRONT = float(MX[-1]) + .002
-LINING_INSET = .95
-
-
-def mouth_section(x):
-    e = smooth((x - MOUTH_BACK) / .026) * smooth((MOUTH_FRONT - x) / .010)
-    w = float(np.interp(x, MX, WIDE)) * LINING_INSET * (.85 + .15 * e)
-    h = max(float(np.interp(x, MX, TALL)) * LINING_INSET, .0026) * (.72 + .28 * e)
-    return w, h
-
-
-# How much head there is round the mouth line at each station: what the palate and the floor are
-# each sized to fill. Two shells drawn to the lumen alone leave a gap either side of them, and a ray
-# into the gape passes between them and hits the inside of the far cheek -- the line the sac's
-# stretching wall used to stand across. Cast inwards on the closed intake surface (`inside`, built
-# before the jaw is cut off): this generation models a real slit, so a ray cast *outwards* from the
-# mouth axis would stop on the lumen's own wall and measure the mouth all over again.
-_room_cache = {}
-
-
-def mouth_room(x):
-    k = round(x, 5)
-    if k not in _room_cache:
-        _room_cache[k] = T.mouth_room(inside, Vector((x, 0, seam(x))), Vector((0, 1, 0)),
-                                      Vector((0, 0, 1)), limit=.20, fallback=.02)
-    return _room_cache[k]
-
-
-LINING_RINGS, LINING_RING = 20, 14
-# A palate rigid on the skull and a floor rigid on the jaw, each closed on its own, overlapping at
-# the corner of the mouth where the jaw's rotation is zero: `T.oral_shells`, shared with the era.
-# What stood here was one sac whose wall stretched between the two bones. The wall could not part,
-# which is what it was written for, and it was still wrong: it photographs as a mouth webbed shut.
-lin_raw, faces, n_palate = T.oral_shells(seam, mouth_section, MOUTH_BACK, MOUTH_FRONT,
-                                         rings=LINING_RINGS, ring=LINING_RING, axis='x',
-                                         room=mouth_room)
-lining = T.oral_object('Oral cavity lining', tx, lin_raw, faces, n_palate, mouthmat, rig,
-                       measured_room=True)
-oralparts.append(lining)
-# Recorded, not asserted, and Placodus says why: a point in the lumen is OUTSIDE the closed shell,
-# because the shell folds in through the modelled slit, so a nearest-surface depth on a lining
-# vertex is as often measuring the mouth's own inner wall as the skin. What the lining being inside
-# the mouth actually rests on is the measurement below -- the section it is drawn from is the
-# cavity's own 92nd-percentile half width and 94th-to-6th-percentile height, inset by LINING_INSET.
-lining_depth = min(depth(p) for p in lin_raw)
 mouth_cover = []
-for k, x in enumerate(MX):
-    if not MOUTH_BACK + .026 < x < MOUTH_FRONT - .010: continue
-    w, h = mouth_section(float(x))
-    mouth_cover.append([round(float(x), 4), round(w / float(WIDE[k]), 3), round(h / max(float(TALL[k]), 1e-6), 3)])
-    assert w >= float(WIDE[k]) * .90, ('the oral lining is narrower than the mouth', x, w, WIDE[k])
-    assert h >= float(TALL[k]) * .85, ('the oral lining is shallower than the mouth', x, h, TALL[k])
-
-# A closed cheek envelope around the actual hinge, covering the square face the cut leaves at
-# x = HINGE_X from the seam down to the chin, which swings into view the moment the mouth opens.
-HINGE_Z = (seam(HINGE_X) + _lo) / 2
-bpy.ops.mesh.primitive_uv_sphere_add(segments=18, ring_count=10, location=tx((HINGE_X + .002, 0, HINGE_Z)))
-o = bpy.context.object; o.name = 'Seated jaw hinge tissue'; o.scale = (.136, .090, .072)
-bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-for v in o.data.vertices: v.co = o.matrix_world @ v.co
-o.location = (0, 0, 0)
-hm = bpy.data.materials.new('Henodus jaw hinge body'); hm.use_nodes = True
-hbs = hm.node_tree.nodes.get('Principled BSDF'); hbs.inputs['Base Color'].default_value = (.30, .28, .23, 1)
-hbs.inputs['Roughness'].default_value = .7; hm.diffuse_color = (.30, .28, .23, 1)
-o.data.materials.clear(); o.data.materials.append(hm)
-for n in ['skull', 'jaw']: o.vertex_groups.new(name=n)
-for v in o.data.vertices:
-    t = max(0., min(1., (seam(HINGE_X) * SCALE - v.co.z) / (.030 * SCALE)))
-    o.vertex_groups['jaw'].add([v.index], t * .5, 'REPLACE'); o.vertex_groups['skull'].add([v.index], 1 - t * .5, 'REPLACE')
-for p in o.data.polygons: p.use_smooth = True
-mo = o.modifiers.new('Hinge skin', 'ARMATURE'); mo.object = rig; o.parent = rig; oralparts.append(o)
-hinge_depth = min(depth(Vector((-v.co.y / SCALE, v.co.x / SCALE, v.co.z / SCALE))) for v in o.data.vertices)
-assert hinge_depth > -.006, ('the hinge envelope breaks the skin', hinge_depth)
 
 # ---- measured comparison of the two actual surfaces --------------------------------------------
 AUTH_GROUP = [auth, parts['lower jaw'][auth.name]]
@@ -1037,10 +1333,10 @@ open(os.path.join(HERE, 'henodus-profile.json'), 'w').write(json.dumps({
     'surfaceDistanceMax': max(distances), 'surfaceDistanceP95': float(np.quantile(distances, .95)),
     'surfaceTolerance': .30, 'surfaceOutliersOver0p15': surface_outliers, 'seatingDepthRaw': seating,
     'mouthSeam': [[round(float(a), 5), round(float(b), 5)] for a, b in zip(MX, MID)],
-    'liningCoverage': mouth_cover, 'forkedTail': fork}, indent=2))
+    'mouthCaps': CAPS, 'forkedTail': fork}, indent=2))
 
 meta = {'id': ID, 'name': 'Henodus', 'species': 'Henodus chelyops',
-        'description': 'Canonical Tripo body and procedural volume twin on one 25-joint rig: a fused rigid carapace, an articulated beak with a closed oral lining, four rowing limbs and a trailing tail.',
+        'description': 'Canonical Tripo body and procedural volume twin on one 25-joint rig: a fused rigid carapace, an articulated beak whose cut is capped with its own rim, four rowing limbs and a trailing tail.',
         'modelLength': round(model_length, 4), 'lengthMeters': 1.0, 'locomotion': 'Swim',
         'clips': list(CLIPS), 'looping': LOOPS, 'anchors': [a['name'] for a in anchors], 'puppet': 'henodus.puppet.glb',
         'notes': [
@@ -1072,15 +1368,15 @@ report = {'sourceSha256': hashlib.sha256(open(RAW, 'rb').read()).hexdigest(),
           'carapaceVertices': carapace_vertices, 'carapaceBoneUnanimated': True,
           'limbSweepDegreesPerCycle': limb_sweep,
           'curvature': curvature, 'pairedLimbAsymmetry': asymmetry,
-          'mouth': {'method': 'the modelled oral cavity, found by casting each head vertex normal back into the mesh over %.3f raw units; the seam is the mid height of that cavity per station and the lining is its measured section' % MOUTH_GAP,
+          'mouth': {'method': 'the modelled slit, found by casting each head vertex normal back into the mesh over %.3f raw units; the seam is the mid height of that cavity per station, and the cut is closed by its own rim and domed into each half' % MOUTH_GAP,
                     'cutTopology': jaw_split, 'cavityVertices': int(len(CAV)), 'hingeX': HINGE_X, 'jawFrontX': JAW_FRONT_X,
                     'seam': [[round(float(a), 5), round(float(b), 5)] for a, b in zip(MX, MID)],
                     'cavityHalfWidth': [[round(float(a), 5), round(float(b), 5)] for a, b in zip(MX, WIDE)],
                     'cavityHalfHeight': [[round(float(a), 5), round(float(b), 5)] for a, b in zip(MX, TALL)],
                     'mandibleDepthOverHeadDepthAtHinge': round(float(jaw_depth), 3),
-                    'liningInset': LINING_INSET, 'liningCoverage': mouth_cover, 'liningRings': LINING_RINGS,
-                    'liningRing': LINING_RING, 'liningBackX': MOUTH_BACK, 'liningFrontX': MOUTH_FRONT, 'liningNearestSurfaceDepthRaw': round(float(lining_depth), 5),
-                    'skinDoubleSided': True, 'liningCullsBackfaces': True, 'oneClosedLining': False, 'separateRigidOralShells': True},
+                    'oralGeometry': 'none: the cut is capped with its own rim and domed (T.cap_mouth)',
+                    'cutRim': CUT_RIM, 'mouthCaps': CAPS, 'capDome': CAP_DOME, 'capRoom': CAP_ROOM,
+                    'skinDoubleSided': True},
           'forkedTail': fork,
           'normalizedWeights': True, 'rootStable': True, 'noScaleChannels': True}
 # The two checks that cannot run inside the build -- the edge-stretch sweep over every clip of the

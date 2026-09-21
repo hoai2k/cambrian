@@ -593,7 +593,7 @@
   ],
   "maximumEnvelopeDifference": 0.09619787335395813,
   "surfaceDistanceMax": 0.07497167587280273,
-  "surfaceDistanceP95": 0.012998215109109878,
+  "surfaceDistanceP95": 0.012786239944398377,
   "surfaceTolerance": 0.3,
   "surfaceOutliersOver0p15": 0,
   "seatingDepthRaw": {
@@ -629,28 +629,64 @@
       -0.04195
     ]
   ],
-  "liningCoverage": [
-    [
-      0.465,
-      0.95,
-      0.95
-    ],
-    [
-      0.47,
-      0.95,
-      0.95
-    ],
-    [
-      0.475,
-      0.95,
-      0.95
-    ],
-    [
-      0.48,
-      0.95,
-      0.95
-    ]
-  ],
+  "mouthCaps": {
+    "Henodus authored body": {
+      "skullAtHinge": 37,
+      "jawAtHinge": 37,
+      "palate": {
+        "rimEdges": 63,
+        "cycles": [
+          {
+            "vertices": 63,
+            "faces": 63,
+            "sinkRaw": 0.005412
+          }
+        ],
+        "deepestRaw": 0.005412,
+        "capped": true
+      },
+      "floor": {
+        "rimEdges": 63,
+        "cycles": [
+          {
+            "vertices": 63,
+            "faces": 63,
+            "sinkRaw": 0.005412
+          }
+        ],
+        "deepestRaw": 0.005412,
+        "capped": true
+      }
+    },
+    "Henodus procedural volume puppet": {
+      "skullAtHinge": 25,
+      "jawAtHinge": 25,
+      "palate": {
+        "rimEdges": 49,
+        "cycles": [
+          {
+            "vertices": 49,
+            "faces": 49,
+            "sinkRaw": 0.00471
+          }
+        ],
+        "deepestRaw": 0.00471,
+        "capped": true
+      },
+      "floor": {
+        "rimEdges": 49,
+        "cycles": [
+          {
+            "vertices": 49,
+            "faces": 49,
+            "sinkRaw": 0.00471
+          }
+        ],
+        "deepestRaw": 0.00471,
+        "capped": true
+      }
+    }
+  },
   "forkedTail": {
     "lastSingleTubeStationX": -0.365,
     "cutX": -0.365,

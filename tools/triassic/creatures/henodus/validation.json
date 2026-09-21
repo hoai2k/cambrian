@@ -12,14 +12,14 @@
   "intakeTriangles": 18758,
   "remeshTriangles": 97216,
   "puppetBudget": 6400,
-  "fullTriangles": 20220,
-  "puppetTriangles": 7606,
+  "fullTriangles": 19470,
+  "puppetTriangles": 6828,
   "parts": {
-    "authoredBody": 19119,
-    "authoredJaw": 225,
-    "puppetBody": 6599,
-    "puppetJaw": 131,
-    "sharedOral": 876
+    "authoredBody": 19182,
+    "authoredJaw": 288,
+    "puppetBody": 6648,
+    "puppetJaw": 180,
+    "sharedOral": 0
   },
   "bones": 25,
   "clips": {
@@ -380,10 +380,10 @@
   "envelopeTolerance": 0.2,
   "envelopeTolerancePercent": 4.0,
   "surfaceDistanceMax": 0.07497167587280273,
-  "surfaceDistanceP95": 0.012998215109109878,
-  "surfaceDistanceP99": 0.02651165954768658,
+  "surfaceDistanceP95": 0.012786239944398377,
+  "surfaceDistanceP99": 0.02635374959558247,
   "surfaceOutliersOver0p15": 0,
-  "surfaceVertices": 9725,
+  "surfaceVertices": 9727,
   "seatingDepthRaw": {
     "fore_upper_L": 0.04167346656322479,
     "fore_upper_R": 0.03702265024185181,
@@ -392,7 +392,7 @@
     "carapace": 0.052003126591444016
   },
   "maxInfluences": 4,
-  "meanInfluences": 2.1921766072811772,
+  "meanInfluences": 2.1919919454770755,
   "carapaceVertices": 2647,
   "carapaceBoneUnanimated": true,
   "limbSweepDegreesPerCycle": {
@@ -587,7 +587,7 @@
     }
   },
   "mouth": {
-    "method": "the modelled oral cavity, found by casting each head vertex normal back into the mesh over 0.020 raw units; the seam is the mid height of that cavity per station and the lining is its measured section",
+    "method": "the modelled slit, found by casting each head vertex normal back into the mesh over 0.020 raw units; the seam is the mid height of that cavity per station, and the cut is closed by its own rim and domed into each half",
     "cutTopology": {
       "Henodus authored body": {
         "candidateComponents": 8,
@@ -682,38 +682,174 @@
       ]
     ],
     "mandibleDepthOverHeadDepthAtHinge": 0.224,
-    "liningInset": 0.95,
-    "liningCoverage": [
-      [
-        0.465,
-        0.95,
-        0.95
-      ],
-      [
-        0.47,
-        0.95,
-        0.95
-      ],
-      [
-        0.475,
-        0.95,
-        0.95
-      ],
-      [
-        0.48,
-        0.95,
-        0.95
-      ]
-    ],
-    "liningRings": 20,
-    "liningRing": 14,
-    "liningBackX": 0.389,
-    "liningFrontX": 0.49200000000000005,
-    "liningNearestSurfaceDepthRaw": -0.00543,
-    "skinDoubleSided": true,
-    "liningCullsBackfaces": true,
-    "oneClosedLining": false,
-    "separateRigidOralShells": true
+    "oralGeometry": "none: the cut is capped with its own rim and domed (T.cap_mouth)",
+    "cutRim": {
+      "Henodus authored body": {
+        "skull": {
+          "boundaryEdgesInRegion": 98,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 98,
+              "closed": true,
+              "box": [
+                [
+                  0.437,
+                  0.48118
+                ],
+                [
+                  -0.07242,
+                  0.10262
+                ],
+                [
+                  -0.075,
+                  -0.04864
+                ]
+              ],
+              "reach": 0.04418
+            }
+          ]
+        },
+        "jaw": {
+          "boundaryEdgesInRegion": 98,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 98,
+              "closed": true,
+              "box": [
+                [
+                  0.437,
+                  0.48118
+                ],
+                [
+                  -0.07242,
+                  0.10262
+                ],
+                [
+                  -0.075,
+                  -0.04864
+                ]
+              ],
+              "reach": 0.04418
+            }
+          ]
+        }
+      },
+      "Henodus procedural volume puppet": {
+        "skull": {
+          "boundaryEdgesInRegion": 72,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 72,
+              "closed": true,
+              "box": [
+                [
+                  0.437,
+                  0.49029
+                ],
+                [
+                  -0.07416,
+                  0.10212
+                ],
+                [
+                  -0.07433,
+                  -0.04864
+                ]
+              ],
+              "reach": 0.05329
+            }
+          ]
+        },
+        "jaw": {
+          "boundaryEdgesInRegion": 72,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 72,
+              "closed": true,
+              "box": [
+                [
+                  0.437,
+                  0.49029
+                ],
+                [
+                  -0.07416,
+                  0.10212
+                ],
+                [
+                  -0.07433,
+                  -0.04864
+                ]
+              ],
+              "reach": 0.05329
+            }
+          ]
+        }
+      }
+    },
+    "mouthCaps": {
+      "Henodus authored body": {
+        "skullAtHinge": 37,
+        "jawAtHinge": 37,
+        "palate": {
+          "rimEdges": 63,
+          "cycles": [
+            {
+              "vertices": 63,
+              "faces": 63,
+              "sinkRaw": 0.005412
+            }
+          ],
+          "deepestRaw": 0.005412,
+          "capped": true
+        },
+        "floor": {
+          "rimEdges": 63,
+          "cycles": [
+            {
+              "vertices": 63,
+              "faces": 63,
+              "sinkRaw": 0.005412
+            }
+          ],
+          "deepestRaw": 0.005412,
+          "capped": true
+        }
+      },
+      "Henodus procedural volume puppet": {
+        "skullAtHinge": 25,
+        "jawAtHinge": 25,
+        "palate": {
+          "rimEdges": 49,
+          "cycles": [
+            {
+              "vertices": 49,
+              "faces": 49,
+              "sinkRaw": 0.00471
+            }
+          ],
+          "deepestRaw": 0.00471,
+          "capped": true
+        },
+        "floor": {
+          "rimEdges": 49,
+          "cycles": [
+            {
+              "vertices": 49,
+              "faces": 49,
+              "sinkRaw": 0.00471
+            }
+          ],
+          "deepestRaw": 0.00471,
+          "capped": true
+        }
+      }
+    },
+    "capDome": 0.34,
+    "capRoom": 0.55,
+    "skinDoubleSided": true
   },
   "forkedTail": {
     "lastSingleTubeStationX": -0.365,
