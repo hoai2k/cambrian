@@ -1492,6 +1492,19 @@ unless the user explicitly asks for a PR. Steps:
   because every clip these files carry re-specifies each joint's translation on every frame — a
   warped bind pose would show at rest and then flail — so the numbers go to the animal's builder,
   where the rig and the clips are generated downstream of the mesh and follow it by themselves.
+  **And that half has to be reachable.** `opening()` sends a stretch to the raw generation, which
+  is right — that is the body the bake applies to — but the Model control that would reach the
+  rigged one lives on the info card, which every editing mode replaces, so the documented
+  builder-measurement workflow could not be opened at all. The stretch panel carries its own
+  (`.stretch-model-pick`, the same shape bend's does), offering what the mode can actually be
+  opened on (`editableStages` in `Viewer.tsx`: never the comparison twin, and on an animal whose
+  body is not built only the raw generation), because a choice that quietly ends the mode — or
+  leaves it on screen with no panel in it — is worse than no choice. The panel keeps telling the
+  truth across a swap for free: `rigged` is *measured off the body on stage* and `appliesTo` is
+  derived from it, and the editor is unmounted while a body it does not yet have is loading. The
+  session store is keyed by specimen **and body** (`stretchKey`) for the reason the mark, mouth and
+  bend stores are: one key per specimen was harmless only while the mode could not change bodies,
+  and would now throw the other body's stretch away on a swap.
   Which way a body lies is never taken from its bounding box if anything better exists: the mouth
   socket, then the generation's authored `previewYaw`, then the box, and the panel says which and
   lets a human override it — because Rhaeticosaurus' flippers span further than it is long, so its
@@ -1586,8 +1599,10 @@ unless the user explicitly asks for a PR. Steps:
   corrected-body warning, all of which need a rig — so a warning written to say "this body's rest
   already carries one" could never be shown to the person it was about. The bend panel therefore
   carries **its own Model control** (`.bend-model-pick`), because the info card's is off the screen
-  while any editor is open. It offers everything but the comparison twin, which `canBend` refuses
-  anyway, and the panel goes on telling the truth for free: the editor is keyed by the model, and
+  while any editor is open. It offers `editableStages` — `canBend`/`canStretch`'s own test asked of
+  each body rather than of the one on stage, so never the twin and, on an animal whose body is not
+  built, only the raw generation — and the panel goes on telling the truth for free: the editor is
+  keyed by the model, and
   `appliesTo`, the stage label and the corrected-body warning are all derived from the stage.
   `tools/bend-browser.mjs` takes that control **both ways** and uses it as the regression guard for
   the one-commit swap, because a bone-chain reading is impossible on an unrigged body and

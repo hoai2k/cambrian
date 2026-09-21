@@ -345,7 +345,7 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
           </>}
           {appliesTo === 'origpose' && <> This is the untouched generation, before the builder moved anything — which is the body a correction is aimed on. What needs a rig — the bone chain's answer beside the geometry's, and the per-joint table — is on the built body, which the Model control below goes back to.</>}
         </p>
-        {stages.length > 1 && <label className="scheme-pick bend-model-pick">
+        {stages.length > 1 && <label className="scheme-pick editor-model-pick bend-model-pick">
           <span>Model</span>
           <select aria-label="Which model in bend mode" value={stageId} onChange={(e) => onStage(e.target.value)}>
             {stages.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
