@@ -193,6 +193,87 @@ freeze, then one explosive shove off the hindlimbs that throws the animal up the
 standing Macrocnemus doing — with the head up and watching. **Idle** is the Stand the design asks
 for: the ribs work, the weight shifts, the head snaps round once to look and settles back.
 
+## The mouth: the cut's own rim (T3D-32)
+
+**This head arrived shut.** `T.mouth_cavity` finds nine vertices on the whole head at a 0.026 gap,
+which is nothing: no lumen, no palate, no floor, no commissure — a lip *painted* on a closed taper.
+`T.cut_rim` says the same from the other side, and it is the measurement that decides the
+construction: the cut leaves **one closed loop per half**, 110 vertices authored and 76 on the twin,
+running the whole length of the mouth from the hinge to within 0.002 of the snout, with no boundary
+edge anywhere else in the head. That is CLAUDE.md's first case, and the answer to it is to cap the
+cut with its own rim.
+
+What that replaces is a palate and a floor built inside the lumen to a cast room, plus an ellipsoid
+hinge plug. The record of those not working is in this file's own history: five separate corrections
+to the lining's width, its reach behind the hinge, its throat blend and the axis it was cast about
+moved `Snatch` from 1,447 px of backdrop through the head to 1,460. **A count that will not move is
+a count about something else**, and what it was about is that a shell placed in a lumen has to be
+*rendered* to find out whether it covers the opening. A surface spanning the cut's own rim does not:
+it closes by construction, every vertex of it is one the cut already made, it wears the skin it
+closes, and each cap is part of its own half and rigid to that half's bone through the same weight
+field as the skin around it.
+
+Order, and it matters: `T.cap_cut` over the head's cross-section at the hinge first — that run dips
+out of the mouth's own plane and would fold under a planar fill — then `T.cap_mouth` over what is
+left.
+
+| | authored | twin |
+| --- | ---: | ---: |
+| rim at the hinge, fanned | 45 faces | 30 |
+| mouth rim | 67 edges, one cycle | 48, one cycle |
+| cap | 585 faces | 414 |
+| dome, deepest | 0.0105 raw | 0.0102 |
+
+The dome is `CAP_DOME` (0.34) of each cap vertex's own distance from the nearest rim vertex —
+zero at the lip, deepest along the middle — bounded by `CAP_ROOM` (0.55) of how much head there is
+over or under the cut, read off this builder's **measured section** and never off `depth()`.
+
+**The rim flange went with them**, and there is nothing left for it to fold: `K.rim_flange` existed
+because a cut half ends in a boundary edge one polygon thick, and a capped half has no boundary at
+all — the lip is where two closed surfaces meet.
+
+**The tooth rows stay.** Teeth are the animal, not the mouth's filling, and the game draws them:
+neither `Upper tooth row` nor the `Macrocnemus teeth` material matches
+`src/shared/oral-geometry.ts`. Nothing on this body is hidden in play any more.
+
+### The gape, before and after
+
+`gape-solid.py` at the measured peak of **every** opening clip. The `--as-drawn` column is the one
+that settles it — the runtime hides every lining and every hinge plug, so the plain run was proving
+a body the game does not draw, and on this animal the two disagree by three orders of magnitude.
+
+| Clip @ peak | plain, before | as drawn, before | plain & as drawn, after |
+| --- | ---: | ---: | ---: |
+| `Snatch` @ 0.200 | 0 through / 151 opened | 244 / 2,594 | **0 / 0** |
+| `Bite` @ 0.167 | 0 / 116 | 343 / 2,308 | **0 / 0** |
+| `Heavy` @ 0.100 | 1 / 98 | 210 / 2,141 | **0 / 0** |
+| `Attack` @ 0.100 | 0 / 73 | 330 / 1,920 | **0 / 0** |
+| `Ability` @ 0.433 | 2 / 76 | **934** / 1,920 | **0 / 0** |
+| `Eat` @ 0.267 | 2 / 62 | 334 / 1,824 | **0 / 0** |
+| `Grab` @ 0.500 | 2 / 30 | 475 / 1,491 | **0 / 0** |
+| `Death` @ 1.267 | 0 / 24 | 577 / 1,471 | **0 / 0** |
+| `Charge` @ 0.600 | 2 / 25 | 206 / 1,410 | **0 / 0** |
+| `Retreat` @ 0.267 | 0 / 25 | 454 / 1,286 | **0 / 0** |
+| `Breath` @ 0.800 | 0 / 21 | 426 / 1,241 | **0 / 0** |
+| `Run` @ 0.067 | 0 / 28 | 432 / 1,245 | **0 / 0** |
+
+Whether it reads as a mouth rather than as a closed hole is a picture:
+[`docs/triassic/verification/macrocnemus-mouth-space.png`](../../../../docs/triassic/verification/macrocnemus-mouth-space.png).
+
+Skin: **3.41× → 3.18×** (`Ability`, `hind_upper_L`). `lag.mjs` 0 rim points open past 0.2 %, worst
+0.01 % of a body at `Snatch`@0.38. `idle-bones.mjs`, `oral-shell-audit.mjs` ("no oral lining on
+authored, puppet or LOD") and `hidden-parts.mjs --check` clean.
+
+### One thing that does not pass, and it is not this body's
+
+`node tools/triassic/creatures/macrocnemus/audit.mjs --package --decode` **packages and verifies
+correctly and then stops** on `assert.equal(clips.length, CLIPS)` — 27 against 26 — because the
+`Peer` shore gait is applied after the build by `tools/creatures/motion/apply.mjs` and this audit's
+clip count does not know about it. Straight off `build.py`, before the gait is applied, the audit
+passes end to end (exit 0, exact `--package --decode` parity, LOD1 byte-identical to the twin).
+Five Triassic bodies carry a post-build shore gait and a central fix is in hand; this is recorded
+rather than worked around, and `Peer` is re-applied as this README's reproduction says.
+
 ## What this animal does *not* have, and why
 
 No `Lower`, no `SnapLeft`/`SnapRight`, no `Retract`. `shoreClip` in `src/sim/triassic/shore.ts`
@@ -351,13 +432,44 @@ position, over body length: **0.04077** (fore 0.0328) (hind 0.04874).
 These generations are drawn rather than modelled to a rig, so the four limbs are posed mid-stride
 and do not match; this is by how much.
 
-**The mouth cut against the measured lip line.** No modelled mouth slit on this head — the cavity
-instrument finds 9 vertices and none of them is a cavity — so the lip line is read off the
-albedo per station and the cut is the head's section at the median of those readings, which is
-Dinocephalosaurus' method. Max deviation of the cut from the per-station readings: **0.03114** of body
-length, worst at x = 0.3956. The readings themselves run 0.0888 to 0.6601 of the head's
-section against the 0.229 used, so the spread is wide and a single fraction is smoothing a
-contour that wanders — the deviation number is the honest size of that smoothing.
+**The mouth cut against the measured lip line (T3D-20).** No modelled mouth slit on this head —
+the cavity instrument finds 9 vertices on the whole head and none of them is a cavity — so the lip
+has to be read off the albedo, and *which feature the albedo method actually found* is the whole
+question.
+
+`pigment_seam` is a **step detector**: it maximises `mean(luminance below) − mean(luminance above)`
+over each station's own height, pooling both flanks, which is by construction the single largest
+pale-to-dark transition there. Its twelve readings ran 0.0888, 0.204, 0.302, **0.6601**, **0.5116**,
+0.218, 0.167, 0.240, 0.256, 0.167, 0.248 and 0.180 of the head's section; the cut was the median,
+0.229, and departed from those readings by **0.03043 raw, 3.11 % of body length**, at x = 0.3956 —
+which is *behind* the hinge at 0.4012.
+
+What it found, measured rather than argued: binning the luminance up each flank, every station of
+this snout carries a sharp dark minimum at about **0.375 of the section**, with pale skin
+(0.40–0.49) below it and mid skin (0.19–0.25) above — a thin dark line with lighter skin either
+side, which is a painted lip. The step detector does not sit there, because **this generation's two
+flanks are not painted alike**: the left's pale block runs up to 0.35 of the section and the right's
+ends at about 0.20, so a pooled single step lands between them, on the *right flank's
+countershading boundary*. That is Keichousaurus' trap seen from the other side, and behind the hinge
+the same detector climbs to the true flank boundary above the eye — the 0.66 and 0.51 readings.
+
+So the cut now follows the painted lip, read with `T.painted_line`'s matched filter on both flanks —
+the mean luminance of the bands a fixed fraction of a radius above and below a height, less twice
+the luminance at it, taken as the best-scoring path along the head under a penalty on how far it may
+move between stations, so a broad blotch or a one-sided step scores nothing and one bad station
+cannot take the line with it. Its `u` window is what refuses the countershading outright. The cut is
+a least-squares line fitted through those twenty readings, refit once with hits over 2.5 rms dropped
+(Nothosaurus' robust pass), clamped inside the head's own measured section.
+
+| | Deviation from the painted lip, raw | rms | Over body length |
+| --- | ---: | ---: | ---: |
+| the fitted cut | **0.00398** | 0.00167 | **0.41 %** |
+| the median cut it replaces | 0.00739 | 0.00573 | 0.76 % |
+
+against a 0.005 raw bar. Pitch of the fitted line 10.28°; worst flank disagreement 0.25 of a local
+radius, at the two rearmost stations. The shipped median's 0.03043 against its *own* twelve step
+readings is recorded beside it in `mouthCut`, because that is the number T3D-20 quotes and the
+change has to connect to it.
 
 **Limb sweep**, the total angle each limb root turns through per cycle (summed frame to frame, so a
 limb that goes forward, back and forward again has swept more than its extremes say):

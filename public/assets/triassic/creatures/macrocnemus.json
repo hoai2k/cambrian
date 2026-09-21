@@ -32,7 +32,8 @@
     "Run",
     "Charge",
     "Snatch",
-    "Retreat"
+    "Retreat",
+    "Peer"
   ],
   "looping": [
     "Idle",
@@ -42,7 +43,8 @@
     "Eat",
     "Grab",
     "Crawl",
-    "Run"
+    "Run",
+    "Peer"
   ],
   "anchors": [
     "anchor_mouth",

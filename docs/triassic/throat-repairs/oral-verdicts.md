@@ -55,7 +55,7 @@ column to read.** Nothing here is a claim about every camera: it is one side-on 
 | Cartorhynchus | 2 | 693 | |
 | Cymbospondylus | 4 | 933 | |
 | Archelon | 1 | 1,262 | |
-| Macrocnemus | 343 | 2,594 | |
+| **Macrocnemus** | **0** | **0** | ported in T3D-32B: arrived shut, capped with its own rim on a *fitted* cut (was 934 / 2,594 over **all twelve** opening clips) |
 | Hybodus | 1,346 | 2,833 | |
 | Mixosaurus | 0 | 3,697 | |
 | Atopodentatus | 3,738 | 4,494 | |
@@ -64,7 +64,7 @@ column to read.** Nothing here is a claim about every camera: it is one side-on 
 | Coelophysis | 3 | 7,276 | |
 | Mystriosuchus | 1 | 7,734 | |
 | Aphaneramma | 5 | 10,730 | |
-| Henodus | 407 | 462 | |
+| **Henodus** | **0** | **0** | ported in T3D-32B: the cut makes the aperture, capped with its own rim fanned to a sunk hub (was 407 / 462). T3D-19's fringe pixels were **not** the fringe — a ray through every one of them meets one back face of the mandible and nothing else |
 | Dinocephalosaurus | **120** | 197 | its verdict was **neither**, and it is still right about the lining — but the `Seated jaw hinge tissue` that closes its hinge cross-section is hidden in play, so as drawn the head is open there |
 | Ceratites, Phragmoteuthis | — | — | no jaw and no mouth drawn; settled in T3D-02a and T3D-12B and unaffected by any of this |
 | Birgeria | — | — | **not measured**: its `audit.mjs --decode` fails on an unrelated pre-existing assertion (`no root motion`) without `--package`, so the sweep could not decode it. It does have a jaw and opening clips, so it belongs in the rollout. |
