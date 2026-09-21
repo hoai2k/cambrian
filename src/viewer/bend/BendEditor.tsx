@@ -55,6 +55,17 @@ interface Props {
   /** How the Model control names the body on stage, so the panel can say the same thing it does. */
   stageLabel: string;
   /**
+   * The bodies this specimen offers, and which one is on stage, because **the mode opens on the
+   * unbent body and must not be a cage**. `opening()` sends a reviewer to the original pose — that
+   * is where a correction is aimed — but the mode's headline is the two readings *side by side*,
+   * the per-joint table and the corrected-body warning, and all three need a rig. Locked out of
+   * the built body, a warning built to say "this body's rest already carries one" could never be
+   * shown to the person it is about.
+   */
+  stages: readonly { id: string; label: string }[];
+  stageId: string;
+  onStage(id: string): void;
+  /**
    * Where the untouched generation is, on a body whose rest was moved before binding, and what was
    * moved — `tools/triassic/base-poses.mjs`' own words. The panel points at it, because aiming a
    * correction on the body that already carries it is the one mistake this mode makes easy.
@@ -75,7 +86,7 @@ interface Drag {
   start: Vec3;
 }
 
-export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLabel, origPose, canvas, onExit }: Props) {
+export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLabel, origPose, stages, stageId, onStage, canvas, onExit }: Props) {
   const [doc, setDocState] = useState<BendDoc | null>(null);
   const [error, setError] = useState('');
   const [note, setNote] = useState('');
@@ -329,11 +340,17 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
           {origPose && appliesTo !== 'origpose' && <>
             {' '}This body’s rest pose is <em>not</em> the shape the generation held: its builder moved it
             before binding ({origPose.changed.join('; ')}). A correction aimed here is aimed on a body
-            that already carries one. To aim it on the geometry it was measured from, switch the Model
-            control to <em>{origPose.label}</em>.
+            that already carries one. To aim it on the geometry it was measured from, take the Model
+            control below to <em>{origPose.label}</em>.
           </>}
-          {appliesTo === 'origpose' && <> This is the untouched generation, before the builder moved anything — which is the body a correction is aimed on.</>}
+          {appliesTo === 'origpose' && <> This is the untouched generation, before the builder moved anything — which is the body a correction is aimed on. What needs a rig — the bone chain's answer beside the geometry's, and the per-joint table — is on the built body, which the Model control below goes back to.</>}
         </p>
+        {stages.length > 1 && <label className="scheme-pick bend-model-pick">
+          <span>Model</span>
+          <select aria-label="Which model in bend mode" value={stageId} onChange={(e) => onStage(e.target.value)}>
+            {stages.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
+          </select>
+        </label>}
 
         {doc && readings && <>
           <h3>What it measures</h3>

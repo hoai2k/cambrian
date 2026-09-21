@@ -9,8 +9,13 @@
  * apart (T3D-25/T3D-26). A bend is aimed on a body no builder has moved, and this animal's shipped
  * rest already carries that whole correction — so bend mode **opens on its original pose**, from
  * the Bend button and from a `?mode=bend` deep link alike, both of which go through `opening()`.
- * That is the first thing checked here, and it is also why there is a second animal: the built
- * body of a specimen that publishes an original pose is no longer reachable in bend mode at all.
+ * That is the first thing checked here.
+ *
+ * It is not a **cage**, though: the mode opens on the unbent body, and its panel carries its own
+ * Model control so a reviewer can go back to the built one — where the bone chain's answer, the
+ * per-joint table and the corrected-body warning live. The drive takes that control both ways, and
+ * uses it as the regression guard for the one-commit mode-and-model swap that used to leave the
+ * panel showing one body's numbers over another body's name.
  *
  * On Askeptosaurus it then checks what a headless test cannot:
  *   - the panel says which body the numbers describe, and that it is the untouched generation;
@@ -24,11 +29,10 @@
  *     of that file on disk, and `npm run triassic:bend` accepts it;
  *   - the bend survives a trip through view mode and is forgotten on reload.
  *
- * **Mixosaurus** publishes no original pose and no generation, so bend mode opens on its built
- * body: that is where the rig-only half lives — both readings side by side, the chain guessed
- * through the rig, which two chords the reading is between changing the answer, the per-joint
- * table `carry_rest` consumes, and an export that says `built` and is accepted by the consumer
- * (and refused when it is stale or written against the turn rates the two planes replaced).
+ * **Mixosaurus** publishes no original pose and no generation, so bend mode opens straight on its
+ * built body — the other way into the rigged half, and the one that needs no swap. It carries the
+ * per-joint table `carry_rest` consumes and an export that says `built`, accepted by the consumer
+ * and refused when it is stale or written against the turn rates the two planes replaced.
  *
  * And on both: **the pointer scheme**. Left-drag on a handle moves that handle and leaves the
  * camera exactly where it was, left-drag on empty canvas orbits about a fixed target, right-drag
@@ -354,9 +358,88 @@ try {
   const fresh = await planes();
   assert.ok(fresh.turn < 0.02, `and starts again from no bend at all (turn ${fresh.turn}°, planes ${fresh.apart}° apart — the body's own curve)`);
 
-  // ---- the pointer scheme on this body, last for the damping's sake ----
+  // ---- the pointer scheme on this body ----
+  // Before the model swap below rather than after it: everything the swap checks is a number off
+  // the panel, and nothing measured in screen pixels follows a pan.
   const rawPointer = await drivePointerScheme('origpose');
   await page.screenshot({ path: path.join(out, 'askeptosaurus-bend-panned.png') });
+  await page.evaluate(() => window.__viewerScene.resetCamera());
+  await page.waitForTimeout(400);
+
+  // ---- and the mode is not a cage: its own Model control goes back to the built body ----
+  //
+  // `opening()` sends a reviewer here to the original pose, which is right — that is where a
+  // correction is aimed. But the mode's headline is the two readings *side by side*, and the bone
+  // chain, the per-joint table and the corrected-body warning all need a rig, so the built body
+  // has to stay reachable. The info card carries the Model control and an editing mode replaces
+  // it, so the bend panel carries its own.
+  const bendModel = page.locator('.bend-model-pick select');
+  assert.equal(await bendModel.count(), 1, 'the bend panel carries its own Model control');
+  await bendModel.selectOption('full');
+  // The editor is unmounted while the new body loads — `ready` means the body on stage IS the body
+  // the panel describes — so wait for the file and then for the panel to come back on it.
+  await page.waitForFunction(() => /askeptosaurus\.glb$/.test(document.querySelector('.clips')?.getAttribute('data-loaded-model') ?? ''), null, { timeout: 90000 });
+  await page.waitForSelector('.bend-panel', { timeout: 60000 });
+  await page.waitForTimeout(2500);
+  assert.equal(await page.locator('.bend-body-note').getAttribute('data-applies-to'), 'built', 'the swap takes the panel to the shipped body');
+  assert.equal(await page.locator('.bend-body-note').getAttribute('data-corrected'), 'yes', 'and it says this body\'s rest was moved before binding');
+  const warned = await page.locator('.bend-body-note').textContent();
+  assert.match(warned, /already carries one/i, 'so the warning built to say exactly that is shown to the person it is about');
+  assert.match(warned, /Original pose/i, 'and points back at the untouched generation by name');
+  // **The regression guard.** A bone-chain reading is impossible on an unrigged body and
+  // unavoidable on a rigged one, so its appearance here is proof the panel re-measured on the body
+  // that is now on stage rather than keeping the numbers it had. This is the fault the one-commit
+  // mode-and-model swap caused, and the swap path added here is the obvious place for it to return.
+  assert.equal(await page.locator('.bend-reading[data-reading="bone-chain"]').count(), 1,
+    'and the bone chain\'s answer is back beside the geometry\'s, which an unrigged body cannot show');
+  const chainFrom0 = await pick('Chain starts at').inputValue();
+  const chainTo0 = await pick('Chain ends at').inputValue();
+  assert.ok(chainFrom0 && chainTo0, `the span guessed a chain through the rig (${chainFrom0} → ${chainTo0})`);
+
+  // ---- the worked case, on the animal it came from: three defensible readings of one trunk ----
+  //
+  // This is the argument the mode was built out of (T3D-25/T3D-26). The span is the neck T3D-26
+  // corrected, measured on *this* body rather than carried over from the generation, and the
+  // reading is taken three times against three chords a person could reasonably call "the trunk".
+  // Nothing here asserts a number — what it asserts is that they *differ*, which is the finding.
+  const neck = { base: [-0.1182, 0.0659, -1.2490], tip: [-0.5114, 0.1603, -0.5430] };
+  await typeSpan(neck);
+  const refPickA = (side, end) => page.locator('.bend-refs label', { hasText: `${side} reference ${end}` }).locator('select');
+  const trunkRows = [];
+  for (const [from, to] of [['body', 'chest'], ['tail_00', 'chest'], ['chest', 'neck_00']]) {
+    await refPickA('Base', 'from').selectOption(from);
+    await refPickA('Base', 'to').selectOption(to);
+    await page.waitForTimeout(600);
+    const r = await reading('bone-chain');
+    const text = await page.locator('.bend-reading[data-reading="bone-chain"] .bend-reading-value').textContent();
+    trunkRows.push({ base: `${from} → ${to}`, inPlane: r.before, total: r.beforeTotal, text: text.replace(/\s+/g, ' ').trim() });
+    await page.locator('.bend-panel').evaluate((el) => { el.scrollTop = 0; });
+    await page.waitForTimeout(200);
+    await page.screenshot({ path: path.join(out, `askeptosaurus-bend-trunk-${from}.png`) });
+  }
+  // Compared on the *total* angle rather than the in-plane one: how far apart two definitions are
+  // is a question about directions, not about the plane a bend happens to be being read in.
+  const trunkSpread = Math.max(...trunkRows.map((r) => r.total)) - Math.min(...trunkRows.map((r) => r.total));
+  assert.ok(trunkSpread > 20, `three defensible readings of this animal's trunk disagree by ${trunkSpread.toFixed(1)}°, which is the finding this mode exists for`);
+  const builtGeom = await reading('geometry');
+  fs.writeFileSync(path.join(out, 'askeptosaurus-bend-readings.txt'),
+    ['Askeptosaurus, the shipped body (askeptosaurus.glb) — reached from bend mode\'s own Model',
+      'control, because the mode opens on the original pose and must not be a cage: the bone',
+      'chain\'s answer, the per-joint table and the corrected-body warning all need this rig.',
+      '',
+      `span ${JSON.stringify(neck)}`,
+      ...trunkRows.map((r) => `bone   ${r.base.padEnd(20)} ${r.text}`),
+      `geometry  ${builtGeom.before}° in plane, ${builtGeom.beforeTotal}° in all`,
+      `spread across the three trunk readings: ${trunkSpread.toFixed(1)}°`].join('\n') + '\n');
+
+  // ---- and back again, which is the other half of the guard ----
+  await page.locator('.bend-model-pick select').selectOption('origpose');
+  await page.waitForFunction(() => /origpose\.glb$/.test(document.querySelector('.clips')?.getAttribute('data-loaded-model') ?? ''), null, { timeout: 90000 });
+  await page.waitForSelector('.bend-panel', { timeout: 60000 });
+  await page.waitForTimeout(2500);
+  assert.equal(await page.locator('.bend-body-note').getAttribute('data-applies-to'), 'origpose', 'the control goes both ways');
+  assert.equal(await page.locator('.bend-reading[data-reading="bone-chain"]').count(), 0,
+    'and the rig\'s answer goes away with the rig — the panel re-measures on whichever body it lands on');
 
   fs.writeFileSync(path.join(out, 'askeptosaurus-bend-straightening.txt'),
     ['Askeptosaurus, the untouched original pose (askeptosaurus.origpose.glb) — the generation',
@@ -416,22 +499,11 @@ try {
     `reading the same span against a different idea of "the trunk" gives a different angle (${firstRef.from} → ${firstRef.to}: ${asOpened.before}°, tail_00 → chest: ${hipToShoulder.before}°)`);
   await page.screenshot({ path: path.join(out, 'mixosaurus-bend-references.png') });
 
-  // Three chords a person could reasonably call "the trunk", read against one span. Nothing here
-  // asserts a number — what it asserts is that they *differ*, which is the finding the mode exists
-  // for, and the numbers are written out for `docs/triassic/verification/`.
-  const rows = [];
-  for (const [from, to] of [['root', 'body'], ['tail_00', 'chest'], ['chest', 'neck']]) {
-    await refPick('Base', 'from').selectOption(from);
-    await refPick('Base', 'to').selectOption(to);
-    await page.waitForTimeout(600);
-    const r = await reading('bone-chain');
-    const text = await page.locator('.bend-reading[data-reading="bone-chain"] .bend-reading-value').textContent();
-    rows.push({ base: `${from} → ${to}`, inPlane: r.before, total: r.beforeTotal, text: text.trim() });
-  }
-  // Compared on the *total* angle rather than the in-plane one: how far apart two definitions are
-  // is a question about directions, not about the plane a bend happens to be being read in.
-  const spread = Math.max(...rows.map((r) => r.total)) - Math.min(...rows.map((r) => r.total));
-  assert.ok(spread > 1, `three defensible readings of this animal's trunk disagree by ${spread.toFixed(1)}°, which is the finding this mode exists for`);
+  // The three-trunk-readings finding is driven on Askeptosaurus above, which is the animal it came
+  // from. Here the same question is asked once, because it is what the references are for.
+  await refPick('Base', 'from').selectOption('chest');
+  await refPick('Base', 'to').selectOption('neck');
+  await page.waitForTimeout(600);
 
   // ---- aiming the tip plane bends the body, and the readings are measured rather than predicted ----
   await aimPlane('Tip', [0, 1, 0]);
@@ -462,10 +534,8 @@ try {
     ['the per-joint table, in chain order — a bone name and a local rotation, which is what',
       '`uncurl` returns and `carry_rest` consumes in a Triassic builder',
       '', ...joints.map((j) => `  ${j.bone.padEnd(12)} ${j.local.padStart(8)}   ${j.accumulated}`),
-      '', `  local steps sum to ${localSum.toFixed(2)}° against a whole turn of ${total}°`,
-      '', 'three readings of one span against three chords a person could call "the trunk":',
-      ...rows.map((r) => `  ${r.base.padEnd(20)} ${r.text.replace(/\s+/g, ' ')}`),
-      `  spread across the three: ${spread.toFixed(1)}°`].join('\n') + '\n');
+      '', `  local steps carry ${localSum.toFixed(2)}° of a whole turn of ${total}° — the rest of the span`,
+      '  reaches past the first joint in the chain, which the table cannot account for and does not'].join('\n') + '\n');
 
   // ---- the hand-off on a rigged body, and the consumer's refusals ----
   await page.locator('.mark-note textarea').fill('browser drive: the tip plane aimed off the body’s own heading, measured both ways');
@@ -524,9 +594,10 @@ try {
   console.log('      original pose, which is the body a bend is aimed on; a handle found, dragged and undone');
   console.log(`      with the camera untouched; a neck ${curved.before.toFixed(1)}° off its trunk, two planes aimed the same`);
   console.log(`      way, and the run between them measured ${buttonGeom.after}° in plane over the warped mesh;`);
-  console.log(`      on Mixosaurus' built body, three trunk readings ${spread.toFixed(1)}° apart, a per-joint table in chain`);
-  console.log(`      order carrying ${localSum.toFixed(1)}° of an ${total}° turn, and an export hashed in the page, accepted by`);
-  console.log('      the consumer and refused stale or written against the old rates;');
+  console.log(`      the panel's own Model control back to the built body and out again, where three trunk`);
+  console.log(`      readings sit ${trunkSpread.toFixed(1)}° apart and the corrected-body warning is shown to the person it`);
+  console.log(`      is about; on Mixosaurus, a per-joint table in chain order carrying ${localSum.toFixed(1)}° of an ${total}° turn,`);
+  console.log('      and an export hashed in the page, accepted by the consumer and refused stale or v1;');
   console.log(`      and the pointer scheme on both bodies — left-drag orbits (${rawPointer.orbit.toFixed(2)}, ${builtPointer.orbit.toFixed(2)}),`);
   console.log(`      right-drag pans (${rawPointer.pan.toFixed(2)}, ${builtPointer.pan.toFixed(2)})`);
 } finally {

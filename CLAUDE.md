@@ -1579,15 +1579,25 @@ unless the user explicitly asks for a PR. Steps:
   body, measured that, and cached those numbers under the new body's key where nothing re-measured
   them: the panel said `origpose` over the built body's angles. `ViewerScene.loadedModel()` answers
   what is actually on stage, synchronously, and `ready` in `Viewer.tsx` now means *the body on
-  stage is the body this UI describes* rather than "the last load finished". And a specimen that
-  publishes an original pose can no longer reach its **built** body in bend mode at all — the Model
-  control lives on the info card, which an editing mode replaces — so the rig-only half of
-  `tools/bend-browser.mjs` (both readings, the chain, the references changing the answer, the
-  per-joint table, an export that says `built`) runs on **Mixosaurus**, which publishes neither.
-  Its three trunk readings disagree by 43°, the same finding on a different animal.
+  stage is the body this UI describes* rather than "the last load finished" — which is the invariant
+  the whole swap path rests on, so an editor is simply unmounted while a body it does not yet have
+  is loading. And **opening on the unbent body must not be a cage**: what the redirect locked away
+  was the mode's headline — the two readings side by side, the per-joint table and the
+  corrected-body warning, all of which need a rig — so a warning written to say "this body's rest
+  already carries one" could never be shown to the person it was about. The bend panel therefore
+  carries **its own Model control** (`.bend-model-pick`), because the info card's is off the screen
+  while any editor is open. It offers everything but the comparison twin, which `canBend` refuses
+  anyway, and the panel goes on telling the truth for free: the editor is keyed by the model, and
+  `appliesTo`, the stage label and the corrected-body warning are all derived from the stage.
+  `tools/bend-browser.mjs` takes that control **both ways** and uses it as the regression guard for
+  the one-commit swap, because a bone-chain reading is impossible on an unrigged body and
+  unavoidable on a rigged one: its appearing on the way in and going away on the way out is proof
+  the panel re-measured rather than keeping the numbers it had.
   The per-joint table's local steps add up to the whole turn only where the chain carries the
   *whole span* — the turn is spread along the span, so any part of it with no joint under it is a
-  share the bone table honestly cannot account for (four joints, 54° of an 83° turn on Mixosaurus).
+  share the bone table honestly cannot account for (four joints, 54° of an 83° turn on Mixosaurus,
+  which is the drive's second animal: it publishes neither an original pose nor a generation, so
+  bend mode opens straight on its built body and reaches the rigged half with no swap at all).
   `npm run bend` and `node tools/bend-browser.mjs` check it,
   `npm run triassic:bend -- <file>` is the consumer and **re-measures rather than reprinting**,
   failing loudly where it disagrees with what the viewer recorded. There is no bake in either

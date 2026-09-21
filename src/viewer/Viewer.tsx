@@ -448,6 +448,15 @@ export function Viewer() {
         <BendEditor key={`${id}|${modelPath}|bend`} scene={sceneRef.current} specimen={def} model={modelPath}
           sha256={showGenerated ? def.generatedSha256 : undefined} appliesTo={bendAppliesTo}
           stageLabel={stage.label} origPose={origPoseNote}
+          /* The mode *opens* on the unbent body and must not be a cage: the info card carries the
+             Model control and an editing mode replaces it, so bend mode carries its own. The twin
+             is left out because `canBend` refuses it anyway (the effect above drops straight back
+             to the view), and offering a choice that quietly ends the mode is worse than not
+             offering it. Everything the panel says about which body it is describing follows the
+             swap for free: the editor is keyed by the model, and `appliesTo`, `stageLabel` and the
+             corrected-body warning are all derived from the stage. */
+          stages={choices.filter(o => o.kind !== 'twin').map(o => ({ id: o.id, label: o.label }))}
+          stageId={stage.id} onStage={setStageId}
           canvas={canvasRef.current} onExit={() => setMode('view')} />
       )}
 
