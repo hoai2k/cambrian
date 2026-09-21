@@ -29,7 +29,7 @@ from math import sin, cos, pi
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.abspath(os.path.join(HERE, '../../../..'))
 import sys
 sys.path.insert(0, os.path.join(ROOT, 'tools/triassic/creatures/_pipeline'))
-from tripo import jaw_junction                                                  # noqa: E402
+from tripo import jaw_junction, cut_rim, cap_cut, cap_mouth                     # noqa: E402
 LOCAL = os.path.join(ROOT, 'local/triassic-authoring/dinocephalosaurus'); OUT = os.path.join(ROOT, 'public/assets/triassic/creatures')
 os.makedirs(LOCAL, exist_ok=True); os.makedirs(OUT, exist_ok=True)
 RAW = os.path.join(HERE, 'tripo-raw/dinocephalosaurus.raw.glb'); ID = 'dinocephalosaurus'
@@ -725,10 +725,90 @@ def split(o, label, test, plane=None):
     return part
 
 
+# ------------------------------------------- the mouth, closed by the cut's own rim ----
+# **This head arrived shut.** The section above says it in so many words: casting every head
+# vertex's own normal back into the mesh finds nothing, because the snout is one smooth closed tube
+# with the lip *painted* on it. `T.cut_rim` says the same thing from the other side -- what the cut
+# leaves in each half is one closed loop, every vertex of it on the seam or on the head's own
+# cross-section at the hinge, which is exactly what a plane cut through a closed head looks like
+# (the numbers land in `mouthCaps` in the report). So there is no aperture until the cut makes one,
+# and what the cut leaves is a hole in each half.
+#
+# That hole used to be closed by the `Seated jaw hinge tissue` ellipsoid, and T3D-12B proved the
+# one-sac lining above it closed nothing the ellipsoid was not already closing. What nobody asked
+# then is whether the ellipsoid is *drawn*: it is not. `src/shared/oral-geometry.ts` matches
+# `hinge tissue` and the runtime hides it, so as drawn this head stood open at the hinge -- 120 px
+# seen through the body at `Heavy` and 197 opened, the highest `through` figure of any body in the
+# roster's as-drawn sweep whose mouth nobody thought was broken.
+#
+# The repair is the cut's own rim and no new part at all. `T.cap_cut` fans the head's cross-section
+# at the hinge with its own vertices -- the back wall of the mouth, which a plane cut takes away --
+# and `T.cap_mouth` then spans what is left of each half's boundary (the two lip runs joined round
+# the snout, and the short chord the fan closed the hinge with) and domes it into its own half, so
+# the palate rides the skull and the floor rides the jaw through the same weight field as the skin
+# around them, with no second surface to keep coincident and nothing for the runtime to hide.
+#
+# `DOME` is the judgement and `DOME_ROOM` the bound on it: each cap vertex is pushed into its half
+# by `DOME` of *its own distance from the nearest rim vertex*, which is zero on the rim, deepest
+# along the middle of the mouth and shallow at the lips and the snout, capped at `DOME_ROOM` of the
+# head there. The head's room is measured rather than assumed -- `head_r` is the fitted section
+# profile and `seam_n` the fitted mouth line, and the smaller of the two gaps (below the seam, on
+# this snout) bounds both caps, so neither can reach the scalp or the throat.
+DOME = .34
+DOME_ROOM = .55
+
+
+def mouth_half_depth(a):
+    """How much head there is between the mouth line and the skin, at station `a`, measured off the
+    head's own fitted section rather than guessed. The gap under the seam is the smaller one on
+    this snout, so it bounds the palate as well as the floor."""
+    return max(1e-4, head_r(a) - abs(seam_n(a)))
+
+
+def at_hinge(p):
+    return abs(head_local(p)[0] - HINGE_A) < 1e-5
+
+
+def on_seam(p):
+    a, n, _ = head_local(p)
+    return a >= HINGE_A - 1e-5 and abs(n - seam_n(a)) < 1e-5
+
+
+def in_head(p):
+    return head_local(p)[0] > HINGE_A - .02
+
+
+CUT_RIM, CAPS = {}, {}
 for o in [auth, puppet]:
-    split(o, 'lower jaw', is_jaw,
-          plane=[(tuple(HEAD_P0 + HEAD_DIR * HINGE_A), tuple(HEAD_DIR)),
-                 (tuple(HEAD_P0 + HEAD_DIR * HINGE_A + HEAD_UP * SEAM0), tuple((HEAD_UP - HEAD_DIR * SEAM_SLOPE).normalized()))])
+    jawshell = split(o, 'lower jaw', is_jaw,
+                     plane=[(tuple(HEAD_P0 + HEAD_DIR * HINGE_A), tuple(HEAD_DIR)),
+                            (tuple(HEAD_P0 + HEAD_DIR * HINGE_A + HEAD_UP * SEAM0),
+                             tuple((HEAD_UP - HEAD_DIR * SEAM_SLOPE).normalized()))])
+
+    # `T.cut_rim`'s own seam share is written for a mouth line of the form z = f(axial); this
+    # head's runs in a tilted frame, so the share is counted here in that frame instead —
+    # `boundaryOnTheCut` against `boundaryEdgesInRegion` is the same question.
+    CUT_RIM[o.name] = {'skull': cut_rim(o, in_head, axis=0),
+                       'jaw': cut_rim(jawshell, in_head, axis=0)}
+    for half, part in (('skull', o), ('jaw', jawshell)):
+        loops = CUT_RIM[o.name][half]['loops']
+        if loops:
+            verts = [v.co for v in part.data.vertices]
+            CUT_RIM[o.name][half]['boundaryOnTheCut'] = sum(
+                1 for e in part.data.edges
+                if all(on_seam(verts[i]) or at_hinge(verts[i]) for i in e.vertices)
+                and in_head(verts[e.vertices[0]]) and in_head(verts[e.vertices[1]]))
+    CAPS[o.name] = {'skullAtHinge': cap_cut(o, at_hinge, HEAD_DIR),
+                    'jawAtHinge': cap_cut(jawshell, at_hinge, -HEAD_DIR)}
+    assert CAPS[o.name]['skullAtHinge'] > 0 and CAPS[o.name]['jawAtHinge'] > 0, \
+        ('the hinge cross-section was left open', o.name, CAPS[o.name])
+    CAPS[o.name]['palate'] = cap_mouth(
+        o, on_seam, -HEAD_UP, dome=DOME, rounds=2,
+        limit=lambda p: mouth_half_depth(head_local(p)[0]) * DOME_ROOM)
+    CAPS[o.name]['floor'] = cap_mouth(
+        jawshell, on_seam, HEAD_UP, dome=DOME, rounds=2,
+        limit=lambda p: mouth_half_depth(head_local(p)[0]) * DOME_ROOM)
+print('DINOCEPHALOSAURUS_MOUTH', json.dumps({'cutRim': CUT_RIM, 'caps': CAPS}))
 
 arm = bpy.data.armatures.new('Dinocephalosaurus shared skeleton'); rig = bpy.data.objects.new('Dinocephalosaurus_Rig', arm)
 bpy.context.collection.objects.link(rig); bpy.context.view_layer.objects.active = rig; rig.select_set(True)
@@ -815,25 +895,13 @@ for label, lift, bonename, sgnz in [('Upper fangs', .0026, 'skull', -1), ('Lower
             for j in range(6): faces.append((base + j, base + (j + 1) % 6, base + 6))
     me = bpy.data.meshes.new(label); me.from_pydata(verts, [], faces); me.update()
     o = bpy.data.objects.new(label, me); bpy.context.collection.objects.link(o); rigid(o, bonename, toothmat)
-# A closed cheek envelope around the actual hinge, so no membrane stretches across the gape.
-bpy.ops.mesh.primitive_uv_sphere_add(segments=18, ring_count=10,
-                                     location=tx(head_point(HINGE_A, -.15 * head_r(HINGE_A), 0)))
-_hr = head_r(HINGE_A) * SCALE
-o = bpy.context.object; o.name = 'Seated jaw hinge tissue'; o.scale = (_hr * .80, _hr * .68, _hr * .60)
-bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-for v in o.data.vertices: v.co = o.matrix_world @ v.co
-o.location = (0, 0, 0)
-hm = bpy.data.materials.new('Dinocephalosaurus jaw hinge body'); hm.use_nodes = True
-hbs = hm.node_tree.nodes.get('Principled BSDF'); hbs.inputs['Base Color'].default_value = (.30, .28, .24, 1)
-hbs.inputs['Roughness'].default_value = .7; hm.diffuse_color = (.30, .28, .24, 1)
-o.data.materials.clear(); o.data.materials.append(hm)
-for n in ['skull', 'jaw']: o.vertex_groups.new(name=n)
-_hinge_mid = tx(head_point(HINGE_A, -.15 * head_r(HINGE_A), 0))
-for v in o.data.vertices:
-    t = max(0., min(1., (_hinge_mid.z - v.co.z) / (.030 * SCALE)))
-    o.vertex_groups['jaw'].add([v.index], t * .5, 'REPLACE'); o.vertex_groups['skull'].add([v.index], 1 - t * .5, 'REPLACE')
-for p in o.data.polygons: p.use_smooth = True
-mo = o.modifiers.new('Hinge skin', 'ARMATURE'); mo.object = rig; o.parent = rig; oralparts.append(o)
+# **And no hinge tissue either.** A `Seated jaw hinge tissue` ellipsoid stood here, blended between
+# `skull` and `jaw` across the corner of the mouth, and T3D-12B measured it doing the only oral job
+# on this head: strip it as well as the sac and the count went from 3 px to 113. It was closing the
+# head's cross-section at the hinge -- and `src/shared/oral-geometry.ts` matches `hinge tissue`, so
+# the runtime hides it and it was closing that hole for the audit and not for the player. The
+# cross-section is now fanned with its own vertices above, part of the half it belongs to, which
+# closes it for both. Nothing is left in this head for the classifier to hide.
 
 # ---- the mouth interior must be inside the mouth ---------------------------------------------------
 # `inside` is the closed intake surface, before the jaw was cut out of it, so a palate, a fang or a
@@ -1251,9 +1319,16 @@ report = {'sourceSha256': hashlib.sha256(open(RAW, 'rb').read()).hexdigest(),
                        'length': round(HEAD_LEN, 4), 'profile': [[round(a, 3), round(r, 4)] for a, r in HEAD_PROFILE],
                        'hingeAlongHead': round(HINGE_A, 4)},
           'oralPartDepthInsideHead': oral_depth,
-          'oralGeometry': {'lining': None, 'palate': None, 'floor': None,
-                           'verdict': 'neither: the sac closed nothing the seated hinge tissue was not '
-                                      'already closing; see docs/triassic/throat-repairs/oral-verdicts.md',
+          'mouthCaps': {'kind': 'shut -- the generation models no interior; the lip is painted on a '
+                                'closed snout and the cut is what makes the aperture',
+                        'cutRim': CUT_RIM, 'caps': CAPS, 'dome': DOME, 'domeRoom': DOME_ROOM},
+          'oralGeometry': {'lining': None, 'palate': None, 'floor': None, 'hingeTissue': None,
+                           'verdict': 'none: the cut is capped with its own rim and domed '
+                                      '(T.cap_cut at the hinge, then T.cap_mouth over the lip). The sac '
+                                      'closed nothing the seated hinge tissue was already closing '
+                                      '(T3D-12B) and the hinge tissue is hidden in play, so as drawn the '
+                                      'head stood open at the hinge; see '
+                                      'docs/triassic/throat-repairs/oral-verdicts.md',
                            'parts': [o.name for o in oralparts]},
           'normalizedWeights': True, 'rootStable': True, 'noScaleChannels': True}
 # The figures that cannot be measured inside the build -- the strict-cull gape counts, the skin

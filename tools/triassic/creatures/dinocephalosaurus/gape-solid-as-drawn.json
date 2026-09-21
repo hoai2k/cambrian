@@ -6,7 +6,7 @@
     1.0,
     1.0
   ],
-  "asDrawn": false,
+  "asDrawn": true,
   "shots": [
     {
       "clip": "Bite",
@@ -17,8 +17,8 @@
       "seenThroughTheBody": 0,
       "backdropInBothPasses": 15,
       "markedImage": null,
-      "solid": "local/triassic-authoring/dinocephalosaurus/gape-solid/Bite-0.133-solid.png",
-      "culled": "local/triassic-authoring/dinocephalosaurus/gape-solid/Bite-0.133-culled.png"
+      "solid": "local/triassic-authoring/dinocephalosaurus/gape-solid-as-drawn/Bite-0.133-solid.png",
+      "culled": "local/triassic-authoring/dinocephalosaurus/gape-solid-as-drawn/Bite-0.133-culled.png"
     },
     {
       "clip": "Attack",
@@ -29,8 +29,8 @@
       "seenThroughTheBody": 0,
       "backdropInBothPasses": 19,
       "markedImage": null,
-      "solid": "local/triassic-authoring/dinocephalosaurus/gape-solid/Attack-0.367-solid.png",
-      "culled": "local/triassic-authoring/dinocephalosaurus/gape-solid/Attack-0.367-culled.png"
+      "solid": "local/triassic-authoring/dinocephalosaurus/gape-solid-as-drawn/Attack-0.367-solid.png",
+      "culled": "local/triassic-authoring/dinocephalosaurus/gape-solid-as-drawn/Attack-0.367-culled.png"
     },
     {
       "clip": "Heavy",
@@ -41,8 +41,8 @@
       "seenThroughTheBody": 0,
       "backdropInBothPasses": 28,
       "markedImage": null,
-      "solid": "local/triassic-authoring/dinocephalosaurus/gape-solid/Heavy-0.5-solid.png",
-      "culled": "local/triassic-authoring/dinocephalosaurus/gape-solid/Heavy-0.5-culled.png"
+      "solid": "local/triassic-authoring/dinocephalosaurus/gape-solid-as-drawn/Heavy-0.5-solid.png",
+      "culled": "local/triassic-authoring/dinocephalosaurus/gape-solid-as-drawn/Heavy-0.5-culled.png"
     },
     {
       "clip": "Eat",
@@ -53,8 +53,8 @@
       "seenThroughTheBody": 0,
       "backdropInBothPasses": 2,
       "markedImage": null,
-      "solid": "local/triassic-authoring/dinocephalosaurus/gape-solid/Eat-0.233-solid.png",
-      "culled": "local/triassic-authoring/dinocephalosaurus/gape-solid/Eat-0.233-culled.png"
+      "solid": "local/triassic-authoring/dinocephalosaurus/gape-solid-as-drawn/Eat-0.233-solid.png",
+      "culled": "local/triassic-authoring/dinocephalosaurus/gape-solid-as-drawn/Eat-0.233-culled.png"
     },
     {
       "clip": "NeckStrike",
@@ -65,8 +65,8 @@
       "seenThroughTheBody": 0,
       "backdropInBothPasses": 21,
       "markedImage": null,
-      "solid": "local/triassic-authoring/dinocephalosaurus/gape-solid/NeckStrike-0.567-solid.png",
-      "culled": "local/triassic-authoring/dinocephalosaurus/gape-solid/NeckStrike-0.567-culled.png"
+      "solid": "local/triassic-authoring/dinocephalosaurus/gape-solid-as-drawn/NeckStrike-0.567-solid.png",
+      "culled": "local/triassic-authoring/dinocephalosaurus/gape-solid-as-drawn/NeckStrike-0.567-culled.png"
     }
   ]
 }
