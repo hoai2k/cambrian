@@ -11,6 +11,12 @@ import { isIdentity, warp } from './sculpt/profile';
 import { StretchEditor } from './stretch/StretchEditor';
 import { getStretch } from './stretch/store';
 import { isIdentity as stretchIsIdentity, warp as stretchWarp } from './stretch/stretch';
+import { MouthEditor } from './mouth/MouthEditor';
+import type { AppliesTo } from './mouth/mouth';
+import type { AppliesTo as BendAppliesTo } from './bend/bend';
+import { BendEditor } from './bend/BendEditor';
+import { clampTime, intentMissing, tracksIntent, type ClipIntent } from './playback/selection';
+import { getIntent, setIntent } from './playback/store';
 
 const SPEEDS = [0.25, 0.5, 1, 2];
 
@@ -34,14 +40,17 @@ function readPicks(): Picks {
   }
 }
 
-/** What the page is doing with the specimen: looking at it, reshaping it, lengthening a run of it, or marking it up. */
-type Mode = 'view' | 'sculpt' | 'mark' | 'stretch';
+/**
+ * What the page is doing with the specimen: looking at it, reshaping it, lengthening a run of it,
+ * turning a run of it, marking it up, or aiming its mouth.
+ */
+type Mode = 'view' | 'sculpt' | 'mark' | 'stretch' | 'mouth' | 'bend';
 
 /**
  * The page remembers which specimen it is showing in the URL (`?specimen=<key>`, and `&mode=sculpt`,
- * `&mode=mark` or `&mode=stretch` while editing), so a reload — or a link — comes back to the same
- * creature. Nothing else is kept there: the view, the clip, any sculpt in progress and any marked
- * region start over.
+ * `&mode=mark`, `&mode=stretch`, `&mode=mouth` or `&mode=bend` while editing), so a reload — or a
+ * link — comes back to the same creature. Nothing else is kept there: the view, the clip, any
+ * sculpt in progress, any marked region, any mouth cut and any bend start over.
  *
  * `mode=stretch` does not also restore the generated body it applies to, because which body is on
  * stage is not in the URL at all; the editor is shown only once one is, and the mode falls back to
@@ -58,7 +67,7 @@ function readUrlState(): { key: string; mode: Mode } {
   // not export anything portable.
   const collection = specimenByKey.get(key)?.collection;
   const editable = !isPropCollection(collection);
-  const asking = asked === 'mark' || asked === 'stretch' || (asked === 'sculpt' && collection !== 'triassic');
+  const asking = asked === 'mark' || asked === 'stretch' || asked === 'mouth' || asked === 'bend' || (asked === 'sculpt' && collection !== 'triassic');
   return { key, mode: editable && asking ? asked as Mode : 'view' };
 }
 function writeUrlState(key: string, mode: Mode) {
@@ -77,6 +86,13 @@ export function Viewer() {
   const [id, setId] = useState(initial.current.key);
   const [mode, setMode] = useState<Mode>(initial.current.mode);
   /**
+   * Raised while an editor is holding a preview — the mouth's gape is the one — so the viewer can
+   * take its own chrome off the screen and leave the animal alone with what is being looked at.
+   * The chrome only fades: hiding it outright would change the grid and reframe the camera under
+   * a reviewer mid-drag, which is the one thing a preview must not do.
+   */
+  const [previewing, setPreviewing] = useState(false);
+  /**
    * What can be on stage, as one list rather than two crossed axes.
    *
    * There used to be a *Model detail* control (full / reduced) and a *Body* control (authored /
@@ -90,7 +106,7 @@ export function Viewer() {
    * in play — so the raw generation stands in at the head of the list, which is what the roster's
    * preview badge already says about it.
    */
-  type Stage = { id: string; label: string; model: string; kind: 'full' | 'reduced' | 'twin' | 'generated' | 'borrowed' | 'origpose' };
+  type Stage = { id: string; label: string; model: string; kind: 'full' | 'reduced' | 'twin' | 'generated' | 'borrowed' | 'origpose' | 'backup' };
   const stages = (c: ViewerSpecimen): Stage[] => {
     const own = !c.generated || !!c.inReview;
     const out: Stage[] = [];
@@ -102,6 +118,7 @@ export function Viewer() {
     // Where a builder moved the mesh before binding, the shipped body rests in a shape the
     // generation never held. Both are offered: the full model IS the base pose every clip is
     // authored from, and this is what Tripo made.
+    if (c.backup) out.push({ id: 'backup', label: 'Backup Model', model: c.backup, kind: 'backup' });
     if (c.origPose) out.push({ id: 'origpose', label: 'Original pose (no rig)', model: c.origPose, kind: 'origpose' });
     // An off-roster subject is in no sea, so there is no body it borrows to offer.
     if (!own && !c.offRoster) out.push({ id: 'borrowed', label: 'Borrowed body (in play)', model: c.model, kind: 'borrowed' });
@@ -157,6 +174,46 @@ export function Viewer() {
   const [loadedId, setLoadedId] = useState('');
   const [picks, setPicks] = useState<Picks>(readPicks);
   const [slots, setSlots] = useState<readonly Slot[]>([]);
+  /**
+   * The reviewer's standing selection — which clip, where in it, paused or not — kept in the
+   * session store (`./playback/store`) so it crosses from one animal to the next, and mirrored
+   * here only so the pane can draw what is being asked for. The store is the truth: every writer
+   * below goes through `remember`, which sets both, and the load effect reads `getIntent()` rather
+   * than this copy so it can never be a render behind.
+   *
+   * What is *playing* is `active`, which the scene reports. The two are deliberately different
+   * things: a body without the chosen clip plays its `Idle` and the intent stands, so the next
+   * animal along that does have it gets it back.
+   */
+  const [intent, setIntentMirror] = useState<ClipIntent | undefined>(getIntent);
+  const remember = (next: ClipIntent) => { setIntent(next); setIntentMirror(next); };
+  /** Picking a clip, or the base pose, *is* the selection: it names what was meant from here on. */
+  const chooseClip = (name: string) => {
+    remember({ clip: name, time: 0, paused: playback.paused });
+    sceneRef.current?.play(name, loop);
+  };
+  const chooseBasePose = () => {
+    remember({ clip: null, time: 0, paused: playback.paused });
+    sceneRef.current?.setRestPose(true);
+  };
+  /**
+   * Pausing changes only the pause. It deliberately does not re-aim the selection at whatever is
+   * on screen: a reviewer pausing a body that fell back to its `Idle` has not given up on the clip
+   * they asked for, and the next animal that has it should still play it — paused.
+   */
+  const choosePaused = (next: boolean) => {
+    sceneRef.current?.setPaused(next);
+    const standing = getIntent();
+    remember(standing ? { ...standing, paused: next } : { clip: active || null, time: playback.time, paused: next });
+  };
+  /** Scrubbing names the clip under the scrubber, because a position is a position *in* one clip. */
+  const scrubTo = (seconds: number) => {
+    // Clamped here as well as in the scene: an arrow key at either end asks for a time outside the
+    // clip, and what is written down has to be the position the body was actually put in.
+    const t = clampTime(seconds, playback.duration);
+    sceneRef.current?.seek(t);
+    remember({ clip: active || null, time: t, paused: true });
+  };
   useEffect(() => { writeUrlState(id, mode); }, [id, mode]);
   // Re-pick the opening model when the specimen changes, and only then: a reviewer who has chosen
   // to look at the twin keeps looking at it. What the list opens on is `opening()` above — for an
@@ -188,6 +245,25 @@ export function Viewer() {
   // the one carrying fins nobody asked for, and it is the reason the mode exists. A prop is the
   // only thing it refuses — there is nothing on a stromatolite for a builder to cut away.
   const canMark = !isPropCollection(collection) && ready;
+  // The mouth editor takes whatever body is on stage as well: a cut is aimed on one file, and the
+  // file it is most wanted on is the raw generation, before any builder has measured a mouth on
+  // it. What the export says the file *is* follows the stage rather than the animal.
+  const canMouth = canMark;
+  const appliesTo: AppliesTo = stage.kind === 'generated' ? 'preview' : stage.kind === 'origpose' ? 'generation' : stage.kind === 'twin' ? 'twin' : 'built';
+  /**
+   * The same answer for the bend editor, which tells the original pose apart from the generation.
+   *
+   * The mouth editor does not need to: a cut aimed on either is aimed on geometry no builder has
+   * moved. A bend does, and by the whole size of the thing it is about — Askeptosaurus' shipped
+   * rest already carries the 67.7° head correction its builder put into the bind, so a bend
+   * measured on `built` and one measured on `origpose` are opposite claims about the same animal.
+   */
+  const bendAppliesTo: BendAppliesTo = stage.kind === 'origpose' ? 'origpose' : appliesTo;
+  /** The untouched generation this specimen publishes, for the bend panel to point a reviewer at. */
+  const origPoseStage = choices.find(o => o.kind === 'origpose');
+  const origPoseNote = origPoseStage && def.origPoseChanged?.length
+    ? { label: origPoseStage.label, changed: def.origPoseChanged }
+    : undefined;
   /**
    * Whether `model` is this animal's own body or one it borrows in play.
    *
@@ -198,17 +274,29 @@ export function Viewer() {
    */
   const ownBody = !def.generated || !!def.inReview;
   const canStretch = !isPropCollection(collection) && !showPuppet && ready && (showGenerated || ownBody);
+  /**
+   * Bend sits exactly where stretch does, because it asks the same kind of question about the same
+   * run of body: stretch changes a span's *length* and bend changes its *direction*, and neither
+   * can be baked into a rigged body. So it is offered on a raw generation (where the warp on stage
+   * is the edit) and on a built body (where the rig is held at rest and the export is a measurement
+   * for the builder), and refused on the comparison twin and on props for stretch's own reasons —
+   * a measurement exported off the twin would name the right creature and describe the wrong mesh.
+   */
+  const canBend = canStretch;
   useEffect(() => {
     if (mode === 'sculpt' && (!sculptable || showPuppet || showGenerated)) setMode('view');
     // Stretch is the one mode a *built* body still answers: there it is a measurement rather than
     // an edit, so all it refuses is a prop and the comparison twin.
-    if (mode === 'stretch' && (isPropCollection(collection) || showPuppet)) setMode('view');
-    if (mode === 'mark' && isPropCollection(collection)) setMode('view');
+    if ((mode === 'stretch' || mode === 'bend') && (isPropCollection(collection) || showPuppet)) setMode('view');
+    if ((mode === 'mark' || mode === 'mouth') && isPropCollection(collection)) setMode('view');
   }, [mode, collection, sculptable, showPuppet, showGenerated]);
 
   // The show effect must not re-run when a pick changes, so it reads the picks through a ref.
   const picksRef = useRef(picks);
   picksRef.current = picks;
+  // Same for the loop switch: toggling it must not reload the body.
+  const loopRef = useRef(loop);
+  loopRef.current = loop;
   const schemeId = picks[id] ?? defaultScheme(id);
   const activeScheme = scheme(schemeId);
 
@@ -231,7 +319,11 @@ export function Viewer() {
     sceneRef.current?.setScheme(picksRef.current[id] ?? defaultScheme(id));
     // The yaw is the generated mesh's alone: the shipped body and the twin are already built to
     // the engine's convention and must not be turned.
-    sceneRef.current?.show({ ...def, model: modelPath, previewYaw: showGenerated ? def.previewYaw : 0 }, { preserveView: true })
+    // The standing selection is read from the store rather than from the mirror above, and the
+    // loop switch through a ref, so that neither puts this effect — a model load — back on the
+    // dependency list. What this body can give the selection is decided in `scene.show`.
+    sceneRef.current?.show({ ...def, model: modelPath, previewYaw: showGenerated ? def.previewYaw : 0 },
+      { preserveView: true, intent: getIntent(), loop: loopRef.current })
       .then((names) => {
         if (cancelled) return;
         // A sculpt made this session follows the creature back onto the stage, full or reduced.
@@ -253,6 +345,21 @@ export function Viewer() {
   useEffect(() => {
     try { sessionStorage.setItem(STORE_KEY, JSON.stringify(picks)); } catch { /* private mode: picks stay in memory */ }
   }, [picks]);
+  /**
+   * A running clip carries the reviewer's position along with it, so the position that crosses to
+   * the next animal is where they had got to — but **only while what is playing is what was asked
+   * for**. On a body that fell back to its `Idle`, that clock belongs to a clip nobody chose, and
+   * writing it back would quietly replace the intended position with somebody else's idle frame.
+   *
+   * Only the store is written, not the mirror: this runs on every playback report and none of it
+   * changes what the pane draws.
+   */
+  useEffect(() => {
+    if (!ready || playback.paused) return;
+    const standing = getIntent();
+    if (!tracksIntent(standing, active) || standing!.time === playback.time) return;
+    setIntent({ ...standing!, time: playback.time });
+  }, [playback, active, ready]);
 
   function exportColors() {
     const payload = {
@@ -275,7 +382,8 @@ export function Viewer() {
   const changed = roster.filter((c) => (picks[c.key] ?? defaultScheme(c.key)) !== defaultScheme(c.key)).length;
 
   return (
-    <div className={`viewer ${mode === 'sculpt' ? 'sculpting' : mode === 'stretch' ? 'stretching' : mode === 'mark' ? 'marking' : ''}`} data-mode={mode}>
+    <div className={`viewer ${mode === 'sculpt' ? 'sculpting' : mode === 'stretch' ? 'stretching' : mode === 'mark' ? 'marking' : mode === 'mouth' ? 'mouthing' : mode === 'bend' ? 'bending' : ''} ${previewing ? 'previewing' : ''}`}
+      data-mode={mode} data-previewing={previewing ? 'yes' : 'no'}>
       <div className="stage">
         <canvas ref={canvasRef} className="viewer-canvas" />
         {/* The notice sits on the stage, over where the specimen will stand. `status` stays in the
@@ -303,6 +411,22 @@ export function Viewer() {
       {mode === 'mark' && canMark && sceneRef.current && canvasRef.current && (
         <MarkEditor key={`${id}|${modelPath}`} scene={sceneRef.current} specimen={def} model={modelPath}
           sha256={showGenerated ? def.generatedSha256 : undefined}
+          canvas={canvasRef.current} onExit={() => setMode('view')} />
+      )}
+      {/* Mouth mode is the same shape as mark mode — handles on the orbit view, a panel where the
+          info card was — and is keyed by the body on stage for the same reason: the cut is aimed
+          on one file. */}
+      {mode === 'mouth' && canMouth && sceneRef.current && canvasRef.current && (
+        <MouthEditor key={`${id}|${modelPath}|mouth`} scene={sceneRef.current} specimen={def} model={modelPath}
+          sha256={showGenerated ? def.generatedSha256 : undefined} appliesTo={appliesTo}
+          canvas={canvasRef.current} onPreview={setPreviewing} onExit={() => setMode('view')} />
+      )}
+      {/* Bend mode is the same shape again — handles on the orbit view, a panel where the info card
+          was — and is keyed by the body on stage because a span is placed on one file. */}
+      {mode === 'bend' && canBend && sceneRef.current && canvasRef.current && (
+        <BendEditor key={`${id}|${modelPath}|bend`} scene={sceneRef.current} specimen={def} model={modelPath}
+          sha256={showGenerated ? def.generatedSha256 : undefined} appliesTo={bendAppliesTo}
+          stageLabel={stage.label} origPose={origPoseNote}
           canvas={canvasRef.current} onExit={() => setMode('view')} />
       )}
 
@@ -343,7 +467,7 @@ export function Viewer() {
         {def.kindNote && <p className="specimen-description">{def.kindNote}</p>}
         {def.description && <p className="specimen-description">{def.description}</p>}
         {def.lengthMeters != null && <p className="specimen-scale">Representative length: {new Intl.NumberFormat('en', { maximumSignificantDigits: 3 }).format(def.lengthMeters)} m · views individually framed</p>}
-        {collection !== 'cambrian' && <p className="specimen-downloads">{!def.offRoster && <a href={`${ASSET_BASE}${def.model}`} download>Full model</a>}{def.lod && <a href={`${ASSET_BASE}${def.lod}`} download>Reduced model</a>}{def.puppet && <a href={`${ASSET_BASE}${def.puppet}`} download>Procedural twin</a>}{def.generated && <a href={`${ASSET_BASE}${def.generated}`} download>Generated mesh</a>}</p>}
+        {collection !== 'cambrian' && <p className="specimen-downloads">{!def.offRoster && <a href={`${ASSET_BASE}${def.model}`} download>Full model</a>}{def.lod && <a href={`${ASSET_BASE}${def.lod}`} download>Reduced model</a>}{def.puppet && <a href={`${ASSET_BASE}${def.puppet}`} download>Procedural twin</a>}{def.generated && <a href={`${ASSET_BASE}${def.generated}`} download>Generated mesh</a>}{def.backup && <a href={`${ASSET_BASE}${def.backup}`} download>Backup Model</a>}</p>}
         {choices.length > 1 && <label className="scheme-pick">
           <span>Model</span>
           <select aria-label="Which model" value={stage.id} disabled={loading} onChange={e => setStageId(e.target.value)}>
@@ -402,8 +526,15 @@ export function Viewer() {
               : 'Lengthen a run of this body between two cuts and measure it. A built body is held at rest and cannot be baked: the numbers go to its builder.'}>
             Stretch{(() => { const d = getStretch(id); return d && !stretchIsIdentity(d) ? ' (edited)' : ''; })()}
           </button>}
+          {!isPropCollection(collection) && <button className="ghost" onClick={() => { if (def.generated && !def.inReview) setStageId('generated'); setMode('bend'); }} disabled={!canBend}
+            title="Turn a run of this body between two cuts — a neck off its trunk — and read the angle before and after. On a built body it is a measurement for its builder.">
+            Bend
+          </button>}
           {!isPropCollection(collection) && <button className="ghost" onClick={() => setMode('mark')} disabled={!canMark} title="Paint the geometry that should not be there and export it as a region file for tools/triassic/cut-region.py">
             Mark region
+          </button>}
+          {!isPropCollection(collection) && <button className="ghost" onClick={() => setMode('mouth')} disabled={!canMouth} title="Aim the mouth cut on this body — how far back the hinge goes, where the line sits, its angle — and export it for the builder">
+            Mouth
           </button>}
         </div>
 
@@ -432,7 +563,13 @@ export function Viewer() {
         </section>}
       </div>
 
-      <section className="clips" aria-label="Animations" data-loaded-specimen={loadedId} data-loaded-model={loadedId ? modelPath : ''}>
+      {/* `data-clip-intent` is what was asked for and `data-clip-playing` what this body could
+          give it — the two are the same except while a body without the chosen clip is standing
+          in, and keeping them both on the pane is what lets a browser drive prove the difference.
+          The base pose says so by name, since it is a selection with no clip in it. */}
+      <section className="clips" aria-label="Animations" data-loaded-specimen={loadedId} data-loaded-model={loadedId ? modelPath : ''}
+        data-clip-intent={intent ? intent.clip ?? 'base' : ''}
+        data-clip-playing={!loadedId ? '' : !clips.length ? 'none' : active || 'base'}>
         <div className="clips-head">
           <h3>Animations</h3>
           {(clips.length > 0 || loading) && <><label className="toggle">
@@ -446,7 +583,7 @@ export function Viewer() {
           </div></>}
         </div>
         {!loading && clips.length > 0 && <div className="timeline">
-          <button className="ghost" onClick={() => sceneRef.current?.setPaused(!playback.paused)}>
+          <button className="ghost" onClick={() => choosePaused(!playback.paused)}>
             {playback.paused ? 'Resume' : 'Pause'}
           </button>
           <label>
@@ -457,21 +594,39 @@ export function Viewer() {
                 const target = e.key === 'Home' ? 0 : e.key === 'End' ? playback.duration
                   : e.key === 'ArrowLeft' || e.key === 'ArrowDown' ? playback.time - 1 / 30
                   : e.key === 'ArrowRight' || e.key === 'ArrowUp' ? playback.time + 1 / 30 : undefined;
-                if (target != null) { e.preventDefault(); sceneRef.current?.seek(target); }
+                if (target != null) { e.preventDefault(); scrubTo(target); }
               }}
-              onChange={e => sceneRef.current?.seek(Number(e.target.value))} />
+              onChange={e => scrubTo(Number(e.target.value))} />
           </label>
           <output>{playback.time.toFixed(2)} / {playback.duration.toFixed(2)} s</output>
         </div>}
         {!loading && !clips.length && <p className="hint">Static specimen</p>}
+        {/* The intent is invisible while it is not being met, and an invisible intent reads as the
+            pane having forgotten what was chosen. So it says so, and says it is still standing. */}
+        {!loading && clips.length > 0 && intentMissing(intent, clips) && <p className="hint clip-fallback">
+          <strong>{intent!.clip}</strong> is not one of this animal's clips, so {active || 'the base pose'} is standing
+          in. The choice holds: the next animal that has {intent!.clip} plays it, where you left off.
+        </p>}
         <div className="clip-grid">
+          {/* The rig at rest is the neutral pose: jaw shut, body straight, limbs where the builder
+              bound them, which is the shape every clip here is authored from. It is a pose rather
+              than a clip, so it is offered beside them as one — the way to see what the animations
+              start from, and to check that a body whose generation arrived bent or gaping was
+              actually unbent and shut before binding rather than posed that way by its Idle. */}
+          {!loading && clips.length > 0 && (
+            <button className={`clip clip-base ${active === '' ? 'active' : ''}`} aria-pressed={active === ''}
+              title="The rig at rest: the neutral pose every clip is authored from"
+              onClick={chooseBasePose}>
+              Base pose
+            </button>
+          )}
           {clips.filter((n) => !isReplaced(n)).map((name) => {
             // A clip queued for rework is flagged on its own button rather than on the creature:
             // the body is finished, this motion is not, and that is what a viewer wants to know.
             const queued = def.clipNotes?.[name];
             return (
               <button key={name} className={`clip ${name === active ? 'active' : ''}${queued ? ' clip-queued' : ''}`}
-                aria-pressed={name === active} onClick={() => sceneRef.current?.play(name, loop)}>
+                aria-pressed={name === active} onClick={() => chooseClip(name)}>
                 {name}
                 {queued && <ClipQueuedBadge name={name} note={queued} />}
               </button>
@@ -486,7 +641,7 @@ export function Viewer() {
           <div className="clip-grid clip-grid-replaced">
             {clips.filter(isReplaced).map((name) => (
               <button key={name} className={`clip clip-replaced ${name === active ? 'active' : ''}`} aria-pressed={name === active}
-                title={`The clip ${replacedName(name)} superseded; kept for comparison`} onClick={() => sceneRef.current?.play(name, loop)}>
+                title={`The clip ${replacedName(name)} superseded; kept for comparison`} onClick={() => chooseClip(name)}>
                 {replacedName(name)}
               </button>
             ))}

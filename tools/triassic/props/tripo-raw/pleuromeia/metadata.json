@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "name": "pleuromeia",
+  "task": {
+    "type": "image_to_model",
+    "status": "success",
+    "progress": 100,
+    "input": {
+      "pbr": true,
+      "file": {
+        "type": "jpeg",
+        "object": {
+          "key": "tcli_2f16803761ed4cf0af45a11555b61c60/20260920/669ea3a5-e3d7-4b1b-8b83-713e559cb19a/image.jpeg",
+          "bucket": "tripo-data"
+        }
+      },
+      "texture": true,
+      "export_uv": true,
+      "face_limit": 20000,
+      "model_version": "v3.1-20260211",
+      "geometry_quality": "standard",
+      "enable_image_autofix": false
+    },
+    "output": {
+      "model_url": "<redacted download URL>",
+      "rendered_image_url": "<redacted download URL>"
+    },
+    "task_id": "669ea3a5-e3d7-4b1b-8b83-713e559cb19a",
+    "created_at": "2026-09-20T03:00:48.407336Z",
+    "completed_at": "2026-09-20T03:02:29.955286Z",
+    "credits_consumed": 30
+  },
+  "request": {
+    "file": {
+      "file_token": "<uploaded at runtime>"
+    },
+    "model": "v3.1-20260211",
+    "face_limit": 20000,
+    "texture": true,
+    "pbr": true
+  },
+  "image": {
+    "path": "docs/triassic/canonical/model-inputs/pleuromeia/input.png",
+    "sha256": "8117bd19884b3ec53d6dabffb1afc73452a66f2a4a18e33268fc75456fd64fa2",
+    "bytes": 4738111
+  },
+  "artifact": {
+    "path": "tools/triassic/props/tripo-raw/pleuromeia/pleuromeia.raw.glb",
+    "bytes": 1392404,
+    "sha256": "3e549989f3de8e7b2002a170ab76e90bd34ad72ef1ebba8b17842b7d23059337",
+    "source_output_field": "model_url"
+  },
+  "downloaded_at": "2026-09-20T03:02:36.946Z"
+}

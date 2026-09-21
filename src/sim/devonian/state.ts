@@ -1,4 +1,5 @@
 import type { Vec3 } from '../../shared/math';
+import { TEXT } from '../../shared/text';
 import type { Game } from '../game';
 import type { Actor } from '../types';
 
@@ -13,7 +14,8 @@ import type { Actor } from '../types';
  * geometric from there: every moult multiplies the body by the same factor, so the animals with
  * further to go grow faster per stage.
  */
-export const STAGES = ['Hatchling', 'Juvenile', 'Young', 'Adult', 'Prime'] as const;
+/** The five life stages, as the HUD names them (`TEXT.sim.ladder.stages`). */
+export const STAGES: readonly string[] = TEXT.sim.ladder.stages;
 export const ADULT_STAGE = 3, PRIME_STAGE = 4;
 export const PRIME_SCALE = 1.35;
 /** The smallest playable body, and the length nothing hatches longer than. */
@@ -34,7 +36,8 @@ export function stageForScale(adultLength: number, scale: number): number {
   for (let i = 0; i <= PRIME_STAGE; i++) if (scale >= stageScale(adultLength, i) - 1e-6) best = i;
   return best;
 }
-export const RUNG_NAMES = ['', 'Floor', 'Shoal', 'Hunters', 'Giants'] as const;
+/** The rungs of this era's ladder (`TEXT.sim.ladder.rungs`). */
+export const RUNG_NAMES: readonly string[] = TEXT.sim.ladder.rungs;
 /** Standing needed to be fully grown: the meter the five stages are cut out of. */
 export const GROWN = 100;
 export const HOLD_TO_WIN = 90;

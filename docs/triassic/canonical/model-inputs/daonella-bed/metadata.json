@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-19",
+  "task": "T3D-10A",
+  "canonicalStatus": "agent-reviewed-candidate",
+  "humanApprovalClaimed": false,
+  "canonical": "canonical.png",
+  "canonicalSource": "../../daonella-bed-candidate03.png",
+  "canonicalSha256": "e6496436db41180f323227938647c18f4c2762cead7a371f50cae55a058bd18c",
+  "input": "input.png",
+  "inputSha256": "e6496436db41180f323227938647c18f4c2762cead7a371f50cae55a058bd18c",
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "nativeInput": "../../prop-inputs-2026-09-19/native/daonella-bed-attempt2.png",
+  "nativeDimensions": [
+    1254,
+    1254
+  ],
+  "resolutionProcessing": "Lanczos3 resampling from the native 1254-square ImageGen output; not native 2048 detail.",
+  "original": "../../originals/2026-09-19-prop-candidate02/daonella-bed-candidate02.png",
+  "originalSha256": "8f56e088abb0cd67fd0f65a4b3dc2b65123ab4482f7bdde8c40688eeb8a9d6db",
+  "generator": "builtin image_gen.imagegen",
+  "inputPrompt": "Use case: precise-object-edit. Preserve the shells of this Daonella patch, their broad low-convexity oval outlines and extended dorsal hinges, fine radial ribbing and dense shallow overlap. Correct ONLY the background and framing: replace all alpha transparency, black areas, white/red/yellow fringes and broad cast shadows with a perfectly clean opaque neutral LIGHT GRAY studio background. Do not retain any colored fringe. Zoom out so the whole shell patch occupies only 75 percent of image width and height, with at least 12 percent margin on all sides. This is a finite shallow aggregate of ONLY shells; remove any remaining sand grains, sediment, matrix or sandy patch visible between shells. Where there are gaps, show the same plain light gray background or a clearly identifiable lower shell, not sand. No underlying plate, slab, rocks, ground plane, rim or terrain. Final image must be opaque RGB-looking, NOT transparent, square 2048 by 2048. No text, no multiple panels.",
+  "provenance": "../../prop-inputs-2026-09-19/provenance.json",
+  "review": {
+    "verdict": "pass",
+    "evidence": "Dense shallow overlap, broad low-convexity valves, extended dorsal hinge edges and fine radial sculpture. Complete finite patch on clean gray background; no sand slab or colored alpha fringe.",
+    "risk": "A single high-angle view cannot establish exact underside or valve thickness. Keep a very shallow shell aggregate; reject a generated solid mound or terrain plate."
+  },
+  "tripoSubmitted": false,
+  "downstreamApproval": {
+    "reviewer": "/root",
+    "method": "Visual contact-sheet review of all seven final input images",
+    "scope": "Approved for Tripo submission",
+    "note": "Complete silhouettes, neutral background, no substrate slab, and revised morphology reads correctly.",
+    "humanApprovalClaimed": false
+  }
+}

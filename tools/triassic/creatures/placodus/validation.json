@@ -5,16 +5,16 @@
   "removedFlakeVertices": 0,
   "remeshTriangles": 83996,
   "puppetBudget": 6500,
-  "fullTriangles": 21701,
-  "puppetTriangles": 8446,
+  "fullTriangles": 22119,
+  "puppetTriangles": 8314,
   "parts": {
-    "authoredBody": 17362,
-    "authoredJaw": 706,
+    "authoredBody": 17752,
+    "authoredJaw": 1062,
     "authoredArmour": 2025,
-    "puppetBody": 6183,
-    "puppetJaw": 160,
+    "puppetBody": 6281,
+    "puppetJaw": 258,
     "puppetArmour": 495,
-    "sharedOral": 1608
+    "sharedOral": 1280
   },
   "bones": 26,
   "clips": {
@@ -50,6 +50,7 @@
     "Sprint",
     "Guard",
     "Eat",
+    "Grab",
     "Crawl",
     "Pry",
     "Breathe"
@@ -73,7 +74,7 @@
     "Eat": 1.3877787807814457e-17,
     "Stagger": 2.9995195879107854e-33,
     "Ability": 2.3996155968602314e-33,
-    "Grab": 4.799231193720463e-33,
+    "Grab": 1.6653346031121838e-17,
     "Breath": 6.748919348305756e-33,
     "Growth": 5.2491593706793705e-33,
     "Crawl": 0.0,
@@ -108,12 +109,12 @@
     ],
     "Sprint": [
       [
-        -1.764531135559082,
+        -1.8949241638183594,
         -2.499870777130127,
-        -0.9827960133552551
+        -1.1027395725250244
       ],
       [
-        1.736859917640686,
+        1.9026581048965454,
         3.063953399658203,
         0.939275324344635
       ]
@@ -300,14 +301,14 @@
     ],
     "Grab": [
       [
-        -1.6918895244598389,
+        -1.6956673860549927,
         -2.5,
-        -1.0466957092285156
+        -1.049938678741455
       ],
       [
-        1.6763665676116943,
+        1.6785900592803955,
         3.2613260746002197,
-        1.0097010135650635
+        1.011252522468567
       ]
     ],
     "Breath": [
@@ -387,11 +388,11 @@
   "maximumEnvelopeDifference": 0.011147856712341309,
   "envelopeTolerance": 0.2,
   "envelopeTolerancePercent": 4.0,
-  "surfaceDistanceMax": 0.21310493350028992,
-  "surfaceDistanceP95": 0.014011383801698682,
-  "surfaceDistanceP99": 0.12939764559268943,
-  "surfaceOutliersOver0p15": 71,
-  "surfaceVertices": 10393,
+  "surfaceDistanceMax": 0.1352657824754715,
+  "surfaceDistanceP95": 0.012515064142644347,
+  "surfaceDistanceP99": 0.06533670425415039,
+  "surfaceOutliersOver0p15": 0,
+  "surfaceVertices": 10672,
   "seatingDepthRaw": {
     "fore_upper_L": 0.023843050003051758,
     "fore_upper_R": 0.03000234067440033,
@@ -401,7 +402,7 @@
     "gastralia": 0.030410489067435265
   },
   "maxInfluences": 4,
-  "meanInfluences": 1.91503703087293,
+  "meanInfluences": 1.9044847093547594,
   "mouth": {
     "method": "the modelled oral cavity, found by casting each head vertex normal back into the mesh over 0.030 raw units; the seam is the mid height of that cavity per station and the lining is its measured section",
     "cavityVertices": 193,
@@ -1143,24 +1144,98 @@
         0.465,
         0.95,
         0.95
-      ],
-      [
-        0.4675,
-        0.95,
-        0.95
-      ],
-      [
-        0.47,
-        0.95,
-        0.95
       ]
     ],
     "liningRings": 22,
     "liningRing": 14,
     "liningBackX": 0.39799999999999996,
-    "liningFrontX": 0.4771,
+    "liningFrontX": 0.4711,
     "skinDoubleSided": true,
-    "liningCullsBackfaces": true
+    "liningCullsBackfaces": true,
+    "oralShells": {
+      "contract": "a palate rigid on skull and a floor rigid on jaw, each a closed shell (T.oral_shells), overlapping behind the hinge, no wall between them",
+      "palateVertices": 154,
+      "floorVertices": 154,
+      "measuredRoomAtStations": [
+        [
+          0.398,
+          0.0686,
+          0.0937,
+          0.0384
+        ],
+        [
+          0.4102,
+          0.0619,
+          0.0866,
+          0.039
+        ],
+        [
+          0.4224,
+          0.0481,
+          0.0805,
+          0.0367
+        ],
+        [
+          0.4345,
+          0.0143,
+          0.0749,
+          0.0326
+        ],
+        [
+          0.4467,
+          0.0417,
+          0.0696,
+          0.0282
+        ],
+        [
+          0.4589,
+          0.0391,
+          0.0628,
+          0.0231
+        ],
+        [
+          0.4711,
+          0.0298,
+          0.0505,
+          0.0148
+        ]
+      ],
+      "vertexDirectionsOpenToTheOutside": 0,
+      "verticesSeatedInsideTheSilhouette": {
+        "vertices": 13,
+        "maxPullRaw": 0.011694618548295102
+      }
+    },
+    "hingeTissue": {
+      "plug": "none",
+      "closedBy": {
+        "cutCrossSectionCaps": {
+          "Placodus authored body": {
+            "skullAtHinge": 64,
+            "skullAtJawFront": 36,
+            "jawAtHinge": 64,
+            "jawAtFront": 36
+          },
+          "Placodus procedural volume puppet": {
+            "skullAtHinge": 25,
+            "skullAtJawFront": 21,
+            "jawAtHinge": 25,
+            "jawAtFront": 21
+          }
+        },
+        "rimFoldVertices": {
+          "Placodus authored body": {
+            "skull": 150,
+            "jaw": 125
+          },
+          "Placodus procedural volume puppet": {
+            "skull": 26,
+            "jaw": 26
+          }
+        },
+        "rimFoldRaw": 0.0035
+      }
+    }
   },
   "tailStraightening": {
     "maxVertexMove": 0.30864355132087284,
@@ -1171,8 +1246,260 @@
     "caudalStations": 14,
     "applied": true
   },
+  "limbSweepDegrees": {
+    "Idle": {
+      "fore_upper_L": 15.1,
+      "fore_upper_R": 15.0,
+      "hind_upper_L": 15.2,
+      "hind_upper_R": 15.3
+    },
+    "Swim": {
+      "fore_upper_L": 24.2,
+      "fore_upper_R": 24.2,
+      "hind_upper_L": 23.6,
+      "hind_upper_R": 23.6
+    },
+    "Sprint": {
+      "fore_upper_L": 155.4,
+      "fore_upper_R": 155.4,
+      "hind_upper_L": 155.3,
+      "hind_upper_R": 155.3
+    },
+    "TurnLeft": {
+      "fore_upper_L": 42.7,
+      "fore_upper_R": 28.7,
+      "hind_upper_L": 37.8,
+      "hind_upper_R": 21.1
+    },
+    "TurnRight": {
+      "fore_upper_L": 29.2,
+      "fore_upper_R": 43.6,
+      "hind_upper_L": 20.4,
+      "hind_upper_R": 36.9
+    },
+    "Dive": {
+      "fore_upper_L": 45.8,
+      "fore_upper_R": 45.0,
+      "hind_upper_L": 9.6,
+      "hind_upper_R": 9.6
+    },
+    "Rise": {
+      "fore_upper_L": 45.5,
+      "fore_upper_R": 46.2,
+      "hind_upper_L": 9.6,
+      "hind_upper_R": 9.6
+    },
+    "Attack": {
+      "fore_upper_L": 48.5,
+      "fore_upper_R": 47.9,
+      "hind_upper_L": 53.7,
+      "hind_upper_R": 54.2
+    },
+    "Bite": {
+      "fore_upper_L": 9.4,
+      "fore_upper_R": 9.5,
+      "hind_upper_L": 9.5,
+      "hind_upper_R": 9.6
+    },
+    "Heavy": {
+      "fore_upper_L": 48.7,
+      "fore_upper_R": 48.0,
+      "hind_upper_L": 53.2,
+      "hind_upper_R": 53.7
+    },
+    "Hit": {
+      "fore_upper_L": 9.4,
+      "fore_upper_R": 9.4,
+      "hind_upper_L": 9.5,
+      "hind_upper_R": 9.5
+    },
+    "Death": {
+      "fore_upper_L": 17.6,
+      "fore_upper_R": 17.6,
+      "hind_upper_L": 17.7,
+      "hind_upper_R": 17.7
+    },
+    "Guard": {
+      "fore_upper_L": 6.6,
+      "fore_upper_R": 6.6,
+      "hind_upper_L": 6.6,
+      "hind_upper_R": 6.6
+    },
+    "Parry": {
+      "fore_upper_L": 9.3,
+      "fore_upper_R": 9.4,
+      "hind_upper_L": 9.4,
+      "hind_upper_R": 9.5
+    },
+    "Dodge": {
+      "fore_upper_L": 79.3,
+      "fore_upper_R": 63.3,
+      "hind_upper_L": 62.2,
+      "hind_upper_R": 37.8
+    },
+    "Eat": {
+      "fore_upper_L": 12.5,
+      "fore_upper_R": 12.6,
+      "hind_upper_L": 12.7,
+      "hind_upper_R": 12.7
+    },
+    "Stagger": {
+      "fore_upper_L": 9.4,
+      "fore_upper_R": 9.5,
+      "hind_upper_L": 9.5,
+      "hind_upper_R": 9.6
+    },
+    "Ability": {
+      "fore_upper_L": 11.3,
+      "fore_upper_R": 11.4,
+      "hind_upper_L": 11.5,
+      "hind_upper_R": 11.5
+    },
+    "Grab": {
+      "fore_upper_L": 39.5,
+      "fore_upper_R": 40.7,
+      "hind_upper_L": 39.8,
+      "hind_upper_R": 38.5
+    },
+    "Breath": {
+      "fore_upper_L": 35.0,
+      "fore_upper_R": 37.3,
+      "hind_upper_L": 45.5,
+      "hind_upper_R": 43.8
+    },
+    "Growth": {
+      "fore_upper_L": 21.5,
+      "fore_upper_R": 21.6,
+      "hind_upper_L": 37.7,
+      "hind_upper_R": 37.7
+    },
+    "Crawl": {
+      "fore_upper_L": 107.1,
+      "fore_upper_R": 107.1,
+      "hind_upper_L": 146.7,
+      "hind_upper_R": 146.7
+    },
+    "Pry": {
+      "fore_upper_L": 66.3,
+      "fore_upper_R": 67.4,
+      "hind_upper_L": 31.1,
+      "hind_upper_R": 29.8
+    },
+    "CrushBite": {
+      "fore_upper_L": 23.9,
+      "fore_upper_R": 24.9,
+      "hind_upper_L": 13.4,
+      "hind_upper_R": 13.5
+    },
+    "Breathe": {
+      "fore_upper_L": 24.5,
+      "fore_upper_R": 24.6,
+      "hind_upper_L": 24.4,
+      "hind_upper_R": 24.6
+    }
+  },
+  "locomotionDecision": {
+    "swim": "tail scull, limbs trailing -- the research reading of Placodus (docs/research/triassic-swimming.json: \"negatively buoyant benthic bottom-walker with a slow tail scull\"; Neenan: laterally flattened tail, short relatively unmodified limbs with probably webbed feet). Kept at its authored ~24 degrees swept per cycle.",
+    "sprint": "paddles, >= 120 degrees swept per cycle at every limb root, over the unchanged tail wave -- the era rule that a limbed swimmer's dash has to paddle; the burst is where webbed feet earn their keep, as in this animal's own Crawl punt. Root range held inside what Crawl/Pry already ask of the skin (12.36x on Pry).",
+    "crawl": "the bottom-walk punt, unchanged."
+  },
   "normalizedWeights": true,
   "rootStable": true,
   "armourBoneUnanimated": true,
-  "noScaleChannels": true
+  "noScaleChannels": true,
+  "gapeSolid": {
+    "id": "placodus",
+    "backdrop": [
+      1.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "shots": [
+      {
+        "clip": "Ability",
+        "t": 0.14,
+        "pixels": 378000,
+        "differingPixels": 1753,
+        "holesOpenedByCulling": 11,
+        "seenThroughTheBody": 11,
+        "backdropInBothPasses": 130,
+        "markedImage": "triassic-authoring/placodus/gape-solid/Ability-0.14-opened.png",
+        "solid": "triassic-authoring/placodus/gape-solid/Ability-0.14-solid.png",
+        "culled": "triassic-authoring/placodus/gape-solid/Ability-0.14-culled.png"
+      },
+      {
+        "clip": "Attack",
+        "t": 0.13,
+        "pixels": 378000,
+        "differingPixels": 1937,
+        "holesOpenedByCulling": 13,
+        "seenThroughTheBody": 13,
+        "backdropInBothPasses": 694,
+        "markedImage": "triassic-authoring/placodus/gape-solid/Attack-0.13-opened.png",
+        "solid": "triassic-authoring/placodus/gape-solid/Attack-0.13-solid.png",
+        "culled": "triassic-authoring/placodus/gape-solid/Attack-0.13-culled.png"
+      },
+      {
+        "clip": "Bite",
+        "t": 0.23,
+        "pixels": 378000,
+        "differingPixels": 1984,
+        "holesOpenedByCulling": 11,
+        "seenThroughTheBody": 6,
+        "backdropInBothPasses": 8,
+        "markedImage": "triassic-authoring/placodus/gape-solid/Bite-0.23-opened.png",
+        "solid": "triassic-authoring/placodus/gape-solid/Bite-0.23-solid.png",
+        "culled": "triassic-authoring/placodus/gape-solid/Bite-0.23-culled.png"
+      },
+      {
+        "clip": "CrushBite",
+        "t": 0.26,
+        "pixels": 378000,
+        "differingPixels": 1819,
+        "holesOpenedByCulling": 13,
+        "seenThroughTheBody": 13,
+        "backdropInBothPasses": 392,
+        "markedImage": "triassic-authoring/placodus/gape-solid/CrushBite-0.26-opened.png",
+        "solid": "triassic-authoring/placodus/gape-solid/CrushBite-0.26-solid.png",
+        "culled": "triassic-authoring/placodus/gape-solid/CrushBite-0.26-culled.png"
+      },
+      {
+        "clip": "Eat",
+        "t": 0.4,
+        "pixels": 378000,
+        "differingPixels": 1733,
+        "holesOpenedByCulling": 10,
+        "seenThroughTheBody": 10,
+        "backdropInBothPasses": 164,
+        "markedImage": "triassic-authoring/placodus/gape-solid/Eat-0.4-opened.png",
+        "solid": "triassic-authoring/placodus/gape-solid/Eat-0.4-solid.png",
+        "culled": "triassic-authoring/placodus/gape-solid/Eat-0.4-culled.png"
+      },
+      {
+        "clip": "Heavy",
+        "t": 0.14,
+        "pixels": 378000,
+        "differingPixels": 1913,
+        "holesOpenedByCulling": 18,
+        "seenThroughTheBody": 0,
+        "backdropInBothPasses": 3,
+        "markedImage": "triassic-authoring/placodus/gape-solid/Heavy-0.14-opened.png",
+        "solid": "triassic-authoring/placodus/gape-solid/Heavy-0.14-solid.png",
+        "culled": "triassic-authoring/placodus/gape-solid/Heavy-0.14-culled.png"
+      },
+      {
+        "clip": "Pry",
+        "t": 1.93,
+        "pixels": 378000,
+        "differingPixels": 1403,
+        "holesOpenedByCulling": 0,
+        "seenThroughTheBody": 0,
+        "backdropInBothPasses": 0,
+        "markedImage": null,
+        "solid": "triassic-authoring/placodus/gape-solid/Pry-1.93-solid.png",
+        "culled": "triassic-authoring/placodus/gape-solid/Pry-1.93-culled.png"
+      }
+    ]
+  }
 }

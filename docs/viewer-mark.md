@@ -74,8 +74,11 @@ a reload starts clean. What leaves the viewer is the region file.
   (every Tripo preview is). With two it would be a lie by omission, so it is left out.
 - `bounds` is the box the marked vertices occupy in the mesh's own coordinates, as the file stores
   them. It is the check that catches indices meaning something else in another file.
-- `sha256` is the hash from `src/content/triassic/preview-bodies.json` where the manifest knows the
-  body, and `null` otherwise — the panel says so when it will be.
+- `sha256` is measured off the file on stage (`src/viewer/file-hash.ts`, shared with the mouth
+  editor), whatever body that is — a shipped one is in no manifest, which is how a region marked on
+  Mosasaurus once went out with `null`. Where the page cannot hash (a plain http deployment) it
+  falls back to `src/content/triassic/preview-bodies.json`'s hash, then `null`, and the panel says
+  so when it will be.
 - Only meshes with something marked appear; `vertexCount` at the top is the whole body, because the
   share cut is the number the cut is judged by.
 

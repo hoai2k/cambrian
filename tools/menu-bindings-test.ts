@@ -15,6 +15,9 @@
  *          --outfile=/tmp/mb.mjs && node /tmp/mb.mjs
  */
 import { applyMouse, emptyControls, readGamepad, type RawControls } from '../src/input/input';
+import { applyTouch, type TouchPlay } from '../src/input/touch';
+
+type TouchFrameLike = ReturnType<TouchPlay['read']>;
 
 /** Every control the menu code in src/app/App.tsx reads, with where it is used. */
 const MENU_ACTIONS: { key: keyof RawControls; used: string }[] = [
@@ -132,8 +135,53 @@ for (const m of MOUSE) {
   console.log(`  ${m.name.padEnd(13)} → ${m.expect.join(', ')}`);
 }
 
+/**
+ * The fingers, for a session played on glass. The same rule again — one gesture, one action, and
+ * never a menu action — with one deliberate difference from the mouse.
+ *
+ * The mouse is forbidden `ability`, `guard` and `sense` because it plays *beside* a keyboard and
+ * those have keys on it. A finger has no keyboard to fall back on, so the secondary pad reaches all
+ * three, one at a time: that is what the swipe-to-swap ring is for, and forbidding them would leave
+ * a touch player unable to hide or block at all. What is still out of reach is the same in kind — the
+ * menu actions, which a finger works by tapping the buttons themselves — plus `rise` and `sink`,
+ * which the camera covers here as it does on a mouse (pitch the view and hold swim).
+ */
+const TOUCH: { name: string; press: Partial<TouchFrameLike>; expect: (keyof RawControls)[] }[] = [
+  { name: 'tap', press: { light: true }, expect: ['light'] },
+  { name: 'double-tap animal', press: { heavy: true }, expect: ['heavy'] },
+  { name: 'double-tap water', press: { dash: true }, expect: ['dash', 'dodge'] },
+  { name: 'swim pad', press: { swim: true }, expect: [] },
+  { name: 'pad · aim', press: { secondary: 'aim' }, expect: ['aim', 'lock'] },
+  { name: 'pad · guard', press: { secondary: 'guard' }, expect: ['guard'] },
+  { name: 'pad · hide', press: { secondary: 'ability' }, expect: ['ability'] },
+  { name: 'pad · sense', press: { secondary: 'sense' }, expect: ['sense'] },
+];
+const TOUCH_FORBIDDEN: (keyof RawControls)[] = ['confirm', 'back', 'menu', 'lb', 'rb', 'view', 'teleport', 'rise', 'sink', 'burst'];
+for (const m of TOUCH) {
+  const c = applyTouch(emptyControls(), {
+    dx: 0, dy: 0, zoom: 0, bites: 0, heavies: 0, swim: false, secondary: undefined, dash: false,
+    dragging: false, ndc: undefined, swapped: false, pinching: false, buttons: [], light: false, heavy: false, ...m.press,
+  });
+  for (const k of m.expect) if (!c[k]) fail(`${m.name} does not drive "${String(k)}"`);
+  for (const k of TOUCH_FORBIDDEN) if (c[k]) fail(`${m.name} drives the menu control "${String(k)}"`);
+  const others = TOUCH.filter((o) => o !== m).flatMap((o) => o.expect).filter((k) => !m.expect.includes(k));
+  for (const k of others) if (c[k]) fail(`${m.name} also drives "${String(k)}", which belongs to another gesture`);
+  // The swim pad is the one gesture with no button behind it at all: it is the stick.
+  if (m.press.swim && c.my !== 1) fail('the swim pad does not push the stick forward');
+  console.log(`  ${m.name.padEnd(19)} → ${m.expect.length ? m.expect.join(', ') : 'forward (the stick)'}`);
+}
+/** Only one secondary at a time: the ring is a ring, not a row of buttons. */
+for (const a of TOUCH) for (const b of TOUCH) {
+  if (a === b || !a.press.secondary || !b.press.secondary) continue;
+  const c = applyTouch(emptyControls(), {
+    dx: 0, dy: 0, zoom: 0, bites: 0, heavies: 0, swim: false, secondary: a.press.secondary, dash: false,
+    dragging: false, ndc: undefined, swapped: false, pinching: false, buttons: [], light: false, heavy: false,
+  });
+  for (const k of b.expect) if (c[k]) fail(`the pad set to ${a.press.secondary} also drives ${b.press.secondary}'s "${String(k)}"`);
+}
+
 for (const { key, used } of MENU_ACTIONS) {
   console.log(`  ${key.padEnd(9)} button(s) ${buttonsFor.get(key)!.join(', ').padEnd(6)}  ${used}`);
 }
-console.log(`\n${MENU_ACTIONS.length} menu actions over ${BUTTONS} buttons, ${MOUSE.length} mouse buttons · ${failures} failure(s)`);
+console.log(`\n${MENU_ACTIONS.length} menu actions over ${BUTTONS} buttons, ${MOUSE.length} mouse buttons, ${TOUCH.length} gestures · ${failures} failure(s)`);
 process.exit(failures ? 1 : 0);

@@ -16,7 +16,7 @@ the same reason -- the animal's own colouring is the only measurement there is.
 The generation arrives lying along +Y with the head at +Y; intake turns it a quarter turn about Z
 so the rest of this file can speak the same raw frame every other builder in the era speaks.
 """
-import bpy, bmesh, math, json, os, struct, hashlib, shutil
+import bpy, bmesh, math, json, os, sys, struct, hashlib, shutil
 import numpy as np
 from mathutils import Vector, Matrix, Quaternion
 from mathutils.bvhtree import BVHTree
@@ -24,6 +24,9 @@ from mathutils.geometry import barycentric_transform
 from math import sin, cos, pi
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.abspath(os.path.join(HERE, '../../../..'))
+sys.path.insert(0, os.path.join(os.path.abspath(os.path.join(HERE, '../../../..')),
+                                'tools/triassic/creatures/_pipeline'))
+import tripo as T                                                              # noqa: E402
 LOCAL = os.path.join(ROOT, 'local/triassic-authoring/keichousaurus'); OUT = os.path.join(ROOT, 'public/assets/triassic/creatures')
 os.makedirs(LOCAL, exist_ok=True); os.makedirs(OUT, exist_ok=True)
 RAW = os.path.join(HERE, 'tripo-raw/keichousaurus.raw.glb'); ID = 'keichousaurus'; SCALE = 5
@@ -36,7 +39,7 @@ CLIPS = {'Idle': 2.4, 'Swim': 1.6, 'Sprint': 1.0, 'TurnLeft': 1.4, 'TurnRight': 
          'Attack': 1., 'Bite': .5, 'Heavy': 1.1, 'Hit': .6, 'Death': 1.6, 'Guard': 1., 'Parry': .4, 'Dodge': .5,
          'Eat': 1.6, 'Stagger': 1.2, 'Ability': .9, 'Grab': 1.2, 'Breath': 2.4, 'Growth': 1.5,
          'Shoal': 1.4, 'Breathe': 3.}
-LOOPS = ['Idle', 'Swim', 'Sprint', 'Guard', 'Eat', 'Shoal', 'Breathe']
+LOOPS = ['Idle', 'Swim', 'Sprint', 'Guard', 'Eat', 'Grab', 'Shoal', 'Breathe']
 
 bpy.ops.object.select_all(action='SELECT'); bpy.ops.object.delete(use_global=False)
 for a in list(bpy.data.actions): bpy.data.actions.remove(a)
@@ -445,25 +448,34 @@ for n, (p, parent) in B.items():
     eb = arm.edit_bones.new(n); eb.head = tx(p); eb.tail = eb.head + Vector((0, .16, 0))
     if parent: eb.parent = arm.edit_bones[parent]
 bpy.ops.object.mode_set(mode='OBJECT')
-influences = []
+# The mandible is skinned *into* the head rather than rigid against it: one field over both parts,
+# the throat under the hinge following the jaw and the shell ramping to full jaw over `band` from
+# the cut rim, so the two copies of every rim vertex carry the same weights and the cut cannot open
+# (`T.jaw_junction`; `tools/triassic/lag.mjs` measures the seam it closes).
+influences, JUNCTION = [], {}
 for o in [auth, puppet]:
-    for n in B: o.vertex_groups.new(name=n)
-    for v in o.data.vertices:
-        w = weights(v.co); influences.append(len(w))
-        for n, val in w.items(): o.vertex_groups[n].add([v.index], val, 'REPLACE')
-    for v in o.data.vertices: v.co = tx(v.co)
-    for p in o.data.polygons: p.use_smooth = True
-    mod = o.modifiers.new('Shared articulated skeleton', 'ARMATURE'); mod.object = rig; o.parent = rig
-for o in parts['lower jaw'].values():
-    g = o.vertex_groups.new(name='jaw'); g.add(list(range(len(o.data.vertices))), 1., 'REPLACE')
-    for v in o.data.vertices: v.co = tx(v.co)
-    for p in o.data.polygons: p.use_smooth = True
-    mo = o.modifiers.new('Rigid lower jaw', 'ARMATURE'); mo.object = rig; o.parent = rig
+    shell = parts['lower jaw'][o.name]
+    for part in (o, shell):
+        for n in B: part.vertex_groups.new(name=n)
+    body_w, shell_w, JUNCTION[o.name] = T.jaw_junction(
+        o, shell, [weights(v.co) for v in o.data.vertices], B['jaw'][0],
+        rear=lambda p: abs(head_local(p)[0] - HINGE_A) < 1e-5,
+        upper_jaw=lambda p: head_local(p)[0] > HINGE_A and head_local(p)[1] >= seam_n(head_local(p)[0]) - 1e-6,
+        axis=tuple(HEAD_DIR), down=tuple(-HEAD_UP))
+    for part, field in ((o, body_w), (shell, shell_w)):
+        for v in part.data.vertices:
+            w = field[v.index]; influences.append(len(w))
+            for n, val in w.items(): part.vertex_groups[n].add([v.index], val, 'REPLACE')
+        for v in part.data.vertices: v.co = tx(v.co)
+        for p in part.data.polygons: p.use_smooth = True
+        mod = part.modifiers.new('Shared articulated skeleton' if part is o else 'Mandible into the head', 'ARMATURE'); mod.object = rig; part.parent = rig
 
-# ---- mouth interior: one closed skinned lining ----------------------------------------------------
-# Roof on the skull, floor on the jaw, wall stretching between them, wound inwards so the near wall
-# culls and the far wall draws, with the skin double-sided behind it. One lining, not two tubes:
-# two tubes look identical at rest and part the moment the jaw swings.
+# ---- mouth interior: a palate and a floor -------------------------------------------------------
+# A palate rigid on the skull and a floor rigid on the jaw, each closed on its own and each filling
+# its own jaw's interior out to the head's measured room, overlapping rather than joining at the
+# corner of the mouth where the jaw's rotation is zero (`T.oral_shells`). One sac whose wall
+# stretched between the two bones stood here; the wall could not part, which is what it was written
+# for, and it still photographs as a mouth webbed shut.
 mouthmat = bpy.data.materials.new('Keichousaurus mouth interior'); mouthmat.use_nodes = True
 mouthmat.use_backface_culling = True
 mbs = mouthmat.node_tree.nodes.get('Principled BSDF')
@@ -506,44 +518,35 @@ def mouth_section(a):
 
 
 LINING_RINGS, LINING_RING = 18, 10
-lin_raw = []; verts = []; faces = []
-for i in range(LINING_RINGS):
-    a = MOUTH_BACK + (MOUTH_FRONT - MOUTH_BACK) * (i / (LINING_RINGS - 1)); w, hu, hd = mouth_section(a)
-    for j in range(LINING_RING):
-        th = j * 2 * pi / LINING_RING
-        n_ = seam_n(a) + (hu if sin(th) >= 0 else hd) * sin(th)
-        p = head_point(a, n_, w * cos(th))
-        lin_raw.append((a, n_, p)); verts.append(tx(p))
-for i in range(LINING_RINGS - 1):
-    for j in range(LINING_RING):
-        a = i * LINING_RING + j; b = i * LINING_RING + (j + 1) % LINING_RING
-        faces.append((a, a + LINING_RING, b + LINING_RING, b))
-faces.append(tuple(range(LINING_RING)))
-faces.append(tuple(reversed(range((LINING_RINGS - 1) * LINING_RING, LINING_RINGS * LINING_RING))))
-me = bpy.data.meshes.new('Oral cavity lining'); me.from_pydata(verts, [], faces); me.update()
-lining = bpy.data.objects.new('Oral cavity lining', me); bpy.context.collection.objects.link(lining)
-lining.location = (0, 0, 0); lining.data.materials.append(mouthmat)
-for n in ['skull', 'jaw']: lining.vertex_groups.new(name=n)
-for idx, (a, n_, p) in enumerate(lin_raw):
-    w, hu, hd = mouth_section(a)
-    t = smooth(.5 + .5 * (seam_n(a) - n_) / max(hd, 1e-6))
-    # No front taper on the jaw's share: the floor of the mouth at the very front IS the tip of
-    # the mandible, and pinning it to the skull leaves the tip swinging out from under the lining --
-    # which is where the gape test found the backdrop.
-    # The floor is fully on the jaw BY the hinge, not 0.014 after it. A lining that is still all
-    # skull at the hinge does not follow the mandible's rear edge at all, and the V that opens
-    # between the two cut edges is where the gape test found 30 px of backdrop. Points at the hinge
-    # barely move under the rotation, so giving them the jaw costs nothing.
-    g = t * smooth((a - (HINGE_A - .012)) / .012)
-    lining.vertex_groups['jaw'].add([idx], g, 'REPLACE'); lining.vertex_groups['skull'].add([idx], 1 - g, 'REPLACE')
-for p in lining.data.polygons: p.use_smooth = True
-mo = lining.modifiers.new('Oral membrane', 'ARMATURE'); mo.object = rig; lining.parent = rig
+# A palate rigid on the skull and a floor rigid on the jaw, each closed on its own and overlapping
+# at the corner of the mouth: `T.oral_shells`. One sac whose wall stretched between the two bones
+# stood here, and the wall photographs as a mouth webbed shut. This head's mouth is measured on the
+# **head's own curved frame** rather than on a straight axis -- a long neck carries the lumen round
+# with it -- so the shells are placed through `head_point` and their `z` is distance along the
+# head's normal, which is what the `point` hook is for.
+lin_raw, faces, n_palate = T.oral_shells(seam_n, mouth_section, MOUTH_BACK, MOUTH_FRONT,
+                                         rings=LINING_RINGS, ring=LINING_RING,
+                                         point=(lambda a, lat, n_: head_point(a, n_, lat)),
+                                         # What the palate and the floor each fill: the head's own
+                                         # room at the mouth line. `mouth_extent` casts outwards
+                                         # from the mouth axis, which is honest here and only here
+                                         # -- this generation models no slit for a ray to stop on.
+                                         # Held further inside the head than the kit's
+                                         # default. This generation models no slit, so its
+                                         # own nearest-surface check on the lining means
+                                         # what it says, and a shell drawn to nine tenths
+                                         # of the measured room leaves it 0.00025 of clear
+                                         # flesh against the 0.0005 it asks for.
+                                         fill=.84,
+                                         room=mouth_extent)
+lining = T.oral_object('Oral cavity lining', tx, lin_raw, faces, n_palate, mouthmat, rig,
+                       measured_room=True)
 oralparts.append(lining)
 # This generation models no slit, so the shell is smooth and a nearest-surface depth on a lining
 # vertex means what it says -- unlike Placodus, where the shell folds in through a real slit and
 # the same measurement is untrustworthy. So it is asserted here: a lining that leaves the head is a
 # red nub on the snout at rest, which is what the first pass at closing the gape produced.
-_ld = sorted(((depth(p), round(a, 4), round(n_, 4), tuple(round(float(c), 4) for c in p)) for a, n_, p in lin_raw))[:5]
+_ld = sorted((depth(p), tuple(round(float(c), 4) for c in p)) for p in lin_raw)[:5]
 lining_depth = _ld[0][0]
 assert lining_depth > .0005, ('the oral lining leaves the head', _ld)
 
@@ -1001,7 +1004,12 @@ report = {'sourceSha256': hashlib.sha256(open(RAW, 'rb').read()).hexdigest(),
                         liningSideShareOfMeasuredReach=LINING_SIDE,
                         liningRoofShareOfMeasuredReach=LINING_ROOF, liningFloorShareOfMeasuredReach=LINING_FLOOR,
                         liningNearestSurfaceDepthRaw=round(float(lining_depth), 5),
-                        skinDoubleSided=True, liningCullsBackfaces=True, oneClosedLining=True),
+                        liningRoomShareFilled=.84, palateVertices=n_palate,
+                        floorVertices=len(lin_raw) - n_palate,
+                        skinDoubleSided=True, liningCullsBackfaces=True, oneClosedLining=False,
+                        separatePalateAndFloor='a palate rigid on skull and a floor rigid on jaw, '
+                                               'each a closed shell (T.oral_shells); no vertex '
+                                               'blends the two bones'),
           'normalizedWeights': True, 'rootStable': True, 'noScaleChannels': True}
 _qa = os.path.join(HERE, 'qa.json')
 report['postBuildQA'] = json.load(open(_qa)) if os.path.exists(_qa) else None

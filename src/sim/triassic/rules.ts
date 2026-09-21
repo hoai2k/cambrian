@@ -1,3 +1,4 @@
+import { TEXT } from '../../shared/text';
 import { clamp, distXZ, heading, type Vec3 } from '../../shared/math';
 import { makeBrain } from '../ai';
 import type { EraHud, EraRules } from '../era-rules';
@@ -12,7 +13,7 @@ import { DEVONIAN_RULES } from '../devonian/rules';
 import { ADULT_STAGE, devActor, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageProgress, stageScale } from '../devonian/state';
 import { botNursery, canBreach as devCanBreach, sanctuary, spawnInCover, spawnProtect, spawnY, swim as devSwim, wanderY } from '../devonian/swim';
 import { camoDrain, installTriassicSpecials, stepAbility, useAbility, ySpecial } from './specials';
-import { shoreClip, stepShore } from './shore';
+import { setShoreAnimals, shoreClip, shoreRadar, stepShore } from './shore';
 import { AIR_LOW, AIR_MAX, triActor, triState } from './state';
 
 /**
@@ -30,7 +31,8 @@ import { AIR_LOW, AIR_MAX, triActor, triState } from './state';
  * - **Armour with a facing**, the pod, heat on the flats and cold in
  *   the deep, a held animal's lost air, and the specials in ./specials.ts.
  */
-const RUNG_NAMES_TRI = ['', 'Floor', 'Shelf', 'Hunters', 'Giants'] as const;
+/** The rungs of this era's ladder (`TEXT.sim.ladder.rungs`). */
+const RUNG_NAMES_TRI: readonly string[] = TEXT.sim.ladder.rungs;
 /** The stamina left, under water, at which the body starts to sound winded — a quarter bar. */
 const WINDED_BELOW = 0.25;
 /** How often the winded heartbeat sounds at a quarter bar, closing to a shade under two seconds when the bar is gone. */
@@ -293,7 +295,7 @@ export const TRIASSIC_RULES: EraRules = {
     const ctx = hitCtxFor(g);
     for (const a of players(g)) {
       const t = triActor(g, a), def = creature(a.creature);
-      t.shoreWarn = 0;                                        // the shore module raises it again this step if it is still winding up
+      t.shoreWarn = 0; t.shoreWatch = 0;                      // the shore module raises them again this step if it is still watching or winding up
       updateAir(g, a, dt);
       updateClimate(g, a, dt);
       updatePod(g, a, dt);
@@ -463,7 +465,7 @@ export const TRIASSIC_RULES: EraRules = {
     // The gauge comes back with the body. A hatchling that respawned on the empty chest it drowned
     // with would start the next life already out of air, and drown again the moment its bar went.
     t.atSurface = false; t.air = AIR_MAX; t.drownT = 0;
-    t.windT = 0; t.heldT = 0; t.podShield = 0; t.strokeT = 0; t.shoreWarn = 0; t.sawT = 0;
+    t.windT = 0; t.heldT = 0; t.podShield = 0; t.strokeT = 0; t.shoreWarn = 0; t.shoreWatch = 0; t.sawT = 0;
   },
 
   updateModes: DEVONIAN_RULES.updateModes,
@@ -476,6 +478,9 @@ export const TRIASSIC_RULES: EraRules = {
    * Presentation only, and only for `shore: true`: everything else in the era is untouched.
    */
   clip(a) { return creature(a.creature).shore ? shoreClip(a) : undefined; },
+  radar: shoreRadar,
+  /** Settings → Shore animals: off by default, and live — a match fills or clears its banks from the next step (`setShoreAnimals` in ./shore.ts). */
+  settings: { shoreAnimals: setShoreAnimals },
 
   hud(g, i): EraHud | undefined {
     const p = g.players[i]; if (!p) return undefined;
@@ -483,25 +488,27 @@ export const TRIASSIC_RULES: EraRules = {
     void RUNG_NAMES; void nurseryAt;
     return {
       standing: d.standing, stageProgress: stageProgress(d), rung: rungOf(p), rungName: RUNG_NAMES_TRI[rungOf(p)], stage: STAGES[d.stage],
-      bimodal: def.breathing === 'bimodal', air: def.breathing === 'air', atSurface: t.atSurface, shoreWarn: t.shoreWarn, heldUnder: def.breathing === 'air' && p.grabbedBy >= 0,
+      bimodal: def.breathing === 'bimodal', air: def.breathing === 'air', atSurface: t.atSurface, shoreWarn: t.shoreWarn, shoreWatch: t.shoreWatch, heldUnder: def.breathing === 'air' && p.grabbedBy >= 0,
       airLeft: def.breathing === 'air' ? clamp(t.air / AIR_MAX, 0, 1) : undefined,
       airLow: def.breathing === 'air' && t.air < AIR_LOW, drowning: t.drownT > 0,
-      beached: false, primeT: d.primeT, inDeadZone: false, deadZones: [],
+      beached: p.ashore, primeT: d.primeT, inDeadZone: false, deadZones: [],
     };
   },
 
   hint(g, i) {
     const p = g.players[i]; if (!p || !isAlive(p)) return undefined;
     const t = triActor(g, p), def = creature(p.creature), rung = rungOf(p);
-    if (t.shoreWarn > 0) return 'Something on the shore is fishing. Get deeper.';
+    const H = TEXT.sim.hints;
+    if (t.shoreWarn > 0) return H.shoreFishing;
+    if (t.shoreWatch > 0) return H.shoreWatching;
     // These no longer mention air, for two reasons. It is not what the era is about — it went back
     // to the sea, it does not merely breathe — and the two that did say so had been made wrong by
     // the gauge: effort costs stamina, which comes back normally on a full chest, so "air is what
     // effort costs" and "every fight ends at the surface" both stopped being true. The gauge itself
     // teaches the mechanic where it belongs, on the bar, and flashes for its last minute.
-    if (g.time < 12) return rung === 1 ? 'Feed, hide, moult. Everything out there is bigger than you are today.' : rung === 2 ? 'Feed and grow. The deep is busier than the shallows, and everything in it is bigger.' : rung === 3 ? 'Hunt the shelf. Five stages between you and Prime.' : 'Stay fed. The deep is yours; the flats are closed to you.';
-    if (def.shell && g.time < 40) return 'Your funnel makes rise and sink free, and no direction is slow. Block withdraws into the shell.';
-    if (def.sink && g.time < 40) return 'You settle when you stop. The floor is where you feed.';
+    if (g.time < 12) return H.opening[Math.min(rung, H.opening.length) - 1] ?? H.opening[H.opening.length - 1];
+    if (def.shell && g.time < 40) return H.shell;
+    if (def.sink && g.time < 40) return H.sink;
     return undefined;
   },
 };

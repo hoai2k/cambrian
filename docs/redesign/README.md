@@ -15,6 +15,8 @@ and the procedural environment.
 | [06 · Era content boundary](06-era-content.md) | Implemented configuration boundary for future content packs; Cambrian remains the only available era. |
 | [07 · Devonian natural-history and asset brief](07-devonian-design.md) | Natural-history descriptions for 21 creatures; regional environments, plants, props, and a quantified image/3D asset inventory. No gameplay specification. |
 | [08 · Devonian Domination](08-devonian-domination.md) | Game design for the Devonian era: rungs of a food chain instead of growth, standing and range as progress, armour, air, anoxia, shells, moulting, shoaling, a climbable shore, the biome set, modes and an implementation order. Proposal, not built. |
+| [10 · The shore](10-the-shore.md) | **Built.** A body can end up on the sand: a leap lands there in every era, an animal with legs and lungs walks up and back, a stranded water-breather has a minute and can only flop toward the sea. `src/sim/beach.ts`, `npm run beach`. |
+| [11 · Touch and small screens](11-touch-and-small-screens.md) | **Built.** The third way to play: tap to bite, double-tap to pounce or dash, swipe to look, pinch to zoom, two holdable pads bottom-left with the second one swipeable through aim / guard / hide / sense. Plus what a phone-sized window changes in the HUD and the menus. `src/shared/touch-play.ts`, `npm run touch`, `node tools/touch-browser.mjs`. |
 | [Triassic (docs/triassic/)](../triassic/README.md) | The third era: design, roster, biomes and depth, image and model requests in Tripo / in-house tiers, and the Tripo production strategy. Proposal, not built. |
 
 Start with the design doc if you want the game; start with the technical plan

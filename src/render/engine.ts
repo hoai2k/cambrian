@@ -4,26 +4,32 @@ import * as THREE from 'three';
 import { audio, SAMPLES } from '../audio/audio';
 import { distanceAtten, hugeLength } from '../audio/mix';
 import { applyMouse, emptyControls, gamepads, KeyboardInput, MousePlay, readGamepad, rumble, type RawControls } from '../input/input';
+import { applyTouch, TouchPlay } from '../input/touch';
+import { splitAxis } from '../shared/small-screen';
+import type { Secondary } from '../shared/touch-play';
 import { cursorFor, cursorState } from '../shared/cursors';
 import { clamp, damp, TAU, wrapAngle } from '../shared/math';
-import { bandOf, comingFor, isAlive, isHidden, lengthOf } from '../sim/actors';
+import { bandOf, comingFor, floorClearance, isAlive, isHidden, lengthOf } from '../sim/actors';
 import { creature, type CreatureId } from '../sim/creatures';
 import { CORPSE_WINDOW, DEATH_FADE, Game, radarRange as radarReach, type GripHud, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
 import type { Phase } from '../sim/daynight';
 import { BAND_COLOR, CALM_MARK, emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
 import { recordStep, recordingPhase } from '../app/debug-record';
-import { BIOME_NAMES, biomeAt, coverAt, groundHeight, nurseryAt, sampleHeight, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
+import { BIOME_NAMES, biomeAt, coverAt, groundHeight, LAND_REACH, nurseryAt, sampleHeight, shoreDistance, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
+import { amphibious, breathesAir, STRAND_BREATH, STRAND_LOW } from '../sim/beach';
 import { AssetQueue, type AssetProgress } from './assets';
 import { fillOf, ladderName } from '../sim/ladder';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
 import { Edges } from '../shared/edges';
+import { SAND_COLORS } from '../shared/environment-colors';
 import { Attachments } from './attachments';
-import { Bubbles, Impacts, Silt, Splash } from './fx';
+import { Bubbles, Impacts, laysMark, printableSand, Sand, sandThrow, Silt, Splash, trackGait, Tracks, type BurrowPhase } from './fx';
 import { Eggs } from './eggs';
 import { Mouthfuls } from './carcass';
 import { createSea, type Quality, type SeaEnvironment } from './sea';
 import { RULES, type EraHud } from '../sim/era-rules';
 import { key as controlKey, schemeForDevice, type Scheme } from '../shared/controls';
+import { TEXT } from '../shared/text';
 
 export interface Rect { x: number; y: number; w: number; h: number; }
 export interface PlayerHud {
@@ -34,10 +40,27 @@ export interface PlayerHud {
   tier: number; tierName: string; progress: number; scale: number;
   abilityName: string; abilityReady: number; abilityActive: boolean; abilityUnlocked: boolean;
   lock?: { name: string; kind?: string; band: Band; hp: number; color: string };
-  aim?: { hasTarget: boolean; inRange: boolean; name?: string; color: string; ready: boolean; /** What RT does for this creature: POUNCE, or the special's own name. */ action: string };
+  aim?: {
+    hasTarget: boolean; inRange: boolean; name?: string; color: string; ready: boolean;
+    /** What RT does for this creature: POUNCE, or the special's own name. */ action: string;
+    /**
+     * Where to draw it, in normalised device coordinates (-1..1, y up), when that is not the middle
+     * of the screen. Only touch sets it: the reticle belongs dead centre for a pad, because the
+     * centre of the camera *is* the aim axis, and it belongs under the finger for a touch player,
+     * because there the last tap is the aim axis (`cursorDir`). Absent means the middle, which is
+     * what every other scheme means.
+     */
+    at?: { x: number; y: number };
+  };
   /** Sense is on: the band glyphs and the radar are drawn. */
   senseOn: boolean;
   hunted: number; hunterAngle: number | null; hunterName?: string; hunterState: 'none' | 'noticed' | 'hunting'; inCover: boolean; still: boolean;
+  /**
+   * Out of the water, on the shore (src/sim/beach.ts). `strandLeft` is a water-breather's minute
+   * out of the water, 1 down to 0, and is set only while it is ashore — the gauge is for the sand
+   * and nowhere else; `strandLow` is the last of it. An air-breather ashore carries neither.
+   */
+  ashore: boolean; strandLeft?: number; strandLow?: boolean;
   hint?: string; respawnIn: number; fade: number; state: string; modelReady: boolean; kills: number; eats: number; escapes: number; protect: boolean;
   /**
    * Co-op: seconds left for a team-mate to reach this downed player, and the downed team-mates
@@ -103,9 +126,37 @@ export interface EngineCallbacks {
   onProgress?(p: AssetProgress): void;
   /** The pointer lock went away on its own (Escape, alt-tab). The match should pause. */
   onPointerLost?(): void;
+  /**
+   * A swipe on the secondary pad chose a different action. The shell remembers it, so the choice
+   * outlives the match — a player who plays as a hider should not have to swipe back to it every
+   * time they hatch.
+   */
+  onSecondary?(s: Secondary): void;
 }
 
 export const PLAYER_COLORS = ['#61f2d5', '#ffb457', '#c7a3ff', '#ff86a4'];
+
+/**
+ * How far from the camera a burrow still throws sand. Past this the grains are a pixel inside the
+ * fog, so the work of emitting them buys nothing.
+ */
+const SAND_RANGE = 70;
+/** How far a print is lifted off the sand it is pressed into, so it draws rather than z-fights. */
+const TRACK_LIFT = 0.02;
+/** The step the sand's own gradient is measured over, to lie a print along the beach's slope. */
+const TRACK_SLOPE = 0.35;
+const SAND_SWATCH = new THREE.Color();
+const SAND_CACHE = new Map<Biome, THREE.Color>();
+/**
+ * The floor's own colour where a body is digging. A burrow in the shelf mosaic and one in the
+ * black basin must not shower the same beige, and the biome under the animal is what decides.
+ */
+function sandColorAt(x: number, z: number): THREE.Color {
+  const b = biomeAt(x, z);
+  let c = SAND_CACHE.get(b);
+  if (!c) { c = new THREE.Color(SAND_COLORS[b]); SAND_CACHE.set(b, c); }
+  return SAND_SWATCH.copy(c);
+}
 
 interface CamState { showBoard: boolean; hatchShot: number; breathT: number; rideBlend: number; yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; climbHold: number; followHold: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
 /** Per-player teleport menu state: opened with D-pad down, steered with the D-pad or stick, A confirms, B closes. */
@@ -217,6 +268,29 @@ export const AIM_CLOSER = 0.42, AIM_SHOULDER = 0.75;
  * straight back and the drag would have been pointless.
  */
 const FOLLOW_RATE = 1.6, FOLLOW_HOLD = 1.2;
+/**
+ * The cursor's *height* nudges the camera's pitch, in mouse play.
+ *
+ * A mouse has one hand and two jobs — point at an animal, and look where you are going — and with
+ * the pointer free the second one only happened on a drag. So the top and bottom of the screen
+ * steer: carry the cursor up and the view tilts up with it, carry it down and it tilts down, and
+ * the middle `EDGE_DEAD` of the screen does nothing at all, which is the band a player aims in.
+ * That is the whole trade — the dead zone is what keeps pointing and looking from being the same
+ * gesture — so it is generous, and the push ramps in from its edge rather than starting at full
+ * rate, so there is no line the view jumps at.
+ *
+ * It is a *rate*, not a position: holding the cursor near the top keeps tilting, the way an
+ * edge-scroll does, because a screen's top edge is not a camera angle and cannot be mapped to one.
+ */
+const EDGE_DEAD = 0.38, EDGE_RATE = 0.85;
+/** Radians per second of pitch the cursor at `ndcY` is asking for. Positive tilts the view down. */
+export function edgePitch(ndcY: number): number {
+  const over = Math.abs(ndcY) - EDGE_DEAD;
+  if (over <= 0) return 0;
+  const k = Math.min(1, over / (1 - EDGE_DEAD));
+  // Squared, so the first part of the push past the dead zone is gentle and the corner is quick.
+  return -Math.sign(ndcY) * k * k * EDGE_RATE;
+}
 /** How much a body inside the near field outranks one the same apparent size further off. */
 const NEAR_RANK = 3;
 /** 1 at a full-width view, falling off for a narrow one; never less than a third of the shift. */
@@ -283,9 +357,22 @@ export function climbAimHold(hold: number, pitch: number, dashCd: number, dt: nu
   return Math.max(0, Math.max(hold, armed) - dt);
 }
 
+/**
+ * Where each seat's view goes.
+ *
+ * Two players are halved across the **longer** axis rather than always left and right
+ * (`splitAxis`): on a tablet held upright, two windows 400 across and 1100 down are two slots and
+ * not two views, and every HUD panel in them hangs off a corner that is now a long way from the
+ * middle. Four are a grid either way, and one takes the window, so two is the only case with a
+ * choice to make. The HUD follows these rects by percentage, so it needs no telling.
+ */
 export function layoutRects(n: number, w: number, h: number): Rect[] {
   if (n <= 1) return [{ x: 0, y: 0, w, h }];
-  if (n === 2) return [{ x: 0, y: 0, w: w / 2, h }, { x: w / 2, y: 0, w: w / 2, h }];
+  if (n === 2) {
+    return splitAxis(w, h) === 'down'
+      ? [{ x: 0, y: 0, w, h: h / 2 }, { x: 0, y: h / 2, w, h: h / 2 }]
+      : [{ x: 0, y: 0, w: w / 2, h }, { x: w / 2, y: 0, w: w / 2, h }];
+  }
   return Array.from({ length: n }, (_, i) => ({ x: (i % 2) * w / 2, y: Math.floor(i / 2) * h / 2, w: w / 2, h: h / 2 }));
 }
 
@@ -310,9 +397,12 @@ export class Engine {
   private impacts = new Impacts();
   private splash = new Splash(SURFACE_Y);
   private silt = new Silt();
+  private sand = new Sand();
+  private tracks = new Tracks();
   private eggs = new Eggs();
   private keyboard = new KeyboardInput();
   private mouse = new MousePlay();
+  private touch = new TouchPlay();
   /**
    * Whether the mouse is steering the camera. Decided once per match, at `startMatch`: with no
    * controller anywhere the game is a mouse-and-keyboard game, and with even one pad in the
@@ -330,6 +420,17 @@ export class Engine {
   private pointerWanted = false;
   /** What the mouse did this frame, kept between `controlsFor` and the camera. */
   private mouseFrame: ReturnType<MousePlay['read']> | undefined;
+  /**
+   * Whether a finger is playing this match: true when a seat joined on `'touch'`. Kept apart from
+   * `mouseLook` rather than folded into it, because the two schemes want *different* halves of what
+   * that flag gates. Both want the follow camera, since neither has a second stick to steer the view
+   * with. Only the mouse wants the CSS cursor and the reticle switched off, because only the mouse
+   * has a crosshair on screen at all times — a finger is usually not touching the glass, so touch
+   * keeps the reticle and moves it to wherever the last tap was.
+   */
+  private touchPlay = false;
+  /** What the fingers did this frame, kept between `controlsFor` and the camera, as the mouse's is. */
+  private touchFrame: ReturnType<TouchPlay['read']> | undefined;
   /** Scratch for the ray from the camera through the cursor. */
   private tmpRay = new THREE.Vector3();
   /** The CSS cursor currently set, so the style is only written when it changes. */
@@ -377,7 +478,11 @@ export class Engine {
     this.mouse.attach(container);
     // Nothing to lose: without pointer lock there is no lock to be taken away.
     this.mouse.onLost = null;
-    this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.splash.group, this.mouthfuls.group, this.eggs.group);
+    // The fingers listen on the window rather than on this element (see `TouchPlay.attach`), but the
+    // element is still what a touch's position is measured against, so it is handed over the same way.
+    this.touch.attach(container);
+    this.touch.onSwap = (sec) => { this.cb.onSecondary?.(sec); audio.play('ui-move'); };
+    this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.sand.points, this.tracks.mesh, this.splash.group, this.mouthfuls.group, this.eggs.group);
     (window as any).__cambrian = this;
     this.resize = new ResizeObserver(() => this.onResize());
     this.resize.observe(container);
@@ -416,6 +521,9 @@ export class Engine {
   private syncPointer() {
     const playing = this.pointerWanted && !this.paused && !this.attract;
     this.mouse.want(playing);
+    // The fingers stand down for exactly the same reasons the mouse does: paused, in a dialog, on
+    // the results screen or back at the menus, a tap belongs to whatever button it landed on.
+    this.touch.want(this.touchPlay && !this.paused && !this.attract);
     // Paused, in a dialog, on the results screen or back at the menus, the cursor belongs to the
     // buttons again: a targeting reticle over a *Quit to title* is a lie about what a click does.
     if (!playing) { this.cursorNow = ''; this.container.style.cursor = ''; }
@@ -424,6 +532,10 @@ export class Engine {
   releasePointer() { this.pointerWanted = false; this.syncPointer(); }
   /** Whether this match is being played on mouse and keyboard, so the HUD can name the buttons. */
   get usingMouse() { return this.mouseLook; }
+  /** Whether a finger is playing it, so the shell knows to draw the pads. */
+  get usingTouch() { return this.touchPlay; }
+  /** Put the secondary pad back where the player left it last time. */
+  setSecondary(s: Secondary) { this.touch.setSecondary(s); }
 
   /**
    * Carry a finished co-op match on rather than restarting it: same world, same bodies, same
@@ -475,7 +587,11 @@ export class Engine {
     this.paused = false;
     // Mouse and keyboard, or pads. Not both: a session with a controller in it is a controller
     // game, and stealing the pointer there would only take the cursor away from the other player.
-    this.mouseLook = gamepads().length === 0 && !setups.some((s) => typeof s.device === 'number');
+    this.touchPlay = setups.some((s) => s.device === 'touch');
+    // A finger and a mouse are not both playing: a session that joined on the glass is a touch
+    // session, and leaving the mouse in charge as well would have two schemes fighting over the
+    // camera. The mouse stays a perfectly good pointer for the menus either way.
+    this.mouseLook = gamepads().length === 0 && !this.touchPlay && !setups.some((s) => typeof s.device === 'number');
     this.pointerWanted = this.mouseLook;
     this.syncPointer();
     // The button that started the match is almost certainly still held right now. Seed the menu
@@ -491,12 +607,26 @@ export class Engine {
   private clearMatch() {
     for (const v of this.views.values()) v.dispose();
     this.views.clear(); this.attachments.clear();
+    this.tracks.clear(); this.printed.clear();
     this.eggs.dispose();
     this.cams = [];
     this.game = undefined;
   }
 
   private controlsFor(setup: PlayerSetup, index: number): RawControls {
+    if (setup.device === 'touch') {
+      // The keyboard is read underneath the fingers rather than instead of them. A tablet with a
+      // keyboard case is still a tablet, and a player who has one should not have to choose: every
+      // key binding stays live, and the pads are added beside them.
+      const c = this.keyboard.read(1);
+      // One read per frame, for the mouse's reason: `read()` drains the swipes and the taps, so the
+      // frame holds on to them for the camera and the aim after the controls have been folded.
+      // Unscaled by the camera-speed setting on purpose: the engine applies `lookSpeed` to
+      // `lookDX`/`lookDY` below, exactly as it does for the mouse, and scaling here as well would
+      // square it.
+      this.touchFrame = this.touch.read();
+      return applyTouch(c, this.touchFrame);
+    }
     if (setup.device === 'keyboard') {
       const c = this.keyboard.read(1);
       if (!this.mouseLook) return c;
@@ -506,6 +636,7 @@ export class Engine {
       return applyMouse(c, this.mouseFrame);
     }
     if (setup.device === 'keyboard2') return this.keyboard.read(2);
+    if (typeof setup.device !== 'number') return emptyControls();
     const gp = navigator.getGamepads?.()[setup.device];
     if (!gp || !gp.connected) return emptyControls();
     void index;
@@ -528,11 +659,12 @@ export class Engine {
     // separate thing the middle button asks for (`updateAim` still blends on `c.aim`).
     const cursor = this.cursorDir(cs);
     if (cursor) { f.aim = true; f.aimTarget = cs.aimTarget; }
-    // The right button dashes at what the cursor is over: the dash takes its direction from the
-    // stick through the camera, so for those frames the camera's forward *is* the cursor's ray and
-    // a neutral stick is pushed forward along it. Held, the body keeps going that way, which is
-    // what a dash as long as it is held should do.
-    if (cursor && this.mouseFrame?.right) {
+    // The right button — or a double-tap on the water — dashes at what is being pointed at: the dash
+    // takes its direction from the stick through the camera, so for those frames the camera's forward
+    // *is* the pointing ray and a neutral stick is pushed forward along it. Held, the body keeps
+    // going that way, which is what a dash as long as it is held should do. A finger is the same
+    // gesture with the same answer, and re-aims as it moves.
+    if (cursor && (this.mouseFrame?.right || this.touchFrame?.dash)) {
       f.camYaw = Math.atan2(cursor.x, cursor.z);
       f.camPitch = swimPitch(-Math.asin(clamp(cursor.y, -1, 1)));
       if (Math.hypot(f.mx, f.my) < 0.3) { f.mx = 0; f.my = 1; }
@@ -577,6 +709,10 @@ export class Engine {
           // chain of them climbs instead of flattening out between presses.
           cs.climbHold = climbAimHold(cs.climbHold, cs.pitch, p?.dashCd ?? 0, dt);
           if (this.mouseLook && this.mouseFrame) this.showCursor(this.mouseFrame, game, p, cs);
+          // The fingers need the same fact and draw no cursor with it: whether there is something
+          // worth attacking where the player is pointing is what decides, at the *next* down, whether
+          // a double-tap is a pounce or a dash.
+          if (this.touchPlay) this.touch.aimingAt(this.pointingAt(game, p, cs) !== 'none');
           if (c.rsClick) {
             // Right stick pressed in: up/down zooms instead of pitching.
             cs.zoom = clamp(cs.zoom * Math.exp(c.lookY * dt * 1.6), 0.55, 2.2);
@@ -586,21 +722,35 @@ export class Engine {
             cs.yaw = wrapAngle(cs.yaw - (c.lookX * dt * 2.6 + c.lookDX) * this.lookSpeed);
             cs.pitch = clamp(cs.pitch + (c.lookY * dt * 1.6 + c.lookDY) * this.lookSpeed * (this.invertY ? -1 : 1), PITCH_UP, PITCH_DOWN);
             // Pitch drifts back to level when a stick is let go, which is what makes a pad feel
-            // like it is swimming for you. A mouse holds where it was put: the same drift there
-            // would fight the hand every frame.
-            if (!this.mouseLook && Math.abs(c.lookY) < 0.05 && cs.climbHold === 0) cs.pitch = damp(cs.pitch, 0.2, 0.6, dt);
-            // On a mouse the camera *follows the body* unless a hand is on it. There is no second
-            // stick and no pointer lock, so nothing is steering the view frame to frame: left to
-            // itself it would stay pointing wherever the animal last turned away from. It eases
-            // round behind the creature and back to the resting pitch, and stands aside for
-            // `FOLLOW_HOLD` after a drag so a player who has just looked somewhere on purpose is
-            // not immediately turned away from it.
-            if (this.mouseLook && p) {
-              if (this.mouseFrame?.dragging || Math.abs(c.lookX) > 0.05 || Math.abs(c.lookY) > 0.05) cs.followHold = FOLLOW_HOLD;
+            // like it is swimming for you. A mouse holds where it was put and so does a finger: the
+            // same drift under either would fight the hand every frame. Both of them get the *follow*
+            // camera's gentler return instead, just below.
+            if (!this.mouseLook && !this.touchPlay && Math.abs(c.lookY) < 0.05 && cs.climbHold === 0) cs.pitch = damp(cs.pitch, 0.2, 0.6, dt);
+            // On a mouse or a finger the camera *follows the body* unless a hand is on it. There is
+            // no second stick and no pointer lock, so nothing is steering the view frame to frame:
+            // left to itself it would stay pointing wherever the animal last turned away from. It
+            // eases round behind the creature and back to the resting pitch, and stands aside for
+            // `FOLLOW_HOLD` after a drag or a swipe so a player who has just looked somewhere on
+            // purpose is not immediately turned away from it.
+            if ((this.mouseLook || this.touchPlay) && p) {
+              // The cursor's height is a second way of aiming the view, and it is *asking* for
+              // something just as a drag is — so it holds the follow off while it pushes, or the
+              // two would pull against each other and the pitch would sit wherever they balanced.
+              //
+              // Only the *mouse* gets it. A hovering cursor is otherwise idle information — it is
+              // somewhere whether or not the player is doing anything with it — and a finger is the
+              // opposite: it is only on the glass while it is being used, and while it is, its travel
+              // is already the camera. Reading its height as a tilt as well would have one gesture
+              // pulling the pitch two ways.
+              const edge = this.mouseLook && this.mouseFrame?.ndc && !this.mouseFrame.dragging ? edgePitch(this.mouseFrame.ndc.y) : 0;
+              if (edge !== 0) cs.pitch = clamp(cs.pitch + edge * dt, PITCH_UP, PITCH_DOWN);
+              if (this.mouseFrame?.dragging || this.touchFrame?.dragging || Math.abs(c.lookX) > 0.05 || Math.abs(c.lookY) > 0.05) cs.followHold = FOLLOW_HOLD;
               else cs.followHold = Math.max(0, cs.followHold - dt);
               if (cs.followHold === 0 && cs.climbHold === 0) {
                 cs.yaw = wrapAngle(cs.yaw + wrapAngle(p.yaw - cs.yaw) * (1 - Math.exp(-FOLLOW_RATE * dt)));
-                cs.pitch = damp(cs.pitch, 0.2, FOLLOW_RATE * 0.5, dt);
+                // The pitch only settles back while the cursor is in the dead zone: the follow is
+                // what a view does when nobody is asking, and the cursor up there is an ask.
+                if (edge === 0) cs.pitch = damp(cs.pitch, 0.2, FOLLOW_RATE * 0.5, dt);
               }
             }
           }
@@ -611,14 +761,19 @@ export class Engine {
 
     // The sprint bed follows whichever local body is driving hardest, and only while it has the
     // stamina to be driving at all — an empty bar is a body labouring, not one surging.
-    let sprint = 0;
+    let sprint = 0, sprintDepth = 0;
     if (!this.attract && running) {
       for (const [i, f] of inputs) {
         const p = game.players[i];
-        if (p && isAlive(p) && p.exhausted === 0 && p.stamina > 0) sprint = Math.max(sprint, Math.min(1, f.burst));
+        const drive = Math.min(1, f.burst);
+        if (p && isAlive(p) && p.exhausted === 0 && p.stamina > 0 && drive > sprint) {
+          sprint = drive;
+          const column = ACTIVE_ERA.environment.floorDepth?.[biomeAt(p.pos.x, p.pos.z)] ?? 60;
+          sprintDepth = clamp((SURFACE_Y - p.pos.y) / column, 0, 1);
+        }
       }
     }
-    audio.setSprint(sprint);
+    audio.setSprint(sprint, sprintDepth);
 
     // Fixed step. Capped at 3 sub-steps so a slow frame cannot spiral into more simulation work.
     const tSim = performance.now();
@@ -671,7 +826,9 @@ export class Engine {
 
     // Views
     this.syncViews(game, camPositions, dt);
-    this.bubbles.update(dt); this.sparkles.update(dt); this.splash.update(dt); this.mouthfuls.update(dt);
+    this.burrowSand(game, dt);
+    this.shoreTracks(game);
+    this.bubbles.update(dt); this.sparkles.update(dt); this.splash.update(dt); this.mouthfuls.update(dt); this.sand.update(dt); this.tracks.update(dt);
     this.eggs.update(game.actors, dt);
     this.impacts.update(dt, focus);
     this.silt.sync(game.silt, this.time);
@@ -809,8 +966,12 @@ export class Engine {
    * and every caller then falls back to the way it worked before.
    */
   private cursorDir(cs: CamState): THREE.Vector3 | undefined {
-    const ndc = this.mouseFrame?.ndc;
-    if (!this.mouseLook || !ndc) return undefined;
+    // Either pointer will do, because the rule is about pointing rather than about hardware:
+    // whatever the player has aimed at is what the attacks go to. The mouse's cursor is always
+    // somewhere; a finger's aim point lapses a moment after the hand comes off the glass, and then
+    // there is nothing pointing and aiming goes back to the middle of the screen.
+    const ndc = this.mouseFrame?.ndc ?? this.touchFrame?.ndc;
+    if ((!this.mouseLook && !this.touchPlay) || !ndc) return undefined;
     return this.tmpRay.set(ndc.x, ndc.y, 0.5).unproject(cs.camera).sub(cs.camera.position).normalize();
   }
 
@@ -822,10 +983,22 @@ export class Engine {
    * Edible or a fight is the size band, the same one every other readout in the game uses: what you
    * could swallow or chase down is green, what would be a fight is red.
    */
-  private showCursor(m: ReturnType<MousePlay['read']>, game: Game, p: Actor | undefined, cs: CamState) {
+  /**
+   * What is where the player is pointing: nothing, something edible, or a fight.
+   *
+   * The size band, the same one every other readout in the game uses. Both pointing schemes want
+   * this and want it for the same reason — it is what decides whether the *next* press or tap is an
+   * attack or a look — so it is asked once here rather than twice in two places that could drift
+   * apart.
+   */
+  private pointingAt(game: Game, p: Actor | undefined, cs: CamState): 'none' | 'edible' | 'attack' {
     const t = p && cs.aimTarget >= 0 ? game.byId(cs.aimTarget) : undefined;
     const band = t && p && isAlive(t) ? bandOf(p, t) : undefined;
-    const over = !band ? 'none' : band === 'snack' || band === 'prey' ? 'edible' : 'attack';
+    return !band ? 'none' : band === 'snack' || band === 'prey' ? 'edible' : 'attack';
+  }
+
+  private showCursor(m: ReturnType<MousePlay['read']>, game: Game, p: Actor | undefined, cs: CamState) {
+    const over = this.pointingAt(game, p, cs);
     this.mouse.aimingAt(over !== 'none');
     const want = cursorFor(cursorState(m, over));
     if (want !== this.cursorNow) { this.cursorNow = want; this.container.style.cursor = want; }
@@ -847,17 +1020,26 @@ export class Engine {
     for (const o of this.game.nearby(p.pos, range)) {
       if (o.id === p.id || !isAlive(o) || isHidden(o)) continue;
       const band = bandOf(p, o);
-      if (band === 'giant' || band === 'threat') continue;
-      // Another player can be aimed at, but never handed to you: the entry snap ignores them and
-      // the crosshair has to be genuinely on one for it to take.
+      // Anything the crosshair is over. The threat and giant bands used to be skipped outright,
+      // which meant a player holding the crosshair squarely on something their own size or larger
+      // was told there was nothing there — and what you do about a big animal (ride it, take hold
+      // of it, pounce at it) is exactly what aiming is for.
+      //
+      // Another player can be aimed at, but never *handed* to you: the entry snap, which happens
+      // on the frame aim mode comes on and picks a target without the player having pointed at
+      // anything, ignores them. Once the crosshair is being held, it is being held on purpose.
       const rival = o.controller === 'player';
-      if (rival && !wasAiming) continue;
+      const entrySnap = aiming && !wasAiming && !cursor;
+      if (rival && entrySnap) continue;
       const to = this.tmpDesired.set(o.pos.x - cs.camera.position.x, o.pos.y - cs.camera.position.y, o.pos.z - cs.camera.position.z);
       const d = to.length(); if (d < 0.01) continue;
       to.divideScalar(d);
       // angular distance from the crosshair, widened slightly for close/large targets
       const ang = Math.acos(clamp(fwd.dot(to), -1, 1)) - Math.min(0.08, lengthOf(o) * 0.5 / d);
-      const bandW = rival ? 2.4 : band === 'prey' ? 0.85 : band === 'snack' ? 1 : 1.25;
+      // The entry snap is the game choosing for you, so it leans toward what you probably meant:
+      // food ahead of a fight, and never another player. A crosshair being held is not choosing for
+      // you at all, so it ranks on pure angle — whatever is nearest the point of the cursor.
+      const bandW = entrySnap ? (rival ? 2.4 : band === 'prey' ? 0.85 : band === 'snack' ? 1 : 1.25) : 1;
       if (ang * bandW < bestAng) { bestAng = ang * bandW; best = o; }
     }
     // A cursor gets one cone and no snap: the player is already pointing, and easing the camera
@@ -1018,7 +1200,10 @@ export class Engine {
     // faster up than down, because a cut to the sky and back is a flinch rather than a breath.
     cs.breathT = Math.max(0, cs.breathT - dt);
     const peek = cs.breathT <= 0 ? 0 : Math.sin(Math.min(1, cs.breathT / BREATH_PEEK) * Math.PI) ** 0.6;
-    const ceiling = p.airborne ? SURFACE_Y + 40 : (SURFACE_Y - 0.4) + peek * (L * 0.5 + 1.6);
+    // And the sand lifts it: a body wading up the beach takes the camera up out of the water with
+    // it, by its wade, which is continuous in where it stands, so the view comes up as the animal
+    // does rather than cutting to the sky when a rule says it is ashore.
+    const ceiling = p.airborne ? SURFACE_Y + 40 : (SURFACE_Y - 0.4) + Math.max(peek * (L * 0.5 + 1.6), p.wade * (L * 0.8 + 6));
     const fit = fitCameraArm(lookAt.y + L * 0.18, pitch, dist, L * CAMERA_CLOSE,
       (d) => { place(d); return sampleHeight(desired.x, desired.z) + CAMERA_SAND; },
       ceiling);
@@ -1144,6 +1329,134 @@ export class Engine {
     this.breathe(game, keep);
     for (const [id, v] of this.views) if (!keep.has(id)) { v.dispose(); this.views.delete(id); }
   }
+
+  /**
+   * Sand around a body going into the seabed, and again as it comes back out.
+   *
+   * The simulation already leaves a silt cloud at the moment a burrower is covered — that is the
+   * haze that hides it, and it is part of the rules. This is the other half, and it is purely a
+   * look: the grains the animal actually displaces. A steady shower while it works itself down,
+   * one throw as the floor closes over it, and a harder one thrown clear when it surfaces, so
+   * both ends of the act are seen rather than only the disappearing.
+   *
+   * Renderer-side, off the actors' own `hideMode`, because nothing here is a rule: `src/sim` keeps
+   * its determinism and gains no event. What it costs is one map of the bodies that are currently
+   * in the floor, which on any roster is a handful.
+   */
+  private burrowSand(game: Game, dt: number) {
+    for (const a of game.actors) {
+      const was = this.burrowing.get(a.id) ?? 'none';
+      const now = a.hideMode === 'descending' || a.hideMode === 'burrowed' ? a.hideMode : 'none';
+      if (was === 'none' && now === 'none') continue;
+      if (now === 'none') { this.burrowing.delete(a.id); this.sandOwed.delete(a.id); }
+      else this.burrowing.set(a.id, now);
+      // Only what somebody could be looking at: a shower behind the fog is frames spent on nothing.
+      const dx = a.pos.x - this.lastFocus.x, dz = a.pos.z - this.lastFocus.z;
+      if (dx * dx + dz * dz > SAND_RANGE * SAND_RANGE) continue;
+      const L = lengthOf(a);
+      // The floor is where the sand is, so the shower is seated there rather than on a body that
+      // has already sunk half its length past it.
+      const at = { x: a.pos.x, y: Math.min(a.pos.y + L * 0.1, sampleHeight(a.pos.x, a.pos.z) + L * 0.3), z: a.pos.z };
+      const col = sandColorAt(a.pos.x, a.pos.z);
+      const th = sandThrow(was, now, L);
+      if (!th) continue;
+      if (th.perSecond === 0) { this.sand.emit(at, col, th.grains, th.spread, th.speed, th.up, th.size, th.life); this.sandOwed.delete(a.id); continue; }
+      // A rate rather than a count per frame, so the shower is the same shower at any frame rate
+      // and a slow frame does not round it away.
+      const owed = (this.sandOwed.get(a.id) ?? 0) + th.perSecond * dt;
+      const n = Math.floor(owed);
+      this.sandOwed.set(a.id, owed - n);
+      if (n > 0) this.sand.emit(at, col, n, th.spread, th.speed, th.up, th.size, th.life);
+    }
+    // Bodies that left the sea while in the floor: the map is only ever a few entries deep.
+    for (const id of this.burrowing.keys()) if (!game.byId(id)) { this.burrowing.delete(id); this.sandOwed.delete(id); }
+  }
+  /** Which bodies are in the seabed, so both the going in and the coming up are seen. */
+  private burrowing = new Map<number, Exclude<BurrowPhase, 'none'>>();
+  /** Fractional grains carried between frames, so a trickle is a rate and not a per-frame count. */
+  private sandOwed = new Map<number, number>();
+
+  /**
+   * Prints in the sand, wherever a player's body actually touches the shore.
+   *
+   * **The contacts are measured, never named.** A rig's bones are whatever its builder called them
+   * — three eras, a dozen kits and no agreement on `fore_foot_L` — so asking for the feet by name
+   * would work on one animal and silently do nothing on the next. What a print is, is the part of
+   * the body that is *on the sand*, so that is what is asked: the lowest few bones of the rig, and
+   * whether each is within `touch` of the ground under it. On a walker standing on the beach the
+   * lowest bones are its feet, and when one lifts it stops being down; on a body lying in the sand
+   * they are its belly, and the belly never lifts. The same test gives footprints for the one and
+   * a drag for the other with nothing in it that knows which animal it is looking at.
+   *
+   * `laysMark` then decides, and one rule covers both: a contact marks when it comes down, and
+   * again every `spacing` it travels while it stays down. A planted foot does not travel, so it
+   * prints once; a belly does nothing else, so it draws a groove.
+   *
+   * Presentation only. Nothing here is a rule and `src/sim` gains no event — it is read off `wade`
+   * and the drawn pose, like the burrow's sand above it. Players only, because these are the marks
+   * the player is being shown that they made.
+   */
+  private shoreTracks(game: Game) {
+    for (const a of game.players) {
+      const gait = isAlive(a) ? trackGait({
+        legs: amphibious(a.creature), lungs: breathesAir(a.creature),
+        wade: a.wade, length: lengthOf(a), clearance: floorClearance(a),
+      }) : null;
+      const view = gait ? this.views.get(a.id) : undefined;
+      if (!gait || !view) { this.printed.delete(a.id); continue; }
+      const bones = view.anchors.bones;
+      if (!bones.length) continue;
+      // The lowest `contacts` bones, by world height. Their matrices are last frame's until the
+      // renderer walks the scene, and a print has to land where the foot is *now*.
+      const n = Math.min(gait.contacts, this.lowY.length);
+      let have = 0;
+      for (const b of bones) {
+        b.updateWorldMatrix(true, false);
+        const e = b.matrixWorld.elements, y = e[13];
+        if (have === n && y >= this.lowY[have - 1]) continue;
+        let i = have < n ? have++ : n - 1;
+        for (; i > 0 && this.lowY[i - 1] > y; i--) {
+          this.lowY[i] = this.lowY[i - 1]; this.lowX[i] = this.lowX[i - 1]; this.lowZ[i] = this.lowZ[i - 1]; this.lowName[i] = this.lowName[i - 1];
+        }
+        this.lowY[i] = y; this.lowX[i] = e[12]; this.lowZ[i] = e[14]; this.lowName[i] = b.name || `bone${b.id}`;
+      }
+      let st = this.printed.get(a.id);
+      if (!st) { st = new Map(); this.printed.set(a.id, st); }
+      this.printSeen.clear();
+      for (let i = 0; i < have; i++) {
+        const x = this.lowX[i], y = this.lowY[i], z = this.lowZ[i], name = this.lowName[i];
+        this.printSeen.add(name);
+        const sand = sampleHeight(x, z);
+        let c = st.get(name);
+        if (!c) { c = { down: false, mx: x, mz: z }; st.set(name, c); }
+        if (y - sand > gait.touch) { c.down = false; continue; }   // this part is off the sand
+        const lay = laysMark(gait, c.down, Math.hypot(x - c.mx, z - c.mz));
+        c.down = true;
+        if (!lay) continue;
+        c.mx = x; c.mz = z;
+        // Sand only, and the shore only. A boulder stands proud of the seabed it sits on and
+        // presses into nothing, out past the strand the sand is under the sea, and past
+        // `LAND_REACH` is not the shore; `printableSand` answers all three.
+        if (!printableSand({
+          sand, ground: groundHeight(game.world, x, z, this.scratchBoulders), surfaceY: SURFACE_Y,
+          inland: -shoreDistance(x, z), reach: LAND_REACH,
+        })) continue;
+        const h = TRACK_SLOPE;
+        const dhdx = (sampleHeight(x + h, z) - sampleHeight(x - h, z)) / (2 * h);
+        const dhdz = (sampleHeight(x, z + h) - sampleHeight(x, z - h)) / (2 * h);
+        this.tracks.lay(x, sand + TRACK_LIFT, z, dhdx, dhdz, a.yaw, gait);
+      }
+      // A rig whose lowest bones have changed leaves the old ones behind; the map is a handful.
+      for (const name of st.keys()) if (!this.printSeen.has(name)) st.delete(name);
+    }
+    for (const id of this.printed.keys()) if (!game.byId(id)) this.printed.delete(id);
+  }
+  /** Per player, per contact: was it down last frame, and where did it last leave a mark. */
+  private printed = new Map<number, Map<string, { down: boolean; mx: number; mz: number }>>();
+  private printSeen = new Set<string>();
+  /** The lowest bones of one rig this frame, kept as plain numbers so a frame allocates nothing. */
+  private lowX = new Float64Array(6); private lowY = new Float64Array(6); private lowZ = new Float64Array(6);
+  private lowName: string[] = new Array(6).fill('');
 
   /**
    * Lungs leak when they work. A bag of air inside a body under water shows every time the body
@@ -1369,9 +1682,9 @@ export class Engine {
         // frame's own inputs): it is held down for minutes at a time, and one loud whoosh per press
         // was the single most repeated sound in the game.
         case 'burst': { const b = game.byId(e.actor); if (b && RULES?.jet(b)) { world('jet', e.pos); this.bubbles.emit(e.pos, 30, 0.9, 3, 0.1, 1.4); } break; }
-        // Coming out of an egg. There is no shell-crack sample yet (docs/audio-requests.md), so it
-        // borrows the hatch-in sound rather than synthesising a stand-in for one.
-        case 'hatch': { if (e.player != null && e.player >= 0) audio.play('respawn'); else world('respawn', e.pos, 1, 0.5); break; }
+        // Coming out of an egg: a wet tear as the soft shell opens.
+        case 'eggPoke': { if (e.player != null && e.player >= 0) audio.play('eggPoke', 0.7); else world('eggPoke', e.pos, 0.7, 0.5); break; }
+        case 'hatch': { if (e.player != null && e.player >= 0) audio.play('hatch'); else world('hatch', e.pos, 1, 0.5); break; }
         // Hatching out of a nursery after a respawn (the moult state is reused for the hatch-in).
         case 'moult': { if (e.player != null && e.player >= 0) audio.play(e.strength === 1 && RULES ? 'moult' : 'respawn'); else world('respawn', e.pos, 1, 0.5); break; }
         // Era events (Devonian). Their samples are registered by the era's entry page; an
@@ -1408,7 +1721,9 @@ export class Engine {
           // under the waterline at all times (see the ceiling in `updateCamera`), so a breath took
           // place just off the top of the screen and the player's own view of it was the water.
           if (broken > 0 && e.player != null && e.player >= 0) { const cs = this.cams[e.player]; if (cs) cs.breathT = BREATH_PEEK; }
-          personal('gulp');
+          const sized = bl < 4 ? 'gulp-small' : bl >= hugeLength() ? 'gulp-giant' : 'gulp-mid';
+          const gulp = SAMPLES[sized] ? sized : 'gulp';
+          if (e.player != null && e.player >= 0) audio.play(gulp); else world(gulp, e.pos);
           break;
         }
         // The winded heartbeat, and a thin trickle of bubbles escaping with it: a body that
@@ -1422,7 +1737,9 @@ export class Engine {
           personal('winded', 0.18 + 0.22 * s);
           break;
         }
+        case 'shoreStrike': { world('shoreStrike', e.pos, 1, 1); break; }
         case 'anoxia': { personal('anoxia', 0.8); break; }
+        case 'flop': { personal('flop', 0.75); break; }
         case 'beach': { if (e.strength) { this.bubbles.emit(e.pos, 12, 0.5, 2, 0.06, 1); personal('beach', 0.9); } break; }
         case 'shoalJoin': { this.sparkles.emit(e.pos, 16, 0.6, 1.2, 0.05, 1.2); personal('shoalJoin', 0.7); break; }
         case 'teleport': {
@@ -1513,7 +1830,7 @@ export class Engine {
       }
       const tele = cs?.tele.open && !cs.tele.swap.open
         ? { options: [...game.teleportOptions(i).map((o) => ({ label: o.label, detail: o.detail, distance: o.distance, dest: o.dest })),
-                      { label: 'Change creature', detail: 'Swap bodies · each keeps what it has grown', distance: 0, dest: 'home' as TeleportDest }],
+                      { label: TEXT.hud.teleport.changeCreature, detail: TEXT.hud.teleport.changeCreatureDetail, distance: 0, dest: 'home' as TeleportDest }],
             index: cs.tele.index, cooldown: p.teleportCd }
         : undefined;
       let swap: PlayerHud['swap'];
@@ -1544,16 +1861,21 @@ export class Engine {
       // their seat, anything else by its species.
       const killerId = p.swallowedBy >= 0 ? p.swallowedBy : p.killer;
       const killer = killerId >= 0 ? game.byId(killerId) : undefined;
-      const nameOf = (a: Actor | undefined) => (a ? (a.player >= 0 ? `P${a.player + 1}` : creature(a.creature).name) : undefined);
+      const nameOf = (a: Actor | undefined) => (a ? (a.player >= 0 ? TEXT.common.playerChip(a.player + 1) : creature(a.creature).name) : undefined);
       const watched = this.spectatorTarget(game, i);
-      const spectate = watched ? { index: watched.player, name: `P${watched.player + 1}`, color: PLAYER_COLORS[watched.player % 4], creature: watched.creature } : undefined;
+      const spectate = watched ? { index: watched.player, name: TEXT.common.playerChip(watched.player + 1), color: PLAYER_COLORS[watched.player % 4], creature: watched.creature } : undefined;
       let aim: PlayerHud['aim'];
       // On a mouse the *cursor* is the crosshair (`src/shared/cursors.ts`), so the reticle is off:
       // two crosshairs on one screen, one of them nailed to the middle, is worse than either alone.
       if (p.aiming && cs && !this.mouseLook) {
         const t = lockA && isAlive(lockA) ? lockA : undefined;
         const heavyMove = game.heavyMove(p);
-        aim = { hasTarget: !!t, inRange: !!t && p.aimInRange, name: t ? creature(t.creature).name : undefined, color: t ? BAND_COLOR[bandOf(p, t)] : '#eefaf6', ready: heavyMove.ready, action: heavyMove.name };
+        // A finger keeps the reticle and takes it *with* it. The mouse has a cursor doing this job
+        // and so draws none; a pad has no pointer at all and so draws it in the middle, which is
+        // where its aim axis is. Touch is the third case and needs both halves: a mark to aim by,
+        // standing where the player last pointed, and back in the middle once that has lapsed.
+        const at = this.touchPlay ? this.touchFrame?.ndc : undefined;
+        aim = { hasTarget: !!t, inRange: !!t && p.aimInRange, name: t ? creature(t.creature).name : undefined, color: t ? BAND_COLOR[bandOf(p, t)] : '#eefaf6', ready: heavyMove.ready, action: heavyMove.name, at: at ? { x: at.x, y: at.y } : undefined };
       }
       return {
         index: i, creature: p.creature, color: PLAYER_COLORS[i % 4], alive: p.state !== 'dead', aim,
@@ -1561,10 +1883,12 @@ export class Engine {
         hp: p.hp, hpMax: p.hpMax, stamina: p.stamina, staminaMax: p.staminaMax, exhausted: p.exhausted > 0,
         tier: p.tier, tierName: era ? `${era.stage} · ${era.rungName}` : TIER_NAMES[p.tier], // The ring means the same thing in both eras: how close the next moult is, full when it lands.
         progress: era ? era.stageProgress : p.tier >= 4 ? 1 : clamp(p.nutrition / TIER_NEED[p.tier], 0, 1), scale: p.scale,
-        abilityName: p.hideMode === 'descending' ? 'Sinking to burrow' : p.hideMode === 'burrowed' ? `Buried · ${controlKey('ability', scheme)} emerge` : p.hideMode === 'camouflage' ? `Camo: ${p.camoLabel}` : RULES?.ySpecial(p.creature)?.name ?? hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : RULES?.ySpecial(p.creature) ? 1 - clamp(p.abilityCd / Math.max(1, creature(p.creature).abilityCooldown), 0, 1) : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none' || (p.state === 'ability' && !!RULES?.ySpecial(p.creature)), abilityUnlocked: true,
+        abilityName: p.hideMode === 'descending' ? TEXT.sim.hide.sinking : p.hideMode === 'burrowed' ? TEXT.sim.hide.buried(controlKey('ability', scheme)) : p.hideMode === 'camouflage' ? TEXT.sim.hide.camouflaged(p.camoLabel) : RULES?.ySpecial(p.creature)?.name ?? hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : RULES?.ySpecial(p.creature) ? 1 - clamp(p.abilityCd / Math.max(1, creature(p.creature).abilityCooldown), 0, 1) : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none' || (p.state === 'ability' && !!RULES?.ySpecial(p.creature)), abilityUnlocked: true,
         senseOn: p.senseMode,
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, kind: creature(lockA.creature).kind, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,
+        ashore: p.ashore, strandLeft: p.ashore && !breathesAir(p.creature) ? clamp(1 - p.strandT / STRAND_BREATH, 0, 1) : undefined,
+        strandLow: p.ashore && !breathesAir(p.creature) && STRAND_BREATH - p.strandT < STRAND_LOW,
         hunterState: p.hunted >= 0.5 ? 'hunting' : p.hunted > 0.2 ? 'noticed' : 'none', inCover: p.cover > 0.3, still: Math.hypot(p.vel.x, p.vel.y, p.vel.z) < 0.3,
         hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, (game.reviveWindow(p) || CORPSE_WINDOW) - (game.reviveWindow(p) ? 0 : p.respawnT)) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
         downedFor: game.reviveWindow(p), reviveProgress: game.reviveProgress(p), downedAllies: downed, spectating: spectate,
@@ -1599,10 +1923,11 @@ export class Engine {
     this.resize.disconnect();
     this.keyboard.dispose();
     this.mouse.dispose();
+    this.touch.dispose();
     this.assets.dispose();
     this.clearMatch();
     this.sea?.dispose();
-    this.bubbles.dispose(); this.splash.dispose(); this.sparkles.dispose(); this.impacts.dispose(); this.silt.dispose();
+    this.bubbles.dispose(); this.splash.dispose(); this.sparkles.dispose(); this.impacts.dispose(); this.silt.dispose(); this.sand.dispose(); this.tracks.dispose();
     this.shieldGeo.dispose();
     this.mouthfuls.dispose(); this.eggs.dispose();
     this.renderer.dispose();

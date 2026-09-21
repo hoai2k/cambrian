@@ -1,0 +1,28 @@
+{
+  "id": "nothosaurus",
+  "verdict": "no oral lining: nothing to be mixed",
+  "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present. A body with no lining mesh is reported as such, with the hidden oral parts it does carry listed, and all three variants must agree.",
+  "models": [
+    {
+      "variant": "authored",
+      "sha256": "7d0f5b4e9d2b2ed3cd4c9696b9f1fee27487950790d212d3f081c9d50b894d69",
+      "meshes": [],
+      "otherOralMeshes": [],
+      "oralShells": "none"
+    },
+    {
+      "variant": ".puppet",
+      "sha256": "6ba00076f5ce179698e968ca38a0236b057878c7b28b21aea11956ae80c62932",
+      "meshes": [],
+      "otherOralMeshes": [],
+      "oralShells": "none"
+    },
+    {
+      "variant": ".lod1",
+      "sha256": "6ba00076f5ce179698e968ca38a0236b057878c7b28b21aea11956ae80c62932",
+      "meshes": [],
+      "otherOralMeshes": [],
+      "oralShells": "none"
+    }
+  ]
+}

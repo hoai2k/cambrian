@@ -1,0 +1,83 @@
+{
+  "id": "cartorhynchus",
+  "backdrop": [
+    1.0,
+    0.0,
+    1.0,
+    1.0
+  ],
+  "shots": [
+    {
+      "clip": "Ability",
+      "t": 0.15,
+      "pixels": 378000,
+      "differingPixels": 443,
+      "holesOpenedByCulling": 14,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0,
+      "markedImage": "triassic-authoring/cartorhynchus/gape-solid/Ability-0.15-opened.png",
+      "solid": "triassic-authoring/cartorhynchus/gape-solid/Ability-0.15-solid.png",
+      "culled": "triassic-authoring/cartorhynchus/gape-solid/Ability-0.15-culled.png"
+    },
+    {
+      "clip": "Attack",
+      "t": 0.38,
+      "pixels": 378000,
+      "differingPixels": 355,
+      "holesOpenedByCulling": 11,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0,
+      "markedImage": "triassic-authoring/cartorhynchus/gape-solid/Attack-0.38-opened.png",
+      "solid": "triassic-authoring/cartorhynchus/gape-solid/Attack-0.38-solid.png",
+      "culled": "triassic-authoring/cartorhynchus/gape-solid/Attack-0.38-culled.png"
+    },
+    {
+      "clip": "Bite",
+      "t": 0.1,
+      "pixels": 378000,
+      "differingPixels": 446,
+      "holesOpenedByCulling": 13,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0,
+      "markedImage": "triassic-authoring/cartorhynchus/gape-solid/Bite-0.1-opened.png",
+      "solid": "triassic-authoring/cartorhynchus/gape-solid/Bite-0.1-solid.png",
+      "culled": "triassic-authoring/cartorhynchus/gape-solid/Bite-0.1-culled.png"
+    },
+    {
+      "clip": "Eat",
+      "t": 0.35,
+      "pixels": 378000,
+      "differingPixels": 405,
+      "holesOpenedByCulling": 10,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0,
+      "markedImage": "triassic-authoring/cartorhynchus/gape-solid/Eat-0.35-opened.png",
+      "solid": "triassic-authoring/cartorhynchus/gape-solid/Eat-0.35-solid.png",
+      "culled": "triassic-authoring/cartorhynchus/gape-solid/Eat-0.35-culled.png"
+    },
+    {
+      "clip": "Grab",
+      "t": 0.09,
+      "pixels": 378000,
+      "differingPixels": 203,
+      "holesOpenedByCulling": 5,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0,
+      "markedImage": "triassic-authoring/cartorhynchus/gape-solid/Grab-0.09-opened.png",
+      "solid": "triassic-authoring/cartorhynchus/gape-solid/Grab-0.09-solid.png",
+      "culled": "triassic-authoring/cartorhynchus/gape-solid/Grab-0.09-culled.png"
+    },
+    {
+      "clip": "Heavy",
+      "t": 0.47,
+      "pixels": 378000,
+      "differingPixels": 423,
+      "holesOpenedByCulling": 12,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0,
+      "markedImage": "triassic-authoring/cartorhynchus/gape-solid/Heavy-0.47-opened.png",
+      "solid": "triassic-authoring/cartorhynchus/gape-solid/Heavy-0.47-solid.png",
+      "culled": "triassic-authoring/cartorhynchus/gape-solid/Heavy-0.47-culled.png"
+    }
+  ]
+}

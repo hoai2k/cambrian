@@ -943,6 +943,40 @@ const { TIER_SCALE } = await import('../src/sim/types');
   ok(g.state.status === 'playing', '...and it does not win itself again');
 }
 {
+  // An apex is one seat's and one animal's, never the match's.
+  //
+  // It used to be the match's: one latch (`Game.endless`) closed the whole mode the first time
+  // anybody finished, and carrying on zeroed *every* seat's hold timer — so a player watched their
+  // own ninety seconds go back to nothing because somebody else had arrived, and could never be
+  // told about it if they did arrive.
+  const g = new Game('rise', [{ creature: 'dunkleosteus', device: 'keyboard', ready: true }, { creature: 'cladoselache', device: 0, ready: true }]);
+  g.skipHatch();
+  const [p0, p1] = g.players;
+  const d0 = devActor(g, p0), d1 = devActor(g, p1);
+  d0.standing = 100; d0.stage = PRIME_STAGE; d0.primeT = HOLD_TO_WIN - 0.01;
+  // The second seat is most of the way there, which is exactly what the old reset threw away.
+  d1.standing = 100; d1.stage = PRIME_STAGE; d1.primeT = HOLD_TO_WIN * 0.5;
+  const both = new Map([[0, emptyInput()], [1, emptyInput()]]);
+  tick(g, both);
+  ok(g.state.status === 'won' && g.state.winner === 0, 'the first seat to hold Prime wins');
+  const held = devActor(g, g.players[1]).primeT;
+  ok(g.continueMatch(), 'and the sea carries on');
+  ok(devActor(g, g.players[0]).primeT === 0, "...with the winner's own clock cleared");
+  ok(devActor(g, g.players[1]).primeT === held && held > 0,
+    `...and the other seat's clock untouched (${held.toFixed(1)}s of ${HOLD_TO_WIN})`);
+  // The second seat finishes on its own, in the same sea, after the first already has.
+  for (let i = 0; i < HOLD_TO_WIN * 60; i++) { tick(g, both); if (g.state.status !== 'playing') break; }
+  ok(g.state.status === 'won' && g.state.winner === 1, 'the second seat wins its own apex afterwards');
+  ok(g.continueMatch(), 'and that one carries on too');
+  // The winner standing at Prime on the same animal does not win again...
+  for (let i = 0; i < HOLD_TO_WIN * 60 + 120; i++) tick(g, both);
+  ok(g.state.status === 'playing', 'an animal already taken to the top does not win a second time');
+  // ...but the same seat on a *different* animal is a separate apex, which is the whole point.
+  ok(g.progress[0].apexDone.includes('dunkleosteus') && g.progress[1].apexDone.includes('cladoselache'),
+    'each seat records the animal it took up');
+  ok(!g.progress[0].apexDone.includes('cladoselache'), "and not the other seat's");
+}
+{
   // Reef is co-op too; Hunter & Hunted is a contest between players and stays decided.
   ok(isCoop('rise') && isCoop('reef') && !isCoop('hunted'), 'rise and reef are co-op, hunted is versus');
   const hh = new Game('hunted', [{ creature: 'coccosteus', device: 'keyboard', ready: true }, { creature: 'cladoselache', device: 0, ready: true }]);

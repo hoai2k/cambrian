@@ -18,6 +18,9 @@ python3 tools/triassic/creatures/rhaeticosaurus/contact-sheets.py
 /opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- rhaeticosaurus Heavy@0.45 Heavy@0.5 Bite@0.1 Attack@0.45 Eat@0.4
 node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/rhaeticosaurus.glb
 node tools/triassic/idle-bones.mjs public/assets/triassic/creatures/rhaeticosaurus.glb
+# T3D-31: the proof that is about the body the game draws, and the picture of it
+/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- rhaeticosaurus --as-drawn Attack@0.458 Bite@0.104 Heavy@0.575 Eat@0.400
+/opt/blender/blender -b --factory-startup --python tools/triassic/mouth-space.py -- rhaeticosaurus Heavy@0.575 docs/triassic/verification/rhaeticosaurus-mouth-after.png
 ```
 
 ## The source, and what has already been done to it
@@ -38,7 +41,7 @@ build reads hashes `867bc10e…`.
 | | |
 | --- | --- |
 | Source triangles | 19,138 · one connected component after a 1e-6 weld |
-| Authored delivery | 21,320 triangles (body, mandible, oral lining, hinge envelope) |
+| Authored delivery | 21,320 triangles at T3D-08F (body, mandible, oral lining, hinge envelope); 20,848 now, with the lining and the hinge envelope retired and the cut capped with its own rim |
 | Twin | 7,582 triangles = **35.6 %** of the authored body, and `lod1` byte for byte |
 | Joints | 30, all of which own skin |
 | Influences | 4 maximum, 3.25 mean |
@@ -145,6 +148,39 @@ mouth's section is not an ellipse and an ellipse narrows towards its floor; and 
 `fit`**, because shrinking a whole ring by one factor couples its two axes — a floor set deep enough
 to sit inside the mandible rather than stipple against it took the *width* down to 0.68 of the
 mouth's own and the far wall then stopped short of the mandible's rim.
+
+### T3D-31: the mouth is the cut, capped and domed — and the lining is gone
+
+Everything above about the lining is history. This head **arrived shut** — one closed solid with
+the lip painted on it, which is exactly what the geometric method returning three vertices means —
+so turning the jaw bone opens nothing until the cut makes an aperture, and what the cut leaves is a
+hole in each half. `T.cut_rim` measures it: **one closed loop of 116 vertices per half** on the
+authored body, 68 of them on the seam and 48 on the head's cross-section at the hinge; 69 on the
+twin.
+
+Those two holes are now closed with the cut's own rim and domed apart (`T.cap_mouth`), and the
+`Oral cavity lining` and the blended `Seated jaw hinge tissue` are both retired. The hinge
+cross-section is fanned first with its own vertices (`T.cap_cut`, 50 faces authored / 31 twin);
+what is left — the two lip runs joined round the snout and the chord that fan closed the hinge with
+— is filled in the mouth's own plane and poked twice (594 faces authored / 342 twin), then pushed
+into its own half by **0.34 of each vertex's own distance from the rim**, bounded at 0.55 of
+`mouth_half_depth` (the ray cast from the seam to the skin). Deepest 0.016 raw on a mouth 0.10 long.
+Nothing is invented: every cap vertex is a convex combination of rim vertices, and its UVs and
+vertex colour come off the rim, so the roof of the mouth is this animal's own albedo.
+
+| Measurement | Before | After |
+| --- | --- | --- |
+| `gape-solid.py`, plain, six opening clips | 0 px through, 166–177 opened | **0 px through, 0 opened** |
+| `gape-solid.py --as-drawn` (what the game shows) | **4,626 px through** at `Heavy`; 4,427–6,066 opened at `Attack`, `Bite`, `Eat` | **0 through, 0 opened** |
+| `lag.mjs` | 0 open past 0.2 % | 0 open past 0.2 %, worst 0.00 % |
+| `skin-tears.mjs` | 2.81x | 2.81x (mouth skin jaw 1.52x, skull 1.26x) |
+| `oral-shell-audit.mjs` | palate + floor | no oral lining on any variant |
+
+The as-drawn row is the one that matters and it is new: the runtime hides everything
+`src/shared/oral-geometry.ts` matches, so the plain proof was about a body the game never drew.
+Pictures, with the classifier applied, at `Heavy`'s widest:
+[before](../../../../docs/triassic/verification/rhaeticosaurus-mouth-before.png) — a black void into
+a hollow head — and [after](../../../../docs/triassic/verification/rhaeticosaurus-mouth-after.png).
 
 ## The performance: underwater flight
 

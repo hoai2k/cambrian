@@ -55,21 +55,73 @@ try {
   // 2. A click is a bite — wherever it lands. Biting at the water ahead of you is a real move.
   const centre = { x: 640, y: 400 };
   await page.mouse.move(centre.x, centre.y);
-  await page.mouse.click(centre.x, centre.y, { delay: 40 });
-  await page.waitForFunction(() => window.__cambrian.game.players[0].state === 'attack', null, { timeout: 30000 });
-  const bit = await page.evaluate(() => window.__cambrian.game.players[0].moveKind);
-  assert.equal(bit, 'light', `a click bites (got ${bit})`);
+  // The attack is caught by a watcher on the page's own frames rather than by polling for it: a
+  // bite is over in a few tenths of a second, and a poll that happens to look on either side of it
+  // reports an animal doing nothing at all. The click itself is repeated for the same reason —
+  // whatever else the body is in the middle of when the first one lands, it is free by the next.
   await settled();
+  let bit;
+  for (let i = 0; i < 5 && !bit; i++) {
+    await page.evaluate(() => {
+      window.__bite = undefined;
+      const g = window.__cambrian.game, tick = () => {
+        const a = g.players[0];
+        if (a.state === 'attack' && !window.__bite) window.__bite = a.moveKind;
+        if (!window.__bite) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+    await page.mouse.click(centre.x, centre.y, { delay: 40 });
+    await frames(20);
+    bit = await page.evaluate(() => window.__bite);
+    await settled();
+  }
+  assert.equal(bit, 'light', `a click bites (got ${bit})`);
 
-  // ...and a hold is the heavy — but **only over something**. The cursor is walked until the engine
-  // says it has a target (any animal will do; what is being checked is that the same button, held
-  // on something rather than clicked, reaches the heavy branch instead of the bite), because a hold
-  // over open water is the camera and nothing else.
+  // ...and a hold is the heavy — but **only over something**, because a hold over open water is the
+  // camera and nothing else. Any animal will do: what is being checked is that the same button,
+  // held on something rather than clicked, reaches the heavy branch instead of the bite.
+  // An animal is *put* under the cursor rather than hunted for by sweeping the screen: the cursor
+  // now steers the view outside its dead zone, so a search that wandered up the screen would be
+  // tilting the camera while it looked and would never settle. The engine's own cursor ray is what
+  // decides a target, so the body goes on that ray — and candidates are tried in turn because a
+  // giant is never a target whatever it is pointed at.
+  await page.mouse.move(centre.x, centre.y);
+  await frames(2);
   let found = false;
-  for (let i = 0; i < 48 && !found; i++) {
-    await page.mouse.move(centre.x + ((i % 8) - 4) * 80, centre.y + (Math.floor(i / 8) - 3) * 60);
-    await frames(1);
-    found = await page.evaluate(() => window.__cambrian.cams[0].aimTarget >= 0);
+  for (let i = 0; i < 16 && !found; i++) {
+    // Each candidate is *held* on the ray for a few frames rather than dropped there once: a body
+    // the sim puts back where it belongs (anything that keeps to the sand, say) would otherwise
+    // have left before the aim was read, and an animal too big to be a target is never one however
+    // well it is placed — so the next one is tried.
+    for (let k = 0; k < 4 && !found; k++) {
+      const placed = await page.evaluate((j) => {
+        const e = window.__cambrian, g = e.game, a = g.players[0], cs = e.cams[0];
+        const dir = e.cursorDir(cs); if (!dir) return false;
+        const small = g.actors.filter((o) => o !== a && o.hp > 0).sort((x, y) => x.scale - y.scale);
+        const o = small[j]; if (!o) return false;
+        // Far enough along the ray to be in front of the animal and near enough to be *pounceable*:
+        // the aim cone reaches well past the pounce, so a body placed at the edge of what the cursor
+        // can name is a target the heavy would refuse.
+        const want = g.pounceRange(a) * 0.6;
+        const C = cs.camera.position;
+        let d = 4, bestGap = Infinity;
+        for (let t = 2; t <= 44; t += 0.5) {
+          const gap = Math.abs(Math.hypot(C.x + dir.x * t - a.pos.x, C.y + dir.y * t - a.pos.y, C.z + dir.z * t - a.pos.z) - want);
+          if (gap < bestGap) { bestGap = gap; d = t; }
+        }
+        o.pos.x = C.x + dir.x * d; o.pos.y = C.y + dir.y * d; o.pos.z = C.z + dir.z * d;
+        // The snapshot the renderer interpolates from moves with it: a teleport that left it behind
+        // reads as a body stretched across the sea, and clearing it outright breaks the frame.
+        o.prevT.x = o.pos.x; o.prevT.y = o.pos.y; o.prevT.z = o.pos.z;
+        o.vel.x = o.vel.y = o.vel.z = 0;
+        a.stamina = a.staminaMax;
+        return true;
+      }, i);
+      if (!placed) break;
+      await frames(1);
+      found = await page.evaluate(() => window.__cambrian.cams[0].aimTarget >= 0);
+    }
   }
   assert(found, 'the cursor found an animal to hold on');
   await page.mouse.down();
@@ -120,6 +172,35 @@ try {
   const dashed = await state(); await page.mouse.up({ button: 'right' });
   assert.equal(dashed.state, 'dodge', `the right button dashes (got ${dashed.state})`);
 
+  // 6. A and D turn the *animal*, and the camera comes round after it — the order a player feels.
+  await settled();
+  await page.evaluate(() => { const e = window.__cambrian; e.cams[0].followHold = 0; });
+  const before = await page.evaluate(() => ({ yaw: window.__cambrian.game.players[0].yaw, cam: window.__cambrian.cams[0].yaw }));
+  await page.keyboard.down('d'); await frames(14); await page.keyboard.up('d');
+  const turned = await page.evaluate(() => ({ yaw: window.__cambrian.game.players[0].yaw, cam: window.__cambrian.cams[0].yaw }));
+  const wrap = (x) => Math.abs(((x + Math.PI * 3) % (Math.PI * 2)) - Math.PI);
+  assert(wrap(turned.yaw - before.yaw) > 0.15, `D turns the animal (${wrap(turned.yaw - before.yaw).toFixed(2)} rad)`);
+  await frames(10);
+  const followed = await page.evaluate(() => ({ yaw: window.__cambrian.game.players[0].yaw, cam: window.__cambrian.cams[0].yaw }));
+  assert(wrap(followed.cam - followed.yaw) < wrap(turned.cam - turned.yaw) + 0.02, 'and the camera comes round after it');
+
+  // 7. The cursor's height steers the view. *Where* the dead zone ends and how hard the push ramps
+  // is a pure function and is checked exactly in `npm run swim`; what only a browser can say is
+  // that the wiring is live and pulls in the right direction from each half of the screen.
+  await settled();
+  // Long enough for the follow to finish easing the view back: the steps before this one dragged
+  // it about, and the dead zone means the cursor is no longer holding it anywhere.
+  await page.mouse.move(centre.x, centre.y); await frames(80);
+  const rest = await page.evaluate(() => window.__cambrian.cams[0].pitch);
+  await page.mouse.move(centre.x, 30); await frames(12);
+  const up = await page.evaluate(() => window.__cambrian.cams[0].pitch);
+  await page.mouse.move(centre.x, 780); await frames(16);
+  const down = await page.evaluate(() => window.__cambrian.cams[0].pitch);
+  // Centred, the view settles toward its resting pitch rather than running anywhere.
+  assert(Math.abs(rest - 0.2) < 0.25, `a centred cursor leaves the view at rest (${rest.toFixed(2)})`);
+  assert(up < rest - 0.15, `the top of the screen tilts the view up (${rest.toFixed(2)} → ${up.toFixed(2)})`);
+  assert(down > up + 0.3, `and the bottom tilts it down (${up.toFixed(2)} → ${down.toFixed(2)})`);
+
   assert.deepEqual(errors, [], `page errors: ${errors.join(' · ')}`);
-  console.log('PASS browser: no pointer lock, click bites, hold is the heavy, the camera follows, a press over nothing looks, the right button dashes, and the cursor is the crosshair');
+  console.log('PASS browser: no pointer lock, click bites, hold is the heavy, the camera follows, a press over nothing looks, the right button dashes, the cursor is the crosshair, A and D turn the animal, and its height steers the view');
 } finally { await browser.close(); }

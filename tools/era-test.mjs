@@ -3,10 +3,10 @@ import fs from 'node:fs';
 import { build } from 'esbuild';
 
 const result = await build({
-  stdin: { contents: "export * from './src/content'; export * from './src/content/era'; export * from './src/content/asset-paths'; export { CAMBRIAN } from './src/content/cambrian'; export { DEVONIAN } from './src/content/devonian'; export { TRIASSIC } from './src/content/triassic'; export { CAMBRIAN_PENDING } from './src/content/cambrian/model-status'; export { default as DEVONIAN_PENDING } from './src/content/devonian/pending-refinements.json'; export { default as TRIASSIC_PENDING } from './src/content/triassic/pending-refinements.json';", resolveDir: process.cwd() },
+  stdin: { contents: "export * from './src/content'; export * from './src/content/era'; export * from './src/content/asset-paths'; export { CAMBRIAN } from './src/content/cambrian'; export { DEVONIAN } from './src/content/devonian'; export { TRIASSIC } from './src/content/triassic'; export { SHARED_STRINGS, mergeStrings } from './src/content/strings'; export { CAMBRIAN_PENDING } from './src/content/cambrian/model-status'; export { default as DEVONIAN_PENDING } from './src/content/devonian/pending-refinements.json'; export { default as TRIASSIC_PENDING } from './src/content/triassic/pending-refinements.json';", resolveDir: process.cwd() },
   bundle: true, platform: 'node', format: 'esm', write: false,
 });
-const { ACTIVE_ERA: era, defineEra, createAssetPaths, CAMBRIAN, DEVONIAN, TRIASSIC, CAMBRIAN_PENDING, DEVONIAN_PENDING, TRIASSIC_PENDING } = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString('base64')}`);
+const { ACTIVE_ERA: era, defineEra, createAssetPaths, SHARED_STRINGS, mergeStrings, CAMBRIAN, DEVONIAN, TRIASSIC, CAMBRIAN_PENDING, DEVONIAN_PENDING, TRIASSIC_PENDING } = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString('base64')}`);
 assert.equal(era.id, 'cambrian');
 assert.equal(era.creatures.length, 21);
 assert.equal(era.defaults.player, 'anomalocaris');
@@ -107,3 +107,38 @@ for (const { name, era: e, pending } of [
 }
 
 console.log('PASS: era validation, all 21 model/portrait paths and byte sizes, group labels, model/animation badge split with reasons for all three eras, cross-era stand-ins, and independent future asset namespaces');
+
+/**
+ * The text tables: `src/content/strings.ts` shared, `src/content/<era>/strings.ts` per game, joined
+ * by `mergeStrings` (which `src/shared/text.ts` does at runtime). Three things are worth holding.
+ *
+ * An era may only *override* — a key it invents is a key nothing reads, which is how a renamed
+ * string quietly stops being shown. Every leaf of the merged table has to be a string, a function
+ * or a list of strings, or something the UI draws comes out `undefined`. And the loading lines have
+ * to be that era's own: one shared list is how all three games came to be loading to Cambrian
+ * trivia about Hallucigenia.
+ */
+const leaves = (o, path = '') => Object.entries(o).flatMap(([k, v]) =>
+  v && typeof v === 'object' && !Array.isArray(v) ? leaves(v, `${path}${k}.`) : [[`${path}${k}`, v]]);
+const SHARED_KEYS = new Set(leaves(SHARED_STRINGS).map(([k]) => k));
+for (const [name, e] of [['cambrian', CAMBRIAN], ['devonian', DEVONIAN], ['triassic', TRIASSIC]]) {
+  assert.ok(e.strings, `${name}: no strings table`);
+  for (const [key] of leaves(e.strings)) {
+    assert.ok(SHARED_KEYS.has(key), `${name}: strings.${key} is not a key the shared table has, so nothing reads it`);
+  }
+  const merged = mergeStrings(SHARED_STRINGS, e.strings);
+  for (const [key, value] of leaves(merged)) {
+    const ok = typeof value === 'string' || typeof value === 'function'
+      || (Array.isArray(value) && value.every((x) => typeof x === 'string'));
+    assert.ok(ok, `${name}: strings.${key} is neither a string, a function nor a list of strings`);
+  }
+  assert.ok(merged.loading.facts.length >= 4, `${name}: the boot screen needs its own loading lines`);
+  assert.ok(merged.sim.ladder.rungs.length === SHARED_STRINGS.sim.ladder.rungs.length,
+    `${name}: the ladder must name every rung`);
+}
+// Each era's loading lines are its own, not another game's.
+const FACTS = [CAMBRIAN, DEVONIAN, TRIASSIC].map((e) => mergeStrings(SHARED_STRINGS, e.strings).loading.facts);
+for (let i = 0; i < FACTS.length; i++) for (let j = i + 1; j < FACTS.length; j++) {
+  assert.ok(!FACTS[i].some((f) => FACTS[j].includes(f)), 'two eras are showing the same loading line');
+}
+console.log('PASS: the shared and per-era text tables, with every era override landing on a key the shared table has');

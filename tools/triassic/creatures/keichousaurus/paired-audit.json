@@ -2,24 +2,24 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1726704,
-      "sha256": "510d3c0666196861df719e92edda250ff66c469e5bbc611f220003f11b4107ce",
-      "triangles": 20120,
-      "vertices": 11659
+      "bytes": 1728324,
+      "sha256": "7d6d9f73522f3cc8a20fddd5a0892406f4f95e5c36c6d365689d0beb371a60c7",
+      "triangles": 20156,
+      "vertices": 11679
     },
     {
       "suffix": ".puppet",
-      "bytes": 733504,
-      "sha256": "51bc695d23e5829d529a531284c86bac7f6f7735689f267498fab4cf60be9040",
-      "triangles": 7588,
-      "vertices": 3911
+      "bytes": 733860,
+      "sha256": "70eb5f415e66fd374a60d12660e117b10ce1c1caa61b1d672030b00b9ad2e402",
+      "triangles": 7624,
+      "vertices": 3931
     },
     {
       "suffix": ".lod1",
-      "bytes": 733504,
-      "sha256": "51bc695d23e5829d529a531284c86bac7f6f7735689f267498fab4cf60be9040",
-      "triangles": 7588,
-      "vertices": 3911
+      "bytes": 733860,
+      "sha256": "70eb5f415e66fd374a60d12660e117b10ce1c1caa61b1d672030b00b9ad2e402",
+      "triangles": 7624,
+      "vertices": 3931
     }
   ],
   "sockets": [
@@ -129,7 +129,7 @@
     },
     {
       "name": "Grab",
-      "sha256": "e2619db799bc313ab4381283fd21f1e66cdf0732d727e65a34b8712c2655d057"
+      "sha256": "35712b4a59334fa23302c8508f6423ccb66adc8baa6efea0d10d36e17516c00d"
     },
     {
       "name": "Growth",
@@ -184,7 +184,7 @@
       "sha256": "19cf363dce8be5bee4a62d4a07ea3f588446bec615a57de58fd06badaf4f40d7"
     }
   ],
-  "lodTriangleFraction": 0.3771371769383698,
+  "lodTriangleFraction": 0.3782496527088708,
   "playback": [
     {
       "suffix": "",
@@ -247,7 +247,7 @@
           "clip": "Grab",
           "duration": 1.2000000476837158,
           "samples": 61,
-          "maxVertexTravel": 0.6792581549683169
+          "maxVertexTravel": 0.6851116483145706
         },
         {
           "clip": "Growth",
@@ -390,7 +390,7 @@
           "clip": "Grab",
           "duration": 1.2000000476837158,
           "samples": 61,
-          "maxVertexTravel": 0.676252082770262
+          "maxVertexTravel": 0.6820072340230732
         },
         {
           "clip": "Growth",

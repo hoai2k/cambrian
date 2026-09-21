@@ -2,7 +2,16 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--
+      `viewport-fit=cover` is what makes `env(safe-area-inset-*)` non-zero, and the HUD and the
+      touch pads are positioned off those insets so they clear a notch and a home bar.
+      `maximum-scale=1, user-scalable=no` is here because **double-tap is a move in this game**
+      (it is the pounce, and the dash): a browser that answered it with its own zoom would take
+      the move away. It is a real accessibility cost and it is paid on the game pages only —
+      the trilogy page, the viewer and the stats page all stay pinchable, and inside the game the
+      view has its own pinch-to-zoom on the camera.
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#06161c" />
     <title>Cambrian Conquest</title>
     <link rel="icon" href="../favicon-anomalocaris-16.png" sizes="16x16" type="image/png" />

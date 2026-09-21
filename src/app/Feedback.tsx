@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ACTIVE_ERA } from '../content';
 import { CloseIcon } from './icons';
 import { feedbackEnabled, MIN_COMPOSE_MS, sendFeedback, TURNSTILE_KEY } from '../shared/feedback';
+import { TEXT } from '../shared/text';
 
 /**
  * "Send Feedback" — the corner of the choose-your-creature screen, and the dialog behind it.
@@ -35,7 +36,7 @@ export function FeedbackButton() {
   if (!feedbackEnabled()) return null;
   return (
     <>
-      <button className="feedback-button" onClick={() => setOpen(true)}>Send Feedback</button>
+      <button className="feedback-button" onClick={() => setOpen(true)}>{TEXT.feedback.button}</button>
       {open && <FeedbackDialog onClose={() => setOpen(false)} />}
     </>
   );
@@ -60,6 +61,7 @@ function FeedbackDialog({ onClose }: { onClose: () => void }) {
     return () => clearTimeout(t);
   }, []);
 
+  const t = TEXT.feedback;
   const early = Date.now() - opened.current < MIN_COMPOSE_MS;
   // `failed` is offerable again on purpose: the error says to try again, and a Send that stays
   // grey after telling somebody to press it is the same as losing what they wrote.
@@ -85,35 +87,32 @@ function FeedbackDialog({ onClose }: { onClose: () => void }) {
     <dialog ref={ref} className="tools-dialog feedback-dialog"
       onCancel={(e) => { e.preventDefault(); onClose(); }}
       onClick={(e) => { if (e.target === ref.current) onClose(); }}>
-      <button className="tools-close icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button>
+      <button className="tools-close icon-button" aria-label={TEXT.common.close} onClick={onClose}><CloseIcon /></button>
       <div className="dialog-body">
-        <p className="eyebrow">FEEDBACK</p>
+        <p className="eyebrow">{t.eyebrow}</p>
         {state === 'sent' ? (
           <>
-            <h2>Thank you.</h2>
-            <p>It has landed, and it will be read. If it needs an answer you will get one at {email.trim()}.</p>
-            <div className="feedback-actions"><button className="ghost" onClick={onClose}>Close</button></div>
+            <h2>{t.sentHeading}</h2>
+            <p>{t.sentBody(email.trim())}</p>
+            <div className="feedback-actions"><button className="ghost" onClick={onClose}>{TEXT.common.close}</button></div>
           </>
         ) : (
           <form onSubmit={submit}>
-            <h2>Tell us what you think.</h2>
-            <p>
-              We are always open to suggestions and comments and would love to hear your feedback,
-              or of course about any bugs or difficulties you encounter.
-            </p>
+            <h2>{t.heading}</h2>
+            <p>{t.intro}</p>
 
             <label className="feedback-field">
-              <span>Your email</span>
+              <span>{t.emailLabel}</span>
               <input type="email" required value={email} autoComplete="email"
-                placeholder="you@example.com" disabled={state === 'sending'}
+                placeholder={t.emailPlaceholder} disabled={state === 'sending'}
                 onChange={(e) => setEmail(e.target.value)} />
-              <small className="dim">Only so we can reply, if needed</small>
+              <small className="dim">{t.emailNote}</small>
             </label>
 
             <label className="feedback-field">
-              <span>Your message</span>
+              <span>{t.messageLabel}</span>
               <textarea required rows={6} value={message} maxLength={4000}
-                disabled={state === 'sending'} placeholder="What happened, or what would you change?"
+                disabled={state === 'sending'} placeholder={t.messagePlaceholder}
                 onChange={(e) => setMessage(e.target.value)} />
             </label>
 
@@ -129,16 +128,13 @@ function FeedbackDialog({ onClose }: { onClose: () => void }) {
             {TURNSTILE_KEY && <div className="cf-turnstile" data-sitekey={TURNSTILE_KEY} data-theme="dark" />}
 
             {state === 'failed' && (
-              <p className="feedback-error" role="alert">
-                That did not send — the connection or the inbox is having a moment. Try again in a
-                minute; nothing you have typed is lost.
-              </p>
+              <p className="feedback-error" role="alert">{t.failed}</p>
             )}
 
             <div className="feedback-actions">
-              <button type="button" className="ghost" onClick={onClose}>Cancel</button>
+              <button type="button" className="ghost" onClick={onClose}>{TEXT.common.cancel}</button>
               <button type="submit" className="start-button" disabled={!ready}>
-                {state === 'sending' ? 'SENDING…' : 'SEND'}
+                {state === 'sending' ? t.sending : t.send}
               </button>
             </div>
           </form>

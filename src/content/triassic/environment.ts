@@ -57,6 +57,8 @@ export const FLORA_BASE: Record<string, string> = {
   // The three authored substrate families. They carry their own vertex pigment, so these are only
   // what the procedural fallback is tinted with where the GLB has not loaded.
   stromatolite: '#9a8f74', saltCrust: '#e8e6dd', mudRipple: '#3a3630',
+  encrinusLitter: '#d6c7a2', daonellaBed: '#d8cfba', brachiopodCluster: '#d2c19f', cidaris: '#a86d43',
+  neocalamites: '#5d7834', pleuromeia: '#657a32', bjuvia: '#4f7034',
   vauxia: '#9c8f72', sac: '#a89a80', choia: '#8f8a6a', thalli: '#6b6a3a', tuft: '#5e7a45',
 };
 /**
@@ -71,14 +73,34 @@ export const FLORA_DENSITY: Record<Biome, Partial<Record<FloraKind, number>>> = 
   // this slot has gone: `stromatoporoid` means sponge mound here, and a reef form scattered over a
   // hypersaline pan was the wrong animal in the wrong sea — the authored dome is what belongs.
   shallows: { saltCrust: 5, stromatolite: 6, bryozoan: 1.5, log: 0.4 },
-  nursery: { reed: 24, frondTower: 3, log: 5, bryozoan: 6, crinoid: 2, stromatolite: 1 },
-  shelf: { bryozoan: 22, crinoid: 2, tabulate: 0.6, rugose: 0.5, log: 0.3 },
-  forest: { crinoid: 28, bryozoan: 4, tabulate: 1.2, rugose: 1.5, lilyColumn: 1.5 },
-  boulders: { tabulate: 9, rugose: 7, stromatoporoid: 3, bryozoan: 2, crinoid: 1 },
-  flats: { bryozoan: 3, crinoid: 0.4, tabulate: 0.3 },
+  nursery: { neocalamites: 24, pleuromeia: 1.2, bjuvia: 0.7, frondTower: 3, log: 5, bryozoan: 6, crinoid: 2, stromatolite: 1 },
+  shelf: { bryozoan: 22, crinoid: 2, daonellaBed: 2, tabulate: 0.6, rugose: 0.5, log: 0.3 },
+  forest: { crinoid: 28, encrinusLitter: 8, brachiopodCluster: 3, cidaris: 1, bryozoan: 4, tabulate: 1.2, rugose: 1.5, lilyColumn: 1.5 },
+  boulders: { tabulate: 9, rugose: 7, stromatoporoid: 3, bryozoan: 2, crinoid: 1, cidaris: 2 },
+  flats: { daonellaBed: 14, encrinusLitter: 3, brachiopodCluster: 2, bryozoan: 3, crinoid: 0.4, tabulate: 0.3 },
   channel: { rugose: 1.2, tabulate: 0.8, bryozoan: 0.5, log: 1 },
   escarpment: { tabulate: 3, rugose: 3, lilyColumn: 2.5, crinoid: 1 },
   basin: { mudRipple: 2, lilyColumn: 0.6, log: 0.3 },
+};
+/**
+ * The shore fringe: the only growth above the waterline in any era, and the Triassic's alone.
+ *
+ * The three land plants the era already has are a coastal gradient in their own right, so the
+ * bands are the plants (02-biomes-and-depth.md, research.md):
+ *
+ * - **Neocalamites**, the horsetail, stands in the water and in the wet sand at the very edge —
+ *   the one plant here that is happy with its feet wet, so its band crosses the waterline.
+ * - **Pleuromeia**, the lycopsid, is the Early Triassic's pioneer of bare salty coastal flats and
+ *   takes the strand behind it, where the tide reaches but does not stand.
+ * - **Bjuvia**, the bennettitalean, is the driest of the three and holds the back of the beach.
+ *
+ * Thin on purpose: the beach is a place a player arrives at by accident or is hunted on, not a
+ * second forest, and a fringe that hides the shore animals would spoil both.
+ */
+export const SHORE_FLORA: Partial<Record<FloraKind, { density: number; from: number; to: number }>> = {
+  neocalamites: { density: 3.2, from: 3, to: -9 },
+  pleuromeia: { density: 2.4, from: -6, to: -20 },
+  bjuvia: { density: 1.4, from: -15, to: -30 },
 };
 /**
  * Superseded by the scenery pack (`./scenery.ts`), which the era declares as `instancedScenery`

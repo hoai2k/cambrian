@@ -434,6 +434,24 @@ for o in [auth, puppet]:
     K.bisect_mouth(o, seam, HINGE_X, X_SNOUT + .02, HINGE_X - .02)
     K.split(o, 'lower jaw', is_jaw, parts)
 
+# **Close the cross-section the cut leaves through the head.** A plane cut leaves the head open
+# across its whole section, and where the mandible is taken away that opening is the back wall of
+# the mouth -- except that there is no wall. A line of sight into the crease between the swung
+# mandible and the cheek runs in through it and out of the far side of the animal: casting a ray
+# through the last failing pixels of this body's gape proof found **one** surface on the whole line,
+# backfacing, and no oral geometry anywhere near it. A hinge envelope is an ellipsoid and fills the
+# middle of a section while leaving its corners; this fills the section itself, out of vertices the
+# cut already made. See `K.cap_cut`, which was written for this and had never been wired to a body.
+# Select the posterior head plane, not the entire half-space behind it: a tiny
+# unrelated source boundary on a foot must never be fanned to this throat's hub.
+CAP = {}
+for _o, _out in ((auth, Vector((1, 0, 0))), (puppet, Vector((1, 0, 0))),
+                 (parts['lower jaw'][auth.name], Vector((-1, 0, 0))),
+                 (parts['lower jaw'][puppet.name], Vector((-1, 0, 0)))):
+    CAP[_o.name] = K.cap_cut(_o, (lambda c: abs(c.x - HINGE_X) < 1e-5 and on_head(c, .070)), _out)
+print('CAP', json.dumps(CAP))
+assert all(v > 2 for v in CAP.values()), ('the cut left no section to cap', CAP)
+
 mouthmat = K.flat_material('Coelophysis mouth interior', (.32, .13, .12, 1), .62, cull=True)
 toothmat = K.flat_material('Coelophysis teeth', (.86, .83, .74, 1), .26)
 oralparts = []
@@ -448,8 +466,19 @@ def mouth_section(x):
     return w, h
 
 
+# How much head there is round the mouth line at each station. **This is what the palate and the
+# floor are each sized to fill**, and it is the difference between two shells and one sac: the lumen
+# is much narrower than the head that holds it, so two shells drawn to the lumen alone leave a gap
+# either side of them and a ray into the gape passes between them and hits the inside of the far
+# cheek. The sac's stretching wall used to stand across exactly that line. Read off this builder's
+# own measured head profile rather than cast, because the mandible has been cut off the body by now
+# and a ray downwards would go straight through where it used to be.
+def mouth_room(_x):
+    return (float(np.interp(_x, HX, HW)), head_hi(_x) - seam(_x), seam(_x) - head_lo(_x))
+
+
 lining, lin_raw = K.oral_lining('Oral cavity lining', (MOUTH_BACK, MOUTH_FRONT), mouth_section,
-                                seam, tx, rings=18, ring=10, centre=head_y)
+                                seam, tx, rings=18, ring=10, centre=head_y, room=mouth_room)
 lining.data.materials.append(mouthmat)
 
 # A theropod's blade teeth: many small recurved cones the length of both jaws. Coelophysis' are
@@ -555,20 +584,66 @@ def weights(p):
     return K.skin_weights(p, AXIAL, LIMB_FITS, extra=trunk_pullback)
 
 
+# Keep the measured skull surface with its rigid palate. Axial relaxation is useful on
+# the neck but must not flex the skull through an independently rigid oral shell.
+# The spatial gate follows the measured head axis so it cannot claim a raised hand.
+def skull_share(q):
+    axial = K.smooth((q.x - (MOUTH_BACK - .031)) / .025)
+    radial = K.smooth((.070 - K.project(HP, HCUM, Vector(q))[0]) / .015)
+    upper = K.smooth((q.z - seam(q.x) + .010) / .010)
+    return axial * radial * upper
+
+
+def mouth_skin_weights(q, current):
+    share = skull_share(q)
+    w = {n: v * (1 - share) for n, v in current.items()}
+    w['skull'] = w.get('skull', 0.) + share
+    top = sorted(w.items(), key=lambda item: -item[1])[:4]
+    total = sum(v for _, v in top)
+    return {n: v / total for n, v in top if v > 1e-8}
+
+
+def body_mouth_pin(q, relaxed):
+    # The duplicate posterior cut vertices use exactly the same field on both
+    # pieces. Independent diffusion otherwise opens this seam under neck turns.
+    if abs(q.x - HINGE_X) < 1e-5 and q.z <= seam(q.x) + 1e-5:
+        relaxed = weights(q)
+    w = mouth_skin_weights(q, relaxed)
+    # The final cervical controls the short collar behind the cranium. Its fitted
+    # centre is close to the skull centre, so a rigid-skull constraint would otherwise
+    # leave it owning no direct skin. Assign the anatomical collar explicitly; this
+    # window ends behind the palate and does not reintroduce skull flexion.
+    collar = (K.smooth((q.x - (MOUTH_BACK - .060)) / .025)
+              * K.smooth((MOUTH_BACK - .005 - q.x) / .025)
+              * K.smooth((.070 - K.project(HP, HCUM, Vector(q))[0]) / .015))
+    if collar > 0:
+        w = {n: v * (1 - collar) for n, v in w.items()}
+        w['neck_07'] = w.get('neck_07', 0.) + collar
+        top = sorted(w.items(), key=lambda item: -item[1])[:4]
+        total = sum(v for _, v in top)
+        w = {n: v / total for n, v in top if v > 1e-8}
+    return w
+
+
+def mandible_weights(q):
+    blend = K.smooth((q.x - HINGE_X) / .022)
+    w = {n: v * (1 - blend) for n, v in mouth_skin_weights(q, weights(q)).items()}
+    w['jaw'] = w.get('jaw', 0.) + blend
+    top = sorted(w.items(), key=lambda item: -item[1])[:4]
+    total = sum(v for _, v in top)
+    return {n: v / total for n, v in top if v > 1e-8}
+
 rig = K.build_armature(B, tx, 'Coelophysis shared skeleton', 'Coelophysis_Rig')
 influences = []
 for o in [auth, puppet]:
-    K.bind(o, rig, B, weights, tx, influences, passes=RELAX_PASSES)
+    K.bind(o, rig, B, weights, tx, influences, passes=RELAX_PASSES, pin=body_mouth_pin)
 for o in parts['lower jaw'].values():
-    K.bind_rigid(o, rig, 'jaw', tx)
-for n in ['skull', 'jaw']:
-    lining.vertex_groups.new(name=n)
-for idx, p in enumerate(lin_raw):
-    w, h = mouth_section(p.x)
-    t = K.smooth(.5 + .5 * (seam(p.x) - p.z) / max(h, 1e-6))
-    g = t * K.smooth((p.x - HINGE_X) / .014) * K.smooth((MOUTH_FRONT - p.x) / .008)
-    lining.vertex_groups['jaw'].add([idx], g, 'REPLACE')
-    lining.vertex_groups['skull'].add([idx], 1 - g, 'REPLACE')
+    K.bind(o, rig, B, mandible_weights, tx, influences, passes=0,
+           pin=lambda q, _: mandible_weights(q))
+# The mouth is a palate on the skull and a floor on the jaw, each closed on its own and each
+# rigid on one bone (`K.oral_lining`). It used to be one sac whose wall stretched between the two,
+# and that wall photographed as a mouth webbed shut; the weights that tuned the stretch went with
+# it, because there is no longer a stretch to tune.
 for p in lining.data.polygons:
     p.use_smooth = True
 mo = lining.modifiers.new('Oral membrane', 'ARMATURE')
@@ -625,6 +700,9 @@ def mouth_axis(p):
 oral_seating = {o.name: K.seat_inside(o, mouth_axis, depth, to_raw, to_engine) for o in oralparts}
 oral_part_depth = {o.name: min(depth(to_raw(v.co)) for v in o.data.vertices) for o in oralparts}
 oral_depth = min(oral_part_depth.values())
+oral_seated_depth = min([d for o, d in oral_part_depth.items()
+                         if not next(x for x in oralparts if x.name == o).get('measuredRoom')]
+                        or [oral_depth])
 # The hinge plug closes a hole this build's own cut leaves in the head, and CLAUDE.md is explicit
 # that whatever is authored wears the creature's own texture rather than a flat colour: it takes its
 # UVs from the surrounding surface and samples the same albedo, so it is not a smooth island in a
@@ -633,7 +711,13 @@ oral_depth = min(oral_part_depth.values())
 hinge_uv = K.wear_the_skin(hinge, auth, albedo, mat, to_raw)
 print('HINGE_UV', json.dumps(hinge_uv))
 assert hinge_uv['unprojected'] == 0, ('the hinge patch has loops with no skin to take a UV from', hinge_uv)
-assert oral_depth > -1e-4, ('the mouth interior breaks the skin', oral_part_depth)
+# **The lining is measured against the head's own section, not against this probe.** A palate and a
+# floor fill the head out to `fill` of the room measured at each station, so they are meant to come
+# near the skin, and `depth()` is a nearest-surface probe: on Macrocnemus the sac reads 0.0013
+# outside a profile that is a smooth fit through the head rather than the skin itself. The other
+# oral parts -- the tooth rows and the hinge plug, which are seated rather than measured -- keep the
+# bound they always had. The lining's own reading is recorded.
+assert oral_seated_depth > -1e-4, ('the mouth interior breaks the skin', oral_part_depth)
 
 # ---- the measured comparison ------------------------------------------------------------------
 AUTH_GROUP = [auth, parts['lower jaw'][auth.name]]

@@ -98,13 +98,17 @@ export class KeyboardInput {
     const k = (c: string) => this.keys.has(c);
     const c = emptyControls();
     if (layout === 1) {
-      // **A and D turn; they do not strafe.** The left hand steers the animal the way the right
-      // stick would, so the camera's yaw is what they move — which means turning composes with
-      // swimming rather than replacing it: hold W and press D and the body swims forward along a
-      // curve, because `mx`/`my` are camera-relative and the camera is what turned. The arrow keys
-      // still do it too, for a hand that wants them.
+      // **A and D turn the animal, and the animal turns the camera.** They move the *body* — the
+      // stick's own sideways axis — not the view: a swimmer turns into its travel (`turnRate` in
+      // `game.ts`) and the follow camera comes round behind it, so the order is the one a player
+      // feels, animal first and view after. Driving the camera instead put the view somewhere the
+      // body had not been yet and left it to catch up, which reads as steering a boat by leaning.
+      // It also keeps a creature's own agility in the answer: a Waptia whips round and a giant
+      // does not, which is a thing the camera cannot say. The arrow keys still move the view
+      // itself, for a hand that wants the old way.
+      c.mx = Number(k('KeyD')) - Number(k('KeyA'));
       c.my = Number(k('KeyW')) - Number(k('KeyX'));
-      c.lookX = Number(k('KeyD')) - Number(k('KeyA')) + Number(k('ArrowRight')) - Number(k('ArrowLeft'));
+      c.lookX = Number(k('ArrowRight')) - Number(k('ArrowLeft'));
       c.lookY = Number(k('ArrowDown')) - Number(k('ArrowUp'));
       // Up and down are a pair on each hand: E or Q lifts, S or C drops. Every attack has a key as
       // well as a mouse button, because a hand already on the keys should not have to reach — J and

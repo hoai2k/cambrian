@@ -1,5 +1,13 @@
 # Hupehsuchus — the armoured one, and a pelican rather than a whale
 
+> **Current repair, 19 September 2026:** The cut now follows 34 measured lip stations to
+> the posterior end of the visible lip, rather than stopping on the narrow rostrum.
+> Both copies of the posterior cut share the pouch/body weights, with a short blend
+> into the rigid mandible. The cut cross-sections are capped with the source skin.
+> Authored and puppet shared-rim gaps are exactly zero over 61 phases of all 23 clips.
+> The hidden sac is replaced by separate rigid palate/floor shells. Older tube-lining
+> measurements below describe the previous delivery; `paired-audit.json` is current.
+
 The delivered Tripo body and its procedural twin share one **28-joint skeleton**, the same three
 mouth/attack sockets and **23 byte-for-byte equivalent decoded animation performances**. The twin is
 also the runtime LOD, with every clip retained so either model can perform the same gameplay.

@@ -2,12 +2,13 @@
   "schemaVersion": 1,
   "createdAt": "2026-09-13",
   "tool": "builtin image_gen.imagegen",
-  "purpose": "One canonical redraw request: Shonisaurus is drawn with a dorsal fin and a crescent fluke that the research denies it. Requested, not yet drawn.",
-  "note": "Status is deliberately 'requested-not-yet-drawn' rather than 'candidate-awaiting-human-greenlight'. Only the latter reopens a subject in tools/triassic/apply-selections.mjs, and Shonisaurus is delivered with a human-approved body. Whether this finding changes that approval is the reviewer's call, not this file's.",
+  "purpose": "Shonisaurus fin and tail canonical redraw from the proportion audit; candidate generated 19 September 2026 and pending human review.",
+  "note": "The delivered body remains untouched. This candidate records the requested anatomical correction for a fresh human decision before any downstream rebuild.",
   "externalInputs": [],
   "subjects": {
     "shonisaurus": {
-      "status": "requested-not-yet-drawn",
+      "status": "candidate-awaiting-human-greenlight",
+      "candidate": "shonisaurus-candidate02.png",
       "original": "shonisaurus.png",
       "requiredFeature": "no dorsal fin; a long tail with no crescent fluke",
       "reviewerNote": "The greenlit pose gives Shonisaurus a prominent triangular dorsal fin and a two-lobed lunate tail — the tail of a Jurassic ichthyosaur. The research denies it both. The shipped body reproduces the pose faithfully, so the pose is what is wrong.",
@@ -17,7 +18,11 @@
         "seenInBothPictures": "The dorsal fin and the forked tail are plainly visible in docs/triassic/canonical/shonisaurus.png and in the model portrait public/assets/triassic/creatures/shonisaurus.card.png."
       },
       "prompt": "Use case: precise-object-edit. Edit this existing canonical Shonisaurus paleoart image. Preserve EXACTLY: this individual animal's species and identity, its grey-and-charcoal mottled hide and every marking on it, its long narrow toothed snout, its unusually deep ribcage, its four long narrow pointed flippers and their positions, the underwater setting, the lighting, the camera angle and the framing. Make exactly TWO corrections, and change nothing else. FIRST: REMOVE THE DORSAL FIN COMPLETELY. There is no evidence Shonisaurus had one. The back must be a smooth unbroken dorsal contour from behind the skull to the tail, with no fin, no ridge, no hump and no bump where the fin used to be — just the animal's own back. SECOND: REPLACE THE CRESCENT TAIL. The tail currently ends in a deep two-lobed lunate fluke like a Jurassic ichthyosaur's or a tuna's; Shonisaurus had no such fluke. Redraw it as a LONG TAIL that tapers gradually and evenly from the deep body to a narrow tip, with at most a modest shallow fin-fold along it and a slight downturn of the vertebral axis near the end. NO forked tail, NO crescent, NO symmetrical two-lobed fluke, NO large ventral lobe, NO tuna or dolphin tail. The tail should read as an eel-like or shastasaurid taper, not a thunniform propeller. Do not change the body's depth, the snout, the flippers or the animal's size. The whole animal stays comfortably inside the frame with the complete tail visible. Photorealistic paleoart matching the input's quality and palette, landscape 1536x1024. No labels, no text, no people, no additional animals.",
-      "consequences": "Shonisaurus is delivered with a human-approved body, and its reviewer set the bar for carrying no caution sign at 'playable, with no specific outstanding reconstruction requests'. This is such a request, so whether the approval still stands is the reviewer's decision. Acting on it means a fresh greenlight, a fresh four-view modelling sheet, a fresh Tripo generation and a rebuilt pair; the shipped authored skin embeds the original Tripo albedo, so a regeneration draws a new skin. It ranks first among the audit's findings because a dorsal fin and a tail shape are exactly what remains legible on a rung-IV giant seen at a distance in side view, which is how this animal is mostly seen."
+      "consequences": "Shonisaurus is delivered with a human-approved body, and its reviewer set the bar for carrying no caution sign at 'playable, with no specific outstanding reconstruction requests'. This is such a request, so whether the approval still stands is the reviewer's decision. Acting on it means a fresh greenlight, a fresh four-view modelling sheet, a fresh Tripo generation and a rebuilt pair; the shipped authored skin embeds the original Tripo albedo, so a regeneration draws a new skin. It ranks first among the audit's findings because a dorsal fin and a tail shape are exactly what remains legible on a rung-IV giant seen at a distance in side view, which is how this animal is mostly seen.",
+      "generatedSource": "/Users/hoai/.codex/generated_images/01a09ac3-37dc-7381-ad26-8d5c8cd87ad6/exec-8dac77fa-f39e-4339-ab94-65ae9cf6475f.png",
+      "sha256": "2285cf47bf99a785c3be39876e67debba590782039266b0c12d4a0ee06b1dda5",
+      "dimensions": [1536, 1024],
+      "visualReview": "The dorsal contour is smooth with no fin, and the tail is long and continuously tapering to a single point with no crescent or fork. All four flippers remain visible; no downstream model was changed."
     }
   }
 }

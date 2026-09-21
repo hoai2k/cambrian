@@ -168,6 +168,14 @@ reused and said so; nothing Cambrian is reused because nothing in the Triassic l
 The shore strip is the last 48 units, above the waterline. Nothing here is instanced by the
 thousand, and the shore animals stand among these.
 
+**Built**, as `environment.shoreFlora` — the three T2 plants, each with a band in `shoreDistance`
+and a density, placed on the land by their own pass in `generateChunk` (the biome table stops at
+`SHORE_WALL`). *Neocalamites* crosses the waterline, *Pleuromeia* takes the strand behind it,
+*Bjuvia* the dry back of the beach; the bands are the plants' own tolerance of salt and wet. The
+densities are deliberately low — a fringe that hid the shore animals would spoil them and the
+beach both. *Voltzia*, the tree-line, is still an art request: it is the one row here with no
+model, and the beach has no trees until it lands.
+
 | Id | Model | Scale-1 size | Notes |
 | --- | --- | --- | --- |
 | `voltzia` | **T1** *Voltzia* conifer, a scale-leaved shore tree | 9 tall | The tree-line. Three by size. |

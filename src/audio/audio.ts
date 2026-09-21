@@ -46,7 +46,12 @@ export const SAMPLES: Record<string, string[]> = {
   kill: ['kill'], death: ['death'], tierUp: ['tier-up'], hunted: ['hunted'], escape: ['escape'],
   sense: ['sense'], ability: ['ability'], heartbeat: ['heartbeat'], noticed: ['noticed'], respawn: ['respawn'],
   pounce: ['pounce'], swallow: ['swallow'], disintegrate: ['disintegrate'], routed: ['routed'],
+  flop: ['flop-1', 'flop-2'], eggPoke: ['egg-poke'], hatch: ['egg-crack'],
+  sprint: ['sprint-loop-1', 'sprint-loop-2', 'sprint-loop-3'],
   'ui-move': ['ui-move'], 'ui-confirm': ['ui-confirm'], 'ui-back': ['ui-back'], 'ui-join': ['ui-join'], 'ui-start': ['ui-start'], won: ['won'],
+  // A body coming down on the sand (src/sim/beach.ts): every era can land on its shore now, and
+  // the Devonian's own recording is the one that exists, so the shared table borrows it.
+  beach: ['devonian/beach'],
 };
 /**
  * The two always-on beds, from the era rather than from a constant: the Devonian's ambience is
@@ -69,6 +74,8 @@ export class GameAudio {
   /** The sprint wash: a loop held at silence and wound up while a local player is driving. */
   private sprintGain?: GainNode;
   private sprintStarted = false;
+  /** Shallow, middle and deep versions of the sprint wash, crossfaded by water-column depth. */
+  private sprintLayers?: GainNode[];
   private musicGain?: GainNode;
   private musicStarted = false;
   private music?: MusicVoice;
@@ -381,23 +388,37 @@ export class GameAudio {
    * Sprinting used to be a *sting*: one whoosh on every press, at the loudest volume in the game,
    * and on a body over `HUGE_LENGTH` the giant's own surge sample. Sprint is not an event, it is a
    * thing you are doing, sometimes for a minute at a time, so it is a bed now: a loop that fades up
-   * while the body is driving and away when it stops, well under the ambience. The sample is the
-   * delivered `burst` whoosh looped on itself (see `startLoop` for the seam) until there is a
-   * purpose-made one — docs/audio-requests.md has the ask.
+   * while the body is driving and away when it stops, well under the ambience. The three delivered
+   * beds run together and crossfade from shallow to deep with the player's
+   * position in the water column. Keeping their playback clocks together makes changing depth a
+   * timbral move rather than restarting a loop.
    */
-  setSprint(level: number) {
+  setSprint(level: number, depth = 0) {
     if (!this.ctx || !this.sprintGain) return;
     const want = Math.max(0, Math.min(1, level));
-    const name = SAMPLES.burst?.[0];
-    if (!this.sprintStarted && want > 0 && name) {
-      if (!this.buffers.has(name)) { void this.load(name); return; }   // next frame, with the sound
+    const names = SAMPLES.sprint ?? [];
+    if (!this.sprintStarted && want > 0 && names.length) {
+      if (!names.every((name) => this.buffers.has(name))) {
+        for (const name of names) if (!this.buffers.has(name)) void this.load(name);
+        return;                                                       // next frame, with the sounds
+      }
       this.sprintStarted = true;
-      this.startLoop(name, this.sprintGain);
+      this.sprintLayers = names.map((name) => {
+        const gain = this.ctx!.createGain(); gain.gain.value = 0; gain.connect(this.sprintGain!);
+        this.startLoop(name, gain);
+        return gain;
+      });
     }
     // Quiet: this sits under the reef rather than over it. Up quickly, out slowly, so a tap is a
     // swell rather than a click and letting go trails off the way the water would.
     const now = this.ctx.currentTime;
     this.sprintGain.gain.setTargetAtTime(want * 0.16, now, want > 0 ? 0.08 : 0.25);
+    const d = Math.max(0, Math.min(1, depth));
+    // Equal-power adjacent crossfades: 1 is shallow, 2 is mid-water, 3 is deepest.
+    const x = d * 2, mix = x <= 1
+      ? [Math.cos(x * Math.PI / 2), Math.sin(x * Math.PI / 2), 0]
+      : [0, Math.cos((x - 1) * Math.PI / 2), Math.sin((x - 1) * Math.PI / 2)];
+    this.sprintLayers?.forEach((gain, i) => gain.gain.setTargetAtTime(mix[i] ?? 0, now, 0.2));
   }
 
   resume() { this.ctx?.resume(); }

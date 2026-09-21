@@ -1,4 +1,4 @@
-# Askeptosaurus: what is actually wrong with it, measured
+# Askeptosaurus: original diagnosis, regeneration, and the body that ships
 
 *15 September 2026. Reproduce with `local/askepto.py`, `local/askepto2.py`, `local/askepto3.py` and
 `local/askcurv.py` — each is a Blender or plain-Python script that prints its numbers.*
@@ -117,3 +117,132 @@ Two routes out, and the recommendation is the first:
 
 What is **not** recommended is building it on the shared kit as it stands. That is what was tried
 once, and the numbers above say why it could not have worked.
+
+## Regeneration delivered · 19–20 September 2026
+
+The owner's selected straight-pose route is complete. The updated canonical and single Tripo
+input produced a textured body for 30 credits; its measured neutral-axis tail fraction is 0.6323.
+The authored model and independent volume twin now ship with one exact 33-joint rig, 24 dynamic
+clips, three anchors, LOD and fresh portraits. The game uses the replacement. The viewer offers
+**Model: Backup Model**, preserving the original corrected surface on a pose-matched animated rig.
+
+The earlier source files and canonical images remain preserved. The old sources had zero skins
+and zero clips; the backup adds the complete action set rather than claiming preexisting animation.
+Its curved rest pose differs from the replacement, and its coil/whip range is limited to prevent
+skin stretching. The reconstruction does not force the old surface onto a straight axis.
+
+All 24 clips pass dynamic playback and skin checks. Full/twin rig, clips and anchors match exactly.
+The posterior throat attachment has zero gap at 61 phases of every clip for full, twin and backup.
+Real Chrome viewer swaps load all three bodies with 24 actions and no page errors. The game build,
+typecheck, 442 Triassic checks and asset check pass. T3D-01 is finished.
+
+See [the build and validation record](../../tools/triassic/creatures/askeptosaurus/README.md),
+[paired audit](../../tools/triassic/creatures/askeptosaurus/paired-audit.json), and
+[review images](../../tools/triassic/creatures/askeptosaurus/review/).
+
+## Pose follow-up · 20 September 2026 (T3D-24)
+
+The straight regeneration was the right call and stands. What it left behind is that the straight
+*modelling* pose became the pose the animal was seen in: every clip rode on it and every portrait
+was shot at it, so the roster card was a needle with four spines and `Idle` carried a quarter of a
+degree of tail yaw. The animal's curvature is now authored as **pose, in the clips**, the bind is
+untouched, the clip amplitudes and the wave's phase step are re-tuned and measured into
+`validation.json`, and the cards are shot from a posed frame. See the builder's README and
+`docs/triassic/3d-work-status.md` T3D-24.
+
+The preceding September 15 analysis is retained as the historical diagnosis, not current work.
+
+## The swap · 20 September 2026 (T3D-25)
+
+**The posed generation is the shipped body again, and the straight regeneration is the backup.**
+The owner's reading of the two: the regeneration is lumpy, too straight and too flat, while the
+preserved generation has the textures and the proportions the subject wants and only its
+*positioning* was ever wrong. So the regeneration's contribution stands as a diagnosis — it proved
+the shared axial kit could not build the posed body as it was — but the animal that ships is the one
+that reads as an animal.
+
+What the September 15 analysis got right and wrong about the posed body, measured again on the
+build:
+
+- **The tail's bend was never the blocker, and section 4 said so**: 8.84 mean curvature over
+  section is Dinocephalosaurus' tail, which straightened on the rig. It straightens here too, in
+  pose, and the trunk's 0.41 tightest — a bend radius smaller than its own section — is the exact
+  reason no *mesh* unbending can work there and the rejected one overlapped.
+- **The axis was the blocker, and it was fixable.** Section 3 was right that a geodesic banding
+  works once the seeds are declared, and half right about why the first one shredded. The seeds were
+  declared in the backup build and the banding still lied, because the four **paddles** were left in
+  the bands: a paddle sits at much the same geodesic distance from the snout as the flank it grows
+  from, so its vertices join the band and drag the median sideways. That axis measured 2.025 against
+  a surface the verdict itself measured at 1.578, and its first three tail controls doubled back on
+  each other at 68.9° and 89.9°. Excluding the paddles and smoothing once gives 1.612, a monotone
+  chain, and a tail fraction of **0.606** rather than 0.562 — against the board's 0.63–0.66 and the
+  regeneration's 0.632. The proportion complaint the original audit opened with was, in the end,
+  another artefact of a bad axis.
+
+The positioning is fixed in the rest skeleton and the clips and nowhere else: seventy per cent of the
+tail's 180.4° of turn is carried into the bind by posing the rig and letting the skin follow its own
+weights, and the rest is per-clip, so the animal holds a curve at rest, lays itself out to sprint and
+coils back past its own generation. Not one vertex is moved by anything but the weights that already
+held it — no remesh, no smoothing, no reshaping, no change to a UV or a texel — which is the whole
+reason this body was promoted. Skin 1.34x, second on the roster; the jaw cut closed; every joint
+owning skin.
+
+**One thing this swap leaves open, and it is a human's to close.** `docs/triassic/canonical/askeptosaurus.png`
+is the straight redraw, and the body that now ships is the generation made from the *previous*
+canonical (preserved at `model-inputs/askeptosaurus/backup-2026-09-19/original-canonical.png`). The
+pipeline's rule is that a body which no longer matches its pose is the body that is wrong — but here
+the owner's judgement is that the pose is what is wrong, so the two are deliberately out of step
+until a canonical is drawn in this body's own proportions and greenlit. Nothing downstream reads the
+image, and the manifest's `previousCanonical` already names the one this body came from; it is
+recorded here so nobody reads the disagreement as an oversight.
+
+See [the build and validation record](../../tools/triassic/creatures/askeptosaurus/README.md) and
+`docs/triassic/verification/askeptosaurus-swap-*.png`.
+
+## The front · 20 September 2026 (T3D-26)
+
+The owner's reading of the swapped body: *"his head area and right fin are currently at a 90deg
+angle to his left."* Seen from above that is exactly what it was, and the cause was recorded in
+`validation.json` from the day of the swap without anybody reading it that way.
+
+`uncurl` opens a chain onto **its own first segment**, which removes the bend *along* the chain and
+leaves its **takeoff** — the angle it leaves the body at — exactly where the generation put it.
+T3D-25 chose that deliberately and had a measurement for it: aiming a chain at the trunk instead
+makes the whole correction one rigid rotation at the chain's root and read 2.62x on
+`skin-tears.mjs` against 1.51x. On the tail that choice is right and stays — a thalattosaur's tail
+sweeps, and its 24.7° takeoff is character. On the **front** it was the fault: opened onto its own
+first segment the head still left the trunk at 54.6° and finished **67.7°** off it.
+
+Two corrections to the arithmetic that was assumed before this was measured. The 67.7° is not
+44.5 + 34.1: the cervical chain's 34° of internal turn is an **S**, +3.0° signed, so opening it
+barely moves the head at all and nearly the whole fault is takeoff. And the takeoff is larger than
+44.5° once it is measured against the right thing — 44.5° is against the `body`→`chest` chord,
+which on a trunk this curled is itself 17.1° off the trunk's own run, and the measured axis'
+tangent at the shoulder is 42.8° off it. The trunk's **run**, hip to shoulder, is the long straight
+stretch between this body's two bends and is the only reading of "in line with the body" that is
+not itself a curve.
+
+The fix is the era's own lesson about distributing a correction. `uncurl` takes a cumulative
+`share` and applies that fraction of the takeoff arc at **each** joint of the chest, the four
+cervicals and the skull — 9.1° a joint, 17.2° at the worst once it is composed with the opening —
+so the front turns onto the trunk over its own length instead of being swung there at the shoulder.
+Equal per joint rather than per unit of length, because a skin folds at a joint. The aim is carried
+**whole** into the bind (an animal looks where it swims in every clip, so it is a fact about the
+body rather than a dial the clips play with) and only the opening is left per clip. Head against
+the trunk's run: **67.7° → 4.2° at rest**, 0.5–5.2° in `Sprint`, 6.5–8.1° in `Idle`, 27.8° at the
+peak of `Coil`, which pulls the neck round on purpose. The builder asserts all of it, so the right
+angle cannot come back in a clip where no `heldShape` row would show it.
+
+The **right pectoral** the owner named is rigged like its mirror and follows its own joint like its
+mirror — 1.07 against 1.16 median skin-travel-over-joint-travel, roots both about two hundredths
+inside their own skin, distal blades owning 168 and 155 vertices. It hangs off the shoulder, the
+shoulder went round with the head, and the front fix carries it: `chest` takes 9.1° of the aim and
+both blades come round together. The right blade's cluster is genuinely the smaller and sits 0.036
+further forward, which is the generation's own pose and not the rig's doing. The whole pair is now
+measured into `validation.json` every build.
+
+Skin 1.34x → **1.37x**, still second on the roster. The surface, UVs, albedo, proportions, the
+tail's straightening and its signed coil are untouched, and the straight regeneration is
+byte-identical. Renders: `docs/triassic/verification/askeptosaurus-front-*.png` — dorsal above all,
+and one frame looked at down the trunk's own run, where the fault stops being an angle to judge and
+becomes the head standing beside the body instead of on the end of it.

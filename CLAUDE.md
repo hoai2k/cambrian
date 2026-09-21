@@ -23,7 +23,15 @@ unless the user explicitly asks for a PR. Steps:
   not be modified in place; new animation clips are added, never replaced. The one sanctioned way
   to re-author a clip is `tools/creatures/motion/apply.mjs`, which keeps the shipped clip in the
   file as `replaced/<Name>` (shown under *Replaced* in the viewer) and is re-runnable on top of
-  whatever else lands in the GLB; the performance is code in `performances/<id>.mjs`.
+  whatever else lands in the GLB; the performance is code in `performances/<id>.mjs`. It works on
+  all three eras' folders now, and a clip a rig never had is simply added — which is how the shore's
+  gaits landed without Blender: `tools/creatures/motion/gaits.mjs` authors `Flop` (a stranded
+  fish's lash, one `FLOP_PERIOD` long so the loop *is* the flop), `Walk` (a sprawling
+  lateral-sequence walk, lent to lobe fins, palms and paddles alike) and the lurkers' `Fish`/`Peer`,
+  and each rig's file names its own bones. A new clip has no shipped source to carry, so it must
+  close its loop on every bone. After a run: the era JSON's `clips`/`looping` by hand,
+  `node tools/update-asset-sizes.mjs`, and the era's own check. Onychodus' performance file is stale
+  against its rebuilt rig (`whorlL`) and fails to apply at all, so it carries no `Flop`.
 - Any change to a creature's model, colours or textures must go through
   `docs/creature-intake.md`: re-render, `npm run cards`, `npm run lods`, and
   `npm run check` must pass. The check flags stale images automatically.
@@ -35,6 +43,25 @@ unless the user explicitly asks for a PR. Steps:
   as median ones — so a seated root follows the flank when the tail bends. Cheirolepis V2 shipped
   every fin root at or outside the surface (pectoral +0.07, pelvic +0.31, dorsal and anal trailing
   bases +0.17/+0.26) and read as fins floating beside the body; the reference's mottling hid it.
+- **A paddle's root is a band and a depth, never the one vertex nearest the axis.** `T.thin_clusters`
+  reports a blade's `seat` as the single thin-shell vertex with the smallest radial distance from
+  the centreline, and which vertex that is on a broad base is decided by a few thousandths: on
+  Cartorhynchus it was the trailing corner of the left paddle and the leading corner of the right,
+  0.105 of a body apart on a pair whose clusters mirror to 0.03. `T.seat` then walks a root inwards
+  "until it is 0.016 inside the skin", and the depth it reads is whatever surface is nearest — the
+  blade's own thick base on one side, the flank on the other — so the two roots also ended at
+  different depths (x −0.075 against 0.046). Everything downstream inherited it: the right polyline
+  started in the chest, its 99th-percentile radius grew to reach a blade it no longer ran through,
+  and the right blade's rigid-fit residual in `Sprint` was 3.2 % of L against the left's 2.2 % on
+  identical swept angles. Seat a paired limb from the cluster's innermost *band* in the trunk's
+  **section** metric (Cheirolepis' `depth()`) and carry it a fixed fraction of the section in
+  (`E_BAND`/`E_SEAT` in Cartorhynchus' builder), then check the margin. And the depth is a lever:
+  the stroke is angles at the root, a root nearer the flank is a shorter arm and a smaller stroke,
+  and the paired audit's "paddles out-travel the tail" bar was set on whatever depth the old walk
+  happened to give — seat to a fraction, not to the margin. Skin 3.72x → 2.98x on that change alone.
+  A measurement is also of a *file*: T3D-17 measured Cartorhynchus' gape leak (29–51 px at the
+  commissure) on the file from before T3D-15's jaw junction landed two hours later, which closed
+  it (0 px on all six opening clips); a sweep should name the commit or hash it measured.
 - The creature builders are Blender 5.2 Python and the version is not a detail: the glTF
   exporter's `export_vertex_color='NAME'` is a 5.x option that 4.x does not have at all, so a 4.x
   Blender will sculpt, shade and rig a creature and then fail on the export. `npm run blender`
@@ -102,16 +129,19 @@ unless the user explicitly asks for a PR. Steps:
   lists (`npm run ancientseas:delivered` regenerates it from the folder) and draws a shipped
   stand-in or a named wash for the rest, so nothing asks the network for art that has not arrived.
   A game is its title *and* the animal arching over it: both carry the link and light together,
-  with the picture kept out of the keyboard's way so a game is one stop rather than two. A game
-  that is not out yet (`comingSoon` on its `GameLink`; the Triassic, for now) keeps its title, its
-  animal and its place on the plate and gives up the link, the lighting and the pointer, with a
-  *Coming soon* badge under the title — the plate is the trilogy, and a gap where the third game
-  goes says less than the third game does. `OPEN_GAMES` is what the pad and the arrow keys walk,
-  so nothing can steer into it. Its own page is untouched: this is what the trilogy page offers,
-  not whether the game runs, and `/triassic/` still opens by address. **That one line is the whole
-  switch**: deleting `comingSoon: true` opens the game in every sense at once, and both checks read
-  the flag rather than naming a game, so nothing else needs editing — which is checked by flipping
-  it, not by assertion. A game's title and the animal over it also grow together, by one amount
+  with the picture kept out of the keyboard's way so a game is one stop rather than two. All three
+  are open today, and the plate can close one again without closing a gap in itself: a game that is
+  not out yet (`comingSoon` on its `GameLink`; the Triassic carried it while the era was being
+  built) keeps its title, its animal and its place and gives up the link, the lighting and the
+  pointer, with a *Coming soon* badge under the title — the plate is the trilogy, and a gap where a
+  game goes says less than the game does. `OPEN_GAMES` is what the pad and the arrow keys walk, so
+  nothing can steer into a closed one, and its own page is untouched either way: this is what the
+  trilogy page offers, not whether the game runs, so a closed game still opens by address. **That
+  one line is the whole switch** in both directions: adding or deleting `comingSoon: true` closes
+  or opens a game in every sense at once, because everything — the components, `npm run
+  ancientseas` and the browser smoke, which reads link-or-address off the plate rather than naming
+  a game — is derived from the flag. Checked by flipping it, not by assertion.
+  A game's title and the animal over it also grow together, by one amount
   from one rule (`.as-slot-title.as-lit, .as-slot-animal.as-lit`), because they are one link: the
   growth was split across the lit state and a title-only hover once, and a pad then lifted the
   animal alone while a pointer lifted the two by different steps.
@@ -175,15 +205,151 @@ unless the user explicitly asks for a PR. Steps:
   `npm run mouse` holds the wiring. And with no second stick and no lock, nothing is steering the view frame to frame, so
   it steers itself: `FOLLOW_RATE` eases the camera round behind the body and back to the resting
   pitch, and `FOLLOW_HOLD` stands it aside after a drag so looking somewhere on purpose sticks.
-  The keyboard around it is the mouse's own layout: **A and D turn rather than strafe** — they move
-  the camera's yaw, which is what the right stick does, so turning *composes* with swimming instead
-  of replacing it (hold W, press D, and the body swims forward along a curve, because `mx`/`my` are
-  camera-relative and the camera is what turned) — W forward, X back, E or Q up, S or C down, R the
+  **The cursor's own height is the other half of the view.** Outside a dead zone either side of the
+  middle (`edgePitch` in `src/render/engine.ts`, `EDGE_DEAD`), the cursor tilts the camera — up in
+  the top of the screen, down in the bottom, squared past the edge so the first part of the push is
+  gentle and the corner is quick — which is how a player angles the view so what they are swimming
+  at arrives near the middle. The middle is left alone precisely because that is where the aiming
+  happens, and a push is an *ask* like a drag is: it holds the follow off while it lasts, or the
+  two would pull against each other and the pitch would sit wherever they balanced.
+  The keyboard around it is the mouse's own layout: **A and D turn the animal, and the animal turns
+  the camera** — they move the *body*, the stick's own sideways axis, not the view: a swimmer turns
+  into its travel (`turnRate` in `game.ts`) and the follow camera comes round behind it, so the
+  order is the one a player feels, animal first and view after. Driving the camera instead put the
+  view somewhere the body had not been yet and left it to catch up, which reads as steering a boat
+  by leaning; it also kept a creature's own agility out of the answer, and a Waptia whipping round
+  where a giant does not is a thing the camera cannot say. The arrow keys still move the view
+  itself. Turning composes with swimming (hold W, press D and the body swims forward along a
+  curve) — W forward, X back, E or Q up, S or C down, R the
   shield, Z camouflage, I sense, space to dash, Shift to sprint. Every attack has a key as well as a
   mouse button, because a hand already on the keys should not have to reach: J and F bite, G and K
   are the heavy. `npm run mouse` drives the whole of it in a real browser, where every part of it is something a headless test cannot vouch for. That harness
   waits on the *game's own state and frames*, never on the clock: this page draws about a frame a
   second under the software renderer, so a wait in seconds measures the renderer.
+- **A finger is the third way to play, and it is the mouse scheme's argument carried one step
+  further.** `src/shared/touch-play.ts` is the whole of it as a state machine over touch events —
+  pure, no DOM, no clock of its own — and `src/input/touch.ts` is the adapter, split that way so
+  `npm run touch` drives every gesture with the clock passed in. The mouse already answered the hard
+  question: tell presses apart by **what they did**, not by which button they were on. So a touch is
+  classified at its **down**, from the zone it landed in (`water`, the `swim` pad, the `secondary`
+  pad, or a drawn button), and keeps that job until it lifts — which is the whole reason multi-touch
+  costs nothing here: both pads held while another hand swipes and a third finger taps compose with no
+  special handling anywhere, because each finger was answered when it arrived.
+  Over the water a **tap is the bite**, fired on the *lift* for the mouse's own reason (until the
+  finger comes up it is not known to have stayed still), and it bites wherever it lands. A
+  **double-tap** is the mouse's own rule about needing something to pounce *at*: on an animal it is
+  the heavy, on open water it is the **dash**, aimed at that water and running as long as the finger
+  stays down — and moving that finger re-aims the dash rather than turning the camera, which is the
+  right button verbatim. The first tap of a double **still bites**, deliberately: the alternative is
+  sitting on every bite for `DOUBLE` to find out whether a second is coming, which taxes the common
+  move to pay for the rare one, and a bite a quarter-second late is a bite that missed. A **swipe**
+  past `DRAG` is the camera and only the camera, vertical included — forward is camera-relative, so a
+  lifted view and a held swim pad *are* the climb, which is why there is no up or down pad. A
+  **pinch** is the one gesture about a *pair* rather than either finger, and exists because zoom is
+  otherwise unreachable: separation is the zoom, **centroid** is the camera, and two fingers merely
+  resting are not a pinch but two taps that have not happened yet. There is deliberately **no
+  hold-to-heavy** though the mouse has one — the mouse needs it (no double-click in its vocabulary, a
+  cursor that sits exactly still) and a finger has neither property, so a hold threshold would turn
+  the start of every careful look into a pounce.
+  **The secondary pad is one pad holding one of four things** — aim, guard, hide, sense — swiped
+  sideways to change, because four buttons would cost four times the glass for a choice made once and
+  kept, and because travel changing what a touch means is the same rule as everywhere else in the
+  scheme. The ring is the **same four on every animal**: all four mean something for every body in all
+  three games (what *changes* is the guard and the hide, which is the point of them), and a ring whose
+  length depends on the animal is a ring whose muscle memory resets with every pick. The choice is
+  remembered in `Settings.secondary`.
+  **A live finger is the crosshair**, so the last water touch is the aim point and it **outlives the
+  finger** by `AIM_HOLD` — the bite fires on the lift, when the finger is already gone, so a point
+  that vanished with it would aim every tap at nothing. Which is why touch *keeps* the reticle where
+  the mouse switches it off, and moves it: the mouse has a cursor doing that job, a pad has no pointer
+  and draws it dead centre where its aim axis is, and touch needs a mark standing where the player
+  pointed and back in the middle once it has lapsed. Touch takes the **follow camera** (no second
+  stick steers the view) but **not** `edgePitch` and not the pad's pitch drift: a hovering cursor is
+  idle information and a finger is the opposite — it is only on the glass while it is being used, and
+  while it is, its travel is *already* the camera.
+  **Gestures and drawn buttons are two channels and the split is load-bearing.** No gesture may reach
+  a menu action — a tap aimed at the sea must not also answer what a menu is asking, which is the line
+  `tools/menu-bindings-test.ts` already held for the mouse. But travel opens a *menu* that has to be
+  walked and the scoreboard is a hold, so those are `ButtonZone`s: an explicitly enumerated channel,
+  only drawn when it applies, with what it does written on it, and the four buttons that walk the
+  travel menu appear and go away with it, because a menu that opens and cannot be walked is worse than
+  no menu. Unlike the mouse a finger *does* reach `ability`, `guard` and `sense`, because a mouse plays
+  beside a keyboard and those have keys while a finger has nothing to fall back on; `rise`/`sink` stay
+  out of reach because the camera covers them, as on a mouse.
+  **A gesture is timed by when it happened, never by when the handler ran.** `TouchPlay` reads each
+  event's own `timeStamp`, and this is not a nicety: a tap is measured against `TAP_TIME` and a double
+  against `DOUBLE`, both a few hundred milliseconds, so timing from the handler makes any frame longer
+  than that a frame in which the player's taps are silently reclassified as fingers resting. A stall of
+  half a second is not hypothetical on a phone and is the *normal* case under a software renderer,
+  where a tap dispatched into one measured **2.4 seconds** long and was thrown away. Found by the
+  browser harness; it would have been a real dropped-input bug on a real slow device. The same fact
+  bites the harness from the other side, and is the one thing to know before touching it: Chromium
+  stamps a touch when it *processes* it, so a `touchStart` whose round-trip is awaited before the
+  `touchEnd` puts a whole blocked frame between them — every gesture with a time threshold in it goes
+  out as one queued **batch** (`gesture`/`tap`/`doubleTapDown` in `tools/touch-browser.mjs`), while a
+  swipe and a pinch are measured in pixels and are better off awaited one move at a time.
+  `npm run touch` is the scheme and the thresholds, `node tools/touch-browser.mjs` is real touches in
+  a real browser, and `docs/redesign/11-touch-and-small-screens.md` is the whole of it.
+- **How small the window is, and whether a finger is working it, are two questions.** `.is-touch` and
+  `.layout-compact` are two classes on the shell for that reason: a desktop window dragged narrow is
+  compact and gets no thumb pads, a tablet held upright is roomy and still gets them, and answering
+  the two together is wrong in both directions. `src/shared/small-screen.ts` holds both, pure;
+  `src/app/use-small-screen.ts` is the one place in `src/app` that measures the window at all.
+  `layoutFor` is compact below `COMPACT_W` (760) or `COMPACT_H` (540), and **each axis catches a
+  different shape**: a phone held up is caught by its width, a phone on its side is 780 across and
+  over the line so it is caught by its *height* at 360 — between them that is every phone, without the
+  width creeping past a small tablet. Both sit clear of the breakpoints the stylesheet already used
+  (900 and 1000 across, 640 down) so the two reflows never fight. It asks about the **window and not
+  the device**, which is what makes it checkable and is also true: a pulled-down desktop window wants
+  the same layout for the same reasons. `touchFirst` is the other question and wants all three of
+  coarse pointer, **no hover** (a touch laptop being used with its trackpad reports a coarse pointer
+  *available* and a fine primary one) and no pad connected — the same stand-down the mouse already
+  makes for a controller.
+  The cheapest correct lever on the HUD is that **all of it is drawn in `em` off one font size**
+  (`.hud`, plus the two split-screen variants), so one number brings every panel, gauge, marker and
+  menu down together with its proportions intact; what is left is the few things that have to *move*
+  rather than shrink, because the pads own the bottom-left corner and the drawn buttons the top-right.
+  The menus reflow in CSS at the same two figures and **the media query has to keep matching the
+  constants**, or a window gets one half of the compact layout and not the other; it is a query as
+  well as a class because the standalone pages have no React shell to set one and because a stylesheet
+  that only reflows once JavaScript says so flashes the wide layout first.
+  One old breakpoint was backwards rather than merely tight: every rule under 1000px read "not wide"
+  as "stack the picker and scroll it", which is right at 900x1200 and wrong at 780x360 — 360 pixels of
+  height is not something scrolling fixes, and the crew card ended up laid *over* the roster. That one
+  is keyed on the **aspect ratio**, because it is the shape that decides and no single width tells
+  780x360 apart from 820x1180. Two players on a tall window are now cut top and bottom (`splitAxis`,
+  read by `layoutRects`); the HUD follows the rects by percentage and needed no telling. Portrait is
+  never *blocked* — `rotateHint` asks once, past 3:2, so a phone held up (2.16) is asked and every
+  tablet upright (1.33) is left alone.
+  The four game entries gained `viewport-fit=cover` (without which `env(safe-area-inset-*)` is always
+  zero and the pads sit under a notch) and `maximum-scale=1, user-scalable=no` — a real accessibility
+  cost taken knowingly, because **double-tap is a move in this game** and a browser that answered it
+  with its own zoom would take the pounce away. Paid on the game pages only: the trilogy page, the
+  viewer and the stats page stay pinchable, and the view has its own pinch-to-zoom on the camera.
+- **`gridColumns` packs the roster into three rows, and three rows is a rule about a laptop.** The
+  Triassic's 26 animals are nine columns, and nine columns of a 390-pixel window is a 36-pixel tile —
+  a smudge under an ellipsis. `rosterCap` caps them so the overflow becomes **rows**, which a phone
+  can scroll and a three-row grid cannot. A cap and never a count: it only ever takes columns away,
+  so a short roster lays out exactly as it always did and a roomy window gets `Infinity`. It is
+  threaded through the pure model rather than done in CSS because **three places have to agree about
+  the number** — the screen that draws the grid, the cursor that walks it and the loader that guesses
+  which portraits are wanted next — which is the whole reason `roster-grid.ts` is a model.
+- **A narrow window is where you finally see the bugs a wide one hides.** Two of the worst things the
+  compact layout turned up were not about touch at all. **Every centred HUD panel was off-centre**:
+  `.hint`, `.grip-panel`, `.notice`, `.threat-alert` and `.death-note` are `left: 50%` plus
+  `transform: translateX(-50%)` and animate in with `rise-in`, whose last keyframe is `transform:
+  none` — and under `fill-mode: both` that keyframe goes on applying after the animation ends, so the
+  centring is destroyed for good. They had all been sitting with their *left edge* on the middle of
+  the screen since they were written, which on a 1440-pixel window looks vaguely central and on a
+  390-pixel one runs off the edge. `rise-in-centred` carries the static transform through the
+  keyframes: **animating a property an element also sets statically means the keyframes have to
+  include it.** And the pick screen **stacked where it should have columned** — every rule under
+  1000px read "not wide" as "stack the picker and scroll it", which is right at 900x1200 and wrong at
+  780x360, where 360 pixels of height is not something scrolling fixes and the crew card ended up laid
+  over the roster; that one is keyed on the **aspect ratio**, because it is the shape that decides and
+  no single width tells 780x360 apart from 820x1180. In portrait the crew card is then **sticky** at
+  the bottom of the scroll, because stacked it is simply the second block and the Lock In that is the
+  only way on sits below the fold.
 - **A seat is a claim, and arriving at a screen claims nothing.** Reaching the roster from another
   game's picker (`deepLinkedToSelect`) used to open a keyboard seat on the era's default animal, so
   the screen showed somebody playing before anybody had pressed anything. The keyboard now takes its
@@ -232,13 +398,31 @@ unless the user explicitly asks for a PR. Steps:
   `breathing: 'air'` is a gauge *and* a stamina economy (`AIR_MAX`, five minutes, in
   `src/sim/triassic/state.ts`), armour has a facing (`armourFacing`), the sea floor sinks
   by biome (`environment.floorDepth` → `depthProfile` in `src/sim/world.ts`; the other eras leave
-  it out and keep their flat floor), and shore animals (`shore: true`, never pickable) are brainless actors pinned on
-  the beach by `src/sim/triassic/shore.ts` that telegraph and strike into the water. **They are off
-  (`SHORE_ANIMALS` in that file) and the beach is empty**: the behaviour they are meant to have is
-  designed and not built (`docs/triassic/06-shore-visitors.md`), and a hazard a player is supposed
-  to learn should arrive finished rather than as a partial version that teaches the wrong lesson.
-  The cycle that *is* built stays intact and checked — `setShoreAnimals(true)` is how the suite runs
-  it — so turning them on is one line. A `shore: true` creature is also never an ambient swimmer:
+  it out and keep their flat floor), and shore animals (`shore: true`, never pickable) are brainless,
+  scripted actors on the beach (`src/sim/triassic/shore.ts`, built to
+  `docs/triassic/06-shore-visitors.md`). **They are off by default and `Settings → Shore animals`
+  turns them on** (`RULES.settings.shoreAnimals`; `forceOccupancy` is for the tests only). The
+  switch is **live**: turned on mid-match `ensurePosts` fills the banks from the next step and
+  turned off `clearShore` takes every body off the beach and forgets every post, because a setting
+  that silently did nothing until the next match read as a broken switch. It is the one thing that
+  reaches into a running simulation from outside, and it is safe to because it changes the world
+  the same way in the same place whenever it is flipped and the schedule behind it (`occupied`) is
+  pure in the post and the clock rather than in the history. What they take is **what
+  lingers**: a body still within a post's reach — under `STILL_SPEED` of its own cruise, at the
+  surface or on the sand — for `STILL_TIME_LURKER`/`STILL_TIME_RUNNER`; a swimmer passing at its own
+  pace is never touched, which is what makes the shore a trap rather than a fence. The boom takes a
+  snack whole (`startSwallow`, the camera following it), bites and shoves prey, and never lowers for
+  anything bigger; a rung III bite on the neck while it is out still severs it and clears the bank
+  for the match. The runners (Macrocnemus, Coelophysis) are not in the world between excursions —
+  `away` is a timer on the post — and appear `INLAND_OFF` up the beach, run down, peer for a window,
+  commit to a **straight** dash at where the victim was (never homing: moving on the commit is the
+  escape), bite or miss, and run back out of the world; under two seconds in the water, killable
+  there. Banks come and go on `occupied(k, seed, t)` — windows of `OCCUPANCY_WINDOW` with a per-post
+  phase offset — and a lurker arrives and leaves by *walking* the beach, never by teleport. The
+  performance is one clock with the mechanic (`shoreClip`: `Fish`/`Breathe` for the watch, `Peer`
+  for the runner's look, `Lower`, the snaps, `Drag` for the gulp, `Charge`, `Retreat`, `Run` and
+  `Crawl` as *loops* for the moves — the era clip hook now carries `loop`, and a looping era clip is
+  the body's locomotion rather than a fight with Idle). A `shore: true` creature is also never an ambient swimmer:
   the sea is populated from `WILD`/`WILD_IDS` (the roster minus the shore animals) rather than from
   `CREATURES`, because the ambient draw took the whole roster and the Triassic was spawning
   hatchling Tanystropheus in open water with ordinary brains — walking animals swimming about
@@ -285,6 +469,87 @@ unless the user explicitly asks for a PR. Steps:
   (the renderer cannot know a dash fired until that step has run) and gives up that one frame of
   drift and no more. `npm run swim` closes the loop end to end — camera drift into the stick into
   the real cooldown — and measures the second dash's own rise against the first's.
+- **The shore is somewhere a body can end up, and what the sand does to it depends on what it
+  breathes** (`src/sim/beach.ts`, `docs/redesign/10-the-shore.md`, `npm run beach`, one process
+  per era). Two ways there and they are deliberately unequal: a *leap* lands wherever its arc comes
+  down, because nothing in the air is held by water — the shore wall in `resolveStatic` stands only
+  for a body swimming at it, and the Cambrian breaches now too, on the Devonian's own terms — and an
+  animal with legs *and* lungs (`amphibious` on its card: Tiktaalik, Acanthostega, Nothosaurus,
+  Placodus, Aphaneramma, Henodus, Cartorhynchus, Odontochelys) walks up through it, its swim
+  handing over to its walk along one ramp (`landSpeed`) and back the same way. **Nothing strands
+  itself by swimming**: beside the fixed wall a second one is measured in the body's own draught
+  (`WALL_WADE`), because the beach is a different slope in every era and on the Triassic's the
+  fixed wall stands on dry sand for a hatchling; a swimmer becomes `ashore` on exactly one frame,
+  the one its leap lands on, and both walls *ease* a body found inside them out at a bounded pace
+  rather than snapping it. `wade` (0..1, continuous in position) is what the walk ramp, the clip
+  handover and the camera's lift out of the water all read; `ashore` is the rule past `ASHORE_WADE`.
+  Ashore, a water-breather has `STRAND_BREATH` (a minute, the gauge shown only there — under water a
+  gill has nothing to count) and one move, the flop, which goes seaward whatever the stick says; an
+  air-breather has no clock, walks along the shore at `LAND_WALK` of its cruise and no further
+  inland than `LAND_REACH`, and a Triassic lung fills on the sand because the sand is the surface.
+  The flop's hop, twist and nose-up are the simulation's own (`pos.y`, `bank`, `pitch` through
+  `flopT`), so no clip is needed for it to read; the renderer throws the swim stroke on top. A
+  brainless body ashore is handed the seaward stick (`ashoreInput`). The Triassic's beach becomes
+  dangerous when its shore animals are switched on, not before.
+- **The dash is the hop, and on the sand the dash is the only gait worth having.** A walk is
+  `LAND_WALK_LEGS` of a cruise that was already slow, so a beach crossed at a walk is a chore. The
+  dash button ashore throws a *hop* instead (`JUMP_PERIOD`, one bell-shaped arc, `flopT`), and it
+  is a different animal's move at each end: a legged air-breather **bounds** in the direction it is
+  facing or the stick asked for, committed at the throw and not steered after it like every other
+  launch in the game; a stranded water-breather **flips**, harder for a dash than for a nudge of
+  the stick (`FLOP_DASH_BOOST`), and always seaward whatever the stick says. What a bound is worth
+  is set against the *walk* (`JUMP_GAIN`) rather than in body lengths, because the promise is that
+  it is the fast way along a beach and a length-based throw is not: a hatchling's walk outruns a
+  hatchling-sized bound, so the jump would be a way of going slower for a small animal and a bolt
+  for a big one. `JUMP_STAMINA` is a *gate* rather than a drain — an air-breather ashore is at the
+  surface by definition, so both eras that have walkers refill its bar there every step and the
+  throw's cost is handed straight back; what the price does is refuse the throw to a body with
+  nothing left, and bounding is meant to be the land gait rather than a sprint. A hop once thrown
+  always finishes, including the one that carries a body over the `ashore` threshold, or a body
+  walking the line restarts a hop it never gets to take.
+- **A body on the beach leaves prints in it.** `Tracks` in `src/render/fx.ts`, laid by
+  `shoreTracks` in the engine: footprints where a walker's feet come down, a groove behind a body
+  hauling itself along on its belly, and a broad slap wherever a stranded flopper lands. They fill
+  in over `TRACK_LIFE`, about a minute, so a stretch of beach carries where you have just been and
+  not where you were ten minutes ago.
+  **The contacts are measured, never named.** Rig bones are whatever their builder called them —
+  three eras, a dozen kits and no agreement on `fore_foot_L` — so asking for the feet by name would
+  work on one animal and silently do nothing on the next. What a print is, is the part of the body
+  that is *on the sand*, so that is what is asked: the lowest few bones of the rig, and whether
+  each is within `touch` of the ground under it. On a walker standing on the beach those are its
+  feet, and when one lifts it stops being down; on a body lying in the sand they are its belly, and
+  a belly never lifts. One rule then covers both (`laysMark`): a contact marks when it comes down,
+  and again every `spacing` it travels while it stays down — so a planted foot prints once and a
+  belly draws a groove, with nothing anywhere that knows which animal it is looking at. Which of
+  the three marks a body leaves is its own card and not its era: legs and lungs walk, lungs without
+  legs haul, and no lungs at all is stranded and can only flop.
+  **The mark has no colour of its own.** Every other decal here has to be told what shade the floor
+  is (`Sand` carries a colour per grain for exactly that reason) and a print must not: the seabed is
+  a lit `MeshStandardMaterial` with the biome in its vertex colours and the beach blended over that
+  again, so a flat colour laid on top would be right in one era at one hour and pasted-on
+  everywhere else. A print is not a colour, it is a *depression* — the same sand, in shadow — so
+  the shader emits a multiplier and multiply-blends, and whatever the ground drew is what gets
+  darkened. Right shade, every biome, every time of day, for free.
+  **Sand only, and the shore only** (`printableSand`): a boulder stands proud of the seabed it sits
+  on and presses into nothing, sand out past the strand is under the sea, and past `LAND_REACH` is
+  not the shore. That last one is a distance and cannot be anything else — the land inland of the
+  beach is a flat plateau at *exactly* the height the beach tops out at, one unit over the
+  waterline, in all three eras, so nothing about the ground itself could tell them apart.
+  Presentation only, off `wade` and the drawn pose, so `src/sim` gains no event and stays
+  deterministic. `npm run tracks` holds the decisions and `node tools/tracks-browser.mjs` drives
+  the whole of it in a real browser — the body settled on the *ramp* at the water's edge rather
+  than up on the flat top, because the top is flat in every era and a run that stands there proves
+  nothing about a mark lying along a slope.
+- **The land is bare unless the era plants it.** `generateChunk` places nothing inland of
+  `SHORE_WALL`, which is the Cambrian's and the Devonian's beach entire: sand, rock, and whatever
+  the sea throws up. An era may declare a **shore fringe** (`environment.shoreFlora`) and the
+  Triassic does — each kind naming a band in `shoreDistance` and a density on the same scale as
+  the biome table, placed by a separate pass that works along the coastline column by column so
+  the strip stays an even line where a chunk boundary crosses it. The bands are the plants' own
+  tolerance of salt and wet, which is why they are a fact about the era's flora: *Neocalamites*
+  stands with its feet in the water, *Pleuromeia* takes the salty strand behind it, *Bjuvia* holds
+  the dry back of the beach. Thin on purpose — a fringe that hid the shore animals would spoil
+  both them and the beach.
 - **A breach is a leap, not a launch.** The vertical a body carried through the surface used to be
   whatever it had, and a dash's launch speed is `L * 9.5 + 7` — so a five-unit animal that dashed
   straight up cleared a hundred units of air and a Cymbospondylus over a thousand. `breachSpeed` in
@@ -445,8 +710,9 @@ unless the user explicitly asks for a PR. Steps:
   and there is no wall anywhere to stretch. The warning the old rule carried — that two separate
   tubes part when the jaw swings, which is how Placodus came to open onto transparency — was true of
   two *tubes* sharing a seam, and is answered by closing each half rather than by joining them.
-  **And the first question is whether a mouth needs filling at all.** Several do not: Shonisaurus and
-  Dinocephalosaurus among them. A generation that models no cavity, or whose head is closed behind
+  **And the first question is whether a mouth needs filling at all** — and the question ahead of
+  even that is whether the *cut* is earning its place, which is the next bullet. Several need no
+  filling: Shonisaurus and Dinocephalosaurus among them. A generation that models no cavity, or whose head is closed behind
   the lip, needs an anchor and nothing else — and a beak inside an arm crown needs an anchor and
   nothing else in every case, which is why both cephalopods have none. Authored geometry in a mouth
   is a cost (it is invented shape on a Tripo body, against the simplicity bar), so it is justified
@@ -498,6 +764,89 @@ unless the user explicitly asks for a PR. Steps:
   interpenetrate when they are first brought together, the oral cavity Tripo modelled has to fold
   rather than be built, and closing is a large jaw rotation, so the pose the animal spends almost
   all its time in becomes the most deformed one.
+- **The first question about a mouth is whether the cut is earning its place, and there are three
+  kinds of generation.** This is ahead of "how do we fill it", because two of the three answers are
+  not "fill it" at all. `T.cut_rim` measures which kind a body is, by reporting what the cut
+  actually left open in each half — how many loops, how long, and how much of each is on the seam
+  rather than pre-existing rim.
+  1. **The generation arrived shut**, with no interior at all — the commonest, and Dinocephalosaurus
+     is the extreme, where the lip is *painted* on a closed snout. Turning the jaw bone opens
+     nothing, because there is no aperture: the cut is what makes one, and what it leaves is a hole
+     in each half. **This is where capping applies.**
+  2. **The generation modelled a slit or a shallow cavity.** Judge per body; the cut usually still
+     makes most of the aperture.
+  3. **The generation arrived gaping, with a real lumen** — a palate, a floor, a commissure, all
+     modelled. Here the aperture and its walls already exist, and a cut makes a **boundary where
+     the surface was continuous** and then has to close it again. The right construction is **no
+     cut at all**.
+- **A cut mouth is closed with the cut's own rim, not with a shell placed inside it** (`T.cap_mouth`).
+  Span each half's boundary and each half is a closed solid again, and the two surfaces that span
+  them *are* the roof and the floor of the mouth, following the measured seam exactly because the
+  rim is what bounds them. Four things follow, and they are the whole argument: it **closes by
+  construction** (a surface spanning a closed curve leaves no hole, where a shell in the lumen has
+  to be *rendered* to find out — which is how Cartorhynchus shipped leaking 51 px with nobody
+  knowing); the geometry is the **body's own**, every vertex a convex combination of rim vertices,
+  so nothing is invented and a fitted or curved cut is followed for free; it **wears the skin it
+  closes**, UVs and vertex colours inverse-distance weighted off the rim; and each cap is **part of
+  its own half**, rigid to that half's bone through the same weight field as the skin around it,
+  with no second surface to keep coincident — the failure that cost Mosasaurus four rebuilds.
+  The lip run is what must *not* be filled, and the answer is not to separate it from the rest
+  (which cannot be done robustly on a curved cut): it is to fill the whole loop on **each half
+  separately** and dome each fill into its own half, so the two plates part and what is between
+  them is the cavity. The order is `T.cap_cut` over the transverse cross-sections at the ends of
+  the cut first — they dip out of the mouth's plane and would fold under a planar fill — then
+  `T.cap_mouth` over what is left, which lies in the mouth's own surface. **The dome's depth is
+  measured, not chosen**: each cap vertex is pushed into its half by a fixed fraction of *its own
+  distance from the nearest rim vertex*, which is exactly zero on the rim, deepest along the middle
+  of the mouth, shallow at the lips and in the corners, and scaled to the local mouth size by
+  construction — the distance from a point on the midline to the rim *is* the half-width there — with
+  an optional ceiling off the head's own measured section so a palate cannot reach the scalp.
+  Rhaeticosaurus is the worked example.
+- **A generation that arrived gaping is not cut** (`T.jaw_field_uncut`). Mosasaurus' cut left one
+  closed loop of 156 vertices per half spanning 0.057 of a body behind the hinge, on a gape 0.176
+  of a body long: the *back third* of the mouth and nothing else, because forward of that the jaws
+  are already apart and the seam plane passes between them without touching either. So the cut
+  bought nothing at the front and paid for a rim at the back, and the lining and the hinge plug
+  existed to close that rim. Uncut, the body is one surface, the mouth opening is a bone turning
+  inside skin like every other joint, and the weighting is full `jaw` below the mouth line and
+  forward of the hinge, full skull above it, and a band at the commissure that stretches. **The
+  band is the one number with a cost either way** — too wide and the front of the mandible takes
+  only part of the jaw's rotation, so the lower tooth row lags the bone it is drawn on; too narrow
+  and the whole swing is carried by a strip of skin at the corner, where linear blend skinning
+  pinches — so sweep it and record the sweep. Mosasaurus ran 3.62x / 2.81x / 2.54x / 2.54x of skin
+  at 0.20 / 0.30 / 0.38 / 0.50 of the head's half depth at the hinge, with the mandible still
+  travelling 0.96–1.00 of its own joint at every one; it ships at 0.50, where the worst edge is no
+  longer in the mouth at all and the figure is exactly the 2.54x the cut body shipped.
+- **`gape-solid.py` was proving a body the game does not draw, and `--as-drawn` is the fix.** The
+  runtime hides everything `src/shared/oral-geometry.ts` matches — every lining, every hinge plug —
+  so a gape closed *by* one of those parts passes the proof and still shows a hole to a player.
+  That is not hypothetical: Mosasaurus measured 0 px through the body at every opening clip while
+  its owner was looking at holes in its mouth, and measured as drawn it reads 71 / 292 / 0 / 222 px
+  at `Attack` / `Bite` / `Heavy` / `Eat`, every one of them at the corner of the mouth where the cut
+  rim parts. Rhaeticosaurus read 0 px plain and **4,626 px** at `Heavy` as drawn. Both are 0 as
+  drawn now. Any verdict about a mouth is about the body on screen, so it is `--as-drawn` that
+  settles it; the plain run stays, because it is what the file contains and it is what every
+  earlier verdict measured.
+- **Whether a mouth reads as a mouth is a picture, and `tools/triassic/mouth-space.py` takes it.**
+  Three views of one posed gape, framed on the animal's own `anchor_mouth` and `anchor_mouth_inside`
+  and lit from inside: into the gape from in front and above the lip, square down the mouth's own
+  axis, and a cutaway whose near clipping plane is the animal's midline so the roof and the floor
+  are two surfaces with room between them rather than one silhouette. It applies the runtime's own
+  oral classifier, so the picture is what a player sees.
+- **Ask what an oral part is doing by taking it out, before building anything in its place.** A
+  named mesh can be stripped from the unpacked packaged GLB and `gape-solid.py` run on what is left
+  in half a minute, with no rebuild; that is how Dinocephalosaurus' verdict was measured and it
+  separated two things a builder had taken for one. The one-sac lining there closed **nothing** —
+  0 px through the head shipped, 0–3 px with the sac gone — because what a plane cut through a
+  closed head leaves open is the head's cross-section at the hinge, and the seated hinge tissue
+  every jawed body carries was already filling it (98–113 px with that gone too). The verdicts, per
+  body and with the measurement behind each, are `docs/triassic/throat-repairs/oral-verdicts.md`,
+  and a body that carries no lining is a verdict rather than an omission: `oral-shell-audit.mjs`
+  reports it cleanly (every variant must agree, and the hidden oral parts it does carry are listed)
+  and `gape-crown.py` records itself moot on a crown with no mouth drawn, since a tool whose subject
+  has been removed must say so and not fail on an empty `max()`. Expect the throat audit to count
+  mixed `skull`/`jaw` vertices on a cephalopod's *body* — the lip band of the crown's own skin is
+  weighted to both on purpose — and on every hinge plug; neither is a lining.
 - **A beak inside an arm crown is a mouth, and almost nothing about a jawed head applies to it.**
   Neither cephalopod's generation models a mouth at all, and Placodus' method — cast head vertex
   normals back into the mesh and fit the hits — returns hundreds of them spread over the whole crown,
@@ -553,13 +902,15 @@ unless the user explicitly asks for a PR. Steps:
   at full gape says only that the mouth opened — Hupehsuchus' 50x is the lining working, not a torn
   head. Two builders split it locally before it was split centrally; the tool now reports both and
   ranks on skin, matching those builders' own figures exactly. True era-wide skin picture:
-  Shonisaurus 1.44x, Keichousaurus 2.34x, Mosasaurus 2.54x, Cymbospondylus 2.48x, Rhaeticosaurus 2.81x, Macrocnemus
-  2.94x, Nothosaurus 2.98x, Tanystropheus 3.00x, Birgeria 3.46x, Saurichthys 3.61x, Cartorhynchus 3.72x,
-  Archelon 3.86x, Mixosaurus 3.62x, Aphaneramma 4.45x, Coelophysis 4.46x, Mystriosuchus 4.48x,
-  Henodus 4.81x, Hupehsuchus 5.79x, Hybodus 5.93x, Dinocephalosaurus 7.00x,
-  Helicoprion 11.68x, Placodus 12.36x. Placodus and Helicoprion are the outstanding repair work:
-  Coelophysis came down from 25.25x, Macrocnemus from 23.31x, Tanystropheus from 6.09x and
-  Cartorhynchus from 5.17x.
+  Shonisaurus 1.44x, Keichousaurus 2.34x, Cymbospondylus 2.48x, Mosasaurus 2.54x,
+  Rhaeticosaurus 2.81x, Nothosaurus 2.99x, Tanystropheus 3.00x, Macrocnemus 3.41x, Birgeria 3.46x,
+  Hupehsuchus 3.47x, Saurichthys 3.61x, Mixosaurus 3.62x, Cartorhynchus 3.72x, Archelon 3.86x,
+  Atopodentatus 3.90x, Helicoprion 4.21x, Aphaneramma 4.43x, Mystriosuchus 4.48x, Henodus 4.81x,
+  Askeptosaurus 1.37x (the promoted posed generation; the straight regeneration it replaced reads 1.31x as the backup), Odontochelys 5.12x, Hybodus 5.93x (its opercular crack), Dinocephalosaurus 7.00x, Coelophysis 7.74x
+  (SnapRight, skull/neck), Ceratites 7.73x, Placodus 12.36x. Placodus is the outstanding repair work:
+  Coelophysis came down from 25.25x, Macrocnemus from 23.31x, Helicoprion from 14.33x, Tanystropheus
+  from 6.09x and Cartorhynchus from 5.17x. `docs/triassic/jaw-skinning.md` is the per-body record of
+  the jaw cut and the mouth-region figures beside these.
 - **A skin weighting is three things, and the era has now paid for each of them separately.** The
   *relaxation* — diffusion over the mesh's own edge graph, coupled by inverse edge length, trimmed
   to four influences every pass, sliver runs welded into one weight set — is the one that stops a
@@ -640,6 +991,35 @@ unless the user explicitly asks for a PR. Steps:
   cut shell's own bounding box: a mandible is not a body-length deep. `local`-side proof is a lag
   measurement — skin travel round a joint over that joint's own travel — because neither
   `skin-tears.mjs` nor `idle-bones.mjs` can see this at all.
+- **A mandible cut off the head as a rigid shell opens the head at the hinge by the gape, and no
+  edge test sees it.** Every jawed Triassic body cuts its lower jaw off as a separate object, and
+  every one of them then weighted that shell to `jaw` at 1 against a body on the skull: the two
+  copies of each rim vertex parted by the rim's depth under the hinge times the gape angle — 6 % of
+  a body on Hybodus, 3.5 % on Saurichthys, 2 % on Nothosaurus, Cartorhynchus, Mystriosuchus and
+  Placodus, eleven bodies past half a percent — a slot under the corner of the mouth that `skin-tears.mjs` cannot measure
+  because no edge crosses a seam between two shells, `idle-bones.mjs` cannot because both parts
+  own plenty, and the paired audits cannot because the twin has the same slot.
+  `tools/triassic/lag.mjs` (in `npm run triassic`) measures it as the worst separation over every
+  clip of the rest-coincident pairs at the cut, and `T.jaw_junction` closes it: **one weight field
+  over both parts, evaluated on position**, so the two copies cannot disagree (it asserts they do
+  not), with the throat under the hinge following the jaw — bounded radially about the hinge and
+  along the body — and the shell ramping to full jaw over a *short* band from the rim. Short on
+  purpose: at 0.05 of a body Mixosaurus' jaw bowed, its dorsal-rear corner held by the skull while
+  its chin dropped, and a mouth that opens by bending its lower jaw is worse than a slot; the shell
+  only has to agree with the body at the rim, and where the two fields differ a point turns on a
+  short radius. Which shared points *are* the rim is the builder's word (`rear`), never a
+  coincidence test: a front cut (Mixosaurus' overhanging snout) taken for the junction glued the
+  mandible's tip to the snout's own tip at 7.6x, the label boundary round Saurichthys' interlocking
+  tooth roots pinned its mandible to the upper tooth row at 5.6x, and Hybodus' labelled rim runs
+  0.04 of a body *behind* the hinge, so a window ahead of the hinge found 30 of 109 rim points with
+  a negative depth and closed nothing. The corner of the mouth is one vertex on both the lip and
+  the cut, so a point or two parting there by the gape times its short radius is the lip; a cut
+  that opens opens along its length, which is what the tool fails on. And the throat share is
+  scaled by what a vertex is *not* a limb's, and is a builder parameter: Aphaneramma's tucked
+  forelimb took half of itself from the jaw at 4.6x until the limb term, and Atopodentatus'
+  `Heavy` pulls the neck back a third of a body while the jaw opens, so a full share tore the
+  neck behind the corner harder than the jaw's own edge (3.90x → 4.31x) and that body runs at
+  0.6. Record and renders: `docs/triassic/jaw-skinning.md`.
 - **A containment test written on `np.interp` cannot fail outside its own table**, because
   `np.interp` clamps rather than refusing. Hybodus' and Saurichthys' hinge plugs were "fitted" by
   asking whether each vertex was inside `head_half_width(y)` and between `head_z(y)` — both
@@ -653,6 +1033,26 @@ unless the user explicitly asks for a PR. Steps:
   table — with a second parity test against the lining sac, because a modelled open mouth is an
   invagination and a point in the lumen is outside the solid by construction.
 
+- **On a generation that arrived gaping, a mouth built about the mouth line is built in the water.**
+  The shared shells (`T.oral_shells`) put the palate and the floor about one `seam` -- the mid-height
+  of the modelled cavity -- and on a body whose jaws are parted in the bind pose that line runs
+  through open gape: Saurichthys' palate hung 0.011 below the underside of its own upper rostrum,
+  and no room measured from mid-gape and held short of the skin ever reached the jaw it belonged to.
+  The helper now takes `seam` and `room` as a **pair** `(palate, floor)` and a separate
+  `u_front_floor`, and the two fish build each shell about *its own jaw's edge of the lumen*, cast
+  from the mouth's axis (`jaw_face` in their builders), with the floor ending where there is
+  mandible under the axis rather than at the mouth's front -- a gaping mandible's rami reach the
+  front while its symphysis has swung back. Three more things those two ports paid for, each once:
+  the mouth's **lateral centre is measured** (`cx`), because the unbent rostrum runs 0.02-0.035 off
+  the midline and a lining on x = 0 stood beside it; `T.mouth_room`'s **fallback is a positive
+  number**, so a cast that misses reads as room where there is open water and cannot be used to ask
+  whether a jaw is there (cast the ray yourself); and a bmesh vertex **starts every layer at zero**,
+  so `T.cap_cut`'s hub drew as a black slab until it copied the rim's UVs and vertex colour. The
+  containment test those builders assert is the one from the `np.interp` lesson above, asked per
+  shell: rays from every shell vertex to either side and up and down against the closed intake
+  surface, with the exceptions a gaping mouth needs written out -- a point the measured cavity
+  contains may look out through the parted lips, and a point pressed within 0.003 of a body against
+  its own jaw's surface is under its own jaw.
 - **A limbed swimmer's dash has to paddle.** The Triassic's reptiles and amphibians did not scull
   along on a tail beat, and a Sprint clip that waggles the limbs while the body does the work reads
   as a fish with legs attached. The stroke runs from the limb stretched forward to flush with the
@@ -660,6 +1060,34 @@ unless the user explicitly asks for a PR. Steps:
   `validation.json`, so "the limbs move" is a number rather than an impression. Attack clips are the
   same question asked of the weapon: a long neck, a tail or a pair of tentacles is what that animal
   attacks *with*, and a clip that leaves it hanging has not used the animal.
+- **A body straightened for the rig has to be given its shape back as pose, or it ships as a
+  stick.** Askeptosaurus' generation was regenerated straight because its over-curved tail could
+  not be rigged otherwise, which was right and stays; what nobody did afterwards was put the
+  animal's own curvature back into its *clips*, so the bind pose — a modelling pose — was what
+  every clip rode on and what every portrait was shot at, and the roster card was a needle with
+  four spines. A resting shape belongs in the clips and never in the bind (a warped bind shows at
+  rest and then flails, and the roster matrix's identity rest jaw and `lag.mjs`' jaw cut are both
+  measured against it): a dorsal arch through the trunk, a tail that falls away rather than
+  standing out straight behind, paddles set off the flank. **And it is posed per clip, not stamped
+  under all of them** — one resting curve used as a constant offset everywhere is the same mistake
+  one step along, because an idling animal holds itself differently from one turning, diving,
+  rising, feeding, bracing or dead, and on a body that is two thirds tail that difference has to
+  run through the whole length rather than being a tail waggle on a straight trunk. A turn is one
+  long C through trunk, neck and tail; an attack is the body gathering and then extending, since a
+  strike that moves the head on a still trunk is the same fault again. Three things make it cheap
+  to get wrong.
+  **The wave's phase step matters more than its amplitude**: twelve tail controls lagging by 0.62
+  rad each carry more than a whole wavelength on the tail and their contributions to the tip
+  *cancel* — the same amplitude that reads as a swimming animal at 0.40 moves the tail tip 1.1 % of
+  a body at 0.62, which is why an `Idle` can be raised fourfold and still look rigid. A
+  **portrait is shot at a frame, so which frame is the builder's to name**: `portrait_pose` on
+  `creature_render.run` defaults to the `('Idle', 0)` the whole roster was rendered at, and a posed
+  one is re-framed on the geometry the armature actually produced, because a long animal bent into
+  a curve projects to a fraction of its own bounding box. Record the swept angle and the tip travel
+  per clip in `validation.json` and assert a floor, so "it moves" is a number: `Idle` at 0.008 rad
+  is what a quarter of a degree of yaw looks like in a file nobody was measuring. Record the
+  **held shape** per clip beside it, and assert the clips' holds are actually different from each
+  other, or a table of per-clip poses is a claim rather than a fact.
 - Devonian specimens land in batches (`tools/devonian/shipped.json`). When one lands: run
   `node tools/update-asset-sizes.mjs` (refreshes `src/content/devonian/asset-sizes.json`), remove its
   entry from `DEVONIAN_STAND_INS` in `src/content/devonian/index.ts`, and run `npm run devonian`.
@@ -711,6 +1139,21 @@ unless the user explicitly asks for a PR. Steps:
 - Nothosaurus now holds its head still in its authored `Swim` and `Sprint` clips. The earlier
   renderer-side `steadyHead` counter-rotation was removed when those clips were corrected; do not
   reintroduce a runtime pose patch for motion that belongs in the reproducible Blender builder.
+- **A jaw cut follows the lip the generation modelled, and the plane may tilt across the head.**
+  Nothosaurus' head arrived yawed 20° to its right and its cut was a horizontal plane at a typed
+  height, 0.005 raw under the modelled lip on one flank and on it on the other. The first instinct —
+  measure the head's roll and roll the head so a flat cut fits — asks two features that disagree:
+  the countershading boundary reads 13–15° of roll on this head and the modelled slit reads 4°,
+  because the pale zone's upper edge sits above the lip on the left flank (Keichousaurus' lesson
+  again, seen from the other side). So the cut is a plane fitted to the slit hits on *both* flanks,
+  `z = a + b·x + c·y`, which carries the lip's pitch and its tilt across the head, and nobody rolls
+  the head to meet it; the yaw is the pose and is unbent in the mesh before binding (Dinocephalosaurus'
+  rigid carry, with the frames built on the vertical so a yaw carries no incidental roll). Two
+  smaller things from the same builder: a hinge envelope is seated by **ray parity against the
+  closed intake, taken before the jaw cut opens it** — asked after the cut it says every vertex is
+  outside — and it is built with `from_pydata` like the shells, because a bisected primitive left
+  the exporter splitting the cap's vertices: 148 open edges to `oral-shell-audit.mjs` on a mesh
+  Blender itself called closed.
 - A body may shape itself to what it is on: `conformArms` bends a radial rig's arms onto the ground
   under them, or around a creature it is holding, after the mixer has written the pose
   (`src/render/conform.ts`, `npm run conform`). Presentation only, and asked for by name rather than
@@ -799,6 +1242,12 @@ unless the user explicitly asks for a PR. Steps:
   no approaching one to ride it. A fed giant notices — the head comes round, which is the tell — and
   goes back to its route; how often one is hungry follows the hour and the water it is over
   (`appetiteAt`), which is where the rhythm of the day is set. `npm run hunt` covers both halves.
+- **Being eaten is the end of the chase.** The hunt warning — the arrow, the eye, the line — is a
+  reading of the *live* world, and `updateHunted` only ever runs on a body that can still act, so a
+  corpse kept whatever score it died holding and went on saying something was hunting it. It is
+  cleared where death is actually handled, in `kill` and `startSwallow` in `src/sim/combat.ts`
+  (a body in something's mouth has stopped being chased too), rather than by a guard in
+  `updateHunted` that nothing would reach. `npm run hunt` holds both.
 - A warning is about intent, never about size. The colour of a band marker and of a radar contact is
   red only for a body that is actually coming for you (`comingFor` in `src/sim/actors.ts`: hunting,
   fighting or seeing you off its ground — and for a steered body, aiming at you); everything else is
@@ -837,6 +1286,18 @@ unless the user explicitly asks for a PR. Steps:
   keeps its rung. The rung is set by giving the body the scale that rung is worth and letting the
   era read it back (`onSwap`), because the Cambrian stores a `tier` and the other two a `stage`.
   `npm run respawn` prices it at four places on the ladder.
+- **An apex is one seat's and one animal's, never the match's.** It used to be the match's: one
+  latch on the whole game (`Game.endless`) closed the mode the first time anybody finished, and
+  carrying on (`continueMatch`) zeroed *every* seat's hold timer — so a player two thirds of the
+  way through their own ninety seconds was sent back to nothing because somebody else had arrived,
+  and could never be told about it when they did. `PlayerProgress.apexDone` is the record instead:
+  the creatures that *seat* has taken to the top, so a seat standing at apex on an animal already
+  in it simply goes on swimming, a second seat finishes its own apex in the same sea afterwards,
+  and one player who grows a second animal up gets a second results screen for it. `continueMatch`
+  clears only the winner's clock, and the era hook is handed the winning seat for the same reason
+  (the Devonian and the Triassic count their own `primeT`). The `endless` latch stays for what it
+  was always about — the board's own "the reef is won" line — and for a bot, which has no seat to
+  remember with.
 - A death costs a rung, not the swim back. `respawnAt` in `src/sim/game.ts` returns a body to the
   distance from shore it died at — the same biome, the same depth — and away from any giant;
   inshore that is still the nursery, which is the hatchery and in the shore band anyway. Every
@@ -976,6 +1437,30 @@ unless the user explicitly asks for a PR. Steps:
   `tools/sculpt-browser.mjs` drives the mode in a browser; `npm run sculpt:measure -- <glb> [sculpt.json]`
   measures a model the same way and reports how far a rebuilt candidate is from a sculpt's target,
   which is how a port is checked.
+- **The Animations pane's selection is sticky across a change of creature, and the *intent* is kept
+  apart from *what is playing*.** The pane is for comparing one motion across bodies — how six
+  animals hold a `Heavy`, what each does at the top of a `Crawl` — so picking an animal must not
+  also pick the animation again: the clip, the position in it, the pause and the *Base pose* (a
+  selection like a clip is, and the one a reviewer comparing rest poses most wants kept) all cross
+  over. Not every body has every clip, and that is where the whole thing is won or lost: an animal
+  without the chosen clip plays its resting clip and **the choice still stands**, so the next animal
+  that does have it plays it again. Store what is *playing* and the choice is lost at the first
+  animal that lacks the clip and can never come back — which is why `ClipIntent` (what was asked
+  for) and `Selection` (what this body can give) are two types in `src/viewer/playback/selection.ts`
+  and why nothing in the scene may write the intent. The same split decides three smaller things,
+  each of which reads as a bug the other way round: a position is **clamped** to a shorter clip
+  rather than wrapped (Ottoia's `Crawl` is 1.4 s where Hallucigenia's is 2.0 s, and wrapping 1.8 s
+  to 0.4 s jumps to the start of a stride) and the clamp lands on what plays, never on the intent,
+  so a longer clip further along gives the full position back; a fall-back starts at **zero**,
+  because a time is a position in one particular clip; and a running clip's clock is written back
+  onto the intent **only while the intended clip is the one playing** (`tracksIntent`), or some
+  other animal's idle frame quietly becomes the position that was chosen. Pausing changes only the
+  pause — it does not re-aim the selection at the stand-in on screen — while picking a clip or
+  scrubbing names the clip it is done to. The pane says out loud when it is standing in for
+  something (`.clip-fallback`) and carries both facts as `data-clip-intent`/`data-clip-playing`.
+  Session-scoped like the editors' stores and deliberately not `localStorage`: a reload puts every
+  body back on its own `Idle`. `npm run playback` holds the decision and
+  `node tools/playback-browser.mjs` drives the whole journey in a browser.
 - The viewer also has a **mark mode** (`&mode=mark`, the *Mark region* button), which is the answer
   to geometry that is welded to the body and should not be there — the extra fins and spare tails on
   the raw generated meshes, where 19 of the 21 bodies are one connected surface and only a human can
@@ -1015,6 +1500,120 @@ unless the user explicitly asks for a PR. Steps:
   `tripo-raw/`, and it refuses a rigged body by name), importing the viewer's own `warp()` so the
   file is what was previewed and reading the result back to prove it. `docs/viewer-stretch.md` is
   the whole of it; Blender work it implies goes in `docs/triassic/builder-requests.md`.
+- The stretcher lengthens a run of body; the **bend editor** (`&mode=bend`, the *Bend* button) turns
+  one, and its **readout is the tool rather than the warp**. It is the answer to a diagnosis that
+  went wrong three times on one animal: Askeptosaurus' head stood 67.7° off its trunk, a coordinator
+  derived 78.6° by adding a chain's *absolute* per-joint turn to its takeoff when that chain was an S
+  whose signed turn was three degrees, and underneath both, **three defensible readings of "the
+  trunk" disagreed by up to 43°** (`axis.front` in its `validation.json`). Every number in that
+  argument was taken on trust and none was ever looked at. So the panel never shows an angle without
+  naming the two references it is between, and on a rigged body it shows **both** the geometry's
+  answer and the bone chain's, side by side, because those are the two that disagreed — with each
+  said three ways (in the bend plane, out of it, and in all), since the total is the number everybody
+  quotes and is exactly the one that hides the other two. A reading *after* an edit is measured
+  again rather than predicted, because predicting the answer from the numbers that produced it is
+  what the original argument did. The span is **two points on the animal** rather than the
+  stretcher's coordinates-plus-tilts: both cuts are square to the line between them, that line is
+  the direction and the length, and it has to be, because Askeptosaurus' neck leaves its shoulder at
+  **61° to its own long axis** and cuts square to the frame's axis would swing the head rather than
+  bend the neck. The turn is spread linearly across the span (the stretcher's reason: easing piles
+  the change into the middle and kinks both ends). Behind the base cut nothing moves at all, past
+  the tip cut the far part is carried rigidly, and the span
+  keeps its own length, because a rotation about one fixed pivot is a spiral and not a bend.
+  **The span's two ends are oriented planes, and the bend is whatever carries the creature's axis
+  line from the one to the other.** A plane's normal is the direction that axis line runs through
+  it: the base plane is where it runs **in** and is a pure reference (nothing behind the base cut
+  moves under any bend, so aiming it never moves the body — what it says is *which direction you
+  are calling the trunk*, which is the argument this tool was built out of made into a control);
+  the tip plane is where it is **to** run out, seated on the body's own measured heading there so
+  the editor opens on the animal as it stands. **Aim both planes the same way and the run between
+  them comes straight**, because the bend is then the rotation carrying the head's own heading onto
+  the trunk's. That replaced a pair of turn *rates* and keeps what they were for: the rates existed
+  because the obvious reading of two angles puts a kink at the base cut, and an orientation per
+  plane cannot — the rotation there is the one carrying the tip plane's rest onto itself, identity
+  by construction however far apart the planes are aimed. What is given up is a bend that starts
+  straight and tightens; two orientations are a circular arc, which is the shape straightening
+  wants. The **axle is derived** from the two planes rather than dialled, which is why there is no
+  bend-plane roll and no *Aim the plane* button: the old roll swept the creature's own long axis —
+  a twist — while the body it bent went ninety degrees the other way, so the control's motion was
+  not the bend it produced, and a plane's is. Where an aim is oblique the hinge leans a little along
+  the span, which really is a twist; that is reported (`axis.twistDegrees`) rather than clamped,
+  because clamping it would mean the turn no longer carried the tip plane where it was aimed.
+  **And which body the numbers describe is said out loud, in the panel and in `appliesTo`.** Bend
+  mode holds a rigged body at rest, and Askeptosaurus' rest already carries T3D-26's whole
+  correction (`carry`: the head 4.17° off the trunk's run where the generation had it at 67.68°),
+  so on the shipped body there is nothing left to aim. The pre-carry body is reached by the route
+  that already existed: `tools/triassic/base-poses.mjs` republishes the untouched generation of any
+  body whose builder moved its rest, and a **rest-pose carry is such a move** — not a mesh
+  unbending, so it carries no `applied` flag and is told by there being bones in `carriedBones` with
+  some share of the aim in them. `appliesTo: 'origpose'` is its own value beside `generation`,
+  because `built` and `origpose` on this animal are opposite claims about one creature; it is still
+  `use: 'builder-measurement'`, since the file on stage is a published *copy* of `tripo-raw/`.
+  The geometry reading **traces the body rather than binning a coordinate**, and that is Askeptosaurus
+  again: its left paddle reaches *further forward than its own snout*, so an axial slab ahead of the
+  neck averages the head with a flipper and reports the head running backwards. Each step takes the
+  surface near where the trace stood one step back — `reach` is what refuses a limb, and it never
+  starves the trace, because a body is a shell and the surface at a station stands at that station's
+  own radius. The trace is **drawn on the body** and reports its own `residual`: past about 0.05 it
+  wandered, and the angle it gives is between two directions nothing in the animal runs in. On that
+  animal it reads 0.009 ahead of the span and 0.062 behind it — excellent at the head, unusable at
+  the curled limb-crossed trunk — which is a judgement for the reviewer rather than a number to
+  hide, and the answer to it is *Window* and *Reach* (on the original pose's neck, 26 % and 2 %
+  bring both residuals under the bar and the planes then read the animal's 41.40° curve, which
+  straightens to 1.05° measured over the warped mesh). Which bone chords a reading is between, and
+  which run of the rig the joint table follows,
+  are **dropdowns**: guessed from where the span is, re-guessed whenever it moves (a stale default
+  left the tip chord at `skull → jaw`, pointing at the chin, reading that head as 97° off its trunk)
+  and never re-guessed once a person has named one. The export carries the span, the two planes and
+  the axle in the root frame *and* in the builders' Z-up one, both readings before and after, and a **per-joint
+  table of local rotations in chain order** — which is exactly what `uncurl` returns and `carry_rest`
+  consumes in that animal's builder. It is `bend-span/2`, and a `bend-span/1` file is refused by
+  name rather than half-read: it carries turn rates and a plane roll, which no longer describe a
+  bend at all. `npm run bend` and `node tools/bend-browser.mjs` check it,
+  `npm run triassic:bend -- <file>` is the consumer and **re-measures rather than reprinting**,
+  failing loudly where it disagrees with what the viewer recorded. There is no bake in either
+  direction: a rigged body cannot have one (a bent bind pose flails the moment a clip plays) and a
+  generation's bend belongs at the pose. `docs/viewer-bend.md` is the whole of it.
+- The viewer's **mouth editor** (`&mode=mouth`, the *Mouth* button) is the human answer to the
+  mouth rule above: every builder finds the mouth by a measurement that has been fooled at least
+  once, and this lets a person aim the cut by eye and hand it over as numbers. The document is a
+  **cut plane and a hinge** — six numbers on the body's frame (`src/viewer/mouth/mouth.ts`, pure):
+  how far back from the nose the hinge sits, the line's height and its seat across the head, and
+  pitch, yaw and roll — composed in that order so each angle reads as its own view's angle when
+  the other two are zero, and exported as basis vectors as well, so no consumer recomposes them.
+  The mandible is everything **below the plane and ahead of the hinge**; the second half-space is
+  what stops the cut running back through the neck, and it is also the editor's honest limit — a
+  paddle tucked forward under the snout falls inside it, as Aphaneramma's did in a builder's own
+  cut, and the count says so rather than the tool hiding it. Three handles on the orbit view
+  (hinge moves the cut in the camera's plane, front aims the line, side tips it), right-drag
+  orbits as in mark mode, every mandible vertex is lit with the same overlay mark mode uses — a
+  vertex-colour tint was the obvious alternative and would have broken the recolour hook, which
+  reads COLOR_0 as its mask. The first guess follows the stretcher's precedence: a rigged body's
+  `jaw` bone *is* its hinge and `anchor_mouth` sets the pitch, a socket alone sets the height, a
+  raw generation gets the head's own section a head's worth back, and the panel says which. It
+  works on **whatever body is on stage**, the raw generation above all, and the export names the
+  exact file by a **sha256 measured in the page** (`crypto.subtle` over the bytes the browser has;
+  a manifest's hash or `null` where it cannot) with `appliesTo` saying whether that was the
+  generation, its preview, the built body or the twin. `fromExport` is the one reader and refuses
+  a file whose hash or vertex count no longer matches, `npm run triassic:mouth -- <file>` is the
+  consumer that hashes the GLB on disk and re-counts the cut over the real mesh, `npm run mouth`
+  and `node tools/mouth-browser.mjs` check it, and `docs/viewer-mouth.md` is the schema and the
+  workflow, exact use and guidance both. Aimed cuts that have been handed over live in
+  `docs/triassic/mouths/`. **And a cut is previewed by swinging it, never by playing the body's own
+  clips**: a built body's `Bite` opens the jaw the file was *built* with, baked into weights, so a
+  clip played after the hinge moves shows the same mouth as before it — which is worse than showing
+  nothing, because it looks like an answer. The *Gape* slider rotates the document's own mandible
+  set about its own hinge instead, rigidly, so the tear along the cut is the slot a rigid shell
+  would open there; holding it takes the handles, the planes, the lit vertices and the panel off the
+  screen and letting go brings them back with the jaw still open, so the hinge is dragged and
+  watched at once. It is a way of looking and never the document — not in the export, not an undo
+  step, and shutting it restores the positions *and* the file's own normals (clearing a warp now
+  puts the shipped normals back rather than recomputing a smooth set, or every look after the first
+  was at a differently lit animal). The axis it turns about is `normal × forward` rather than
+  `hinge`, because `hinge` is the pivot only to within a sign: the triple is right-handed in two of
+  the four frames a document can be in, so turning about it would have shut the mouth on half the
+  bodies — and shut is where the slider starts, so that reads as a control that does nothing rather
+  than as a bug.
 - A bare `?debug` on the site root (`/?debug`) opens the index of every one of these tools —
   `src/ancientseas/DebugIndex.tsx`, data in `src/ancientseas/debug-index.ts`, mounted by
   `src/ancientseas/main.tsx` the way `Root.tsx` mounts the state editor. It is the trilogy page's
@@ -1045,6 +1644,23 @@ unless the user explicitly asks for a PR. Steps:
   measured the wrong one and so listed no neighbours at all in eleven hundred samples. `npm run
   record` checks that a recording distinguishes a grab that worked from one that could not, names
   the reason, and lists the animal it is about however big that animal is.
+- **Whatever the crosshair is on is the target.** `updateAim` used to skip the threat and giant
+  bands outright, so a player holding the crosshair squarely on something their own size or larger
+  was told there was nothing there — and what you do about a big animal (ride it, take hold of it,
+  pounce at it) is exactly what aiming is for. Two rankings, not one: the **entry snap**, which
+  happens on the frame aim mode comes on and picks a target without the player having pointed at
+  anything, still leans toward what they probably meant (food ahead of a fight) and still refuses
+  another player outright; a crosshair being *held* ranks on pure angle, because it is not
+  choosing for you at all.
+- **Another player is never handed to you, but one you are aiming at is your own choice.** Four
+  automatic picks in `game.ts` — the charge, the grip, the bite's aim nudge and the lunge — refused
+  a player-controlled target outright, which between them meant a player could aim squarely at
+  another, hold the grab, and find that nothing at all would take. `Game.handedOver` is the one
+  rule now: a player is skipped unless the aiming player has actually locked onto them, and then
+  every path admits them. So player-versus-player grabs work the way they read — aim, hold the
+  grab button — while nothing picks a friend for you by accident. Everything after that is
+  unchanged: an equal-sized rival is a *ride* rather than a mouthful, so `takeRide`'s head-end rule
+  still says you cannot cling to the jaws.
 - Taking hold is not an attack. Holding costs nothing — no clock, no stamina — and hurts nothing: a
   player's grip never crushes, button down or up. Anything from the animal's own size upwards is
   *ridden* (`takeRide`) until the player lets go or the host shakes them off with a dash; anything
@@ -1136,6 +1752,48 @@ unless the user explicitly asks for a PR. Steps:
   page it opens): a network that blocks the counter makes the browser log a console error, and
   these tools fail on console errors — one blocked counter would otherwise fail a check about
   creature meshes.
+- **Every word the games say is config.** `src/content/strings.ts` is the shared table — the shell,
+  the HUD, the menus, the help page, the settings panel, the feedback form — and
+  `src/content/<era>/strings.ts` is what one game says for itself, laid over it by
+  `src/shared/text.ts` (`TEXT`). The trilogy page has its own, `src/ancientseas/strings.ts`, and it
+  must stay separate: that page is no game's, reads `ACTIVE_ERA` nowhere, and importing `TEXT`
+  would pull a roster into the entry bundle. A component asks the table and never spells a sentence
+  out, which is what makes the messaging editable without reading the code that draws it and makes
+  a second language a second table. Keys are named for **where the player sees the words** —
+  `pause.`, `results.`, `hud.grip.`, `select.crew.` — never for what they mean, and a line with a
+  number or a name in it is a *function* of that value rather than a string with a placeholder, so
+  the argument is typed and a translator can put it where the sentence needs it. An era overrides
+  only what it says differently; `mergeStrings` walks plain objects and treats a function or an
+  array as one whole value, so replacing the loading facts means *that era's* facts rather than its
+  facts interleaved with the Cambrian's — which is what those lines were before, shared and about
+  Hallucigenia in all three games. Button names are the one exception and stay in
+  `src/shared/controls.ts`: that is the binding table, what the key *is* rather than what the game
+  *says*, and `src/input/input.ts` and both diagrams read the same rows. `npm run eras` holds the split: an era
+  may only *override* a key the shared table already has (a key it invents is a key nothing reads,
+  which is how a renamed string quietly stops being drawn), every leaf of the merged table has to be
+  a string, a function or a list of strings, and no two eras may show the same loading line.
+- Nothing in a menu describes how to work the menu. The pause and results choices used to carry a
+  line under them naming the D-pad and the confirm button; the cursor already answers left, right,
+  up and down by where the buttons actually are (`src/app/spatial-nav.ts`), so the line was
+  explaining something that needs no explaining and naming one input device out of four while doing
+  it. The `pick` action went with it, since nothing else asked for its name.
+- A burrower shows the sand it is moving. `Sand` in `src/render/fx.ts` and `burrowSand` in
+  `src/render/engine.ts`: a steady shower while a body works itself down, one throw as the floor
+  closes over it, and a harder one thrown clear as it surfaces — so both ends of the act are seen
+  rather than only the disappearing. Presentation only, off the actors' own `hideMode`, so `src/sim`
+  keeps its determinism and gains no event; the silt cloud it already pushes on burial is the
+  *rule* (that is what hides the animal) and stays where it is. The grains take the biome's own
+  floor colour per grain, because a burrow in the shelf mosaic and one in the black basin must not
+  shower the same beige. The *decision* — which of the three moments a body's move between two
+  hiding states is, and what that owes — is `sandThrow`, which is pure and held by `npm run sand`;
+  the renderer keeps only the accumulator that turns a rate into whole grains, and
+  `node tools/sand-browser.mjs` drives the whole of it in a real browser against a preview build.
+  That harness is a worked example of the rule about this page's frame clock: the engine clamps
+  `dt` to 0.08 s and the software renderer draws about a frame a second, so a wall-clock second is
+  a twelfth of a second of particle life and a key held for a fraction of a second can fall
+  entirely *between* two frames and never be sampled. Hold presses for seconds, arm the watchers
+  before the press, and wait on the game's own state rather than on `waitForTimeout`.
+
 - All docs live in `docs/`. Design docs are in `docs/redesign/`. Image, glyph and prop
   needs go in `docs/image-requests.md` and move to `docs/image-requests-history.md` once
   delivered and integrated; sound and music needs go in `docs/audio-requests.md`.

@@ -10,29 +10,40 @@ size budget, a description of the sound, and the code that will consume it.
 
 ## Open
 
-- **Sprint bed — 1 file.** `public/assets/sfx/sprint-loop.mp3`, 3–5 s, seamless
-  loop, mono, -26 LUFS, under 60 KB. The wash of water over a body driving hard:
-  broadband, no transient, nothing that reads as a repeating swoosh when it comes
-  round. Sprint is held down for minutes at a time, so it is a bed rather than a
-  sting — `audio.setSprint` in `src/audio/audio.ts` fades it up while a local
-  player is driving and away when they stop, at 0.16 gain under the reef. It
-  loops the delivered one-shot `burst` sample on itself until this lands, which
-  is audible as a pulse if you listen for it. Shared between the eras; a
-  nautiloid's jet keeps its own discrete `jet` sting and does not want this.
-
-- **Egg hatch — 2 files.** `public/assets/sfx/egg-poke.mp3` (~0.4 s) and
-  `public/assets/sfx/egg-crack.mp3` (~1.2 s), mono, -18 LUFS, under 30 KB each.
-  Every player now hatches out of an egg on the bottom rung: five seconds of a
-  soft shell taking a poke from inside, splitting along the top, and the animal
-  wriggling clear (`HATCH_TIME` in `src/sim/game.ts`, drawn by
-  `src/render/eggs.ts`). *Poke* is the muffled thud of something pressing the
-  wall from within, underwater and close — a knuckle on a taut membrane, not a
-  drum. *Crack* is the wall giving way: a wet tearing rather than a shell
-  shattering, these are not birds' eggs. Consumed by the `hatch` case in
-  `src/render/engine.ts`, which plays `respawn` in their place for now. Shared
-  between the eras (`assets/sfx/`), because both hatch the same way.
+None.
 
 ## Delivered
+
+- **Egg poke — 1 file** (`egg-poke`) in the shared `public/assets/sfx/`, 0.522
+  seconds. Three soft pokes now follow the visible shell deformations before the
+  separately delivered crack sounds at the exact moment the player is released.
+
+- **Triassic signature sound set — 7 files** in `public/assets/triassic/sfx/`,
+  generated with ElevenLabs Sound Effects v2 on 20 September 2026: surface breaths
+  for bodies under 4 m, 4–10 m and at least 10 m (`blow-small/-mid/-giant`), the
+  low-air pulse (`winded`), the bank predator's wet neck/lunge impact
+  (`shore-strike`), the 22-second seamless hot shallow-water ambience
+  (`ambient-lagoon`), and the 12-second seamless black-basin tension bed
+  (`basin-drone`). `src/content/triassic/sfx.ts` owns the event mappings;
+  `src/content/triassic/index.ts` selects both beds. The breath event chooses its
+  take from the actual actor length, and shore attacks emit their own event rather
+  than borrowing the generic pounce cue.
+
+- **Flop variations — 2 files** (`flop-1`, `flop-2`) in the shared
+  `public/assets/sfx/`. `src/sim/beach.ts` emits `flop` when a stranded
+  water-breather throws itself toward the sea, and the sample table randomly
+  chooses one of the two short wet-sand takes.
+
+- **Depth-layered sprint beds — 3 files** (`sprint-loop-1/-2/-3`) in the shared
+  `public/assets/sfx/`, each 4.584 seconds. `audio.setSprint` keeps the three
+  loops phase-aligned and equal-power crossfades from #1 at the surface, through
+  #2 in mid-water, to #3 in the deepest part of the local water column. The
+  common gain still follows the strongest local sprint and sits at 0.16 under
+  the ambience; a nautiloid jet retains its discrete sting.
+
+- **Egg crack — 1 file** (`egg-crack`) in the shared `public/assets/sfx/`, 1.392
+  seconds. The `hatch` event now plays this wet soft-shell tear instead of
+  borrowing `respawn`; the earlier poke remains open above.
 
 - **Area music themes — 4 tracks** (`Cambrian Drifting`, `Cambrian Abyss`, `Devonian Calm`,
   `Devonian Ritual`) in `public/music/`, replacing the placeholder `theme-calm` / `theme-danger`
@@ -89,17 +100,9 @@ size budget, a description of the sound, and the code that will consume it.
 
 ## Triassic Triumph — 12 September 2026
 
-The era plays with every sound borrowed (`src/content/triassic/sfx.ts` maps each event to a
-delivered Devonian or shared sample). Its own, in priority order:
+The era's complete requested SFX set is delivered above. Its requested music was also delivered:
 
-1. **The blow** (`gulp` in the Triassic): an air-breather breaking the surface. The era's signature
-   sound; a real recording of a large animal exhaling at the surface, not a synthesis. Three
-   takes by size (small, mid, giant).
-2. **Winded under water** (`winded`): a low, quiet pulse for a bar running down with no refill.
-3. **The shore strike**: the neck's snap and the water taken with it; the phytosaur's lunge.
-4. **Ambient bed** (`audio.loops.ambient`, today the Devonian's open sea): a bright, shallow,
-   hot-water lagoon with the surface close overhead; and the basin's dead stillness as the drone.
-5. ~~Two area themes named in `src/content/triassic/music.ts`.~~ **Delivered and wired, 13
+1. ~~Two area themes named in `src/content/triassic/music.ts`.~~ **Delivered and wired, 13
    September 2026** — and three rather than two, under names of their own:
 
    | Track | Role |

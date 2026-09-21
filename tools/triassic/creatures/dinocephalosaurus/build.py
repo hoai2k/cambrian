@@ -27,6 +27,9 @@ from mathutils.geometry import barycentric_transform
 from math import sin, cos, pi
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.abspath(os.path.join(HERE, '../../../..'))
+import sys
+sys.path.insert(0, os.path.join(ROOT, 'tools/triassic/creatures/_pipeline'))
+from tripo import jaw_junction                                                  # noqa: E402
 LOCAL = os.path.join(ROOT, 'local/triassic-authoring/dinocephalosaurus'); OUT = os.path.join(ROOT, 'public/assets/triassic/creatures')
 os.makedirs(LOCAL, exist_ok=True); os.makedirs(OUT, exist_ok=True)
 RAW = os.path.join(HERE, 'tripo-raw/dinocephalosaurus.raw.glb'); ID = 'dinocephalosaurus'
@@ -361,8 +364,9 @@ def seat(p, toward, margin=.022):
 mat.name = 'Dinocephalosaurus body pigmentation'
 # The source material culls its backfaces, which is right for a closed shell and wrong for this
 # one: cutting the jaw off leaves both halves open along the mouth, so a culled skin is a hole an
-# open gape looks straight out of. The lining below is what an open mouth is meant to show; this is
-# the backstop under it, and it costs the runtime nothing but a little overdraw inside the head.
+# open gape looks straight out of. There is no lining on this head (see the mouth section below):
+# the inside of the skin **is** what an open mouth shows here, so the skin is double-sided, and it
+# costs the runtime nothing but a little overdraw inside the head.
 mat.use_backface_culling = False
 bs = mat.node_tree.nodes.get('Principled BSDF')
 layer = auth.data.color_attributes.new(name='Color', type='FLOAT_COLOR', domain='POINT')
@@ -733,29 +737,29 @@ for n, (p, parent) in B.items():
     eb = arm.edit_bones.new(n); eb.head = tx(p); eb.tail = eb.head + Vector((0, .16, 0))
     if parent: eb.parent = arm.edit_bones[parent]
 bpy.ops.object.mode_set(mode='OBJECT')
-influences = []
+# The mandible is skinned *into* the head rather than rigid against it: one field over both parts,
+# the throat under the hinge following the jaw and the shell ramping to full jaw over `band` from
+# the cut rim, so the two copies of every rim vertex carry the same weights and the cut cannot open
+# (`T.jaw_junction`; `tools/triassic/lag.mjs` measures the seam it closes).
+influences, JUNCTION = [], {}
 for o in [auth, puppet]:
-    for n in B: o.vertex_groups.new(name=n)
-    for v in o.data.vertices:
-        w = weights(v.co); influences.append(len(w))
-        for n, val in w.items(): o.vertex_groups[n].add([v.index], val, 'REPLACE')
-    for v in o.data.vertices: v.co = tx(v.co)
-    for p in o.data.polygons: p.use_smooth = True
-    mod = o.modifiers.new('Shared articulated skeleton', 'ARMATURE'); mod.object = rig; o.parent = rig
-for o in parts['lower jaw'].values():
-    g = o.vertex_groups.new(name='jaw'); g.add(list(range(len(o.data.vertices))), 1., 'REPLACE')
-    for v in o.data.vertices: v.co = tx(v.co)
-    for p in o.data.polygons: p.use_smooth = True
-    mo = o.modifiers.new('Rigid jaw', 'ARMATURE'); mo.object = rig; o.parent = rig
+    shell = parts['lower jaw'][o.name]
+    for part in (o, shell):
+        for n in B: part.vertex_groups.new(name=n)
+    body_w, shell_w, JUNCTION[o.name] = jaw_junction(
+        o, shell, [weights(v.co) for v in o.data.vertices], B['jaw'][0],
+        rear=lambda p: abs(head_local(p)[0] - HINGE_A) < 1e-5,
+        upper_jaw=lambda p: head_local(p)[0] > HINGE_A and head_local(p)[1] >= seam_n(head_local(p)[0]) - 1e-6,
+        axis=tuple(HEAD_DIR), down=tuple(-HEAD_UP))
+    for part, field in ((o, body_w), (shell, shell_w)):
+        for v in part.data.vertices:
+            w = field[v.index]; influences.append(len(w))
+            for n, val in w.items(): part.vertex_groups[n].add([v.index], val, 'REPLACE')
+        for v in part.data.vertices: v.co = tx(v.co)
+        for p in part.data.polygons: p.use_smooth = True
+        mod = part.modifiers.new('Shared articulated skeleton' if part is o else 'Mandible into the head', 'ARMATURE'); mod.object = rig; part.parent = rig
 
 # ---- mouth interior: the fang trap ---------------------------------------------------------------
-mouthmat = bpy.data.materials.new('Dinocephalosaurus mouth interior'); mouthmat.use_nodes = True
-mbs = mouthmat.node_tree.nodes.get('Principled BSDF')
-mbs.inputs['Base Color'].default_value = (.090, .038, .034, 1); mbs.inputs['Roughness'].default_value = .62
-mouthmat.diffuse_color = (.090, .038, .034, 1)
-# Wound inwards and the one material here that culls: what an open mouth shows is the far wall of
-# the lumen, and the near wall has to be got out of the way so the teeth between them are seen.
-mouthmat.use_backface_culling = True
 toothmat = bpy.data.materials.new('Dinocephalosaurus fangs'); toothmat.use_nodes = True
 tbs = toothmat.node_tree.nodes.get('Principled BSDF')
 tbs.inputs['Base Color'].default_value = (.78, .74, .64, 1); tbs.inputs['Roughness'].default_value = .30
@@ -774,47 +778,26 @@ def rigid(o, bonename, material):
 def head_point(a, n, b): return HEAD_P0 + HEAD_DIR * a + HEAD_UP * n + HEAD_SIDE * b
 
 
-# One lining rather than a palate and a floor. Two separate closed tubes, one rigid on the skull and
-# one rigid on the jaw, part the moment the jaw swings and leave a wedge at the back of the mouth
-# that a single-sided skin is seen straight out through -- Placodus' fault exactly. This is one sac
-# on the head's own radius profile, *skinned*: the roof follows the skull, the floor follows the
-# jaw, and the wall between them stretches, so no opening the clips reach can open it.
-LINING_RINGS, LINING_RING = 26, 14
-LIN_BACK = HINGE_A - .005
-LIN_FRONT = HEAD_LEN - .004
-
-
-def lining_section(a, u):
-    # Drawn in at both ends so the sac closes rather than ending in a ring standing in open flesh.
-    e = smooth(u / .12) * smooth((1. - u) / .07)
-    return .55 * head_r(a) * (.16 + .84 * e), .30 * head_r(a) * (.20 + .80 * e)
-
-
-verts = []; faces = []; lin_an = []
-for i in range(LINING_RINGS):
-    u = i / (LINING_RINGS - 1.); a = LIN_BACK + (LIN_FRONT - LIN_BACK) * u
-    wy, wz = lining_section(a, u)
-    for j in range(LINING_RING):
-        th = j * 2 * pi / LINING_RING
-        verts.append(tx(head_point(a, seam_n(a) + wz * sin(th), wy * cos(th))))
-        lin_an.append(sin(th))
-for i in range(LINING_RINGS - 1):
-    for j in range(LINING_RING):
-        p0 = i * LINING_RING + j; p1 = i * LINING_RING + (j + 1) % LINING_RING
-        faces.append((p0, p1, p1 + LINING_RING, p0 + LINING_RING))
-faces.append(tuple(reversed(range(LINING_RING))))
-faces.append(tuple(range((LINING_RINGS - 1) * LINING_RING, LINING_RINGS * LINING_RING)))
-me = bpy.data.meshes.new('Mouth lining'); me.from_pydata(verts, [], faces); me.update()
-_lin = bpy.data.objects.new('Mouth lining', me); bpy.context.collection.objects.link(_lin)
-_lin.location = (0, 0, 0); _lin.data.materials.clear(); _lin.data.materials.append(mouthmat)
-for n in ['skull', 'jaw']: _lin.vertex_groups.new(name=n)
-for v in _lin.data.vertices:
-    t = .5 + .5 * lin_an[v.index]                      # 1 at the roof, 0 at the floor
-    _lin.vertex_groups['skull'].add([v.index], smooth(t), 'REPLACE')
-    _lin.vertex_groups['jaw'].add([v.index], 1. - smooth(t), 'REPLACE')
-_lin.parent = rig; _lin.modifiers.new('Mouth lining', 'ARMATURE').object = rig
-for p in _lin.data.polygons: p.use_smooth = True
-oralparts.append(_lin)
+# **No lining, no palate, no floor.** One sac whose wall stretched between the two jaws stood here
+# (26 stations by 14, roof on the skull, floor on the jaw, 364 vertices every one of them blended
+# between the two bones), and it was the era's mouthful of gum on this head as on every other. The
+# first question `CLAUDE.md` asks of a mouth is whether it needs filling at all, and on this head
+# the answer is measured rather than assumed: `gape-solid.py` at the peak gape of `Bite`, `Attack`,
+# `Heavy`, `Eat` and `NeckStrike`, with and without the backface-cull shim, against the shipped
+# body with the sac in place, with the sac stripped out, and with the sac and the hinge tissue
+# both stripped out.
+#
+#   sac in place ................ 0 px seen through the body at every shot
+#   sac removed ................. 0, 2, 3, 1, 1 px (tolerance 12)
+#   sac and hinge tissue removed  98, 87, 113, 50, 101 px
+#
+# So the sac closed nothing: what the cut leaves open is the head's cross-section at the hinge --
+# the back wall of the mouth, which a plane cut through a closed head takes away -- and the seated
+# hinge tissue below already fills it, as it does on every jawed body in the era. This generation
+# paints its lip on a closed snout and models no cavity (the normals-cast method found zero
+# vertices; the lip was read off the albedo), so there is no lumen wall for a gape to open onto:
+# what an open mouth shows is the inside of the skin, double-sided, and the fangs between the jaws.
+# The verdict and its counts are on the record in `docs/triassic/throat-repairs/oral-verdicts.md`.
 # The fang trap: a long slender snout of interlocking conical teeth, the front pair the largest.
 for label, lift, bonename, sgnz in [('Upper fangs', .0026, 'skull', -1), ('Lower fangs', -.0024, 'jaw', 1)]:
     verts = []; faces = []
@@ -1268,7 +1251,15 @@ report = {'sourceSha256': hashlib.sha256(open(RAW, 'rb').read()).hexdigest(),
                        'length': round(HEAD_LEN, 4), 'profile': [[round(a, 3), round(r, 4)] for a, r in HEAD_PROFILE],
                        'hingeAlongHead': round(HINGE_A, 4)},
           'oralPartDepthInsideHead': oral_depth,
+          'oralGeometry': {'lining': None, 'palate': None, 'floor': None,
+                           'verdict': 'neither: the sac closed nothing the seated hinge tissue was not '
+                                      'already closing; see docs/triassic/throat-repairs/oral-verdicts.md',
+                           'parts': [o.name for o in oralparts]},
           'normalizedWeights': True, 'rootStable': True, 'noScaleChannels': True}
+# The figures that cannot be measured inside the build -- the strict-cull gape counts, the skin
+# figure -- are kept in qa.json and folded in here so a rebuild carries them.
+_qa = os.path.join(HERE, 'qa.json')
+report['postBuildQA'] = json.load(open(_qa)) if os.path.exists(_qa) else None
 open(os.path.join(HERE, 'validation.json'), 'w').write(json.dumps(report, indent=2))
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(LOCAL, 'dinocephalosaurus-paired.blend'))
 print('DINOCEPHALOSAURUS_REPORT', json.dumps({k: v for k, v in report.items() if k != 'boundsAt13Phases'}))

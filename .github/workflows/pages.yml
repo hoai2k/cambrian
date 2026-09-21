@@ -29,7 +29,18 @@ jobs:
       - run: npm run devonian:check
       - run: npm run triassic
       - run: npm run eras
+      # The specimen viewer's five editors, each a pure sub-second check of the document it
+      # exports: reshape a body, lengthen a run of one, turn a run of one, aim a mouth cut, name
+      # a region. Only the sculpt one was here, which left the other four as guards with a script
+      # nobody ran on a push — the exact thing the note in tools/flora-test.ts is about.
       - run: npm run sculpt
+      - run: npm run stretch
+      - run: npm run bend
+      - run: npm run mouth
+      - run: npm run mark
+      # And the pane they all sit beside: what the Animations pane plays when a body arrives, which
+      # is sticky across a change of creature and so is a decision rather than a default.
+      - run: npm run playback
       # The rig tests: creature anchors and the attachment pass, read off the shipped GLBs.
       # They need no browser and no network, only the creature assets already in the repo,
       # and take about eight seconds together — cheap enough that a rig regression can no

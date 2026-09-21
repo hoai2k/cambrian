@@ -69,8 +69,9 @@ const travelOf = (rows, n) => {
 await MeshoptDecoder.ready;
 globalThis.self = globalThis;
 globalThis.createImageBitmap = async () => ({ width: 2048, height: 2048, close() {} });
-{
-  const bytes = fs.readFileSync(`${base}.glb`);
+report.rigidShellModels = [];
+for (const suffix of ['', '.puppet']) {
+  const bytes = fs.readFileSync(`${base}${suffix}.glb`);
   const gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
     .parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
   const mixer = new THREE.AnimationMixer(gltf.scene);
@@ -93,11 +94,23 @@ globalThis.createImageBitmap = async () => ({ width: 2048, height: 2048, close()
   };
   const pure = [];
   let nearPure = 0;
+  let anatomicalVertices = 0, contaminatedVertices = 0;
+  const centre = validation.coil.centre, radius = validation.coil.outerWhorlRadius;
+  const position = mesh.geometry.attributes.position;
   for (let v = 0; v < ji.count; v++) {
     const w = shellWeight(v);
     if (w > 0.999) nearPure++;
-    if (w >= 1 - 1e-6 && pure.length < 400) pure.push(v);
+    // The coil selection is geometric, independent of the weights being tested.
+    const y = -position.getZ(v) / 5, z = position.getY(v) / 5;
+    const inShell = (y >= centre[1] - radius * .64 || z >= centre[2] + radius * .18)
+      && Math.hypot(y - centre[1], z - centre[2]) <= radius + .019;
+    if (inShell) {
+      anatomicalVertices++;
+      if (w < 1 - 1e-6) contaminatedVertices++;
+      pure.push(v);
+    }
   }
+  assert.equal(contaminatedVertices, 0, 'anatomical shell has moving head/arm weights');
   assert(pure.length > 100, `the shell must own a solid block of skin outright (${pure.length})`);
   const p = new THREE.Vector3();
   const snapshot = () => {
@@ -132,7 +145,7 @@ globalThis.createImageBitmap = async () => ({ width: 2048, height: 2048, close()
       });
     }
   }
-  report.rigidShell = { pureShellVertices: pure.length, nearPureShellVertices: nearPure,
+  report.rigidShell = { anatomicalVertices, contaminatedVertices, pureShellVertices: pure.length, nearPureShellVertices: nearPure,
                         pairsChecked: pairs.length,
                         worstPairwiseDistanceChange: worst, worstAt: worstClip,
                         shellHasNoAnimationChannel:
@@ -140,6 +153,7 @@ globalThis.createImageBitmap = async () => ({ width: 2048, height: 2048, close()
   assert(report.rigidShell.shellHasNoAnimationChannel, 'the shell must carry no animation channel');
   // 5 engine units of body: 1e-5 is two millionths of it, which is packing noise and nothing else.
   assert(worst < 1e-5, `the shell flexes by ${worst} at ${worstClip}`);
+  report.rigidShellModels.push({ variant: suffix || 'authored', ...report.rigidShell });
 }
 
 // --- 2. the crown, and the funnel ---------------------------------------------------------------

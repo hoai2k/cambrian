@@ -8,12 +8,13 @@ import { FeedbackButton } from './Feedback';
 import { PLAYER_COLORS } from '../render/engine';
 import { PLAYABLE as CREATURES, authoredCreature, creature, naturalSizing, realCm, type CreatureId } from '../sim/creatures';
 import type { Mode, PlayerSetup } from '../sim/types';
-import { CheckIcon, ChevronDown, Emblem, KeyboardIcon, PadIcon } from './icons';
+import { CheckIcon, ChevronDown, Emblem, KeyboardIcon, PadIcon, TouchIcon } from './icons';
 import { appBase } from '../shared/base';
 import { btn, fillControls, key, type Scheme } from '../shared/controls';
 import { fillOf, ladderName, rungOf } from '../sim/ladder';
 import { gridColumns, rosterGrid, sameSlot, type ExtraId, type Slot } from './roster-grid';
 import { ERA_NAME, type EraId } from '../content/visitors';
+import { TEXT } from '../shared/text';
 
 interface Props {
   players: PlayerSetup[]; mode: Mode; modes: Mode[]; modeInfo: Record<Mode, { name: string; blurb: string; players: string }>;
@@ -33,6 +34,12 @@ interface Props {
   extras: ExtraId[];
   /** Press one of them, for the seat that is on it. */
   onExtra: (i: number, id: ExtraId) => void;
+  /**
+   * The most columns this window has room for (`rosterCap`). `Infinity` on anything roomy, so the
+   * grid lays out exactly as it always did; on a phone it turns the overflow into scrollable rows
+   * rather than into tiles too small to read.
+   */
+  maxCols: number;
   /** How many animals this device has earned from the other games. */
   visitorCount: number;
   /**
@@ -78,7 +85,7 @@ function BrandHeader({ onBack }: { onBack: () => void }) {
   const toggle = () => setOpen((o) => !o);
   return (
     <div className="brand">
-      <button className="brand-home" onClick={onBack} aria-label={`Back to the ${ACTIVE_ERA.title} title screen`}>
+      <button className="brand-home" onClick={onBack} aria-label={T.backToTitle(ACTIVE_ERA.title)}>
         <Emblem size={34} />
       </button>
       {/* Title and chevron are one control, so they light up together: the chevron is a mark on the
@@ -88,12 +95,12 @@ function BrandHeader({ onBack }: { onBack: () => void }) {
       <div className={`brand-titles ${open ? 'open' : ''}`} ref={wrap}>
         <button className="brand-title" onClick={sibling ? toggle : undefined} disabled={!sibling}
           aria-expanded={sibling ? open : undefined} aria-haspopup={sibling ? 'true' : undefined}
-          aria-label={sibling ? `${ACTIVE_ERA.title} — choose which game to play` : ACTIVE_ERA.title}>
+          aria-label={sibling ? T.chooseGame(ACTIVE_ERA.title) : ACTIVE_ERA.title}>
           <img className="header-logo" src={`${ASSETS}${ACTIVE_ERA.assets.logo}`} alt="" />
           {sibling && <ChevronDown width={18} height={18} aria-hidden="true" />}
         </button>
         {open && sibling && (
-          <nav className="era-menu" aria-label="Choose a game">
+          <nav className="era-menu" aria-label={T.gameMenuLabel}>
             {/* Straight to the other game's roster, not its title screen: this is a picker, and
                 landing back on PRESS START would undo the choice the player just made. */}
             {siblings.map((s) => (
@@ -185,19 +192,17 @@ function FitName({ name }: { name: string }) {
 const stat = (v: number, max: number) => Math.round((v / max) * 5);
 export { gridColumns };
 const ASSETS = appBase();
+const T = TEXT.select, C = TEXT.select.crew, B = TEXT.select.best;
 
 /** What each of the grid's buttons says. Short, because the tile is smaller than a card. */
 const EXTRA_LABEL: Record<ExtraId, { name: string; glyph: string; title: string }> = {
-  random: { name: 'Random', glyph: '?', title: 'Random · pick a creature for me' },
-  // **Not "animals you have earned".** Two of the animals behind this button were never earned by
-  // anyone: Archelon and Mosasaurus are Late Cretaceous, belong to no game's roster, and stand here
-  // for every player from the day their bodies ship. The label has to be true of both kinds.
-  visitors: { name: 'Visitors', glyph: '★', title: 'Visitors · animals from outside this sea — standing guests, and any you have taken to the top elsewhere' },
+  random: { name: T.randomName, glyph: '?', title: T.randomTitle },
+  visitors: { name: T.visitorsName, glyph: '★', title: T.visitorsTitle },
 };
 
 export function SelectScreen(p: Props) {
   const s = p.scheme;
-  const grid = rosterGrid(CREATURES.map((c) => c.id), p.extras);
+  const grid = rosterGrid(CREATURES.map((c) => c.id), p.extras, p.maxCols);
   const cols = grid.cols;
   const compact = p.players.length >= 3;
   // Controllers the game can see that have not joined yet, and joined players whose controller
@@ -207,10 +212,10 @@ export function SelectScreen(p: Props) {
   /** Nobody is on the keyboard yet, so it is still a way in. Only ever one player deep. */
   const keyboardFree = !p.players.some((pl) => typeof pl.device === 'string');
   return (
-    <section className="select" aria-label="Choose your creature">
+    <section className="select" aria-label={T.screenLabel}>
       <header className="select-header">
         <BrandHeader onBack={p.onBack} />
-        <div className="mode-picker" role="tablist" aria-label="Game mode">
+        <div className="mode-picker" role="tablist" aria-label={T.modePickerLabel}>
           {p.modes.map((m, i) => (
             <button key={m} role="tab" aria-selected={p.mode === m} className={`mode-chip ${p.mode === m ? 'active' : ''}${i === p.modeFocus ? ' pad-focus' : ''}`} onClick={() => p.onMode(m)}>
               <img className="mode-art" src={`${ASSETS}${assetPaths.ui(`mode-${m}.webp`)}`} alt="" />
@@ -218,12 +223,12 @@ export function SelectScreen(p: Props) {
             </button>
           ))}
         </div>
-        <p className="mode-blurb">{p.modeInfo[p.mode].blurb} <span className="dim">{btn('modePrev', s)} / {btn('modeNext', s)} switch modes.</span></p>
+        <p className="mode-blurb">{p.modeInfo[p.mode].blurb} <span className="dim">{T.modeSwitchHint(btn('modePrev', s), btn('modeNext', s))}</span></p>
       </header>
 
       <div className="pick-layout">
         {/* ---- roster grid ---- */}
-        <div className={`roster-grid ${cols >= 6 ? 'dense' : ''}`} role="listbox" aria-label="Creatures" style={{ ['--cols' as string]: cols }}>
+        <div className={`roster-grid ${cols >= 6 ? 'dense' : ''}`} role="listbox" aria-label={T.rosterLabel} style={{ ['--cols' as string]: cols }}>
           {CREATURES.map((c) => {
             const hovering = p.players.map((pl, i) => ({ pl, i })).filter(({ pl }) => !pl.cursor && pl.creature === c.id);
             const lockedBy = hovering.filter(({ pl }) => pl.ready);
@@ -248,7 +253,7 @@ export function SelectScreen(p: Props) {
                 <span className="cell-rings">
                   {hovering.map(({ i, pl }) => <i key={i} style={{ ['--c' as string]: PLAYER_COLORS[i], ['--k' as string]: i }} className={pl.ready ? 'ring locked' : 'ring'} />)}
                 </span>
-                {lockedBy.map(({ i }) => <span key={'b' + i} className="lock-badge" style={{ background: PLAYER_COLORS[i] }}>P{i + 1}</span>)}
+                {lockedBy.map(({ i }) => <span key={'b' + i} className="lock-badge" style={{ background: PLAYER_COLORS[i] }}>{TEXT.common.playerChip(i + 1)}</span>)}
               </button>
             );
           })}
@@ -290,49 +295,58 @@ export function SelectScreen(p: Props) {
               <article key={i} className={`crew-card ${pl.ready ? 'ready' : ''}`} style={{ ['--player' as string]: PLAYER_COLORS[i] }}>
                 {pl.ready && <span key={'fx' + pl.creature} className="lock-fx" aria-hidden="true" />}
                 <div className="crew-top">
-                  <span className="player-chip">P{i + 1}</span>
-                  <span className="device">{pl.device === 'keyboard' ? <><KeyboardIcon width={16} height={16} /> Keyboard 1</> : pl.device === 'keyboard2' ? <><KeyboardIcon width={16} height={16} /> Keyboard 2</> : <><PadIcon width={16} height={16} /> Controller {(pl.device as number) + 1}{!p.padIndices.includes(pl.device as number) && <em className="gone"> · disconnected</em>}</>}</span>
-                  <button className="remove" aria-label={`Remove player ${i + 1}`} onClick={() => p.onRemove(i)}>×</button>
+                  <span className="player-chip">{TEXT.common.playerChip(i + 1)}</span>
+                  {/* Which thing this seat is steered by. The touch seat has to be named as itself:
+                      it used to fall through to the controller branch, which drew a pad icon, called
+                      it "Controller touch1" and — since `padIndices` never contains a string — marked
+                      it *disconnected*, on the one device that cannot be. */}
+                  <span className="device">{
+                    pl.device === 'keyboard' ? <><KeyboardIcon width={16} height={16} /> {C.keyboard1}</>
+                      : pl.device === 'keyboard2' ? <><KeyboardIcon width={16} height={16} /> {C.keyboard2}</>
+                      : pl.device === 'touch' ? <><TouchIcon width={16} height={16} /> {C.touch}</>
+                      : <><PadIcon width={16} height={16} /> {C.controller((pl.device as number) + 1)}{!p.padIndices.includes(pl.device as number) && <em className="gone">{C.disconnected}</em>}</>
+                  }</span>
+                  <button className="remove" aria-label={C.removePlayer(i + 1)} onClick={() => p.onRemove(i)}>×</button>
                 </div>
                 <div className="hero">
                   {/* A seat drawn in another palette because it is the second on this creature shows
                       that palette here, so a player knows which animal in the water is theirs before
                       the match starts. Falls back to the authored render where no portrait has been
                       baked for the scheme, which is most of them. */}
-                  <CreaturePortrait key={`${def.id}:${pl.scheme ?? ''}`} creatureId={def.id} kind="select" schemeId={pl.scheme} assetBase={ASSETS} alt={`${def.name} reconstruction`} draggable={false} />
+                  <CreaturePortrait key={`${def.id}:${pl.scheme ?? ''}`} creatureId={def.id} kind="select" schemeId={pl.scheme} assetBase={ASSETS} alt={C.portraitAlt(def.name)} draggable={false} />
                 </div>
                 <CopyBox>
-                  <span className="role">{def.ground ? 'SEAFLOOR' : 'SWIMMER'} · {def.role}</span>
+                  <span className="role">{def.ground ? TEXT.common.seafloor : TEXT.common.swimmer} · {def.role}</span>
                   <h2>{def.name}</h2>
-                  <small className="provenance">{def.kind && <b className="kind">{def.kind}</b>}{def.species} · {def.provenance ?? def.locality ?? 'Burgess Shale'}{cm != null && <> · <b className="real-size">{cm} cm</b></>}</small>
+                  <small className="provenance">{def.kind && <b className="kind">{def.kind}</b>}{def.species} · {def.provenance ?? def.locality ?? C.defaultLocality}{cm != null && <> · <b className="real-size">{C.realSize(cm)}</b></>}</small>
                   <p className="tagline">{def.tagline}</p>
                   {/* A visitor is not this game's animal and does not carry this game's record, so
                       the growth badge has nothing to say about it. What it says instead is where the
                       animal is from and how to look through the others you have earned. */}
                   {pl.visitorScale
-                    ? <p className="visitor-note"><b>VISITOR</b> · {p.visitorOrigin?.(pl.creature) ?? ERA_NAME.devonian} · left / right for the others</p>
+                    ? <p className="visitor-note">{C.visitorNote(p.visitorOrigin?.(pl.creature) ?? ERA_NAME.devonian)}</p>
                     : <BestRun mark={p.best[def.id]} carrying={!!p.carry[i]} rise={p.mode === 'rise'} scheme={s} onToggle={() => p.onCarry(i)} />}
                   {!compact && (
                     <>
                       <div className="stats">
-                        <Stat label="Speed" v={stat(bars.speed * bars.burst, 14.6)} />
-                        <Stat label="Power" v={stat(bars.heavy.damage, 26)} />
-                        <Stat label="Armor" v={stat(bars.hp * (1 + bars.defense), 233)} />
-                        <Stat label="Agility" v={stat(bars.agility + bars.turnRate, 8.6)} />
+                        <Stat label={C.statSpeed} v={stat(bars.speed * bars.burst, 14.6)} />
+                        <Stat label={C.statPower} v={stat(bars.heavy.damage, 26)} />
+                        <Stat label={C.statArmor} v={stat(bars.hp * (1 + bars.defense), 233)} />
+                        <Stat label={C.statAgility} v={stat(bars.agility + bars.turnRate, 8.6)} />
                       </div>
                       {def.kindNote && <p className="kind-note">{def.kindNote}</p>}
                       <dl className="kit">
                         <div><dt>{key('heavy', s)}</dt><dd>{HEAVY_SPECIALS.has(def.ability) ? def.abilityName : def.heavy.name}</dd></div>
-                        <div><dt>{key('guard', s)}</dt><dd>{DEFENSIVE_SPECIALS.has(def.ability) ? def.abilityName : def.canGuard ? 'Block / parry' : 'Evade'}</dd></div>
+                        <div><dt>{key('guard', s)}</dt><dd>{DEFENSIVE_SPECIALS.has(def.ability) ? def.abilityName : def.canGuard ? C.blockParry : C.evade}</dd></div>
                         <div><dt>{key('ability', s)}</dt><dd><b>{RULES?.ySpecial(def.id)?.name ?? hideLabel(def.id)}.</b> {fillControls(RULES?.ySpecial(def.id)?.desc ?? hideDescription(def.id), s)}</dd></div>
-                        <div><dt>+</dt><dd>{def.passive}</dd></div>
-                        <div><dt>−</dt><dd>{def.weakness}</dd></div>
+                        <div><dt>{C.passiveMark}</dt><dd>{def.passive}</dd></div>
+                        <div><dt>{C.weaknessMark}</dt><dd>{def.weakness}</dd></div>
                       </dl>
                     </>
                   )}
                 </CopyBox>
                 <button className="ready-button" aria-pressed={pl.ready} onClick={() => p.onReady(i)}>
-                  {pl.ready ? <><CheckIcon width={18} height={18} /> LOCKED IN · {key('confirm', s).toUpperCase()} DIVES</> : `LOCK IN  ·  ${key('confirm', s).toUpperCase()}`}
+                  {pl.ready ? <><CheckIcon width={18} height={18} /> {C.lockedIn(key('confirm', s).toUpperCase())}</> : C.lockIn(key('confirm', s).toUpperCase())}
                 </button>
               </article>
             );
@@ -345,7 +359,7 @@ export function SelectScreen(p: Props) {
              */
             <div className={`join-card ${waiting.length ? 'waiting' : ''}`}>
               <PadIcon width={32} height={32} />
-              <p>Press <b>{btn('confirm', 'pad')}</b>{keyboardFree && <> or <b>{btn('confirm', 'kbm')}</b></>} to join</p>
+              <p>{keyboardFree ? T.joinPadOrKeyboard(btn('confirm', 'pad'), btn('confirm', 'kbm')) : T.joinPad(btn('confirm', 'pad'))}</p>
             </div>
           )}
         </div>
@@ -357,7 +371,7 @@ export function SelectScreen(p: Props) {
             unless a feedback endpoint was compiled in — see src/shared/feedback.ts. */}
         <FeedbackButton />
         <div className="start-wrap">
-          <button className={`start-button ${p.allReady ? 'focused' : ''}`} disabled={!p.allReady} onClick={p.onStart}>DIVE IN  ·  {key('confirm', s).toUpperCase()}</button>
+          <button className={`start-button ${p.allReady ? 'focused' : ''}`} disabled={!p.allReady} onClick={p.onStart}>{T.dive(key('confirm', s).toUpperCase())}</button>
         </div>
       </footer>
     </section>
@@ -378,16 +392,14 @@ function BestRun({ mark, carrying, rise, scheme, onToggle }: { mark: number | un
   const next = ladderName(rungOf(mark) + 1);
   // A part-grown mark is worth saying out loud: it is the difference between starting over and
   // starting a short swim from where you stopped.
-  const badge = part > 0 ? `${name.toUpperCase()} · PART GROWN` : name.toUpperCase();
-  const title = part > 0
-    ? `Furthest grown in ${MODE_NAME}: reached ${next}, but did not hold it. You start as a ${name} already ${Math.round(part * 100)}% of the way back.`
-    : `Furthest grown in ${MODE_NAME}: ${name}.`;
+  const badge = part > 0 ? B.partGrown(name) : B.whole(name);
+  const title = part > 0 ? B.partTitle(MODE_NAME, next, name, Math.round(part * 100)) : B.title(MODE_NAME, name);
   return (
     <div className={`best-run ${carrying ? 'carrying' : ''}`}>
-      <span className="best-badge" title={title}><b>BEST</b> {badge}</span>
+      <span className="best-badge" title={title}><b>{B.badge}</b> {badge}</span>
       {rise && (
         <button className="carry-toggle" aria-pressed={carrying} onClick={onToggle} title={title}>
-          {carrying ? `Continuing as ${name}${part > 0 ? ', part grown' : ''}` : `Starting as ${ladderName(0)}`}
+          {carrying ? B.continuing(name, part > 0) : B.starting(ladderName(0))}
           <kbd>{scheme === 'pad' ? key('light', scheme) : 'C'}</kbd>
         </button>
       )}
@@ -395,7 +407,7 @@ function BestRun({ mark, carrying, rise, scheme, onToggle }: { mark: number | un
   );
 }
 /** The mode the record belongs to, in the era's own words. */
-const MODE_NAME = ACTIVE_ERA.modes.find((m) => m.id === 'rise')?.name ?? 'Rise';
+const MODE_NAME = ACTIVE_ERA.modes.find((m) => m.id === 'rise')?.name ?? TEXT.sim.board.riseTitle;
 
 function Stat({ label, v }: { label: string; v: number }) {
   return (

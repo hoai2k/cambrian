@@ -1,0 +1,134 @@
+{
+  "schema": "mouth-cut/1",
+  "id": "mixosaurus",
+  "model": "assets/triassic/creatures/mixosaurus.glb",
+  "sha256": "c2cade2c239b54291b4d3229249d2473ad804ca4055756d70ce7b24f039fa1ea",
+  "sha256Source": "measured",
+  "appliesTo": "built",
+  "authoredAt": "2026-09-20T21:50:00.773Z",
+  "note": "",
+  "creature": {
+    "key": "triassic:mixosaurus",
+    "id": "mixosaurus",
+    "collection": "triassic",
+    "vertices": 11917,
+    "rigged": true
+  },
+  "frame": {
+    "axis": "z",
+    "forward": 1,
+    "up": "y",
+    "source": "mouth",
+    "note": "Model root frame, unscaled: the file's own coordinates with the scene graph flattened. The body runs along z; the head is at the high end."
+  },
+  "seat": {
+    "source": "manual"
+  },
+  "hinge": {
+    "depth": 0.757501,
+    "headFraction": 0.1894,
+    "centre": [
+      -0.004922,
+      0.027416,
+      1.033836
+    ],
+    "axis": [
+      1,
+      0,
+      0
+    ]
+  },
+  "plane": {
+    "point": [
+      -0.004922,
+      0.027416,
+      1.033836
+    ],
+    "normal": [
+      0,
+      0.993058,
+      -0.117629
+    ],
+    "forward": [
+      0,
+      0.117629,
+      0.993058
+    ],
+    "pitch": 0.11790184635946056,
+    "yaw": 0,
+    "roll": 0,
+    "pitchDegrees": 6.755,
+    "yawDegrees": 0,
+    "rollDegrees": 0
+  },
+  "sides": {
+    "mandible": 722,
+    "skull": 11195,
+    "total": 11917
+  },
+  "bounds": {
+    "length": 4,
+    "height": 1.6318758726119995,
+    "width": 2.318321943283081,
+    "axisMin": -2.208662509918213,
+    "axisMax": 1.791337490081787,
+    "lateralMid": 0.0335543155670166,
+    "upMid": 0.02668631076812744
+  },
+  "head": {
+    "height": 0.31439105048775673,
+    "width": 0.40093526244163513,
+    "upMid": 0.11172784678637981,
+    "lateralMid": -0.04535645246505737
+  },
+  "rule": "A vertex is on the mandible when (v − plane.point) · plane.normal < 0 and (v − plane.point) · plane.forward > 0: below the cut plane and ahead of the hinge. hinge.axis is the pivot the jaw swings about, through hinge.centre. See docs/viewer-mouth.md.",
+  "mouth": {
+    "version": 1,
+    "key": "triassic:mixosaurus",
+    "id": "mixosaurus",
+    "collection": "triassic",
+    "model": "assets/triassic/creatures/mixosaurus.glb",
+    "frame": {
+      "axis": "z",
+      "forward": 1,
+      "up": "y"
+    },
+    "frameSource": "mouth",
+    "vertices": 11917,
+    "rigged": true,
+    "box": {
+      "lo": [
+        -1.125606656074524,
+        -0.7892516255378723,
+        -2.208662509918213
+      ],
+      "hi": [
+        1.1927152872085571,
+        0.8426242470741272,
+        1.791337490081787
+      ]
+    },
+    "bounds": {
+      "length": 4,
+      "height": 1.6318758726119995,
+      "width": 2.318321943283081,
+      "axisMin": -2.208662509918213,
+      "axisMax": 1.791337490081787,
+      "lateralMid": 0.0335543155670166,
+      "upMid": 0.02668631076812744
+    },
+    "head": {
+      "height": 0.31439105048775673,
+      "width": 0.40093526244163513,
+      "upMid": 0.11172784678637981,
+      "lateralMid": -0.04535645246505737
+    },
+    "seatSource": "manual",
+    "depth": 0.7575014236579212,
+    "up": 0.02741638531944801,
+    "lateral": -0.004922262613257573,
+    "pitch": 0.11790184635946056,
+    "yaw": 0,
+    "roll": 0
+  }
+}

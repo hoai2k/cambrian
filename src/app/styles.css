@@ -259,7 +259,7 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 /* The grip. Centred and low, under the reticle rather than over it, because a player who has
    hold of something is looking at the thing they have hold of. Loud enough that its arrival is
    the answer to "did that work"; gone the instant the grip is. */
-.grip-panel { position: absolute; left: 50%; bottom: 8.2em; transform: translateX(-50%); display: grid; gap: .3em; justify-items: center; padding: .55em 1em; border-radius: 1em; background: rgba(6,22,28,.72); backdrop-filter: blur(10px); border: 1px solid currentColor; min-width: 13em; max-width: 92%; text-align: center; pointer-events: none; animation: rise-in .25s both; }
+.grip-panel { position: absolute; left: 50%; bottom: 8.2em; transform: translateX(-50%); display: grid; gap: .3em; justify-items: center; padding: .55em 1em; border-radius: 1em; background: rgba(6,22,28,.72); backdrop-filter: blur(10px); border: 1px solid currentColor; min-width: 13em; max-width: 92%; text-align: center; pointer-events: none; animation: rise-in-centred .25s both; }
 .grip-panel b { font: 700 .95em var(--font-display); color: var(--foam); letter-spacing: .06em; }
 .grip-panel span { font-size: .8em; letter-spacing: .06em; color: var(--mist); }
 .grip-panel .bar.grip { width: 100%; height: .35em; border-radius: .2em; background: rgba(238,250,246,.16); overflow: hidden; }
@@ -284,7 +284,7 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .chip.active { border-color: var(--ember); box-shadow: 0 0 18px rgba(255,179,107,.5); }
 .chip.sense.ready .cool { background: #9be9ff; }
 .tally { display: flex; gap: .8em; color: var(--dim); font-size: .8em; letter-spacing: .06em; padding-bottom: .3em; }
-.hint { position: absolute; left: 50%; bottom: 5.4em; transform: translateX(-50%); margin: 0; padding: .6em 1.1em; border-radius: 1em; background: rgba(6,22,28,.72); border: 1px solid rgba(255,179,107,.5); color: var(--foam); font-weight: 700; font-size: 1em; white-space: nowrap; animation: rise-in .4s both; max-width: 90%; text-overflow: ellipsis; overflow: hidden; }
+.hint { position: absolute; left: 50%; bottom: 5.4em; transform: translateX(-50%); margin: 0; padding: .6em 1.1em; border-radius: 1em; background: rgba(6,22,28,.72); border: 1px solid rgba(255,179,107,.5); color: var(--foam); font-weight: 700; font-size: 1em; white-space: nowrap; animation: rise-in-centred .4s both; max-width: 90%; text-overflow: ellipsis; overflow: hidden; }
 .hint.danger { border-color: var(--coral); color: #ffd4da; }
 .marker { position: absolute; width: calc(.7em * var(--s)); height: calc(.7em * var(--s)); transform: translate(-50%, -50%) rotate(45deg); border: 2px solid currentColor; border-radius: 2px; opacity: .8; box-shadow: 0 0 8px currentColor; transition: left .1s linear, top .1s linear; }
 /* Only a mark that is *about* you blinks. It used to be every giant-band body on screen. */
@@ -294,7 +294,7 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .hunter-arrow span { display: inline-block; transform: rotate(90deg); }
 /* Death: a line low on the viewport, not a panel over it. You watch what got you finish the job;
    the screen fades out at the end of the watch, so nothing here needs to cover the picture. */
-.death-note { position: absolute; left: 50%; bottom: 3.6em; transform: translateX(-50%); display: grid; justify-items: center; gap: .15em; text-align: center; pointer-events: none; animation: fade-in .5s both; text-shadow: 0 .08em .5em rgba(0,0,0,.85), 0 0 1.2em rgba(0,0,0,.6); }
+.death-note { position: absolute; left: 50%; bottom: 3.6em; transform: translateX(-50%); display: grid; justify-items: center; gap: .15em; text-align: center; pointer-events: none; animation: fade-in-centred .5s both; text-shadow: 0 .08em .5em rgba(0,0,0,.85), 0 0 1.2em rgba(0,0,0,.6); }
 .death-note b { font: 800 1.35em var(--font-display); letter-spacing: .06em; color: var(--coral); }
 .death-note b i { font-style: normal; font-weight: 600; color: var(--mist); opacity: .85; }
 .death-note span { font-size: .85em; color: var(--mist); opacity: .75; }
@@ -353,7 +353,7 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .hud-quarter .scoreboard { width: min(96%, 20em); font-size: .86em; }
 
 /* A line from the simulation: a turn changing over, a team-mate picked up. */
-.notice { position: absolute; z-index: 5; left: 50%; top: 6.5em; transform: translateX(-50%); margin: 0; padding: .5em 1.1em; border-radius: 1em; background: rgba(6,22,28,.8); border: 1px solid var(--ember); color: var(--foam); font-weight: 700; font-size: .92em; white-space: nowrap; max-width: 92%; overflow: hidden; text-overflow: ellipsis; animation: rise-in .3s both; pointer-events: none; }
+.notice { position: absolute; z-index: 5; left: 50%; top: 6.5em; transform: translateX(-50%); margin: 0; padding: .5em 1.1em; border-radius: 1em; background: rgba(6,22,28,.8); border: 1px solid var(--ember); color: var(--foam); font-weight: 700; font-size: .92em; white-space: nowrap; max-width: 92%; overflow: hidden; text-overflow: ellipsis; animation: rise-in-centred .3s both; pointer-events: none; }
 
 /* The hour of the day, sitting above the radar. */
 .day-phase { position: absolute; right: 1.4em; bottom: 15.4em; display: flex; align-items: center; gap: .45em; padding: .35em .7em .35em .5em; border-radius: 1em; background: rgba(6,22,28,.55); border: 1px solid rgba(238,250,246,.16); color: var(--mist); pointer-events: none; transition: color .6s, border-color .6s, background .6s; }
@@ -410,7 +410,6 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .results-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-right: 4px; }
 .menu-buttons { flex: none; display: grid; gap: 8px; margin-top: 18px; }
 .menu-choices { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.menu-hint { margin: 0; font-size: 12px; color: var(--dim); }
 /* The highlight, for a menu that is steered rather than button-mapped. Deliberately loud: on the
    results screen it is the only thing saying which choice a press will take. */
 .menu-choices .selected { outline: 2px solid var(--ember); outline-offset: 3px; }
@@ -522,6 +521,19 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .portrait-wait { position: absolute; inset: 0; margin: auto; width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(238,250,246,.18); border-top-color: var(--foam); animation: portrait-spin .9s linear infinite, fade-in .2s ease both; pointer-events: none; }
 @keyframes portrait-spin { to { transform: rotate(1turn); } }
 @keyframes rise-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+/*
+ * The same rise, for a panel that is **centred by a transform of its own**.
+ *
+ * `rise-in` ends at `transform: none`, and every one of these carries `fill-mode: both`, so when the
+ * animation finishes its final keyframe keeps overriding the element's own `translateX(-50%)` — for
+ * good. Every centred HUD panel has therefore been sitting with its *left edge* on the middle of the
+ * screen rather than straddling it, ever since it was written. On a wide window a 300-pixel hint
+ * half a screen to the right still looks vaguely central and nobody caught it; on a 390-pixel phone
+ * it runs off the edge, which is what finally showed it. Animating a property an element also sets
+ * statically means the keyframes have to carry the static part too.
+ */
+@keyframes rise-in-centred { from { opacity: 0; transform: translate(-50%, 14px); } to { opacity: 1; transform: translateX(-50%); } }
+@keyframes fade-in-centred { from { opacity: 0; } to { opacity: 1; } }
 @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 @keyframes pulse-mark { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
 @keyframes heartbeat { 0%, 100% { opacity: .75; } 50% { opacity: 1; } }
@@ -588,7 +600,7 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 /* The hunter warning. Named `threat-alert`, not `threat`: the help page's size bands are
    `.band.threat` and friends, and a bare `.threat` rule here absolutely-positioned the word
    "Orange" out of its sentence and dropped it on top of the paragraph above. */
-.threat-alert { position: absolute; top: 5.2em; left: 50%; transform: translateX(-50%); display: flex; gap: .8em; align-items: center; padding: .6em 1em; border-radius: 1em; background: rgba(6,22,28,.72); border: 1px solid rgba(255,138,61,.7); color: var(--foam); max-width: 90%; animation: rise-in .3s both; }
+.threat-alert { position: absolute; top: 5.2em; left: 50%; transform: translateX(-50%); display: flex; gap: .8em; align-items: center; padding: .6em 1em; border-radius: 1em; background: rgba(6,22,28,.72); border: 1px solid rgba(255,138,61,.7); color: var(--foam); max-width: 90%; animation: rise-in-centred .3s both; }
 .threat-alert.hunting { border-color: var(--coral); box-shadow: 0 0 24px rgba(255,75,92,.45); animation: rise-in .3s both, heartbeat .9s ease-in-out infinite; }
 .threat-alert b { display: block; font: 700 .85em var(--font-display); letter-spacing: .12em; }
 .threat-alert span:last-child { display: block; font-size: .9em; color: var(--mist); }
@@ -856,3 +868,345 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .icon-button.pad-focus { outline-offset: 2px; }
 .mode-chip.pad-focus { outline-offset: 2px; }
 .era-switch.pad-focus { outline-offset: 4px; }
+
+/* =======================================================================================
+ * Touch, and small windows
+ * ---------------------------------------------------------------------------------------
+ * Two separate questions, deliberately keyed on two separate classes, because they are not the
+ * same thing and answering them together would be wrong in both directions. `.is-touch` is set when
+ * a finger is what is working the page (`touchFirst`), and `.layout-compact` when the window is
+ * small (`layoutFor`) — a narrow desktop window is compact and gets no thumb pads, and a tablet
+ * held upright is roomy and still gets them.
+ *
+ * Everything before this point in the file may be re-declared later, so this block is last on
+ * purpose: several selectors above are declared twice already and the later one wins.
+ * ======================================================================================= */
+
+/* The browser's own gestures — scroll, rubber-band, double-tap zoom — are the game's gestures here,
+   and double-tap is a *move*, so a page that zoomed on it would take the pounce away. `TouchPlay`
+   also calls `preventDefault`, and this is the half that has to be declarative: a passive listener
+   cannot stop a scroll that has already started. */
+.is-touch, .is-touch .sea-canvas, .is-touch .hud-layer { touch-action: none; }
+/* A long press on glass raises a selection or a context menu over the sea. Only inside the game:
+   the dialogs have real text in them that a player may well want to copy. */
+.is-touch .shell > .sea-canvas, .is-touch .touch-pads { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+
+/* ---------- The pads ---------- */
+/*
+ * One layer, above the HUD and below the menus, click-through except for the controls themselves —
+ * so the sea underneath is still the water a tap lands in. `env(safe-area-inset-*)` keeps the pads
+ * clear of a notch and a home bar; the entry pages carry `viewport-fit=cover`, without which those
+ * insets are always zero.
+ */
+.touch-pads {
+  position: absolute; inset: 0; z-index: 6; pointer-events: none;
+  padding: calc(.6rem + env(safe-area-inset-top)) calc(.6rem + env(safe-area-inset-right))
+           calc(.6rem + env(safe-area-inset-bottom)) calc(.6rem + env(safe-area-inset-left));
+  font-family: var(--font-display);
+}
+.touch-left { position: absolute; left: calc(.9rem + env(safe-area-inset-left)); bottom: calc(1rem + env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: flex-start; gap: .45rem; }
+.touch-pad-row { display: flex; align-items: flex-end; gap: .7rem; }
+/*
+ * A **row**, not a column. Stacked, three buttons are 110 pixels down the right-hand edge, which is
+ * exactly where the radar is — and the radar cannot move far, because below it is open sea a player
+ * is trying to look at. In a row they take the strip of top edge the health bars do not reach (those
+ * end 242 pixels in on the narrowest window this supports), and the radar drops just under them.
+ */
+.touch-right { position: absolute; right: calc(.9rem + env(safe-area-inset-right)); top: calc(.7rem + env(safe-area-inset-top)); display: flex; gap: .35rem; align-items: flex-start; }
+
+/*
+ * A pad is round, big enough for a thumb, and see-through enough to be stood on top of the sea.
+ * 68px is the floor: below about 44 a thumb misses, and these are held rather than tapped, so they
+ * are larger than the minimum rather than at it.
+ */
+.touch-pad {
+  pointer-events: auto; touch-action: none;
+  width: 68px; height: 68px; border-radius: 50%;
+  display: grid; place-items: center; gap: 0;
+  border: 1.5px solid rgba(238, 250, 246, .34);
+  background: radial-gradient(circle at 50% 38%, rgba(238, 250, 246, .16), rgba(6, 22, 28, .48) 72%);
+  backdrop-filter: blur(6px);
+  color: var(--foam);
+  font: 700 10px/1 var(--font-display); letter-spacing: .1em; text-align: center;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, .85);
+  /* No transition on the press: a held control has to answer on the frame it is touched, and 150ms
+     of ease reads as lag on something you are steering with. */
+  transition: none;
+}
+/* `:active` never fires on these — they carry no event handlers and `TouchPlay` calls
+   `preventDefault` on the touch that lands on them — so the lit state is drawn by the pad being
+   held in the game's own state, not by CSS. What is left here is the resting drawing. */
+.touch-swim { border-color: rgba(159, 246, 255, .5); }
+.touch-secondary { position: relative; width: 62px; height: 62px; font-size: 9.5px; }
+.touch-secondary.just-swapped { border-color: var(--ember); color: var(--ember); box-shadow: 0 0 0 1px var(--ember), 0 0 20px color-mix(in srgb, var(--ember) 45%, transparent); }
+
+/* The arrows that say the pad can be swiped. Part of the drawing rather than a hint that goes away,
+   because a control that can be changed and never looks it is a control nobody changes. */
+.swipe-mark { position: absolute; top: 50%; width: 0; height: 0; margin-top: -3.5px; opacity: .5; border-top: 3.5px solid transparent; border-bottom: 3.5px solid transparent; }
+.swipe-mark.left { left: 5px; border-right: 5px solid currentColor; }
+.swipe-mark.right { right: 5px; border-left: 5px solid currentColor; }
+
+.touch-hint { pointer-events: none; margin: 0; max-width: 10.5rem; font: 600 10.5px/1.35 var(--font-body); color: var(--mist); text-shadow: 0 1px 4px rgba(0, 0, 0, .85); animation: fade-in .4s both; }
+
+/* The small buttons: pause, travel, scores, and the four that walk the travel menu. Rectangular
+   rather than round, so they never read as something to hold the way the pads do. */
+.touch-btn {
+  pointer-events: auto; touch-action: none;
+  min-width: 42px; min-height: 34px; padding: 0 .4rem;
+  display: grid; place-items: center;
+  border-radius: 10px; border: 1px solid rgba(238, 250, 246, .22);
+  background: rgba(6, 22, 28, .5); backdrop-filter: blur(6px);
+  color: var(--mist); font: 700 10px/1 var(--font-display); letter-spacing: .09em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .8);
+}
+.touch-pause { color: var(--foam); }
+.touch-menu { position: absolute; right: calc(.9rem + env(safe-area-inset-right)); bottom: calc(1rem + env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(2, auto); gap: .45rem; }
+.touch-take { color: var(--lagoon); border-color: color-mix(in srgb, var(--lagoon) 55%, transparent); }
+
+/*
+ * Nobody can join a touch session, so it does not offer. `Press A to join` is a *pad* prompt and it
+ * is the only thing it could be — the local seat is taken and there is one screen — and `.is-touch`
+ * is exactly the condition under which it is untrue, because `touchFirst` requires no pad connected.
+ * Plug one in and the class comes off and the offer comes back, which is the honest behaviour.
+ */
+.is-touch .join-card { display: none; }
+
+/* The reticle follows the finger in touch play (`PlayerHud.aim.at`), so it is no longer a drawing of
+   the camera's own axis and should not pretend to be one — it is dimmer and carries no label, because
+   a label under a mark that moves with a thumb is a label under the thumb. */
+.aim.aim-pointed { opacity: .85; }
+.aim.aim-pointed .aim-label { display: none; }
+
+/* Asked once, and it goes away by itself. Over the sea rather than in front of it: the game runs in
+   portrait, and a screen that refused to draw until it was turned round would be worse. */
+.rotate-hint {
+  /* Over the open middle of the sea, because the bottom of a portrait window is already carrying the
+     pads, the ability chips, the hint and the toolbar, and this is a line that arrives unasked. */
+  position: absolute; left: 50%; top: 38%; transform: translateX(-50%);
+  z-index: 7; margin: 0; padding: .5rem .85rem; max-width: 78%;
+  border-radius: 12px; background: rgba(6, 22, 28, .68); backdrop-filter: blur(8px);
+  border: 1px solid rgba(238, 250, 246, .16);
+  color: var(--foam); font: 600 12px/1.35 var(--font-body); text-align: center;
+  animation: fade-in .5s both;
+}
+
+/* ---------- The compact layout ---------- */
+/*
+ * The whole in-match HUD is drawn in `em` off one font-size (`.hud`, and the two split-screen
+ * variants), which makes this the cheapest correct lever there is: one number and every panel,
+ * gauge, marker and menu in it comes down together and keeps its proportions. It is not the whole
+ * job — a few things have to move rather than shrink — but it is most of it.
+ */
+.layout-compact .hud { font-size: 11px; }
+.layout-compact .hud-half { font-size: 10px; }
+.layout-compact .hud-quarter { font-size: 9px; }
+/*
+ * The pads own the bottom-left corner and the drawn buttons the top edge of the right, so what used
+ * to live in either goes elsewhere. These are measured against what the pads actually are rather
+ * than guessed at: 68 pixels of pad plus a 1rem margin is 84 from the bottom, and the HUD's own
+ * `em` is 11px in a compact window, so anything that was hugging the bottom starts above 7.7em.
+ * They were 6.8em and the ability chips sat *on* the pads.
+ */
+.is-touch .hud-bottom { bottom: 12.4em; }
+.is-touch .hint { bottom: 15.6em; }
+.is-touch .grip-panel { bottom: 18.2em; }
+.is-touch .death-note { bottom: 15.6em; }
+.is-touch .radar { top: 4.6em; }
+/*
+ * And the name line is kept off them. `.bars` is 15em wide but the row inside it is not clipped, so
+ * a long genus and a rung name run straight out of the box and under the buttons — "Cymbospondylus
+ * HATCHLING · GIANT" is wider than half a phone on its own. The row is given the width there
+ * actually is and the two parts ellipsis, the genus last, because that is the one you need.
+ */
+.is-touch .hud-top { max-width: calc(100% - 13.5em); }
+.is-touch .name-row { min-width: 0; }
+.is-touch .name-row b, .is-touch .tier-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.is-touch .tier-name { flex: 0 1 auto; }
+/*
+ * The day dial follows the radar down instead of keeping its own distance from the bottom. It sits
+ * `15.4em` up from there normally, which is directly *under* the radar in a full window and — with
+ * the radar moved to `4.6em` from the top — lands in the middle of the hint line instead. Under the
+ * radar is where it belongs and where it now is, measured from the top like the radar it belongs to.
+ */
+.is-touch .day-phase { top: 15.6em; bottom: auto; }
+
+/*
+ * Below this the menus reflow. The breakpoints match `COMPACT_W`/`COMPACT_H` in
+ * `src/shared/small-screen.ts` and must keep matching them: the React side sets `.layout-compact`
+ * from those numbers, so a media query at a different figure would give a window one half of the
+ * compact layout and not the other. Written as a media query as well as a class because the
+ * *standalone* pages (the viewer, the trilogy page) have no React shell setting the class, and
+ * because a stylesheet that only reflows when JavaScript says so flashes the wide layout first.
+ */
+@media (max-width: 759px), (max-height: 539px) {
+  /* The title. The painting stays full-bleed; the type comes down and the tagline goes, because on a
+     phone the picture is doing that job better than a sentence can. */
+  .logo-line-1 { font-size: clamp(30px, 11vw, 60px); }
+  .logo-line-2 { font-size: clamp(26px, 10vw, 54px); }
+  .title-tag { display: none; }
+  .press-start { font-size: clamp(13px, 4.4vw, 18px); letter-spacing: .22em; margin-bottom: 8px; }
+  .title-hint { font-size: 11px; }
+  .title-inner { padding-bottom: calc(1rem + env(safe-area-inset-bottom)); }
+
+  /* The pick screen. It already goes to one column under 1000px; what is left is the padding, the
+     header's own furniture and the crew card, which is the tallest thing on the screen. */
+  .select { padding: 10px 12px 64px; gap: 8px; }
+  .select-header { gap: 8px; }
+  .mode-blurb { display: none; }
+  .header-logo { width: 104px; }
+  .brand-name { font-size: 11px; }
+  .mode-chip { min-height: 52px; padding: 5px 8px; }
+  .mode-chip small { display: none; }
+  .pick-layout { gap: 8px; }
+  .roster-grid { max-width: none; }
+  .cell { padding: 3px; }
+  .cell-kind { display: none; }
+  .crew-card { padding: 8px 10px 10px; gap: 5px 8px; }
+  .creature-copy .kit { display: none; }
+  .creature-copy .tagline { display: none; }
+  .select-footer { gap: 8px; }
+  .start-button { padding: 11px 18px; font-size: 13px; letter-spacing: .12em; }
+  .feedback-button { display: none; }
+
+  /* Overlays. `min(94vw, …)` already fits; what does not is the padding inside it and the fixed
+     200px range inputs in the settings panel. */
+  .panel, .tools-dialog { padding: 14px 14px 12px; border-radius: 14px; }
+  .panel.results { max-height: 94vh; }
+  .result-grid { grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); }
+  .help-columns { grid-template-columns: 1fr; }
+  .setting-row { grid-template-columns: 1fr; gap: 4px; }
+  input[type='range'] { width: 100%; }
+  .xbox-diagram, .kbm-diagram { max-height: 30vh; }
+
+  /* Menu buttons are tapped, so they get a thumb's worth of height wherever they are. */
+  .menu-buttons button, .ghost, .icon-button { min-height: 44px; }
+  .icon-button { width: 44px; }
+}
+
+/* A window that is short *and* narrow — a phone on its side — has the least room of anything, and
+   the things that go here are the ones that were still just fitting at one of the two. */
+@media (max-width: 759px) and (max-height: 449px) {
+  .title-inner .press-start { margin-bottom: 4px; }
+  .era-switches { display: none; }
+  .crew-card { grid-template-rows: auto minmax(64px, 40%) minmax(0, 1fr); }
+  .creature-copy h2 { font-size: 15px; }
+  .biome-banner b { font-size: 1.5em; }
+  .scoreboard { max-height: 88%; }
+}
+
+/*
+ * A phone held upright: the roster and the crew card are stacked, and neither of them fits.
+ *
+ * The thing to *not* do here is give the two tracks a share of the height each. `fr` tracks look
+ * like the answer and are the bug: the crew carries a `min-height` floor from the rules above, so
+ * its track refuses to shrink to its share, the roster's track is squeezed below the height of the
+ * grid in it, and — since nothing there clips — the roster spills out and the crew card paints over
+ * it. What a phone actually wants is for the whole picker to be as tall as its contents and to
+ * scroll, which is what it already does at `max-width: 1000px`; all this has to do is not break it
+ * and give the card a floor of its own so the portrait is not squeezed to nothing.
+ */
+@media (max-width: 559px) and (orientation: portrait) {
+  /*
+   * Flex, not grid, and that is the fix rather than a preference. As a grid this is two `auto`
+   * tracks, and `auto` is only content-sized until something lets it be otherwise: between the
+   * roster's own `min-height: 0`, the crew's floor and `align-content`, the two tracks resolved to
+   * an equal 289px each against a 619px roster, so the grid overflowed and the crew card was
+   * painted over the animals. A flex column with `flex: 0 0 auto` on each child has no track sizing
+   * in it at all — each block is exactly as tall as its content, they stack, and the column scrolls.
+   */
+  .pick-layout { display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior: contain; }
+  .pick-layout > * { flex: 0 0 auto; }
+  /*
+   * And the card **sticks to the bottom** of that scroll. Stacked, it is simply the second block, so
+   * on a 390x844 phone the roster is 619 pixels of animals and the card — with the name of what you
+   * have picked and the Lock In that is the only way on — sits below the fold. A player tapped a
+   * creature and nothing they could see changed. Sticky keeps it in sight whatever the roster is
+   * scrolled to, which is the one thing a picker on a phone has to do, and costs the roster about a
+   * third of the window it can scroll back.
+   */
+  .crew { position: sticky; bottom: 0; z-index: 2; }
+  /*
+   * And opaque while it is sticking. Everywhere else the card is a translucent pane over the sea,
+   * which is right when it has its own column; standing *over the roster* the same glass shows tiles
+   * through it and reads exactly like the overlap bug this replaced — a card you cannot tell from
+   * the thing behind it is worse than one you have to scroll to.
+   */
+  .crew-card, .join-card { background: rgba(4, 16, 21, .97); }
+  .crew, .crew-1, .crew-2 { min-height: 0; }
+  .crew-1 { grid-template-rows: auto auto; }
+  .crew-card { min-height: 0; max-height: 38vh; grid-template-rows: auto minmax(56px, 32%) minmax(0, 1fr); }
+  /* With the kit and the tagline gone the copy has no reason to hold a card's worth of empty room. */
+  .creature-copy { min-height: 0; }
+  /* So the last band of tiles can be scrolled clear of the card standing over it. */
+  .roster-grid { padding-bottom: 38vh; }
+}
+
+/*
+ * A short *wide* window — a phone on its side, which is how this game is meant to be held — is the
+ * one case the stack above gets backwards. Every rule up to here treats "not wide" as "stack the
+ * picker into a column and scroll it", which is right at 900x1200 and wrong at 780x360: there the
+ * window has 360 pixels of height and no amount of scrolling makes a stacked roster and a stacked
+ * crew card fit, so the card ends up laid over the roster it is supposed to sit beside. With more
+ * width than height the answer is the one the wide layout already gives — roster on the left, crew
+ * on the right, nothing scrolling — just smaller.
+ *
+ * Keyed on the aspect ratio rather than on a width, because it is the *shape* that decides: 780x360
+ * and 1400x420 want the same thing and no single width tells them apart from 820x1180.
+ */
+@media (max-height: 539px) and (min-aspect-ratio: 1/1) {
+  .select { grid-template-rows: auto minmax(0, 1fr) auto; }
+  .pick-layout {
+    grid-template-columns: minmax(0, 1.45fr) minmax(210px, 0.85fr);
+    grid-template-rows: minmax(0, 1fr);
+    overflow: hidden;
+  }
+  /*
+   * `min-height` is the whole of the fix here. Every rule under 1000px gives the crew a floor of
+   * 440 or 540 pixels so its cards have something to stand on in a stacked, scrolling picker — and
+   * in a 360-pixel-tall window that floor is taller than the window, so the column overflowed its
+   * track and the card was painted over the roster. Flow is left alone: `.crew-1` already lays a
+   * card and a one-line join prompt out as `1fr auto`, which is exactly right here.
+   */
+  .crew, .crew-1, .crew-2 { min-height: 0; }
+  .roster-grid { align-self: stretch; }
+  /* The roster scrolls rather than squeezing: `rosterCap` has already kept the tiles legible by
+     capping the columns, so what is left over is rows, and rows are a thing a finger can reach. */
+  .pick-layout { overflow: hidden; padding: 0; }
+  .roster-grid { overflow-y: auto; overscroll-behavior: contain; }
+  .crew-card { grid-template-areas: 'top top' 'hero btn' 'copy copy'; grid-template-rows: auto minmax(44px, 32%) minmax(0, 1fr); }
+  .creature-copy h2 { font-size: 14px; }
+  .creature-copy .stats { display: none; }
+  .ready-button { padding: 7px 9px; font-size: 11px; letter-spacing: .08em; }
+
+  /*
+   * The header is the thing to cut here, and by a lot. At 360 pixels tall the brand row and the
+   * mode chips were taking 114 of them and the footer and padding another 112, which left the
+   * picker 134 — three bands of roster in 134 pixels, so every tile's picture overran into its own
+   * name. It goes back to one row, and the chips to the height of their own words.
+   */
+  .select { padding: 8px 10px 42px; gap: 6px; }
+  .select-header { grid-template-columns: auto minmax(0, 1fr); grid-template-areas: 'brand modes'; align-items: center; gap: 10px; }
+  .header-logo { width: 88px; }
+  .mode-chip { min-height: 36px; padding: 3px 8px; }
+  .mode-chip span { font-size: 10.5px; letter-spacing: .05em; }
+  /*
+   * And the picture is given a height rather than a ratio. `aspect-ratio` makes the image as tall as
+   * the tile is wide over 4:3, which is fine when the band has the room and is exactly what overran
+   * when it did not: the row is sized by the picture, so the picture cannot be sized by the row.
+   * A flat height ends the circularity, and `contain` still fits every render inside it.
+   */
+  .cell img { aspect-ratio: auto; height: 44px; margin: -3px -8px 0; width: calc(100% + 16px); }
+  .cell { padding: 3px 4px 4px; }
+  .cell-name { font-size: 10.5px; }
+  .select-footer { gap: 6px; }
+  /*
+   * And the icons move to the *other* corner, on this screen only. The toolbar and the footer both
+   * want the bottom right, and normally the picker's 80 pixels of bottom padding keeps them apart —
+   * 80 pixels is a quarter of this window, so instead of buying the clearance the footer's Dive In
+   * is simply given the corner and the icons take the empty one. Only on the picker: in a match the
+   * bottom left is where the swim pad lives, and the two must not be in the same place.
+   */
+  .screen-select .toolbar-right { right: auto; left: 10px; }
+  .screen-select .toolbar { bottom: 8px; gap: 6px; }
+  .screen-select .icon-button { width: 38px; height: 38px; border-radius: 11px; }
+}

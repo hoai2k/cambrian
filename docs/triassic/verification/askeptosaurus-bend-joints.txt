@@ -1,0 +1,11 @@
+the per-joint table, in chain order — a bone name and a local rotation, which is what
+`uncurl` returns and `carry_rest` consumes in tools/triassic/creatures/askeptosaurus/build.py
+
+  chest              0°   0° accumulated
+  neck_00         15.7°   15.7° accumulated
+  neck_01         16.3°   32° accumulated
+  neck_02         16.4°   48.3° accumulated
+  neck_03         16.3°   64.6° accumulated
+  skull           15.7°   80.3° accumulated
+
+  local steps sum to 80.40° against a whole turn of 80.297°

@@ -28,16 +28,16 @@
     }
   },
   "appendageRootSeatingRaw": {
-    "fore_upper_L": 0.01818334497511387,
-    "fore_upper_R": 0.017466211691498756,
-    "hind_upper_L": 0.016588063910603523,
-    "hind_upper_R": 0.017053810879588127
+    "fore_upper_L": 0.018250558525323868,
+    "fore_upper_R": 0.01629144325852394,
+    "hind_upper_L": 0.021004609763622284,
+    "hind_upper_R": 0.02561766840517521
   },
   "appendageRootSeatingFractionOfBodyLength": {
-    "fore_upper_L": 0.01818334497511387,
-    "fore_upper_R": 0.017466211691498756,
-    "hind_upper_L": 0.016588063910603523,
-    "hind_upper_R": 0.017053810879588127
+    "fore_upper_L": 0.018250558525323868,
+    "fore_upper_R": 0.01629144325852394,
+    "hind_upper_L": 0.021004609763622284,
+    "hind_upper_R": 0.02561766840517521
   },
   "limbReach": {
     "fore": 0.3727791205143112,

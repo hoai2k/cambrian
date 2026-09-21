@@ -1,0 +1,134 @@
+{
+  "schema": "mouth-cut/1",
+  "id": "atopodentatus",
+  "model": "assets/triassic/creatures/atopodentatus.glb",
+  "sha256": "eacc9ccda3f54919ff41525c1892ddc55090561d834cab2429fe477f3dfa888e",
+  "sha256Source": "measured",
+  "appliesTo": "built",
+  "authoredAt": "2026-09-20T21:43:21.948Z",
+  "note": "",
+  "creature": {
+    "key": "triassic:atopodentatus",
+    "id": "atopodentatus",
+    "collection": "triassic",
+    "vertices": 14865,
+    "rigged": true
+  },
+  "frame": {
+    "axis": "z",
+    "forward": 1,
+    "up": "y",
+    "source": "mouth",
+    "note": "Model root frame, unscaled: the file's own coordinates with the scene graph flattened. The body runs along z; the head is at the high end."
+  },
+  "seat": {
+    "source": "manual"
+  },
+  "hinge": {
+    "depth": 0.693207,
+    "headFraction": 0.1386,
+    "centre": [
+      -0.046411,
+      0.08074,
+      0.995969
+    ],
+    "axis": [
+      1,
+      0,
+      0
+    ]
+  },
+  "plane": {
+    "point": [
+      -0.046411,
+      0.08074,
+      0.995969
+    ],
+    "normal": [
+      0,
+      0.994226,
+      0.107304
+    ],
+    "forward": [
+      0,
+      -0.107304,
+      0.994226
+    ],
+    "pitch": -0.10751066929937274,
+    "yaw": 0,
+    "roll": 0,
+    "pitchDegrees": -6.16,
+    "yawDegrees": 0,
+    "rollDegrees": 0
+  },
+  "sides": {
+    "mandible": 3102,
+    "skull": 11763,
+    "total": 14865
+  },
+  "bounds": {
+    "length": 4.9999998807907104,
+    "height": 1.166485846042633,
+    "width": 2.779881477355957,
+    "axisMin": -3.310823440551758,
+    "axisMax": 1.6891764402389526,
+    "lateralMid": -0.03840601444244385,
+    "upMid": -0.04492422938346863
+  },
+  "head": {
+    "height": 0.40338562428951263,
+    "width": 1.013051599264145,
+    "upMid": 0.09348589926958084,
+    "lateralMid": 0.020458534359931946
+  },
+  "rule": "A vertex is on the mandible when (v − plane.point) · plane.normal < 0 and (v − plane.point) · plane.forward > 0: below the cut plane and ahead of the hinge. hinge.axis is the pivot the jaw swings about, through hinge.centre. See docs/viewer-mouth.md.",
+  "mouth": {
+    "version": 1,
+    "key": "triassic:atopodentatus",
+    "id": "atopodentatus",
+    "collection": "triassic",
+    "model": "assets/triassic/creatures/atopodentatus.glb",
+    "frame": {
+      "axis": "z",
+      "forward": 1,
+      "up": "y"
+    },
+    "frameSource": "mouth",
+    "vertices": 14865,
+    "rigged": true,
+    "box": {
+      "lo": [
+        -1.4283467531204224,
+        -0.6281671524047852,
+        -3.310823440551758
+      ],
+      "hi": [
+        1.3515347242355347,
+        0.5383186936378479,
+        1.6891764402389526
+      ]
+    },
+    "bounds": {
+      "length": 4.9999998807907104,
+      "height": 1.166485846042633,
+      "width": 2.779881477355957,
+      "axisMin": -3.310823440551758,
+      "axisMax": 1.6891764402389526,
+      "lateralMid": -0.03840601444244385,
+      "upMid": -0.04492422938346863
+    },
+    "head": {
+      "height": 0.40338562428951263,
+      "width": 1.013051599264145,
+      "upMid": 0.09348589926958084,
+      "lateralMid": 0.020458534359931946
+    },
+    "seatSource": "manual",
+    "depth": 0.6932070332122318,
+    "up": 0.08074000351132327,
+    "lateral": -0.046411245150641385,
+    "pitch": -0.10751066929937274,
+    "yaw": 0,
+    "roll": 0
+  }
+}

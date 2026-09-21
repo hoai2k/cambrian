@@ -33,9 +33,9 @@ const PASS = 'attack-feeding';
 const authoredOn = new Date().toISOString().slice(0, 10);
 
 const io = await makeIO();
-// Both eras: a Cambrian id lives in creatures/, a Devonian one in devonian/creatures/.
+// All three eras: a Cambrian id lives in creatures/, a Devonian one in devonian/creatures/, a Triassic one in triassic/creatures/.
 const { existsSync } = await import('node:fs');
-const assetDir = existsSync(`public/assets/creatures/${id}.glb`) ? 'public/assets/creatures' : 'public/assets/devonian/creatures';
+const assetDir = ['public/assets/creatures', 'public/assets/devonian/creatures', 'public/assets/triassic/creatures'].find((d) => existsSync(`${d}/${id}.glb`)) ?? 'public/assets/creatures';
 const file = `${assetDir}/${id}.glb`;
 const before = await readFile(file);
 const rig = await loadRig(io, file);

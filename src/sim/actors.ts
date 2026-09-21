@@ -148,7 +148,7 @@ export function makeActor(id: number, creatureId: CreatureId, controller: Contro
     hitFlash: 0, hitDir: v3(), hitStop: 0,
     grabbedBy: -1, grabbing: -1, grabT: 0, grabOff: v3(0, 0, 1), eatingTarget: -1, eatProgress: 0,
     corpseT: 0, eaten: 0, eatBites: 0, killer: -1, noise: 0.5, cover: 0, stillness: 0,
-    dodgeDir: v3(0, 0, 1), dodgeTapT: 0, hopVel: 0, grounded: true, climbPush: 0, climbTo: -Infinity, airborne: false,
+    dodgeDir: v3(0, 0, 1), dodgeTapT: 0, hopVel: 0, grounded: true, climbPush: 0, climbTo: -Infinity, airborne: false, wade: 0, ashore: false, strandT: 0, flopT: 0,
     prev: { light: false, heavy: false, ability: false, dodge: false, guard: false, lock: false, sense: false, rise: false, burst: false, dash: false, aim: false },
     respawnT: 0, reviveT: 0, carriedTop: false, hatching: false, dashHoldT: 0, dashUsed: false, pounceCd: 0, dashCd: 0, dashCost: 0, sinceHit: 99, lastHitBy: -1, swallowedBy: -1, holdT: 0, graspHold: false, graspT: 0, graspSpent: false, rideHost: -1, rideT: 0, rideOff: v3(), riddenBy: -1, gripSyncT: -1, drive: v3(), deathY: 0, sparkled: false, tumble: v3(), aimInRange: false, aiming: false, kills: 0, eats: 0, escapes: 0, hunted: 0, hunterId: -1, wasHunted: false, seen: 0, bubbles: 0,
     spawnProtect: controller === 'player' ? 3 : 0,

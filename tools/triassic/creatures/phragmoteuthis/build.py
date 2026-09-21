@@ -86,7 +86,10 @@ smooth = T.smooth
 auth, intake = T.load_raw(RAW, NAME + ' authored body')
 sample_albedo, luminance_at, albedo_sha, skin_material = T.retain_albedo(
     auth, NAME + ' mantle and arms', roughness=.52)
-skin_material.use_backface_culling = False       # the backstop behind the oral lining
+# Double-sided, as the era's rule asks of every skin. The crown is no longer cut, so there is no hole
+# for this to be the backstop under; it stays because a single-sided skin is a runtime decision the
+# whole roster makes the same way, and the cost is a little overdraw.
+skin_material.use_backface_culling = False
 frame = T.measure_frame(auth, head_is_positive_pca=True, luminance_at=luminance_at)
 
 bm = bmesh.new(); bm.from_mesh(auth.data)
@@ -381,14 +384,15 @@ puppet, pup_thickness, twin_report, _bvh = T.build_twin(
     triangle_target=PUPPET_TRIANGLE_TARGET, sample_albedo=sample_albedo,
     blade_dilation=.0022, thin=THIN, band=THIN_BAND, roughness=.66)
 
-mouth_cut = {}
-for o, key in ((auth, 'authored'), (puppet, 'twin')):
-    n, pts = cut_peristome(o)
-    mouth_cut[key] = {'facesRemoved': int(n), 'rimVertices': int(len(pts))}
-    if key == 'authored':
-        PERISTOME = pts
-    assert n >= (7 if key == 'authored' else 3), ('the peristome cut found no faces on the ' + key, n)
-    assert len(pts) >= (9 if key == 'authored' else 5), ('the peristome left no rim on the ' + key, len(pts))
+# **The peristome is not cut and there is no mouth modelled here at all.** It used to be: a hole in
+# the crown, a sac sewn to its rim and two authored mandibles behind it. A beak inside an arm crown
+# is a mouth the player never sees -- it faces down the crown's own axis, inside a thicket of arms --
+# and the whole of it was geometry invented to close a hole that was itself invented. The generation
+# models no mouth, so the crown stays closed and `anchor_mouth`, `anchor_mouth_inside` and
+# `anchor_attack_primary` below are all the simulation ever needed. `cut_peristome` is kept because
+# it is the measurement the anchors are placed from, and because a later pass may want the hole back.
+mouth_cut = {'authored': {'facesRemoved': 0, 'rimVertices': 0},
+             'twin': {'facesRemoved': 0, 'rimVertices': 0}, 'cut': False}
 mouth_cut.update({'centre': MOUTH_P.round(5).tolist(), 'normal': M_N.round(4).tolist(),
                   'radius': round(MOUTH_R, 5), 'armBandRadius': round(ARM_BAND, 5),
                   'method': 'authored on the crown axis; the generation models no mouth, and casting '
@@ -672,32 +676,20 @@ _total = sum(weight_tally.values())
 thin_joints = sorted((n, round(weight_tally[n] / _total, 6)) for n in weight_tally
                      if weight_tally[n] / _total < .0005)
 
-# ----------------------------------------------- the mouth interior: one closed skinned lining ----
-mouth_material = T.inward_material(NAME + ' mouth interior', (.23, .10, .10, 1), roughness=.60)
-beak_material = T.opaque_material(NAME + ' beak', (.050, .038, .033, 1), roughness=.32)
+# --------------------------------------------------------- the mouth: an anchor and nothing else ----
+# There is no oral geometry on this animal. See the note at the peristome above: a beak inside an arm
+# crown is never seen, and the lining and the two mandibles that used to stand here were built to
+# close a hole this builder had itself cut. `MOUTH_R` and `MOUTH_P` survive because they are the
+# measurement the mouth anchors are placed from, and `skull` and `jaw` survive because the lip band
+# of the crown's own skin is weighted to them, so they are joints that own skin and the clips that
+# move them move the animal rather than a prop.
 oralparts = []
-LINING_RINGS, LINING_RING = 16, 14
-LINING_DEPTH = min(MOUTH_R * 2.3, HEAD_ROOM * .80)
-assert LINING_DEPTH > MOUTH_R * .8, ('no room for a mouth behind the peristome', HEAD_ROOM)
+MOUTH_DEPTH = min(MOUTH_R * 2.3, HEAD_ROOM * .80)   # how far in `anchor_mouth_inside` sits
 
 
 def mouth_point(a, dn, ds):
     return Vector((MOUTH_P + M_N * a + M_DN * dn + M_DS * ds).tolist())
 
-
-_lining, _lining_raw = T.crown_lining(
-    NAME + ' oral lining', rig, tx, PERISTOME, MOUTH_P, M_N, M_DN, M_DS,
-    into_head=LINING_DEPTH, skin_weights=lambda q: weights(q, 0.), material=mouth_material,
-    rings=LINING_RINGS, ring=LINING_RING)
-oralparts.append(_lining)
-
-
-for _label, _bone, _sign in ((' upper mandible', 'skull', -1), (' lower mandible', 'jaw', 1)):
-    oralparts.append(T.crown_beak(NAME + _label, rig, _bone, tx, MOUTH_P, M_N, M_DN, M_DS,
-                                  MOUTH_R, _sign, beak_material))
-lining_back = Vector(np.asarray(_lining_raw)[-LINING_RING:].mean(0).tolist())
-lining_depth_raw = depth(lining_back)
-assert lining_depth_raw > .003, ('the lining reaches outside the head', round(float(lining_depth_raw), 5))
 
 # --------------------------------------------- measured comparison of the two real surfaces ----
 auth_v = np.array([v.co[:] for v in auth.data.vertices])
@@ -782,6 +774,26 @@ SQUEEZE_TRAVEL = float(half_width(MANTLE_MID)) * .30 * SCALE
 AMP = {'Idle': .35, 'Swim': 1., 'Sprint': 1.3, 'Eat': .55, 'Guard': .25, 'Breath': .45,
        'Dodge': 1.1, 'Ability': .9, 'Grab': .8, 'Growth': .45, 'Hit': .8, 'Stagger': .9}
 arm_sweep, fin_sweep, funnel_sweep, squeeze_travel, seams, bounds = {}, {}, {}, {}, {}, {}
+STRIKE_LUNGE = .10              # the dart, in bodies: what `body` carries the animal forward by
+STRIKE_CLIPS = ('Attack', 'Bite', 'Grab', 'Heavy')
+ARM_TIP_LOCAL = {}              # each appendage's measured tip, in its last bone's rest frame
+for a in ARMS:
+    last = '%s_%02d' % (a['name'], a['nseg'] - 1)
+    ARM_TIP_LOCAL[a['name']] = (last, rig.data.bones[last].matrix_local.inverted() @ tx(a['pts'][-1]))
+ARM_TIP_REST = {a['name']: tx(a['pts'][-1]) for a in ARMS}
+FORWARD = Vector(CROWN_DIR.tolist())                  # the crown axis, the mean direction of the arms
+ANCHOR_ARM = max(TENTACLES, key=lambda a: a['graphLength'])['name']   # the arm `anchor_attack_primary` rides
+reach_track = {}
+
+
+def arm_tips_now():
+    """Every appendage's tip in object space at the pose the rig is holding, off the evaluated bones."""
+    bpy.context.view_layer.update()
+    out = {}
+    for name, (last, local) in ARM_TIP_LOCAL.items():
+        out[name] = rig.pose.bones[last].matrix @ local
+    return out
+
 
 for clip, duration in CLIPS.items():
     action = bpy.data.actions.new(clip)
@@ -817,9 +829,25 @@ for clip, duration in CLIPS.items():
         # it should read as is a lithe grab forward rather than a hit. So the gather is small and
         # early, the reach is large and held open long enough to arrive, and the close follows it.
         # All three are zero at u=0 and u=1, which is what a looping Grab needs.
-        gather = sin(pi * u / .28) ** 2 if u < .28 else 0.
+        #
+        # **And the reach is the animal's, not the crown's.** The verification sweep (T3D-17)
+        # measured the shipped strike at its tips: the attack anchor went 3-4 % of a body forward on
+        # every attack clip against Ceratites' 14 %, because on this generation the tentacles already
+        # lie straight along the axis with their tips at the front of the bounding box -- no rotation
+        # extends them, and the head's own protraction is capped by the skin between it and the
+        # mantle (0.36 tore the neck 5.77x). The owner's note is that this should be "a lithe grab
+        # forward" with the tentacles rather than hits with them. A squid takes prey by darting at
+        # it on a jet and shooting the pair, so the reach that is missing is the **dart**: `body`
+        # carries the whole animal forward on `lunge`, which rises after the gather, is *held* through
+        # the close so the tentacles shut on something out in front rather than back at rest, and
+        # comes home after. The crown's gather, spread and close ride on it unchanged; the funnel
+        # swings aft and the fins clamp for the dart. The numbers are read off the tips below
+        # (`attackReach`) and asserted, not assumed.
+        gather = sin(pi * u / .24) ** 2 if u < .24 else 0.
+        lunge = smooth((u - .12) / .26) * (1 - smooth((u - .70) / .30))
         reach = sin(pi * (u - .15) / .81) ** 2 if .15 < u < .96 else 0.
         close = sin(pi * (u - .42) / .54) ** 2 if .42 < u < .96 else 0.
+        strike = clip in ('Attack', 'Bite', 'Grab', 'Heavy')
 
         # ---- the fins. **This is the locomotion.** A wave runs down each fin from front to back,
         # and the two run together at cruise and split in a turn, which is how a body with no front
@@ -846,6 +874,8 @@ for clip, duration in CLIPS.items():
                 bias = s * .26 * e * (1 if clip == 'TurnRight' else -1)
             if clip == 'Sprint':
                 lean = .35                              # clamped against the mantle for the dart
+            if strike:
+                lean = 1. - .55 * lunge                 # and clamped again for the strike's dart
             for i, n in enumerate(FIN_NAMES[side]):
                 lag = i * .55
                 q = pb[n]
@@ -879,7 +909,7 @@ for clip, duration in CLIPS.items():
 
         # ---- the funnel, which vectors whatever the mantle pushed out.
         fn = pb['funnel']
-        fn.rotation_euler.x = (-.50 * pump
+        fn.rotation_euler.x = (-.50 * pump - (.35 * lunge if strike else 0.)
                                + (.40 if clip == 'Dive' else -.40 if clip == 'Rise' else 0.) * e
                                + .12 * dead)
         fn.rotation_euler.z = turn * .60 + (.10 * sin(p) * env if clip == 'Idle' else 0.)
@@ -905,7 +935,10 @@ for clip, duration in CLIPS.items():
             # so the head carries the whole crown forward through the reach and gathers a little
             # before it. The head is the arms' parent, so this is the one channel that moves all
             # twelve of them the same way.
-            hd.location.y += (.011 * gather - .050 * reach) * SCALE
+            hd.location.y += (.008 * gather - .050 * reach) * SCALE
+            # The dart: the whole animal, rigidly, so it stretches no skin. Held through the close
+            # (see `lunge` above) so the pair shuts out in front rather than back at rest.
+            pb['body'].location.y = -STRIKE_LUNGE * lunge * SCALE
         pb['tail'].rotation_euler.z = turn * .12 + .10 * sin(p * beats - 1.8) * env * finamp * 2
         pb['tail'].rotation_euler.x = .16 * dead
 
@@ -956,11 +989,14 @@ for clip, duration in CLIPS.items():
                 # the pair closing on whatever the eight have gathered, which is what `heavy:
                 # 'Hook latch'` names.
                 out = {'Attack': .62, 'Bite': .56, 'Grab': .58, 'Heavy': .72}[clip]
-                shut = {'Attack': .80, 'Bite': .62, 'Grab': .95, 'Heavy': .95}[clip]
+                shut = {'Attack': .80, 'Bite': .72, 'Grab': .95, 'Heavy': .95}[clip]
                 hold = max(gather, reach)
                 sweep = .14 * out * gather - .08 * out * reach
                 spread = (.70 if tentacle else .85) * out * hold - (1.30 if tentacle else .85) * shut * close
-                curl = shut * close * (1.35 if tentacle else .80)
+                # The tentacles shut by converging on the axis more than by curling: a curl on a
+                # straight chain is a shortening, and at 1.35 it gave back nine hundredths of a
+                # body of the reach at the moment the pair closed.
+                curl = shut * close * (.95 if tentacle else .80)
             if clip == 'Eat':
                 sweep = .55 + .18 * sin(p * 2 - phase)
                 curl = .45 + .18 * sin(p * 2 - phase)
@@ -994,6 +1030,19 @@ for clip, duration in CLIPS.items():
                 acc = acc @ pb[n].rotation_euler.to_quaternion()
             arm_angles[ARMS[ai]['name']].append(acc)
 
+        if strike:
+            # The reach, read off the tips rather than assumed: every appendage's tip along the
+            # crown axis against where it rests, in bodies. This is the number T3D-17 measured on
+            # the packaged file and the one the owner's note is about.
+            tips = arm_tips_now()
+            reach_track.setdefault(clip, []).append({
+                'u': round(u, 4),
+                'anchor': (tips[ANCHOR_ARM] - ARM_TIP_REST[ANCHOR_ARM]).dot(FORWARD) / BODY_LENGTH,
+                'tentacles': min((tips[a['name']] - ARM_TIP_REST[a['name']]).dot(FORWARD)
+                                 for a in TENTACLES) / BODY_LENGTH,
+                'meanTips': float(np.mean([(tips[n] - ARM_TIP_REST[n]).dot(FORWARD) for n in tips])) / BODY_LENGTH,
+                'body': -pb['body'].location.y / BODY_LENGTH,
+            })
         state = np.array([tuple(q.rotation_euler) + tuple(q.location) for q in pb])
         if f == 0:
             first_state = state.copy()
@@ -1039,6 +1088,29 @@ assert squeeze_travel['Ability'] > .05, ('the ink blast must empty the mantle', 
 for c in ('Attack', 'Heavy'):
     assert min(arm_sweep[c][a['name']] for a in TENTACLES) > 40, \
         ('the tentacles must strike in ' + c, {a['name']: arm_sweep[c][a['name']] for a in TENTACLES})
+# **A grab reaches.** The attack anchor's tip has to go well forward of where it rests and never
+# much behind it: the gather is a little draw-back and nothing else in the clip may be a retreat.
+# The targets are T3D-23's (Ceratites reaches 14 % of a body; the shipped Phragmoteuthis 3-4 %).
+ATTACK_REACH = {}
+for c in STRIKE_CLIPS:
+    rows = reach_track[c]
+    fwd = max(rows, key=lambda r: r['anchor'])
+    back = min(rows, key=lambda r: r['anchor'])
+    ATTACK_REACH[c] = {
+        'axis': 'the crown axis (mean direction of the arms), in bodies',
+        'anchorForwardOverL': round(fwd['anchor'], 4), 'forwardAtPhase': fwd['u'],
+        'anchorRearBackOverL': round(back['anchor'], 4), 'rearBackAtPhase': back['u'],
+        'tentaclesMinForwardOverL': round(max(r['tentacles'] for r in rows), 4),
+        'meanTipsForwardOverL': round(max(r['meanTips'] for r in rows), 4),
+        'meanTipsRearBackOverL': round(min(r['meanTips'] for r in rows), 4),
+        'bodyLungeOverL': round(max(r['body'] for r in rows), 4),
+        'anchorMinThroughTheCloseOverL': round(min(r['anchor'] for r in rows if .55 < r['u'] < .85), 4),
+        'trace': [[r['u'], round(r['anchor'], 3)] for r in rows[::max(1, len(rows) // 12)]],
+    }
+    assert ATTACK_REACH[c]['anchorForwardOverL'] >= .12, ('the grab does not reach in ' + c, ATTACK_REACH[c])
+    assert ATTACK_REACH[c]['anchorRearBackOverL'] >= -.04, ('the grab draws back too far in ' + c, ATTACK_REACH[c])
+    assert ATTACK_REACH[c]['forwardAtPhase'] > ATTACK_REACH[c]['rearBackAtPhase'], ('the gather must come first in ' + c, ATTACK_REACH[c])
+print('PHRAGMOTEUTHIS_REACH', json.dumps({c: {k: v for k, v in r.items() if k != 'trace'} for c, r in ATTACK_REACH.items()}))
 reset()
 scene.frame_set(0)
 
@@ -1054,7 +1126,7 @@ anchors = [
     {'name': 'anchor_mouth', 'bone': 'jaw', 'role': 'mouth',
      'point': list(tx(mouth_point(MOUTH_R * .70, MOUTH_R * .14, 0)))},
     {'name': 'anchor_mouth_inside', 'bone': 'skull', 'role': 'swallow',
-     'point': list(tx(mouth_point(-LINING_DEPTH * .55, 0, 0)))},
+     'point': list(tx(mouth_point(-MOUTH_DEPTH * .55, 0, 0)))},
     {'name': 'anchor_attack_primary', 'bone': '%s_%02d' % (TENT[0]['name'], TENT[0]['nseg'] - 1),
      'role': 'attack', 'point': list(tx(Vector([float(x) for x in TENT[0]['pts'][-1]]))),
      'chain': ['%s_%02d' % (TENT[0]['name'], i) for i in range(TENT[0]['nseg'])]},
@@ -1121,8 +1193,9 @@ open(os.path.join(HERE, ID + '-profile.json'), 'w').write(json.dumps({
 meta = {'id': ID, 'name': NAME, 'species': 'Phragmoteuthis bisinuata',
         'description': 'Canonical Tripo body and procedural volume twin on one %d-joint rig: a stiff '
                        'mantle that squeezes by translation rather than scale, two lateral fins '
-                       'carrying a travelling wave, %d appendages of which two are tentacles, and an '
-                       'authored beak inside a closed oral lining.' % (len(B), NARM),
+                       'carrying a travelling wave, %d appendages of which two are tentacles, and no '
+                       'modelled mouth: the crown is the closed surface it was delivered as, with the '
+                       'mouth and attack anchors on its axis.' % (len(B), NARM),
         'modelLength': round(model_length, 4), 'lengthMeters': 2.42, 'locomotion': 'Swim',
         'clips': list(CLIPS), 'looping': LOOPS, 'anchors': [a['name'] for a in anchors],
         'puppet': ID + '.puppet.glb',
@@ -1136,9 +1209,17 @@ meta = {'id': ID, 'name': NAME, 'species': 'Phragmoteuthis bisinuata',
             'The mantle is one stiff bone: a phragmoteuthid carries a rigid internal shell up its '
             'back. Its jet is a radial contraction, which the contract cannot express as scale, so '
             'it is two flank bones with translation channels and the audit measures the width.',
-            'The generation models no mouth, and casting head normals back into the mesh finds '
-            'neighbouring arms across the crown gaps rather than a lip opposite, so the peristome '
-            'is authored on the crown axis with one closed skinned lining and two mandibles.',
+            'The strike is a grab and it reaches: the tentacles lie straight along the axis at rest '
+            'with their tips at the front of the body, so no rotation extends them and the head\'s '
+            'protraction is capped by the neck skin. What carries the crown out is the dart -- '
+            '`body` translates the whole animal %.2f of a body forward after a small gather and '
+            'holds it through the close, so the pair shuts out in front -- and `validation.json` '
+            '`attackReach` records the attack anchor\'s travel along the crown axis per strike clip.'
+            % STRIKE_LUNGE,
+            'The generation models no mouth, and this animal is not given one: a beak inside an '
+            'arm crown faces down the crown axis inside a thicket of arms and is never in frame, '
+            'so the crown stays the closed surface it was delivered as and the three mouth and '
+            'attack anchors are the whole of it.',
             'This animal has `swimStyle: omnidirectional` and NOT `shell: true`, so it does not '
             'jet in the simulation and nothing scrubs its Swim clip to a phase. Its cruise is the '
             'fin wave, which is what an animal with fins this size and no fixed front actually '
@@ -1181,12 +1262,12 @@ report = {'id': ID, 'intake': intake,
           'funnelSweepDegreesPerCycle': funnel_sweep,
           'mantleSqueezeTravelEngineUnits': squeeze_travel,
           'squeezeTravelAtFull': SQUEEZE_TRAVEL,
+          'attackReach': dict(ATTACK_REACH, strikeLungeOverL=STRIKE_LUNGE, anchorArm=ANCHOR_ARM,
+                              targets={'anchorForwardOverL': '>= 0.12', 'anchorRearBackOverL': '>= -0.04'}),
           'curvature': curvature, 'pairedAppendageAsymmetry': asymmetry,
-          'mouth': dict(mouth_cut, liningRings=LINING_RINGS, liningRing=LINING_RING,
-                        liningDepth=LINING_DEPTH,
-                        liningNearestSurfaceDepthRaw=round(float(lining_depth_raw), 5),
-                        skinDoubleSided=True, liningCullsBackfaces=True, oneClosedLining=True,
-                        beak='two authored mandibles, 7 sections each, rigid on skull and jaw'),
+          'mouth': dict(mouth_cut, modelled=False, anchorDepth=round(MOUTH_DEPTH, 5),
+                        note='no peristome cut, no lining and no beak: a mouth inside an arm crown '
+                             'is never seen, so the anchors are the whole of it'),
           'albedoSha256': albedo_sha,
           'mantleIsStiff': True, 'squeezeIsTranslationNotScale': True,
           'normalizedWeights': True, 'rootStable': True, 'noScaleChannels': True}

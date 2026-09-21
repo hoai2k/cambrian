@@ -60,7 +60,11 @@ export const GROUPS: SoundGroup[] = [
       { kind: 'silt', label: 'Silt', spatial: true, usage: 'A retreating dodge along the bottom, or a burrowing creature kicking up sediment.' },
       { kind: 'ability', label: 'Ability', spatial: true, usage: 'A creature’s special move fires — the generic whoosh under every ability.' },
       { kind: 'sense', label: 'Sense', spatial: true, usage: 'The sonar-style sense pulse. Flat and full volume for your own pulse; attenuated when another creature pings.' },
-      { kind: 'respawn', label: 'Respawn / hatch', spatial: true, usage: 'A creature hatches back into a nursery after dying (the sim reuses the moult state for the hatch-in). This event had no sound at all before.' },
+      { kind: 'flop', label: 'Flop', spatial: false, usage: 'A stranded water-breather throws itself toward the sea. Randomly chooses between two wet, gritty slap takes.' },
+      { kind: 'sprint', label: 'Sprint beds', spatial: false, usage: 'Three seamless water-wash loops crossfaded by depth: shallow, middle, then deep. Their shared gain follows the strongest local sprint.' },
+      { kind: 'eggPoke', label: 'Egg poke', spatial: false, usage: 'Three soft internal knocks during the visible shell-deformation phase of a bottom-rung hatch.' },
+      { kind: 'hatch', label: 'Egg crack', spatial: true, usage: 'The wet tear of a soft egg wall giving way when a new player hatches.' },
+      { kind: 'respawn', label: 'Respawn', spatial: true, usage: 'A creature hatches back into a nursery after dying (the sim reuses the moult state for the hatch-in).' },
     ],
   },
   {
@@ -152,10 +156,27 @@ export const DEVONIAN_GROUPS: SoundGroup[] = [
   },
 ];
 
+export const TRIASSIC_GROUPS: SoundGroup[] = [{
+  title: 'Triassic · Triumph',
+  blurb: 'The era\u2019s air-breathing and shoreline signatures, replacing the Devonian stand-ins.',
+  sounds: [
+    { kind: 'gulp-small', label: 'Surface breath (small)', spatial: false, usage: 'A body under 4 m breaks the surface to refill its air.' },
+    { kind: 'gulp-mid', label: 'Surface breath (mid)', spatial: false, usage: 'A 4–10 m marine reptile breaks the surface to refill its air.' },
+    { kind: 'gulp-giant', label: 'Surface breath (giant)', spatial: false, usage: 'A body at least 10 m long breaks the surface to refill its air.' },
+    { kind: 'triassic:winded', label: 'Winded', spatial: false, usage: 'The subdued pulse of an air-breather below a quarter bar underwater.' },
+    { kind: 'shoreStrike', label: 'Shore strike', spatial: true, usage: 'A shore animal snaps or lunges into the water and connects with prey.' },
+  ],
+}];
+
 /** Devonian long-form beds. */
 export const DEVONIAN_BEDS = [
   { file: 'devonian/ambient-open-sea', label: 'Open sea', usage: 'The era\u2019s ambience: cold open water far from shore. Generated as a 22 s loop, but the loop table in `src/audio/audio.ts` is still shared, so the Devonian currently plays the Cambrian reef bed instead.' },
   { file: 'devonian/anoxia-drone', label: 'Anoxia drone', usage: 'A 12 s loop for the inside of a dead zone. Same story: generated and registered, not yet on a per-era loop bus.' },
+];
+
+export const TRIASSIC_BEDS = [
+  { file: 'triassic/ambient-lagoon', label: 'Triassic lagoon', usage: 'The era\u2019s always-on bright, shallow hot-water ambience.' },
+  { file: 'triassic/basin-drone', label: 'Triassic basin', usage: 'The era\u2019s tension bed: deep, black, almost motionless water.' },
 ];
 
 /** The long-form beds. These are not `play()` kinds — the game runs them as loops on their own bus. */

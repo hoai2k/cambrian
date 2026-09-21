@@ -887,9 +887,9 @@
       ".puppet": 46
     }
   },
-  "authoredTriangles": 21926,
-  "twinTriangles": 7314,
-  "twinTriangleFraction": 0.33357657575481164,
+  "authoredTriangles": 21922,
+  "twinTriangles": 7310,
+  "twinTriangleFraction": 0.3334549767356993,
   "twinRemeshTriangles": 126272,
   "twinDecimateRatio": 0.04434870928525925,
   "twinVerticesHeldBackFromRelaxation": 7234,
@@ -1396,7 +1396,7 @@
   "weights": {
     "Odontochelys authored body": {
       "maxInfluences": 4,
-      "vertices": 10060,
+      "vertices": 10336,
       "verticesPerBone": {
         "tail_00": 4824,
         "hind_outer_L": 814,
@@ -1406,12 +1406,12 @@
         "tail_01": 1103,
         "fore_outer_L": 412,
         "fore_mid_L": 943,
-        "chest": 4857,
+        "chest": 4843,
         "fore_upper_L": 989,
-        "neck_00": 1093,
+        "neck_00": 1065,
         "fore_tip_L": 299,
-        "jaw": 644,
-        "neck_01": 965,
+        "jaw": 649,
+        "neck_01": 937,
         "plastron": 1921,
         "tail_04": 178,
         "tail_03": 251,
@@ -1421,16 +1421,29 @@
         "hind_upper_L": 448,
         "fore_tip_R": 410,
         "fore_outer_R": 588,
-        "skull": 648,
+        "skull": 633,
         "hind_outer_R": 591,
-        "fore_upper_R": 917,
+        "fore_upper_R": 912,
         "fore_mid_R": 1010,
         "hind_tip_R": 391
+      },
+      "jawJunction": {
+        "cutRimPairs": 51,
+        "lipPairs": 102,
+        "rimReach": 0.046192754078169924,
+        "rimDepth": 0.016147512942552567,
+        "dz": 0.005382504314184189,
+        "band": 0.015,
+        "back": 0.06,
+        "throat": 1.0,
+        "shellVertices": 276,
+        "shellFullJaw": 208,
+        "bodyThroatVertices": 127
       }
     },
     "Odontochelys procedural volume twin": {
       "maxInfluences": 4,
-      "vertices": 2858,
+      "vertices": 2922,
       "verticesPerBone": {
         "hind_tip_L": 184,
         "hind_outer_L": 274,
@@ -1447,24 +1460,37 @@
         "hind_upper_R": 211,
         "body": 1805,
         "plastron": 581,
-        "chest": 1566,
+        "chest": 1556,
         "fore_upper_L": 313,
         "fore_upper_R": 255,
         "fore_mid_R": 364,
-        "neck_00": 355,
+        "neck_00": 344,
         "fore_outer_R": 247,
         "fore_mid_L": 382,
         "fore_outer_L": 218,
         "fore_tip_L": 183,
-        "skull": 160,
-        "neck_01": 266,
+        "skull": 159,
+        "neck_01": 255,
         "jaw": 182,
         "fore_tip_R": 196
+      },
+      "jawJunction": {
+        "cutRimPairs": 19,
+        "lipPairs": 20,
+        "rimReach": 0.049389224774235484,
+        "rimDepth": 0.019620634615421295,
+        "dz": 0.006540211538473765,
+        "band": 0.015,
+        "back": 0.06,
+        "throat": 1.0,
+        "shellVertices": 64,
+        "shellFullJaw": 44,
+        "bodyThroatVertices": 39
       }
     }
   },
   "maxInfluences": 4,
-  "meanInfluences": 3.5088248954946586,
+  "meanInfluences": 3.4557248453763765,
   "mouth": {
     "method": "modelled cavity, measured by casting head vertex normals back into the mesh",
     "note": "The generation models a real slit with an interior: 106 cavity vertices at a 0.012 gap. The seam is the cavity's own mid height per station, blurred once and fitted over the 11 stations in front of the hinge -- behind it the detector walks onto the forelimb, which stands beside the jaw on this pose, and the seam it reports falls a fifth of a body length below the head. Station-to-station roughness 0.0526 of the local radius.",
@@ -1854,109 +1880,53 @@
         0.02273,
         0.0035
       ],
-      "-0.34338": [
-        0.02305,
-        0.00368
+      "-0.34609": [
+        0.02379,
+        0.00409
       ],
-      "-0.3459": [
-        0.02373,
-        0.00406
-      ],
-      "-0.34842": [
-        0.02441,
-        0.00444
-      ],
-      "-0.35093": [
+      "-0.35132": [
         0.02471,
         0.00461
       ],
-      "-0.35345": [
-        0.02471,
-        0.00461
+      "-0.35655": [
+        0.02463,
+        0.0046
       ],
-      "-0.35597": [
-        0.0247,
-        0.00461
+      "-0.36178": [
+        0.02399,
+        0.00455
       ],
-      "-0.35849": [
-        0.02442,
-        0.00459
+      "-0.36701": [
+        0.02302,
+        0.00451
       ],
-      "-0.36101": [
-        0.02413,
-        0.00456
+      "-0.37224": [
+        0.02176,
+        0.00447
       ],
-      "-0.36353": [
-        0.02369,
-        0.00454
+      "-0.37748": [
+        0.02033,
+        0.00443
       ],
-      "-0.36604": [
-        0.02324,
-        0.00452
+      "-0.38271": [
+        0.01876,
+        0.00438
       ],
-      "-0.36856": [
-        0.02266,
-        0.0045
+      "-0.38794": [
+        0.01706,
+        0.0043
       ],
-      "-0.37108": [
-        0.02207,
-        0.00448
-      ],
-      "-0.3736": [
-        0.0214,
-        0.00446
-      ],
-      "-0.37612": [
-        0.02073,
-        0.00444
-      ],
-      "-0.37864": [
-        0.01999,
-        0.00442
-      ],
-      "-0.38116": [
-        0.01925,
-        0.0044
-      ],
-      "-0.38367": [
-        0.01845,
-        0.00436
-      ],
-      "-0.38619": [
-        0.01764,
-        0.00433
-      ],
-      "-0.38871": [
-        0.01679,
-        0.00429
-      ],
-      "-0.39123": [
-        0.01595,
-        0.00425
-      ],
-      "-0.39375": [
-        0.01513,
+      "-0.39317": [
+        0.01532,
         0.00422
       ],
-      "-0.39627": [
-        0.01434,
-        0.00418
+      "-0.3984": [
+        0.01377,
+        0.00416
       ],
-      "-0.39879": [
-        0.01367,
-        0.00415
-      ],
-      "-0.4013": [
-        0.01304,
-        0.00413
-      ],
-      "-0.40382": [
-        0.01258,
+      "-0.40363": [
+        0.01262,
         0.00411
-      ],
-      "-0.40634": [
-        0.01191,
-        0.00379
       ],
       "-0.40886": [
         0.01124,
@@ -2028,7 +1998,7 @@
       ]
     },
     "liningFittedPerVertex": true,
-    "liningWorstSectionHullClearance": 0.00200750150544723,
+    "liningWorstSectionHullClearance": 0.002000290047082442,
     "liningVerticesOutsideTheSectionHull": 0,
     "toothPatches": [
       {
@@ -2087,8 +2057,8 @@
     "oralPartSeating": [
       {
         "part": "Oral cavity lining",
-        "worstSectionHullClearance": 0.00200750150544723,
-        "signedDepthProbeMin": -0.00520072178915143
+        "worstSectionHullClearance": 0.002000290047082442,
+        "signedDepthProbeMin": -0.004541111644357443
       },
       {
         "part": "Seated jaw hinge tissue",

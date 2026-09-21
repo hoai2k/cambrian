@@ -3,6 +3,7 @@ import { ACTIVE_ERA } from '../content';
 import type { CreatureId } from '../sim/creatures';
 import type { Biome, LandmarkKind } from '../sim/world';
 import { clampMark } from '../sim/ladder';
+import { TEXT } from '../shared/text';
 
 /**
  * The record of everything the player has found in this era, kept across sessions on this device.
@@ -145,13 +146,6 @@ export function saveCodex(codex: Codex) {
   try { localStorage.setItem(key(), JSON.stringify(codex)); } catch { /* nothing to do about it */ }
 }
 
-export const LANDMARK_NAMES: Record<LandmarkKind, string> = {
-  arch: 'The Arch',
-  stack: 'The Stack',
-  bones: 'A Giant’s Bones',
-};
-export const LANDMARK_BLURBS: Record<LandmarkKind, string> = {
-  arch: 'A span of rock with the sea running under it.',
-  stack: 'Boulders piled into a tower you can climb.',
-  bones: 'A dead giant on the floor. Food — and something comes back for it.',
-};
+/** What each landmark is called, and what it is. The words are in `TEXT.discoveries`. */
+export const LANDMARK_NAMES: Record<LandmarkKind, string> = TEXT.discoveries.landmarkNames;
+export const LANDMARK_BLURBS: Record<LandmarkKind, string> = TEXT.discoveries.landmarkBlurbs;

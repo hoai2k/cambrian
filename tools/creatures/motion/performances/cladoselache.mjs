@@ -4,6 +4,7 @@
  */
 import { UP, DOWN } from '../lib.mjs';
 import { wave, beatPhase } from '../common.mjs';
+import { flopClip } from '../gaits.mjs';
 
 const TAIL = ['tail0', 'tail1', 'tail2', 'tail3', 'tail4', 'tail5'];
 
@@ -27,3 +28,6 @@ export const clips = [
     },
   },
 ];
+
+// The flop (src/sim/beach.ts).
+clips.push(flopClip({ tail: ['tail0','tail1','tail2','tail3','tail4','tail5'], pectorals: ['pectoralL','pectoralR'], skull: 'skull', jaw: 'jaw', amp: 0.3 }));

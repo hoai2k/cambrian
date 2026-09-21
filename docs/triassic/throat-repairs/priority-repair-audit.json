@@ -1,0 +1,4942 @@
+{
+  "method": "Three.js GLTFLoader/AnimationMixer; all shipped authored and puppet clips, 25 samples including clamped endpoints; skin and hidden oral surfaces recorded separately; mouth region selected by jaw/skull/neck/pouch influences. Strain flags require posed edge >1.5% body length and ratio >2. No automatic claim of intersection-free geometry.",
+  "phases": 25,
+  "models": [
+    {
+      "id": "hupehsuchus",
+      "variant": "authored",
+      "sha256": "f31f31e60372e728d19a325b01361d5afc713be73c726c0a8993ec43aad75e41",
+      "length": 3.9999998579516953,
+      "meshes": [
+        {
+          "name": "Hupehsuchus_authored_body",
+          "hiddenOral": false,
+          "vertices": 11031,
+          "mixedJawSkullVertices": 0
+        },
+        {
+          "name": "Hupehsuchus_authored_body_lower_jaw",
+          "hiddenOral": false,
+          "vertices": 727,
+          "mixedJawSkullVertices": 227
+        },
+        {
+          "name": "Oral_cavity_lining",
+          "hiddenOral": true,
+          "vertices": 364,
+          "mixedJawSkullVertices": 0
+        },
+        {
+          "name": "Seated_jaw_hinge_tissue",
+          "hiddenOral": true,
+          "vertices": 207,
+          "mixedJawSkullVertices": 113
+        }
+      ],
+      "clips": [
+        {
+          "name": "Ability",
+          "duration": 2.4000000953674316,
+          "skin": {
+            "ratio": 2.8126180794893587,
+            "rest": 0.03661097669940459,
+            "posed": 0.10297269497250901,
+            "phase": 0.6666666666666666,
+            "mesh": "Hupehsuchus_authored_body_lower_jaw",
+            "vertices": [
+              35,
+              275
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 2.8126180794893587,
+            "rest": 0.03661097669940459,
+            "posed": 0.10297269497250901,
+            "phase": 0.6666666666666666,
+            "mesh": "Hupehsuchus_authored_body_lower_jaw",
+            "vertices": [
+              35,
+              275
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000093466175,
+            "rest": 0.06511621170820446,
+            "posed": 0.06511621231682078,
+            "phase": 0.16666666666666666,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              195,
+              182
+            ]
+          }
+        },
+        {
+          "name": "Attack",
+          "duration": 1,
+          "skin": {
+            "ratio": 2.7928295205473526,
+            "rest": 0.0255018340870471,
+            "posed": 0.07122227506640588,
+            "phase": 0.4583333333333333,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              3679,
+              2906
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 2.7928295205473526,
+            "rest": 0.0255018340870471,
+            "posed": 0.07122227506640588,
+            "phase": 0.4583333333333333,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              3679,
+              2906
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000049239501,
+            "rest": 0.09827110654396859,
+            "posed": 0.09827110702785061,
+            "phase": 0.5416666666666666,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              196,
+              195
+            ]
+          }
+        },
+        {
+          "name": "Bite",
+          "duration": 0.5,
+          "skin": {
+            "ratio": 1.3684626573762022,
+            "rest": 0.04652539543761756,
+            "posed": 0.06366826627604076,
+            "phase": 0.4166666666666667,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              42,
+              2012
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.3005519924812055,
+            "rest": 0.048998810369906005,
+            "posed": 0.06372550045579001,
+            "phase": 0.2916666666666667,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              2102,
+              710
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000025491025,
+            "rest": 0.07925153876203173,
+            "posed": 0.07925153896405202,
+            "phase": 0.16666666666666666,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              285,
+              270
+            ]
+          }
+        },
+        {
+          "name": "Breath",
+          "duration": 2.4000000953674316,
+          "skin": {
+            "ratio": 1.274237217966072,
+            "rest": 0.0502192510560818,
+            "posed": 0.06399123875404139,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              787,
+              2173
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1113752533313757,
+            "rest": 0.06226434551072253,
+            "posed": 0.06919905276549156,
+            "phase": 0.6666666666666666,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              8572,
+              3679
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000004373277,
+            "rest": 0.084263835923927,
+            "posed": 0.08426383596077791,
+            "phase": 0.3333333333333333,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              5,
+              7
+            ]
+          }
+        },
+        {
+          "name": "Breathe",
+          "duration": 3,
+          "skin": {
+            "ratio": 1.1593312756862701,
+            "rest": 0.06226434551072253,
+            "posed": 0.07218500311071664,
+            "phase": 1,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              8572,
+              3679
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1593312756862701,
+            "rest": 0.06226434551072253,
+            "posed": 0.07218500311071664,
+            "phase": 1,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              8572,
+              3679
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000006079972,
+            "rest": 0.084263835923927,
+            "posed": 0.08426383597515918,
+            "phase": 0.25,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              5,
+              7
+            ]
+          }
+        },
+        {
+          "name": "Death",
+          "duration": 1.7999999523162842,
+          "skin": {
+            "ratio": 1.3865747897035547,
+            "rest": 0.047092891244090856,
+            "posed": 0.06529781577330765,
+            "phase": 1,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              5100,
+              1989
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0883002922867568,
+            "rest": 0.06437707748076316,
+            "posed": 0.07006159223888174,
+            "phase": 1,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              8990,
+              2861
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.000000075543395,
+            "rest": 0.22156290696652903,
+            "posed": 0.22156292370414324,
+            "phase": 0.625,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              11,
+              3
+            ]
+          }
+        },
+        {
+          "name": "Dive",
+          "duration": 1.399999976158142,
+          "skin": {
+            "ratio": 1.2211008615546923,
+            "rest": 0.0502192510560818,
+            "posed": 0.061322770731212874,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              787,
+              2173
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0061568060872228,
+            "rest": 0.06219959731594596,
+            "posed": 0.06258254817532358,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              6175,
+              4541
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000003995015,
+            "rest": 0.084263835923927,
+            "posed": 0.08426383595759053,
+            "phase": 0.3333333333333333,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              5,
+              7
+            ]
+          }
+        },
+        {
+          "name": "Dodge",
+          "duration": 0.5,
+          "skin": {
+            "ratio": 1.959657148899588,
+            "rest": 0.03624173786438329,
+            "posed": 0.0710213806944836,
+            "phase": 0.4583333333333333,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              368,
+              5963
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2033560801082799,
+            "rest": 0.05245176257432483,
+            "posed": 0.0631181474062097,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              10576,
+              3404
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000244707672,
+            "rest": 0.06325309206460608,
+            "posed": 0.06325309361245778,
+            "phase": 0.3333333333333333,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              194,
+              195
+            ]
+          }
+        },
+        {
+          "name": "Eat",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 1.852509726364906,
+            "rest": 0.03661097669940459,
+            "posed": 0.06782219042736595,
+            "phase": 0.75,
+            "mesh": "Hupehsuchus_authored_body_lower_jaw",
+            "vertices": [
+              35,
+              275
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.852509726364906,
+            "rest": 0.03661097669940459,
+            "posed": 0.06782219042736595,
+            "phase": 0.75,
+            "mesh": "Hupehsuchus_authored_body_lower_jaw",
+            "vertices": [
+              35,
+              275
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000041188168,
+            "rest": 0.11075593330897397,
+            "posed": 0.11075593376515738,
+            "phase": 0.375,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              200,
+              185
+            ]
+          }
+        },
+        {
+          "name": "Grab",
+          "duration": 1.100000023841858,
+          "skin": {
+            "ratio": 1.338110708122018,
+            "rest": 0.0502192510560818,
+            "posed": 0.06719891759201102,
+            "phase": 0.4166666666666667,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              787,
+              2173
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0571626846480975,
+            "rest": 0.06116794310662884,
+            "posed": 0.06466446694900584,
+            "phase": 0.75,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              6502,
+              1396
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000047085953,
+            "rest": 0.13604575413650877,
+            "posed": 0.13604575477709316,
+            "phase": 0.08333333333333333,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              25,
+              10
+            ]
+          }
+        },
+        {
+          "name": "Growth",
+          "duration": 1.399999976158142,
+          "skin": {
+            "ratio": 1.3160599173106582,
+            "rest": 0.0502192510560818,
+            "posed": 0.06609154339227019,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              787,
+              2173
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0514258452846887,
+            "rest": 0.06437707748076316,
+            "posed": 0.0676877231071693,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              8990,
+              2861
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000003731855,
+            "rest": 0.21784005113668928,
+            "posed": 0.21784005121798403,
+            "phase": 0.6666666666666666,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              189,
+              193
+            ]
+          }
+        },
+        {
+          "name": "Guard",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 1.1026466949958216,
+            "rest": 0.06104949372640733,
+            "posed": 0.06731602248859118,
+            "phase": 0.4583333333333333,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              3837,
+              10230
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0034820043638208,
+            "rest": 0.06437707748076316,
+            "posed": 0.06460123874548121,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              8990,
+              2861
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000010245484,
+            "rest": 0.084263835923927,
+            "posed": 0.08426383601025939,
+            "phase": 0.25,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              5,
+              7
+            ]
+          }
+        },
+        {
+          "name": "Gulp",
+          "duration": 1.399999976158142,
+          "skin": {
+            "ratio": 3.4673366254331635,
+            "rest": 0.017873630033224074,
+            "posed": 0.061973892043640004,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              621,
+              2061
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 2.8092896490726016,
+            "rest": 0.03661097669940459,
+            "posed": 0.10285083788407552,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_authored_body_lower_jaw",
+            "vertices": [
+              35,
+              275
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000018345843,
+            "rest": 0.1254941458025657,
+            "posed": 0.1254941460327953,
+            "phase": 0.6666666666666666,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              189,
+              191
+            ]
+          }
+        },
+        {
+          "name": "Heavy",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 3.166521982421134,
+            "rest": 0.0255018340870471,
+            "posed": 0.08075211822869123,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              3679,
+              2906
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 3.166521982421134,
+            "rest": 0.0255018340870471,
+            "posed": 0.08075211822869123,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              3679,
+              2906
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000088519563,
+            "rest": 0.07923266778111561,
+            "posed": 0.07923266848247972,
+            "phase": 0.4166666666666667,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              313,
+              298
+            ]
+          }
+        },
+        {
+          "name": "Hit",
+          "duration": 0.6000000238418579,
+          "skin": {
+            "ratio": 1.2444452850331866,
+            "rest": 0.0502192510560818,
+            "posed": 0.062495110194638874,
+            "phase": 0.375,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              787,
+              2173
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1592920445153172,
+            "rest": 0.06437707748076316,
+            "posed": 0.0746318337725949,
+            "phase": 0.3333333333333333,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              8990,
+              2861
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000127374817,
+            "rest": 0.0657760247467806,
+            "posed": 0.06577602558460151,
+            "phase": 0.5,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              12,
+              13
+            ]
+          }
+        },
+        {
+          "name": "Idle",
+          "duration": 2.5999999046325684,
+          "skin": {
+            "ratio": 1.0804158501225118,
+            "rest": 0.06485398545118985,
+            "posed": 0.0700692738250803,
+            "phase": 0.5416666666666666,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              1432,
+              1945
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0024697380062089,
+            "rest": 0.06437707748076316,
+            "posed": 0.06453607199574606,
+            "phase": 0.4583333333333333,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              8990,
+              2861
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000005427974,
+            "rest": 0.084263835923927,
+            "posed": 0.08426383596966519,
+            "phase": 0.25,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              5,
+              7
+            ]
+          }
+        },
+        {
+          "name": "Parry",
+          "duration": 0.4000000059604645,
+          "skin": {
+            "ratio": 1.4951754210270318,
+            "rest": 0.0432437247563943,
+            "posed": 0.06465695436941893,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              8286,
+              7851
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2433040548211096,
+            "rest": 0.048998810369906005,
+            "posed": 0.06092041961431477,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              2102,
+              710
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000111598593,
+            "rest": 0.06325309206460608,
+            "posed": 0.06325309277050169,
+            "phase": 0.5,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              190,
+              191
+            ]
+          }
+        },
+        {
+          "name": "Rise",
+          "duration": 1.399999976158142,
+          "skin": {
+            "ratio": 1.1852448095666912,
+            "rest": 0.06485398545118985,
+            "posed": 0.07686784963573648,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              1432,
+              1945
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0318400906044303,
+            "rest": 0.06251517407051929,
+            "posed": 0.06450566287707636,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              3168,
+              7479
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.000000000399495,
+            "rest": 0.084263835923927,
+            "posed": 0.08426383595758999,
+            "phase": 0.3333333333333333,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              5,
+              7
+            ]
+          }
+        },
+        {
+          "name": "Sprint",
+          "duration": 1.100000023841858,
+          "skin": {
+            "ratio": 1.91680206386092,
+            "rest": 0.03194341227652235,
+            "posed": 0.06122919857839829,
+            "phase": 1,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              5588,
+              8384
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0048020442515904,
+            "rest": 0.06437707748076316,
+            "posed": 0.06468621905561384,
+            "phase": 0.625,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              8990,
+              2861
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000029596414,
+            "rest": 0.084263835923927,
+            "posed": 0.08426383617331774,
+            "phase": 0.125,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              5,
+              7
+            ]
+          }
+        },
+        {
+          "name": "Stagger",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 1.2482291597553263,
+            "rest": 0.0502192510560818,
+            "posed": 0.06268513354927477,
+            "phase": 0.4166666666666667,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              787,
+              2173
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2464371598608066,
+            "rest": 0.048998810369906005,
+            "posed": 0.06107393803402388,
+            "phase": 0.5833333333333334,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              2102,
+              710
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.000000012741445,
+            "rest": 0.0657760247467806,
+            "posed": 0.0657760255848622,
+            "phase": 0.5,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              12,
+              13
+            ]
+          }
+        },
+        {
+          "name": "Swim",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 1.4215511924478532,
+            "rest": 0.042245768968866,
+            "posed": 0.06005452325356798,
+            "phase": 0.7083333333333334,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              10367,
+              4424
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0039446785687314,
+            "rest": 0.06437707748076316,
+            "posed": 0.06463102435861909,
+            "phase": 0.625,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              8990,
+              2861
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000020565714,
+            "rest": 0.084263835923927,
+            "posed": 0.08426383609722159,
+            "phase": 0.125,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              5,
+              7
+            ]
+          }
+        },
+        {
+          "name": "TurnLeft",
+          "duration": 1.5,
+          "skin": {
+            "ratio": 1.142209360733796,
+            "rest": 0.05377216137330802,
+            "posed": 0.061419066067480675,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              6619,
+              1367
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1107482679099558,
+            "rest": 0.06116794310662884,
+            "posed": 0.0679421868573027,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              6502,
+              1396
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000093242656,
+            "rest": 0.06325309206460608,
+            "posed": 0.06325309265439472,
+            "phase": 0.5416666666666666,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              190,
+              191
+            ]
+          }
+        },
+        {
+          "name": "TurnRight",
+          "duration": 1.5,
+          "skin": {
+            "ratio": 1.7453375293767432,
+            "rest": 0.03624173786438329,
+            "posed": 0.0632540652245423,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              368,
+              5963
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1252177906264784,
+            "rest": 0.060026879147105645,
+            "posed": 0.06754331233210885,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_authored_body",
+            "vertices": [
+              6758,
+              6983
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.00000001060686,
+            "rest": 0.13604575413650877,
+            "posed": 0.13604575557952703,
+            "phase": 0.5,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              25,
+              10
+            ]
+          }
+        }
+      ],
+      "worstMouth": {
+        "ratio": 3.166521982421134,
+        "rest": 0.0255018340870471,
+        "posed": 0.08075211822869123,
+        "phase": 0.5,
+        "mesh": "Hupehsuchus_authored_body",
+        "vertices": [
+          3679,
+          2906
+        ],
+        "clip": "Heavy"
+      }
+    },
+    {
+      "id": "hupehsuchus",
+      "variant": "puppet",
+      "sha256": "a08e963201ffa7f674581cd25333dc999a0834d1dac1369098b0f167c8a2865d",
+      "length": 4.0169493917223456,
+      "meshes": [
+        {
+          "name": "Hupehsuchus_procedural_volume_twin",
+          "hiddenOral": false,
+          "vertices": 3273,
+          "mixedJawSkullVertices": 0
+        },
+        {
+          "name": "Hupehsuchus_procedural_volume_twin_lower_jaw",
+          "hiddenOral": false,
+          "vertices": 259,
+          "mixedJawSkullVertices": 72
+        },
+        {
+          "name": "Oral_cavity_lining",
+          "hiddenOral": true,
+          "vertices": 364,
+          "mixedJawSkullVertices": 0
+        },
+        {
+          "name": "Seated_jaw_hinge_tissue",
+          "hiddenOral": true,
+          "vertices": 207,
+          "mixedJawSkullVertices": 113
+        }
+      ],
+      "clips": [
+        {
+          "name": "Ability",
+          "duration": 2.4000000953674316,
+          "skin": {
+            "ratio": 2.927870060294404,
+            "rest": 0.04363897819191612,
+            "posed": 0.12776925770995162,
+            "phase": 0.6666666666666666,
+            "mesh": "Hupehsuchus_procedural_volume_twin_lower_jaw",
+            "vertices": [
+              93,
+              92
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 2.927870060294404,
+            "rest": 0.04363897819191612,
+            "posed": 0.12776925770995162,
+            "phase": 0.6666666666666666,
+            "mesh": "Hupehsuchus_procedural_volume_twin_lower_jaw",
+            "vertices": [
+              93,
+              92
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000093466175,
+            "rest": 0.06511621170820446,
+            "posed": 0.06511621231682078,
+            "phase": 0.16666666666666666,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              195,
+              182
+            ]
+          }
+        },
+        {
+          "name": "Attack",
+          "duration": 1,
+          "skin": {
+            "ratio": 2.8812944144499846,
+            "rest": 0.04363897819191612,
+            "posed": 0.1257367441166726,
+            "phase": 0.4583333333333333,
+            "mesh": "Hupehsuchus_procedural_volume_twin_lower_jaw",
+            "vertices": [
+              93,
+              92
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 2.8812944144499846,
+            "rest": 0.04363897819191612,
+            "posed": 0.1257367441166726,
+            "phase": 0.4583333333333333,
+            "mesh": "Hupehsuchus_procedural_volume_twin_lower_jaw",
+            "vertices": [
+              93,
+              92
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000049239501,
+            "rest": 0.09827110654396859,
+            "posed": 0.09827110702785061,
+            "phase": 0.5416666666666666,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              196,
+              195
+            ]
+          }
+        },
+        {
+          "name": "Bite",
+          "duration": 0.5,
+          "skin": {
+            "ratio": 1.453980605791118,
+            "rest": 0.05143507114940547,
+            "posed": 0.07478559590872183,
+            "phase": 0.4583333333333333,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              970,
+              985
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.3558219526521096,
+            "rest": 0.04468328142395803,
+            "posed": 0.06058257387113451,
+            "phase": 0.2916666666666667,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              2825,
+              2820
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000025491025,
+            "rest": 0.07925153876203173,
+            "posed": 0.07925153896405202,
+            "phase": 0.16666666666666666,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              285,
+              270
+            ]
+          }
+        },
+        {
+          "name": "Breath",
+          "duration": 2.4000000953674316,
+          "skin": {
+            "ratio": 1.4079903470494788,
+            "rest": 0.05097565864133283,
+            "posed": 0.07177323530148597,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              951,
+              981
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1062398400427238,
+            "rest": 0.0658211801529023,
+            "posed": 0.07281401180376994,
+            "phase": 0.3333333333333333,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              2166,
+              2164
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000004373277,
+            "rest": 0.084263835923927,
+            "posed": 0.08426383596077791,
+            "phase": 0.3333333333333333,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              5,
+              7
+            ]
+          }
+        },
+        {
+          "name": "Breathe",
+          "duration": 3,
+          "skin": {
+            "ratio": 1.1754234603540543,
+            "rest": 0.060800733888524396,
+            "posed": 0.07146660901931536,
+            "phase": 0.4583333333333333,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              984,
+              952
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1508435418197278,
+            "rest": 0.0658211801529023,
+            "posed": 0.07574988009392045,
+            "phase": 1,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              2166,
+              2164
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000006079972,
+            "rest": 0.084263835923927,
+            "posed": 0.08426383597515918,
+            "phase": 0.25,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              5,
+              7
+            ]
+          }
+        },
+        {
+          "name": "Death",
+          "duration": 1.7999999523162842,
+          "skin": {
+            "ratio": 1.5555251251721927,
+            "rest": 0.05454657426497508,
+            "posed": 0.08484856676123965,
+            "phase": 1,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              368,
+              369
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0896691667179228,
+            "rest": 0.07748246502117971,
+            "posed": 0.0844302530948795,
+            "phase": 1,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              2196,
+              2195
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.000000075543395,
+            "rest": 0.22156290696652903,
+            "posed": 0.22156292370414324,
+            "phase": 0.625,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              11,
+              3
+            ]
+          }
+        },
+        {
+          "name": "Dive",
+          "duration": 1.399999976158142,
+          "skin": {
+            "ratio": 1.3331031185146072,
+            "rest": 0.05097565864133283,
+            "posed": 0.06795580950309688,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              951,
+              981
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.024457532996564,
+            "rest": 0.08940142796653452,
+            "posed": 0.09158796634096597,
+            "phase": 0.4583333333333333,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              2186,
+              2196
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000003995015,
+            "rest": 0.084263835923927,
+            "posed": 0.08426383595759053,
+            "phase": 0.3333333333333333,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              5,
+              7
+            ]
+          }
+        },
+        {
+          "name": "Dodge",
+          "duration": 0.5,
+          "skin": {
+            "ratio": 2.1257270710898655,
+            "rest": 0.031918638811307465,
+            "posed": 0.06785031459353592,
+            "phase": 0.4583333333333333,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              439,
+              441
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2643355165877415,
+            "rest": 0.04809741585145828,
+            "posed": 0.060811271117088936,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              2655,
+              2653
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000244707672,
+            "rest": 0.06325309206460608,
+            "posed": 0.06325309361245778,
+            "phase": 0.3333333333333333,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              194,
+              195
+            ]
+          }
+        },
+        {
+          "name": "Eat",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 1.9225592419957334,
+            "rest": 0.03446407235350305,
+            "posed": 0.06625922082003693,
+            "phase": 0.75,
+            "mesh": "Hupehsuchus_procedural_volume_twin_lower_jaw",
+            "vertices": [
+              42,
+              41
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.9225592419957334,
+            "rest": 0.03446407235350305,
+            "posed": 0.06625922082003693,
+            "phase": 0.75,
+            "mesh": "Hupehsuchus_procedural_volume_twin_lower_jaw",
+            "vertices": [
+              42,
+              41
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000041188168,
+            "rest": 0.11075593330897397,
+            "posed": 0.11075593376515738,
+            "phase": 0.375,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              200,
+              185
+            ]
+          }
+        },
+        {
+          "name": "Grab",
+          "duration": 1.100000023841858,
+          "skin": {
+            "ratio": 1.5004218463014072,
+            "rest": 0.05097565864133283,
+            "posed": 0.07648499185505889,
+            "phase": 0.4166666666666667,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              951,
+              981
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0661224719888844,
+            "rest": 0.09786526682153064,
+            "posed": 0.104336360185622,
+            "phase": 0.4166666666666667,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              2859,
+              2825
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000047085953,
+            "rest": 0.13604575413650877,
+            "posed": 0.13604575477709316,
+            "phase": 0.08333333333333333,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              25,
+              10
+            ]
+          }
+        },
+        {
+          "name": "Growth",
+          "duration": 1.399999976158142,
+          "skin": {
+            "ratio": 1.4779461663123894,
+            "rest": 0.05143507114940547,
+            "posed": 0.0760182662192688,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              970,
+              985
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0615982532067694,
+            "rest": 0.07748246502117971,
+            "posed": 0.08225524952063899,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              2196,
+              2195
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000003731855,
+            "rest": 0.21784005113668928,
+            "posed": 0.21784005121798403,
+            "phase": 0.6666666666666666,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              189,
+              193
+            ]
+          }
+        },
+        {
+          "name": "Guard",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 1.1766677116254705,
+            "rest": 0.05143507114940547,
+            "posed": 0.06052198746666419,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              970,
+              985
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0394947621254433,
+            "rest": 0.08240786785681413,
+            "posed": 0.08566254699508398,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              2826,
+              2854
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000010245484,
+            "rest": 0.084263835923927,
+            "posed": 0.08426383601025939,
+            "phase": 0.25,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              5,
+              7
+            ]
+          }
+        },
+        {
+          "name": "Gulp",
+          "duration": 1.399999976158142,
+          "skin": {
+            "ratio": 3.3120099350490326,
+            "rest": 0.031918638811307465,
+            "posed": 0.10571484885629197,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              439,
+              441
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 2.9238805230936555,
+            "rest": 0.04363897819191612,
+            "posed": 0.12759515838305233,
+            "phase": 0.4166666666666667,
+            "mesh": "Hupehsuchus_procedural_volume_twin_lower_jaw",
+            "vertices": [
+              93,
+              92
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000018345843,
+            "rest": 0.1254941458025657,
+            "posed": 0.1254941460327953,
+            "phase": 0.6666666666666666,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              189,
+              191
+            ]
+          }
+        },
+        {
+          "name": "Heavy",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 2.890135324391234,
+            "rest": 0.04363897819191612,
+            "posed": 0.1261225523927955,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_procedural_volume_twin_lower_jaw",
+            "vertices": [
+              93,
+              92
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 2.890135324391234,
+            "rest": 0.04363897819191612,
+            "posed": 0.1261225523927955,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_procedural_volume_twin_lower_jaw",
+            "vertices": [
+              93,
+              92
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000088519563,
+            "rest": 0.07923266778111561,
+            "posed": 0.07923266848247972,
+            "phase": 0.4166666666666667,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              313,
+              298
+            ]
+          }
+        },
+        {
+          "name": "Hit",
+          "duration": 0.6000000238418579,
+          "skin": {
+            "ratio": 1.4059806187308994,
+            "rest": 0.04521417642411622,
+            "posed": 0.06357025574418697,
+            "phase": 0.6666666666666666,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              1589,
+              1592
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1408133189967231,
+            "rest": 0.07748246502117971,
+            "posed": 0.08839302808485953,
+            "phase": 0.3333333333333333,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              2196,
+              2195
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000127374817,
+            "rest": 0.0657760247467806,
+            "posed": 0.06577602558460151,
+            "phase": 0.5,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              12,
+              13
+            ]
+          }
+        },
+        {
+          "name": "Idle",
+          "duration": 2.5999999046325684,
+          "skin": {
+            "ratio": 1.1138522011440022,
+            "rest": 0.058732451055070266,
+            "posed": 0.06541926988627239,
+            "phase": 0.9166666666666666,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              1180,
+              1182
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0144480845971948,
+            "rest": 0.06822569953942385,
+            "posed": 0.06921143021807225,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_procedural_volume_twin_lower_jaw",
+            "vertices": [
+              87,
+              84
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000005427974,
+            "rest": 0.084263835923927,
+            "posed": 0.08426383596966519,
+            "phase": 0.25,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              5,
+              7
+            ]
+          }
+        },
+        {
+          "name": "Parry",
+          "duration": 0.4000000059604645,
+          "skin": {
+            "ratio": 1.6679663502556668,
+            "rest": 0.05143507114940547,
+            "posed": 0.08579196790021439,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              970,
+              985
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.188192913532749,
+            "rest": 0.07748246502117971,
+            "posed": 0.09206411586121482,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              2196,
+              2195
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000111598593,
+            "rest": 0.06325309206460608,
+            "posed": 0.06325309277050169,
+            "phase": 0.5,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              190,
+              191
+            ]
+          }
+        },
+        {
+          "name": "Rise",
+          "duration": 1.399999976158142,
+          "skin": {
+            "ratio": 1.2589025327017214,
+            "rest": 0.05143507114940547,
+            "posed": 0.06475174133967979,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              970,
+              985
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0581017990164634,
+            "rest": 0.06677782832018385,
+            "posed": 0.07065774027999906,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              1959,
+              1960
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.000000000399495,
+            "rest": 0.084263835923927,
+            "posed": 0.08426383595758999,
+            "phase": 0.3333333333333333,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              5,
+              7
+            ]
+          }
+        },
+        {
+          "name": "Sprint",
+          "duration": 1.100000023841858,
+          "skin": {
+            "ratio": 1.962906315702309,
+            "rest": 0.031918638811307465,
+            "posed": 0.06265329771133626,
+            "phase": 0.25,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              439,
+              441
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.016683898301321,
+            "rest": 0.07748246502117971,
+            "posed": 0.07877517458772874,
+            "phase": 0.16666666666666666,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              2196,
+              2195
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000029596414,
+            "rest": 0.084263835923927,
+            "posed": 0.08426383617331774,
+            "phase": 0.125,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              5,
+              7
+            ]
+          }
+        },
+        {
+          "name": "Stagger",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 1.4059807233934225,
+            "rest": 0.04521417642411622,
+            "posed": 0.06357026047641676,
+            "phase": 0.6666666666666666,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              1589,
+              1592
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1561834677425398,
+            "rest": 0.07748246502117971,
+            "posed": 0.08958394509742759,
+            "phase": 0.5833333333333334,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              2196,
+              2195
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.000000012741445,
+            "rest": 0.0657760247467806,
+            "posed": 0.0657760255848622,
+            "phase": 0.5,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              12,
+              13
+            ]
+          }
+        },
+        {
+          "name": "Swim",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 1.4960076613118647,
+            "rest": 0.05143507114940547,
+            "posed": 0.07694726049963145,
+            "phase": 0.25,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              970,
+              985
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0144480845971948,
+            "rest": 0.06822569953942385,
+            "posed": 0.06921143021807225,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_procedural_volume_twin_lower_jaw",
+            "vertices": [
+              87,
+              84
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000020565714,
+            "rest": 0.084263835923927,
+            "posed": 0.08426383609722159,
+            "phase": 0.125,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              5,
+              7
+            ]
+          }
+        },
+        {
+          "name": "TurnLeft",
+          "duration": 1.5,
+          "skin": {
+            "ratio": 1.2138414659355432,
+            "rest": 0.07555259202778006,
+            "posed": 0.09170886906223058,
+            "phase": 0.5416666666666666,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              1593,
+              1595
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.119869308345704,
+            "rest": 0.07059379138524052,
+            "posed": 0.07905582033209023,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              2644,
+              2856
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000093242656,
+            "rest": 0.06325309206460608,
+            "posed": 0.06325309265439472,
+            "phase": 0.5416666666666666,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              190,
+              191
+            ]
+          }
+        },
+        {
+          "name": "TurnRight",
+          "duration": 1.5,
+          "skin": {
+            "ratio": 1.9369416520185279,
+            "rest": 0.031918638811307465,
+            "posed": 0.06182454098935658,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              439,
+              441
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1324190179773952,
+            "rest": 0.06704677122168962,
+            "posed": 0.07592503882542083,
+            "phase": 0.5,
+            "mesh": "Hupehsuchus_procedural_volume_twin",
+            "vertices": [
+              2036,
+              3196
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.00000001060686,
+            "rest": 0.13604575413650877,
+            "posed": 0.13604575557952703,
+            "phase": 0.5,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              25,
+              10
+            ]
+          }
+        }
+      ],
+      "worstMouth": {
+        "ratio": 2.927870060294404,
+        "rest": 0.04363897819191612,
+        "posed": 0.12776925770995162,
+        "phase": 0.6666666666666666,
+        "mesh": "Hupehsuchus_procedural_volume_twin_lower_jaw",
+        "vertices": [
+          93,
+          92
+        ],
+        "clip": "Ability"
+      }
+    },
+    {
+      "id": "ceratites",
+      "variant": "authored",
+      "sha256": "a5bec74e67e4965354eb32cae08e89d2d40897c1bc865116b1c4c8694402f793",
+      "length": 4.999999753727922,
+      "meshes": [
+        {
+          "name": "Ceratites_authored_body",
+          "hiddenOral": false,
+          "vertices": 14570,
+          "mixedJawSkullVertices": 1072
+        }
+      ],
+      "clips": [
+        {
+          "name": "Ability",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 2.012495177275388,
+            "rest": 0.03913001364667706,
+            "posed": 0.0787489637506577,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              7225,
+              4110
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1020200950826886,
+            "rest": 0.1371125576807887,
+            "posed": 0.1511007938524134,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              4422,
+              9290
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Attack",
+          "duration": 1,
+          "skin": {
+            "ratio": 6.408762278644193,
+            "rest": 0.03913001364667706,
+            "posed": 0.25077495542165645,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              7225,
+              4110
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2967412202084903,
+            "rest": 0.07468028857184751,
+            "posed": 0.09684100852817971,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              10289,
+              7605
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Bite",
+          "duration": 0.5,
+          "skin": {
+            "ratio": 4.686077436400735,
+            "rest": 0.03913001364667706,
+            "posed": 0.1833662740357462,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              7225,
+              4110
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2007933198667111,
+            "rest": 0.07468028857184751,
+            "posed": 0.08967559164279278,
+            "phase": 0.5416666666666666,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              10289,
+              7605
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Breath",
+          "duration": 2.4000000953674316,
+          "skin": {
+            "ratio": 1.1070475210694213,
+            "rest": 0.1142850932544687,
+            "posed": 0.1265190291825472,
+            "phase": 0.7083333333333334,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              10703,
+              11578
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0373853957393255,
+            "rest": 0.1371125576807887,
+            "posed": 0.1422385649105161,
+            "phase": 0.041666666666666664,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              4422,
+              9290
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Death",
+          "duration": 1.7999999523162842,
+          "skin": {
+            "ratio": 2.8815815580329898,
+            "rest": 0.03913001364667706,
+            "posed": 0.11275632568984383,
+            "phase": 1,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              7225,
+              4110
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0239111634431806,
+            "rest": 0.11650892664524268,
+            "posed": 0.11929479063284662,
+            "phase": 1,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              805,
+              6802
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Dive",
+          "duration": 1.399999976158142,
+          "skin": {
+            "ratio": 1.243410035088823,
+            "rest": 0.1142850932544687,
+            "posed": 0.14210323181366835,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              10703,
+              11578
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0397315478431157,
+            "rest": 0.21172313038444188,
+            "posed": 0.22013521806880554,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              5713,
+              4828
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Dodge",
+          "duration": 0.5,
+          "skin": {
+            "ratio": 3.262127650553388,
+            "rest": 0.023537040339779536,
+            "posed": 0.07678083010458533,
+            "phase": 0.4583333333333333,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              4110,
+              11394
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.131399330422895,
+            "rest": 0.07468028857184751,
+            "posed": 0.08449322848597686,
+            "phase": 0.5416666666666666,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              10289,
+              7605
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Eat",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 5.965940083677791,
+            "rest": 0.03913001364667706,
+            "posed": 0.2334473168895696,
+            "phase": 0.625,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              7225,
+              4110
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.3865827405682285,
+            "rest": 0.1371125576807887,
+            "posed": 0.1901179059953473,
+            "phase": 0.041666666666666664,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              4422,
+              9290
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Grab",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 6.0038282766861,
+            "rest": 0.03913001364667706,
+            "posed": 0.2349298823990327,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              7225,
+              4110
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2797438428201509,
+            "rest": 0.07468028857184751,
+            "posed": 0.09557163947985393,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              10289,
+              7605
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Growth",
+          "duration": 1.5,
+          "skin": {
+            "ratio": 1.1725502523958438,
+            "rest": 0.1142850932544687,
+            "posed": 0.13400501494060982,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              10703,
+              11578
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0695697070633388,
+            "rest": 0.1157498920397992,
+            "posed": 0.12380257812162113,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              9457,
+              11635
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Guard",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 7.734812215660161,
+            "rest": 0.03913001364667706,
+            "posed": 0.3026633075532665,
+            "phase": 0.25,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              7225,
+              4110
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.6061516007345875,
+            "rest": 0.1371125576807887,
+            "posed": 0.22022355399981222,
+            "phase": 0.041666666666666664,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              4422,
+              9290
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Heavy",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 7.6963980898166175,
+            "rest": 0.03913001364667706,
+            "posed": 0.3011601622847835,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              7225,
+              4110
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.558789858359486,
+            "rest": 0.1371125576807887,
+            "posed": 0.21372966436654345,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              4422,
+              9290
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Hit",
+          "duration": 0.6000000238418579,
+          "skin": {
+            "ratio": 5.471717852952548,
+            "rest": 0.03913001364667706,
+            "posed": 0.21410839425679967,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              7225,
+              4110
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2844437525050014,
+            "rest": 0.1371125576807887,
+            "posed": 0.17611336810307068,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              4422,
+              9290
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Idle",
+          "duration": 2.5999999046325684,
+          "skin": {
+            "ratio": 1.1460669004802928,
+            "rest": 0.1142850932544687,
+            "posed": 0.13097836259725015,
+            "phase": 0.375,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              10703,
+              11578
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0510605762565255,
+            "rest": 0.1371125576807887,
+            "posed": 0.14411360388797587,
+            "phase": 0.041666666666666664,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              4422,
+              9290
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Parry",
+          "duration": 0.4000000059604645,
+          "skin": {
+            "ratio": 5.437111401468852,
+            "rest": 0.03913001364667706,
+            "posed": 0.2127542433379796,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              7225,
+              4110
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2868890733571137,
+            "rest": 0.1371125576807887,
+            "posed": 0.17644865229945397,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              4422,
+              9290
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Rise",
+          "duration": 1.399999976158142,
+          "skin": {
+            "ratio": 1.116566599819999,
+            "rest": 0.11292689387906675,
+            "posed": 0.12609039792678342,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              5724,
+              3793
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0710628661079684,
+            "rest": 0.1371125576807887,
+            "posed": 0.1468561690089797,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              4422,
+              9290
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Sprint",
+          "duration": 1.100000023841858,
+          "skin": {
+            "ratio": 4.07288757044501,
+            "rest": 0.023537040339779536,
+            "posed": 0.09586371904495088,
+            "phase": 0.08333333333333333,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              4110,
+              11394
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.152726889656134,
+            "rest": 0.08478650488136616,
+            "posed": 0.09773568405671183,
+            "phase": 0.08333333333333333,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              10639,
+              13778
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Stagger",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 5.478637990004836,
+            "rest": 0.03913001364667706,
+            "posed": 0.21437917931409262,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              7225,
+              4110
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2839644351008,
+            "rest": 0.1371125576807887,
+            "posed": 0.1760476476678397,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              4422,
+              9290
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Swim",
+          "duration": 2,
+          "skin": {
+            "ratio": 4.310283044903304,
+            "rest": 0.023537040339779536,
+            "posed": 0.10145130590375685,
+            "phase": 0.08333333333333333,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              4110,
+              11394
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.16695478339667,
+            "rest": 0.08478650488136616,
+            "posed": 0.09894201743879535,
+            "phase": 0.08333333333333333,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              10639,
+              13778
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "TurnLeft",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 2.6404221338143063,
+            "rest": 0.03913001364667706,
+            "posed": 0.10331975412914196,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              7225,
+              4110
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1208756706177156,
+            "rest": 0.1371125576807887,
+            "posed": 0.15368613004056425,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              4422,
+              9290
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "TurnRight",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 3.1309720848842955,
+            "rest": 0.03913001364667706,
+            "posed": 0.12251498040888739,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              7225,
+              4110
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1136613369025246,
+            "rest": 0.07054759082303717,
+            "posed": 0.07856612431123586,
+            "phase": 0.5,
+            "mesh": "Ceratites_authored_body",
+            "vertices": [
+              13058,
+              14105
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        }
+      ],
+      "worstMouth": {
+        "ratio": 1.6061516007345875,
+        "rest": 0.1371125576807887,
+        "posed": 0.22022355399981222,
+        "phase": 0.041666666666666664,
+        "mesh": "Ceratites_authored_body",
+        "vertices": [
+          4422,
+          9290
+        ],
+        "clip": "Guard"
+      }
+    },
+    {
+      "id": "ceratites",
+      "variant": "puppet",
+      "sha256": "50c3e4257080bfe9d4205801f05f52999c26534888302bc8d3d31cd942c3a675",
+      "length": 5.0105794129598396,
+      "meshes": [
+        {
+          "name": "Ceratites_procedural_volume_twin",
+          "hiddenOral": false,
+          "vertices": 3598,
+          "mixedJawSkullVertices": 143
+        }
+      ],
+      "clips": [
+        {
+          "name": "Ability",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 1.2288578632279592,
+            "rest": 0.07273284710199289,
+            "posed": 0.08937833107624085,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              3048,
+              3050
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.084886470975205,
+            "rest": 0.08947044449568888,
+            "posed": 0.09706527478551086,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1978,
+              1979
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Attack",
+          "duration": 1,
+          "skin": {
+            "ratio": 3.5331799009295226,
+            "rest": 0.07936921145459219,
+            "posed": 0.28042570266399036,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1794,
+              3212
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2279667925162818,
+            "rest": 0.09654386344801685,
+            "posed": 0.11855265833539116,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              3358,
+              3357
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Bite",
+          "duration": 0.5,
+          "skin": {
+            "ratio": 2.801731214284541,
+            "rest": 0.07936921145459219,
+            "posed": 0.22237119718548107,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1794,
+              3212
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1602020792355419,
+            "rest": 0.09654386344801685,
+            "posed": 0.11201039110982139,
+            "phase": 0.5416666666666666,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              3358,
+              3357
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Breath",
+          "duration": 2.4000000953674316,
+          "skin": {
+            "ratio": 1.1552729293339594,
+            "rest": 0.10581779048124952,
+            "posed": 0.1222484287849203,
+            "phase": 0.25,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              559,
+              558
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0331154826670625,
+            "rest": 0.0822284532045335,
+            "posed": 0.08495148812136759,
+            "phase": 0.20833333333333334,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1978,
+              1980
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Death",
+          "duration": 1.7999999523162842,
+          "skin": {
+            "ratio": 1.422777628355158,
+            "rest": 0.17864638273616248,
+            "posed": 0.2541740767435851,
+            "phase": 1,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1320,
+              1319
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0302736234653151,
+            "rest": 0.07449433419146413,
+            "posed": 0.07674954761507587,
+            "phase": 1,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              2619,
+              2609
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Dive",
+          "duration": 1.399999976158142,
+          "skin": {
+            "ratio": 1.1978313412627908,
+            "rest": 0.07273284710199289,
+            "posed": 0.08712168379804162,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              3048,
+              3050
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.070723909640388,
+            "rest": 0.08947044449568888,
+            "posed": 0.09579814412768732,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1978,
+              1979
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Dodge",
+          "duration": 0.5,
+          "skin": {
+            "ratio": 2.134214352480521,
+            "rest": 0.07936921145459219,
+            "posed": 0.169390910231452,
+            "phase": 0.4583333333333333,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1794,
+              3212
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.10219047583074,
+            "rest": 0.09654386344801685,
+            "posed": 0.10640972679230767,
+            "phase": 0.5416666666666666,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              3358,
+              3357
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Eat",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 2.4399962765708754,
+            "rest": 0.08875979933224168,
+            "posed": 0.21657357987984777,
+            "phase": 0.625,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              3212,
+              1793
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.3959917321900728,
+            "rest": 0.06494771489665664,
+            "posed": 0.0906664730203707,
+            "phase": 0.20833333333333334,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1980,
+              1982
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Grab",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 3.3599578634298153,
+            "rest": 0.07936921145459219,
+            "posed": 0.2666772061410808,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1794,
+              3212
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2159707513327689,
+            "rest": 0.09654386344801685,
+            "posed": 0.1173945141734533,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              3358,
+              3357
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Growth",
+          "duration": 1.5,
+          "skin": {
+            "ratio": 1.1536509469688105,
+            "rest": 0.07273284710199289,
+            "posed": 0.0839083179349518,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              3048,
+              3050
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0620741423369904,
+            "rest": 0.13600925860690966,
+            "posed": 0.1444519166848235,
+            "phase": 0.5416666666666666,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              2397,
+              2648
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Guard",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 4.101911654415084,
+            "rest": 0.07936921145459219,
+            "posed": 0.3255654934673269,
+            "phase": 0.20833333333333334,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1794,
+              3212
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.6137920932471799,
+            "rest": 0.06494771489665664,
+            "posed": 0.10481210877469657,
+            "phase": 0.375,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1980,
+              1982
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Heavy",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 3.998640991808366,
+            "rest": 0.07936921145459219,
+            "posed": 0.31736898240983846,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1794,
+              3212
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.5653854266137412,
+            "rest": 0.06494771489665664,
+            "posed": 0.10166820639109049,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1980,
+              1982
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Hit",
+          "duration": 0.6000000238418579,
+          "skin": {
+            "ratio": 2.266086256576738,
+            "rest": 0.07936921145459219,
+            "posed": 0.1798574792725844,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1794,
+              3212
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.292149984987973,
+            "rest": 0.06494771489665664,
+            "posed": 0.08392218882871802,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1980,
+              1982
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Idle",
+          "duration": 2.5999999046325684,
+          "skin": {
+            "ratio": 1.1239739575660626,
+            "rest": 0.07273284710199289,
+            "posed": 0.08174982600227428,
+            "phase": 0.375,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              3048,
+              3050
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0429583296729423,
+            "rest": 0.0822284532045335,
+            "posed": 0.08576085020578995,
+            "phase": 0.375,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1978,
+              1980
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Parry",
+          "duration": 0.4000000059604645,
+          "skin": {
+            "ratio": 2.2484017152204876,
+            "rest": 0.07936921145459219,
+            "posed": 0.17845387117020264,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1794,
+              3212
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2900519923320215,
+            "rest": 0.06494771489665664,
+            "posed": 0.08378592899984401,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1980,
+              1982
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Rise",
+          "duration": 1.399999976158142,
+          "skin": {
+            "ratio": 1.0868037485552824,
+            "rest": 0.0853217833660816,
+            "posed": 0.09272803399567922,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              3491,
+              3498
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0561146681219333,
+            "rest": 0.17726029679353175,
+            "posed": 0.18720719951929618,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              3370,
+              3341
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Sprint",
+          "duration": 1.100000023841858,
+          "skin": {
+            "ratio": 2.5602908565900377,
+            "rest": 0.07936921145459219,
+            "posed": 0.2032082663819537,
+            "phase": 0.08333333333333333,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1794,
+              3212
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1160628963196173,
+            "rest": 0.07929253438567933,
+            "posed": 0.08849545558300413,
+            "phase": 0.08333333333333333,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              2619,
+              2614
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Stagger",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 2.2696241071709204,
+            "rest": 0.07936921145459219,
+            "posed": 0.1801382756844888,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1794,
+              3212
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2925819757404797,
+            "rest": 0.06494771489665664,
+            "posed": 0.08395024564094983,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1980,
+              1982
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "Swim",
+          "duration": 2,
+          "skin": {
+            "ratio": 2.678705686127101,
+            "rest": 0.07936921145459219,
+            "posed": 0.21260675802684034,
+            "phase": 0.08333333333333333,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1794,
+              3212
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1257582165625932,
+            "rest": 0.09654386344801685,
+            "posed": 0.10868504753530198,
+            "phase": 0.08333333333333333,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              3358,
+              3357
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "TurnLeft",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 1.6949885912859923,
+            "rest": 0.13554340000136225,
+            "posed": 0.22974451662642278,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1930,
+              1327
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0975058722676605,
+            "rest": 0.09946921052943526,
+            "posed": 0.1091680426658834,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              2001,
+              1993
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        },
+        {
+          "name": "TurnRight",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 1.9655128941907019,
+            "rest": 0.03932508476359137,
+            "posed": 0.07729396116798114,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              1764,
+              1766
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.0862039127449004,
+            "rest": 0.17726029679353175,
+            "posed": 0.19254082795145652,
+            "phase": 0.5,
+            "mesh": "Ceratites_procedural_volume_twin",
+            "vertices": [
+              3370,
+              3341
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1
+          }
+        }
+      ],
+      "worstMouth": {
+        "ratio": 1.6137920932471799,
+        "rest": 0.06494771489665664,
+        "posed": 0.10481210877469657,
+        "phase": 0.375,
+        "mesh": "Ceratites_procedural_volume_twin",
+        "vertices": [
+          1980,
+          1982
+        ],
+        "clip": "Guard"
+      }
+    },
+    {
+      "id": "henodus",
+      "variant": "authored",
+      "sha256": "f07b5096a8c530ba99833ed35120d58d6ca18bf61d7f4dbc56693c59e45724ff",
+      "length": 4.999999875987385,
+      "meshes": [
+        {
+          "name": "Henodus_authored_body",
+          "hiddenOral": false,
+          "vertices": 11736,
+          "mixedJawSkullVertices": 0
+        },
+        {
+          "name": "Henodus_authored_body_lower_jaw",
+          "hiddenOral": false,
+          "vertices": 225,
+          "mixedJawSkullVertices": 69
+        },
+        {
+          "name": "Oral_cavity_lining",
+          "hiddenOral": true,
+          "vertices": 280,
+          "mixedJawSkullVertices": 0
+        },
+        {
+          "name": "Seated_jaw_hinge_tissue",
+          "hiddenOral": true,
+          "vertices": 207,
+          "mixedJawSkullVertices": 151
+        }
+      ],
+      "clips": [
+        {
+          "name": "Ability",
+          "duration": 0.8999999761581421,
+          "skin": {
+            "ratio": 1.232123702687276,
+            "rest": 0.07736761789075026,
+            "posed": 0.09532647582364556,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              2330,
+              8222
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1737251436130334,
+            "rest": 0.06698236236296844,
+            "posed": 0.07861888288401538,
+            "phase": 0.375,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              5183,
+              4279
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000019699262,
+            "rest": 0.08714743413053919,
+            "posed": 0.0871474343022132,
+            "phase": 0.4166666666666667,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              232,
+              217
+            ]
+          }
+        },
+        {
+          "name": "Attack",
+          "duration": 1,
+          "skin": {
+            "ratio": 1.7353249224823621,
+            "rest": 0.051173147327009554,
+            "posed": 0.08880203791842135,
+            "phase": 0.16666666666666666,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.7353249224823621,
+            "rest": 0.051173147327009554,
+            "posed": 0.08880203791842135,
+            "phase": 0.16666666666666666,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000005484377,
+            "rest": 0.0818197862530216,
+            "posed": 0.08181978629789464,
+            "phase": 0.20833333333333334,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              278,
+              263
+            ]
+          }
+        },
+        {
+          "name": "Bite",
+          "duration": 0.5,
+          "skin": {
+            "ratio": 1.552333055886931,
+            "rest": 0.051173147327009554,
+            "posed": 0.07943776816948887,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.552333055886931,
+            "rest": 0.051173147327009554,
+            "posed": 0.07943776816948887,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000004260456,
+            "rest": 0.09767206118927564,
+            "posed": 0.0976720612308884,
+            "phase": 0.4166666666666667,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              251,
+              236
+            ]
+          }
+        },
+        {
+          "name": "Breath",
+          "duration": 2.4000000953674316,
+          "skin": {
+            "ratio": 3.390652967945813,
+            "rest": 0.051173147327009554,
+            "posed": 0.1735103838634533,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 3.390652967945813,
+            "rest": 0.051173147327009554,
+            "posed": 0.1735103838634533,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.000000002019892,
+            "rest": 0.07932175447197501,
+            "posed": 0.07932175463219639,
+            "phase": 0.375,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              170,
+              184
+            ]
+          }
+        },
+        {
+          "name": "Breathe",
+          "duration": 3,
+          "skin": {
+            "ratio": 3.1981437625371787,
+            "rest": 0.051173147327009554,
+            "posed": 0.1636590819332717,
+            "phase": 0.2916666666666667,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 3.1981437625371787,
+            "rest": 0.051173147327009554,
+            "posed": 0.1636590819332717,
+            "phase": 0.2916666666666667,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000007578334,
+            "rest": 0.07932175444757655,
+            "posed": 0.07932175450768923,
+            "phase": 0.3333333333333333,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              40,
+              54
+            ]
+          }
+        },
+        {
+          "name": "Crawl",
+          "duration": 2,
+          "skin": {
+            "ratio": 4.698464293758882,
+            "rest": 0.051173147327009554,
+            "posed": 0.24043520551521713,
+            "phase": 0.08333333333333333,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 4.698464293758882,
+            "rest": 0.051173147327009554,
+            "posed": 0.24043520551521713,
+            "phase": 0.08333333333333333,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000015573187,
+            "rest": 0.143254396469806,
+            "posed": 0.14325439669289874,
+            "phase": 0.7916666666666666,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              58,
+              43
+            ]
+          }
+        },
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 2.058112824792875,
+            "rest": 0.037348824947438485,
+            "posed": 0.07686809561526721,
+            "phase": 1,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              10639,
+              6868
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 2.058112824792875,
+            "rest": 0.037348824947438485,
+            "posed": 0.07686809561526721,
+            "phase": 1,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              10639,
+              6868
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.000000030773488,
+            "rest": 0.15965182749489845,
+            "posed": 0.15965183240794206,
+            "phase": 0.9583333333333334,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              21,
+              6
+            ]
+          }
+        },
+        {
+          "name": "Dive",
+          "duration": 1.399999976158142,
+          "skin": {
+            "ratio": 2.1453043915473664,
+            "rest": 0.037348824947438485,
+            "posed": 0.08012459817887362,
+            "phase": 0.5,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              10639,
+              6868
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 2.1453043915473664,
+            "rest": 0.037348824947438485,
+            "posed": 0.08012459817887362,
+            "phase": 0.5,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              10639,
+              6868
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000003911924,
+            "rest": 0.09767206118927564,
+            "posed": 0.0976720612274842,
+            "phase": 0.4166666666666667,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              251,
+              236
+            ]
+          }
+        },
+        {
+          "name": "Dodge",
+          "duration": 0.5,
+          "skin": {
+            "ratio": 4.842775973666979,
+            "rest": 0.044592033508242084,
+            "posed": 0.2159492284906676,
+            "phase": 0.4583333333333333,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              5774,
+              1685
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 4.842775973666979,
+            "rest": 0.044592033508242084,
+            "posed": 0.2159492284906676,
+            "phase": 0.4583333333333333,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              5774,
+              1685
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000132727613,
+            "rest": 0.12337596069620048,
+            "posed": 0.12337596233374015,
+            "phase": 0.5416666666666666,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              104,
+              89
+            ]
+          }
+        },
+        {
+          "name": "Eat",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 1.4892510988818628,
+            "rest": 0.054905159406779924,
+            "posed": 0.08176756898083085,
+            "phase": 0.625,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              382,
+              3033
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.4892510988818628,
+            "rest": 0.054905159406779924,
+            "posed": 0.08176756898083085,
+            "phase": 0.625,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              382,
+              3033
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000004750134,
+            "rest": 0.10249443505080076,
+            "posed": 0.102494435099487,
+            "phase": 0.3333333333333333,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              11,
+              25
+            ]
+          }
+        },
+        {
+          "name": "Grab",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 3.561040685967417,
+            "rest": 0.051173147327009554,
+            "posed": 0.1822296596604858,
+            "phase": 0.5,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 3.561040685967417,
+            "rest": 0.051173147327009554,
+            "posed": 0.1822296596604858,
+            "phase": 0.5,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000021271935,
+            "rest": 0.07932175447197501,
+            "posed": 0.07932175464070773,
+            "phase": 0.4166666666666667,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              170,
+              184
+            ]
+          }
+        },
+        {
+          "name": "Graze",
+          "duration": 2.4000000953674316,
+          "skin": {
+            "ratio": 3.10986793430063,
+            "rest": 0.051173147327009554,
+            "posed": 0.159141729969509,
+            "phase": 0.2916666666666667,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 3.10986793430063,
+            "rest": 0.051173147327009554,
+            "posed": 0.159141729969509,
+            "phase": 0.2916666666666667,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.00000000856026,
+            "rest": 0.07863662304723479,
+            "posed": 0.07863662372038473,
+            "phase": 0.25,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              261,
+              275
+            ]
+          }
+        },
+        {
+          "name": "Growth",
+          "duration": 1.5,
+          "skin": {
+            "ratio": 1.9422946498812317,
+            "rest": 0.051173147327009554,
+            "posed": 0.0993933302708347,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.9422946498812317,
+            "rest": 0.051173147327009554,
+            "posed": 0.0993933302708347,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000017213957,
+            "rest": 0.268876089404474,
+            "posed": 0.26887608986731615,
+            "phase": 0.5,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              11,
+              1
+            ]
+          }
+        },
+        {
+          "name": "Guard",
+          "duration": 1,
+          "skin": {
+            "ratio": 2.0155880800304637,
+            "rest": 0.037348824947438485,
+            "posed": 0.07527984636720142,
+            "phase": 0.625,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              10639,
+              6868
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 2.0155880800304637,
+            "rest": 0.037348824947438485,
+            "posed": 0.07527984636720142,
+            "phase": 0.625,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              10639,
+              6868
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000002673797,
+            "rest": 0.10249443505080076,
+            "posed": 0.10249443507820569,
+            "phase": 0.3333333333333333,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              11,
+              25
+            ]
+          }
+        },
+        {
+          "name": "Heavy",
+          "duration": 1.100000023841858,
+          "skin": {
+            "ratio": 1.7873306722643951,
+            "rest": 0.051173147327009554,
+            "posed": 0.09146333581386892,
+            "phase": 0.125,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.7873306722643951,
+            "rest": 0.051173147327009554,
+            "posed": 0.09146333581386892,
+            "phase": 0.125,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.000000004051276,
+            "rest": 0.0768084986454027,
+            "posed": 0.07680849895657513,
+            "phase": 0.4583333333333333,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              183,
+              168
+            ]
+          }
+        },
+        {
+          "name": "Hit",
+          "duration": 0.6000000238418579,
+          "skin": {
+            "ratio": 1.1940259307696408,
+            "rest": 0.08942102378041279,
+            "posed": 0.10677102114978157,
+            "phase": 0.4583333333333333,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              10686,
+              2126
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.1753644117383917,
+            "rest": 0.06698236236296844,
+            "posed": 0.07872868493559819,
+            "phase": 0.4583333333333333,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              5183,
+              4279
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000061252834,
+            "rest": 0.13516294383437277,
+            "posed": 0.1351629446622841,
+            "phase": 0.5,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              34,
+              33
+            ]
+          }
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "skin": {
+            "ratio": 1.62576826408839,
+            "rest": 0.051173147327009554,
+            "posed": 0.08319567889777175,
+            "phase": 0.3333333333333333,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.62576826408839,
+            "rest": 0.051173147327009554,
+            "posed": 0.08319567889777175,
+            "phase": 0.3333333333333333,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.000000000589115,
+            "rest": 0.08815366582350007,
+            "posed": 0.0881536658754327,
+            "phase": 0.3333333333333333,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              168,
+              167
+            ]
+          }
+        },
+        {
+          "name": "Parry",
+          "duration": 0.4000000059604645,
+          "skin": {
+            "ratio": 1.2214364047827457,
+            "rest": 0.08942102378041279,
+            "posed": 0.1092220937983398,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              10686,
+              2126
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2116014322028918,
+            "rest": 0.06698236236296844,
+            "posed": 0.08115592617130564,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              5183,
+              4279
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000084640437,
+            "rest": 0.13342813697696096,
+            "posed": 0.13342813810630255,
+            "phase": 0.5,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              20,
+              19
+            ]
+          }
+        },
+        {
+          "name": "Rise",
+          "duration": 1.399999976158142,
+          "skin": {
+            "ratio": 3.2779849556492877,
+            "rest": 0.051173147327009554,
+            "posed": 0.16774480707116188,
+            "phase": 0.4583333333333333,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 3.2779849556492877,
+            "rest": 0.051173147327009554,
+            "posed": 0.16774480707116188,
+            "phase": 0.4583333333333333,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000004723062,
+            "rest": 0.07978935122949599,
+            "posed": 0.079789351267181,
+            "phase": 0.4166666666666667,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              38,
+              23
+            ]
+          }
+        },
+        {
+          "name": "Sprint",
+          "duration": 1.2999999523162842,
+          "skin": {
+            "ratio": 4.74400117519557,
+            "rest": 0.0485792823470711,
+            "posed": 0.2304601725446627,
+            "phase": 0.16666666666666666,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              9401,
+              4983
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 4.74400117519557,
+            "rest": 0.0485792823470711,
+            "posed": 0.2304601725446627,
+            "phase": 0.16666666666666666,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              9401,
+              4983
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000000000104,
+            "rest": 0.08109521813051088,
+            "posed": 0.08109521813051172,
+            "phase": 0.5416666666666666,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              79,
+              64
+            ]
+          }
+        },
+        {
+          "name": "Stagger",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 1.609850535508285,
+            "rest": 0.051173147327009554,
+            "posed": 0.0823811186280307,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.609850535508285,
+            "rest": 0.051173147327009554,
+            "posed": 0.0823811186280307,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000067967374,
+            "rest": 0.15076666118360374,
+            "posed": 0.15076666220832513,
+            "phase": 0.4166666666666667,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              76,
+              61
+            ]
+          }
+        },
+        {
+          "name": "Swim",
+          "duration": 2,
+          "skin": {
+            "ratio": 4.324447450507517,
+            "rest": 0.0485792823470711,
+            "posed": 0.21007855369327644,
+            "phase": 0.16666666666666666,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              9401,
+              4983
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 4.324447450507517,
+            "rest": 0.0485792823470711,
+            "posed": 0.21007855369327644,
+            "phase": 0.16666666666666666,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              9401,
+              4983
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.00000000000001,
+            "rest": 0.08109521813051088,
+            "posed": 0.08109521813051168,
+            "phase": 0.16666666666666666,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              79,
+              64
+            ]
+          }
+        },
+        {
+          "name": "TurnLeft",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 2.97869916011039,
+            "rest": 0.044592033508242084,
+            "posed": 0.13282625275861507,
+            "phase": 0.4583333333333333,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              5774,
+              1685
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 2.97869916011039,
+            "rest": 0.044592033508242084,
+            "posed": 0.13282625275861507,
+            "phase": 0.4583333333333333,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              5774,
+              1685
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000090529373,
+            "rest": 0.07944585270647098,
+            "posed": 0.0794458534256893,
+            "phase": 0.5,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              125,
+              110
+            ]
+          }
+        },
+        {
+          "name": "TurnRight",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 3.173121336094715,
+            "rest": 0.051173147327009554,
+            "posed": 0.16237860561845224,
+            "phase": 0.4583333333333333,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 3.173121336094715,
+            "rest": 0.051173147327009554,
+            "posed": 0.16237860561845224,
+            "phase": 0.4583333333333333,
+            "mesh": "Henodus_authored_body",
+            "vertices": [
+              1065,
+              9401
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000097391117,
+            "rest": 0.07748173364317672,
+            "posed": 0.07748173439777997,
+            "phase": 0.5,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              14,
+              13
+            ]
+          }
+        }
+      ],
+      "worstMouth": {
+        "ratio": 4.842775973666979,
+        "rest": 0.044592033508242084,
+        "posed": 0.2159492284906676,
+        "phase": 0.4583333333333333,
+        "mesh": "Henodus_authored_body",
+        "vertices": [
+          5774,
+          1685
+        ],
+        "clip": "Dodge"
+      }
+    },
+    {
+      "id": "henodus",
+      "variant": "puppet",
+      "sha256": "1da063701d48e1a0158a9ff46b590865b8e3b6972dc44915ff0013227aab4e11",
+      "length": 4.988584632690854,
+      "meshes": [
+        {
+          "name": "Henodus_procedural_volume_puppet",
+          "hiddenOral": false,
+          "vertices": 3357,
+          "mixedJawSkullVertices": 0
+        },
+        {
+          "name": "Henodus_procedural_volume_puppet_lower_jaw",
+          "hiddenOral": false,
+          "vertices": 118,
+          "mixedJawSkullVertices": 20
+        },
+        {
+          "name": "Oral_cavity_lining",
+          "hiddenOral": true,
+          "vertices": 280,
+          "mixedJawSkullVertices": 0
+        },
+        {
+          "name": "Seated_jaw_hinge_tissue",
+          "hiddenOral": true,
+          "vertices": 207,
+          "mixedJawSkullVertices": 151
+        }
+      ],
+      "clips": [
+        {
+          "name": "Ability",
+          "duration": 0.8999999761581421,
+          "skin": {
+            "ratio": 1.2563919338395517,
+            "rest": 0.10895869324624523,
+            "posed": 0.13689482331628056,
+            "phase": 0.375,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1064,
+              1069
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2563919338395517,
+            "rest": 0.10895869324624523,
+            "posed": 0.13689482331628056,
+            "phase": 0.375,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1064,
+              1069
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000019699262,
+            "rest": 0.08714743413053919,
+            "posed": 0.0871474343022132,
+            "phase": 0.4166666666666667,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              232,
+              217
+            ]
+          }
+        },
+        {
+          "name": "Attack",
+          "duration": 1,
+          "skin": {
+            "ratio": 1.611523578812359,
+            "rest": 0.07807895611887213,
+            "posed": 0.12582607879461793,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              2193,
+              2192
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.4971103629845484,
+            "rest": 0.10895869324624523,
+            "posed": 0.16312318879620824,
+            "phase": 0.16666666666666666,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1064,
+              1069
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000005484377,
+            "rest": 0.0818197862530216,
+            "posed": 0.08181978629789464,
+            "phase": 0.20833333333333334,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              278,
+              263
+            ]
+          }
+        },
+        {
+          "name": "Bite",
+          "duration": 0.5,
+          "skin": {
+            "ratio": 1.3722458295290243,
+            "rest": 0.10895869324624523,
+            "posed": 0.1495181123980923,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1064,
+              1069
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.3722458295290243,
+            "rest": 0.10895869324624523,
+            "posed": 0.1495181123980923,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1064,
+              1069
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000004260456,
+            "rest": 0.09767206118927564,
+            "posed": 0.0976720612308884,
+            "phase": 0.4166666666666667,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              251,
+              236
+            ]
+          }
+        },
+        {
+          "name": "Breath",
+          "duration": 2.4000000953674316,
+          "skin": {
+            "ratio": 3.8217031686250826,
+            "rest": 0.024065697142896723,
+            "posed": 0.09197195102618,
+            "phase": 0.4583333333333333,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1069,
+              1068
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 3.8217031686250826,
+            "rest": 0.024065697142896723,
+            "posed": 0.09197195102618,
+            "phase": 0.4583333333333333,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1069,
+              1068
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.000000002019892,
+            "rest": 0.07932175447197501,
+            "posed": 0.07932175463219639,
+            "phase": 0.375,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              170,
+              184
+            ]
+          }
+        },
+        {
+          "name": "Breathe",
+          "duration": 3,
+          "skin": {
+            "ratio": 3.587584881519204,
+            "rest": 0.024065697142896723,
+            "posed": 0.08633773123307618,
+            "phase": 0.2916666666666667,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1069,
+              1068
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 3.587584881519204,
+            "rest": 0.024065697142896723,
+            "posed": 0.08633773123307618,
+            "phase": 0.2916666666666667,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1069,
+              1068
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000007578334,
+            "rest": 0.07932175444757655,
+            "posed": 0.07932175450768923,
+            "phase": 0.3333333333333333,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              40,
+              54
+            ]
+          }
+        },
+        {
+          "name": "Crawl",
+          "duration": 2,
+          "skin": {
+            "ratio": 5.168175374602185,
+            "rest": 0.024065697142896723,
+            "posed": 0.12437574334655299,
+            "phase": 0.08333333333333333,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1069,
+              1068
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 5.168175374602185,
+            "rest": 0.024065697142896723,
+            "posed": 0.12437574334655299,
+            "phase": 0.08333333333333333,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1069,
+              1068
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000015573187,
+            "rest": 0.143254396469806,
+            "posed": 0.14325439669289874,
+            "phase": 0.7916666666666666,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              58,
+              43
+            ]
+          }
+        },
+        {
+          "name": "Death",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 1.7425385225775167,
+            "rest": 0.07807895611887213,
+            "posed": 0.1360555888397742,
+            "phase": 1,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              2193,
+              2192
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.4402121331540696,
+            "rest": 0.10302571627912938,
+            "posed": 0.14837888661209087,
+            "phase": 1,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              500,
+              498
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.000000030773488,
+            "rest": 0.15965182749489845,
+            "posed": 0.15965183240794206,
+            "phase": 0.9583333333333334,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              21,
+              6
+            ]
+          }
+        },
+        {
+          "name": "Dive",
+          "duration": 1.399999976158142,
+          "skin": {
+            "ratio": 1.9562659185785416,
+            "rest": 0.03850381612369889,
+            "posed": 0.07532370321800706,
+            "phase": 0.5,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              600,
+              599
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.9562659185785416,
+            "rest": 0.03850381612369889,
+            "posed": 0.07532370321800706,
+            "phase": 0.5,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              600,
+              599
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000003911924,
+            "rest": 0.09767206118927564,
+            "posed": 0.0976720612274842,
+            "phase": 0.4166666666666667,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              251,
+              236
+            ]
+          }
+        },
+        {
+          "name": "Dodge",
+          "duration": 0.5,
+          "skin": {
+            "ratio": 3.6328000910456018,
+            "rest": 0.024065697142896723,
+            "posed": 0.0874258667717911,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1069,
+              1068
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 3.6328000910456018,
+            "rest": 0.024065697142896723,
+            "posed": 0.0874258667717911,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1069,
+              1068
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000132727613,
+            "rest": 0.12337596069620048,
+            "posed": 0.12337596233374015,
+            "phase": 0.5416666666666666,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              104,
+              89
+            ]
+          }
+        },
+        {
+          "name": "Eat",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 1.4446757189981725,
+            "rest": 0.0620219451588887,
+            "posed": 0.08960159821608275,
+            "phase": 0.625,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1276,
+              1243
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.4446757189981725,
+            "rest": 0.0620219451588887,
+            "posed": 0.08960159821608275,
+            "phase": 0.625,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1276,
+              1243
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000004750134,
+            "rest": 0.10249443505080076,
+            "posed": 0.102494435099487,
+            "phase": 0.3333333333333333,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              11,
+              25
+            ]
+          }
+        },
+        {
+          "name": "Grab",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 4.0894065779259865,
+            "rest": 0.024065697142896723,
+            "posed": 0.09841442019853648,
+            "phase": 0.5,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1069,
+              1068
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 4.0894065779259865,
+            "rest": 0.024065697142896723,
+            "posed": 0.09841442019853648,
+            "phase": 0.5,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1069,
+              1068
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000021271935,
+            "rest": 0.07932175447197501,
+            "posed": 0.07932175464070773,
+            "phase": 0.4166666666666667,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              170,
+              184
+            ]
+          }
+        },
+        {
+          "name": "Graze",
+          "duration": 2.4000000953674316,
+          "skin": {
+            "ratio": 3.6956940257621285,
+            "rest": 0.024065697142896723,
+            "posed": 0.08893945315680414,
+            "phase": 0.2916666666666667,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1069,
+              1068
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 3.6956940257621285,
+            "rest": 0.024065697142896723,
+            "posed": 0.08893945315680414,
+            "phase": 0.2916666666666667,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1069,
+              1068
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.00000000856026,
+            "rest": 0.07863662304723479,
+            "posed": 0.07863662372038473,
+            "phase": 0.25,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              261,
+              275
+            ]
+          }
+        },
+        {
+          "name": "Growth",
+          "duration": 1.5,
+          "skin": {
+            "ratio": 1.6940921269603002,
+            "rest": 0.12355391152771054,
+            "posed": 0.2093117087742439,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1067,
+              1069
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.6940921269603002,
+            "rest": 0.12355391152771054,
+            "posed": 0.2093117087742439,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1067,
+              1069
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000017213957,
+            "rest": 0.268876089404474,
+            "posed": 0.26887608986731615,
+            "phase": 0.5,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              11,
+              1
+            ]
+          }
+        },
+        {
+          "name": "Guard",
+          "duration": 1,
+          "skin": {
+            "ratio": 1.6481274721908847,
+            "rest": 0.05681905028937536,
+            "posed": 0.09364503772571497,
+            "phase": 0.625,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              519,
+              518
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.3325896737716707,
+            "rest": 0.0620219451588887,
+            "posed": 0.08264980366596794,
+            "phase": 0.375,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1276,
+              1243
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000002673797,
+            "rest": 0.10249443505080076,
+            "posed": 0.10249443507820569,
+            "phase": 0.3333333333333333,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              11,
+              25
+            ]
+          }
+        },
+        {
+          "name": "Heavy",
+          "duration": 1.100000023841858,
+          "skin": {
+            "ratio": 1.6151443356084727,
+            "rest": 0.07807895611887213,
+            "posed": 0.12610878370561882,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              2193,
+              2192
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.5311126905125798,
+            "rest": 0.10895869324624523,
+            "posed": 0.16682803797099338,
+            "phase": 0.125,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1064,
+              1069
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.000000004051276,
+            "rest": 0.0768084986454027,
+            "posed": 0.07680849895657513,
+            "phase": 0.4583333333333333,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              183,
+              168
+            ]
+          }
+        },
+        {
+          "name": "Hit",
+          "duration": 0.6000000238418579,
+          "skin": {
+            "ratio": 1.2341557075284841,
+            "rest": 0.10895869324624523,
+            "posed": 0.13447199315469885,
+            "phase": 0.4583333333333333,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1064,
+              1069
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.2341557075284841,
+            "rest": 0.10895869324624523,
+            "posed": 0.13447199315469885,
+            "phase": 0.4583333333333333,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1064,
+              1069
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000061252834,
+            "rest": 0.13516294383437277,
+            "posed": 0.1351629446622841,
+            "phase": 0.5,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              34,
+              33
+            ]
+          }
+        },
+        {
+          "name": "Idle",
+          "duration": 2.4000000953674316,
+          "skin": {
+            "ratio": 1.4280410987282632,
+            "rest": 0.10895869324624523,
+            "posed": 0.15559749201936382,
+            "phase": 0.3333333333333333,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1064,
+              1069
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.4280410987282632,
+            "rest": 0.10895869324624523,
+            "posed": 0.15559749201936382,
+            "phase": 0.3333333333333333,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1064,
+              1069
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.000000000589115,
+            "rest": 0.08815366582350007,
+            "posed": 0.0881536658754327,
+            "phase": 0.3333333333333333,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              168,
+              167
+            ]
+          }
+        },
+        {
+          "name": "Parry",
+          "duration": 0.4000000059604645,
+          "skin": {
+            "ratio": 1.292689198212993,
+            "rest": 0.10895869324624523,
+            "posed": 0.14084972581082422,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1064,
+              1069
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.292689198212993,
+            "rest": 0.10895869324624523,
+            "posed": 0.14084972581082422,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1064,
+              1069
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000084640437,
+            "rest": 0.13342813697696096,
+            "posed": 0.13342813810630255,
+            "phase": 0.5,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              20,
+              19
+            ]
+          }
+        },
+        {
+          "name": "Rise",
+          "duration": 1.399999976158142,
+          "skin": {
+            "ratio": 3.911205696775094,
+            "rest": 0.024065697142896723,
+            "posed": 0.09412589176216177,
+            "phase": 0.4583333333333333,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1069,
+              1068
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 3.911205696775094,
+            "rest": 0.024065697142896723,
+            "posed": 0.09412589176216177,
+            "phase": 0.4583333333333333,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1069,
+              1068
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000004723062,
+            "rest": 0.07978935122949599,
+            "posed": 0.079789351267181,
+            "phase": 0.4166666666666667,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              38,
+              23
+            ]
+          }
+        },
+        {
+          "name": "Sprint",
+          "duration": 1.2999999523162842,
+          "skin": {
+            "ratio": 4.210736032080952,
+            "rest": 0.024065697142896723,
+            "posed": 0.10133429809674285,
+            "phase": 0.20833333333333334,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1069,
+              1068
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 4.210736032080952,
+            "rest": 0.024065697142896723,
+            "posed": 0.10133429809674285,
+            "phase": 0.20833333333333334,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1069,
+              1068
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000000000104,
+            "rest": 0.08109521813051088,
+            "posed": 0.08109521813051172,
+            "phase": 0.5416666666666666,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              79,
+              64
+            ]
+          }
+        },
+        {
+          "name": "Stagger",
+          "duration": 1.2000000476837158,
+          "skin": {
+            "ratio": 1.4141934966174707,
+            "rest": 0.10895869324624523,
+            "posed": 0.15408867538877793,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1064,
+              1069
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 1.4141934966174707,
+            "rest": 0.10895869324624523,
+            "posed": 0.15408867538877793,
+            "phase": 0.4166666666666667,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1064,
+              1069
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000067967374,
+            "rest": 0.15076666118360374,
+            "posed": 0.15076666220832513,
+            "phase": 0.4166666666666667,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              76,
+              61
+            ]
+          }
+        },
+        {
+          "name": "Swim",
+          "duration": 2,
+          "skin": {
+            "ratio": 3.6774124603161455,
+            "rest": 0.024065697142896723,
+            "posed": 0.08849949453948307,
+            "phase": 0.20833333333333334,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1069,
+              1068
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 3.6774124603161455,
+            "rest": 0.024065697142896723,
+            "posed": 0.08849949453948307,
+            "phase": 0.20833333333333334,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1069,
+              1068
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.00000000000001,
+            "rest": 0.08109521813051088,
+            "posed": 0.08109521813051168,
+            "phase": 0.16666666666666666,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              79,
+              64
+            ]
+          }
+        },
+        {
+          "name": "TurnLeft",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 2.248111643454082,
+            "rest": 0.03880222965402498,
+            "posed": 0.08723174427719282,
+            "phase": 0.4583333333333333,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              174,
+              175
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 2.248111643454082,
+            "rest": 0.03880222965402498,
+            "posed": 0.08723174427719282,
+            "phase": 0.4583333333333333,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              174,
+              175
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000090529373,
+            "rest": 0.07944585270647098,
+            "posed": 0.0794458534256893,
+            "phase": 0.5,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              125,
+              110
+            ]
+          }
+        },
+        {
+          "name": "TurnRight",
+          "duration": 1.600000023841858,
+          "skin": {
+            "ratio": 3.3788357280135095,
+            "rest": 0.024065697142896723,
+            "posed": 0.08131403732597209,
+            "phase": 0.4583333333333333,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1069,
+              1068
+            ]
+          },
+          "mouthSkin": {
+            "ratio": 3.3788357280135095,
+            "rest": 0.024065697142896723,
+            "posed": 0.08131403732597209,
+            "phase": 0.4583333333333333,
+            "mesh": "Henodus_procedural_volume_puppet",
+            "vertices": [
+              1069,
+              1068
+            ]
+          },
+          "hiddenOral": {
+            "ratio": 1.0000000097391117,
+            "rest": 0.07748173364317672,
+            "posed": 0.07748173439777997,
+            "phase": 0.5,
+            "mesh": "Oral_cavity_lining",
+            "vertices": [
+              14,
+              13
+            ]
+          }
+        }
+      ],
+      "worstMouth": {
+        "ratio": 5.168175374602185,
+        "rest": 0.024065697142896723,
+        "posed": 0.12437574334655299,
+        "phase": 0.08333333333333333,
+        "mesh": "Henodus_procedural_volume_puppet",
+        "vertices": [
+          1069,
+          1068
+        ],
+        "clip": "Crawl"
+      }
+    }
+  ]
+}
