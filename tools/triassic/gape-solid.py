@@ -19,6 +19,7 @@ Writes the two images and a `gape-solid.json` beside them with the measured diff
 import bpy
 import json
 import math
+import re
 import sys
 from mathutils import Vector
 from pathlib import Path
@@ -26,9 +27,19 @@ from pathlib import Path
 argv = sys.argv[sys.argv.index('--') + 1:]
 ID = argv[0]
 SHOTS = [(c, float(t)) for c, t in (a.split('@') for a in argv[1:] if '@' in a)]
+# **What the game draws is not what this file contains.** `src/shared/oral-geometry.ts` is the
+# runtime's classifier and the game hides everything it matches -- every `Oral cavity lining`, every
+# `Seated jaw hinge tissue` -- so a body whose gape is closed *by* those parts is proved closed here
+# and still shows a hole to a player. That is not a hypothetical: Mosasaurus measured 0 px through
+# the body at every opening clip while its owner was looking at holes in its mouth. `--as-drawn`
+# hides the same parts the runtime hides before rendering, so the proof is about the animal on
+# screen. It is the honest default for any body whose oral parts are hidden in play; the plain run
+# remains, because it is what the file contains and it is what every earlier verdict measured.
+AS_DRAWN = '--as-drawn' in argv
+ORAL = re.compile(r'lining|mouth[ _]interior|hinge[ _]tissue|beak|palate', re.I)
 ROOT = Path(__file__).resolve().parents[2]
 LOCAL = ROOT / 'local/triassic-authoring' / ID
-OUT = LOCAL / 'gape-solid'
+OUT = LOCAL / ('gape-solid-as-drawn' if '--as-drawn' in sys.argv else 'gape-solid')
 OUT.mkdir(parents=True, exist_ok=True)
 
 # A backdrop the animal cannot produce: full-intensity magenta. Every one of these bodies is a brown
@@ -116,6 +127,13 @@ def render_pass(culled, shots):
     s = scene_setup()
     if culled:
         cull_shim()
+    if AS_DRAWN:
+        for o in list(s.objects):
+            if o.type != 'MESH':
+                continue
+            names = [o.name] + [m.name for m in o.data.materials if m]
+            if any(ORAL.search(n) for n in names):
+                o.hide_render = True
     rig = next(o for o in s.objects if o.type == 'ARMATURE')
     for tr in rig.animation_data.nla_tracks:
         tr.mute = True
@@ -197,7 +215,7 @@ def enclosed_backdrop(px, w, h):
     return [i for i in range(w * h) if is_bg(i) and not seen[i]]
 
 
-report = {'id': ID, 'backdrop': list(BACKDROP), 'shots': []}
+report = {'id': ID, 'backdrop': list(BACKDROP), 'asDrawn': AS_DRAWN, 'shots': []}
 for (clip, t, fa), (_, _, fb) in zip(solid, culled):
     a = bpy.data.images.load(fa)
     b = bpy.data.images.load(fb)

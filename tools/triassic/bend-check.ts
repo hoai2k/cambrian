@@ -12,8 +12,9 @@
  * a pair of points measured on one body means nothing on another, and would not fail, it would
  * silently bend a different part of a different animal.
  *
- * On a file that matches it re-measures: the span, the axis, the turn, the per-joint table, and
- * **both readings over the actual mesh and the actual rig**, before and after. Those last are the
+ * On a file that matches it re-measures: the span, the two planes, the axle they imply, the turn,
+ * the per-joint table, and **both readings over the actual mesh and the actual rig**, before and
+ * after. Those last are the
  * point. The tool exists because a diagnosis on Askeptosaurus went wrong three times on numbers
  * nobody could re-take, so a bend file is only worth anything if a second program can take them
  * again and get the same answers — and say so loudly when it does not.
@@ -28,8 +29,9 @@ import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import {
-  bendBasis, fromExport, jointTurns, pinch, readBend, refLabel, refMoves, spanDirection, spanLength,
-  toBlender, totalTurn, traces, type BendExport, type BoneNode, type Reading, type Vec3,
+  angleOf, bendBasis, fromExport, jointTurns, pinch, readBend, refLabel, refMoves, spanDirection,
+  spanLength, toBlender, totalTurn, traces, twistAngle, type BendExport, type BoneNode, type Reading,
+  type Vec3,
 } from '../../src/viewer/bend/bend';
 
 const argv = process.argv.slice(2);
@@ -124,8 +126,10 @@ const say = (r: Reading | null) => (r ? `${r.inPlane > 0 ? '+' : ''}${deg(r.inPl
 console.log(`${doc.id}: ${source} · ${payload.appliesTo ?? 'unknown'} body · ${payload.use ?? 'unknown use'} · sha256 ${sha256.slice(0, 12)}… · ${vertices} vertices`);
 console.log(`  frame      body along ${doc.frame.axis}, head at the ${doc.frame.forward === 1 ? 'high' : 'low'} end (${doc.frameSource})`);
 console.log(`  span       ${v4(doc.base)} → ${v4(doc.tip)} (${doc.baseSource}/${doc.tipSource}), ${f4(spanLength(doc))} long — ${(spanLength(doc) / doc.bounds.length * 100).toFixed(1)}% of the body, along ${v4(spanDirection(doc))}`);
-console.log(`  axle       ${v4(basis.axis)} through the base end · Blender Z-up ${v4(toBlender(basis.axis))} · plane rolled ${deg(doc.axisRoll)}`);
-console.log(`  turn       ${deg(doc.baseTurn)} at the base, ${deg(doc.tipTurn)} at the tip, ${deg(totalTurn(doc))} in total · inside squeezed to ${pinch(doc, chunks).toFixed(3)}`);
+console.log(`  planes     in  ${v4(doc.baseNormal)} (${doc.planeSource.base})   out ${v4(doc.tipNormal)} (${doc.planeSource.tip})`);
+console.log(`             aimed ${deg(angleOf(doc.baseNormal, doc.tipNormal))} apart; the body's own heading there was ${v4(doc.tipRest)}, ${deg(angleOf(doc.baseNormal, doc.tipRest))} off the base plane`);
+console.log(`  axle       ${v4(basis.axis)} through the base end · Blender Z-up ${v4(toBlender(basis.axis))} · leaning ${deg(twistAngle(doc))} along the span`);
+console.log(`  turn       ${deg(totalTurn(doc))} across the span, spread linearly · inside squeezed to ${pinch(doc, chunks).toFixed(3)}`);
 console.log(`  geometry   ${say(readings.geometry.before)} → ${say(readings.geometry.after)}`);
 console.log(`             between the traced centre over ${(doc.window * 100).toFixed(0)}% of the body behind the base cut and the same ahead of the tip cut (reach ${(doc.reach * 100).toFixed(1)}%)`);
 console.log(`             trace residual ${t.base ? t.base.residual.toFixed(3) : '—'} behind, ${t.tip ? t.tip.residual.toFixed(3) : '—'} ahead${Math.max(t.base?.residual ?? 0, t.tip?.residual ?? 0) > 0.05 ? '  ← one of them wandered; that reading is about two directions nothing in the animal runs in' : ''}`);
@@ -158,6 +162,20 @@ const compare = (name: string, recorded: number | null | undefined, here: Readin
   console.error(`! the viewer recorded ${name} at ${recorded.toFixed(2)}° and this reads ${mine.toFixed(2)}°`);
   bad = true;
 };
+/**
+ * The two planes are the document's own numbers rather than a reading, and they are still worth
+ * re-deriving here: `apartDegrees` is what a reviewer reads off the panel as "straight", and a file
+ * whose planes and whose printed figure disagree is a file whose planes were edited by hand.
+ */
+const planeCompare = (name: string, recorded: number | null | undefined, mine: number) => {
+  if (typeof recorded !== 'number') return;
+  if (Math.abs(recorded - mine) <= 0.05) return;
+  console.error(`! the viewer recorded ${name} at ${recorded.toFixed(2)}° and this reads ${mine.toFixed(2)}°`);
+  bad = true;
+};
+planeCompare('the two planes as aimed', payload.planes?.apartDegrees, angleOf(doc.baseNormal, doc.tipNormal) * 180 / Math.PI);
+planeCompare('the two planes before the bend', payload.planes?.apartBeforeDegrees, angleOf(doc.baseNormal, doc.tipRest) * 180 / Math.PI);
+planeCompare('the turn across the span', payload.turn?.totalDegrees, totalTurn(doc) * 180 / Math.PI);
 compare('the geometry reading before', payload.reading?.geometry?.before?.inPlaneDegrees, readings.geometry.before);
 compare('the geometry reading after', payload.reading?.geometry?.after?.inPlaneDegrees, readings.geometry.after);
 compare('the bone reading before', payload.reading?.bones?.before?.inPlaneDegrees, readings.bones.before);

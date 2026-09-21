@@ -1,0 +1,17 @@
+Askeptosaurus, the untouched original pose (askeptosaurus.origpose.glb) — the generation
+before T3D-26 carried the head's aim into the bind, which is the geometry that correction
+was measured from and the body the shipped one no longer is.
+
+  span                  [0.1011,-0.0066,0.2627] → [0.3465,-0.0815,0.4222]
+  reading               window 26% of the body, reach 2% — at the defaults both traces wandered
+                        on this curled generation and the panel said so in orange
+  planes as seated      41.40° apart — the animal's own curve across this span
+  geometry, as seated   41.4° in plane, 41.4° in all
+  planes aimed by hand  0.00° apart, geometry 1.05° in plane
+  the Straighten button 0.00° apart, turn 41.40°,
+                        geometry -41.4° → 1.05° in plane, measured over the warped mesh
+
+Aiming both planes the same way is the whole act: the bend is the rotation carrying the tip
+end's own heading onto the tip plane's aim, so with the two aimed alike the head's heading is
+turned onto the trunk's and the run between them comes straight. Nothing at the base cut
+moves, whatever the planes are aimed at, because the rotation there is identity by construction.

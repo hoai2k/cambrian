@@ -2,23 +2,26 @@
  * The viewer's bend document. Run: npm run bend
  *
  * Guards what the editor is made of, without a browser: the span is two points and everything
- * follows from them; the warp holds the body behind the base cut exactly still, carries the far
- * part rigidly, and bends the part between without changing its length; the turn is a rate, so
- * there is no kink at the base cut whatever the numbers are; the per-joint table is what a builder
- * poses a rig with and adds back up to the whole turn; the readings say which two references they
- * are between and are measured after the edit rather than predicted; the trace follows the body
- * past a limb that crosses it; and the exported file is enough to rebuild all of it — and is
- * refused on a body whose hash or vertex count no longer matches, which is the whole point of
- * carrying them.
+ * follows from them; each end is an **oriented plane** and the bend is whatever carries the axis
+ * line from the one to the other, so aiming both the same way straightens the run between them;
+ * the warp holds the body behind the base cut exactly still, carries the far part rigidly, and
+ * bends the part between without changing its length; the rotation at the base cut is identity by
+ * construction however far apart the planes are aimed, so no number can kink the body there; the
+ * per-joint table is what a builder poses a rig with and adds back up to the whole turn; the
+ * readings say which two references they are between and are measured after the edit rather than
+ * predicted; the trace follows the body past a limb that crosses it; and the exported file is
+ * enough to rebuild all of it — refused on a body whose hash or vertex count no longer matches, and
+ * refused outright where it was written against the turn rates the planes replaced.
  */
 import assert from 'node:assert/strict';
 import {
-  DEFAULT_REACH, DEFAULT_WINDOW, MAX_TURN, MIN_SPAN, aimAxisAt, angleBetween, bendBasis, boneStation,
-  chainPath, describeReadingText, exportDoc, flipForward, fromExport, isIdentity, jointTurns,
+  DEFAULT_REACH, DEFAULT_WINDOW, MIN_SPAN, angleBetween, angleOf, bendBasis, bendRotation, boneStation,
+  chainPath, describeReadingText, exportDoc, flipForward, fromExport, headFractionAt, isIdentity, jointTurns,
   measureBend, moveEnd, normalWarp, pinch, readBend, readBones, readGeometry, refLabel, refMoves,
-  reguessRefs, reseat, resetTurn, rollForAxis, seat, setAxis, setAxisRoll, setChain, setEnd, setReach, setRef,
-  setTotalTurn, setTurn, setWindow, spanDirection, spanLength, toBlender, totalTurn, traceCentreline,
-  traces, turnAt, turnToTarget, warp, warpBones, type BendDoc, type BoneNode, type Vec3,
+  reguessRefs, reseat, resetTurn, rotateAbout, seat, seatPlanes, seatPlanesFromBones, setAxis, setChain,
+  setEnd, setPlaneNormal, setReach, setRef, setWindow, spanDirection, spanLength, straighten, toBlender,
+  totalTurn, traceCentreline, traces, turnAt, twistAngle, warp, warpBones,
+  type BendDoc, type BoneNode, type Vec3,
 } from '../src/viewer/bend/bend';
 import { History } from '../src/viewer/sculpt/history';
 
@@ -30,6 +33,16 @@ const nearV = (a: readonly number[], b: readonly number[], tol: number, msg: str
 const dot = (a: Vec3, b: Vec3) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const deg = (r: number) => r * 180 / Math.PI;
 const rad = (d: number) => d * Math.PI / 180;
+
+/**
+ * Aim the tip plane `radians` off the body's own heading there, about `axis`: the one act that
+ * bends anything now. `[-1, 0, 0]` on this fixture lifts the tip the way up is.
+ */
+function bendBy(doc: BendDoc, radians: number, axis: Vec3 = [-1, 0, 0]): BendDoc {
+  const out: Vec3 = [0, 0, 0];
+  rotateAbout(doc.tipRest, axis, radians, out);
+  return setPlaneNormal(doc, 'tip', out);
+}
 
 /**
  * The stretch and mouth tests' animal, along z with the head at the high end: a body from z=−4 to
@@ -82,7 +95,7 @@ ok(measureBend({ chunks, yaw: 180, mouth }, meta).frameSource === 'mouth', 'the 
 assert.throws(() => measureBend({ chunks: [new Float32Array(0)] }, meta), /no vertices/); passes++;
 
 // The span is two points, and everything about it follows from them.
-const neck = setEnd(setEnd(measureBend({ chunks, mouth, bones, rigged: true }, meta), 'base', [0, 0, 0]), 'tip', [0, 0, 2]);
+const neck = seatPlanes(setEnd(setEnd(measureBend({ chunks, mouth, bones, rigged: true }, meta), 'base', [0, 0, 0]), 'tip', [0, 0, 2]), chunks);
 near(spanLength(neck), 2, 1e-12, 'the span is as long as the gap between its ends');
 nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the tip end');
 {
@@ -94,34 +107,48 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
   ok(spanLength(tiny) >= neck.bounds.length * MIN_SPAN - 1e-9, 'two ends may not meet: the tip is pushed off rather than dividing through zero');
 }
 
-// ---------------------------------------------------------------------------------- the basis
+// --------------------------------------------------------------------------------- the planes
 
 {
+  nearV(neck.baseNormal, [0, 0, 1], .02, 'seated on a straight body, the base plane says the axis runs in along the body');
+  nearV(neck.tipRest, [0, 0, 1], .02, 'and the tip plane says it runs out the same way');
+  ok(isIdentity(neck), 'so the two agree and there is no bend at all');
+  near(totalTurn(neck), 0, 1e-9, 'nor any turn');
+  ok(neck.planeSource.base === 'trace' && neck.planeSource.tip === 'trace', 'both were measured rather than chosen, and the document says so');
+
   const level = bendBasis(neck);
-  nearV(level.forward, [0, 0, 1], 1e-12, 'level, forward runs along the span');
-  nearV(level.up, [0, 1, 0], 1e-12, 'up is up');
-  near(dot(level.axis, level.forward), 0, 1e-12, 'and the axle is square to the span — a component along it would be a twist');
+  nearV(level.forward, [0, 0, 1], 1e-12, 'forward runs along the span');
+  near(Math.hypot(...level.axis), 1, 1e-12, 'the axle is a unit vector even with nothing to turn about');
+  near(dot(level.up, level.forward), 0, 1e-12, 'and up is square to the span');
+
   const out: Vec3 = [0, 0, 0];
-  const turned = warp(setTotalTurn(neck, rad(30)))(0, 0, 2, out) ?? out;
-  ok(turned[1] > 0, 'a positive turn at roll 0 lifts the tip');
+  warp(bendBy(neck, rad(30)))(0, 0, 2, out);
+  ok(out[1] > 0, 'aiming the tip plane up about −x lifts the tip');
   const swung: Vec3 = [0, 0, 0];
-  warp(setTotalTurn(setAxisRoll(neck, Math.PI / 2), rad(30)))(0, 0, 2, swung);
-  ok(swung[0] > 0, 'and at 90° it swings it towards +lateral');
-  for (const r of [-2.5, 0, .3, 3]) {
-    const b = bendBasis(setAxisRoll(neck, r));
-    near(dot(b.axis, b.forward), 0, 1e-12, 'the axle stays square to the span at every roll');
-    near(Math.hypot(...b.axis), 1, 1e-12, 'and unit');
-  }
-  ok(Math.abs(setAxisRoll(neck, 3 * Math.PI).axisRoll - Math.PI) < 1e-9, 'the roll wraps rather than sticking at a limit');
-  const aimAt = bendBasis(setAxisRoll(neck, .7)).axis;
-  near(rollForAxis(neck, aimAt)!, .7, 1e-9, 'and a roll read back off its own axis comes back as itself');
-  ok(rollForAxis(neck, spanDirection(neck)) === null, 'an axis along the span names no plane and is refused');
+  warp(bendBy(neck, rad(30), [0, 1, 0]))(0, 0, 2, swung);
+  ok(swung[0] > 0, 'and about +y it swings it towards +lateral — the plane goes where it is aimed');
+
+  // The axle is derived from the two planes and nothing else: no roll, no dial.
+  const up30 = bendBy(neck, rad(30));
+  nearV(bendRotation(up30).axis, [-1, 0, 0], .02, 'the axle is the hinge the two planes imply');
+  near(deg(bendRotation(up30).angle), 30, 1e-6, 'and the turn is the angle between them');
+  near(deg(angleOf(up30.baseNormal, up30.tipNormal)), 30, 1e-6, 'which is what "the planes are N° apart" means');
+  near(deg(twistAngle(up30)), 0, 1e-6, 'a hinge square to the span carries no twist');
+
+  // A plane aimed at nothing is refused: a plane with no normal has no orientation, and every
+  // angle taken against it would come back NaN and read as an answer.
+  ok(setPlaneNormal(neck, 'tip', [0, 0, 0]) === neck, 'a zero direction leaves the plane where it was');
+  ok(setPlaneNormal(neck, 'base', [NaN, 0, 1]) === neck, 'and so does nonsense');
+  const aimed = setPlaneNormal(neck, 'tip', [0, 2, 0]);
+  near(Math.hypot(...aimed.tipNormal), 1, 1e-12, 'an aim is normalised, because a plane is a direction');
+  ok(aimed.planeSource.tip === 'manual', 'and is then a person\'s answer rather than the tool\'s measurement');
+  ok(aimed.planeSource.base === 'trace', 'the other plane is left alone');
 }
 
 // ---------------------------------------------------------------------------------- the warp
 
 {
-  const bent = setTotalTurn(neck, rad(40));
+  const bent = bendBy(neck, rad(40));
   const f = warp(bent);
   const out: Vec3 = [0, 0, 0];
   // Behind the base cut: nothing at all, to the last decimal.
@@ -152,21 +179,31 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
   near(deg(turnAt(bent, 0)), 0, 1e-12, 'and nothing has turned at the base cut');
 }
 {
-  // The turn is a *rate*: a base rate on its own still leaves the base cut unturned, so a large
-  // base number cannot put a kink where the body meets the span.
-  const biased = setTurn(neck, 'baseTurn', rad(120));
-  near(deg(turnAt(biased, 0)), 0, 1e-12, 'a base turn of 120° still turns nothing at the base cut');
-  near(deg(totalTurn(biased)), 60, 1e-9, 'and the span turns through the mean of the two rates');
-  near(deg(turnAt(setTotalTurn(neck, rad(30)), .5)), 15, 1e-9, 'an even rate is a circular arc');
-  ok(deg(turnAt(setTurn(neck, 'tipTurn', rad(60)), .5)) < 15, 'a turn that tightens towards the tip has done less than half of it by halfway');
-  ok(setTurn(neck, 'baseTurn', 99).baseTurn === MAX_TURN, 'a turn past the limit is held at it');
-  ok(setTurn(neck, 'tipTurn', NaN).tipTurn === neck.tipTurn, 'and nonsense leaves it where it was');
-  ok(isIdentity(neck) && !isIdentity(setTotalTurn(neck, .1)), 'no turn is no edit');
-  ok(isIdentity(resetTurn(setTotalTurn(neck, 1))), 'and it can be taken back off');
+  // **The base cut cannot kink, by construction.** This is what the pair of turn rates was for, and
+  // an orientation per plane gives it for nothing: the rotation at the base cut is the rotation
+  // carrying the tip plane's rest onto itself, which is identity whatever the planes are aimed at.
+  for (const d of [rad(10), rad(120), rad(179)]) {
+    near(deg(turnAt(bendBy(neck, d), 0)), 0, 1e-12, 'nothing turns at the base cut, at any aim');
+  }
+  near(deg(turnAt(bendBy(neck, rad(30)), .5)), 15, 1e-9, 'the turn is spread linearly, so halfway along is half of it');
+  near(deg(turnAt(bendBy(neck, rad(30)), 1)), 30, 1e-9, 'and all of it at the tip cut');
+  // Two unit vectors can be at most a half turn apart, so the span can never wrap round on itself
+  // — which the old rates had to be clamped to guarantee.
+  const back = bendBy(neck, rad(300));
+  ok(deg(totalTurn(back)) <= 180 + 1e-9, `a wild aim still turns at most half a turn (${deg(totalTurn(back)).toFixed(1)}°)`);
+  ok(isIdentity(neck) && !isIdentity(bendBy(neck, rad(6))), 'the planes agreeing is no edit');
+  ok(isIdentity(resetTurn(bendBy(neck, rad(60)))), 'and the tip plane goes back onto the body\'s own heading');
+  nearV(resetTurn(bendBy(neck, rad(60))).tipNormal, neck.tipRest, 1e-12, 'exactly onto it');
+  // Straightening is the whole point, and it is one act: aim the tip plane at the base plane.
+  const curved = setPlaneNormal(neck, 'base', [0, .5, 1]);
+  const flat = straighten(curved);
+  nearV(flat.tipNormal, flat.baseNormal, 1e-12, 'straightening aims the two planes the same way');
+  near(deg(angleOf(flat.baseNormal, flat.tipNormal)), 0, 1e-4, 'so they are no degrees apart');
+  ok(deg(totalTurn(flat)) > 20, 'and the turn that gets there is the angle the body was off by');
 }
 {
   // Normals follow the rotation, and the stretch along the span that a bend is.
-  const bent = setTotalTurn(neck, rad(40));
+  const bent = bendBy(neck, rad(40));
   const n = normalWarp(bent);
   const out: Vec3 = [0, 0, 0];
   n(0, 0, -1, 0, 1, 0, out);
@@ -177,10 +214,10 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
   near(Math.hypot(...out), 1, 1e-9, 'and it stays a unit vector inside the span');
 }
 {
-  const squeezed = setTotalTurn(neck, rad(60));
+  const squeezed = bendBy(neck, rad(60));
   ok(pinch(squeezed, chunks) < 1 && pinch(squeezed, chunks) > 0, 'a moderate bend squeezes the inside without folding it');
   ok(pinch(neck, chunks) === 1, 'and no turn squeezes nothing');
-  ok(pinch(setTotalTurn(neck, MAX_TURN), chunks) < pinch(squeezed, chunks), 'a tighter turn squeezes harder');
+  ok(pinch(bendBy(neck, rad(170)), chunks) < pinch(squeezed, chunks), 'a tighter turn squeezes harder');
 }
 
 // ---------------------------------------------------------------------------------- the trace
@@ -220,23 +257,24 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
 // ---------------------------------------------------------------------------------- the readings
 
 {
-  const bent = setTotalTurn(neck, rad(25));
+  const bent = bendBy(neck, rad(25));
   const r = readBend(bent, chunks);
   near(deg(r.geometry.after!.inPlane) - deg(r.geometry.before!.inPlane), 25, .5,
     'a turn of 25° moves the geometry reading by 25°, because both windows are outside the span');
   ok(r.geometry.before!.offPlane < rad(1), 'and nothing is left out of the plane on a body bent in it');
-  // The bend plane is also the reading plane, so a body bent one way and read in another plane is
-  // what "out of plane" is about: here the body is bent 25° upwards and read about an axle turned
-  // a quarter turn, which is a plane holding none of it.
+  ok(r.geometry.after!.offPlane < rad(2), 'nor after it, because the plane the angles are read in is the one the planes imply');
+  // The reading plane is the one the two *planes* imply, and it no longer has to be aimed at all:
+  // that used to be a control and a button, and both were wrong more often than they were right.
+  // Read about some other axle — here a quarter turn away — and the same bend comes back as almost
+  // entirely out of plane, which is the tell the readout exists to give.
   const bendUp = warp(bent);
-  const askew = setAxisRoll(bent, Math.PI / 2);
+  const askew = bendBy(neck, rad(25), [0, 1, 0]);
   const misread = readGeometry(askew, chunks, bendUp)!;
-  ok(deg(misread.offPlane) > 20, `a bend the plane does not hold reads as out of plane, which is the tell that the axis is aimed wrong (${deg(misread.offPlane).toFixed(1)}°)`);
+  ok(deg(misread.offPlane) > 20, `a bend the plane does not hold reads as out of plane (${deg(misread.offPlane).toFixed(1)}°)`);
   ok(Math.abs(deg(misread.inPlane)) < 5, 'and almost nothing reads as in it');
-  const aimed = aimAxisAt(askew, misread);
-  const reread = readGeometry(aimed, chunks, bendUp)!;
-  ok(deg(reread.offPlane) < 2, 'aiming the plane at the measured turn takes it back in');
-  ok(Math.abs(deg(reread.inPlane)) > 20, 'and the turn is then the number the plane holds');
+  const reread = readGeometry(bent, chunks, bendUp)!;
+  ok(deg(reread.offPlane) < 2, 'read in the plane the bend is actually in, it is back in the plane');
+  ok(Math.abs(deg(reread.inPlane)) > 20, 'and the turn is then the number that plane holds');
 }
 {
   const r = angleBetween([0, 0, 1], [0, 1, 0], [-1, 0, 0]);
@@ -263,7 +301,7 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
   near(boneStation(span, span.bones.find((b) => b.name === 'neck_01')!), .5, 1e-9, 'a joint halfway along the span is at half of it');
   ok(boneStation(span, span.bones.find((b) => b.name === 'body')!) < 0, 'and one behind the base cut is behind it');
 
-  const bent = setTotalTurn(span, rad(30));
+  const bent = bendBy(span, rad(30));
   const after = readBones(bent, warpBones(bent))!;
   ok(deg(after.inPlane) > 10, 'bending the span turns the chord the chain leaves on');
   ok(deg(after.inPlane) < 30, 'by less than the whole turn, because that chord starts inside the span');
@@ -315,16 +353,47 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
   nearV(adrift.base, [0, 9, 0], 1e-9, 'an end with no body near it stays where it was put');
 }
 
+// --------------------------------------------------------------------- seating the planes again
+
+{
+  const rigged = seat(setEnd(setEnd(measureBend({ chunks, mouth, bones, rigged: true }, meta), 'base', [0, 0, 0]), 'tip', [0, 0, 2]), chunks, true);
+  // An aim a person gave survives the span moving under it \u2014 a straightened tip plane has to stay
+  // aimed at the base plane while the ends are nudged about \u2014 but `tipRest` never does: it is the
+  // body's own heading where the span leaves it, and a turn measured from a stale one would be a
+  // rotation taken from a place the body never was.
+  const aimed = setPlaneNormal(rigged, 'tip', [0, .5, 1]);
+  const moved = seatPlanes(setEnd(aimed, 'tip', [0, 0, 1.4]), chunks);
+  nearV(moved.tipNormal, aimed.tipNormal, 1e-12, 'an aim a person gave survives the span moving under it');
+  ok(moved.planeSource.tip === 'manual', 'and is still theirs');
+  nearV(moved.tipRest, [0, 0, 1], .05, 'while the body\'s own heading there is measured again');
+  const forced = seatPlanes(aimed, chunks, true);
+  nearV(forced.tipNormal, forced.tipRest, 1e-12, 'seating the planes on purpose hands both back to the body');
+  ok(forced.planeSource.tip === 'trace', 'and says so');
+
+  // The bone chords instead of the traced surface: the answer on a body whose trunk trace wanders.
+  const fromBones = seatPlanesFromBones(rigged);
+  nearV(fromBones.baseNormal, [0, 0, 1], 1e-9, 'the base plane takes the chord the chain runs in on');
+  nearV(fromBones.tipRest, [0, 0, 1], 1e-9, 'and the tip plane the chord it runs out on');
+  ok(fromBones.planeSource.base === 'bones' && fromBones.planeSource.tip === 'bones', 'and both say where they came from');
+  ok(isIdentity(fromBones), 'a straight chain seats two planes that agree, so there is no bend');
+  ok(seatPlanesFromBones({ ...rigged, refs: null }) !== null, 'a body with no references is left alone rather than throwing');
+}
+
 // ---------------------------------------------------------------------------------- the frame
 
 {
   const rigged = seat(setEnd(setEnd(measureBend({ chunks, mouth, bones, rigged: true }, meta), 'base', [0, 0, 0]), 'tip', [0, 0, 2]), chunks, true);
-  const turned = setTurn(setTurn(rigged, 'baseTurn', rad(10)), 'tipTurn', rad(30));
+  const turned = bendBy(rigged, rad(20));
   const flipped = flipForward(turned);
   ok(flipped.frame.forward === -1 && flipped.frameSource === 'manual', 'flipping the head end is a manual frame');
-  nearV(flipped.base, turned.tip, 1e-12, 'the span stays exactly where it was drawn');
-  nearV(flipped.tip, turned.base, 1e-12, 'with its two ends swapped');
-  near(deg(totalTurn(flipped)), -deg(totalTurn(turned)), 1e-9, 'and the same shape read from the other end');
+  // It re-reads "back from the nose" and nothing else. It used to swap the span's ends and negate
+  // the turns with them; two aimed planes have no such negation, and which end the bend is anchored
+  // at is a real choice the reviewer already made by placing the two ends.
+  nearV(flipped.base, turned.base, 1e-12, 'the span keeps its base end');
+  nearV(flipped.tip, turned.tip, 1e-12, 'and its tip end');
+  near(deg(totalTurn(flipped)), deg(totalTurn(turned)), 1e-9, 'and the bend keeps its shape');
+  near(headFractionAt(flipped, flipped.tip) + headFractionAt(turned, turned.tip), 1, 1e-9,
+    'what changes is which end of the body “back from the nose” counts from');
   nearV(flipForward(flipped).base, turned.base, 1e-12, 'flipping twice is nothing');
   const onX = setAxis(rigged, 'x', chunks);
   ok(onX.frame.axis === 'x', 'the axis can be set by hand');
@@ -335,7 +404,8 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
 // ---------------------------------------------------------------------------------- the file
 
 {
-  const doc = setTurn(setTurn(seat(setEnd(setEnd(measureBend({ chunks, mouth, bones, rigged: true }, meta), 'base', [0, 0, 0]), 'tip', [0, 0, 2]), chunks, true), 'baseTurn', rad(12)), 'tipTurn', rad(28));
+  const placed = seat(setEnd(setEnd(measureBend({ chunks, mouth, bones, rigged: true }, meta), 'base', [0, 0, 0]), 'tip', [0, 0, 2]), chunks, true);
+  const doc = bendBy(placed, rad(20));
   const readings = readBend(doc, chunks);
   const t = traces(doc, chunks);
   const file = exportDoc(doc, {
@@ -343,14 +413,25 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
     authoredAt: '2026-09-20T00:00:00.000Z', readings, pinch: pinch(doc, chunks),
     traceResidual: { base: t.base?.residual ?? null, tip: t.tip?.residual ?? null },
   });
-  ok(file.schema === 'bend-span/1' && file.id === 'test' && file.model === meta.model, 'the file says what it is and what it is about');
+  ok(file.schema === 'bend-span/2' && file.id === 'test' && file.model === meta.model, 'the file says what it is and what it is about');
   ok(file.sha256 === 'a'.repeat(64) && file.appliesTo === 'built' && file.use === 'builder-measurement', 'and which exact file, and that a rigged body is a measurement rather than an edit');
   ok(exportDoc({ ...doc, rigged: false }, { sha256: null, sha256Source: null, appliesTo: 'generation', note: '', authoredAt: '', readings, pinch: 1, traceResidual: { base: null, tip: null } }).use === 'mesh-edit',
     'while an unrigged one is the edit on stage');
+  // The original pose is a measurement too, though it carries no rig: the file on stage is a
+  // published copy of the generation the builder reads, so an edit to it would edit a copy.
+  ok(exportDoc({ ...doc, rigged: false }, { sha256: null, sha256Source: null, appliesTo: 'origpose', note: '', authoredAt: '', readings, pinch: 1, traceResidual: { base: null, tip: null } }).use === 'builder-measurement',
+    'and the untouched original pose is a measurement for the builder rather than a mesh edit');
   nearV(file.span.base, doc.base, 1e-5, 'the span is written out as its two points');
   nearV(file.span.direction, spanDirection(doc), 1e-5, 'with the direction they imply');
+  nearV(file.planes.baseNormal, doc.baseNormal, 1e-5, 'both planes are in it, as the directions they are');
+  nearV(file.planes.tipNormal, doc.tipNormal, 1e-5, 'aim and all');
+  nearV(file.planes.tipRest, doc.tipRest, 1e-5, 'with the body\'s own heading there beside the aim');
+  nearV(file.planes.baseNormalBlenderZUp, toBlender(doc.baseNormal), 1e-9, 'and in the builders\' own Z-up frame, so nobody re-derives them');
+  near(file.planes.apartDegrees, 20, 1e-3, 'how far apart the two planes are aimed');
+  near(file.planes.apartBeforeDegrees, 0, 1e-3, 'and how far apart they were before the bend \u2014 nothing, on a straight body');
+  ok(file.planes.baseSource === 'trace' && file.planes.tipSource === 'manual', 'each plane says where its aim came from');
   near(file.turn.totalDegrees, 20, 1e-3, 'the turn in degrees for the reader');
-  near(file.axis.rollDegrees, 0, 1e-9, 'the plane too');
+  near(file.axis.twistDegrees, 0, 1e-3, 'and how much of the aim is a twist rather than a bend');
   nearV(file.axis.vectorBlenderZUp, toBlender(bendBasis(doc).axis), 1e-9, 'and the axle in the builders\' own frame, so nobody has to turn it round by hand');
   ok(file.reading.geometry.baseReference.includes('behind the base cut'), 'the file names the two references the geometry reading is between');
   ok(file.reading.bones!.baseReference === refLabel(doc.refs!.base), 'and the two the bone reading is between');
@@ -373,23 +454,55 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
   assert.doesNotThrow(() => fromExport(file, { sha256: null, vertices: doc.vertices }), 'a consumer that could not hash still checks the count'); passes++;
   assert.throws(() => fromExport({ schema: 'mouth-cut/1' }), /not a bend file/, 'a mouth file is not a bend file'); passes++;
   assert.throws(() => fromExport({ format: 'cambrian-stretch' }), /not a bend file/, 'nor is a stretch file'); passes++;
-  assert.throws(() => fromExport({ schema: 'bend-span/1', bend: { ...doc, baseTurn: 'a lot' } }), /"baseTurn"/, 'a document missing a number is refused by name'); passes++;
-  assert.throws(() => fromExport({ schema: 'bend-span/1', bend: { ...doc, tip: [0, 0] } }), /"tip"/, 'and one missing an end'); passes++;
+  // The rates the planes replaced. A file written against them describes a shape this cannot make,
+  // so it is refused by name rather than half-read \u2014 its turn numbers would simply be ignored.
+  assert.throws(() => fromExport({ schema: 'bend-span/1', bend: { ...doc } }), /written before the two planes/, 'a file from before the planes is refused, and says why'); passes++;
+  assert.throws(() => fromExport({ schema: 'bend-span/2', bend: { ...doc, tipNormal: [0, 0, 0] } }), /"tipNormal"/, 'a plane with no orientation is refused by name'); passes++;
+  assert.throws(() => fromExport({ schema: 'bend-span/2', bend: { ...doc, baseNormal: 'up' } }), /"baseNormal"/, 'and so is one that is not a direction at all'); passes++;
+  assert.throws(() => fromExport({ schema: 'bend-span/2', bend: { ...doc, window: 'a lot' } }), /"window"/, 'a document missing a number is refused by name'); passes++;
+  assert.throws(() => fromExport({ schema: 'bend-span/2', bend: { ...doc, tip: [0, 0] } }), /"tip"/, 'and one missing an end'); passes++;
   assert.throws(() => fromExport(null), /not a bend file/); passes++;
 }
 
-// ---------------------------------------------------------------------------------- aiming
+// -------------------------------------------------------------------------- straightening a curve
 
 {
-  const doc = setEnd(setEnd(measureBend({ chunks, mouth }, meta), 'base', [0, 0, 0]), 'tip', [0, 0, 2]);
-  const bent = setTotalTurn(doc, rad(35));
-  const r = readBend(bent, chunks).geometry.after!;
-  const flat = turnToTarget(bent, r, 0);
-  ok(Math.abs(deg(totalTurn(flat))) < 5, 'dialling a reading to zero takes off what it read');
-  const measuredAfter = readBend(flat, chunks).geometry.after!;
-  ok(Math.abs(deg(measuredAfter.inPlane)) < 3, 'and the result is measured rather than assumed');
-  const toTen = turnToTarget(bent, r, rad(10));
-  ok(deg(readBend(toTen, chunks).geometry.after!.inPlane) > 7, 'a target other than zero is aimed at the same way');
+  // The headline case, on a body built bent: a trunk running along z and a neck leaving it at 35\u00b0.
+  // Seat the planes, aim them the same way, and the run between them comes straight \u2014 measured on
+  // the warped mesh rather than predicted from the numbers that produced it.
+  const bentBody: number[] = [];
+  const ring = (c: Vec3, along: Vec3, r: number) => {
+    const u: Vec3 = Math.abs(along[1]) < .9 ? [0, 1, 0] : [1, 0, 0];
+    const e1: Vec3 = [u[1] * along[2] - u[2] * along[1], u[2] * along[0] - u[0] * along[2], u[0] * along[1] - u[1] * along[0]];
+    const l1 = Math.hypot(...e1);
+    const a1: Vec3 = [e1[0] / l1, e1[1] / l1, e1[2] / l1];
+    const a2: Vec3 = [along[1] * a1[2] - along[2] * a1[1], along[2] * a1[0] - along[0] * a1[2], along[0] * a1[1] - along[1] * a1[0]];
+    for (let k = 0; k < 24; k++) {
+      const t = (k / 24) * Math.PI * 2, cs = Math.cos(t) * r, sn = Math.sin(t) * r;
+      bentBody.push(c[0] + a1[0] * cs + a2[0] * sn, c[1] + a1[1] * cs + a2[1] * sn, c[2] + a1[2] * cs + a2[2] * sn);
+    }
+  };
+  const lean = rad(35);
+  const neckDir: Vec3 = [0, Math.sin(lean), Math.cos(lean)];
+  for (let i = 0; i <= 40; i++) ring([0, 0, -4 + 4 * (i / 40)], [0, 0, 1], 1 - .6 * (i / 40));
+  for (let i = 1; i <= 30; i++) {
+    const d = 2 * (i / 30);
+    ring([0, neckDir[1] * d, neckDir[2] * d], neckDir, .2);
+  }
+  const curved = [new Float32Array(bentBody)];
+  const doc = seatPlanes(setEnd(setEnd(measureBend({ chunks: curved, mouth: [0, 2 * neckDir[1], 2 * neckDir[2]] }, meta), 'base', [0, 0, 0]), 'tip', [0, neckDir[1] * 1.6, neckDir[2] * 1.6]), curved);
+  const before = readBend(doc, curved).geometry.before!;
+  ok(deg(before.total) > 20, `the body's own curve is there to be read (${deg(before.total).toFixed(1)}\u00b0 between the two traced runs)`);
+  near(deg(angleOf(doc.baseNormal, doc.tipRest)), deg(before.total), 3,
+    'and the two planes, freshly seated, say the same thing the geometry reading does');
+  const flat = straighten(doc);
+  nearV(flat.tipNormal, flat.baseNormal, 1e-12, 'aiming both planes the same way is the whole act');
+  const after = readBend(flat, curved).geometry.after!;
+  ok(Math.abs(deg(after.total)) < 5, `and the run between them comes straight, measured over the warped mesh (${deg(after.total).toFixed(1)}\u00b0)`);
+  near(deg(turnAt(flat, 0)), 0, 1e-12, 'with nothing at all turned at the base cut');
+  const out: Vec3 = [0, 0, 0];
+  warp(flat)(0, 0, -2, out);
+  nearV(out, [0, 0, -2], 0, 'and the trunk behind it untouched to the last decimal');
 }
 
 // ---------------------------------------------------------------------------------- history
@@ -397,10 +510,10 @@ nearV(spanDirection(neck), [0, 0, 1], 1e-12, 'and runs from the base end to the 
 {
   const doc = measureBend({ chunks, mouth }, meta);
   const h = new History<BendDoc>(doc);
-  h.replace(setTotalTurn(doc, rad(5))); h.replace(setTotalTurn(doc, rad(12))); h.commit();
-  near(deg(totalTurn(h.present)), 12, 1e-9, 'a drag is a run of replacements and one commit');
+  h.replace(bendBy(doc, rad(5))); h.replace(bendBy(doc, rad(12))); h.commit();
+  near(deg(totalTurn(h.present)), 12, 1e-6, 'a drag is a run of replacements and one commit');
   ok(h.undo() === doc, 'and one undo takes the whole drag back');
-  near(deg(totalTurn(h.redo())), 12, 1e-9, 'and redo puts it back');
+  near(deg(totalTurn(h.redo())), 12, 1e-6, 'and redo puts it back');
 }
 
 // ---------------------------------------------------------------------------------- a raw trace

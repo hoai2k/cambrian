@@ -1214,6 +1214,302 @@ def cap_cut(obj, near, outward):
     return len(made)
 
 
+def cut_rim(obj, within, seam=None, axis=1):
+    """What a jaw cut actually left open in one half of a head, measured rather than assumed.
+
+    **The first question about a mouth is whether the cut is earning its place**, and it is a
+    question about the *generation*, not about the builder. Three answers turn up on this roster:
+
+    - a head that arrived **shut** -- the commonest, and Dinocephalosaurus is the extreme, where
+      the lip is painted on a closed snout. Rotating the jaw bone there opens nothing, because
+      there is no aperture; the cut is what makes one, and something has to close behind it.
+    - a head with a **slit or a shallow cavity** modelled, where the cut runs partly through
+      surface that was already there.
+    - a head that arrived **gaping**, with a real lumen: a roof, a floor and a commissure, all
+      modelled. There the aperture already exists and so do its walls, and a cut through it makes
+      a boundary where the surface was continuous.
+
+    This reports the boundary each half is left with, inside `within`, as loops: how many, how long
+    each is, the box it occupies, and -- where a `seam` is given -- how much of each loop is
+    actually *on* the cut (a vertex the bisection put there) rather than pre-existing rim. A cut
+    through a closed head leaves exactly one loop, every vertex of it on the seam or on one of the
+    transverse cross-sections at the ends. Anything else is the generation talking.
+
+    The tell for a gaping generation is short: the loop does not reach the snout. Cymbospondylus'
+    measures 112 vertices spanning 0.042 of a body behind the hinge on a mouth 0.14 long, because
+    forward of its commissure the upper and lower jaws are already separate sheets and the seam
+    plane passes between them without touching either -- so nothing there was cut, and nothing
+    there needs capping.
+
+    `within(p)` bounds the region asked about (the head); `axis` is which component of a position
+    is along the body, for the reach figure.
+    """
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    border = [e for e in bm.edges if len(e.link_faces) == 1
+              and within(e.verts[0].co) and within(e.verts[1].co)]
+    elsewhere = sum(1 for e in bm.edges if len(e.link_faces) == 1) - len(border)
+    adj = {}
+    for e in border:
+        adj.setdefault(e.verts[0], []).append(e)
+        adj.setdefault(e.verts[1], []).append(e)
+    seen, groups = set(), []
+    for v in adj:
+        if v in seen:
+            continue
+        stack, part = [v], []
+        seen.add(v)
+        while stack:
+            q = stack.pop()
+            part.append(q)
+            for e in adj[q]:
+                w = e.other_vert(q)
+                if w not in seen:
+                    seen.add(w)
+                    stack.append(w)
+        groups.append(part)
+    groups.sort(key=len, reverse=True)
+    out = {'boundaryEdgesInRegion': len(border), 'boundaryEdgesElsewhere': elsewhere,
+           'loops': []}
+    for p in groups[:8]:
+        co = [v.co for v in p]
+        row = {'vertices': len(p), 'closed': all(len(adj[v]) == 2 for v in p),
+               'box': [[round(min(c[i] for c in co), 5), round(max(c[i] for c in co), 5)]
+                       for i in range(3)],
+               'reach': round(max(c[axis] for c in co) - min(c[axis] for c in co), 5)}
+        if seam is not None:
+            on = sum(1 for c in co if abs(c[2] - seam(c[axis])) < 1e-5)
+            row['verticesOnTheSeam'] = on
+        out['loops'].append(row)
+    bm.free()
+    return out
+
+
+def _rim_cycles(edges):
+    """Order a set of boundary edges into vertex cycles, or say why they are not cycles.
+
+    A cap that is claimed to close by construction has to know it is spanning a *closed* curve.
+    Every vertex of a set of disjoint cycles has exactly two of the set's edges on it; anything
+    else -- a run that stops, a T where three edges meet -- means the selector has picked up
+    something that is not one rim, and the honest answer is to refuse rather than to fill.
+    """
+    adj = {}
+    for e in edges:
+        a, b = e.verts
+        adj.setdefault(a, []).append(b)
+        adj.setdefault(b, []).append(a)
+    bad = [v for v, n in adj.items() if len(n) != 2]
+    if bad:
+        return None, {'verticesWithoutTwoRimEdges': len(bad), 'rimVertices': len(adj),
+                      'bad': bad[:6]}
+    cycles, seen = [], set()
+    for start in adj:
+        if start in seen:
+            continue
+        cyc, prev, cur = [start], None, start
+        seen.add(start)
+        while True:
+            nxt = next((w for w in adj[cur] if w is not prev), None)
+            if nxt is None or nxt is start:
+                break
+            cyc.append(nxt)
+            seen.add(nxt)
+            prev, cur = cur, nxt
+        cycles.append(cyc)
+    return cycles, {'rimVertices': len(adj), 'cycles': [len(c) for c in cycles]}
+
+
+def cap_mouth(obj, rim, facing, dome=.30, rounds=2, limit=None, eps=1e-9):
+    """Close the opening the jaw cut left in one half of a head **with the cut's own rim**, and
+    dome it into that half, so the space between the two caps is the mouth.
+
+    This is the owner's construction and it replaces a shell placed in the lumen. A mouth cut takes
+    a closed head and separates it into a skull part and a jaw part, and each is left with an open
+    boundary along the cut. Span that boundary and the part is a closed solid again -- and the
+    surface that spans it *is* the roof or the floor of the mouth, following the cut exactly,
+    because the cut rim is what bounds it. Four things follow, and they are why this is worth the
+    change rather than a second way of doing the same thing:
+
+    - **It closes by construction.** A surface spanning a closed curve leaves no hole. A shell
+      placed inside the lumen has to be *rendered* against a backdrop to find out whether it
+      covers the opening, which is how Cartorhynchus shipped leaking 51 px at its commissure with
+      nobody knowing. `gape-solid.py` stays the proof, because a cap can still face the wrong way
+      or miss a run of rim -- but it is checking a claim the geometry already makes.
+    - **The geometry is the body's own.** Every vertex of the cap is a convex combination of rim
+      vertices the generation made: the fill uses no new points at all, and the points the dome
+      needs are face centroids of that fill. `CLAUDE.md`'s bar for authoring on a Tripo body is how
+      much shape is being invented, and this invents none -- it follows a fitted or curved cut for
+      free, with no per-body sizing of a shell inside a lumen.
+    - **It wears the skin it closes.** UVs and vertex colours come from the rim, inverse-distance
+      weighted, so the palate is the head's own albedo rather than a flat-shaded island.
+    - **Each cap is part of its own half**, so it is rigid to that half's bone *by construction*,
+      through the same weight field as the skin around it. There is no second surface to keep
+      coincident with the first -- which is the failure that cost Mosasaurus four rebuilds, where
+      anything riding the jaw at weight 1 arrived exactly where the palate already was.
+
+    **The lip run is what must not be filled.** A cut half's whole boundary is one loop -- forward
+    along the mouth line on one flank, across the head at the far end of the cut, back along the
+    other flank, and across again -- and a fill over all of it in one go is a flat plate whose twin
+    on the other half is coincident with it: a mouth with no volume, which is the "sealed shut"
+    `cap_cut` warns about. The answer is *not* to separate the lip from the rest, which cannot be
+    done robustly on a curved cut. It is to fill the whole loop on **each half separately** and
+    then dome each fill into its own half: the two plates part, and what is between them is the
+    cavity. The lip is then the one curve where the two caps still meet, which is what a lip is.
+
+    So the order a builder uses is: `cap_cut` over each transverse run first -- the cross-sections
+    at the ends of the cut, which dip out of the mouth's own plane and would fold under a planar
+    fill -- and then this, over what is left, which is the two lip runs and the short chords
+    `cap_cut` closed the ends with. That residual loop lies in the mouth's own surface, which is
+    why `triangle_fill` can project it along `facing` and triangulate it in the plane.
+
+    **The dome's depth is measured, not chosen.** Each cap vertex is pushed into its half by
+    `dome` times *its own distance from the nearest rim vertex*. That is one rule with three
+    properties worth having: it is exactly zero on the rim, so the cap meets the skin without a
+    step; it is deepest along the middle of the mouth and shallow at the lips, at the snout and in
+    the corners, which is the shape a palate has; and it scales with the local mouth size by
+    construction, because the distance from a point on the midline to the rim *is* the half-width
+    there. `limit(p)` is an optional ceiling -- a builder that has measured how much head there is
+    above the mouth line passes it, and the cap then cannot reach the skin whatever `dome` says.
+
+    **Several loops are normal and all of them are filled.** Nothosaurus' cut leaves 225 boundary
+    edges per half in *six* closed curves -- the lip, and five small ones the generation's own
+    modelled slit contributes at the snout -- and `triangle_fill` over the whole selection in the
+    mouth's own plane closes them all at once. What the helper refuses is a rim that is not a set
+    of closed curves; a leftover boundary after the fill is an assertion, not a warning.
+
+    `rim(p)` selects the mouth's own boundary vertices; `facing` is the direction the cap's faces
+    should point, which is into the mouth, so a skull's cap faces down and a mandible's up, and the
+    dome runs the other way. `rounds` is how many times the fill is poked to give the dome interior
+    vertices to use: one round triples the triangle count of the fill, two multiply it by nine.
+
+    Returns a report, and raises where the rim is not one closed curve or the fill left the half
+    open -- both of which are the construction failing to be a construction.
+    """
+    facing = Vector(facing).normalized()
+    before = len(obj.data.vertices)
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    border = [e for e in bm.edges
+              if len(e.link_faces) == 1 and rim(e.verts[0].co) and rim(e.verts[1].co)]
+    if len(border) < 3:
+        bm.free()
+        return {'rimEdges': len(border), 'capped': False, 'why': 'no rim'}
+    cycles, shape = _rim_cycles(border)
+    if cycles is None:
+        # What a dangling end means is that the selector let go of the rim, so say what is actually
+        # there: every boundary edge on the offending vertex and whether `rim` took it.
+        sel = set(border)
+        detail = []
+        for w in shape.pop('bad', []):
+            detail.append({'at': [round(c, 5) for c in w.co],
+                           'boundary': [{'to': [round(c, 5) for c in (e.other_vert(w).co)],
+                                         'selected': e in sel,
+                                         'rimEnds': [bool(rim(e.verts[0].co)), bool(rim(e.verts[1].co))]}
+                                        for e in w.link_edges if len(e.link_faces) == 1]})
+        shape['detail'] = detail
+        bm.free()
+        raise AssertionError(('the mouth rim is not a closed curve, so nothing here closes by '
+                              'construction', obj.name, shape))
+    uv_layer = bm.loops.layers.uv.active
+    colour_layers = [l for layers in (bm.verts.layers.float_color, bm.verts.layers.color)
+                     for l in layers.values()]
+    rim_verts = []
+    for e in border:
+        for v in e.verts:
+            if v not in rim_verts:
+                rim_verts.append(v)
+    rim_uv = {}
+    if uv_layer is not None:
+        for v in rim_verts:
+            loops = list(v.link_loops)
+            if loops:
+                rim_uv[v] = sum((l[uv_layer].uv for l in loops), Vector((0., 0.))) / len(loops)
+    rim_co = [v.co.copy() for v in rim_verts]
+    rim_set = set(rim_verts)
+
+    made = [g for g in bmesh.ops.triangle_fill(bm, edges=border, use_beauty=True,
+                                               use_dissolve=False, normal=facing)['geom']
+            if isinstance(g, bmesh.types.BMFace)]
+    if not made:
+        bm.free()
+        raise AssertionError(('the mouth rim could not be filled', obj.name, shape))
+    for _ in range(max(0, rounds)):
+        made = bmesh.ops.poke(bm, faces=made)['faces']
+
+    # The dome. Every vertex the fill and the pokes added is inside the rim; the rim itself does
+    # not move, which is what keeps the cap and the skin one surface. A vertex is reached from
+    # several faces, so `tag` marks the ones already pushed -- cleared first as well as after,
+    # because a bmesh's tags are whatever the last operator left on them.
+    for v in bm.verts:
+        v.tag = False
+    pushed, deepest = 0, 0.
+    for f in made:
+        for v in f.verts:
+            if v in rim_set or v.tag:
+                continue
+            v.tag = True
+            d = min((v.co - p).length for p in rim_co)
+            push = dome * d
+            if limit is not None:
+                push = min(push, max(0., limit(v.co)))
+            if push > eps:
+                v.co = v.co - facing * push
+                pushed += 1
+                deepest = max(deepest, push)
+    for v in bm.verts:
+        v.tag = False
+
+    # The skin the cap closes. A bmesh vertex starts every layer at zero, so a fill with no UVs
+    # draws as a black slab -- Placodus' mandible cap did exactly that before `cap_cut` learned to
+    # carry the rim's. Inverse distance over the rim rather than the nearest rim vertex, so the
+    # albedo runs across the cap instead of stepping between the vertices it was taken from.
+    def blend_uv(co):
+        num, den = Vector((0., 0.)), 0.
+        for v in rim_verts:
+            w = 1. / max((co - v.co).length, 1e-6) ** 2
+            num += rim_uv.get(v, Vector((0., 0.))) * w
+            den += w
+        return num / den if den else Vector((0., 0.))
+
+    def nearest_rim(co):
+        return min(rim_verts, key=lambda v: (co - v.co).length)
+
+    new_uv = {}
+    for f in made:
+        f.smooth = True
+        for l in f.loops:
+            v = l.vert
+            if uv_layer is not None:
+                if v in rim_uv:
+                    l[uv_layer].uv = rim_uv[v]
+                else:
+                    if v not in new_uv:
+                        new_uv[v] = blend_uv(v.co)
+                    l[uv_layer].uv = new_uv[v]
+            if v not in rim_set:
+                for layer in colour_layers:
+                    v[layer] = nearest_rim(v.co)[layer]
+    for f in made:
+        f.normal_update()
+        if f.normal.dot(facing) < 0:
+            f.normal_flip()
+    bm.normal_update()
+    left = [e for e in bm.edges
+            if len(e.link_faces) == 1 and rim(e.verts[0].co) and rim(e.verts[1].co)]
+    if left:
+        bm.free()
+        raise AssertionError(('the mouth cap left the half open', obj.name, len(left)))
+    # Where the cap's own vertices start in the mesh, so a builder can put them through its own
+    # containment test -- ray parity against the closed intake, which uses no normals and no table.
+    report = {'rimEdges': len(border), 'capped': True, 'faces': len(made),
+              'domedVertices': pushed, 'deepestRaw': round(deepest, 6),
+              'dome': dome, 'rounds': rounds, 'firstNewVertex': before, **shape}
+    bm.to_mesh(obj.data)
+    obj.data.update()
+    bm.free()
+    return report
+
+
 def rim_flange(obj, axis_of, amount, select=None):
     """Fold the open rim of a cut mouth inwards, so the lip is not one polygon thick.
 
@@ -1812,6 +2108,87 @@ def jaw_junction(body, shell, body_weights, hinge, rear, upper_jaw, axis, down=(
               'dz': float(dz), 'band': band, 'back': back, 'throat': throat,
               'shellVertices': len(sco), 'shellFullJaw': full, 'bodyThroatVertices': body_throat}
     return body_out, shell_out, report
+
+
+def jaw_field_uncut(body, body_weights, hinge, below, axis, band, behind, throat=1.,
+                    reach=None, reach_margin=.5):
+    """Give an **uncut** head a jaw, by weighting the mouth the generation already modelled.
+
+    This is the answer for the third kind of generation. A body that arrived with its mouth *shut*
+    has no aperture at all until a cut makes one, and `cap_mouth` is what closes behind that cut. A
+    body that arrived **gaping** is the opposite case: the aperture is there, and so are its walls
+    -- a palate, a floor, a commissure where the two meet, all modelled by the generator. Cutting
+    such a head makes a boundary where the surface was continuous and then has to close it again,
+    which is the whole of what the lining and the hinge plug were doing on those bodies. Mosasaurus'
+    own builder said so in as many words: the sac's job is "the **back** of the mouth: at the throat
+    the modelled cavity closes, the cut passes through real geometry and leaves a rim on each half,
+    and that rim is what parts when the jaw swings."
+
+    So do not cut it. The mouth opening and closing is then a bone turning inside skin that is one
+    continuous surface, which is what the owner asked for and what every other joint on the animal
+    already is. The mandible's own shell is rigid on `jaw` because the field is 1 there; the palate
+    is rigid on `skull` because the field is 0 there; and the commissure -- the fold of skin where
+    the two lips meet at the corner of the mouth -- is the band between, which stretches, exactly
+    as the skin over an elbow does.
+
+    `below(p)` is how far a point is **below the mouth line** in the builder's own measurement,
+    positive under it; the share ramps from 0 to 1 over `band` of that. `band` is a distance and it
+    is the one number with a real cost either way: too wide and the front of the mandible takes only
+    part of the jaw's rotation, so the lower tooth row lags the bone it is drawn on; too narrow and
+    the whole of the gape's swing is carried by a thin strip of skin at the corner, which is where
+    linear blend skinning pinches. Measure it, report it, and look at the corner at the widest gape
+    the clips reach.
+
+    Along the body the share is 1 forward of the `hinge` and falls to 0 over `behind` behind it, so
+    the throat follows the jaw and the neck does not -- the same thing `jaw_junction`'s `back` does,
+    without a rim to measure it from. `reach` bounds it across the head as well (the transverse
+    distance from the hinge past which nothing is the jaw's, `reach_margin` of it to fade over),
+    because a flipper tucked under a chin is not a throat: that is the lesson Aphaneramma's and
+    Mystriosuchus' cut shells paid for, and it applies here for the same reason. The limb term is
+    the other half of it, and is taken off the body's own relaxed field exactly as `jaw_junction`
+    takes it.
+
+    Returns `(field, report)` -- the field a list of {bone: weight} dicts trimmed to four
+    influences, in the body's vertex order.
+    """
+    import re
+    LIMB = re.compile(r'fore|hind|pec|pelvic|paddle|foot|hand|fin_|flipper', re.I)
+    H = Vector(hinge)
+    axis = Vector(axis).normalized()
+
+    def transverse(p):
+        d = Vector(p) - H
+        return (d - axis * d.dot(axis)).length
+
+    margin = max((reach or 0.) * reach_margin, 1e-4)
+
+    def trim(w):
+        items = sorted(((n, v) for n, v in w.items() if v > 1e-6), key=lambda kv: -kv[1])[:4]
+        total = sum(v for _, v in items) or 1.
+        return {n: v / total for n, v in items}
+
+    out, full, blended = [], 0, 0
+    for i, v in enumerate(body.data.vertices):
+        c = v.co
+        w = body_weights[i]
+        ahead = smooth(((Vector(c) - H).dot(axis) + behind) / behind)
+        radial = 1. if reach is None else 1. - smooth((transverse(c) - reach) / margin)
+        axial = 1. - sum(x for n, x in w.items() if LIMB.search(n))
+        j = throat * smooth(below(c) / band) * ahead * radial * max(0., axial)
+        if j > .99:
+            full += 1
+        elif j > .01:
+            blended += 1
+        if j <= 0:
+            out.append(trim(w))
+        else:
+            mixed = {n: x * (1. - j) for n, x in w.items()}
+            mixed['jaw'] = mixed.get('jaw', 0.) + j
+            out.append(trim(mixed))
+    report = {'vertices': len(out), 'fullJaw': full, 'blended': blended,
+              'band': band, 'behind': behind, 'throat': throat,
+              'reach': None if reach is None else float(reach), 'uncut': True}
+    return out, report
 
 
 def depth_probe(o):

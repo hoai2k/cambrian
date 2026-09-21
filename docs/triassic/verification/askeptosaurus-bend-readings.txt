@@ -1,0 +1,7 @@
+span {"base":[-0.1182,0.0659,-1.249],"tip":[-0.5114,0.1603,-0.543]}
+bone   body → chest         vs neck_03 → skull      -0.5° in the bend plane · 2.8° out of it · 2.8° in all
+bone   tail_00 → chest      vs neck_03 → skull      +5.2° in the bend plane · 13.4° out of it · 14.3° in all
+bone   chest → neck_00      vs neck_03 → skull      +1.2° in the bend plane · 32.0° out of it · 32.0° in all
+geometry  16.57° in plane, 16.57° in all
+Geometry+16.6° in the bend plane · 0.0° out of it · 16.6° in allbetween the body’s own traced centre over the 12% behind the base cut and the 12% ahead of the tip cuttrace residual 0.062 — the trace wandered; move an end, shorten the window or narrow the reach
+spread across the three trunk readings: 29.1°

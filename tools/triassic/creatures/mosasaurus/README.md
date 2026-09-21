@@ -82,19 +82,19 @@ came through the top of the snout as a pink slab the length of the head.
 The closing rotation is defined as the one that carries the mandible's dorsal margin at the snout
 onto the palate's ventral margin at the same station: **32.55°**.
 
-| | |
-|---|---|
-| closing rotation | 32.55° |
-| mandible vertices measured | 1,275 |
-| inside the skull's surface, by normal sign | 346 (27 %), max 0.224 units = **4.5 %** of body length |
-| **outside the head's own measured section** | 170, max 0.036 units = **0.72 %** of body length |
+| | with the cut (historical) | uncut, as it ships |
+|---|---|---|
+| closing rotation | 32.55° | 32.55° |
+| mandible vertices measured | 1,275 (the cut shell) | 783 (the vertices the jaw field carries outright) |
+| inside the skull's surface, by normal sign | 346 (27 %), max 0.224 units = **4.5 %** of body length | **not defined**: with one surface there is nothing to cast against but the animal itself |
+| **outside the head's own measured section** | 170, max 0.036 units = **0.72 %** of body length | 128, max 0.0358 units = **0.72 %** of body length |
 
-The two rows measure different things and the second is the one that matters. A `find_nearest` sign
-test beside a modelled oral cavity counts a mouth floor *correctly* inside the mouth as inside the
-skull, so the first row is an upper bound; what the question actually is — does the shut jaw push out
-through the outside of the head — uses no normals at all and answers **0.72 % of a body length, on
-13 % of the mandible**. At gameplay scale that is a lip fold, and it is visible as one small pink
-sliver at the corner of the mouth in the `Idle` mouth sheet.
+The second row measured a *cut shell* against a *skull surface*, and neither of those exists any
+more, so it is null rather than zero — reporting a figure that is trivially 0 by construction would
+be worse than reporting none. What the question actually is — does the shut jaw push out through the
+outside of the head — uses no normals at all, needs no cut, and answers the same **0.72 % of a body
+length** either way. At gameplay scale that is a lip fold, and it is visible as one small pink sliver
+at the corner of the mouth in the `Idle` mouth sheet.
 
 That is the price. It is much smaller than the rule warns it can be, and the reason is that this
 generation's gape is a third of the one its reference draws: the jaws part over 0.176 of a body and
@@ -103,7 +103,64 @@ were all paid too — the oral cavity had to fold rather than be built, the lini
 three times to stop it inverting at the shut pose, and the pose the animal spends nearly all its time
 in is now its most deformed one.
 
-### The lining, and the one weight that is forced rather than chosen
+### T3D-31: this mouth is not cut, and that is what closed the holes
+
+Everything in the next section is history, and so is the cut it depended on. The owner, looking at
+this animal: *"when his mouth opens I see some holes — shouldn't we just be stretching the geometry
+instead of cutting it? the open mouth is essentially just a bone motion that should have organic
+skinning inside of it."*
+
+**The generation arrived gaping**, which the section above measures four ways, and that means its
+mouth already exists and so do its walls: a palate, a floor, a tongue, a commissure. On a head like
+that a cut does not make the aperture — it makes a **boundary where the surface was continuous**,
+and the lining and the hinge plug then exist to close that boundary. This file said so itself: the
+sac's job was *"the back of the mouth: at the throat the modelled cavity closes, the cut passes
+through real geometry and leaves a rim on each half, and that rim is what parts when the jaw
+swings."*
+
+`T.cut_rim` on the body this replaces: **one closed loop of 156 vertices per half**, 113 of them on
+the seam, spanning y −0.267 to −0.210 — **0.057 of a body**, against a gape **0.176 of a body**
+long. The cut only ever reached the back third of the mouth, because forward of that the jaws are
+already apart and the seam plane passes between them without touching either. It bought nothing at
+the front and paid for a rim at the back.
+
+So the body is one surface. `T.jaw_field_uncut` weights the mouth the generation drew: full `jaw`
+below the mouth line and forward of the hinge, full skull above it, and a band at the commissure
+that stretches. No `Oral cavity lining`, no `Seated jaw hinge tissue`, nothing blended between two
+bones, nothing for the runtime to hide.
+
+**What the owner was seeing, measured.** `gape-solid.py` rendered the file as it is, and the game
+hides every part the oral classifier matches — so the proof was about a body nobody draws. This
+animal read 0 px through the body at every opening clip on the plain run. `--as-drawn`:
+
+| | Attack@0.433 | Bite@0.100 | Heavy@0.560 | Eat@0.150 |
+| --- | ---: | ---: | ---: | ---: |
+| shipped, as drawn: through the body | 71 | **292** | 0 | 222 |
+| shipped, as drawn: opened by the cull | 486 | 1,904 | 0 | 1,466 |
+| uncut, as drawn | **0** | **0** | **0** | **0** |
+
+Every failing pixel was at the corner of the mouth, where the cut rim parts
+([the green mask](../../../../docs/triassic/verification/mosasaurus-Bite-as-drawn-before.png)).
+
+**What it costs.** The commissure has to stretch, because three clips open past the gaping bind
+(`Heavy` +0.50, `Bite` +0.46, `Attack` +0.42 rad). The band is the lever, and it was swept rather
+than chosen:
+
+| band (of the head's half depth at the hinge) | worst skin | mouth skin | jaw follows at `Bite` |
+| ---: | ---: | ---: | ---: |
+| 0.20 | 3.62x | 3.62x | 0.98 |
+| 0.30 | 2.81x | 2.81x | 0.97 |
+| 0.38 | 2.54x | 2.39x | 0.96 |
+| **0.50 (shipped)** | **2.54x** | **2.05x** | **0.96** |
+
+At 0.50 the skin figure is exactly the 2.54x the cut body shipped, the worst edge is no longer in
+the mouth at all, 5 of 22 clips tear past 2x against 4 before, and the mandible still travels
+0.96–1.00 of its own joint, so the lower tooth row does not lag the bone it is drawn on. `lag.mjs`
+now has no seam to measure and says so — nothing is cut, so nothing can part.
+
+[The mouth as the game draws it, at `Bite`'s widest](../../../../docs/triassic/verification/mosasaurus-mouth-after.png).
+
+### The lining, and the one weight that is forced rather than chosen — historical
 
 At the snout the closing rotation carries the mandible's margin **exactly** onto the palate's, so a
 lining floor riding the jaw at weight 1 arrives exactly where its own roof already is: the sac is
