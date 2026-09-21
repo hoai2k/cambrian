@@ -172,11 +172,11 @@ async function applyTo(file, dest) {
 }
 
 // --- The family -------------------------------------------------------------------------------
-const source = `${assetDir}/${id}.glb`;
-const authoredDoc = await io.read(source);
+const authoredFile = `${assetDir}/${id}.glb`;
+const authoredDoc = await io.read(authoredFile);
 const authoredKey = familyKey(authoredDoc.getRoot().listAnimations().map((a) => a.getName()));
 const authoredJoints = (authoredDoc.getRoot().listSkins()[0]?.listJoints() ?? []).map((j) => j.getName()).join('|');
-const family = [{ suffix: '', file: source }];
+const family = [{ suffix: '', file: authoredFile }];
 const skipped = [];
 for (const suffix of ['.puppet', '.lod1']) {
   const file = `${assetDir}/${id}${suffix}.glb`;
