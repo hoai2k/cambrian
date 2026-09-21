@@ -1,0 +1,121 @@
+{
+  "id": "saurichthys",
+  "backdrop": [
+    1.0,
+    0.0,
+    1.0,
+    1.0
+  ],
+  "asDrawn": true,
+  "shots": [
+    {
+      "clip": "Bite",
+      "t": 0.133,
+      "pixels": 378000,
+      "differingPixels": 4901,
+      "holesOpenedByCulling": 523,
+      "seenThroughTheBody": 89,
+      "backdropInBothPasses": 8,
+      "markedImage": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Bite-0.133-opened.png",
+      "solid": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Bite-0.133-solid.png",
+      "culled": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Bite-0.133-culled.png"
+    },
+    {
+      "clip": "Attack",
+      "t": 0.267,
+      "pixels": 378000,
+      "differingPixels": 4559,
+      "holesOpenedByCulling": 507,
+      "seenThroughTheBody": 123,
+      "backdropInBothPasses": 10,
+      "markedImage": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Attack-0.267-opened.png",
+      "solid": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Attack-0.267-solid.png",
+      "culled": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Attack-0.267-culled.png"
+    },
+    {
+      "clip": "Heavy",
+      "t": 0.333,
+      "pixels": 378000,
+      "differingPixels": 3763,
+      "holesOpenedByCulling": 451,
+      "seenThroughTheBody": 82,
+      "backdropInBothPasses": 11,
+      "markedImage": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Heavy-0.333-opened.png",
+      "solid": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Heavy-0.333-solid.png",
+      "culled": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Heavy-0.333-culled.png"
+    },
+    {
+      "clip": "FastStart",
+      "t": 0.233,
+      "pixels": 378000,
+      "differingPixels": 3558,
+      "holesOpenedByCulling": 387,
+      "seenThroughTheBody": 30,
+      "backdropInBothPasses": 10,
+      "markedImage": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/FastStart-0.233-opened.png",
+      "solid": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/FastStart-0.233-solid.png",
+      "culled": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/FastStart-0.233-culled.png"
+    },
+    {
+      "clip": "Grab",
+      "t": 0.667,
+      "pixels": 378000,
+      "differingPixels": 3477,
+      "holesOpenedByCulling": 380,
+      "seenThroughTheBody": 37,
+      "backdropInBothPasses": 46,
+      "markedImage": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Grab-0.667-opened.png",
+      "solid": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Grab-0.667-solid.png",
+      "culled": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Grab-0.667-culled.png"
+    },
+    {
+      "clip": "Ability",
+      "t": 0.3,
+      "pixels": 378000,
+      "differingPixels": 3213,
+      "holesOpenedByCulling": 395,
+      "seenThroughTheBody": 34,
+      "backdropInBothPasses": 28,
+      "markedImage": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Ability-0.3-opened.png",
+      "solid": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Ability-0.3-solid.png",
+      "culled": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Ability-0.3-culled.png"
+    },
+    {
+      "clip": "Eat",
+      "t": 0.3,
+      "pixels": 378000,
+      "differingPixels": 3234,
+      "holesOpenedByCulling": 387,
+      "seenThroughTheBody": 33,
+      "backdropInBothPasses": 21,
+      "markedImage": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Eat-0.3-opened.png",
+      "solid": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Eat-0.3-solid.png",
+      "culled": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Eat-0.3-culled.png"
+    },
+    {
+      "clip": "Breath",
+      "t": 0.967,
+      "pixels": 378000,
+      "differingPixels": 1192,
+      "holesOpenedByCulling": 82,
+      "seenThroughTheBody": 24,
+      "backdropInBothPasses": 695,
+      "markedImage": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Breath-0.967-opened.png",
+      "solid": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Breath-0.967-solid.png",
+      "culled": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Breath-0.967-culled.png"
+    },
+    {
+      "clip": "Death",
+      "t": 1.333,
+      "pixels": 378000,
+      "differingPixels": 1023,
+      "holesOpenedByCulling": 90,
+      "seenThroughTheBody": 30,
+      "backdropInBothPasses": 608,
+      "markedImage": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Death-1.333-opened.png",
+      "solid": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Death-1.333-solid.png",
+      "culled": "local/triassic-authoring/saurichthys/gape-solid-as-drawn/Death-1.333-culled.png"
+    }
+  ],
+  "note": "T3D-32C. Unchanged by this pass, and recorded rather than repaired: see the README section \"The cut is earning its place -- measured\". T.cut_rim says the authored body and its twin are different kinds of generation (the twin one closed loop the length of the mouth, the authored body a branching boundary confined to the hinge), and T.cap_mouth refuses on the authored half by construction because the rim is not a set of closed curves. The lining that closes it is hidden in play, which is what these figures are."
+}

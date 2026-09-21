@@ -1,5 +1,35 @@
 # Saurichthys — the straightest body in the set, and the one the thickness rule cannot read
 
+> **Current repair, 21 September 2026 (T3D-32C).** Three things, two done and one measured and
+> recorded.
+>
+> **The pectoral chains are measured off the fins (T3D-21).** They used to be typed as fractions of
+> the body — a mirrored pair of chains on a generation whose two blades are not mirrored — and
+> `pec_tip_R` stood 3.58 % of a body from the nearest skin vertex against the left's 1.67 %, with the
+> right chain dominating 126 vertices to the left's 247. Each blade is now found as the largest
+> connected blade-thin patch under the flank, flooded over the mesh's own edges (405 vertices left,
+> 390 right), stationed in eight bands of geodesic distance from its tip, and the two stationed
+> centrelines are checked against each other's mirror (worst 0.0267 raw, 2.5 % of a body — the
+> generation's own asymmetry) and averaged; the root is the base station pulled 0.0128 into the trunk
+> by ray parity against the closed skin. Which joint owns a point is arc along that fin's own
+> centreline rather than distance out across the body, and the window each blade's bid reads is that
+> blade's own measured extent. **After: owned area 0.004719 / 0.004344, 8.0 % apart; dominated
+> vertices 169 / 140, 17.2 % apart; each chain dominates 0.417 / 0.359 of its own blade, 14.0 % apart; joint to
+> nearest skin 1.03 / 1.42 % of a body at the root, 0.57 / 0.62 % at the mid and 0.22 / 0.38 % at the
+> tip, a worst left-right gap of 0.39 % of a body against the 1.9 % this body shipped with.** Skin
+> **3.61x → 3.32x**, and the worst bone is no longer `pec_tip_R`.
+>
+> **The twin was carrying the authored body's textures.** There was one `Mouth lining` object and it
+> was exported with *both* bodies, so the vertex-coloured twin carried this lining's authored
+> material — a 2048-square albedo and its normal map, **604,389 bytes of JPEG** — for a surface of a
+> few hundred vertices. The twin now has its own copy on the twin's own vertex-colour material:
+> `saurichthys.puppet.glb` **1,313,156 → 708,252 bytes**, and `lod1` with it, at identical triangle
+> and vertex counts.
+>
+> **The mouth is measured and recorded, not re-cut.** See *The cut is earning its place — measured*
+> below.
+
+
 **Status: built, measured and rendered; not shipped.** `saurichthys` is deliberately *not* in
 `tools/triassic/shipped.json` and its preview badge in
 `src/content/triassic/pending-refinements.json` is untouched, so nothing in the game has changed.
@@ -403,3 +433,72 @@ delivered animals and 33 shots nothing goes up. The section above has the eviden
 Two lessons worth keeping. **A count that will not move is a count about something else** — that is
 now twice — and **the right way to find out what a failing pixel is, is to cast a ray through it**
 and ask every surface on the line, rather than to keep changing geometry and re-reading renders.
+
+
+## The cut is earning its place — measured (T3D-32C)
+
+T3D-31's first question is whether the cut should be there at all, and `T.cut_rim` answers it by
+reporting what the cut actually left open in each half. On this animal it returns **two different
+answers for the two bodies**, which is worth saying plainly because it is the reason neither of
+T3D-31's two constructions can simply be applied here.
+
+| | boundary edges in the head | largest loop | closed? | reach over body | on the seam |
+| --- | ---: | ---: | :--: | ---: | ---: |
+| authored | 282 (+8 elsewhere) | 165 vertices | no | 0.0824 | 65 of 165 |
+| authored, mandible | 222 | 162 vertices | no | 0.0824 | 65 |
+| twin | 148 | 148 vertices | **yes** | **0.1825** | 103 |
+| twin, mandible | 0 | — | — | — | — |
+
+The mouth runs 0.18 of a body. **The twin's cut makes the whole aperture** — one closed loop the
+length of the mouth, every other vertex of it on the seam — which is case 1, a head that arrived
+shut, and it arrived shut because a voxel remesh of an occupancy field is a closed solid whatever
+the generation was. **The authored body's does not.** Its largest run spans 0.0824 of a body and
+sits at y −0.377 to −0.289 against a hinge at −0.340: it straddles the hinge, which is the cut's
+cross-section and the generation's own opercular seams behind it. Forward of that, over 0.15 of the
+mouth's 0.18 run, the cut left nothing open at all, because the generation's own modelled slit was
+already open there. That is case 2 shading into case 3.
+
+`T.cap_mouth` was tried on the authored half and **refuses, correctly and by construction**:
+`_rim_cycles` finds 32 of 141 rim vertices without exactly two rim edges — including one with four
+boundary edges at y −0.363 — because the generation's slit rim and the cut's rim are one connected
+branching boundary, and the lip run is open at the snout where the slit already opens. A cap that
+claims to close by construction has to know it is spanning a closed curve. The twin's rim is nearly
+closed (4 bad vertices of 107), and capping one body of a pair and not the other is not an option.
+
+What the lining is worth, measured by drawing it and not drawing it at the peak of every opening
+clip: **2 px through / 162 opened with it, 89 / 523 as drawn without it.** So it is doing real
+work — about 87 through and 360 opened — and the runtime hides it, which is exactly T3D-31's
+complaint. The 162 that remain *with* the lining are slivers along the generation's own tooth row,
+which is geometry `CLAUDE.md`'s simplicity bar forbids re-modelling.
+
+So this body does **not** reach 0 through and 0 opened as drawn in this pass, and it is recorded
+rather than papered over. The routes out are the two T3D-31 names for this case and both are larger
+than a weighting change: a mouth-closed regeneration, or `T.jaw_field_uncut` on the authored body
+with the cut kept on the twin — which would have to answer what the bind pose is on a body whose
+`RESTING_GAPE` closing rotation is currently baked into a labelled mandible shell.
+
+As drawn, at the measured peak of every clip that opens the jaw past a degree:
+
+| clip | phase | through | opened |
+| --- | ---: | ---: | ---: |
+| Bite | 0.133 | 89 | 523 |
+| Attack | 0.267 | 123 | 507 |
+| Heavy | 0.333 | 82 | 451 |
+| FastStart | 0.233 | 30 | 387 |
+| Grab | 0.667 | 37 | 380 |
+| Ability | 0.300 | 34 | 395 |
+| Eat | 0.300 | 33 | 387 |
+| Breath | 0.967 | 24 | 82 |
+| Death | 1.333 | 30 | 90 |
+
+Plain (the file as it is, lining drawn): 2 / 2 / 4 through and 162 / 164 / 152 opened at
+`Bite` / `Attack` / `Heavy`.
+
+**A note on the audit.** `audit.mjs` cannot run on the shipped file at all, with or without
+`--package`, once the shore gait `Flop` has been applied: the clip's `root` channels are constant
+(the contract is that the root does not move) and the audit asserts the channel does not *exist*.
+That is a central tooling defect and not this body's. Parity was therefore measured on the body
+**immediately before `Flop` was applied**, which is the same geometry: exact rig, inverse-bind,
+socket and per-clip sample parity, `saurichthys.glb` 1,806,412 B / 22,078 triangles / 13,491
+vertices and `saurichthys.puppet.glb` = `saurichthys.lod1.glb` byte for byte at 708,252 B / 8,443
+triangles / 4,288 vertices (38.2 % of the authored triangles).

@@ -5,10 +5,14 @@
     "worstClip": "Sprint",
     "worstBone": "chest",
     "worstOutsideTheOralLining": 7.0,
-    "note": "Unchanged by the oral verdict: the figure is the paddle row against the chest in Sprint, nowhere near the mouth, and it is the same 7.00x the era-wide table in CLAUDE.md records. Removing the sac removed the only oral surface that stretched, so the 'including the oral lining' figure is now the skin figure."
+    "mouthRegion": {
+      "jaw": "1.02x in Heavy (0.084->0.086)",
+      "skull": "1.03x in Heavy (0.081->0.084)"
+    },
+    "note": "Unchanged by T3D-32C's caps, exactly as it was unchanged by T3D-12B's verdict: the figure is the paddle row against the chest in Sprint, nowhere near the mouth, and it is the same 7.00x the era-wide table in CLAUDE.md records. The caps are part of the halves they close and ride the same weight field as the skin round them, so the mouth region reads 1.02x/1.03x -- the mouth opening rather than anything stretching."
   },
   "gapeSolid": {
-    "tool": "/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- dinocephalosaurus Bite@0.133 Attack@0.367 Heavy@0.5 Eat@0.233 NeckStrike@0.567",
+    "tool": "/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- dinocephalosaurus Bite@0.133 Attack@0.367 Heavy@0.5 Eat@0.233 NeckStrike@0.567 [--as-drawn]",
     "shots": [
       "Bite@0.133",
       "Attack@0.367",
@@ -19,55 +23,127 @@
     "shotsAre": "the peak jaw rotation of each clip, measured off the packaged rig (skull-to-jaw angle per frame)",
     "backdropTest": "r > .90, g < .20, b > .90",
     "tolerance": 12,
-    "verdict": "PASS -- neither a palate nor a floor is needed",
-    "seenThroughTheBody": {
-      "shippedWithTheSac": [
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      "sacRemoved_thisBuild": [
-        0,
-        2,
-        3,
-        1,
-        1
-      ],
-      "sacAndHingeTissueRemoved": [
-        98,
-        87,
-        113,
-        50,
-        101
-      ]
+    "verdict": "PASS -- 0 through and 0 opened at every shot, plain and as drawn",
+    "asDrawnIsTheOneThatCounts": "The runtime hides everything src/shared/oral-geometry.ts matches, and this head's Seated jaw hinge tissue was one of them, so the plain run was proving a body the game does not draw.",
+    "asDrawn": {
+      "before_T3D_32C": {
+        "seenThroughTheBody": [
+          104,
+          94,
+          120,
+          54,
+          107
+        ],
+        "openedByCulling": [
+          166,
+          153,
+          197,
+          65,
+          171
+        ]
+      },
+      "after_T3D_32C": {
+        "seenThroughTheBody": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "openedByCulling": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
     },
-    "openedByCulling": {
-      "shippedWithTheSac": [
-        0,
-        0,
-        0,
-        0,
-        1
-      ],
-      "sacRemoved_thisBuild": [
-        67,
-        63,
-        80,
-        12,
-        67
-      ],
-      "sacAndHingeTissueRemoved": [
-        160,
-        146,
-        190,
-        61,
-        165
-      ]
+    "plain": {
+      "before_T3D_32C": {
+        "seenThroughTheBody": [
+          0,
+          2,
+          3,
+          1,
+          1
+        ],
+        "openedByCulling": [
+          67,
+          63,
+          80,
+          12,
+          67
+        ]
+      },
+      "after_T3D_32C": {
+        "seenThroughTheBody": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "openedByCulling": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
     },
-    "maxSeenThroughTheBody": 3,
+    "history": {
+      "shippedWithTheSac_plain": {
+        "seenThroughTheBody": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "openedByCulling": [
+          0,
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "sacRemoved_plain": {
+        "seenThroughTheBody": [
+          0,
+          2,
+          3,
+          1,
+          1
+        ],
+        "openedByCulling": [
+          67,
+          63,
+          80,
+          12,
+          67
+        ]
+      },
+      "sacAndHingeTissueRemoved_plain": {
+        "seenThroughTheBody": [
+          98,
+          87,
+          113,
+          50,
+          101
+        ],
+        "openedByCulling": [
+          160,
+          146,
+          190,
+          61,
+          165
+        ]
+      }
+    },
     "ofPixels": 378000,
-    "note": "Three renders of the same five shots decide the verdict. With the one-sac lining in place nothing showed through; with the sac stripped out of the unpacked GLB and everything else left as it was, 3 px at worst, inside the roster's 12 px tolerance; with the sac and the seated hinge tissue both stripped out, 50 to 113 px. So the sac was closing nothing that the hinge tissue was not already closing: what a plane cut through a closed head leaves open is the head's own cross-section at the hinge, the back wall of the mouth, and the hinge tissue fills it. The generation paints its lip on a closed snout and models no cavity, so there is no lumen wall for a gape to open onto. The sac is removed and no palate or floor is built in its place. The 'opened by culling' figures that are not seen through the body are the silhouette's own one-polygon rims losing their back face, which the tool discounts by design."
+    "note": "T3D-12B's three renders were right about the *lining*: the sac closed nothing the seated hinge tissue was not already closing. What nobody asked was whether the hinge tissue is drawn, and it is not -- so as drawn this head stood open at the hinge, 120 px through and 197 opened at Heavy. T3D-32C closes the head's cross-section at the hinge with its own vertices (T.cap_cut) and spans what is left of each half's boundary and domes it into that half (T.cap_mouth), which closes it for the player as well as for the audit. Both parts retired; this head now carries no hidden geometry at all."
   }
 }

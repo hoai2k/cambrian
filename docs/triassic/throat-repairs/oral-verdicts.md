@@ -47,11 +47,13 @@ column to read.** Nothing here is a claim about every camera: it is one side-on 
 | **Nothosaurus** | **0** | **0** | ported in T3D-31: capped with its own rim |
 | **Rhaeticosaurus** | **0** | **0** | ported in T3D-31: capped with its own rim |
 | **Mosasaurus** | **0** | **0** | ported in T3D-31: not cut at all |
+| **Dinocephalosaurus** | **0** | **0** | ported in T3D-32C: capped with its own rim; all ten opening clips |
+| **Tanystropheus** | **0** | **0** | ported in T3D-32C: capped with its own rim; all thirteen opening clips |
 | Helicoprion | 0 | 0 | already clean; no legacy lining |
 | Askeptosaurus | 1 | 193 | |
 | Odontochelys | 6 | 236 | |
 | Placodus | 23 | 454 | |
-| Saurichthys | 123 | 523 | |
+| Saurichthys | 123 | 523 | **measured and recorded in T3D-32C, not re-cut**: the authored body and its twin are different kinds of generation and `T.cap_mouth` refuses on the authored half by construction — see [the README](../../../tools/triassic/creatures/saurichthys/README.md#the-cut-is-earning-its-place--measured-t3d-32c). Its pectorals and its twin's textures were repaired in the same pass. |
 | Cartorhynchus | 2 | 693 | |
 | Cymbospondylus | 4 | 933 | |
 | Archelon | 1 | 1,262 | |
@@ -69,7 +71,7 @@ column to read.** Nothing here is a claim about every camera: it is one side-on 
 | Ceratites, Phragmoteuthis | — | — | no jaw and no mouth drawn; settled in T3D-02a and T3D-12B and unaffected by any of this |
 | Birgeria | — | — | **not measured**: its `audit.mjs --decode` fails on an unrelated pre-existing assertion (`no root motion`) without `--package`, so the sweep could not decode it. It does have a jaw and opening clips, so it belongs in the rollout. |
 | Shonisaurus | 13 | 1,943 | its verdict is **neither** and stays; the pixels are the generation's own open gape and the slivers at the tooth row this table already describes |
-| Tanystropheus | 142 | 1,388 | |
+| ~~Tanystropheus~~ | ~~142~~ | ~~1,388~~ | **superseded by T3D-32C**: capped with its own rim, `Oral cavity lining` and `Seated jaw hinge tissue` both retired, and its jaw cut re-fitted (T3D-20) from a median to a robust least-squares ramp over both flanks' own readings. |
 
 The Dinocephalosaurus row is the one that changes a verdict rather than confirming it. T3D-12B
 measured it three ways and concluded correctly that the **sac** closed nothing the hinge plug was
@@ -126,3 +128,19 @@ the game draws.
 `gape-solid.py` measures and no more: it is not every camera, and it does not see a mouth that
 merely reads badly. That last question is `tools/triassic/mouth-space.py`'s, and it is a picture
 rather than a number.
+
+
+## T3D-32C: three more bodies, two ported and one measured
+
+| Body | Kind | What ships | Measurement |
+| --- | --- | --- | --- |
+| **Dinocephalosaurus** | **shut** — the lip is *painted* on a closed snout; the cavity instrument finds nothing | no oral geometry at all: `cap_cut` over the hinge cross-section (27 faces authored / 18 twin) and `cap_mouth` over the lip (252 / 162 faces), domed at 0.34 of each vertex's own distance from the rim and bounded at 0.55 of the head's measured room under the mouth line. The `Seated jaw hinge tissue` ellipsoid is retired. **This head is now the only jawed body in the era that hides nothing.** | `cut_rim`: one closed loop of 55 vertices per half, reaching 0.083 of a body on a mouth 0.083 long; 92 of 94 boundary edges in the head on the seam or the hinge cross-section. As drawn **104 / 94 / 120 / 54 / 107 px through and 166 / 153 / 197 / 65 / 171 opened → 0 at all ten opening clips**; plain 0–3 through and 12–80 opened → 0. Deepest dome 0.0081 raw. Skin 7.00x unchanged, mouth region jaw 1.02x / skull 1.03x. |
+| **Tanystropheus** | **shut**, with the mouth painted on and a cut re-fitted to it | no oral geometry: `cap_cut` (29 / 19 faces) and `cap_mouth` (65 / 38 rim edges, one cycle each), each cap bounded by **its own** room — palate 0.00915 deep, floor 0.00599 — because the mouth line falls to a fifteenth of the section at the snout tip and one shared bound would flatten one of the two. `Oral cavity lining` and `Seated jaw hinge tissue` retired; the authored fish-trap fangs kept. | `cut_rim`: one closed loop of 92 vertices per half reaching 0.0884 on a mouth 0.0889 long (twin 55 / 0.0874). As drawn **0 through and 0 opened at all thirteen opening clips**, from 167/1352 at `SnapLeft` and 628/701 at `Breath`. Skin 3.00x unchanged. Cut-to-measured-line 0.01159 → **0.00198 raw** (T3D-20). |
+| **Saurichthys** | **the two bodies are different kinds** — recorded, not re-cut | unchanged: `cap_cut`, `rim_flange`, `seal_seams` and the `T.oral_shells` palate/floor pair. What *did* change is that the twin no longer carries the authored albedo the lining wears (1,313,156 → 708,252 B) and the pectoral chains are measured off the fins. | `cut_rim`: the **twin** one closed loop of 148 vertices (103 on the seam) spanning 0.1825 of a body on a mouth 0.18 long — the whole aperture, case 1, because a voxel remesh of an occupancy field is a closed solid whatever the generation was. The **authored body** 282 boundary edges in fragments, largest 165 vertices spanning 0.0824 and straddling the hinge with 65 on the seam; nothing open over 0.15 of the mouth's 0.18 run, because the generation's own slit was already there. `cap_mouth` refuses by construction: 32 of 141 rim vertices without a second rim edge, one with four. The hidden lining is worth 87 px through and 360 opened (2/162 drawn against 89/523 as drawn); the 162 that remain with it are slivers along the generation's own tooth row. |
+
+**What Saurichthys adds to the three kinds.** A paired delivery can be two kinds at once, and it is
+worth saying so because neither of T3D-31's constructions survives it: the authored body wants
+`jaw_field_uncut` and the twin cannot have it, because the twin's surface is closed and its cut is
+the only thing that makes an aperture at all. The routes out are a mouth-closed regeneration, or
+`jaw_field_uncut` on the authored body with the cut kept on the twin — which has to answer what the
+bind pose is on a body whose closing rotation is currently baked into a labelled mandible shell.

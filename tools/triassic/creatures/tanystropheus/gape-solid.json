@@ -6,30 +6,79 @@
     1.0,
     1.0
   ],
+  "asDrawn": false,
   "shots": [
     {
-      "clip": "Bite",
-      "t": 0.25,
+      "clip": "Severed",
+      "t": 1.733,
       "pixels": 378000,
-      "differingPixels": 1243,
-      "holesOpenedByCulling": 8,
+      "differingPixels": 355,
+      "holesOpenedByCulling": 0,
       "seenThroughTheBody": 0,
-      "backdropInBothPasses": 2,
-      "markedImage": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/tanystropheus/gape-solid/Bite-0.25-opened.png",
-      "solid": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/tanystropheus/gape-solid/Bite-0.25-solid.png",
-      "culled": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/tanystropheus/gape-solid/Bite-0.25-culled.png"
+      "backdropInBothPasses": 34,
+      "markedImage": null,
+      "solid": "local/triassic-authoring/tanystropheus/gape-solid/Severed-1.733-solid.png",
+      "culled": "local/triassic-authoring/tanystropheus/gape-solid/Severed-1.733-culled.png"
     },
     {
       "clip": "SnapRight",
-      "t": 0.25,
+      "t": 0.167,
       "pixels": 378000,
-      "differingPixels": 600,
-      "holesOpenedByCulling": 6,
+      "differingPixels": 425,
+      "holesOpenedByCulling": 0,
       "seenThroughTheBody": 0,
-      "backdropInBothPasses": 8,
-      "markedImage": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/tanystropheus/gape-solid/SnapRight-0.25-opened.png",
-      "solid": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/tanystropheus/gape-solid/SnapRight-0.25-solid.png",
-      "culled": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/agent-throat/local/triassic-authoring/tanystropheus/gape-solid/SnapRight-0.25-culled.png"
+      "backdropInBothPasses": 12,
+      "markedImage": null,
+      "solid": "local/triassic-authoring/tanystropheus/gape-solid/SnapRight-0.167-solid.png",
+      "culled": "local/triassic-authoring/tanystropheus/gape-solid/SnapRight-0.167-culled.png"
+    },
+    {
+      "clip": "Bite",
+      "t": 0.2,
+      "pixels": 378000,
+      "differingPixels": 321,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 1,
+      "markedImage": null,
+      "solid": "local/triassic-authoring/tanystropheus/gape-solid/Bite-0.2-solid.png",
+      "culled": "local/triassic-authoring/tanystropheus/gape-solid/Bite-0.2-culled.png"
+    },
+    {
+      "clip": "Heavy",
+      "t": 0.133,
+      "pixels": 378000,
+      "differingPixels": 314,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0,
+      "markedImage": null,
+      "solid": "local/triassic-authoring/tanystropheus/gape-solid/Heavy-0.133-solid.png",
+      "culled": "local/triassic-authoring/tanystropheus/gape-solid/Heavy-0.133-culled.png"
+    },
+    {
+      "clip": "Eat",
+      "t": 0.367,
+      "pixels": 378000,
+      "differingPixels": 296,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 0,
+      "markedImage": null,
+      "solid": "local/triassic-authoring/tanystropheus/gape-solid/Eat-0.367-solid.png",
+      "culled": "local/triassic-authoring/tanystropheus/gape-solid/Eat-0.367-culled.png"
+    },
+    {
+      "clip": "Attack",
+      "t": 0.133,
+      "pixels": 378000,
+      "differingPixels": 295,
+      "holesOpenedByCulling": 0,
+      "seenThroughTheBody": 0,
+      "backdropInBothPasses": 1,
+      "markedImage": null,
+      "solid": "local/triassic-authoring/tanystropheus/gape-solid/Attack-0.133-solid.png",
+      "culled": "local/triassic-authoring/tanystropheus/gape-solid/Attack-0.133-culled.png"
     }
   ]
 }

@@ -595,7 +595,7 @@
   "envelopeTolerance": 0.22,
   "envelopeTolerancePercent": 4.0,
   "surfaceDistanceMax": 0.0338234007358551,
-  "surfaceDistanceP95": 0.0039288273081183435,
+  "surfaceDistanceP95": 0.0039339086972177036,
   "surfaceOutliersOver0p15": 0,
   "seatingDepthRaw": {
     "fore_upper_L": 0.0899,
