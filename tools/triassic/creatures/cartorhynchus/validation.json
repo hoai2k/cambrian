@@ -828,9 +828,9 @@
       "radiusOuter": 0.09572745557726973
     }
   },
-  "authoredTriangles": 20996,
-  "twinTriangles": 7662,
-  "twinTriangleFraction": 0.3649266526957516,
+  "authoredTriangles": 21156,
+  "twinTriangles": 7754,
+  "twinTriangleFraction": 0.36651540934013993,
   "twinRemeshTriangles": 129272,
   "twinDecimateRatio": 0.04950801283121109,
   "twinVerticesHeldBackFromRelaxation": 11910,
@@ -1026,44 +1026,44 @@
     "Swim": {
       "pecL": {
         "chain": {
-          "worstOverL": 0.018964374502781215,
+          "worstOverL": 0.018964373570267336,
           "atPhase": 0.3333333333333333,
           "vertices": 1098
         },
         "fore_upper_L": {
-          "worstOverL": 0.009502635517734608,
+          "worstOverL": 0.00950263470635428,
           "atPhase": 0.3333333333333333,
           "vertices": 476
         },
         "fore_mid_L": {
-          "worstOverL": 0.005908216266828308,
+          "worstOverL": 0.005908216346923716,
           "atPhase": 0.3333333333333333,
           "vertices": 474
         },
         "fore_tip_L": {
-          "worstOverL": 0.002497957893907536,
+          "worstOverL": 0.002497958799221641,
           "atPhase": 0.3333333333333333,
           "vertices": 148
         }
       },
       "pecR": {
         "chain": {
-          "worstOverL": 0.020085002831567535,
+          "worstOverL": 0.020085004955933926,
           "atPhase": 0.3333333333333333,
           "vertices": 1132
         },
         "fore_upper_R": {
-          "worstOverL": 0.009760358873100736,
+          "worstOverL": 0.009760359357887409,
           "atPhase": 0.3333333333333333,
           "vertices": 501
         },
         "fore_mid_R": {
-          "worstOverL": 0.00633006331888659,
+          "worstOverL": 0.006330072523661429,
           "atPhase": 0.3333333333333333,
           "vertices": 471
         },
         "fore_tip_R": {
-          "worstOverL": 0.0024960875001271503,
+          "worstOverL": 0.002496087362399503,
           "atPhase": 0.3333333333333333,
           "vertices": 160
         }
@@ -1072,44 +1072,44 @@
     "Sprint": {
       "pecL": {
         "chain": {
-          "worstOverL": 0.024083888899288766,
+          "worstOverL": 0.024083887541367952,
           "atPhase": 0.3333333333333333,
           "vertices": 1098
         },
         "fore_upper_L": {
-          "worstOverL": 0.01185390806269042,
+          "worstOverL": 0.011853907733579049,
           "atPhase": 0.3333333333333333,
           "vertices": 476
         },
         "fore_mid_L": {
-          "worstOverL": 0.00758803174491244,
+          "worstOverL": 0.007588031664853276,
           "atPhase": 0.3333333333333333,
           "vertices": 474
         },
         "fore_tip_L": {
-          "worstOverL": 0.0034058702736182024,
+          "worstOverL": 0.003405871256978558,
           "atPhase": 0.3333333333333333,
           "vertices": 148
         }
       },
       "pecR": {
         "chain": {
-          "worstOverL": 0.02552759356221637,
+          "worstOverL": 0.02552759636726538,
           "atPhase": 0.3333333333333333,
           "vertices": 1132
         },
         "fore_upper_R": {
-          "worstOverL": 0.012237184677553956,
+          "worstOverL": 0.01223718486079567,
           "atPhase": 0.3333333333333333,
           "vertices": 501
         },
         "fore_mid_R": {
-          "worstOverL": 0.00818402625444214,
+          "worstOverL": 0.008184038062763386,
           "atPhase": 0.3333333333333333,
           "vertices": 471
         },
         "fore_tip_R": {
-          "worstOverL": 0.0033676498736400396,
+          "worstOverL": 0.003367649350091855,
           "atPhase": 0.08333333333333333,
           "vertices": 160
         }
@@ -1119,24 +1119,24 @@
   "foreChainTrunkBlend": {
     "pecL": {
       "vertices": 1098,
-      "chainWeight": 1027.4231007330147,
-      "trunkWeight": 70.57621205001999,
+      "chainWeight": 1027.4231011282268,
+      "trunkWeight": 70.57621200476729,
       "perTrunkBone": {
         "neck": 0.0,
-        "chest": 13.207481109269793,
-        "body": 57.306269658241604,
-        "tail_00": 0.062461282508593285
+        "chest": 13.207480821984063,
+        "body": 57.30626989319512,
+        "tail_00": 0.062461289588100044
       }
     },
     "pecR": {
       "vertices": 1132,
-      "chainWeight": 1053.082565141217,
-      "trunkWeight": 78.91031944153201,
+      "chainWeight": 1053.0825579941084,
+      "trunkWeight": 78.91032628108678,
       "perTrunkBone": {
-        "neck": 0.00011428031757532153,
-        "chest": 29.097276674768295,
-        "body": 48.658153994890995,
-        "tail_00": 1.1547744915551448
+        "neck": 0.00011441129481681855,
+        "chest": 29.097279093201678,
+        "body": 48.658158273997515,
+        "tail_00": 1.1547745025927725
       }
     }
   },
@@ -1182,7 +1182,101 @@
     "cutFromMeasuredLineRaw": 0.00016692936105226763,
     "cutFromMeasuredLineOverBodyLength": 0.00016692936105226763,
     "aStraightCutWouldHaveDeviatedRaw": 0.0022971089486221313,
-    "aStraightCutWouldHaveDeviatedOverBodyLength": 0.0022971089486221313
+    "aStraightCutWouldHaveDeviatedOverBodyLength": 0.0022971089486221313,
+    "aimedAgainstTheMeasuredSlit": {
+      "file": "docs/triassic/mouths/cartorhynchus-mouth.json",
+      "belowTheSlitMaxRaw": 0.021151178562494967,
+      "belowTheSlitAtTheSnoutRaw": 0.005478897841989544,
+      "worstOverLocalHeadHalfDepth": 0.4837245346469272,
+      "hingeBehindTheSlitRaw": 0.042223010301589925,
+      "hingeBehindTheSlitOverBodyLength": 0.042223010301589925,
+      "perStation": [
+        [
+          -0.3592,
+          0.00548
+        ],
+        [
+          -0.3572,
+          0.00589
+        ],
+        [
+          -0.3552,
+          0.00617
+        ],
+        [
+          -0.3532,
+          0.00634
+        ],
+        [
+          -0.3512,
+          0.00646
+        ],
+        [
+          -0.3492,
+          0.00664
+        ],
+        [
+          -0.3472,
+          0.00699
+        ],
+        [
+          -0.3452,
+          0.00755
+        ],
+        [
+          -0.3432,
+          0.00832
+        ],
+        [
+          -0.3412,
+          0.00929
+        ],
+        [
+          -0.3392,
+          0.01044
+        ],
+        [
+          -0.3372,
+          0.01172
+        ],
+        [
+          -0.3352,
+          0.01305
+        ],
+        [
+          -0.3332,
+          0.01435
+        ],
+        [
+          -0.3312,
+          0.01559
+        ],
+        [
+          -0.3292,
+          0.01677
+        ],
+        [
+          -0.3272,
+          0.01785
+        ],
+        [
+          -0.3252,
+          0.01885
+        ],
+        [
+          -0.3232,
+          0.01972
+        ],
+        [
+          -0.3212,
+          0.02049
+        ],
+        [
+          -0.3192,
+          0.02115
+        ]
+      ]
+    }
   },
   "clips": {
     "Idle": 2.4,
@@ -1248,7 +1342,7 @@
     "Idle": [
       [
         -0.9368380904197693,
-        -1.1040518283843994,
+        -1.104051947593689,
         -0.711525559425354
       ],
       [
@@ -1308,8 +1402,8 @@
     "Dive": [
       [
         -0.9081653356552124,
-        -1.1075224876403809,
-        -0.7066322565078735
+        -1.1075226068496704,
+        -0.7066321969032288
       ],
       [
         0.8893284797668457,
@@ -1321,7 +1415,7 @@
       [
         -0.9771060943603516,
         -1.1037936210632324,
-        -0.7044100761413574
+        -0.7044100165367126
       ],
       [
         0.9285313487052917,
@@ -1344,8 +1438,8 @@
     "Bite": [
       [
         -0.9351420402526855,
-        -1.2638792991638184,
-        -0.705898642539978
+        -1.263879418373108,
+        -0.7058985829353333
       ],
       [
         0.8907211422920227,
@@ -1357,7 +1451,7 @@
       [
         -1.0116353034973145,
         -1.6462533473968506,
-        -0.7078815698623657
+        -0.707881510257721
       ],
       [
         1.4903216361999512,
@@ -1367,7 +1461,7 @@
     ],
     "Hit": [
       [
-        -1.0547124147415161,
+        -1.0547122955322266,
         -1.1037936210632324,
         -0.8711404800415039
       ],
@@ -1379,21 +1473,21 @@
     ],
     "Death": [
       [
-        -1.1169475317001343,
-        -1.135424017906189,
-        -1.1557751893997192
+        -1.1169474124908447,
+        -1.135425090789795,
+        -1.1557750701904297
       ],
       [
         0.8893284797668457,
         1.9090955257415771,
-        0.9068124890327454
+        0.9068122506141663
       ]
     ],
     "Guard": [
       [
         -0.9846218228340149,
-        -1.123521089553833,
-        -0.7008438110351562
+        -1.1235212087631226,
+        -0.7008436918258667
       ],
       [
         0.9537656307220459,
@@ -1404,7 +1498,7 @@
     "Parry": [
       [
         -0.8953793048858643,
-        -1.1063798666000366,
+        -1.10637629032135,
         -0.9279263019561768
       ],
       [
@@ -1416,8 +1510,8 @@
     "Dodge": [
       [
         -0.8998202085494995,
-        -1.1337984800338745,
-        -1.0089236497879028
+        -1.1337968111038208,
+        -1.0089235305786133
       ],
       [
         0.8957936763763428,
@@ -1428,7 +1522,7 @@
     "Eat": [
       [
         -0.9394577741622925,
-        -1.1065185070037842,
+        -1.10767662525177,
         -0.7097910046577454
       ],
       [
@@ -1452,8 +1546,8 @@
     "Ability": [
       [
         -0.9830389618873596,
-        -1.1643766164779663,
-        -0.8152930736541748
+        -1.1712721586227417,
+        -0.81529301404953
       ],
       [
         0.9875869154930115,
@@ -1464,8 +1558,8 @@
     "Grab": [
       [
         -0.9159268140792847,
-        -1.2775554656982422,
-        -0.7700180411338806
+        -1.2775521278381348,
+        -0.7700179815292358
       ],
       [
         0.9608625769615173,
@@ -1477,7 +1571,7 @@
       [
         -0.9195512533187866,
         -1.1037936210632324,
-        -0.7043898105621338
+        -0.704389750957489
       ],
       [
         0.8890764117240906,
@@ -1489,19 +1583,19 @@
       [
         -0.936241865158081,
         -1.1037936210632324,
-        -0.7066004872322083
+        -0.7066004276275635
       ],
       [
-        0.928716778755188,
+        0.9287167191505432,
         1.91249418258667,
         0.5592151284217834
       ]
     ],
     "Haul": [
       [
-        -0.9551370143890381,
-        -1.7106974124908447,
-        -0.7659634947776794
+        -0.9551369547843933,
+        -1.710700511932373,
+        -0.7659634351730347
       ],
       [
         0.9019405841827393,
@@ -1511,9 +1605,9 @@
     ],
     "Breathe": [
       [
-        -0.9267705678939819,
+        -0.9267705082893372,
         -1.1543529033660889,
-        -0.6877241134643555
+        -0.6877239942550659
       ],
       [
         0.8995000123977661,
@@ -1525,24 +1619,24 @@
   "weights": {
     "Cartorhynchus authored body": {
       "maxInfluences": 4,
-      "vertices": 10087,
+      "vertices": 10156,
       "verticesPerBone": {
         "fore_tip_R": 598,
         "fore_mid_R": 1005,
-        "fore_upper_R": 1786,
-        "neck": 2012,
-        "chest": 3989,
-        "skull": 1216,
-        "body": 5091,
+        "fore_upper_R": 1789,
+        "neck": 2114,
+        "skull": 1138,
+        "chest": 4215,
+        "body": 5165,
         "tail_02": 3007,
-        "tail_00": 3074,
+        "tail_00": 3082,
         "tail_03": 2949,
         "tail_01": 2714,
         "hind_upper_R": 1407,
         "tail_04": 2088,
         "fore_tip_L": 611,
         "fore_mid_L": 1042,
-        "fore_upper_L": 1726,
+        "fore_upper_L": 1745,
         "hind_mid_R": 391,
         "caudal_upper": 430,
         "caudal_lower": 540,
@@ -1550,25 +1644,25 @@
         "hind_upper_L": 1079,
         "hind_mid_L": 451,
         "hind_tip_L": 255,
-        "jaw": 187
+        "jaw": 164
       },
       "jawJunction": {
-        "cutRimPairs": 55,
-        "lipPairs": 54,
-        "rimReach": 0.051851269390645646,
-        "rimDepth": 0.031102534383535385,
-        "dz": 0.010367511461178461,
+        "cutRimPairs": 39,
+        "lipPairs": 59,
+        "rimReach": 0.06641808656947282,
+        "rimDepth": 0.026245182380080223,
+        "dz": 0.008748394126693407,
         "band": 0.015,
         "back": 0.06,
         "throat": 1.0,
-        "shellVertices": 202,
-        "shellFullJaw": 150,
-        "bodyThroatVertices": 163
+        "shellVertices": 198,
+        "shellFullJaw": 161,
+        "bodyThroatVertices": 147
       }
     },
     "Cartorhynchus procedural volume twin": {
       "maxInfluences": 4,
-      "vertices": 3366,
+      "vertices": 3418,
       "verticesPerBone": {
         "tail_04": 657,
         "caudal_lower": 217,
@@ -1577,48 +1671,86 @@
         "tail_03": 925,
         "tail_02": 847,
         "tail_01": 704,
-        "tail_00": 912,
+        "tail_00": 925,
         "hind_upper_L": 350,
         "hind_mid_L": 179,
         "hind_mid_R": 179,
         "hind_tip_R": 115,
         "hind_tip_L": 115,
-        "body": 1988,
-        "chest": 1352,
-        "neck": 709,
-        "fore_upper_R": 636,
+        "body": 2077,
+        "chest": 1410,
+        "neck": 764,
+        "fore_upper_R": 643,
         "fore_mid_R": 380,
         "fore_tip_R": 242,
-        "fore_upper_L": 594,
-        "skull": 450,
+        "fore_upper_L": 602,
+        "skull": 419,
         "jaw": 77,
         "fore_mid_L": 369,
         "fore_tip_L": 234
       },
       "jawJunction": {
-        "cutRimPairs": 32,
-        "lipPairs": 23,
-        "rimReach": 0.053226096085572314,
-        "rimDepth": 0.034124456346035004,
-        "dz": 0.011374818782011667,
+        "cutRimPairs": 26,
+        "lipPairs": 35,
+        "rimReach": 0.0665069800358933,
+        "rimDepth": 0.026010440662503242,
+        "dz": 0.008670146887501081,
         "band": 0.015,
         "back": 0.06,
         "throat": 1.0,
-        "shellVertices": 97,
-        "shellFullJaw": 71,
-        "bodyThroatVertices": 75
+        "shellVertices": 108,
+        "shellFullJaw": 92,
+        "bodyThroatVertices": 69
       }
     }
   },
   "maxInfluences": 4,
-  "meanInfluences": 3.8169181595183233,
+  "meanInfluences": 3.8244437895977605,
   "mouth": {
-    "method": "modelled cavity (a shallow groove: 26 vertices on the snout, against 193 on Placodus)",
-    "note": "Placodus' geometric method was tried first and does not reach this animal: over the whole front third it returns 63 vertices and only 26 of them are on the rostrum at all. The rostrum is one smooth closed tube with the mouth painted on it, so the lip was read off the albedo -- walking outwards from the pale belly on each flank, where the step off it is sharp -- and fitted to a ramp.",
+    "method": "aimed by hand in the viewer's mouth editor (docs/triassic/mouths/cartorhynchus-mouth.json); the modelled cavity -- a shallow groove, 26 vertices on the snout against 193 on Placodus -- is measured beside it and no longer cuts",
+    "note": "The cut is aimed by hand and no longer measured. Placodus' geometric method returns 63 vertices over the whole front third and only 26 of them on the rostrum -- one band two thousandths deep, which is the lip this generation drew rather than the joint its jaw turns about. A reviewer aimed the plane and the hinge on the shipped body in the viewer's mouth editor; the groove is still measured, and what the two disagree about is in mouthCutDeviation.",
     "cavityVertices": 63,
     "cavityVerticesOnTheRostrum": 26,
-    "hingeY": -0.31919899964332576,
+    "hingeY": -0.27697598934173584,
     "jawFrontY": -0.3591989996433258,
+    "slitBackY": -0.31919899964332576,
+    "aimedCut": {
+      "file": "docs/triassic/mouths/cartorhynchus-mouth.json",
+      "appliesTo": "built",
+      "sha256": "da116683099babe1df53b3d0ee8da6a2087be8fc49de1b3810ff6a0ede8e653f",
+      "authoredAt": "2026-09-22T00:26:43.252Z",
+      "hingeCentreRaw": [
+        0.0018356667133048177,
+        -0.27697598934173584,
+        0.04617433249950409
+      ],
+      "planeNormalRaw": [
+        0.023015005514025688,
+        0.2658770680427551,
+        0.9637322425842285
+      ],
+      "mouthLineForwardRaw": [
+        -0.01736399717628956,
+        -0.9637357592582703,
+        0.266292929649353
+      ],
+      "hingeAxisRaw": [
+        0.9995843768119812,
+        -0.022863008081912994,
+        -0.01756400614976883
+      ],
+      "pitchDegrees": 15.444,
+      "yawDegrees": -1.032,
+      "rollDegrees": -1.044,
+      "headFraction": 0.0882,
+      "mandibleVerticesTheDocumentCounted": 220,
+      "frameCheckWorstUnits": 5.960464477539063e-08,
+      "seatRaw": 0.0018356667133048177,
+      "measuredCentrelineAtTheHingeRaw": 0.005298131277423604,
+      "seatOffTheMeasuredCentrelineRaw": -0.0034624645641187866,
+      "seatOffTheMeasuredCentrelineOverBodyLength": 0.0034624645641187866,
+      "seatOffTheMeasuredCentrelineOverHeadHalfWidth": 0.0396982347207946
+    },
     "albedoStations": 21,
     "flankToFlankDisagreementMax": 0.0,
     "rampSlope": 0.15825994704470261,
@@ -1629,107 +1761,107 @@
       [
         -0.3592,
         0.07456,
-        0.0
+        0.00548
       ],
       [
         -0.3572,
         0.07442,
-        0.0
+        0.00589
       ],
       [
         -0.3552,
         0.07414,
-        0.0
+        0.00617
       ],
       [
         -0.3532,
         0.0737,
-        0.0
+        0.00634
       ],
       [
         -0.3512,
         0.07317,
-        0.0
+        0.00646
       ],
       [
         -0.3492,
         0.07271,
-        0.0
+        0.00664
       ],
       [
         -0.3472,
         0.07249,
-        0.0
+        0.00699
       ],
       [
         -0.3452,
         0.07251,
-        0.0
+        0.00755
       ],
       [
         -0.3432,
         0.07273,
-        0.0
+        0.00832
       ],
       [
         -0.3412,
         0.07315,
-        0.0
+        0.00929
       ],
       [
         -0.3392,
         0.07378,
-        0.0
+        0.01044
       ],
       [
         -0.3372,
         0.07459,
-        0.0
+        0.01172
       ],
       [
         -0.3352,
         0.07542,
-        0.0
+        0.01305
       ],
       [
         -0.3332,
         0.07619,
-        0.0
+        0.01435
       ],
       [
         -0.3312,
         0.07687,
-        0.0
+        0.01559
       ],
       [
         -0.3292,
         0.07749,
-        0.0
+        0.01677
       ],
       [
         -0.3272,
         0.07804,
-        0.0
+        0.01785
       ],
       [
         -0.3252,
         0.0785,
-        0.0
+        0.01885
       ],
       [
         -0.3232,
         0.07882,
-        0.0
+        0.01972
       ],
       [
         -0.3212,
         0.07903,
-        0.0
+        0.02049
       ],
       [
         -0.3192,
         0.07915,
-        0.0
+        0.02115
       ]
     ],
     "restSlitMaxHalfDepthRaw": 0.006027693051181651,
@@ -1737,28 +1869,73 @@
     "liningCoverage": [
       [
         -0.3452,
-        0.458,
-        0.284
+        0.317,
+        0.196
       ],
       [
         -0.3432,
-        0.598,
-        0.371
+        0.246,
+        0.153
       ],
       [
         -0.3412,
+        0.528,
+        0.327
+      ],
+      [
+        -0.3392,
         0.458,
         0.284
       ],
       [
-        -0.3392,
+        -0.3372,
+        0.458,
+        0.284
+      ],
+      [
+        -0.3352,
+        0.528,
+        0.327
+      ],
+      [
+        -0.3332,
+        0.528,
+        0.327
+      ],
+      [
+        -0.3312,
+        0.528,
+        0.327
+      ],
+      [
+        -0.3292,
+        0.528,
+        0.327
+      ],
+      [
+        -0.3272,
+        0.528,
+        0.327
+      ],
+      [
+        -0.3252,
         0.598,
         0.371
       ],
       [
-        -0.3372,
-        0.669,
-        0.415
+        -0.3232,
+        0.528,
+        0.327
+      ],
+      [
+        -0.3212,
+        0.528,
+        0.327
+      ],
+      [
+        -0.3192,
+        0.528,
+        0.327
       ]
     ],
     "toothPatches": [
@@ -1769,8 +1946,8 @@
           -0.3651989996433258,
           -0.3096027970314026
         ],
-        "onJaw": 9,
-        "onSkull": 58
+        "onJaw": 0,
+        "onSkull": 67
       },
       {
         "vertices": 47,
@@ -1779,8 +1956,8 @@
           -0.28387650847435,
           -0.19602692127227783
         ],
-        "onJaw": 0,
-        "onSkull": 47
+        "onJaw": 2,
+        "onSkull": 45
       },
       {
         "vertices": 35,
@@ -1809,8 +1986,8 @@
           -0.3576749861240387,
           -0.31412577629089355
         ],
-        "onJaw": 26,
-        "onSkull": 3
+        "onJaw": 23,
+        "onSkull": 6
       },
       {
         "vertices": 29,
@@ -1949,8 +2126,8 @@
           -0.3232254981994629,
           -0.3069082200527191
         ],
-        "onJaw": 4,
-        "onSkull": 3
+        "onJaw": 0,
+        "onSkull": 7
       },
       {
         "vertices": 6,
@@ -1968,11 +2145,11 @@
     "oralPartSeating": [
       {
         "part": "Oral cavity lining",
-        "worstDepthRaw": -0.011647491715848446
+        "worstDepthRaw": -0.01808178797364235
       },
       {
         "part": "Seated jaw hinge tissue",
-        "worstDepthRaw": 0.003737904829904437
+        "worstDepthRaw": 0.005332384258508682
       }
     ]
   },
@@ -1980,24 +2157,24 @@
     "maximumEnvelopeDifference": 0.04287433624267578,
     "maximumEnvelopeDifferenceFractionOfBodyLength": 0.01429144541422526,
     "surfaceDistanceMax": 0.1084677055478096,
-    "surfaceDistanceP95": 0.008421284239739176,
+    "surfaceDistanceP95": 0.008336523547768593,
     "envelopeTolerance": 0.12
   },
   "anchors": {
     "anchor_mouth": {
-      "nearestSurfaceRaw": 0.0036576034035533667,
-      "nearestSurfaceUnits": 0.0109728102106601,
-      "fractionOfBodyLength": 0.0036576034035533667
+      "nearestSurfaceRaw": 0.002573982812464237,
+      "nearestSurfaceUnits": 0.007721948437392712,
+      "fractionOfBodyLength": 0.002573982812464237
     },
     "anchor_mouth_inside": {
-      "nearestSurfaceRaw": 0.008132821880280972,
-      "nearestSurfaceUnits": 0.024398465640842915,
-      "fractionOfBodyLength": 0.008132821880280972
+      "nearestSurfaceRaw": 0.014102775603532791,
+      "nearestSurfaceUnits": 0.04230832681059837,
+      "fractionOfBodyLength": 0.014102775603532791
     },
     "anchor_attack_primary": {
-      "nearestSurfaceRaw": 0.0008530446793884039,
-      "nearestSurfaceUnits": 0.0025591340381652117,
-      "fractionOfBodyLength": 0.0008530446793884039
+      "nearestSurfaceRaw": 0.0028983247466385365,
+      "nearestSurfaceUnits": 0.00869497423991561,
+      "fractionOfBodyLength": 0.0028983247466385365
     }
   },
   "normalizedWeights": true,

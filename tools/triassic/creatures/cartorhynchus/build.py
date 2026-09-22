@@ -118,22 +118,26 @@ depth, bvh_auth = T.depth_probe(auth)
 # opposite. This generation answers with **26 vertices** on the snout against Placodus' 193 and
 # Cymbospondylus' 280, which is what a very short blunt snout with a shallow modelled groove looks
 # like rather than a failure: the 26 lie in one band, their mid height moves smoothly from 0.0746
-# to 0.0764 over the snout, and their half width and half depth grow and taper as a slit's do. So
-# the seam is measured rather than read off the albedo, and the low count is recorded rather than
-# hidden. MOUTH_METHOD says which was used.
+# to 0.0764 over the snout, and their half width and half depth grow and taper as a slit's do.
+#
+# **This measurement is no longer the cut.** It is kept because it is what the generation itself
+# says, and because everything below is measured against it -- but a groove two thousandths deep
+# read off 26 vertices is exactly the weak statement the mouth editor exists to overrule, and a
+# human has now aimed the cut by eye (`the aimed cut`, below). What the two disagree about is
+# recorded rather than averaged: `mouthCutDeviation.aimedAgainstTheMeasuredSlit`.
 MOUTH_GAP = .030
 CAV = T.mouth_cavity(auth, front_fraction=.30, gap=MOUTH_GAP)
 SNOUT_BACK = Y0 + .17
 CAV_ON_SNOUT = int((CAV[:, 1] < SNOUT_BACK).sum()) if len(CAV) else 0
-MOUTH_METHOD = 'modelled cavity (a shallow groove: 26 vertices on the snout, against 193 on Placodus)'
+MOUTH_METHOD = ('aimed by hand in the viewer\'s mouth editor (%s); the modelled cavity -- a '
+                'shallow groove, 26 vertices on the snout against 193 on Placodus -- is measured '
+                'beside it and no longer cuts' % 'docs/triassic/mouths/cartorhynchus-mouth.json')
 assert CAV_ON_SNOUT >= 20, ('the mouth cavity did not measure', CAV_ON_SNOUT)
 MY, MID, WIDE, TALL = T.cavity_profile(CAV, Y0 + .004, SNOUT_BACK, .0020, .006)
 assert len(MY) >= 16, len(MY)
-# **The cut follows the measured slit**, not a straight line near it: the head is sheared by
-# -seam(y) so the measured curve lands on z = 0, cut there, and unsheared. The slit was measured
-# from 26 vertices and is noisy, so the curve is the already-blurred per-station mid height rather
-# than the raw one; the straight ramp is still fitted, but only to record what a straight cut would
-# have cost.
+# The slit was measured from 26 vertices and is noisy, so the curve is the already-blurred
+# per-station mid height rather than the raw one; the straight ramp is still fitted, but only to
+# record what a straight cut would have cost.
 _MIDC = T.blur1d(MID, 1.2)
 _fit = np.polyfit(MY, _MIDC, 1)
 MOUTH_SLOPE, MOUTH_INTERCEPT = float(_fit[0]), float(_fit[1])
@@ -146,16 +150,108 @@ MOUTH_FIT_WORST_AGAINST_SLIT = float(np.max(np.abs(_residual) / np.maximum(TALL,
 RAMP_DEVIATION_RAW = float(np.max(np.abs(_residual)))
 CUT_DEVIATION_RAW = float(np.max(np.abs(MID - _MIDC)))
 MOUTH_DISAGREEMENT = 0.
+SLIT_BACK_Y = float(MY[-1])
+JAW_FRONT_Y = float(MY[0])
 
 
-def seam(y):
-    """The mouth line: the measured mid height of the cavity itself, lightly smoothed."""
+def measured_seam(y):
+    """What the *generation* says the mouth line is: the cavity's mid height, lightly smoothed.
+    No longer the cut -- kept as the record the aimed cut is measured against."""
     return float(np.interp(y, MY, _MIDC))
 
 
-HINGE_Y = float(MY[-1])
-JAW_FRONT_Y = float(MY[0])
-LIP = [{'y': float(a), 'mid': float(b), 'disagreement': 0.} for a, b in zip(MY, MID)]
+# ----------------------------------------------------------------------- the aimed cut ----
+# **The cut is a human's now.** `docs/viewer-mouth.md`: a reviewer aimed a cut plane and a hinge on
+# this exact shipped body in the viewer's mouth editor and exported the six numbers. That file is
+# the cut. It replaces a 26-vertex groove measurement with a statement somebody looked at the
+# animal to make, which is the whole reason the editor exists -- every builder's own method has
+# been fooled at least once, and this one's admits in its own comment that it works "just".
+#
+# What the reviewer moved, against the measurement this builder used to cut on:
+#   * the hinge is **8.8 % of the body back from the nose**, where the modelled groove peters out
+#     at 4.6 % -- the groove is the lip the generation drew, not the joint the jaw turns about;
+#   * the line is pitched **+15.4 deg** in profile where the groove's own ramp reads -6.5 deg, so
+#     the cut starts just under the lip at the snout and dives away from it toward the back;
+#   * the hinge is seated on the **midline**: 0.0055 in the file's frame against a measured
+#     centreline that stands at 0.0159 there -- 0.35 % of a body apart, where the cut this one
+#     replaces sat 0.0905 off it (3.0 %). The reviewer and the body agree about where the middle
+#     of this head is; nothing here has to choose between them.
+#
+# The seam is still read on the body's **own measured centreline** (`cx`) rather than on x = 0:
+# that is the lesson the two fish ports paid for, and an aimed plane does not repeal it -- the
+# plane carries the reviewer's yaw and roll, `cx` carries the animal's own wander.
+AIMED_MOUTH = 'docs/triassic/mouths/cartorhynchus-mouth.json'
+_doc = json.loads(open(os.path.join(ROOT, AIMED_MOUTH)).read())
+assert _doc['schema'] == 'mouth-cut/1' and _doc['id'] == ID, (_doc.get('schema'), _doc.get('id'))
+assert _doc['appliesTo'] == 'built', _doc['appliesTo']
+assert (_doc['frame']['axis'], _doc['frame']['forward'], _doc['frame']['up']) == ('z', 1, 'y')
+
+
+def from_gltf_point(p):
+    """The export frame into this builder's. `tx` scales by SCALE and the glTF exporter's
+    `export_yup` sends Blender (x, y, z) to glTF (x, z, -y); this is that, inverted."""
+    return Vector((p[0] / SCALE, -p[2] / SCALE, p[1] / SCALE))
+
+
+def from_gltf_dir(d):
+    return Vector((d[0], -d[2], d[1]))
+
+
+# **A direction handed in from outside is in the file's frame, so fit the frame rather than
+# assume it.** The map above is the exporter's own convention and not a measurement, so it is
+# checked against something the document measured on the shipped file and this build can measure
+# on the intake: the bounding box over every vertex. Six numbers, and if the head end or the up
+# axis were the other way round they would disagree by a body length rather than by a rounding.
+_lo, _hi = raw_co.min(0) * SCALE, raw_co.max(0) * SCALE
+FRAME_CHECK = max(
+    abs(a - b) for a, b in
+    zip([_lo[0], _lo[2], -_hi[1], _hi[0], _hi[2], -_lo[1]],
+        list(_doc['mouth']['box']['lo']) + list(_doc['mouth']['box']['hi'])))
+assert FRAME_CHECK < 1e-3 * BODY_LENGTH, ('the aimed cut is not in this body\'s frame', FRAME_CHECK)
+
+CUT_P = from_gltf_point(_doc['plane']['point'])
+CUT_N = from_gltf_dir(_doc['plane']['normal']).normalized()
+CUT_F = from_gltf_dir(_doc['plane']['forward']).normalized()
+CUT_AXIS = from_gltf_dir(_doc['hinge']['axis']).normalized()
+assert abs(CUT_N.dot(CUT_F)) < 1e-4, CUT_N.dot(CUT_F)
+assert CUT_N.z > .5 and CUT_F.y < -.5, (tuple(CUT_N), tuple(CUT_F))   # up out of the mouth, and forward
+HINGE_Y = float(CUT_P.y)
+
+
+def plane_z(x, y):
+    """The aimed plane solved for z. A plane is what the reviewer aimed, so it is cut as a plane
+    and not sheared onto one: the yaw and the roll are the x term, which no curve of y can carry."""
+    return float(CUT_P.z - (CUT_N.x * (x - CUT_P.x) + CUT_N.y * (y - CUT_P.y)) / CUT_N.z)
+
+
+def seam(y):
+    """The mouth line: the aimed plane read on the body's own measured centreline."""
+    return plane_z(cx(y), y)
+
+
+def below_cut(p):
+    return (Vector(p) - CUT_P).dot(CUT_N) < 0
+
+
+def ahead_of_hinge(p):
+    return (Vector(p) - CUT_P).dot(CUT_F) > 0
+
+
+def on_hinge_wall(p):
+    return abs((Vector(p) - CUT_P).dot(CUT_F)) < 1e-5
+
+
+# What the human and the generation disagree about, station by station over the groove the
+# generation modelled. Recorded, never averaged: an aimed cut that agreed with the measurement
+# everywhere would not have been worth aiming.
+AIMED_VS_SLIT = [(float(y), measured_seam(float(y)) - seam(float(y))) for y in MY]
+AIMED_BELOW_SLIT_MAX = float(max(d for _y, d in AIMED_VS_SLIT))
+AIMED_BELOW_SLIT_AT_SNOUT = float(AIMED_VS_SLIT[0][1])
+AIMED_VS_SLIT_OVER_HEAD_DEPTH = float(max(
+    abs(d) / max(half_depth(y), 1e-4) for y, d in AIMED_VS_SLIT))
+HINGE_BEHIND_THE_SLIT = float(HINGE_Y - SLIT_BACK_Y)
+LIP = [{'y': float(a), 'mid': float(b), 'disagreement': float(measured_seam(float(a)) - seam(float(a)))}
+       for a, b in zip(MY, MID)]
 # The teeth are documented as rounded, molariform, angled nearly perpendicular to the jaw and
 # **invisible in side view** (Huang et al. 2020 found them by CT). The generation carries no
 # dentition at all, which agrees with the fossil, and none was authored.
@@ -174,14 +270,22 @@ def bone(n, p, parent):
     B[n] = (Vector(p), parent)
 
 
-NECK_Y, CHEST_Y, BODY_Y = HINGE_Y + .035, HINGE_Y + .105, HINGE_Y + .235
+# **The axial chain hangs off the head, not off the hinge.** These stations were measured from the
+# back of the modelled groove and the reviewer aimed a mouth, not a skeleton: hanging them off the
+# aimed hinge instead would carry the neck, the chest, the shoulder and all five tail joints 4.2 %
+# of a body sternwards, which is a re-rig nobody asked for and which the gait audit would then be
+# measuring. `SLIT_BACK_Y` is the old `HINGE_Y` to the last bit, so every bone but `jaw` is exactly
+# where it was.
+NECK_Y, CHEST_Y, BODY_Y = SLIT_BACK_Y + .035, SLIT_BACK_Y + .105, SLIT_BACK_Y + .235
 TAIL_Y = [BODY_Y + .085 + .072 * i for i in range(5)]
 bone('root', (0, 0, 0), None)
 bone('body', on_axis(BODY_Y), 'root')
 bone('chest', on_axis(CHEST_Y), 'body')
 bone('neck', on_axis(NECK_Y), 'chest')
-bone('skull', on_axis(HINGE_Y - .012), 'neck')
-bone('jaw', (cx(HINGE_Y), HINGE_Y, seam(HINGE_Y) - .008), 'skull')
+bone('skull', on_axis(SLIT_BACK_Y - .012), 'neck')
+# The jaw is seated on the aimed hinge itself -- `hinge.centre` is the point the reviewer said the
+# mandible turns about, so it is the bone's head and nothing is added to it.
+bone('jaw', CUT_P, 'skull')
 for i, y in enumerate(TAIL_Y):
     bone('tail_%02d' % i, on_axis(y), 'body' if i == 0 else 'tail_%02d' % (i - 1))
 CAUDAL_Y = float(np.clip(caudal_cluster['yRange'][0] + .020, TAIL_Y[-2], TAIL_Y[-1]))
@@ -413,13 +517,41 @@ puppet, puppet_thickness, twin_report, bvh_src = T.build_twin(
     sample_albedo, thin=THIN, band=.020, roughness=.70, blade_dilation=.0028)
 
 # --------------------------------------------------------------------- cut the jaw ----
+# **The document's own rule, verbatim**: below the cut plane and ahead of the hinge wall. The one
+# thing added to it is this builder's front bound, which leaves the last two thousandths of the
+# snout on the skull -- the document has no front bound because a test over a whole body does not
+# need one, and the sliver at the very tip is a front cut rather than the junction (`rear` below
+# excludes it, which is the Mixosaurus lesson).
 def is_jaw(c):
-    return JAW_FRONT_Y - .004 < c.y < HINGE_Y and c.z < seam(c.y) - 1e-7
+    return JAW_FRONT_Y - .004 < c.y and below_cut(c) and ahead_of_hinge(c)
+
+
+def bisect_on_plane(o, point, normal, y_front, margin=.03):
+    """Take the cut where the reviewer aimed it. `T.bisect_on_curve` shears the head by -seam(y)
+    because a *curve* cannot be a bisection plane; an aimed cut is a plane already, so it is cut
+    as one -- which is also the only way its yaw and its roll survive, those being a term in x
+    that no shear by a function of y can carry. Only head faces are offered to the two mouth
+    passes, so the rest of the body keeps its topology, exactly as the curve version does."""
+    bm = bmesh.new()
+    bm.from_mesh(o.data)
+    bmesh.ops.bisect_plane(bm, geom=list(bm.verts) + list(bm.edges) + list(bm.faces), dist=1e-7,
+                           plane_co=(0, y_front, 0), plane_no=(0, 1, 0),
+                           clear_inner=False, clear_outer=False)
+    for no in (CUT_F, normal):                     # the hinge wall, then the mouth line itself
+        head = [f for f in bm.faces if f.calc_center_median().y < HINGE_Y + margin]
+        verts, edges = set(), set()
+        for f in head:
+            verts.update(f.verts)
+            edges.update(f.edges)
+        bmesh.ops.bisect_plane(bm, geom=list(verts) + list(edges) + head, dist=1e-7,
+                               plane_co=point, plane_no=no, clear_inner=False, clear_outer=False)
+    bm.to_mesh(o.data)
+    bm.free()
 
 
 parts = {}
 for o in (auth, puppet):
-    T.bisect_on_curve(o, seam, HINGE_Y, JAW_FRONT_Y - .004, margin=.03)
+    bisect_on_plane(o, CUT_P, CUT_N, JAW_FRONT_Y - .004, margin=.03)
     T.split_part(o, 'lower jaw', is_jaw, parts)
 
 # Every measured tooth patch must belong whole to one jaw or the other. Placodus' first delivery
@@ -470,8 +602,8 @@ for o, thin in ((auth, thickness), (puppet, puppet_thickness)):
     # `band` from the cut rim, so the two copies of every rim vertex carry the same weights and the
     # cut cannot open (`T.jaw_junction`; `tools/triassic/lag.mjs` measures the seam it closes).
     body_w, shell_w, JUNCTION[o.name] = T.jaw_junction(
-        o, shell, relaxed, B['jaw'][0], rear=lambda p: abs(p.y - HINGE_Y) < 1e-5,
-        upper_jaw=lambda p: p.y < HINGE_Y and p.z >= seam(p.y) - 1e-6, axis=(0., -1., 0.))
+        o, shell, relaxed, B['jaw'][0], rear=on_hinge_wall,
+        upper_jaw=lambda p: ahead_of_hinge(p) and not below_cut(p), axis=tuple(CUT_F))
     counts, owners = [], {}
     for part, field in ((o, body_w), (shell, shell_w)):
         for v in part.data.vertices:
@@ -1206,20 +1338,55 @@ report = {
         'cutFromMeasuredLineRaw': CUT_DEVIATION_RAW,
         'cutFromMeasuredLineOverBodyLength': CUT_DEVIATION_RAW,
         'aStraightCutWouldHaveDeviatedRaw': RAMP_DEVIATION_RAW,
-        'aStraightCutWouldHaveDeviatedOverBodyLength': RAMP_DEVIATION_RAW},
+        'aStraightCutWouldHaveDeviatedOverBodyLength': RAMP_DEVIATION_RAW,
+        # The aimed cut against the groove it replaced, over the stations the groove was measured
+        # at. Positive means the aimed plane runs *below* the generation's own slit.
+        'aimedAgainstTheMeasuredSlit': {
+            'file': AIMED_MOUTH,
+            'belowTheSlitMaxRaw': AIMED_BELOW_SLIT_MAX,
+            'belowTheSlitAtTheSnoutRaw': AIMED_BELOW_SLIT_AT_SNOUT,
+            'worstOverLocalHeadHalfDepth': AIMED_VS_SLIT_OVER_HEAD_DEPTH,
+            'hingeBehindTheSlitRaw': HINGE_BEHIND_THE_SLIT,
+            'hingeBehindTheSlitOverBodyLength': HINGE_BEHIND_THE_SLIT,
+            'perStation': [[round(y, 4), round(d, 5)] for y, d in AIMED_VS_SLIT]}},
     'clips': CLIPS, 'looping': LOOPS, 'loopSeams': seams, 'boundsAt13Phases': bounds,
     'weights': weight_report, 'maxInfluences': max(influences),
     'meanInfluences': float(np.mean(influences)),
     'mouth': {
         'method': MOUTH_METHOD,
-        'note': 'Placodus\' geometric method was tried first and does not reach this animal: over '
-                'the whole front third it returns %d vertices and only %d of them are on the '
-                'rostrum at all. The rostrum is one smooth closed tube with the mouth painted on '
-                'it, so the lip was read off the albedo -- walking outwards from the pale belly '
-                'on each flank, where the step off it is sharp -- and fitted to a ramp.'
+        'note': 'The cut is aimed by hand and no longer measured. Placodus\' geometric method '
+                'returns %d vertices over the whole front third and only %d of them on the '
+                'rostrum -- one band two thousandths deep, which is the lip this generation drew '
+                'rather than the joint its jaw turns about. A reviewer aimed the plane and the '
+                'hinge on the shipped body in the viewer\'s mouth editor; the groove is still '
+                'measured, and what the two disagree about is in mouthCutDeviation.'
                 % (len(CAV), CAV_ON_SNOUT),
         'cavityVertices': int(len(CAV)), 'cavityVerticesOnTheRostrum': CAV_ON_SNOUT,
-        'hingeY': HINGE_Y, 'jawFrontY': JAW_FRONT_Y,
+        'hingeY': HINGE_Y, 'jawFrontY': JAW_FRONT_Y, 'slitBackY': SLIT_BACK_Y,
+        # The aimed document as this build read it, in this build's own raw frame, plus the frame
+        # check that says the two frames are the same frame.
+        'aimedCut': {
+            'file': AIMED_MOUTH, 'appliesTo': _doc['appliesTo'], 'sha256': _doc['sha256'],
+            'authoredAt': _doc['authoredAt'],
+            'hingeCentreRaw': [float(v) for v in CUT_P],
+            'planeNormalRaw': [float(v) for v in CUT_N],
+            'mouthLineForwardRaw': [float(v) for v in CUT_F],
+            'hingeAxisRaw': [float(v) for v in CUT_AXIS],
+            'pitchDegrees': _doc['plane']['pitchDegrees'],
+            'yawDegrees': _doc['plane']['yawDegrees'],
+            'rollDegrees': _doc['plane']['rollDegrees'],
+            'headFraction': _doc['hinge']['headFraction'],
+            'mandibleVerticesTheDocumentCounted': _doc['sides']['mandible'],
+            'frameCheckWorstUnits': FRAME_CHECK,
+            # The reviewer's seat against the body's own measured centreline at that station --
+            # `cx` is the measurement CLAUDE.md says a mouth's lateral centre has to come from,
+            # and this is whether the two agree. They do.
+            'seatRaw': float(CUT_P.x),
+            'measuredCentrelineAtTheHingeRaw': float(cx(HINGE_Y)),
+            'seatOffTheMeasuredCentrelineRaw': float(CUT_P.x - cx(HINGE_Y)),
+            'seatOffTheMeasuredCentrelineOverBodyLength': float(abs(CUT_P.x - cx(HINGE_Y))),
+            'seatOffTheMeasuredCentrelineOverHeadHalfWidth':
+                float(abs(CUT_P.x - cx(HINGE_Y)) / max(half_width(HINGE_Y), 1e-6))},
         'albedoStations': len(LIP),
         'flankToFlankDisagreementMax': MOUTH_DISAGREEMENT,
         'rampSlope': MOUTH_SLOPE, 'rampIntercept': MOUTH_INTERCEPT,
@@ -1230,7 +1397,7 @@ report = {
         # How far apart the lips are in the generation's own rest pose. A body authored gaping
         # would measure a cavity a large fraction of the head deep here; this one measures a slit.
         'restSlitMaxHalfDepthRaw': float(np.max(TALL)),
-        'restSlitMaxHalfDepthOverHeadDepth': float(np.max(TALL) / max(half_depth(HINGE_Y), 1e-6)),
+        'restSlitMaxHalfDepthOverHeadDepth': float(np.max(TALL) / max(half_depth(SLIT_BACK_Y), 1e-6)),
         'liningCoverage': mouth_cover, 'toothPatches': tooth_report,
         'toothPatchesStraddlingTheCut': straddling, 'authoredToothRows': tooth_rows,
         'oralPartSeating': oral_seating,
@@ -1248,8 +1415,13 @@ print('CARTO_REPORT', json.dumps({k: report[k] for k in
       ('authoredTriangles', 'twinTriangles', 'twinTriangleFraction', 'bones', 'maxInfluences')}))
 print('CARTO_ENVELOPE', json.dumps(report['envelope']))
 print('CARTO_MOUTH', json.dumps({k: report['mouth'][k] for k in
-      ('method', 'cavityVertices', 'cavityVerticesOnTheRostrum', 'albedoStations',
+      ('cavityVertices', 'cavityVerticesOnTheRostrum', 'albedoStations',
        'flankToFlankDisagreementMax', 'worstResidualAsFractionOfLocalDepth')}))
+print('CARTO_AIMED', json.dumps(report['mouth']['aimedCut']))
+print('CARTO_AIMED_VS_SLIT', json.dumps(
+    {k: v for k, v in report['mouthCutDeviation']['aimedAgainstTheMeasuredSlit'].items()
+     if k != 'perStation'}))
+print('CARTO_JAW_JUNCTION', json.dumps(JUNCTION))
 print('CARTO_POSE', json.dumps({'spine': {k: v for k, v in POSE_DEVIATION['spine'].items() if k != 'perStation'},
       'tail': {k: v for k, v in POSE_DEVIATION['tail'].items() if k != 'perStation'},
       'limbAsymmetry': LIMB_ASYMMETRY.get('allPairs')}))
