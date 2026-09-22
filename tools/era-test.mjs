@@ -3,10 +3,10 @@ import fs from 'node:fs';
 import { build } from 'esbuild';
 
 const result = await build({
-  stdin: { contents: "export * from './src/content'; export * from './src/content/era'; export * from './src/content/asset-paths'; export { CAMBRIAN } from './src/content/cambrian'; export { DEVONIAN } from './src/content/devonian'; export { TRIASSIC } from './src/content/triassic'; export { SHARED_STRINGS, mergeStrings } from './src/content/strings'; export { CAMBRIAN_PENDING } from './src/content/cambrian/model-status'; export { default as DEVONIAN_PENDING } from './src/content/devonian/pending-refinements.json'; export { default as TRIASSIC_PENDING } from './src/content/triassic/pending-refinements.json'; export { SPECIMENS } from './src/viewer/catalogue';", resolveDir: process.cwd() },
+  stdin: { contents: "export * from './src/content'; export * from './src/content/era'; export * from './src/content/asset-paths'; export { CAMBRIAN } from './src/content/cambrian'; export { DEVONIAN } from './src/content/devonian'; export { TRIASSIC } from './src/content/triassic'; export { SHARED_STRINGS, mergeStrings } from './src/content/strings'; export { CAMBRIAN_PENDING } from './src/content/cambrian/model-status'; export { default as DEVONIAN_PENDING } from './src/content/devonian/pending-refinements.json'; export { default as TRIASSIC_PENDING } from './src/content/triassic/pending-refinements.json'; export { SPECIMENS, SPECIMEN_SECTIONS } from './src/viewer/catalogue';", resolveDir: process.cwd() },
   bundle: true, platform: 'node', format: 'esm', write: false,
 });
-const { ACTIVE_ERA: era, defineEra, createAssetPaths, SHARED_STRINGS, mergeStrings, CAMBRIAN, DEVONIAN, TRIASSIC, CAMBRIAN_PENDING, DEVONIAN_PENDING, TRIASSIC_PENDING, SPECIMENS } = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString('base64')}`);
+const { ACTIVE_ERA: era, defineEra, createAssetPaths, SHARED_STRINGS, mergeStrings, CAMBRIAN, DEVONIAN, TRIASSIC, CAMBRIAN_PENDING, DEVONIAN_PENDING, TRIASSIC_PENDING, SPECIMENS, SPECIMEN_SECTIONS } = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString('base64')}`);
 assert.equal(era.id, 'cambrian');
 assert.equal(era.creatures.length, 21);
 assert.equal(era.defaults.player, 'anomalocaris');
@@ -168,14 +168,41 @@ for (const [name, e] of [['Cambrian', CAMBRIAN], ['Devonian', DEVONIAN], ['Trias
   }
 }
 // The viewer lists every body a game has, so "can I play this?" has to be answered there: the ones
-// a player cannot pick sort to the end of their collection and carry the word in their role line.
-for (const c of new Set(SPECIMENS.map((r) => r.collection))) {
-  const rows = SPECIMENS.filter((r) => r.collection === c);
-  const first = rows.findIndex((r) => r.notPlayable);
-  if (first < 0) continue;
-  assert.ok(first > 0, `${c}: a collection cannot be nothing but animals a player is not offered`);
-  assert.ok(rows.slice(first).every((r) => r.notPlayable), `${c}: an animal a player can pick sits after one they cannot`);
-  assert.ok(rows.slice(first).every((r) => r.role.includes(r.notPlayable)),
-    `${c}: a kept-back animal's role line does not say which kind it is`);
+// a player cannot pick sort into named sections after the unlabelled playable one, each alphabetised
+// on its own, and a kept-back animal's role line still says which kind it is.
+const SECTION_ORDER = [undefined, 'Visitors', 'NPCs', 'Unfinished'];
+for (const { id: c, sections } of SPECIMEN_SECTIONS) {
+  assert.ok(sections.length > 0, `${c}: a collection is listed but has no specimens`);
+  assert.equal(sections[0].title, undefined, `${c}: the first section is the playable roster and carries no heading`);
+  // The titles present must appear in this relative order, whichever are missing.
+  let cursor = 0;
+  for (const section of sections) {
+    const at = SECTION_ORDER.indexOf(section.title, cursor);
+    assert.ok(at >= 0, `${c}: '${section.title}' is out of order`);
+    cursor = at + 1;
+  }
+  for (const section of sections) {
+    const names = section.rows.map((r) => r.name);
+    const sorted = [...names].sort((a, b) => a.localeCompare(b));
+    assert.deepEqual(names, sorted, `${c}: section '${section.title ?? '(roster)'}' is not alphabetised (${names.join(', ')})`);
+    for (const r of section.rows) {
+      if (section.title === 'Visitors') {
+        assert.ok(r.offRoster, `${c}: ${r.name} sits under Visitors but is not a standing guest`);
+      } else if (section.title === 'NPCs' || section.title === 'Unfinished') {
+        assert.ok(r.notPlayable, `${c}: ${r.name} sits under ${section.title} but carries no standing`);
+        assert.ok(r.role.includes(r.notPlayable), `${c}: ${r.name}'s role line does not say which kind it is`);
+        assert.equal(section.title === 'Unfinished', r.notPlayable === 'SHELVED',
+          `${c}: ${r.name} (${r.notPlayable}) is filed under the wrong section`);
+      } else {
+        assert.ok(!r.offRoster && !r.notPlayable, `${c}: ${r.name} is in the playable section but is kept back`);
+      }
+    }
+  }
 }
-console.log('PASS: three pick screens of eighteen, and the viewer keeps what it does not offer at the end of each list');
+// A props collection carries none of these flags, and must render as exactly the one unlabelled
+// section rather than a run of empty headings.
+for (const { id: c, sections } of SPECIMEN_SECTIONS.filter((s) => s.id.endsWith('-props'))) {
+  assert.equal(sections.length, 1, `${c}: a props collection has no NPC, shelved or visitor flags, so it is one section`);
+  assert.equal(sections[0].title, undefined, `${c}: a props collection's one section carries no heading`);
+}
+console.log('PASS: three pick screens of eighteen, and the viewer sections what it does not offer into alphabetised, correctly-ordered headings after the roster');

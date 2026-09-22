@@ -834,7 +834,7 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
 // portraits sitting rendered on disk the whole time, because being off the roster is a question
 // about which game an animal belongs to and had quietly become a different code path.
 {
-  const { SPECIMENS } = await import('../src/viewer/catalogue');
+  const { SPECIMENS, SPECIMEN_SECTIONS } = await import('../src/viewer/catalogue');
   for (const row of SPECIMENS.filter((r) => String(r.collection).startsWith('triassic'))) {
     // A body that is not shipped yet has nothing of its own to photograph; everything else does.
     if (!row.model || row.model.includes('/preview/') || !row.model.endsWith('.glb')) continue;
@@ -843,19 +843,26 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
     ok(!!row.image, `${row.key}: the viewer shows a picture of it`);
     if (row.image) ok(fs.existsSync(`public/${row.image}`), `${row.key}: ${row.image} exists`);
   }
-  // Every animal this game keeps and does not offer sorts to the end of the collection and says
-  // which of the three it is in its role line. (`npm run eras` asks the same of all three
-  // collections at once; this is the Triassic's own, with the animals named.)
-  const tri = SPECIMENS.filter((r) => r.collection === 'triassic');
-  const first = tri.findIndex((r) => r.notPlayable);
-  ok(first > 0 && tri.slice(first).every((r) => r.notPlayable), 'nothing a player can pick sits after one they cannot');
-  ok(tri.slice(first).every((r) => r.role.includes(r.notPlayable!)), 'and each says which kind it is in its role line');
-  // And they are exactly the three kinds this era has, in the roster's own order.
-  const kept = tri.filter((r) => r.notPlayable).map((r) => `${r.id}:${r.notPlayable}`);
-  const want = TRIASSIC.creatures
-    .filter((c) => c.shelved || c.npc || c.shore)
-    .map((c) => `${c.id}:${c.shelved ? 'SHELVED' : c.shore ? 'SHORE ANIMAL' : 'NPC'}`);
-  ok(kept.join(' ') === want.join(' '), `the kept-back animals are the era's own, in roster order (${kept.join(' ')})`);
+  // Every animal this game keeps and does not offer sorts into a named section after the
+  // unlabelled playable roster, alphabetised within each, and says which kind it is in its role
+  // line. (`npm run eras` asks the same shape of all three collections at once; this is the
+  // Triassic's own, with the animals named — the case CLAUDE.md spells out.)
+  const sections = SPECIMEN_SECTIONS.find((s) => s.id === 'triassic')!.sections;
+  ok(sections[0].title === undefined, 'the playable roster heads the list with no heading');
+  const named = (title: string | undefined) => sections.find((s) => s.title === title)?.rows.map((r) => r.id).join(' ') ?? '';
+  ok(named('Visitors') === 'archelon mosasaurus', `Visitors is the two standing guests, alphabetised (got: ${named('Visitors')})`);
+  ok(named('NPCs') === 'cartorhynchus coelophysis macrocnemus mystriosuchus tanystropheus',
+    `NPCs is Cartorhynchus and the four shore animals, alphabetised (got: ${named('NPCs')})`);
+  ok(named('Unfinished') === 'askeptosaurus hybodus', `Unfinished is the two shelved bodies, alphabetised (got: ${named('Unfinished')})`);
+  for (const section of sections) {
+    if (section.title === 'Visitors') for (const r of section.rows) ok(r.offRoster, `${r.id}: a Visitors row is a standing guest`);
+    else if (section.title) for (const r of section.rows) ok(r.role.includes(r.notPlayable!), `${r.id} says which kind it is in its role line`);
+  }
+  // And the two off-roster and the three on-roster kinds together are exactly what the era's own
+  // roster and its expansion register declare, nothing more and nothing left out.
+  const kept = new Set(sections.filter((s) => s.title === 'NPCs' || s.title === 'Unfinished').flatMap((s) => s.rows.map((r) => r.id)));
+  const want = new Set(TRIASSIC.creatures.filter((c) => c.shelved || c.npc || c.shore).map((c) => c.id));
+  ok(kept.size === want.size && [...kept].every((id) => want.has(id)), `the kept-back animals are exactly the era's own (${[...kept].join(' ')})`);
 }
 
 // ---- the viewer's scenery catalogue ----
