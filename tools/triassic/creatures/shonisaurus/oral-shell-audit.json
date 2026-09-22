@@ -1,36 +1,29 @@
 {
-  "id": "cymbospondylus",
+  "id": "shonisaurus",
   "verdict": "no oral lining: nothing to be mixed",
   "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present. A body with no lining mesh is reported as such, with the hidden oral parts it does carry listed, and all three variants must agree.",
   "models": [
     {
       "variant": "authored",
-      "sha256": "41fcacb82ad550b22a89975e83b1111a63570d7ce70c01100fb6c0a7f9985fe5",
+      "sha256": "b6927ecee7e93d76d0b0a9ab3c56e1581dbcdcb0cbbf14109d55ebaaa920b5d5",
       "meshes": [],
       "otherOralMeshes": [
-        "Mouth interior seam web",
-        "Seated jaw hinge tissue"
+        "Mouth interior seam web"
       ],
       "oralShells": "none"
     },
     {
       "variant": ".puppet",
-      "sha256": "205b640b5cec8f509f9fcd90c7d74d1f63e8a10115609e03e09713103f69aef3",
+      "sha256": "e501805ed2689b6834c2b545b43cc5c9627c328c238f4245e44ed51e91d5345f",
       "meshes": [],
-      "otherOralMeshes": [
-        "Mouth interior seam web (twin)",
-        "Seated jaw hinge tissue"
-      ],
+      "otherOralMeshes": [],
       "oralShells": "none"
     },
     {
       "variant": ".lod1",
-      "sha256": "205b640b5cec8f509f9fcd90c7d74d1f63e8a10115609e03e09713103f69aef3",
+      "sha256": "e501805ed2689b6834c2b545b43cc5c9627c328c238f4245e44ed51e91d5345f",
       "meshes": [],
-      "otherOralMeshes": [
-        "Mouth interior seam web (twin)",
-        "Seated jaw hinge tissue"
-      ],
+      "otherOralMeshes": [],
       "oralShells": "none"
     }
   ]

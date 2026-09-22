@@ -12,7 +12,56 @@
     "Heavy",
     "Eat"
   ],
-  "oralGeometry": "none",
+  "oralGeometry": {
+    "cycles": [
+      164
+    ],
+    "vertices": 492,
+    "faces": 328,
+    "flippedFaces": 141,
+    "gapeRadians": 0.45,
+    "fold": 0.3,
+    "floorRaw": 0.0072,
+    "partingAtGapeMax": 0.1078918193863072,
+    "partingAtGapeMean": 0.03171563414841159,
+    "rimPairsTheJunctionHolds": 40,
+    "foldDepthMax": 0.020693432522153284,
+    "foldDepthMean": 0.008875286867174438,
+    "middleRowOutsideTheIntake": 64,
+    "rim": {
+      "bodyBoundaryEdges": 164,
+      "shellBoundaryEdges": 168,
+      "sharedVertices": 164,
+      "sharedEdges": 164,
+      "verticesWithoutTwoSharedEdges": 0,
+      "cycles": [
+        164
+      ]
+    },
+    "interiorAlbedo": {
+      "lumenWallVertices": 1215,
+      "meanInteriorColour": [
+        0.3902,
+        0.3808,
+        0.3692
+      ],
+      "meanColourElsewhereOnTheBody": [
+        0.4495,
+        0.4547,
+        0.4607
+      ],
+      "method": "inverse distance over the 4 nearest vertices of the measured lumen wall (a vertex whose own outward normal, cast back into the mesh, meets the wall opposite); nothing outside that set is ever sampled"
+    },
+    "parity": {
+      "rimPairs": 164,
+      "worstRestPositionDifference": 0,
+      "worstWeightDifference": 0
+    },
+    "foldOutsideTheSolid": 64,
+    "foldOutsideTheSolidAndTheMeasuredLumen": 5,
+    "sectionExcessOfTheRimRows": 1.0203485670190846,
+    "sectionExcessOfTheFoldedRow": 1.0118266148867232
+  },
   "eyes": {
     "inset": 0.0025,
     "headLengthRaw": 0.196,
@@ -108,8 +157,8 @@
   },
   "full": {
     "closedSurfaceWinding": [],
-    "triangles": 116064,
-    "weightedVertices": 61731,
+    "triangles": 116720,
+    "weightedVertices": 62223,
     "bones": 21,
     "clips": [
       {
@@ -289,8 +338,8 @@
         }
       }
     ],
-    "bytes": 7371416,
-    "sha256": "5a872684b643a47924dedbc8b8eba9764321f522d1fe0a49b04a699d8c767cf4"
+    "bytes": 7389152,
+    "sha256": "b6927ecee7e93d76d0b0a9ab3c56e1581dbcdcb0cbbf14109d55ebaaa920b5d5"
   },
   "puppet": {
     "closedSurfaceWinding": [
@@ -516,7 +565,7 @@
         }
       }
     ],
-    "bytes": 560968,
-    "sha256": "8543b55dd7f48a31a2dc934cca48eeb3ed6194aa04b7315dd2734360de084dfb"
+    "bytes": 560956,
+    "sha256": "e501805ed2689b6834c2b545b43cc5c9627c328c238f4245e44ed51e91d5345f"
   }
 }

@@ -8,6 +8,8 @@ from mathutils.bvhtree import BVHTree
 from mathutils.kdtree import KDTree
 from pathlib import Path
 from math import sin,cos,pi
+sys.path.insert(0,str(Path.cwd()/'tools/triassic/creatures/_pipeline'))
+import tripo as T                                                        # noqa: E402
 P=Path.cwd();HERE=P/'tools/triassic/creatures/shonisaurus';LOCAL=P/'local/triassic-authoring/shonisaurus';OUT=P/'public/assets/triassic/creatures';REVIEW=LOCAL/'review'
 for d in [HERE,LOCAL,OUT,REVIEW]:d.mkdir(parents=True,exist_ok=True)
 S=6.; CLOSED_REST_ANGLE=-.155; RAW=HERE/'tripo-raw/shonisaurus.raw.glb'
@@ -160,6 +162,21 @@ def is_mandible(center):
  x,y,z=center
  line=float(np.interp(y,[.305,.33,.37,.395,.5],[-.027,-.017,-.005,-.0015,-.0015]))
  return y>.326 and z<line
+# ------------------------------------------------ what the mandible split left open ----
+# **This generation arrived partially open**, which `T.cut_rim` calls case 2: the rostrum carries a
+# real modelled gap from the commissure forward, and the mandible label runs *behind* it into solid
+# head. So the split leaves one closed rim loop over the back of the mouth only, and the two copies
+# of it -- `split_part`'s here is a face-label split, but it duplicates every rim vertex the same
+# way -- part when the jaw opens, because `weights()` gives the mandible's copy a jaw share and the
+# skull's copy none. Behind that run is the inside of the head. `T.seam_web` fills exactly it.
+#
+# The measurement first, on the uncut body: the lumen's own wall, which is what the fill wears.
+CAV_WALL=T.cavity_vertices(source,lambda p:p.y>.30,gap=.030)
+assert len(CAV_WALL)>80,('the lumen wall did not measure',len(CAV_WALL))
+CAV_WALL_CO=[source.data.vertices[i].co.copy()for i in CAV_WALL]
+INTAKE_RAW=BVHTree.FromPolygons([v.co.copy()for v in source.data.vertices],
+                                [list(p.vertices)for p in source.data.polygons],all_triangles=False)
+interior_raw,INTERIOR=T.cavity_pigment(source,CAV_WALL,lambda p:tuple(nearest_color(p)),scale=1.)
 jaw_mesh=source.copy();jaw_mesh.data=source.data.copy();jaw_mesh.name='Shonisaurus authored jaw';bpy.context.collection.objects.link(jaw_mesh);jaw_mesh['region']='mandible'
 for ob,keep_jaw in [(source,False),(jaw_mesh,True)]:
  bm=bmesh.new();bm.from_mesh(ob.data)
@@ -169,6 +186,8 @@ for ob,keep_jaw in [(source,False),(jaw_mesh,True)]:
  if loose:bmesh.ops.delete(bm,geom=loose,context='VERTS')
  bm.to_mesh(ob.data);bm.free();ob.data.update()
 source['region']='authored_upper';authored=[source,jaw_mesh]
+SEAM_CYCLES,SEAM_RIM=T.seam_rim(source,jaw_mesh,within=lambda p:p.y>.29)
+print('SHONI_SEAM_RIM',json.dumps(SEAM_RIM),flush=True)
 
 # No oral geometry. A palate, a floor, a throat-and-cheeks tube and two rows of conical teeth used
 # to be authored here, and all of it was invented shape inside a Tripo body whose mouth is closed
@@ -309,6 +328,68 @@ for o in puppets:
  bm.to_mesh(o.data);bm.free();o.data.update();winding_report[o.name]={'signedVolumeBefore':before,'signedVolumeAfter':after,'outward':True}
 # Performance specification is a separate reproducible source.
 sys.path.insert(0,str(HERE));from performance import CLIPS,LOOPS,pose
+# ------------------------------------------------------ the cut's own seam, filled ----
+# The web goes on the authored body alone, and that is a fact about the twin rather than an
+# omission: this animal's procedural rostrum is two separate closed lofts, `Puppet upper rostrum`
+# and `Puppet lower rostrum`, so there is no cut there and nothing open to fill.
+#
+# It is **off**: named so `src/shared/oral-geometry.ts` matches it, so the game hides it and the
+# viewer's *Mouth geometry* switch starts with it hidden. It is here to be looked at and judged.
+SEAM_FOLD,SEAM_FLOOR=.30,.0012
+# The gape the fold is sized on is the body's own, read off `performance.pose` rather than named.
+SEAM_GAPE=max(abs(float(pose(clip,f/max(1,round(d*30)),list(B))['jaw']['rotation'][0]))
+              for clip,d in CLIPS.items() for f in range(round(d*30)+1))
+assert SEAM_GAPE>.05,('no clip opens this jaw',SEAM_GAPE)
+def vraw(p):return Vector((-p[0]/S,-p[1]/S,p[2]/S))
+def seam_room(p,d):
+ # Cast inwards on the intake surface as it was **before** the split: `depth_probe`'s normal sign
+ # cannot answer beside a modelled cavity, where the nearest surface is the lumen's own wall.
+ q=vraw(p);dr=Vector((-d[0],-d[1],d[2])).normalized()
+ hit=INTAKE_RAW.ray_cast(q+dr*1e-5,dr,.25)
+ return ((hit[0]-q).length if hit[0]is not None else .02)*S
+seam_mat=T.vertex_colour_material('Shonisaurus mouth interior seam',roughness=.62)
+JAW_TURN=arm.bones['jaw'].matrix_local.to_3x3()@Vector((1.,0.,0.))
+seam_web,SEAM_WEB=T.seam_web('Mouth interior seam web',source,jaw_mesh,SEAM_CYCLES,
+                             Vector(B['jaw']['head']),JAW_TURN,SEAM_GAPE,
+                             lambda p:interior_raw(vraw(p)),seam_mat,rig=rig,
+                             fold=SEAM_FOLD,floor=SEAM_FLOOR*S,room=seam_room,cap=.45,
+                             inside=lambda p:T.ray_parity_inside(INTAKE_RAW,vraw(p)))
+SEAM_WEB['rim']=SEAM_RIM;SEAM_WEB['interiorAlbedo']=INTERIOR
+SEAM_WEB['parity']=T.seam_web_parity(seam_web,source,jaw_mesh,SEAM_CYCLES)
+# **Ray parity cannot tell three different things apart here**, and that is the lesson rather than a
+# nuisance. A modelled mouth is an invagination, so a point in the lumen crosses the surface an even
+# number of times on the way out and reads as outside the solid; and this builder closes the
+# generation's own gape in bind geometry, so the two copies of the rim are already parted at rest and
+# the fold's base sits in that parting -- a slot in the surface, and spanning it is what the web is
+# for. So the parity count is recorded, with how much of it the measured lumen accounts for, and what
+# is asserted is the head's own measured section, which uses no normals at all.
+outside_lumen=0
+for v in seam_web.data.vertices:
+ if v.index%3!=1:continue
+ q=vraw(v.co)
+ if T.ray_parity_inside(INTAKE_RAW,q):continue
+ if min((q-c).length for c in CAV_WALL_CO)<.030:continue
+ outside_lumen+=1
+SEAM_WEB['foldOutsideTheSolid']=SEAM_WEB['middleRowOutsideTheIntake']
+SEAM_WEB['foldOutsideTheSolidAndTheMeasuredLumen']=outside_lumen
+# The head's **own measured section**, not a normal-sign probe, is what bounds the fold -- and the
+# rows the web copies off the body are body vertices, so what they say about the section is the
+# metric's calibration rather than a fault. The folded row is judged against them.
+_HY=np.linspace(.302,.498,26);_HW=[];_HD=[]
+for _y in _HY:
+ _m=np.abs(points[:,1]-_y)<.006
+ _q=points[_m]if _m.sum()>5 else points[np.abs(points[:,1]-_y)<.015]
+ _HW.append(float(np.quantile(np.abs(_q[:,0]),.90)));_HD.append(float(np.quantile(np.abs(_q[:,2]),.90)))
+def section_excess(v):
+ q=vraw(v.co)
+ return max(abs(q.x)/max(float(np.interp(q.y,_HY,_HW)),1e-6),
+            abs(q.z)/max(float(np.interp(q.y,_HY,_HD)),1e-6))
+SEAM_WEB['sectionExcessOfTheRimRows']=max(section_excess(v)for v in seam_web.data.vertices if v.index%3!=1)
+SEAM_WEB['sectionExcessOfTheFoldedRow']=max(section_excess(v)for v in seam_web.data.vertices if v.index%3==1)
+assert SEAM_WEB['sectionExcessOfTheFoldedRow']<=SEAM_WEB['sectionExcessOfTheRimRows']+1e-9,(
+ 'the folded row stands further outside the head\'s own measured section than the skin it was '
+ 'folded from',SEAM_WEB['sectionExcessOfTheFoldedRow'],SEAM_WEB['sectionExcessOfTheRimRows'])
+print('SHONI_SEAM_WEB',json.dumps(SEAM_WEB),flush=True)
 for clip,duration in CLIPS.items():
  a=bpy.data.actions.new(clip);a.use_fake_user=True;rig.animation_data.action=a;last=round(duration*30)
  for f in range(last+1):
@@ -333,11 +414,11 @@ def export(obs,path):
  for o in obs+[rig]:o.select_set(True)
  bpy.context.view_layer.objects.active=rig
  bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_animations=True,export_animation_mode='ACTIONS',export_force_sampling=True,export_frame_range=False,export_skins=True,export_normals=True,export_tangents=True,export_texcoords=True,export_materials='EXPORT',export_vertex_color='NAME',export_vertex_color_name='Color',export_all_vertex_colors=False,export_yup=True,export_extras=True,export_morph=False)
-export(authored+features,LOCAL/'shonisaurus.full.uncompressed.glb');export(puppets+features,LOCAL/'shonisaurus.puppet.uncompressed.glb')
+export(authored+features+[seam_web],LOCAL/'shonisaurus.full.uncompressed.glb');export(puppets+features,LOCAL/'shonisaurus.puppet.uncompressed.glb')
 # Authoring file carries both geometries; collection visibility is set by review.py.
 bpy.ops.wm.save_as_mainfile(filepath=str(LOCAL/'shonisaurus.shared-rig.blend'))
 meta={'id':'shonisaurus','name':'Shonisaurus','species':'Shonisaurus popularis','provenance':'Late Triassic · Berlin-Ichthyosaur, Nevada','description':'Deep-bodied shastasaurid with long paired flippers, slender rostrum and lateral tail propulsion. Authored Tripo body and measured procedural volume puppet share the exact armature and actions.','lengthMeters':14,'modelLength':6,'locomotion':'Swim','clips':list(CLIPS),'looping':list(LOOPS),'anchors':[a['name']for a in anchors],'sources':['docs/triassic/canonical/shonisaurus.png','tools/triassic/creatures/shonisaurus/tripo-raw/shonisaurus.raw.glb'],'notes':['Authored skin retains source UV albedo with white COLOR_0 and restrained normal strength 0.15; procedural skin uses measured source pigment.','Procedural geometry is rebuilt from measured radial/spanning sections, not mesh decimation.','Bind geometry has a sealed mouth; only Bite, Attack, Heavy and Eat open it.','No authored oral geometry: the closed generation shows no backdrop through its gape, so the mouth is its anchors and the lip rims and tooth forms the generation drew. The eye globes sit where the albedo paints the eyes, seated 0.0025 raw under the skin along its normal.','Shared clips are applied verbatim to the authored and procedural exports. Oral articulation and swimming performance are inferred soft-tissue behaviour.']}
 existing=json.loads((OUT/'shonisaurus.json').read_text())if(OUT/'shonisaurus.json').exists()else{}
 meta={**existing,**meta}
 (OUT/'shonisaurus.json').write_text(json.dumps(meta,indent=2)+'\n')
-(HERE/'build-report.json').write_text(json.dumps({'materialCorrection':{'authoredAlbedo':'original UV texture; white COLOR_0','normalStrength':.15,'roughness':.7,'puppetMaterialUnchanged':True},'authoredMandibleSeparation':{'frontOwner':'jaw','upperLipOwner':'skull','rearHingeRawY':[.326,.360],'trianglesPreserved':True},'rawSHA256':hashlib.sha256(RAW.read_bytes()).hexdigest(),'closedRestJawAngleRadians':CLOSED_REST_ANGLE,'puppetLipContactFit':{'vertices':puppet_lip_seated,'maximumModelDisplacement':puppet_lip_max},'chinSurgery':{'adjustedVertices':chin_count,'maximumRawLengthDisplacement':chin_max},'oralGeometry':'none','eyes':eye_report,'closedSurfaceWinding':winding_report,'rawVertices':len(points),'rawTriangles':raw_triangles,'meshes':weight_report,'bones':len(B),'clips':list(CLIPS),'profileSections':len(profile)},indent=2)+'\n')
+(HERE/'build-report.json').write_text(json.dumps({'materialCorrection':{'authoredAlbedo':'original UV texture; white COLOR_0','normalStrength':.15,'roughness':.7,'puppetMaterialUnchanged':True},'authoredMandibleSeparation':{'frontOwner':'jaw','upperLipOwner':'skull','rearHingeRawY':[.326,.360],'trianglesPreserved':True},'rawSHA256':hashlib.sha256(RAW.read_bytes()).hexdigest(),'closedRestJawAngleRadians':CLOSED_REST_ANGLE,'puppetLipContactFit':{'vertices':puppet_lip_seated,'maximumModelDisplacement':puppet_lip_max},'chinSurgery':{'adjustedVertices':chin_count,'maximumRawLengthDisplacement':chin_max},'oralGeometry':SEAM_WEB,'eyes':eye_report,'closedSurfaceWinding':winding_report,'rawVertices':len(points),'rawTriangles':raw_triangles,'meshes':weight_report,'bones':len(B),'clips':list(CLIPS),'profileSections':len(profile)},indent=2)+'\n')

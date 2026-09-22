@@ -24,7 +24,56 @@
     "adjustedVertices": 23,
     "maximumRawLengthDisplacement": 0.0011560130119323726
   },
-  "oralGeometry": "none",
+  "oralGeometry": {
+    "cycles": [
+      164
+    ],
+    "vertices": 492,
+    "faces": 328,
+    "flippedFaces": 141,
+    "gapeRadians": 0.45,
+    "fold": 0.3,
+    "floorRaw": 0.0072,
+    "partingAtGapeMax": 0.1078918193863072,
+    "partingAtGapeMean": 0.03171563414841159,
+    "rimPairsTheJunctionHolds": 40,
+    "foldDepthMax": 0.020693432522153284,
+    "foldDepthMean": 0.008875286867174438,
+    "middleRowOutsideTheIntake": 64,
+    "rim": {
+      "bodyBoundaryEdges": 164,
+      "shellBoundaryEdges": 168,
+      "sharedVertices": 164,
+      "sharedEdges": 164,
+      "verticesWithoutTwoSharedEdges": 0,
+      "cycles": [
+        164
+      ]
+    },
+    "interiorAlbedo": {
+      "lumenWallVertices": 1215,
+      "meanInteriorColour": [
+        0.3902,
+        0.3808,
+        0.3692
+      ],
+      "meanColourElsewhereOnTheBody": [
+        0.4495,
+        0.4547,
+        0.4607
+      ],
+      "method": "inverse distance over the 4 nearest vertices of the measured lumen wall (a vertex whose own outward normal, cast back into the mesh, meets the wall opposite); nothing outside that set is ever sampled"
+    },
+    "parity": {
+      "rimPairs": 164,
+      "worstRestPositionDifference": 0.0,
+      "worstWeightDifference": 0.0
+    },
+    "foldOutsideTheSolid": 64,
+    "foldOutsideTheSolidAndTheMeasuredLumen": 5,
+    "sectionExcessOfTheRimRows": 1.0203485670190846,
+    "sectionExcessOfTheFoldedRow": 1.0118266148867232
+  },
   "eyes": {
     "inset": 0.0025,
     "headLengthRaw": 0.196,

@@ -2255,10 +2255,10 @@
           "fold": 0.3,
           "floorRaw": 0.0072,
           "partingAtGapeMax": 0.1529081374057705,
-          "partingAtGapeMean": 0.04366174033769296,
+          "partingAtGapeMean": 0.04366174075776945,
           "rimPairsTheJunctionHolds": 55,
           "foldDepthMax": 0.04587244122173115,
-          "foldDepthMean": 0.014529432535539505,
+          "foldDepthMean": 0.014529432540531177,
           "middleRowOutsideTheIntake": 10,
           "parity": {
             "rimPairs": 125,
@@ -2269,7 +2269,7 @@
           "sectionExcessOfTheRimRows": 1.0869937628581663,
           "sectionExcessOfTheFoldedRow": 1.0787104525141018,
           "foldOutsideTheSolid": 10,
-          "foldNeitherInTheFleshNorInTheMouth": []
+          "foldOutsideTheSolidAndTheMeasuredLumen": 0
         },
         "Cymbospondylus procedural volume twin": {
           "cycles": [
@@ -2283,10 +2283,10 @@
           "fold": 0.3,
           "floorRaw": 0.0072,
           "partingAtGapeMax": 0.5026778433136747,
-          "partingAtGapeMean": 0.19522980734411913,
+          "partingAtGapeMean": 0.1952298074077437,
           "rimPairsTheJunctionHolds": 39,
           "foldDepthMax": 0.07226727995284368,
-          "foldDepthMean": 0.019726543251373317,
+          "foldDepthMean": 0.01972654328162406,
           "middleRowOutsideTheIntake": 0,
           "parity": {
             "rimPairs": 110,
@@ -2297,7 +2297,7 @@
           "sectionExcessOfTheRimRows": 1.2510098600989847,
           "sectionExcessOfTheFoldedRow": 1.2034442872083015,
           "foldOutsideTheSolid": 0,
-          "foldNeitherInTheFleshNorInTheMouth": []
+          "foldOutsideTheSolidAndTheMeasuredLumen": 0
         }
       }
     },

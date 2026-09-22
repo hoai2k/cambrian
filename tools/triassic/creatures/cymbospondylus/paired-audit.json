@@ -3,22 +3,22 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1972256,
-      "sha256": "9658f996235ce40016fcb54a8f250c9c0cef2f0cb0035eb6c964df103a63ebd8",
+      "bytes": 1972576,
+      "sha256": "41fcacb82ad550b22a89975e83b1111a63570d7ce70c01100fb6c0a7f9985fe5",
       "triangles": 20380,
       "vertices": 12068
     },
     {
       "suffix": ".puppet",
-      "bytes": 860228,
-      "sha256": "565f7a0748a3dcf98c5ac5a64ef02d4d3efab830fe62d84e89f766682f418eb4",
+      "bytes": 860544,
+      "sha256": "205b640b5cec8f509f9fcd90c7d74d1f63e8a10115609e03e09713103f69aef3",
       "triangles": 7702,
       "vertices": 4118
     },
     {
       "suffix": ".lod1",
-      "bytes": 860228,
-      "sha256": "565f7a0748a3dcf98c5ac5a64ef02d4d3efab830fe62d84e89f766682f418eb4",
+      "bytes": 860544,
+      "sha256": "205b640b5cec8f509f9fcd90c7d74d1f63e8a10115609e03e09713103f69aef3",
       "triangles": 7702,
       "vertices": 4118
     }

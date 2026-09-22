@@ -2519,6 +2519,11 @@ def vertex_weights(o, index, bones=None):
     return w
 
 
+def swing(p, hinge, rot):
+    """Where a point goes when the jaw turns: the rotation taken about the hinge."""
+    return Vector(hinge) + (rot @ (Vector(p) - Vector(hinge)))
+
+
 def seam_web(name, body, shell, cycles, hinge, axis, gape, colour_at, material,
              rig=None, jaw='jaw', fold=.30, floor=.0012, room=None, cap=.45, inside=None):
     """The ruled surface between the two copies of a cut rim: the fill for a generation that arrived
@@ -2552,25 +2557,33 @@ def seam_web(name, body, shell, cycles, hinge, axis, gape, colour_at, material,
         n = len(cyc)
         base = len(verts)
         for bi, si in cyc:
-            p = body.data.vertices[bi].co.copy()
+            pb = body.data.vertices[bi].co.copy()
+            ps = shell.data.vertices[si].co.copy()
             nrm = Vector(body.data.vertices[bi].normal[:]).normalized()
             wb = vertex_weights(body, bi)
             ws = vertex_weights(shell, si)
-            part = abs(wb.get(jaw, 0.) - ws.get(jaw, 0.)) * ((H + (R @ (p - H))) - p).length
+            # How far the two copies stand apart at `gape`, exactly. Under linear blend skinning
+            # with only the jaw moving, a copy goes to `p + w_jaw (M p - p)`, so this is the whole
+            # of it -- and at a shut mouth it is whatever the bind pose already parted them by,
+            # which on a body that closes its generation's gape in bind geometry is not nothing.
+            a = pb + (swing(pb, H, R) - pb) * wb.get(jaw, 0.)
+            b = ps + (swing(ps, H, R) - ps) * ws.get(jaw, 0.)
+            part = (a - b).length
+            base_p = (pb + ps) / 2
             d = max(fold * part, floor)
             if room is not None:
-                d = min(d, max(1e-5, cap * room(p, -nrm)))
+                d = min(d, max(1e-5, cap * room(base_p, -nrm)))
             wm = {k: (wb.get(k, 0.) + ws.get(k, 0.)) / 2 for k in set(wb) | set(ws)}
             wm = dict(sorted(wm.items(), key=lambda kv: -kv[1])[:4])
             total = sum(wm.values()) or 1.
             wm = {k: v / total for k, v in wm.items()}
-            mid = p - nrm * d
+            mid = base_p - nrm * d
             if inside is not None and not inside(mid):
                 outside += 1
-            for q, w in ((p, wb), (mid, wm), (p, ws)):
+            for q, w in ((pb, wb), (mid, wm), (ps, ws)):
                 verts.append(q)
                 groups.append(w)
-                colours.append(colour_at(p))
+                colours.append(colour_at(q))
                 normals.append(nrm)
             partings.append(float(part))
             depths.append(float(d))
