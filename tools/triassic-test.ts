@@ -25,7 +25,7 @@ const { applyHit } = await import('../src/sim/combat');
 const { forceOccupancy } = await import('../src/sim/triassic/shore');
 void setShoreAnimals;
 const { brokeSurface, isAlive, lengthOf, bandOf, swimCeiling } = await import('../src/sim/actors');
-const { PLAYABLE, creature, CREATURES } = await import('../src/sim/creatures');
+const { PLAYABLE, WILD, WILD_IDS, creature, CREATURES } = await import('../src/sim/creatures');
 const { emptyInput } = await import('../src/sim/types');
 const { sampleHeight, shoreZ, shoreDistance, SURFACE_Y, FLOOR_DEPTH, biomeAt, nurseryAt, groundHeight, LIGHT_WINDOW_Y } = await import('../src/sim/world');
 type InputFrame = import('../src/sim/types').InputFrame;
@@ -40,8 +40,22 @@ const run = (g: InstanceType<typeof Game>, seconds: number, inputs?: Map<number,
 
 // ---- the pack ----
 ok(TRIASSIC.id === 'triassic' && RULES !== undefined && !RULES.growthByNutrition, 'Triassic rules active: growth is by standing, not nutrition');
-ok(TRIASSIC.creatures.length === 25, 'roster is the 21 playable subjects and the four shore animals');
-ok(PLAYABLE.length === 21 && PLAYABLE.every((c) => !c.shore), 'exactly the 21 swimmers are pickable; the shore animals never are');
+// Counted off the flags rather than written down, because three things now keep an animal off the
+// pick screen and each is one word on its card: `shore` stands on the beach, `npc` is in the water
+// and not offered, and `shelved` is not in this game at all and is kept for the specimen viewer.
+const SHORE = TRIASSIC.creatures.filter((c) => c.shore);
+const SHELVED = TRIASSIC.creatures.filter((c) => c.shelved);
+const NPCS = TRIASSIC.creatures.filter((c) => c.npc && !c.shore && !c.shelved);
+ok(TRIASSIC.creatures.length === 25, 'the roster entry is kept for every subject, offered or not');
+ok(SHORE.length === 4 && SHELVED.length === 2 && NPCS.length === 1, `four on the beach, ${SHELVED.length} shelved, ${NPCS.length} in the water and off the menu`);
+ok(PLAYABLE.length === TRIASSIC.creatures.length - SHORE.length - SHELVED.length - NPCS.length,
+  `exactly the ${PLAYABLE.length} offered swimmers are pickable`);
+ok(PLAYABLE.every((c) => !c.shore && !c.npc && !c.shelved), 'and none of the three kept-back kinds is');
+// A shelved animal is out of the game entirely, so it is in no sea either — which is the one thing
+// that separates it from an NPC, and the reason its entry can stay without putting it in the water.
+ok(WILD.every((c) => !c.shelved), 'a shelved animal is in no sea');
+ok(SHELVED.every((c) => !WILD_IDS.includes(c.id)), 'and the ambient draw cannot reach one');
+ok(NPCS.every((c) => WILD_IDS.includes(c.id)), 'an NPC is in the sea, which is the whole of what it is');
 ok(TRIASSIC.modes.map((m) => m.id).join() === 'rise,hunted,reef', 'the same three modes as the other eras, Rise first');
 for (const r of [1, 2, 3, 4]) ok(PLAYABLE.some((c) => c.rung === r), `rung ${r} has at least one playable animal`);
 for (const c of TRIASSIC.creatures) {
@@ -50,7 +64,14 @@ for (const c of TRIASSIC.creatures) {
   ok(c.breathing === 'air' || c.breathing === 'gill', `${c.id} breathes air or water, never both (the Triassic has no bimodal animal)`);
 }
 ok(PLAYABLE.every((c) => !c.shoreReach), 'no playable animal leaves the water: shoreReach is unused');
-ok(PLAYABLE.filter((c) => c.breathing === 'air').length === 15 && PLAYABLE.filter((c) => c.breathing === 'gill').length === 6, 'fifteen air-breathers and six gill-breathers');
+// The climb for air is the era's central act, so most of what is offered has to answer to it —
+// and a player who wants nothing to do with the surface has to have somewhere to go. Both halves
+// are what matters; the exact split follows whatever the roster currently offers.
+const AIR = PLAYABLE.filter((c) => c.breathing === 'air').length;
+const GILL = PLAYABLE.filter((c) => c.breathing === 'gill').length;
+ok(AIR + GILL === PLAYABLE.length, 'every pickable animal breathes air or water');
+ok(AIR === 13 && GILL === 5, `${AIR} air-breathers and ${GILL} gill-breathers on the pick screen`);
+ok(AIR > GILL * 2, 'and the era is an air-breathers\' one, which is what the gauge is for');
 ok(TRIASSIC.creatures.find((c) => c.id === 'helicoprion')!.locality!.includes('relict'), 'Helicoprion is labelled a relict on its card');
 
 // ---- the borrowed bodies ----
@@ -822,6 +843,19 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
     ok(!!row.image, `${row.key}: the viewer shows a picture of it`);
     if (row.image) ok(fs.existsSync(`public/${row.image}`), `${row.key}: ${row.image} exists`);
   }
+  // Every animal this game keeps and does not offer sorts to the end of the collection and says
+  // which of the three it is in its role line. (`npm run eras` asks the same of all three
+  // collections at once; this is the Triassic's own, with the animals named.)
+  const tri = SPECIMENS.filter((r) => r.collection === 'triassic');
+  const first = tri.findIndex((r) => r.notPlayable);
+  ok(first > 0 && tri.slice(first).every((r) => r.notPlayable), 'nothing a player can pick sits after one they cannot');
+  ok(tri.slice(first).every((r) => r.role.includes(r.notPlayable!)), 'and each says which kind it is in its role line');
+  // And they are exactly the three kinds this era has, in the roster's own order.
+  const kept = tri.filter((r) => r.notPlayable).map((r) => `${r.id}:${r.notPlayable}`);
+  const want = TRIASSIC.creatures
+    .filter((c) => c.shelved || c.npc || c.shore)
+    .map((c) => `${c.id}:${c.shelved ? 'SHELVED' : c.shore ? 'SHORE ANIMAL' : 'NPC'}`);
+  ok(kept.join(' ') === want.join(' '), `the kept-back animals are the era's own, in roster order (${kept.join(' ')})`);
 }
 
 // ---- the viewer's scenery catalogue ----

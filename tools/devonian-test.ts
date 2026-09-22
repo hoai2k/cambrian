@@ -638,10 +638,16 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(noFile.length === 0, `every track in the soundtrack has a file (missing: ${noFile.map((t) => t.name).join(', ')})`);
 }
 
-// ---- only delivered creatures can be picked, and they all have portraits ----
+// ---- only delivered creatures the roster offers can be picked, and they all have portraits ----
 {
-  const { PLAYABLE, PLAYABLE_IDS, CREATURE_IDS } = await import('../src/sim/creatures');
-  ok(PLAYABLE.length === DEVONIAN_SHIPPED.length, `the selection screen offers the ${DEVONIAN_SHIPPED.length} delivered specimens, not all ${CREATURE_IDS.length}`);
+  const { PLAYABLE, PLAYABLE_IDS, CREATURE_IDS, WILD } = await import('../src/sim/creatures');
+  // Two separate reasons to be off the pick screen, and the count is derived from both rather
+  // than written down: a body that has not been delivered yet, and an animal the sea keeps and
+  // does not offer (`npc`). Three of this roster are NPCs — ordinary fish in the water, off the
+  // menu — which is what brings the grid to eighteen and three rows of six.
+  const offered = WILD.filter((c) => !c.npc && DEVONIAN_SHIPPED.includes(c.id));
+  ok(PLAYABLE.length === offered.length, `the selection screen offers the ${offered.length} delivered animals the roster puts on it, not all ${CREATURE_IDS.length}`);
+  ok(PLAYABLE.every((c) => !c.npc), 'and an NPC is never one of them');
   for (const id of PLAYABLE_IDS) {
     ok(DEVONIAN_SHIPPED.includes(id), `${id} is pickable and has its own model`);
     for (const kind of ['select', 'card', 'thumb'] as const) ok(fs.existsSync(`public/${paths.portrait(id, kind)}`), `${id} has a ${kind} portrait for the roster`);

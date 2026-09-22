@@ -13,7 +13,7 @@ import { ACTIVE_ERA } from '../content';
  * streamed through media elements, so preloading one would pull four megabytes the player may never
  * reach.
  */
-import { creature, CREATURE_IDS, type CreatureId } from '../sim/creatures';
+import { creature, WILD_IDS, type CreatureId } from '../sim/creatures';
 import { ensureLoaded } from './creature';
 import { loops, SAMPLES, sfxUrl } from '../audio/audio';
 import { appBase } from '../shared/base';
@@ -64,7 +64,10 @@ export class AssetQueue {
     // just to have them fail is noise in the network panel and two wasted round trips each.
     const standIns = ACTIVE_ERA.assets.standIns ?? {};
     const hasArt = (id: CreatureId) => ACTIVE_ERA.assets.standInsPlayable ? !creature(id).shore : !(id in standIns);
-    CREATURE_IDS.forEach((id, i) => {
+    // `WILD_IDS` rather than the whole roster: a shelved animal is in no sea, so nothing in a match
+    // can ask for its body, and queueing it would spend the player's bandwidth on a download the
+    // game has no use for. (An NPC *is* in the sea and is queued like anything else.)
+    WILD_IDS.forEach((id, i) => {
       this.items.set(`glb:${id}`, { key: `glb:${id}`, kind: 'glb', url: `${B}${assetPaths.model(id)}`, size: GLB_SIZES[id]!, priority: 100 + i, status: 'queued', loaded: 0 });
       // The two images the pick screen draws. These used to be the `.card` cutout, which the pick
       // screen never shows — so the grid it does show arrived one request at a time as it opened.
@@ -126,7 +129,7 @@ export class AssetQueue {
 
   prioritize(creatures: CreatureId[], phase: 'boot' | 'title' | 'select' | 'playing') {
     for (const id of creatures) this.wanted.add(id);
-    const order = [...creatures, ...CREATURE_IDS.filter((c) => !creatures.includes(c))];
+    const order = [...creatures, ...WILD_IDS.filter((c) => !creatures.includes(c))];
     order.forEach((id, i) => {
       // A visitor from another game is not on this era's list and so has no queue entry of its
       // own until `addVisitor` gives it one. Nothing here may assume there is one: a pick that is

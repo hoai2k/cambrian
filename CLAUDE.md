@@ -422,6 +422,29 @@ unless the user explicitly asks for a PR. Steps:
   Nothing synthesises a stand-in for a sound that has not loaded — it stays quiet and the file is
   fetched; anything genuinely missing goes in `docs/audio-requests.md`. Only creatures with their own delivered model are pickable
   (`PLAYABLE` in `src/sim/creatures.ts`); the rest borrow a body in the world but stay off the roster.
+- **A roster is a menu, not a census, and three words on a creature's card decide how far into the
+  game it reaches.** `WILD` is what the sea holds and `PLAYABLE` is drawn *from* `WILD`, because a
+  pick has to be something the sea has. `shore` stands on the beach and strikes into the water;
+  `npc` is an ordinary swimmer the world spawns, hunts and is hunted by, and never offers — being
+  worth meeting is not the same as being worth playing, and every animal on a pick screen costs
+  every other one a share of the player's attention; `shelved` is not in that game at all, and its
+  roster entry is kept only so the specimen viewer can still show the body that was built for it,
+  which is what puts it in no sea (deleting the entry would take the animal's name, group, portrait
+  and model paths with it). All three games now offer **eighteen**, which is `gridColumns`' three
+  rows of six: the Cambrian keeps Odontogriphus, Ctenorhabdotus and Vetulicola in the water,
+  the Devonian Bothriolepis, Cheirolepis and Rhinodipterus, and the Triassic Cartorhynchus, with
+  Askeptosaurus and Hybodus shelved. `npm run eras` counts all three off the flags and checks that
+  nothing on a preload list is an animal the pick screen does not offer — the Devonian's `boot`
+  named Bothriolepis the day it stopped being pickable, which is a full body and two portraits
+  fetched ahead of time for a tile nobody sees. Three consequences worth knowing: the preload queue
+  is `WILD_IDS` (a shelved body is a download the game can never use), the codex's apex strip is
+  `PLAYABLE` (a card for an animal nobody can take to the top is a square that never fills, and it
+  would be in the denominator of "N of M species" as well), and `visitorsFrom` drops them too,
+  since an animal that cannot be picked can never be taken to the top of anything.
+  The specimen viewer shows every body a game has, so it answers "can I play this?" separately: a
+  kept-back animal sorts to the **end** of its collection and carries the word in its role line
+  (`TRIASSIC · NPC · SWIMMER · The bottom-worker`), stably, so the roster's own order inside each
+  half is untouched and an animal moved on or off the pick screen moves here by itself.
 - Devonian gameplay lives in `src/sim/devonian/` and Triassic gameplay in `src/sim/triassic/`; both
   reach the shared simulation only through the `RULES?.` hooks in `src/sim/era-rules.ts`. Do not
   branch on the era inside `game.ts`/`combat.ts`; add a hook. With `RULES` undefined the Cambrian
