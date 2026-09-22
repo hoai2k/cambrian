@@ -1624,25 +1624,43 @@ unless the user explicitly asks for a PR. Steps:
   the change into the middle and kinks both ends). Behind the base cut nothing moves at all, past
   the tip cut the far part is carried rigidly, and the span
   keeps its own length, because a rotation about one fixed pivot is a spiral and not a bend.
-  **The span's two ends are oriented planes, and the bend is whatever carries the creature's axis
-  line from the one to the other.** A plane's normal is the direction that axis line runs through
-  it: the base plane is where it runs **in** and is a pure reference (nothing behind the base cut
-  moves under any bend, so aiming it never moves the body — what it says is *which direction you
-  are calling the trunk*, which is the argument this tool was built out of made into a control);
-  the tip plane is where it is **to** run out, seated on the body's own measured heading there so
-  the editor opens on the animal as it stands. **Aim both planes the same way and the run between
-  them comes straight**, because the bend is then the rotation carrying the head's own heading onto
-  the trunk's. That replaced a pair of turn *rates* and keeps what they were for: the rates existed
+  **The span's two ends are oriented planes that describe the animal, and a slider says how much of
+  the way from the one to the other to carry the run between them.** A plane's normal is the
+  direction the creature's axis line runs through it *as the body actually is*: the base plane is
+  where it runs **in** and is a pure reference (nothing behind the base cut moves under any bend, so
+  aiming it never moves the body — what it says is *which direction you are calling the trunk*,
+  which is the argument this tool was built out of made into a control); the tip plane is where it
+  runs **out**, the same statement at the other end, seated on the body's own measured heading so
+  the editor opens on the animal as it stands. Neither is a target and neither on its own bends
+  anything. **`straighten` is the whole of what does**: 0 leaves the body alone, 1 carries the tip
+  plane onto the base plane so the two finish parallel and the run between them is straight, past 1
+  overshoots and below 0 bends it further the way the animal already goes (−0.5 to 1.5, typed or
+  dragged). **That split is what made the tool legible**, and is `bend-span/3`. The tip plane used
+  to be the *target* — where the axis was **to** run out — with the turn implicit in how far it had
+  been dragged off the body's own heading, so two questions were tangled into one drag and the
+  amount of bend was hidden inside the position of a handle: a reviewer aimed this at Askeptosaurus
+  twice and could not tell either time what it was doing to the animal. Now the front plane visibly
+  swings toward the back one as the slider rises — the stage draws that cut plane **where the bend
+  has carried it** while the grabbable knob stays on the aim it sets, so the plane moving and the
+  body moving are one motion and the handle never jumps out from under the pointer — and the
+  contract is measured rather than described: at 1 the separation taken *after the warp* is nought.
+  The two are also **separate answers and neither takes the other back**: re-seating the planes,
+  moving the span, changing the window or the reach all leave the amount alone, which under the
+  aim-only scheme was impossible because the turn *was* where the tip plane had been dragged to.
+  The planes replaced a pair of turn *rates* and keep what they were for: the rates existed
   because the obvious reading of two angles puts a kink at the base cut, and an orientation per
-  plane cannot — the rotation there is the one carrying the tip plane's rest onto itself, identity
-  by construction however far apart the planes are aimed. What is given up is a bend that starts
-  straight and tightens; two orientations are a circular arc, which is the shape straightening
-  wants. The **axle is derived** from the two planes rather than dialled, which is why there is no
-  bend-plane roll and no *Aim the plane* button: the old roll swept the creature's own long axis —
-  a twist — while the body it bent went ninety degrees the other way, so the control's motion was
-  not the bend it produced, and a plane's is. Where an aim is oblique the hinge leans a little along
-  the span, which really is a twist; that is reported (`axis.twistDegrees`) rather than clamped,
-  because clamping it would mean the turn no longer carried the tip plane where it was aimed.
+  plane cannot — the rotation there is identity by construction at any amount. What is given up is
+  a bend that starts straight and tightens; two orientations are a circular arc, which is the shape
+  straightening wants. The **axle is derived** from the two planes rather than dialled, which is why
+  there is no bend-plane roll and no *Aim the plane* button: the old roll swept the creature's own
+  long axis — a twist — while the body it bent went ninety degrees the other way, so the control's
+  motion was not the bend it produced, and a plane's is. It is the direction *straightening* goes
+  and does not move with the slider, which keeps every angle read in one plane as the amount is
+  dragged through zero — and means a run still to be straightened reads **negative** in the bend
+  plane and closes on zero as the slider rises. Where an aim is oblique the hinge leans a little
+  along the span, which really is a twist; that is reported (`axis.twistDegrees`) rather than
+  clamped, because clamping it would mean a full straightening no longer landed the tip plane on
+  the base plane.
   **And which body the numbers describe is said out loud, in the panel and in `appliesTo`.** Bend
   mode holds a rigged body at rest, and Askeptosaurus' rest already carries T3D-26's whole
   correction (`carry`: the head 4.17° off the trunk's run where the generation had it at 67.68°),
@@ -1669,11 +1687,20 @@ unless the user explicitly asks for a PR. Steps:
   are **dropdowns**: guessed from where the span is, re-guessed whenever it moves (a stale default
   left the tip chord at `skull → jaw`, pointing at the chin, reading that head as 97° off its trunk)
   and never re-guessed once a person has named one. The export carries the span, the two planes and
-  the axle in the root frame *and* in the builders' Z-up one, both readings before and after, and a **per-joint
+  the axle in the root frame *and* in the builders' Z-up one, the amount and the turn it is a
+  fraction of, the planes' separation before and after, both readings before and after, and a **per-joint
   table of local rotations in chain order** — which is exactly what `uncurl` returns and `carry_rest`
-  consumes in that animal's builder. It is `bend-span/2`, and a `bend-span/1` file is refused by
-  name rather than half-read: it carries turn rates and a plane roll, which no longer describe a
-  bend at all. **Bend mode opens on the body a bend is aimed on** — the original pose where the
+  consumes in that animal's builder. It is `bend-span/3`, and **two earlier schemas are refused by
+  name** rather than half-read: `bend-span/1` carries turn rates and a plane roll, and `bend-span/2`
+  carries a tip plane that was a target, whose turn was about an axle that could be any direction
+  square to the measured heading where a straightening's is fixed by the two planes — so the two are
+  **not convertible** and a v2 file read as a v3 one would fail nowhere while quietly describing a
+  different bend of a different part of the animal. The one v2 file in the repository
+  (`docs/triassic/bends/askeptosaurus-front-2026-09-21.json`) is read only by that animal's builder,
+  which takes `baseNormal` and `tipNormal` as the trunk's run and the head's run and applies the
+  rotation between them — which is exactly a v3 document at a straighten of 1, so that builder was
+  always on this side of the change: the file stays as exported, `aimed_bend()` accepts either
+  schema, and the rotation it yields is unchanged. **Bend mode opens on the body a bend is aimed on** — the original pose where the
   specimen publishes one, else the raw generation (`opening()` in `Viewer.tsx`, the Bend button and
   a `?mode=bend` link alike) — because on an animal whose builder carried a correction into the
   bind there is nothing left to aim on the shipped one. Two things follow and both were found by

@@ -5,10 +5,11 @@ import { useMeasuredHash } from '../file-hash';
 import { History } from '../sculpt/history';
 import { NumberField } from '../stretch/StretchEditor';
 import {
-  angleOf, bendBasis, describeReadingText, exportDoc, flipForward, forwardEarned, isIdentity, jointTurns,
+  STRAIGHTEN_MAX, STRAIGHTEN_MIN, angleOf, apartAfter, bendBasis, describeReadingText, exportDoc,
+  flipForward, forwardEarned, fullStraightening, isIdentity, jointTurns,
   measureBend, moveEnd, pinch, readBend, refLabel, refMoves, reguessRefs, reseat, resetTurn, seatPlanes,
-  seatPlanesFromBones, setAxis, setChain, setPlaneNormal, setRef, setReach, setWindow, spanDirection,
-  spanLength, straighten, totalTurn, traces, twistAngle, warp,
+  seatPlanesFromBones, setAxis, setChain, setPlaneNormal, setRef, setReach, setStraighten, setWindow,
+  spanDirection, spanLength, straightenFully, tipCarried, totalTurn, traces, twistAngle, warp,
   type AppliesTo, type BendDoc, type PlaneEnd, type Reading, type Vec3,
 } from './bend';
 import { bendKey, getBend, setBend } from './store';
@@ -20,10 +21,17 @@ import { bendKey, getBend, setBend } from './store';
  * the span: drag either one anywhere on the animal and the cuts, the span's direction and its
  * length all follow, because the span is two points rather than four numbers. Standing out from
  * each end is that end's **plane aim** — pale amber at the base, magenta at the tip — which says
- * which way the creature's axis line runs through that plane, and turning the tip's *is* the bend:
- * drag it back to front and the body under it goes back to front. Every vertex inside the span is
- * lit as you go, and the two traced centrelines the geometry reading is taken from are drawn on
- * the body — so a trace that has set off down a flipper is seen rather than believed.
+ * which way the creature's axis line runs through that plane *as the body stands*. Both are
+ * statements about the animal; neither is a target.
+ *
+ * What bends the body is the **Straighten slider**. It carries the front plane toward being
+ * parallel with the back one — 1 is all of the way, which is straight; past 1 overshoots; below 0
+ * bends it further the way the animal already goes — and the geometry between the two cuts comes
+ * with it. The lagoon cut plane on the stage is drawn where the bend has *carried* it, so the
+ * plane swinging and the body swinging are one motion on screen, while the magenta knob stays on
+ * the aim it sets and never jumps out from under the pointer. Every vertex inside the span is lit
+ * as you go, and the two traced centrelines the geometry reading is taken from are drawn on the
+ * body — so a trace that has set off down a flipper is seen rather than believed.
  *
  * The stage keeps the ordinary pointer scheme (`../pointer-scheme`), as mouth mode does:
  * **left-drag orbits** where it is not on a handle, **right-drag pans**, the wheel zooms. The
@@ -113,7 +121,7 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
     const bent = isIdentity(d) ? null : warp(d);
     scene.showBend({
       base: d.base, tip: d.tip, forward: b.forward, axis: b.axis, reach,
-      baseNormal: d.baseNormal, tipNormal: d.tipNormal,
+      baseNormal: d.baseNormal, tipNormal: d.tipNormal, tipCarried: tipCarried(d),
       baseTrace: t.base?.points ?? [], tipTrace: t.tip?.points ?? [],
     }, inSpan, bent);
     scene.applySculpt(bent, true);
@@ -297,16 +305,19 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
   const edited = !!doc && !isIdentity(doc);
   const boneNames = doc?.bones.map((b) => b.name) ?? [];
   const squeeze = doc ? pinch(doc, chunksRef.current) : 1;
-  // How far apart the two planes are aimed now, and how far apart they were before the bend. The
-  // first is what a straightened run reads (zero) and the second is the animal's own curve.
-  // Full precision in the numbers themselves and rounded only where they are drawn: the data
-  // attributes are what a browser check reads back against the file, and a figure rounded twice —
-  // once to a tenth for the panel and once to a hundredth for the attribute — disagrees with the
-  // export by more than either rounding.
-  const apart = doc ? exact(angleOf(doc.baseNormal, doc.tipNormal)) : 0;
-  const apartBefore = doc ? exact(angleOf(doc.baseNormal, doc.tipRest)) : 0;
+  // The two numbers the slider is between: how far apart the planes stand on the body, and how far
+  // apart they are once the bend has carried the front one. The second is **measured after the
+  // warp** rather than worked out from the amount — that is the contract, and at a straighten of 1
+  // it is nought. Full precision in the numbers themselves and rounded only where they are drawn:
+  // the data attributes are what a browser check reads back against the file, and a figure rounded
+  // twice — once to a tenth for the panel and once to a hundredth for the attribute — disagrees
+  // with the export by more than either rounding.
+  const apart = doc ? exact(fullStraightening(doc)) : 0;
+  const after = doc ? exact(apartAfter(doc)) : 0;
+  const restApart = doc ? exact(angleOf(doc.baseNormal, doc.tipRest)) : 0;
   const twist = doc ? exact(twistAngle(doc)) : 0;
   const turn = doc ? exact(totalTurn(doc)) : 0;
+  const amount = doc?.straighten ?? 0;
   /** Move an end of the span and re-measure the planes on the body, which is one act to a reviewer. */
   const placeEnd = (d: BendDoc, which: 'base' | 'tip', delta: Vec3) => seatPlanes(moveEnd(d, which, delta), chunksRef.current);
 
@@ -318,7 +329,7 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
           <li className={`base ${hover === 'base' ? 'hover' : ''}`}><i />base · the end the bend is anchored at</li>
           <li className={`tip ${hover === 'tip' ? 'hover' : ''}`}><i />tip · the end that is carried round</li>
           <li className={`baseAim ${hover === 'baseAim' ? 'hover' : ''}`}><i />base plane · which way the axis runs in</li>
-          <li className={`tipAim ${hover === 'tipAim' ? 'hover' : ''}`}><i />tip plane · which way it is to run out — drag to bend</li>
+          <li className={`tipAim ${hover === 'tipAim' ? 'hover' : ''}`}><i />tip plane · which way the axis runs out</li>
         </ul>
       </div>
       <aside className="sculpt-panel bend-panel" aria-label="Bend">
@@ -328,8 +339,10 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
         </div>
         {error && <p className="sculpt-error">{error}</p>}
         <p className="hint">
-          Put the two ends on the animal, aim the two planes, and read what it measures. Aim them
-          both the same way and the run between them comes straight. The lit vertices are everything
+          Put the two ends on the animal, aim the two planes at the directions you call the trunk
+          and the run leaving it, and then drag <strong>Straighten</strong>: the tip plane swings
+          toward the base plane and the body between the two cuts comes with it. At 1 they are
+          parallel and the run is straight. The lit vertices are everything
           between the two cuts, which is everything the turn would carry — on a span cut obliquely
           across a curled body that takes in whatever else lies between them, and the stage says so
           rather than hiding it. The file names <code>{model.split('/').pop()}</code> by its hash, so
@@ -360,13 +373,39 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
             ? <Readout name="Bone chain" what={`${refLabel(doc.refs.base)}${refMoves(doc, doc.refs.base) ? ' (moves with the bend)' : ''} against ${refLabel(doc.refs.tip)}${refMoves(doc, doc.refs.tip) ? ' (moves with the bend)' : ''}`}
               before={readings.bones.before} after={readings.bones.after} edited={edited} />
             : <p className="hint bend-no-rig">No rig on this body, so there is only the geometry's answer. On a built one the bone chain's answer sits beside it, because those are the two that disagree.</p>}
+          <h3>How much of it to straighten</h3>
+          {/* The slider, and the whole of what bends anything. It is above the planes rather than
+              below them because it is what a reviewer reaches for between every look: place the two
+              planes once, then drag this and watch the front plane swing onto the back one with the
+              body between them coming along. */}
+          <section className="bend-amount" aria-label="Straighten">
+            <label>
+              <span>Straighten · <b>{amount.toFixed(2)}</b> of the way</span>
+              <input type="range" min={STRAIGHTEN_MIN} max={STRAIGHTEN_MAX} step={0.01} value={amount}
+                aria-label="Straighten amount"
+                onChange={(e) => drag(setStraighten(doc, Number(e.target.value)))}
+                onPointerUp={endDrag} onKeyUp={endDrag} onBlur={endDrag} />
+              <small>
+                0 leaves the body as it stands · 1 carries the tip plane onto the base plane, which is
+                straight · past 1 overshoots, below 0 bends it further the way the animal already goes
+              </small>
+            </label>
+            <div className="sculpt-station bend-fields">
+              <label>
+                <span>Exactly</span>
+                <NumberField value={amount} step={0.05} places={3} range={[STRAIGHTEN_MIN, STRAIGHTEN_MAX]}
+                  onChange={(v) => step(setStraighten(doc, v))} />
+                <small>of the {apart.toFixed(1)}° the two planes stand apart</small>
+              </label>
+            </div>
+          </section>
           <div className="sculpt-actions">
-            <button className="ghost primary" onClick={() => step(straighten(doc))}
-              title="Aim the tip plane at the base plane, so the run between them comes straight">
+            <button className="ghost primary" onClick={() => step(straightenFully(doc))}
+              title="All of the way: the tip plane carried onto the base plane, so the run between them comes straight">
               Straighten it
             </button>
             <button className="ghost" onClick={() => step(resetTurn(doc))} disabled={!edited}
-              title="Put the tip plane back on the body’s own heading there">No bend</button>
+              title="The slider back to nothing: the body exactly as it stands">No bend</button>
             <button className="ghost" onClick={() => step(seatPlanes(doc, chunksRef.current, true))}
               title="Measure both planes off the body’s own traced centre again">Seat the planes on the body</button>
             {doc.refs && <button className="ghost" onClick={() => step(seatPlanesFromBones(doc))}
@@ -374,19 +413,27 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
           </div>
 
           <h3>The two planes</h3>
-          <div className="bend-readout" data-apart={apart.toFixed(3)} data-apart-before={apartBefore.toFixed(3)} data-turn={turn.toFixed(3)}>
-            <b className={edited ? 'changed' : undefined}>{apart.toFixed(1)}° apart</b>
+          {/* Never an angle without the two references it is between: these are the base plane
+              against the tip plane, before the bend and after it, and the second is *measured* off
+              the plane the warp actually carried rather than worked back out of the amount. */}
+          <div className="bend-readout" data-apart={apart.toFixed(3)} data-apart-before={apart.toFixed(3)}
+            data-apart-after={after.toFixed(3)} data-rest-apart={restApart.toFixed(3)}
+            data-straighten={amount.toFixed(4)} data-turn={turn.toFixed(3)}>
+            <b className={edited ? 'changed' : undefined}>{apart.toFixed(1)}° apart → {after.toFixed(1)}°</b>
             <small>
-              the animal’s own curve here is {apartBefore.toFixed(1)}° · the turn that closes the difference is {turn.toFixed(1)}°
-              across a span {(spanLength(doc) / doc.bounds.length * 100).toFixed(1)}% of the body · inside squeezed to {squeeze.toFixed(2)}{squeeze < 0 ? ' — the bend has folded the body through itself' : ''}
-              {twist > 1 ? ` · the hinge leans ${twist.toFixed(1)}° along the span, so that much of the aim is a twist` : ''}
+              base plane against tip plane, before the bend and measured after it · the turn applied
+              is {turn.toFixed(1)}° of the {apart.toFixed(1)}° between them, across a span
+              {' '}{(spanLength(doc) / doc.bounds.length * 100).toFixed(1)}% of the body · inside squeezed to {squeeze.toFixed(2)}{squeeze < 0 ? ' — the bend has folded the body through itself' : ''}
+              {Math.abs(restApart - apart) > 0.5 ? ` · the body’s own heading there reads ${restApart.toFixed(1)}° off the base plane, so the tip plane has been aimed off it by hand` : ''}
+              {twist > 1 ? ` · the hinge leans ${twist.toFixed(1)}° along the span, so that much of the turn is a twist` : ''}
             </small>
           </div>
           <p className="hint">
-            Each plane is named by the direction the creature’s axis line runs through it. The
-            <strong> base</strong> plane is the reference and moves nothing — it is where you say
-            the trunk runs. The <strong>tip</strong> plane is the bend: the body turns so its own
-            heading there comes onto this aim. <em>{PLANE_NOTE[doc.planeSource.base]}</em>
+            Each plane is named by the direction the creature’s axis line runs through it <em>as the
+            body stands</em> — the <strong>base</strong> plane where you say the trunk runs in, the
+            <strong> tip</strong> plane where you say the run leaves. Neither is a target and
+            neither on its own bends anything: how far of the way from the one to the other to carry
+            the run is the slider above. <em>{PLANE_NOTE[doc.planeSource.base]}</em>
           </p>
           {(['base', 'tip'] as const).map((which) => (
             <section key={which} className="sculpt-station bend-fields bend-plane" aria-label={which === 'base' ? 'Base plane' : 'Tip plane'} data-source={doc.planeSource[which]}>
@@ -395,7 +442,7 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
                   <span>{which === 'base' ? 'Base' : 'Tip'} plane {'XYZ'[i]}</span>
                   <NumberField value={(which === 'base' ? doc.baseNormal : doc.tipNormal)[i]} step={0.02} places={4}
                     onChange={(v) => { const n: Vec3 = [...(which === 'base' ? doc.baseNormal : doc.tipNormal)] as Vec3; n[i] = v; step(setPlaneNormal(doc, which, n)); }} />
-                  {i === 0 && <small>{which === 'base' ? 'where the axis line runs in' : 'where it is to run out'} · {doc.planeSource[which]}</small>}
+                  {i === 0 && <small>{which === 'base' ? 'where the axis line runs in' : 'where it runs out'} · {doc.planeSource[which]}</small>}
                 </label>
               ))}
             </section>

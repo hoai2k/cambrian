@@ -201,6 +201,13 @@ the rotation carrying the first onto the second. `aimed_bend()` loads it and **c
 this body**: the export names `askeptosaurus.origpose.glb`, which `base-poses.mjs` publishes as a
 byte copy of `tripo-raw/askeptosaurus.raw.glb`, so the builder hashes that file and compares.
 
+That reading of `tipNormal` — *the head's run*, rather than a target a reviewer dragged to — is
+what the bend editor's `bend-span/3` made the schema's own. The file on disk is unchanged and so is
+the rotation taken out of it; `aimed_bend()` accepts either schema, because the two directions it
+reads mean the same thing under both. The editor itself refuses a v2 file, since a *bend* written
+under the old reading turns about an axle a straightening cannot reach and so cannot be
+re-expressed — but the two normals can, and they are all this builder ever wanted.
+
 Two directions in a document are no use in a frame that is not the document's, and neither
 `T.measure_frame` nor `posed_frame` returns the map it rewrote every vertex with. Reconstructing
 those two rotations from what they record would be a guess; `frame_fit` **measures** them instead —

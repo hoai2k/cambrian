@@ -357,12 +357,22 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .bend-legend .tip i { background: var(--lagoon); }
 .bend-legend .baseAim i { background: #ffd9a8; }
 .bend-legend .tipAim i { background: #ff2fa8; }
+/* The tip *cut plane* is lagoon like the tip end, and is drawn where the straighten slider has
+ * carried it rather than where the magenta knob aims it — the plane swinging onto the base plane
+ * and the body swinging with it are one motion, and the knob stays under the pointer. */
 .bend-panel .bend-reading { display: flex; flex-direction: column; gap: 2px; padding: 8px 0; border-top: 1px solid var(--line); }
 .bend-panel .bend-reading h4 { margin: 0; font: 700 10px var(--font-display); letter-spacing: .14em; color: var(--dim); text-transform: uppercase; }
 .bend-panel .bend-reading-value { margin: 0; font: 700 14px var(--font-body); color: var(--foam); font-variant-numeric: tabular-nums; }
 .bend-panel .bend-reading-value .changed { color: var(--lagoon); }
 .bend-panel .bend-reading small { color: var(--dim); font-size: 11px; line-height: 1.35; }
 .bend-panel .bend-residual.warn { color: var(--ember); }
+/* The straighten slider: the one control that bends anything, so it sits above the planes and is
+ * the largest thing in the panel after the readings themselves. */
+.bend-amount { display: flex; flex-direction: column; gap: 6px; padding: 4px 0 8px; }
+.bend-amount > label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--mist); }
+.bend-amount > label b { color: var(--lagoon); font-variant-numeric: tabular-nums; }
+.bend-amount input[type="range"] { width: 100%; margin: 0; accent-color: var(--lagoon); }
+.bend-amount small { color: var(--dim); font-size: 11px; line-height: 1.35; }
 .bend-readout { display: flex; flex-direction: column; gap: 2px; }
 .bend-readout b { font: 700 20px var(--font-body); color: var(--foam); font-variant-numeric: tabular-nums; }
 .bend-readout b.changed { color: var(--lagoon); }

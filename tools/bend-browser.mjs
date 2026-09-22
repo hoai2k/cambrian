@@ -78,15 +78,45 @@ const reading = async (which) => {
     afterTotal: Number(await el.getAttribute('data-after-total')),
   };
 };
-/** How far apart the two planes are aimed, and how far apart the body's own curve had them. */
+/**
+ * The two planes as the panel published them: how far apart they stand on the body, how far apart
+ * they are **after** the bend (measured, and nought at a full straighten), what fraction of the
+ * straightening is being applied, and the turn that is.
+ */
 const planes = async () => {
   const el = page.locator('.bend-readout[data-apart]');
   return {
     apart: Number(await el.getAttribute('data-apart')),
     before: Number(await el.getAttribute('data-apart-before')),
+    after: Number(await el.getAttribute('data-apart-after')),
+    straighten: Number(await el.getAttribute('data-straighten')),
     turn: Number(await el.getAttribute('data-turn')),
   };
 };
+/**
+ * Set the straighten slider and wait for the panel to have published the new amount.
+ *
+ * Waited on the page's own state and never on the clock: this page draws about a frame a second
+ * under the software renderer, so a wait in seconds measures the renderer rather than the edit.
+ */
+const setStraighten = async (amount) => {
+  const slider = page.getByLabel('Straighten amount');
+  await slider.fill(String(amount));
+  await slider.dispatchEvent('change');
+  await page.waitForFunction((want) => {
+    const el = document.querySelector('.bend-readout[data-straighten]');
+    return !!el && Math.abs(Number(el.getAttribute('data-straighten')) - want) < 5e-4;
+  }, amount, { timeout: 60000 });
+  return planes();
+};
+/**
+ * Where the span's own vertices have been carried to, as their centroid in the root frame.
+ *
+ * The proof that the slider moved the *animal* and not only a number: the scene lights exactly the
+ * vertices between the two cuts and draws them where the warp has put them, so this is the part of
+ * the body the bend is about, measured off the stage.
+ */
+const litCentroid = () => page.evaluate(() => window.__viewerScene.bendLitCentroid());
 /**
  * Type a direction into one plane's three fields.
  *
@@ -297,38 +327,80 @@ try {
   const curved = await planes();
   const curvedGeom = await reading('geometry');
   assert.ok(curved.before > 30, `the two planes, seated on the body, are ${curved.before}° apart — the animal's own curve across this span`);
-  assert.ok(Math.abs(curvedGeom.before - curved.before) < 1.5,
-    `and say the same thing the geometry reading does (${curvedGeom.before}°), because they are seated on the same two traced runs`);
+  // Compared on the **total** angle, which is what "how far apart" means: the in-plane figure is
+  // signed about the axle, and the axle is the direction a straightening turns, so a run that still
+  // has to be straightened reads negative there and closes on zero as the slider rises.
+  assert.ok(Math.abs(curvedGeom.beforeTotal - curved.before) < 1.5,
+    `and say the same thing the geometry reading does (${curvedGeom.beforeTotal}° in all), because they are seated on the same two traced runs`);
+  assert.ok(curvedGeom.before < 0,
+    `with the sign of the in-plane figure saying which way it has to go (${curvedGeom.before}°, against an axle that is the straightening's own direction)`);
   await page.screenshot({ path: path.join(out, 'askeptosaurus-bend-origpose-seated.png') });
 
-  // Aim both planes the same way by hand, by typing the base plane's own direction into the tip
-  // plane's fields. This is the owner's sentence carried out literally.
-  const baseAim = await planeValue('Base');
-  await aimPlane('Tip', baseAim);
+  // ---- the slider: the front plane swung onto the back one, and the body between them with it --
+  //
+  // This is the owner's own sentence driven literally, on the animal it was written about. The two
+  // planes describe the body and do not move; the slider says how much of the way from the one to
+  // the other to carry the run between them. Three things are asserted at every step and the third
+  // is the one a headless test cannot vouch for: the separation **measured after the warp** falls,
+  // the geometry reading over the warped mesh falls with it, and the lit vertices — the part of the
+  // body between the two cuts, drawn where the bend has put them — have actually moved on stage.
+  const atZero = await setStraighten(0);
+  assert.ok(Math.abs(atZero.turn) < 0.01, `the slider opens at nothing and nothing is done to the animal (turn ${atZero.turn}°)`);
+  assert.ok(Math.abs(atZero.after - atZero.apart) < 0.02,
+    `with the two planes as far apart after as before: the body's own curve, ${atZero.apart}°`);
+  const restLit = await litCentroid();
+  assert.ok(restLit && restLit[3] > 100, `the span lights ${restLit?.[3]} vertices of the animal`);
+
+  const walk = [];
+  let lastAfter = Infinity, lastGeom = Infinity;
+  for (const amount of [0.25, 0.5, 0.75, 1]) {
+    const at = await setStraighten(amount);
+    const geom = await reading('geometry');
+    const lit = await litCentroid();
+    const moved = Math.hypot(lit[0] - restLit[0], lit[1] - restLit[1], lit[2] - restLit[2]);
+    walk.push({ amount, after: at.after, turn: at.turn, geometry: geom.after, moved });
+    assert.ok(at.after < lastAfter - 1,
+      `at ${amount} of the straightening the two planes measure ${at.after}° apart, less than the ${lastAfter === Infinity ? atZero.after : lastAfter}° before it`);
+    assert.ok(Math.abs(geom.after) < lastGeom - 1,
+      `and the run between them reads ${geom.after}° off over the warped mesh, down from ${lastGeom === Infinity ? geom.before : lastGeom}°`);
+    assert.ok(moved > 1e-4, `and the body between the two cuts has moved on stage (${moved.toFixed(4)} from where it stood)`);
+    assert.ok(Math.abs(at.turn - at.apart * amount) < 0.05,
+      `the turn applied is exactly ${amount} of the ${at.apart}° the planes stand apart (${at.turn}°)`);
+    assert.ok(Math.abs(at.apart - atZero.apart) < 0.02, 'and the planes themselves never moved: the slider is the only thing that bent anything');
+    lastAfter = at.after; lastGeom = Math.abs(geom.after);
+  }
   const straightened = await planes();
-  assert.ok(straightened.apart < 0.5, `aiming both planes the same way by hand leaves them ${straightened.apart}° apart`);
+  assert.ok(straightened.after < 0.05, `at 1 the front plane is parallel to the back one (${straightened.after}° apart, measured after the warp)`);
   const straightGeom = await reading('geometry');
   assert.ok(Math.abs(straightGeom.after) < 5,
     `and the run between them comes straight, measured over the warped mesh (${straightGeom.before}° → ${straightGeom.after}°)`);
+  await page.screenshot({ path: path.join(out, 'askeptosaurus-bend-straightened.png') });
 
-  // The button is the same act in one press, and it lands exactly rather than nearly: the fields
-  // set one component of a direction at a time and the other two are re-normalised with them.
-  await page.getByRole('button', { name: 'No bend', exact: true }).click(); await page.waitForTimeout(700);
+  // Past the answer and back the other way, which is what the two ends of the slider are for.
+  const over = await setStraighten(1.4);
+  assert.ok(over.after > straightened.after + 5, `past 1 it carries the run past straight and out the other side (${over.after}° apart again)`);
+  await page.screenshot({ path: path.join(out, 'askeptosaurus-bend-overshot.png') });
+  const under = await setStraighten(-0.5);
+  assert.ok(under.after > atZero.after + 5, `and below 0 it bends the run further the way the animal already goes (${under.after}° against the ${atZero.after}° it stands at)`);
+
+  // The two buttons are the two ends of the useful range in one press each.
+  await page.getByRole('button', { name: 'No bend', exact: true }).click();
+  await page.waitForFunction(() => Math.abs(Number(document.querySelector('.bend-readout[data-straighten]')?.getAttribute('data-straighten'))) < 5e-4, null, { timeout: 60000 });
   const undoneBend = await planes();
-  assert.ok(undoneBend.turn < 0.02, `No bend puts the tip plane back on the body's own heading (turn ${undoneBend.turn}°)`);
-  assert.ok(undoneBend.apart > 30, 'and the planes are the animal\'s own curve apart again');
-  await page.getByRole('button', { name: 'Straighten it', exact: true }).click(); await page.waitForTimeout(1200);
+  assert.ok(Math.abs(undoneBend.turn) < 0.02, `No bend puts the slider back to nothing (turn ${undoneBend.turn}°)`);
+  assert.ok(undoneBend.after > 30, 'and the body stands at its own curve again');
+  await page.getByRole('button', { name: 'Straighten it', exact: true }).click();
+  await page.waitForFunction(() => Math.abs(Number(document.querySelector('.bend-readout[data-straighten]')?.getAttribute('data-straighten')) - 1) < 5e-4, null, { timeout: 60000 });
   const byButton = await planes();
-  assert.ok(byButton.apart < 0.05, `Straighten it aims the tip plane at the base plane in one press (${byButton.apart}° apart)`);
+  assert.ok(byButton.after < 0.05, `Straighten it carries the run all of the way in one press (${byButton.after}° apart)`);
   const buttonGeom = await reading('geometry');
   assert.ok(Math.abs(buttonGeom.after) < 5,
     `and the run between them is measured straight over the warped mesh (${buttonGeom.before}° → ${buttonGeom.after}°)`);
   assert.ok(Math.abs(byButton.turn - curved.before) < 1.5,
     `the turn that gets there is the curve the body had (${byButton.turn}° against ${curved.before}°)`);
-  await page.screenshot({ path: path.join(out, 'askeptosaurus-bend-straightened.png') });
 
   // ---- the hand-off: the hash is measured here and is the file's own ----
-  await page.locator('.mark-note textarea').fill('browser drive: both planes aimed the same way on the untouched generation');
+  await page.locator('.mark-note textarea').fill('browser drive: the two planes seated on the untouched generation and the straighten slider taken all of the way');
   const origposeHash = await measuredHash();
   const origposeModel = await page.locator('.clips').getAttribute('data-loaded-model');
   assert.equal(origposeHash, hashOnDisk(origposeModel), 'the generation’s own hash is measured in the page');
@@ -339,12 +411,15 @@ try {
   const origFile = path.join(out, 'askeptosaurus-origpose-bend.json');
   await (await origDownload).saveAs(origFile);
   const origJson = JSON.parse(fs.readFileSync(origFile, 'utf8'));
-  assert.equal(origJson.schema, 'bend-span/2');
+  assert.equal(origJson.schema, 'bend-span/3');
   assert.equal(origJson.id, 'askeptosaurus');
   assert.equal(origJson.appliesTo, 'origpose', 'the export says which body it was measured on');
   assert.equal(origJson.use, 'builder-measurement', 'and that it is a measurement for the builder, not an edit to a published copy');
   assert.equal(origJson.creature.rigged, false, 'on a body with no rig');
-  assert.ok(origJson.planes.apartDegrees < 0.05, 'with the two planes aimed the same way');
+  assert.ok(origJson.planes.apartAfterDegrees < 0.05, 'with the two planes measuring parallel after the bend');
+  assert.ok(origJson.planes.apartDegrees > 30, 'and standing the animal\'s own curve apart on the body, which the bend did not change');
+  assert.equal(origJson.straighten.amount, 1, 'and the amount in the file, because it is half of what the document says');
+  assert.ok(Math.abs(origJson.turn.appliedDegrees - origJson.turn.fullDegrees) < 0.02, 'a full straightening applies the whole of it');
   assert.ok(Math.abs(Math.hypot(...origJson.axis.vector) - 1) < 1e-4, 'the axle is a unit vector');
   assert.ok(origJson.axis.vectorBlenderZUp, 'and is given in the builders\' own frame as well');
   const origAccepted = check(origFile);
@@ -355,7 +430,9 @@ try {
   await page.getByRole('button', { name: /Done/ }).click(); await page.waitForTimeout(500);
   assert.equal(new URL(page.url()).searchParams.get('mode'), null, 'view mode drops the URL flag');
   await page.getByRole('button', { name: 'Bend', exact: true }).click(); await page.waitForTimeout(1500);
-  assert.ok(Math.abs((await planes()).apart - byButton.apart) < 0.02, 'the bend survives a trip through view mode');
+  const kept = await planes();
+  assert.ok(Math.abs(kept.straighten - 1) < 1e-3 && Math.abs(kept.after - byButton.after) < 0.02,
+    'the bend survives a trip through view mode, planes and amount both');
   await page.reload({ waitUntil: 'networkidle' }); await loaded();
   assert.equal(new URL(page.url()).searchParams.get('mode'), 'bend', 'a reload keeps the mode');
   await page.waitForSelector('.bend-panel', { timeout: 20000 });
@@ -363,7 +440,8 @@ try {
   // "No bend" is the *turn* at zero, not the two planes at zero: a freshly seated pair on a curled
   // animal is as far apart as that animal's own curve, which is the measurement rather than an edit.
   const fresh = await planes();
-  assert.ok(fresh.turn < 0.02, `and starts again from no bend at all (turn ${fresh.turn}°, planes ${fresh.apart}° apart — the body's own curve)`);
+  assert.ok(Math.abs(fresh.straighten) < 1e-3 && Math.abs(fresh.turn) < 0.02,
+    `and starts again from no bend at all (straighten ${fresh.straighten}, planes ${fresh.apart}° apart — the body's own curve)`);
 
   // ---- the pointer scheme on this body ----
   // Before the model swap below rather than after it: everything the swap checks is a number off
@@ -471,14 +549,24 @@ try {
       '                        on this curled generation and the panel said so in orange',
       `  planes as seated      ${curved.before.toFixed(2)}° apart — the animal's own curve across this span`,
       `  geometry, as seated   ${curvedGeom.before}° in plane, ${curvedGeom.beforeTotal}° in all`,
-      `  planes aimed by hand  ${straightened.apart.toFixed(2)}° apart, geometry ${straightGeom.after}° in plane`,
-      `  the Straighten button ${byButton.apart.toFixed(2)}° apart, turn ${byButton.turn.toFixed(2)}°,`,
+      '',
+      '  the straighten slider, walked up   (the planes never move; only the amount does)',
+      '    amount   planes apart after   turn applied   geometry over the warped mesh   span moved',
+      `    0.00     ${atZero.after.toFixed(2).padStart(6)}°              ${atZero.turn.toFixed(2).padStart(6)}°        ${String(curvedGeom.before).padStart(7)}°                        —`,
+      ...walk.map((w) => `    ${w.amount.toFixed(2)}     ${w.after.toFixed(2).padStart(6)}°              ${w.turn.toFixed(2).padStart(6)}°        ${String(w.geometry).padStart(7)}°                  ${w.moved.toFixed(4)}`),
+      `    1.40     ${over.after.toFixed(2).padStart(6)}°              ${over.turn.toFixed(2).padStart(6)}°        (past straight, the other way)`,
+      `   -0.50     ${under.after.toFixed(2).padStart(6)}°              ${under.turn.toFixed(2).padStart(6)}°        (further the way it already goes)`,
+      '',
+      `  the Straighten button ${byButton.after.toFixed(2)}° apart after, turn ${byButton.turn.toFixed(2)}°,`,
       `                        geometry ${buttonGeom.before}° → ${buttonGeom.after}° in plane, measured over the warped mesh`,
       '',
-      'Aiming both planes the same way is the whole act: the bend is the rotation carrying the tip',
-      'end\'s own heading onto the tip plane\'s aim, so with the two aimed alike the head\'s heading is',
-      'turned onto the trunk\'s and the run between them comes straight. Nothing at the base cut',
-      'moves, whatever the planes are aimed at, because the rotation there is identity by construction.'].join('\n') + '\n');
+      'The two planes describe the animal and never move; the slider says how much of the way from',
+      'the one to the other to carry the run between them. At 1 the front plane finishes parallel to',
+      'the back one — measured after the warp, not worked back out of the amount — and the run is',
+      'straight. Nothing at the base cut moves at any amount, because the rotation there is identity',
+      'by construction. "span moved" is how far the centroid of the lit vertices — the part of the',
+      'body between the two cuts, drawn where the bend has put it — has travelled from where it',
+      'stood at nothing, which is the animal moving rather than a number in a panel changing.'].join('\n') + '\n');
 
   // ============================================================================================
   // Mixosaurus — the rigged half, on a body bend mode still opens on its built model
@@ -528,10 +616,24 @@ try {
   await refPick('Base', 'to').selectOption('neck');
   await page.waitForTimeout(600);
 
-  // ---- aiming the tip plane bends the body, and the readings are measured rather than predicted ----
+  // ---- the planes say what the body is; the slider bends it, and the readings are measured ----
+  //
+  // Aiming a plane on its own does nothing to the animal now, and that is the point of the split:
+  // it says which direction a reviewer is calling the run the span leaves on. Checked here rather
+  // than assumed, because it is the half of the change a reviewer feels first.
   await aimPlane('Tip', [0, 1, 0]);
-  const aimed = await planes();
-  assert.ok(aimed.apart > 5, `the two planes are now aimed ${aimed.apart}° apart`);
+  const aimedOnly = await planes();
+  assert.ok(aimedOnly.apart > 5, `the two planes now stand ${aimedOnly.apart}° apart`);
+  assert.ok(Math.abs(aimedOnly.turn) < 0.01, 'and nothing has been done to the body: a plane is a statement, not a target');
+  const stillGeom = await reading('geometry');
+  assert.equal(stillGeom.after, stillGeom.before, 'so the geometry reading after is the geometry reading before');
+
+  const aimed = await setStraighten(0.6);
+  assert.ok(Math.abs(aimed.apart - aimedOnly.apart) < 0.02, 'the slider does not move the planes');
+  assert.ok(Math.abs(aimed.turn - aimed.apart * 0.6) < 0.05,
+    `and applies exactly 0.6 of the ${aimed.apart}° between them (${aimed.turn}°)`);
+  assert.ok(Math.abs(aimed.after - aimed.apart * 0.4) < 0.05,
+    `leaving them ${aimed.after}° apart afterwards, which is the 0.4 that is left — measured after the warp`);
   const turnedGeom = await reading('geometry');
   assert.notEqual(turnedGeom.after, turnedGeom.before, 'the geometry reading moves with the bend');
   const bonesTurned = await reading('bone-chain');
@@ -561,7 +663,7 @@ try {
       '  reaches past the first joint in the chain, which the table cannot account for and does not'].join('\n') + '\n');
 
   // ---- the hand-off on a rigged body, and the consumer's refusals ----
-  await page.locator('.mark-note textarea').fill('browser drive: the tip plane aimed off the body’s own heading, measured both ways');
+  await page.locator('.mark-note textarea').fill('browser drive: the two planes aimed by hand and the straighten slider at 0.6, measured both ways');
   const hash = await measuredHash();
   assert.match(hash, /^[0-9a-f]{64}$/, 'the page hashed the file on stage');
   const model = await page.locator('.clips').getAttribute('data-loaded-model');
@@ -571,7 +673,7 @@ try {
   const file = path.join(out, 'mixosaurus-bend.json');
   await (await download).saveAs(file);
   const json = JSON.parse(fs.readFileSync(file, 'utf8'));
-  assert.equal(json.schema, 'bend-span/2');
+  assert.equal(json.schema, 'bend-span/3');
   assert.equal(json.id, 'mixosaurus');
   assert.equal(json.appliesTo, 'built', 'the export says it was placed on the built body');
   assert.equal(json.use, 'builder-measurement', 'and that a rigged body is a measurement rather than an edit');
@@ -579,8 +681,11 @@ try {
   assert.equal(json.sha256Source, 'measured');
   assert.equal(json.creature.rigged, true);
   assert.ok(Math.abs(json.planes.apartDegrees - aimed.apart) < 0.02, `the two planes the panel showed are in the file (${json.planes.apartDegrees} vs ${aimed.apart})`);
+  assert.ok(Math.abs(json.planes.apartAfterDegrees - aimed.after) < 0.02, `and how far apart the bend left them (${json.planes.apartAfterDegrees} vs ${aimed.after})`);
+  assert.equal(json.straighten.amount, 0.6, 'with the amount that was applied');
+  assert.ok(Math.abs(json.turn.appliedDegrees - json.turn.fullDegrees * 0.6) < 0.02, 'which is what the turn is that fraction of');
   assert.ok(Math.abs(Math.hypot(...json.planes.tipNormal) - 1) < 1e-4, 'each as the unit direction it is');
-  assert.ok(json.planes.tipRest, 'with the body’s own heading there beside the aim');
+  assert.ok(json.planes.tipRest, 'with the body’s own traced heading there beside the plane a reviewer aimed');
   assert.equal(typeof json.axis.twistDegrees, 'number', 'with how much of the aim is a twist rather than a bend');
   assert.ok(json.reading.geometry.before && json.reading.geometry.after, 'both geometry readings are in it');
   assert.ok(json.reading.bones.before && json.reading.bones.after, 'and both bone readings');
@@ -607,6 +712,14 @@ try {
   const rates = check(old);
   assert.notEqual(rates.status, 0, 'and one from before the two planes');
   assert.match(rates.stderr, /written before the two planes/, 'saying that too');
+  // And so is one from when the tip plane was a target rather than a description: its turn was the
+  // distance that plane had been dragged, about an axle a straightening cannot reach, so reading
+  // it here would describe a different bend without failing anywhere.
+  const aimOnly = path.join(out, 'mixosaurus-bend-v2.json');
+  fs.writeFileSync(aimOnly, JSON.stringify({ ...json, schema: 'bend-span/2' }, null, 2));
+  const targeted = check(aimOnly);
+  assert.notEqual(targeted.status, 0, 'and one from when the tip plane was a target');
+  assert.match(targeted.stderr, /target rather than a description/, 'saying which and why');
 
   // ---- the pointer scheme on a rigged body too, last again ----
   const builtPointer = await drivePointerScheme('built');
@@ -615,12 +728,14 @@ try {
   assert.deepEqual(errors, [], 'no page errors');
   console.log('PASS: bend mode — the Bend button and a ?mode=bend link both open Askeptosaurus on its');
   console.log('      original pose, which is the body a bend is aimed on; a handle found, dragged and undone');
-  console.log(`      with the camera untouched; a neck ${curved.before.toFixed(1)}° off its trunk, two planes aimed the same`);
-  console.log(`      way, and the run between them measured ${buttonGeom.after}° in plane over the warped mesh;`);
+  console.log(`      with the camera untouched; a neck ${curved.before.toFixed(1)}° off its trunk, the straighten slider`);
+  console.log(`      walked ${walk.map((w) => w.after.toFixed(1)).join('° → ')}° apart with the lit span moving at every step,`);
+  console.log(`      and the run between the planes measured ${buttonGeom.after}° in plane over the warped mesh;`);
   console.log(`      the panel's own Model control back to the built body and out again, where three trunk`);
   console.log(`      readings sit ${trunkSpread.toFixed(1)}° apart and the corrected-body warning is shown to the person it`);
-  console.log(`      is about; on Mixosaurus, a per-joint table in chain order carrying ${localSum.toFixed(1)}° of an ${total}° turn,`);
-  console.log('      and an export hashed in the page, accepted by the consumer and refused stale or v1;');
+  console.log(`      is about; on Mixosaurus, a plane aimed alone bending nothing, 0.6 of the straightening`);
+  console.log(`      applied, a per-joint table in chain order carrying ${localSum.toFixed(1)}° of a ${total}° turn,`);
+  console.log('      and an export hashed in the page, accepted by the consumer and refused stale, v1 or v2;');
   console.log(`      and the pointer scheme on both bodies — left-drag orbits (${rawPointer.orbit.toFixed(2)}, ${builtPointer.orbit.toFixed(2)}),`);
   console.log(`      right-drag pans (${rawPointer.pan.toFixed(2)}, ${builtPointer.pan.toFixed(2)})`);
 } finally {
