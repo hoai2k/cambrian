@@ -42,6 +42,12 @@ continuous skin.
 Three widest-opening clips per body, `--as-drawn`, on the shipped packaged files. **`opened` is the
 column to read.** Nothing here is a claim about every camera: it is one side-on framing per clip.
 
+**Nor about every clip, and on one body that mattered.** Three is a sample, and the three widest
+are not where a leak is worst: Cartorhynchus reads 2 px through on its three and **36 px on the
+sixteen its `paired-audit.json` reports a non-zero gape for** — at `Guard`, `Grab` and `Swim`,
+which no sweep was ever going to take. Where a body is being ported rather than surveyed, run every
+clip the audit says opens the jaw.
+
 | Body | worst `through` | worst `opened` | note |
 | --- | ---: | ---: | --- |
 | **Nothosaurus** | **0** | **0** | ported in T3D-31: capped with its own rim |
@@ -54,7 +60,7 @@ column to read.** Nothing here is a claim about every camera: it is one side-on 
 | Odontochelys | 6 | 236 | |
 | Placodus | 23 | 454 | |
 | Saurichthys | 123 | 523 | **measured and recorded in T3D-32C, not re-cut**: the authored body and its twin are different kinds of generation and `T.cap_mouth` refuses on the authored half by construction — see [the README](../../../tools/triassic/creatures/saurichthys/README.md#the-cut-is-earning-its-place--measured-t3d-32c). Its pectorals and its twin's textures were repaired in the same pass. |
-| Cartorhynchus | 2 | 693 | |
+| **Cartorhynchus** | **1** | **1** | ported in T3D-34 on a human's re-aimed cut (`mouths/cartorhynchus-mouth.json`): capped with its own rim, no front bound, no lining, no hinge plug. Measured over **all sixteen** clips that open its jaw rather than the three this table samples, where the shipped body read **36 / 693** and the same re-aim on the sac read **189 / 2,155**. The one pixel is at `Guard`, a 0.06-rad gape; every wide gape is 0 / 0 |
 | Cymbospondylus | 4 | 933 | |
 | Archelon | 1 | 1,262 | |
 | **Macrocnemus** | **0** | **0** | ported in T3D-32B: arrived shut, capped with its own rim on a *fitted* cut (was 934 / 2,594 over **all twelve** opening clips) |

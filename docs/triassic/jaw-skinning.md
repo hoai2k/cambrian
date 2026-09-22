@@ -198,7 +198,19 @@ as the worst before the repair.
   under the fitted lip plane. Skin 2.98x unchanged, the T3D-14 bound. `Walk` re-applied. The
   before render is the clearest of the set: a pale wedge open under the corner at `Heavy`.
 - **Cartorhynchus**: 2.02 → 0.00 %. Skin 3.72x unchanged. The notch under the corner of the mouth
-  at `Heavy` is gone.
+  at `Heavy` is gone. **Superseded twice since**: T3D-18 re-seated its paddle roots and took the
+  skin figure to 2.98x, and T3D-34 re-cut the jaw to a human's aimed plane
+  (`docs/triassic/mouths/cartorhynchus-mouth.json`) and capped it with its own rim. On that cut
+  `dz` is the parameter that decides the skin, and the default is wrong for it: `rim_depth / 3` is
+  0.0087 raw, **narrower than the mesh's own edges out at the corner of the mouth**, where the head
+  is 0.087 half-wide and its edges run about 0.007, so it put 0.93 of jaw on one vertex and 0.18 on
+  its neighbour and read 3.50x on `jaw` at `Heavy`. A weight ramp narrower than an edge is a tear
+  by construction. Over the mandible's whole depth the body is back to 2.98x with `jaw` at 2.29x.
+  Its junction is also the one place `lag.mjs`' classifier does not reach: it calls a rim point
+  "the cut" only at or behind the hinge's own station, and a wall tilted 15.4° slants forward as it
+  goes down, so 3 of 51 wall pairs are classified. Measured against the document's own wall plane
+  the separation is 0.000 % of a body over every clip, and `T.jaw_junction` asserts the two copies
+  of every rim point carry identical weights regardless.
 - **Mystriosuchus**: 1.80 → 0.00 %. Skin 4.48x unchanged. Its right forelimb is tucked under the
   snout; the limb term keeps the throat share off it.
 - **Placodus**: 1.72 → 0.00 % (303 rim points; the hinge plane at `HINGE_X`, the front cut behind
