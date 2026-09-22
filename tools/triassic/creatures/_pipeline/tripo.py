@@ -2373,3 +2373,385 @@ def limb_asymmetry(limb_points, centre_x, body_length=1.):
             'maxMirrorDistanceOverBodyLength':
                 float(max(v['maxMirrorDistanceOverBodyLength'] for v in out.values()))}
     return out
+
+
+# ------------------------------------------------------------ the cut's own seam, filled ----
+#
+# **A generation that arrived *partially* open is `cut_rim`'s case 2, and neither of T3D-31's two
+# constructions is right for it.** The generation modelled a slit or a shallow cavity and the
+# builder's cut runs *deeper than it does*. Cymbospondylus is the worked example: its mouth is 0.14
+# of a body long and its cut left a rim over only the back 0.042, because forward of the commissure
+# the two jaws are already separate sheets and the seam passes between them without touching
+# either. Shonisaurus is the same body plan and the same story, 0.078 of a 0.196 mouth.
+#
+# So there is nothing to fill at the front -- the generation's own lumen is already a closed surface
+# there, and `cap_mouth` over the whole boundary would seal the modelled mouth shut -- and there
+# *is* something to fill at the back: the run of rim the cut drew through solid head. What that run
+# does is the whole of the defect. `split_part` duplicates every rim vertex, one copy on each half;
+# `jaw_junction` holds the copies together at the hinge cross-section, where it asserts their
+# weights equal, and everywhere else on the rim **they part by design**, because that is the mouth
+# opening. On a body cut no deeper than its own lip that parting is the lip and there is nothing
+# behind it. On these two it is the lip *plus* the run through solid geometry, and behind that run
+# is the inside of the head.
+#
+# The fill is therefore not a cap over an aperture. It is the **ruled surface between the two copies
+# of the rim**, and it closes by construction for a reason that needs no render:
+#
+#   - the shared rim is a set of **closed cycles**, refused otherwise (`seam_rim`);
+#   - every web vertex on the skull side is a copy of a body rim vertex at its own rest position
+#     **carrying that vertex's own weight dictionary**, and every web vertex on the jaw side is the
+#     same of the shell's copy. Linear blend skinning is a function of (rest position, weights)
+#     alone, so the web's two boundary curves are *the same points* as the two halves' rims in every
+#     pose, to the last bit -- asserted in `seam_web_parity` rather than rendered;
+#   - therefore every boundary edge of the web is also a boundary edge of a half, and the union
+#     skull half + web + jaw half has no open edge along the cut, at rest and at full gape alike.
+#
+# It also answers "fill only where the cut went through" **by construction rather than by a bound**:
+# the web's extent is the rim's extent, and a rim exists only where the cut passed through surface.
+# Where the generation's own mouth already is, there is no rim, so there is no web.
+#
+# What it is *not*: a shell placed in the lumen, which has to be rendered against a backdrop to find
+# out whether it covered the opening -- which is how Cartorhynchus shipped leaking 51 px at its
+# commissure with nobody knowing. And it invents no shape: every vertex is a body vertex, or a body
+# vertex moved along its own surface normal by a measured depth.
+def cavity_vertices(o, region, gap=.030, offset=3e-4):
+    """Which vertices are on the wall of a mouth the generation actually modelled.
+
+    Placodus' measurement, taken per vertex and returned as *indices* rather than points, and with
+    the head given as a predicate rather than as a fraction of the y range: `mouth_cavity` assumes
+    the head is at low y, which is true of every body built on this module and false of Shonisaurus,
+    whose own builder predates it.
+
+    A vertex is on a lumen wall when its own outward normal, cast back into the mesh, hits another
+    surface within `gap` -- it is looking across the mouth at the wall opposite. That is the
+    definition, and it is why a sampler built on this set is *interior*: nothing on the outside of
+    an animal has the animal in front of it.
+    """
+    bvh = BVHTree.FromPolygons([v.co for v in o.data.vertices],
+                               [p.vertices[:] for p in o.data.polygons], all_triangles=False)
+    out = []
+    for v in o.data.vertices:
+        if not region(v.co):
+            continue
+        n = Vector(v.normal[:])
+        if bvh.ray_cast(Vector(v.co[:]) + n * offset, n, gap)[0] is not None:
+            out.append(v.index)
+    return out
+
+
+def seam_rim(body, shell, within=None, tol=1e-6):
+    """The rim the cut drew twice: the boundary the two halves share, as ordered closed cycles.
+
+    `split_part` leaves each half open along the cut and gives each its own copy of every vertex on
+    it, so a shared rim point is a pair (body index, shell index) at one position. This finds those
+    pairs, walks them into cycles, and **refuses** anything that is not a set of closed curves --
+    the same bar `cap_mouth` sets and for the same reason: a fill over a run that stops does not
+    close anything, and the honest answer is to say so rather than to fill.
+
+    `within(p)` bounds the region asked about, so a pre-existing hole elsewhere in the generation
+    (Cymbospondylus' has fourteen boundary edges out on the body) is neither filled nor complained
+    about. Returns (cycles, report); each cycle is a list of (body index, shell index).
+    """
+    from mathutils.kdtree import KDTree
+
+    def border(o):
+        bm = bmesh.new()
+        bm.from_mesh(o.data)
+        edges = [(e.verts[0].index, e.verts[1].index) for e in bm.edges if len(e.link_faces) == 1
+                 and (within is None or (within(e.verts[0].co) and within(e.verts[1].co)))]
+        co = {i: o.data.vertices[i].co.copy() for e in edges for i in e}
+        bm.free()
+        return edges, co
+
+    b_edges, b_co = border(body)
+    s_edges, s_co = border(shell)
+    keys = list(s_co)
+    kd = KDTree(max(len(keys), 1))
+    for k, i in enumerate(keys):
+        kd.insert(s_co[i], k)
+    kd.balance()
+    pair = {}
+    for i, c in b_co.items():
+        if not keys:
+            break
+        _co, k, d = kd.find(c)
+        if d < tol:
+            pair[i] = keys[k]
+    shared = [(a, b) for a, b in b_edges if a in pair and b in pair]
+    adj = {}
+    for a, b in shared:
+        adj.setdefault(a, []).append(b)
+        adj.setdefault(b, []).append(a)
+    bad = [i for i, n in adj.items() if len(n) != 2]
+    report = {'bodyBoundaryEdges': len(b_edges), 'shellBoundaryEdges': len(s_edges),
+              'sharedVertices': len(pair), 'sharedEdges': len(shared),
+              'verticesWithoutTwoSharedEdges': len(bad)}
+    if bad or not shared:
+        raise AssertionError(('the cut rim the two halves share is not a set of closed curves, so '
+                              'nothing spanning it closes by construction', body.name, report,
+                              [[round(c, 5) for c in b_co[i]] for i in bad[:6]]))
+    cycles, seen = [], set()
+    for start in adj:
+        if start in seen:
+            continue
+        cyc, prev, cur = [start], None, start
+        seen.add(start)
+        while True:
+            nxt = next((w for w in adj[cur] if w != prev), None)
+            if nxt is None or nxt == start:
+                break
+            cyc.append(nxt)
+            seen.add(nxt)
+            prev, cur = cur, nxt
+        cycles.append(cyc)
+    cycles.sort(key=len, reverse=True)
+    report['cycles'] = [len(c) for c in cycles]
+    return [[(i, pair[i]) for i in c] for c in cycles], report
+
+
+def vertex_weights(o, index, bones=None):
+    """A vertex's weight dictionary, read back off the object's own groups."""
+    w = {}
+    for g in o.data.vertices[index].groups:
+        name = o.vertex_groups[g.group].name
+        if g.weight > 1e-6 and (bones is None or name in bones):
+            w[name] = g.weight
+    return w
+
+
+def swing(p, hinge, rot):
+    """Where a point goes when the jaw turns: the rotation taken about the hinge."""
+    return Vector(hinge) + (rot @ (Vector(p) - Vector(hinge)))
+
+
+def seam_web(name, body, shell, cycles, hinge, axis, gape, colour_at, material,
+             rig=None, jaw='jaw', fold=.30, floor=.0012, room=None, cap=.45, inside=None,
+             smoothing=4):
+    """The ruled surface between the two copies of a cut rim: the fill for a generation that arrived
+    partially open. The note above this function is why it closes by construction.
+
+    Three rows per cycle -- the skull side, the jaw side, and a middle row folded into the flesh.
+    The middle row is what stops the mesh being degenerate at a shut mouth, where the two copies are
+    the same point, and its depth is **measured rather than chosen**: `fold` times how far those two
+    copies actually part at a jaw rotation of `gape`. Under linear blend skinning that parting is
+    exactly `|jaw share on the body - jaw share on the shell|` times the distance the hinge carries
+    the point, because the jaw is the only bone whose matrix differs between the two copies. A rim
+    point the junction holds together parts by nothing and folds by `floor` alone; the run through
+    solid head parts by the gape and folds in proportion to it.
+
+    The colour is `colour_at(p)`, which a builder builds over the **lumen's own wall**
+    (`cavity_vertices`): the fill has to wear the inside of the mouth rather than the cheek it was
+    cut through, and half this rim is outer skin. The step in albedo at the rim is then the lip,
+    which is what a lip is.
+
+    `room(p, d)` is the distance from a rim point to the next surface along the fold, so a fold can
+    never reach the far skin; `inside(p)` is a containment test the builder owns -- ray parity
+    against the closed intake, never a nearest-surface probe, because beside a modelled cavity the
+    nearest surface is the lumen's own wall and `depth_probe` answers about that.
+    """
+    H = Vector(hinge)
+    R = Matrix.Rotation(gape, 4, Vector(axis).normalized())
+
+    verts, faces, colours, groups, normals = [], [], [], [], []
+    partings, depths, outside = [], [], 0
+    for cyc in cycles:
+        n = len(cyc)
+        base = len(verts)
+        col = []
+        for bi, si in cyc:
+            pb = body.data.vertices[bi].co.copy()
+            ps = shell.data.vertices[si].co.copy()
+            nrm = Vector(body.data.vertices[bi].normal[:]).normalized()
+            wb = vertex_weights(body, bi)
+            ws = vertex_weights(shell, si)
+            # How far the two copies stand apart at `gape`, exactly. Under linear blend skinning
+            # with only the jaw moving, a copy goes to `p + w_jaw (M p - p)`, so this is the whole
+            # of it -- and at a shut mouth it is whatever the bind pose already parted them by,
+            # which on a body that closes its generation's gape in bind geometry is not nothing.
+            a = pb + (swing(pb, H, R) - pb) * wb.get(jaw, 0.)
+            b = ps + (swing(ps, H, R) - ps) * ws.get(jaw, 0.)
+            col.append({'pb': pb, 'ps': ps, 'n': nrm, 'wb': wb, 'ws': ws,
+                        'part': (a - b).length})
+        # **The fold is smoothed along the rim, and that is not a nicety.** Its depth follows the
+        # parting and its direction follows the rim's own normal, and a rim vertex's parting and
+        # normal both jump between neighbours -- so a fold taken per vertex came out *corrugated*,
+        # and a corrugated ribbon at the back of a mouth reads as a grille rather than as tissue.
+        # A few passes of a [1 2 1] filter round the cycle leave the measurement where it is and
+        # take the grille out; the rim itself is never moved, so nothing here can open the seam.
+        for _ in range(max(0, smoothing)):
+            parts = [c['part'] for c in col]
+            dirs = [c['n'] for c in col]
+            for k, c in enumerate(col):
+                lo, hi = col[(k - 1) % n], col[(k + 1) % n]
+                c['part'] = (parts[(k - 1) % n] + 2 * parts[k] + parts[(k + 1) % n]) / 4
+                q = dirs[(k - 1) % n] + dirs[k] * 2 + dirs[(k + 1) % n]
+                c['n'] = q.normalized() if q.length > 1e-9 else dirs[k]
+        for c in col:
+            pb, ps, nrm, wb, ws = c['pb'], c['ps'], c['n'], c['wb'], c['ws']
+            base_p = (pb + ps) / 2
+            d = max(fold * c['part'], floor)
+            if room is not None:
+                d = min(d, max(1e-5, cap * room(base_p, -nrm)))
+            wm = {k: (wb.get(k, 0.) + ws.get(k, 0.)) / 2 for k in set(wb) | set(ws)}
+            wm = dict(sorted(wm.items(), key=lambda kv: -kv[1])[:4])
+            total = sum(wm.values()) or 1.
+            wm = {k: v / total for k, v in wm.items()}
+            mid = base_p - nrm * d
+            if inside is not None and not inside(mid):
+                outside += 1
+            for q, w in ((pb, wb), (mid, wm), (ps, ws)):
+                verts.append(q)
+                groups.append(w)
+                colours.append(colour_at(q))
+                normals.append(nrm)
+            partings.append(float(c['part']))
+            depths.append(float(d))
+        for k in range(n):
+            a, b = base + 3 * k, base + 3 * ((k + 1) % n)
+            faces.append((a, b, b + 1, a + 1))
+            faces.append((a + 1, b + 1, b + 2, a + 2))
+    me = bpy.data.meshes.new(name)
+    me.from_pydata([Vector(v) for v in verts], [], faces)
+    me.update()
+    o = bpy.data.objects.new(name, me)
+    bpy.context.collection.objects.link(o)
+    if material is not None:
+        me.materials.append(material)
+    at = me.color_attributes.new(name='Color', type='FLOAT_COLOR', domain='POINT')
+    at.data.foreach_set('color_srgb',
+                        np.array([list(c)[:4] for c in colours], dtype=np.float32).ravel())
+    for group in sorted({k for w in groups for k in w}):
+        o.vertex_groups.new(name=group)
+    for i, w in enumerate(groups):
+        for group, value in w.items():
+            o.vertex_groups[group].add([i], value, 'REPLACE')
+    # The face a player sees is the one looking into the mouth, and that is the rim's own outward
+    # normal: out of the animal where the rim is cheek, and into the lumen where it is pocket wall.
+    # A shut mouth is where the two rows cross over -- Shonisaurus bakes its closure into the bind
+    # pose, so its rows are the wrong way round at rest -- so the winding is settled against the
+    # rim's normal, which does not depend on the pose at all.
+    bm = bmesh.new()
+    bm.from_mesh(me)
+    bm.verts.ensure_lookup_table()
+    flipped = 0
+    for f in bm.faces:
+        ref = Vector((0., 0., 0.))
+        for v in f.verts:
+            ref += normals[v.index]
+        f.normal_update()
+        if ref.length > 1e-9 and f.normal.dot(ref.normalized()) < 0:
+            f.normal_flip()
+            flipped += 1
+        f.smooth = True
+    bm.normal_update()
+    bm.to_mesh(me)
+    me.update()
+    bm.free()
+    if rig is not None:
+        mod = o.modifiers.new('Seam web into both halves', 'ARMATURE')
+        mod.object = rig
+        o.parent = rig
+    report = {'cycles': [len(c) for c in cycles], 'vertices': len(verts), 'faces': len(faces),
+              'flippedFaces': flipped, 'gapeRadians': float(gape), 'fold': fold, 'floorRaw': floor,
+              'smoothingPasses': smoothing,
+              'partingAtGapeMax': float(max(partings)) if partings else 0.,
+              'partingAtGapeMean': float(np.mean(partings)) if partings else 0.,
+              'rimPairsTheJunctionHolds': int(sum(1 for q in partings if q < 1e-9)),
+              'foldDepthMax': float(max(depths)) if depths else 0.,
+              'foldDepthMean': float(np.mean(depths)) if depths else 0.,
+              'middleRowOutsideTheIntake': outside}
+    return o, report
+
+
+def seam_web_parity(web, body, shell, cycles, tol=1e-9):
+    """The property the web exists for, asserted rather than trusted: every web vertex on the skull
+    side is the body's own rim vertex -- same rest position, same weight dictionary -- and every web
+    vertex on the jaw side is the shell's. Two vertices with the same rest position and the same
+    weights are carried to the same place by linear blend skinning in every pose, so the web's
+    boundary *is* the two halves' rims and the union has no open edge along the cut. Nothing is
+    rendered to find this out."""
+    worst_p, worst_w, k = 0., 0., 0
+    for cyc in cycles:
+        for bi, si in cyc:
+            for off, src, idx in ((0, body, bi), (2, shell, si)):
+                wv = web.data.vertices[3 * k + off]
+                worst_p = max(worst_p, (wv.co - src.data.vertices[idx].co).length)
+                a = vertex_weights(web, 3 * k + off)
+                b = vertex_weights(src, idx)
+                assert a.keys() == b.keys(), (web.name, 3 * k + off, sorted(a), sorted(b))
+                worst_w = max(worst_w, max(abs(a[n] - b[n]) for n in a))
+            k += 1
+    assert worst_p <= tol and worst_w <= 1e-6, (web.name, worst_p, worst_w)
+    return {'rimPairs': k, 'worstRestPositionDifference': float(worst_p),
+            'worstWeightDifference': float(worst_w)}
+
+
+def ray_parity_inside(bvh, p, dirs=None, eps=3e-5, limit=8.):
+    """Is a point inside a closed surface? Count the crossings on the way out along several
+    directions and take the majority: an odd count is inside. This uses **no normals and no table**,
+    which is the whole point -- Hybodus' and Saurichthys' hinge plugs were "fitted" against
+    `np.interp` tables that clamp rather than refuse, and reported a clearance of +0.004 while
+    standing 1.29 units clear of the nose with 126 of 207 vertices outside the animal."""
+    p = Vector(p)
+    dirs = dirs or [Vector((1, 0, 0)), Vector((-1, 0, 0)), Vector((0, 1, 0)),
+                    Vector((0, -1, 0)), Vector((0, 0, 1)), Vector((0, 0, -1))]
+    odd = 0
+    for d in dirs:
+        d = Vector(d).normalized()
+        q, n = p + d * eps, 0
+        while True:
+            hit = bvh.ray_cast(q, d, limit)
+            if hit[0] is None:
+                break
+            n += 1
+            q = hit[0] + d * eps
+            if n > 64:
+                break
+        odd += n % 2
+    return odd * 2 > len(dirs)
+
+
+def cavity_pigment(o, indices, pigment, scale=1., k=4, power=2.):
+    """The albedo of the **inside of the mouth**, as a sampler over the lumen's own wall.
+
+    `cap_mouth` takes its UVs and colours off the rim, which is right where the whole rim is a cut.
+    On a generation that arrived partially open it is not: more than half of Cymbospondylus' rim is
+    outer cheek, and a fill that samples there wears the flank into a surface that is the inside of
+    a mouth. So the sample set is the set `cavity_vertices` measured -- every vertex whose own
+    outward normal, cast back into the mesh, meets the wall opposite -- and nothing else. Inverse
+    distance over the nearest `k` of them rather than the nearest one, so the albedo runs across the
+    fill instead of stepping between the vertices it came from.
+
+    `scale` converts the fill's coordinates back into the raw frame the measurement was taken in.
+    Returns (sampler, report); the report carries the mean colour of the interior set beside the
+    mean colour of the rest of the head, which is how a reader can see the set is the mouth.
+    """
+    from mathutils.kdtree import KDTree
+    pts = [o.data.vertices[i].co.copy() for i in indices]
+    assert len(pts) >= k, ('too few lumen wall vertices to sample an interior albedo', len(pts))
+    kd = KDTree(len(pts))
+    for j, p in enumerate(pts):
+        kd.insert(p, j)
+    kd.balance()
+    cols = [np.array(pigment(p)[:4], dtype=np.float64) for p in pts]
+
+    def sample(p):
+        num, den = np.zeros(4), 0.
+        for _co, j, d in kd.find_n(Vector(p) / scale, k):
+            w = 1. / max(d, 1e-6) ** power
+            num += cols[j] * w
+            den += w
+        c = num / den if den else np.array([1., 1., 1., 1.])
+        c[3] = 1.
+        return tuple(float(x) for x in c)
+
+    inside = set(indices)
+    rest = [np.array(pigment(v.co)[:3]) for v in o.data.vertices if v.index not in inside][::37]
+    report = {'lumenWallVertices': len(pts),
+              'meanInteriorColour': [round(float(x), 4) for x in np.mean(cols, axis=0)[:3]],
+              'meanColourElsewhereOnTheBody': [round(float(x), 4) for x in np.mean(rest, axis=0)]
+              if rest else None,
+              'method': 'inverse distance over the %d nearest vertices of the measured lumen wall '
+                        '(a vertex whose own outward normal, cast back into the mesh, meets the '
+                        'wall opposite); nothing outside that set is ever sampled' % k}
+    return sample, report
