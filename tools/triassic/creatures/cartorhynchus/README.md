@@ -14,11 +14,11 @@ the tail tip's travel**: on the other three that ratio is well under one by cons
 
 | Delivery | Triangles | Vertices | Packaged bytes |
 | --- | ---: | ---: | ---: |
-| `cartorhynchus.glb` — authored Tripo body | 21,020 | 12,211 | 1,743,196 |
-| `cartorhynchus.puppet.glb` — procedural twin | 7,670 | 3,941 | 680,192 |
-| `cartorhynchus.lod1.glb` — identical puppet alias | 7,670 | 3,941 | 680,192 |
+| `cartorhynchus.glb` — authored Tripo body | 21,182 | 12,132 | 1,842,612 |
+| `cartorhynchus.puppet.glb` — procedural twin | 7,352 | 3,685 | 711,456 |
+| `cartorhynchus.lod1.glb` — identical puppet alias | 7,352 | 3,685 | 711,456 |
 
-The reduced model is **36.49 %** of the authored triangles, inside the contract's 40 %. The model is
+The reduced model is **34.71 %** of the authored triangles, inside the contract's 40 %. The model is
 **3.0 engine authoring units** long, faces +Z in glTF and uses +Y up. The research gives ~40 cm
 reconstructed, from a 21.4 cm preserved skeleton.
 
@@ -76,34 +76,117 @@ partner's, over body length:
 | Pelvic | 4 | 0.0431 | 0.0598 |
 | Both | | **0.0578** | 0.1327 |
 
-## The mouth: the geometric method, and only just
+## The mouth: a human's aim, capped with its own rim (the aimed re-cut, 22 September 2026)
 
-**Method: the geometric one.** Placodus' measurement — every head vertex casts its own outward
+**The cut is not measured any more. It is aimed**, in the viewer's mouth editor
+(`docs/viewer-mouth.md`), on this exact shipped body, and handed over as
+`docs/triassic/mouths/cartorhynchus-mouth.json` — a `mouth-cut/1` document of a cut plane and a
+hinge. `build.py` reads it and cuts on it. What the generation itself says is still measured and is
+still in `validation.json`, because the two disagree and the disagreement is the review.
+
+**What the measurement said.** Placodus' geometric method — every head vertex casts its own outward
 normal back into the mesh over 0.030 raw units, and a vertex that hits is looking across the slit at
 the lip opposite — answers here with **26 vertices on the rostrum**, against Placodus' 193 and
-Cymbospondylus' 280.
+Cymbospondylus' 280. Twenty-six is a mouth rather than noise (they lie in one band, their mid height
+moves smoothly from 0.0746 to 0.0764 along the snout, and their half width and half depth grow and
+then taper as a slit's do) but it is a **shallow groove two thousandths deep on a very short blunt
+snout**, which is exactly the thin statement the mouth editor exists to overrule.
 
-Twenty-six is a small number and the honest question is whether it is a mouth or noise. It is a
-mouth: they lie in one band, their mid height moves smoothly from 0.0746 to 0.0764 along the snout,
-and their half width and half depth grow and then taper as a slit's do. What it is *not* is an open
-cavity — this is a shallow modelled groove on a very short blunt snout, and it is measured as one.
+**What the reviewer said instead**, station by station in `mouthCutDeviation.aimedAgainstTheMeasuredSlit`:
 
-Because 26 points is thin evidence, the seam is the **straight ramp fitted to** the per-station mid
-heights rather than the raw curve: a curve fitted through that little evidence would be fitting the
-noise. The residual is reported both ways in `validation.json` — against the head's local depth
-(the useful number) and against the slit's own half depth (which is 0.002 raw, so any residual looks
-enormous against it).
+| | the groove | the aimed cut |
+| --- | ---: | ---: |
+| hinge, back from the nose | 4.6 % of the body | **8.8 %** |
+| the mouth line in profile | −6.5° (falls toward the nose) | **+15.4°** (rises) |
+| hinge across the head | — | **+0.0055** in the file's frame |
+| mandible vertices on the shipped file | — | 220 of 12,188 (1.8 %) |
 
-The jaw is cut along that ramp with the shear-cut-unshear pass, the lining is one skinned tube on
-the cavity's own measured section wound inwards, and the skin under it is double-sided as the
-backstop. The lining rides the measured centreline rather than the file's x = 0.
+The aimed plane starts 0.0055 raw under the groove at the snout and runs 0.0212 under it at the
+back — 0.48 of the head's own half depth there — and puts the hinge 0.042 of a body behind where
+the groove peters out. The groove is the lip this generation *drew*; the hinge is the joint its jaw
+turns about, and nothing in the albedo was ever going to say where that is.
+
+**The one thing the body could be asked, it was asked.** A mouth's lateral centre is a measurement
+(CLAUDE.md's `cx`, which the two fish ports paid for), so the reviewer's seat is checkable against
+it: the measured centreline stands at **+0.0159** in the file's frame at the hinge's station and the
+reviewer put the hinge at **+0.0055** — 0.0104 apart, **0.35 % of a body length and 4 % of the
+head's half width**. They agree. The cut this file replaced sat 0.0905 off the same centreline
+(3.0 % of a body), so the re-aim is the reviewer coming *onto* the midline rather than off it. The
+builder reads the file for the plane and still seats the mouth line on `cx`, so nothing has to
+choose between them.
+
+**The cut is taken as a plane, not sheared onto one.** `T.bisect_on_curve` shears the head by
+−seam(y) because a *curve* cannot be a bisection plane; an aimed cut is a plane already, and a
+shear by a function of y cannot carry its yaw and its roll, which are a term in x. `is_jaw`, the
+junction's `rear` and its `upper_jaw` are the document's own half-spaces verbatim, so the builder
+and the editor cannot disagree about which vertices are the mandible. The frame map out of the
+document's glTF frame is asserted rather than assumed, against the bounding box the document
+measured on the shipped file: worst disagreement **6e-08** units on a body 3 units long.
+
+**There is no front bound and no oral shell.** This builder used to leave the last two thousandths
+of the snout on the skull; that is gone, and what replaced it was found rather than typed — the
+aimed plane runs 0.0077 *under* the last 0.004 of the nose, so the tip stands entirely above it and
+the cut's own curve closes round the front by itself. Which leaves each half with **one** boundary
+of exactly two arcs, the mouth line and the hinge wall, and that is what makes the capping below
+possible.
+
+### Closing it: the cut's own rim
+
+This body shipped the construction `CLAUDE.md` says not to rebuild — one closed skinned sac wound
+into the lumen, plus a seated hinge ellipsoid — and both were hidden in play, so the proof they
+passed was of a body the game does not draw. Measured `--as-drawn` over **every** clip that opens
+the jaw (sixteen, not the three a sweep samples), the shipped animal read **36 px through the head
+and 693 px of back-facing hole**, against a tolerance of 12.
+
+So it is ported to the T3D-31/32 construction: `T.cap_cut` over the head's cross-section at the
+hinge first — that run dips out of the mouth's own plane and would fold under a planar fill — then
+`T.cap_mouth` along the mouth line, each half's fill domed into its own half by `CAP_DOME` of each
+vertex's own distance from the rim, bounded by the room the head's measured section leaves. 456 cap
+vertices on the authored body, 280 on the twin; every one of them inside the head's own section
+hull (worst clearance +0.0018 authored, −0.0014 twin over 6 of 280, inside the builder's bound),
+with ray parity against the closed intake recorded beside it. No lining. No hinge plug.
 
 **No teeth were authored, and that is right.** Huang et al. 2020 found this animal's teeth by CT:
 rounded, molariform, angled nearly perpendicular to the jaw, in three rows per ramus, and
 **invisible in side view**. The generation carries no dentition. The fossil and the generation agree,
 and authoring a row would have contradicted both.
 
-### Gape see-through
+**No teeth were authored, and that is right.** Huang et al. 2020 found this animal's teeth by CT:
+rounded, molariform, angled nearly perpendicular to the jaw, in three rows per ramus, and
+**invisible in side view**. The generation carries no dentition. The fossil and the generation agree,
+and authoring a row would have contradicted both.
+
+### The gape as the game draws it (the aimed re-cut, 22 September 2026)
+
+`gape-solid.py --as-drawn`, at the measured peak of **every** clip that opens the jaw — the sixteen
+`paired-audit.json` reports a non-zero `maxOpenRadians` for, rather than the three a sweep takes —
+against saturated magenta with and without the backface-cull shim, `gape-solid.json` beside this
+file. This body is not in `src/shared/oral-greenlit.json`, so the runtime would hide any oral mesh
+it carried; it carries none, and the caps are part of the two body meshes, so what this measures is
+what a player sees.
+
+| | shipped (sac + hinge plug) | the aimed cut, same construction | the aimed cut, capped |
+| --- | ---: | ---: | ---: |
+| worst `seenThroughTheBody` | 36 px (`Guard`) | 189 px | **1 px** (`Guard`) |
+| worst `holesOpenedByCulling` | 693 px (`Ability`) | 2,155 px | **1 px** |
+| clips at 0 through | 3 of 16 | 1 of 16 | **15 of 16** |
+
+The middle column is the cost of the re-aim on the construction the body shipped with, and it is
+the argument for the port in one number: a bigger mouth behind a sac that the game throws away is a
+bigger hole. Capped, every wide gape — `Attack`, `Bite`, `Heavy`, `Eat`, `Ability` — is 0 px both
+ways, and the single pixel is at `Guard`, a 0.06-rad gape, which is the enclosure test meeting the
+silhouette's own antialiasing. The tool's tolerance is 12.
+
+**Whether it reads as a mouth** is a picture rather than a count:
+[`docs/triassic/verification/cartorhynchus-mouth-space-aimed-cut.png`](../../../../docs/triassic/verification/cartorhynchus-mouth-space-aimed-cut.png),
+`mouth-space.py` at `Ability@0.1458` — into the gape, square down the mouth's own axis, and a
+cutaway clipped at the midline so the palate and the floor are two surfaces with room between them.
+
+### Gape see-through (T3D-12B, the lining that is gone)
+
+*Kept as history.* Every number below was taken on the construction above it replaced, and on the
+file rather than on the body the game draws — which is the whole reason the section above exists.
+The flood-fill argument it makes is still the right one and `gape-solid.py` still makes it.
 
 The metric is a **flood fill from the border**, not a column scan. A column scan
 counts every transparent pixel between the top and bottom of the head, which on a three-quarter
@@ -148,14 +231,37 @@ because one number for both halves hides the half that matters:
 
 | | worst ratio | on | in | grew |
 | --- | ---: | --- | --- | --- |
-| **skin** | **5.17x** | `chest` | Sprint | 0.011 → 0.057 |
-| oral lining | 1.54x | `skull` | Ability | 0.034 → 0.051 |
+| **skin** (the aimed re-cut, 22 September 2026) | **2.98x** | `hind_upper_R` | Haul | 0.017 → 0.051 |
+| the mouth's own worst, `jaw` | 2.29x | `jaw` | Attack | 0.023 → 0.053 |
+| the mouth's own worst, `skull` | 1.12x | `skull` | Heavy | 0.042 → 0.046 |
+| *(T3D-18, before the re-aim)* | 2.98x | `hind_upper_R` | Haul | 0.017 → 0.051 |
+| *(the first build, T3D-14)* | 5.17x | `chest` | Sprint | 0.011 → 0.057 |
 
 The **skin** figure is the one to read, and the one to compare against the shore batch
-(Nothosaurus 2.98x, Tanystropheus 6.1x, Placodus 12.4x, Macrocnemus 23.3x, Coelophysis 25.3x). The
-lining is a single skinned tube whose roof rides the skull and whose floor rides the jaw: the wall
-between them is *built* to stretch, its rest length at a shut mouth is nearly nothing, and its ratio
-at full gape says the mouth opened rather than that anything tore.
+(Nothosaurus 2.98x, Tanystropheus 6.1x, Placodus 12.4x, Macrocnemus 23.3x, Coelophysis 25.3x).
+There is no lining row any more: the mouth is closed by the cut's own rim and the caps are part of
+the two body meshes, so every edge in this sweep is skin.
+
+**`dz` is measured off this cut and is not the default**, and that is where the re-aim was paid
+for. `T.jaw_junction` ramps the throat's jaw share from the hinge's own height to `dz` under it — a
+third of the rim's depth unless it is told otherwise, which on the aimed cut is **0.0087 raw**,
+narrower than the mesh's own edges out at the corner of the mouth, where the head is 0.087
+half-wide and its edges run about 0.007. A weight ramp narrower than an edge is a tear by
+construction: the first build on this cut put 0.93 of jaw on one vertex and 0.18 on its neighbour,
+and `skin-tears.mjs` read **3.50x on `jaw` at `Heavy`** against 1.46x before the re-aim, with the
+offending edge out on the cheek level with the hinge. Over the mandible's **whole** depth
+(`DZ_SHARE = 1.0`, 0.0262 raw) the same transition is spread over three times the distance and the
+body is back to 2.98x, with the mouth's own worst edge no longer the body's worst. The cheek is
+untouched either way: above the hinge's height the ramp is zero whatever `dz` is.
+
+**The junction itself is closed exactly.** 51 rest-coincident cross-mesh pairs lie on the
+document's own hinge-wall plane and their worst separation over every clip is **0.000 % of a body**;
+the mouth line's 91 pairs part 5.05 % at `Ability`, which is the gape and is bigger than the 2.1 %
+it was because the mandible is longer. `lag.mjs` calls only 3 of those 51 "the cut", because its
+classifier is *at or behind the hinge's own station* and a wall tilted 15.4° slants forward as it
+goes down — so the measurement worth having is against the document's plane, and underneath both
+`T.jaw_junction` asserts that the two copies of every rim point carry identical weights, which is
+stronger than either.
 
 The first build of this body measured far worse, and the fix is in the weights rather than in the
 gates. Every gate a builder writes — a shell-thickness threshold that tells a blade from a flank, a
@@ -256,14 +362,16 @@ only body here that does — which is what `audit.mjs` asserts rather than leave
 | Measure | Value | As % of the 3.0-unit body | Tolerance |
 | --- | ---: | ---: | --- |
 | Maximum dorsal/ventral/width envelope difference | 0.0429 | **1.43 %** | 4 % |
-| Nearest twin-surface distance, 95th percentile | 0.0085 | 0.28 % | — |
-| Nearest twin-surface distance, maximum | 0.1085 | 3.62 % | — |
-| Reduced model triangles | 36.49 % | — | ≤ 40 % |
+| Nearest twin-surface distance, 95th percentile | 0.0083 | 0.28 % | — |
+| Nearest twin-surface distance, maximum | 0.0434 | 1.45 % | — |
+| Reduced model triangles | 34.71 % | — | ≤ 40 % |
 
-The surface-distance maximum is the largest relative figure in the batch and it is the flipper
-rims: this animal's blades are the widest and thinnest relative to its body, and a voxel field
-rounds a rim. The envelope — which is what the contract actually bounds — is comfortable at 1.43 %.
-Anchors and oral-part seating are in `validation.json`.
+The surface-distance maximum used to be the largest relative figure in the batch — 0.1085, 3.62 % —
+and it was the far side of the mouth: the lining's own vertices, measured against a twin whose
+lining is a different tessellation of the same sac. With the sac gone and both halves closed by
+their own rim, the figure is the flipper rims it was always supposed to be measuring, at 1.45 %.
+The envelope — which is what the contract actually bounds — is comfortable at 1.43 %. Anchors and
+the caps' own seating are in `validation.json`.
 
 ## Verification
 
@@ -304,12 +412,35 @@ No independent human review is invented by this automated QA record.
 /opt/blender/blender --background --factory-startup --python tools/triassic/creatures/cartorhynchus/build.py
 node tools/triassic/creatures/cartorhynchus/audit.mjs --package --decode
 /opt/blender/blender -b --factory-startup --python tools/triassic/creatures/cartorhynchus/render.py -- --decoded
+/opt/blender/blender -b --factory-startup --python tools/triassic/creatures/cartorhynchus/render.py -- --decoded --twin
+# `--portraits` alone writes the authored quartet into portraits/; with `--twin` it writes the
+# twin's one portrait into public/ and *nothing else*, so both lines are needed.
+/opt/blender/blender -b --factory-startup --python tools/triassic/creatures/cartorhynchus/render.py -- --portraits --decoded
 /opt/blender/blender -b --factory-startup --python tools/triassic/creatures/cartorhynchus/render.py -- --portraits --twin
 /opt/blender/blender -b --factory-startup --python tools/triassic/creatures/cartorhynchus/mouth-views.py
 python3 tools/triassic/creatures/cartorhynchus/contact-sheets.py
 node tools/triassic/review-bodies.mjs
+node tools/triassic/publish-portraits.mjs
 node tools/update-asset-sizes.mjs
 ```
+
+The mouth, measured rather than looked at — the sixteen clips are the ones `paired-audit.json`
+reports a non-zero `maxOpenRadians` for, not a fixed three:
+
+```sh
+/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- cartorhynchus --as-drawn \
+  Idle@1.2 Swim@0.7 Sprint@0.45 Attack@0.3667 Bite@0.1 Heavy@0.4792 Hit@0.2396 Death@1.6 \
+  Guard@0.55 Eat@0.35 Stagger@0.55 Ability@0.1458 Grab@0.75 Breath@1.0 Haul@0.6667 Breathe@1.4
+/opt/blender/blender -b --factory-startup --python tools/triassic/mouth-space.py -- cartorhynchus \
+  Ability@0.1458 docs/triassic/verification/cartorhynchus-mouth-space-aimed-cut.png
+npm run triassic:mouth -- docs/triassic/mouths/cartorhynchus-mouth.json   # refuses: see below
+```
+
+**That last one is expected to refuse now, and the refusal is the point.** The consumer hashes the
+GLB the file names and compares; this builder *reads* that file, so rebuilding the body is what
+consuming the cut looks like and the hash no longer matches. What guards the frame instead is
+inside the builder: the document's own bounding box against the intake's, worst disagreement 6e-08
+units on a body 3 units long.
 
 ## What is still open
 
@@ -318,9 +449,17 @@ node tools/update-asset-sizes.mjs
   skeleton that swims. For an animal that spends almost all of the game in the water, and whose
   haul-out is a traversal trait rather than a locomotion mode, that is the right trade — but a
   reviewer looking for a land gait will not find one.
-- **The mouth is a groove, not a cavity.** 26 measured vertices is the thinnest evidence any of the
-  four gave, and the seam is a fitted ramp rather than a measured curve because of it. A generation
-  with a real modelled mouth would let the curve be used.
+- **The mouth is aimed rather than measured, and this body's mouth geometry is not greenlit.** The
+  groove the generation drew is 26 vertices two thousandths deep and was never going to say where
+  the jaw joint is; a human's aim replaced it (22 September 2026) and the body agrees with the
+  reviewer about the one thing it can be asked, which is where the middle of its head is. What is
+  still open is a
+  *look*: this animal is not in `src/shared/oral-greenlit.json`, so nobody has yet ruled on whether
+  its mouth reads as a mouth. It is worth ruling on rather than assuming, because unlike a lining
+  the caps are part of the body meshes and are drawn whatever that list says — the greenlist
+  governs meshes the runtime would hide, and there are none here. The sheet to rule on is
+  `docs/triassic/verification/cartorhynchus-mouth-space-aimed-cut.png`; the caps wear the rim's own
+  UVs, which on a mouth this short is a few rim samples spread over the whole palate.
 - **The limbs are posed**, as on every body in this batch; see `limbAsymmetry` in `validation.json`.
   On this animal the hind pair is the more asymmetric.
 - **The pose-deviation ratio is not meaningful on a body this stout** — see the note above the
@@ -328,9 +467,15 @@ node tools/update-asset-sizes.mjs
 - Cartorhynchus is **not** in `tools/triassic/shipped.json` and its preview badge is **not**
   cleared. It is registered in `src/content/triassic/review-bodies.json`.
 - **There are no eye globes**, as on every Triassic body delivered so far.
-- **Only the twin's portrait is written** (`public/assets/triassic/creatures/cartorhynchus.puppet.png`),
-  beside the other delivered bodies that carry one. The authored body's roster cards are not:
-  until a human decides this animal ships, the placeholder cards cut from the canonical pose
-  stay where they are.
+- **Superseded:** this body *is* in `tools/triassic/shipped.json` and all five of its portraits are
+  published (T3D-07), so the two bullets above about a placeholder card and a twin-only portrait
+  were true when they were written and are not now. `publish-portraits.mjs --check` is what keeps
+  them current, and it is in `npm run triassic`.
+- **The roster-wide `docs/triassic/throat-audit.json` is stale for this body** and deliberately not
+  refreshed here: it still lists an `Oral_cavity_lining` and a `Seated_jaw_hinge_tissue` against the
+  old sha256. Running that tool for one animal silently overwrites the whole roster's report, and
+  two other bodies were being rebuilt beside this one, so a sweep taken now would bake their
+  in-flight state. It is a roster-wide re-run for after the batch merges; nothing in
+  `npm run triassic` reads it.
 - Living colours, soft tissues and movements are artistic reconstruction. World travel, grip and
   capture rules remain engine-owned.
