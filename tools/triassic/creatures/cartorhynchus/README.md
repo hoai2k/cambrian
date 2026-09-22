@@ -76,7 +76,7 @@ partner's, over body length:
 | Pelvic | 4 | 0.0431 | 0.0598 |
 | Both | | **0.0578** | 0.1327 |
 
-## The mouth: a human's aim, capped with its own rim (T3D-34)
+## The mouth: a human's aim, capped with its own rim (the aimed re-cut, 22 September 2026)
 
 **The cut is not measured any more. It is aimed**, in the viewer's mouth editor
 (`docs/viewer-mouth.md`), on this exact shipped body, and handed over as
@@ -156,7 +156,7 @@ rounded, molariform, angled nearly perpendicular to the jaw, in three rows per r
 **invisible in side view**. The generation carries no dentition. The fossil and the generation agree,
 and authoring a row would have contradicted both.
 
-### The gape as the game draws it (T3D-34)
+### The gape as the game draws it (the aimed re-cut, 22 September 2026)
 
 `gape-solid.py --as-drawn`, at the measured peak of **every** clip that opens the jaw — the sixteen
 `paired-audit.json` reports a non-zero `maxOpenRadians` for, rather than the three a sweep takes —
@@ -227,7 +227,7 @@ because one number for both halves hides the half that matters:
 
 | | worst ratio | on | in | grew |
 | --- | ---: | --- | --- | --- |
-| **skin** (T3D-34, the aimed cut) | **2.98x** | `hind_upper_R` | Haul | 0.017 → 0.051 |
+| **skin** (the aimed re-cut, 22 September 2026) | **2.98x** | `hind_upper_R` | Haul | 0.017 → 0.051 |
 | the mouth's own worst, `jaw` | 2.29x | `jaw` | Attack | 0.023 → 0.053 |
 | the mouth's own worst, `skull` | 1.12x | `skull` | Heavy | 0.042 → 0.046 |
 | *(T3D-18, before the re-aim)* | 2.98x | `hind_upper_R` | Haul | 0.017 → 0.051 |
@@ -408,12 +408,35 @@ No independent human review is invented by this automated QA record.
 /opt/blender/blender --background --factory-startup --python tools/triassic/creatures/cartorhynchus/build.py
 node tools/triassic/creatures/cartorhynchus/audit.mjs --package --decode
 /opt/blender/blender -b --factory-startup --python tools/triassic/creatures/cartorhynchus/render.py -- --decoded
+/opt/blender/blender -b --factory-startup --python tools/triassic/creatures/cartorhynchus/render.py -- --decoded --twin
+# `--portraits` alone writes the authored quartet into portraits/; with `--twin` it writes the
+# twin's one portrait into public/ and *nothing else*, so both lines are needed.
+/opt/blender/blender -b --factory-startup --python tools/triassic/creatures/cartorhynchus/render.py -- --portraits --decoded
 /opt/blender/blender -b --factory-startup --python tools/triassic/creatures/cartorhynchus/render.py -- --portraits --twin
 /opt/blender/blender -b --factory-startup --python tools/triassic/creatures/cartorhynchus/mouth-views.py
 python3 tools/triassic/creatures/cartorhynchus/contact-sheets.py
 node tools/triassic/review-bodies.mjs
+node tools/triassic/publish-portraits.mjs
 node tools/update-asset-sizes.mjs
 ```
+
+The mouth, measured rather than looked at — the sixteen clips are the ones `paired-audit.json`
+reports a non-zero `maxOpenRadians` for, not a fixed three:
+
+```sh
+/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- cartorhynchus --as-drawn \
+  Idle@1.2 Swim@0.7 Sprint@0.45 Attack@0.3667 Bite@0.1 Heavy@0.4792 Hit@0.2396 Death@1.6 \
+  Guard@0.55 Eat@0.35 Stagger@0.55 Ability@0.1458 Grab@0.75 Breath@1.0 Haul@0.6667 Breathe@1.4
+/opt/blender/blender -b --factory-startup --python tools/triassic/mouth-space.py -- cartorhynchus \
+  Ability@0.1458 docs/triassic/verification/cartorhynchus-mouth-space-aimed-cut.png
+npm run triassic:mouth -- docs/triassic/mouths/cartorhynchus-mouth.json   # refuses: see below
+```
+
+**That last one is expected to refuse now, and the refusal is the point.** The consumer hashes the
+GLB the file names and compares; this builder *reads* that file, so rebuilding the body is what
+consuming the cut looks like and the hash no longer matches. What guards the frame instead is
+inside the builder: the document's own bounding box against the intake's, worst disagreement 6e-08
+units on a body 3 units long.
 
 ## What is still open
 
@@ -424,7 +447,7 @@ node tools/update-asset-sizes.mjs
   reviewer looking for a land gait will not find one.
 - **The mouth is aimed rather than measured, and this body's mouth geometry is not greenlit.** The
   groove the generation drew is 26 vertices two thousandths deep and was never going to say where
-  the jaw joint is; a human's aim replaced it (T3D-34) and the body agrees with the reviewer about
+  the jaw joint is; a human's aim replaced it (the aimed re-cut, 22 September 2026) and the body agrees with the reviewer about
   the one thing it can be asked, which is where the middle of its head is. What is still open is a
   *look*: this animal is not in `src/shared/oral-greenlit.json`, so nobody has yet ruled on whether
   its mouth reads as a mouth. It is worth ruling on rather than assuming, because unlike a lining

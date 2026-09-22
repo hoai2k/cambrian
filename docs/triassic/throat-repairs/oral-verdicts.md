@@ -60,7 +60,7 @@ clip the audit says opens the jaw.
 | Odontochelys | 6 | 236 | |
 | Placodus | 23 | 454 | |
 | Saurichthys | 123 | 523 | **measured and recorded in T3D-32C, not re-cut**: the authored body and its twin are different kinds of generation and `T.cap_mouth` refuses on the authored half by construction — see [the README](../../../tools/triassic/creatures/saurichthys/README.md#the-cut-is-earning-its-place--measured-t3d-32c). Its pectorals and its twin's textures were repaired in the same pass. |
-| **Cartorhynchus** | **1** | **1** | ported in T3D-34 on a human's re-aimed cut (`mouths/cartorhynchus-mouth.json`): capped with its own rim, no front bound, no lining, no hinge plug. Measured over **all sixteen** clips that open its jaw rather than the three this table samples, where the shipped body read **36 / 693** and the same re-aim on the sac read **189 / 2,155**. The one pixel is at `Guard`, a 0.06-rad gape; every wide gape is 0 / 0 |
+| **Cartorhynchus** | **1** | **1** | ported on 22 September 2026 on a human's re-aimed cut (`mouths/cartorhynchus-mouth.json`): capped with its own rim, no front bound, no lining, no hinge plug. Measured over **all sixteen** clips that open its jaw rather than the three this table samples, where the shipped body read **36 / 693** and the same re-aim on the sac read **189 / 2,155**. The one pixel is at `Guard`, a 0.06-rad gape; every wide gape is 0 / 0 |
 | Cymbospondylus | 4 | 933 | |
 | Archelon | 1 | 1,262 | |
 | **Macrocnemus** | **0** | **0** | ported in T3D-32B: arrived shut, capped with its own rim on a *fitted* cut (was 934 / 2,594 over **all twelve** opening clips) |

@@ -199,7 +199,7 @@ as the worst before the repair.
   before render is the clearest of the set: a pale wedge open under the corner at `Heavy`.
 - **Cartorhynchus**: 2.02 → 0.00 %. Skin 3.72x unchanged. The notch under the corner of the mouth
   at `Heavy` is gone. **Superseded twice since**: T3D-18 re-seated its paddle roots and took the
-  skin figure to 2.98x, and T3D-34 re-cut the jaw to a human's aimed plane
+  skin figure to 2.98x, and the aimed re-cut of 22 September 2026 re-cut the jaw to a human's aimed plane
   (`docs/triassic/mouths/cartorhynchus-mouth.json`) and capped it with its own rim. On that cut
   `dz` is the parameter that decides the skin, and the default is wrong for it: `rim_depth / 3` is
   0.0087 raw, **narrower than the mesh's own edges out at the corner of the mouth**, where the head
