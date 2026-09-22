@@ -270,7 +270,7 @@
     {
       "y": -0.08186567475398376,
       "cx": -0.002620968560222537,
-      "cz": -1.5249103307725387e-05,
+      "cz": -0.000015249103307725387,
       "halfWidth": 0.16857867984799668,
       "halfDepth": 0.17699267169833185
     },
@@ -1122,7 +1122,7 @@
       "chainWeight": 1027.4231011282268,
       "trunkWeight": 70.57621200476729,
       "perTrunkBone": {
-        "neck": 0.0,
+        "neck": 0,
         "chest": 13.207480821984063,
         "body": 57.30626989319512,
         "tail_00": 0.062461289588100044
@@ -1288,7 +1288,7 @@
     "Rise": 1.2,
     "Attack": 0.8,
     "Bite": 0.4,
-    "Heavy": 1.0,
+    "Heavy": 1,
     "Hit": 0.5,
     "Death": 1.6,
     "Guard": 1.1,
@@ -1297,8 +1297,8 @@
     "Eat": 1.4,
     "Stagger": 1.1,
     "Ability": 0.7,
-    "Grab": 1.0,
-    "Breath": 2.0,
+    "Grab": 1,
+    "Breath": 2,
     "Growth": 1.2,
     "Haul": 1.6,
     "Breathe": 2.8
@@ -1654,7 +1654,7 @@
         "dz": 0.026245182380080223,
         "band": 0.015,
         "back": 0.06,
-        "throat": 1.0,
+        "throat": 1,
         "shellVertices": 427,
         "shellFullJaw": 333,
         "bodyThroatVertices": 132
@@ -1697,7 +1697,7 @@
         "dz": 0.026010440662503242,
         "band": 0.015,
         "back": 0.06,
-        "throat": 1.0,
+        "throat": 1,
         "shellVertices": 249,
         "shellFullJaw": 198,
         "bodyThroatVertices": 60
@@ -1744,7 +1744,7 @@
       "rollDegrees": -1.044,
       "headFraction": 0.0882,
       "mandibleVerticesTheDocumentCounted": 220,
-      "frameCheckWorstUnits": 5.960464477539063e-08,
+      "frameCheckWorstUnits": 5.960464477539063e-8,
       "seatRaw": 0.0018356667133048177,
       "measuredCentrelineAtTheHingeRaw": 0.005298131277423604,
       "seatOffTheMeasuredCentrelineRaw": -0.0034624645641187866,
@@ -1752,7 +1752,7 @@
       "seatOffTheMeasuredCentrelineOverHeadHalfWidth": 0.0396982347207946
     },
     "albedoStations": 21,
-    "flankToFlankDisagreementMax": 0.0,
+    "flankToFlankDisagreementMax": 0,
     "rampSlope": 0.15825994704470261,
     "rampIntercept": 0.12898450119855773,
     "worstResidualAsFractionOfLocalDepth": 0.09297789654924471,
@@ -2594,5 +2594,22 @@
   },
   "normalizedWeights": true,
   "rootStable": true,
-  "noScaleChannels": true
+  "noScaleChannels": true,
+  "skinTears": {
+    "tool": "tools/triassic/skin-tears.mjs",
+    "phasesPerClip": 17,
+    "clips": 23,
+    "edges": 33273,
+    "bodyLength": 3,
+    "skin": {
+      "worstRatio": 2.98,
+      "clip": "Haul",
+      "bone": "hind_upper_R",
+      "grewFrom": 0.0173,
+      "grewTo": 0.0514,
+      "instancesOverTwice": 107
+    },
+    "oralLining": null,
+    "note": "The lining wall is built to stretch -- roof on the skull, floor on the jaw -- so its ratio at full gape says the mouth opened, not that anything tore. `skin` is the figure to compare against the shore batch's (Nothosaurus 2.98x, Tanystropheus 6.1x, Placodus 12.4x)."
+  }
 }

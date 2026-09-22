@@ -3,8 +3,8 @@
 Mouth files exported from the viewer's mouth editor (`docs/viewer-mouth.md`), one per body, aimed
 by hand on the **built** Triassic model each one names. They are hand-offs: a builder may read the
 hinge and the plane straight off the file instead of measuring, or read the numbers as a review —
-*the hinge belongs this far back, the line rises this much*. Nothing in the game or the build reads
-them.
+*the hinge belongs this far back, the line rises this much*. Nothing in the game reads them, and
+until 22 September 2026 no build did either — **Cartorhynchus' builder is the first that does**.
 
 These are accepted by the consumer against the body each names — **except the one a builder has
 since read**, which is Cartorhynchus and is the first of them:

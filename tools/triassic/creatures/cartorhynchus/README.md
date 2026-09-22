@@ -184,6 +184,10 @@ cutaway clipped at the midline so the palate and the floor are two surfaces with
 
 ### Gape see-through (T3D-12B, the lining that is gone)
 
+*Kept as history.* Every number below was taken on the construction above it replaced, and on the
+file rather than on the body the game draws — which is the whole reason the section above exists.
+The flood-fill argument it makes is still the right one and `gape-solid.py` still makes it.
+
 The metric is a **flood fill from the border**, not a column scan. A column scan
 counts every transparent pixel between the top and bottom of the head, which on a three-quarter
 view of an open mouth includes the background visible *past* the animal between the jaw and the
