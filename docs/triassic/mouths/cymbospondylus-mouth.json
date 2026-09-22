@@ -1,0 +1,134 @@
+{
+  "schema": "mouth-cut/1",
+  "id": "cymbospondylus",
+  "model": "assets/triassic/creatures/cymbospondylus.glb",
+  "sha256": "eecdfe855124cce4f2a993404b83cdaabc09f44319fe1e03715b725924f3501e",
+  "sha256Source": "measured",
+  "appliesTo": "built",
+  "authoredAt": "2026-09-22T00:29:48.419Z",
+  "note": "",
+  "creature": {
+    "key": "triassic:cymbospondylus",
+    "id": "cymbospondylus",
+    "collection": "triassic",
+    "vertices": 12057,
+    "rigged": true
+  },
+  "frame": {
+    "axis": "z",
+    "forward": 1,
+    "up": "y",
+    "source": "mouth",
+    "note": "Model root frame, unscaled: the file's own coordinates with the scene graph flattened. The body runs along z; the head is at the high end."
+  },
+  "seat": {
+    "source": "manual"
+  },
+  "hinge": {
+    "depth": 1.118941,
+    "headFraction": 0.1865,
+    "centre": [
+      0.022643,
+      0.145504,
+      1.581433
+    ],
+    "axis": [
+      0.999985,
+      0.005155,
+      0.001766
+    ]
+  },
+  "plane": {
+    "point": [
+      0.022643,
+      0.145504,
+      1.581433
+    ],
+    "normal": [
+      -0.005051,
+      0.998496,
+      -0.054599
+    ],
+    "forward": [
+      -0.002045,
+      0.054589,
+      0.998507
+    ],
+    "pitch": 0.054616470134241354,
+    "yaw": -0.0020478960505870983,
+    "roll": 0.005163138900296473,
+    "pitchDegrees": 3.129,
+    "yawDegrees": -0.117,
+    "rollDegrees": 0.296
+  },
+  "sides": {
+    "mandible": 807,
+    "skull": 11250,
+    "total": 12057
+  },
+  "bounds": {
+    "length": 6,
+    "height": 1.4252586960792542,
+    "width": 2.5048080682754517,
+    "axisMin": -3.2996256351470947,
+    "axisMax": 2.7003743648529053,
+    "lateralMid": -0.014367163181304932,
+    "upMid": -0.13844755291938782
+  },
+  "head": {
+    "height": 0.38391533866524696,
+    "width": 0.49039284884929657,
+    "upMid": 0.20963488332927227,
+    "lateralMid": 0.018893666565418243
+  },
+  "rule": "A vertex is on the mandible when (v − plane.point) · plane.normal < 0 and (v − plane.point) · plane.forward > 0: below the cut plane and ahead of the hinge. hinge.axis is the pivot the jaw swings about, through hinge.centre. See docs/viewer-mouth.md.",
+  "mouth": {
+    "version": 1,
+    "key": "triassic:cymbospondylus",
+    "id": "cymbospondylus",
+    "collection": "triassic",
+    "model": "assets/triassic/creatures/cymbospondylus.glb",
+    "frame": {
+      "axis": "z",
+      "forward": 1,
+      "up": "y"
+    },
+    "frameSource": "mouth",
+    "vertices": 12057,
+    "rigged": true,
+    "box": {
+      "lo": [
+        -1.2667711973190308,
+        -0.8510769009590149,
+        -3.2996256351470947
+      ],
+      "hi": [
+        1.238036870956421,
+        0.5741817951202393,
+        2.7003743648529053
+      ]
+    },
+    "bounds": {
+      "length": 6,
+      "height": 1.4252586960792542,
+      "width": 2.5048080682754517,
+      "axisMin": -3.2996256351470947,
+      "axisMax": 2.7003743648529053,
+      "lateralMid": -0.014367163181304932,
+      "upMid": -0.13844755291938782
+    },
+    "head": {
+      "height": 0.38391533866524696,
+      "width": 0.49039284884929657,
+      "upMid": 0.20963488332927227,
+      "lateralMid": 0.018893666565418243
+    },
+    "seatSource": "manual",
+    "depth": 1.1189409340523973,
+    "up": 0.14550357683235404,
+    "lateral": 0.022642826775580854,
+    "pitch": 0.054616470134241354,
+    "yaw": -0.0020478960505870983,
+    "roll": 0.005163138900296473
+  }
+}
