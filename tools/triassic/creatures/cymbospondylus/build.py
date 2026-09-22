@@ -424,49 +424,14 @@ oralparts = []
 # check that the measured cut does not saw through one, which is the fault Placodus shipped.
 tooth_rows = []
 
-# A closed envelope round the hinge, covering the square the cut leaves at the back of the
-# mandible: that face swings into view the moment the mouth opens and is flat skin with the
-# texture drawn across it. Placodus shipped one too small and read as a pale block at full gape.
-hinge_mat = T.vertex_colour_material(NAME + ' jaw hinge body', roughness=.7)
-HINGE_CENTRE = (cx(HINGE_Y), HINGE_Y + .010, (seam(HINGE_Y) + cz(HINGE_Y)) / 2)
-HINGE_R = (half_width(HINGE_Y) * .84, .030, half_depth(HINGE_Y) * .84)
-# Fit it rather than type it: the envelope is grown to the largest ellipsoid that still lies
-# inside the closed intake surface everywhere, so it covers the cut face without breaking the
-# cheek. Placodus shipped one too small and read as a pale block at full gape.
-HINGE_FIT = 0.
-for step in range(24):
-    k = 1. - step / 24
-    probe = [Vector((HINGE_CENTRE[0] + HINGE_R[0] * k * math.sin(b) * math.cos(a),
-                     HINGE_CENTRE[1] + HINGE_R[1] * k * math.sin(b) * math.sin(a),
-                     HINGE_CENTRE[2] + HINGE_R[2] * k * math.cos(b)))
-             for a in np.linspace(0, 2 * pi, 20) for b in np.linspace(0, pi, 11)]
-    if min(depth(q) for q in probe) > .0035:
-        HINGE_FIT = k
-        break
-assert HINGE_FIT > .3, ('the hinge envelope could not be seated', HINGE_FIT)
-bpy.ops.mesh.primitive_uv_sphere_add(segments=18, ring_count=10, location=tx(HINGE_CENTRE))
-hinge = bpy.context.object
-hinge.name = 'Seated jaw hinge tissue'
-hinge.scale = tuple(r * HINGE_FIT * SCALE for r in HINGE_R)
-bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-for v in hinge.data.vertices:
-    v.co = hinge.matrix_world @ v.co
-hinge.location = (0, 0, 0)
-hinge.data.materials.clear()
-hinge.data.materials.append(hinge_mat)
-T.paint_from_source(hinge, pigment, SCALE)
-for n in ('skull', 'jaw'):
-    hinge.vertex_groups.new(name=n)
-for v in hinge.data.vertices:
-    t = max(0., min(1., (seam(HINGE_Y) * SCALE - v.co.z) / (.040 * SCALE)))
-    hinge.vertex_groups['jaw'].add([v.index], t * .5, 'REPLACE')
-    hinge.vertex_groups['skull'].add([v.index], 1 - t * .5, 'REPLACE')
-for p in hinge.data.polygons:
-    p.use_smooth = True
-mo = hinge.modifiers.new('Hinge skin', 'ARMATURE')
-mo.object = rig
-hinge.parent = rig
-oralparts.append(hinge)
+# **The seated hinge ellipsoid is retired too.** It existed to cover "the square the cut leaves at
+# the back of the mandible", and since `T.jaw_junction` landed there is no square: the hinge
+# cross-section is the one run of the rim whose two copies the junction holds together, asserted
+# equal weight for weight, so the surface is continuous across it in every pose. Measured as drawn
+# -- which is how it is drawn, because the runtime hides it -- this head reads 1 px through at its
+# widest gape with the plug already invisible, so it was closing nothing a player could see. And it
+# is the one thing the viewer's *Mouth geometry* switch showed that a reviewer would have had to
+# discount: a black blister standing proud of the cheek beside the mouth it was not filling.
 
 # ----------------------------------------------- the cut's own seam, filled (optional) ----
 # **This generation arrived partially open, and the cut goes deeper than its mouth does.** That is
@@ -481,8 +446,9 @@ oralparts.append(hinge)
 #
 # `T.seam_web` fills exactly that run and nothing else, because the run is the rim and the rim is
 # where the web is. It is **off**: named so `src/shared/oral-geometry.ts` matches it, so the game
-# hides it and the viewer's *Mouth geometry* switch starts with it hidden, exactly like the lining
-# and the hinge tissue this body already carries. It is here to be looked at and judged.
+# hides it and the viewer's *Mouth geometry* switch starts with it hidden. It is the **only** thing
+# that switch turns on for this animal now -- the one-sac lining and the hinge ellipsoid are both
+# retired -- so what a reviewer is shown is the fill and nothing beside it.
 SEAM_GAPE = .60                      # Heavy's peak; asserted against the clips once they are built
 SEAM_FOLD, SEAM_FLOOR = .30, .0012
 seam_mat = T.vertex_colour_material(NAME + ' mouth interior seam', roughness=.62)

@@ -5,31 +5,28 @@
   "models": [
     {
       "variant": "authored",
-      "sha256": "41fcacb82ad550b22a89975e83b1111a63570d7ce70c01100fb6c0a7f9985fe5",
+      "sha256": "55898d43f114f4028a5cd545fb23bbbd7da4833758eb900b34a09728f554dd2e",
       "meshes": [],
       "otherOralMeshes": [
-        "Mouth interior seam web",
-        "Seated jaw hinge tissue"
+        "Mouth interior seam web"
       ],
       "oralShells": "none"
     },
     {
       "variant": ".puppet",
-      "sha256": "205b640b5cec8f509f9fcd90c7d74d1f63e8a10115609e03e09713103f69aef3",
+      "sha256": "80d23a43dd2d1f2d4573b063970e2c74820d956fadba3ac7a35d567d0c7b66cb",
       "meshes": [],
       "otherOralMeshes": [
-        "Mouth interior seam web (twin)",
-        "Seated jaw hinge tissue"
+        "Mouth interior seam web (twin)"
       ],
       "oralShells": "none"
     },
     {
       "variant": ".lod1",
-      "sha256": "205b640b5cec8f509f9fcd90c7d74d1f63e8a10115609e03e09713103f69aef3",
+      "sha256": "80d23a43dd2d1f2d4573b063970e2c74820d956fadba3ac7a35d567d0c7b66cb",
       "meshes": [],
       "otherOralMeshes": [
-        "Mouth interior seam web (twin)",
-        "Seated jaw hinge tissue"
+        "Mouth interior seam web (twin)"
       ],
       "oralShells": "none"
     }

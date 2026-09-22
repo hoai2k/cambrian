@@ -117,6 +117,71 @@ cameras on the shipped file before and after (`tools/triassic/head-views.py`).
 
 Skin: 1.44x before and after (`skin-tears.mjs`, 0 of 21 clips past 2x); every joint owns skin.
 
+## The cut's own seam, filled — 22 September 2026 (T3D-34)
+
+The verdict above stands: this body carries **no lining**, no palate, no floor and no throat tube,
+and the pixels the gape proof reports are the generation's own open rostrum and the slivers along
+its own tooth row. What it gained is one optional, hidden fill for a different fault, reported as
+"holes in the geometry near the back of the mouth ... on creatures whose mouth is rendered already
+partially open".
+
+**What the split actually left open.** This builder cuts the mandible by *face label* rather than by
+a plane, so the rim runs along the generation's own edges — and it is still one **closed loop of 164
+shared vertices** (164 shared edges, none without two), confined to raw y **0.322–0.400** of a mouth
+that reaches 0.498. That is `T.cut_rim`'s **case 2**: the rostrum carries a real modelled gap from
+the commissure forward, and behind it the mandible label runs into solid head. There the two copies
+of the rim part when the jaw opens, and behind them is the inside of the head. Forward of the
+commissure nothing was cut, so nothing there is touched — filling it would be filling the mouth the
+generation modelled.
+
+**The fill is the ruled surface between the two copies of the rim** (`T.seam_web`), 328 faces and
+492 vertices. It closes by construction: every boundary vertex is a rim vertex's own rest position
+and own weight dictionary, so linear blend skinning carries the two to the same place in every pose
+— worst rest-position difference 0.0, worst weight difference 0.0, asserted rather than rendered.
+Two things this body taught the shared helper. It closes the generation's gape in **bind geometry**
+(`close_rest`, weighted by each vertex's jaw share), so the two copies are already 0.016 of a body
+apart at rest and the web spans the two *actual* rest positions rather than one shared point; and
+the parting it measures is the two posed positions' own separation, which is that rest gap at a shut
+mouth and the gape at an open one.
+
+It wears the **lumen's** albedo: 1,215 vertices whose own outward normal, cast back into the mesh,
+meets the wall opposite — mean (0.390, 0.381, 0.369) against (0.450, 0.455, 0.461) for the rest of
+the body. The fold into the flesh is 0.30 of the measured parting at `SEAM_GAPE` (0.45 rad, read off
+`performance.pose` rather than named twice), floored, capped by a cast inwards on the pre-split
+intake, and smoothed four passes round the cycle so the ribbon is a fold and not a grille.
+
+**Ray parity cannot judge the fold here**, and that is the lesson rather than a nuisance: a modelled
+mouth is an invagination, and a parted rim is a slot, so both read as *outside* the solid. The parity
+count is recorded with how much of it the measured lumen accounts for, and what is asserted is the
+head's **own measured section**, which uses no normals — the folded row stands no further outside it
+than the rim rows it was folded from (1.012 against 1.020).
+
+**The twin gets no web**, and that is a fact about the twin rather than an omission: its rostrum is
+`Puppet upper rostrum` and `Puppet lower rostrum`, two separate closed lofts, so it has no cut and
+nothing open. `package-audit.mjs` asserts exactly that, in place of its old "carries nothing oral at
+all".
+
+It is **off**: named so `src/shared/oral-geometry.ts` matches it, so the game hides it and the
+viewer's *Mouth geometry* switch starts with it hidden.
+
+| clip | hidden `through`/`opened` | shown | backdrop covered |
+| --- | ---: | ---: | ---: |
+| `Heavy@0.3333` | 6 / 1,863 | 1,671 / 1,671 | **4,747** |
+| `Attack@0.2333` | 5 / 1,478 | 1,305 / 1,305 | 3,821 |
+| `Bite@0.1667` | 306 / 381 | 248 / 248 | 884 |
+| `Eat@0.6` | 9 / 13 | 2 / 5 | 13 |
+
+The hidden column is unchanged from what shipped, and that is checkable rather than asserted: the
+visible geometry is identical to the previous build's, attribute for attribute and triangle for
+triangle. `through` rising at `Heavy` and `Attack` is the enclosure test rather than the mouth — the
+web closes the route from the hole to the frame edge, so what was reachable surround becomes
+enclosed backdrop. What is left there is the generation's own modelled lumen seen from outside with
+every back face culled, on skin that exports `doubleSided`; filling it would mean filling the
+modelled mouth. Skin 1.44x unchanged, 0 of 21 clips past 2x; `lag.mjs` cut 0 open past 0.2 %.
+
+Sheets: `docs/triassic/verification/shonisaurus-mouth-space.png` (shipped) and
+`-mouth-space-seam-web.png` (with the switch on).
+
 ## Reproduction
 
 Run from the repository root with Blender 5.2 (the local application is `/Applications/Blender.app/Contents/MacOS/Blender`):

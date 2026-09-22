@@ -828,9 +828,9 @@
       "radiusOuter": 0.06119582561443898
     }
   },
-  "authoredTriangles": 20380,
-  "twinTriangles": 7702,
-  "twinTriangleFraction": 0.37791952894995096,
+  "authoredTriangles": 20056,
+  "twinTriangles": 7378,
+  "twinTriangleFraction": 0.36786996410051853,
   "twinRemeshTriangles": 56404,
   "twinDecimateRatio": 0.11701297760009766,
   "twinVerticesHeldBackFromRelaxation": 9104,
@@ -2254,11 +2254,12 @@
           "gapeRadians": 0.6,
           "fold": 0.3,
           "floorRaw": 0.0072,
-          "partingAtGapeMax": 0.1529081374057705,
-          "partingAtGapeMean": 0.04366174075776945,
-          "rimPairsTheJunctionHolds": 55,
-          "foldDepthMax": 0.04587244122173115,
-          "foldDepthMean": 0.014529432540531177,
+          "smoothingPasses": 4,
+          "partingAtGapeMax": 0.14687496488438687,
+          "partingAtGapeMean": 0.04366174075776946,
+          "rimPairsTheJunctionHolds": 47,
+          "foldDepthMax": 0.04406248946531606,
+          "foldDepthMean": 0.014706065334146829,
           "middleRowOutsideTheIntake": 10,
           "parity": {
             "rimPairs": 125,
@@ -2267,7 +2268,7 @@
           },
           "worstDepthProbeRaw": -0.00031799377757124603,
           "sectionExcessOfTheRimRows": 1.0869937628581663,
-          "sectionExcessOfTheFoldedRow": 1.0787104525141018,
+          "sectionExcessOfTheFoldedRow": 1.078753909870497,
           "foldOutsideTheSolid": 10,
           "foldOutsideTheSolidAndTheMeasuredLumen": 0
         },
@@ -2282,20 +2283,21 @@
           "gapeRadians": 0.6,
           "fold": 0.3,
           "floorRaw": 0.0072,
-          "partingAtGapeMax": 0.5026778433136747,
+          "smoothingPasses": 4,
+          "partingAtGapeMax": 0.5022700227306182,
           "partingAtGapeMean": 0.1952298074077437,
-          "rimPairsTheJunctionHolds": 39,
-          "foldDepthMax": 0.07226727995284368,
-          "foldDepthMean": 0.01972654328162406,
+          "rimPairsTheJunctionHolds": 31,
+          "foldDepthMax": 0.08239516632938176,
+          "foldDepthMean": 0.024476544137826756,
           "middleRowOutsideTheIntake": 0,
           "parity": {
             "rimPairs": 110,
             "worstRestPositionDifference": 0.0,
             "worstWeightDifference": 0.0
           },
-          "worstDepthProbeRaw": -0.0060250237584114075,
+          "worstDepthProbeRaw": -0.00660425191745162,
           "sectionExcessOfTheRimRows": 1.2510098600989847,
-          "sectionExcessOfTheFoldedRow": 1.2034442872083015,
+          "sectionExcessOfTheFoldedRow": 1.2032064614129396,
           "foldOutsideTheSolid": 0,
           "foldOutsideTheSolidAndTheMeasuredLumen": 0
         }
@@ -2345,12 +2347,7 @@
     ],
     "toothPatchesStraddlingTheCut": [],
     "authoredToothRows": [],
-    "oralPartSeating": [
-      {
-        "part": "Seated jaw hinge tissue",
-        "worstDepthRaw": 0.0037527079693973064
-      }
-    ]
+    "oralPartSeating": []
   },
   "envelope": {
     "maximumEnvelopeDifference": 0.22690588235855103,

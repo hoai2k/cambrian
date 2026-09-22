@@ -2525,7 +2525,8 @@ def swing(p, hinge, rot):
 
 
 def seam_web(name, body, shell, cycles, hinge, axis, gape, colour_at, material,
-             rig=None, jaw='jaw', fold=.30, floor=.0012, room=None, cap=.45, inside=None):
+             rig=None, jaw='jaw', fold=.30, floor=.0012, room=None, cap=.45, inside=None,
+             smoothing=4):
     """The ruled surface between the two copies of a cut rim: the fill for a generation that arrived
     partially open. The note above this function is why it closes by construction.
 
@@ -2556,6 +2557,7 @@ def seam_web(name, body, shell, cycles, hinge, axis, gape, colour_at, material,
     for cyc in cycles:
         n = len(cyc)
         base = len(verts)
+        col = []
         for bi, si in cyc:
             pb = body.data.vertices[bi].co.copy()
             ps = shell.data.vertices[si].co.copy()
@@ -2568,9 +2570,26 @@ def seam_web(name, body, shell, cycles, hinge, axis, gape, colour_at, material,
             # which on a body that closes its generation's gape in bind geometry is not nothing.
             a = pb + (swing(pb, H, R) - pb) * wb.get(jaw, 0.)
             b = ps + (swing(ps, H, R) - ps) * ws.get(jaw, 0.)
-            part = (a - b).length
+            col.append({'pb': pb, 'ps': ps, 'n': nrm, 'wb': wb, 'ws': ws,
+                        'part': (a - b).length})
+        # **The fold is smoothed along the rim, and that is not a nicety.** Its depth follows the
+        # parting and its direction follows the rim's own normal, and a rim vertex's parting and
+        # normal both jump between neighbours -- so a fold taken per vertex came out *corrugated*,
+        # and a corrugated ribbon at the back of a mouth reads as a grille rather than as tissue.
+        # A few passes of a [1 2 1] filter round the cycle leave the measurement where it is and
+        # take the grille out; the rim itself is never moved, so nothing here can open the seam.
+        for _ in range(max(0, smoothing)):
+            parts = [c['part'] for c in col]
+            dirs = [c['n'] for c in col]
+            for k, c in enumerate(col):
+                lo, hi = col[(k - 1) % n], col[(k + 1) % n]
+                c['part'] = (parts[(k - 1) % n] + 2 * parts[k] + parts[(k + 1) % n]) / 4
+                q = dirs[(k - 1) % n] + dirs[k] * 2 + dirs[(k + 1) % n]
+                c['n'] = q.normalized() if q.length > 1e-9 else dirs[k]
+        for c in col:
+            pb, ps, nrm, wb, ws = c['pb'], c['ps'], c['n'], c['wb'], c['ws']
             base_p = (pb + ps) / 2
-            d = max(fold * part, floor)
+            d = max(fold * c['part'], floor)
             if room is not None:
                 d = min(d, max(1e-5, cap * room(base_p, -nrm)))
             wm = {k: (wb.get(k, 0.) + ws.get(k, 0.)) / 2 for k in set(wb) | set(ws)}
@@ -2585,7 +2604,7 @@ def seam_web(name, body, shell, cycles, hinge, axis, gape, colour_at, material,
                 groups.append(w)
                 colours.append(colour_at(q))
                 normals.append(nrm)
-            partings.append(float(part))
+            partings.append(float(c['part']))
             depths.append(float(d))
         for k in range(n):
             a, b = base + 3 * k, base + 3 * ((k + 1) % n)
@@ -2634,6 +2653,7 @@ def seam_web(name, body, shell, cycles, hinge, axis, gape, colour_at, material,
         o.parent = rig
     report = {'cycles': [len(c) for c in cycles], 'vertices': len(verts), 'faces': len(faces),
               'flippedFaces': flipped, 'gapeRadians': float(gape), 'fold': fold, 'floorRaw': floor,
+              'smoothingPasses': smoothing,
               'partingAtGapeMax': float(max(partings)) if partings else 0.,
               'partingAtGapeMean': float(np.mean(partings)) if partings else 0.,
               'rimPairsTheJunctionHolds': int(sum(1 for q in partings if q < 1e-9)),

@@ -30,15 +30,16 @@
     ],
     "vertices": 492,
     "faces": 328,
-    "flippedFaces": 141,
+    "flippedFaces": 139,
     "gapeRadians": 0.45,
     "fold": 0.3,
     "floorRaw": 0.0072,
-    "partingAtGapeMax": 0.1078918193863072,
+    "smoothingPasses": 4,
+    "partingAtGapeMax": 0.0991222311372577,
     "partingAtGapeMean": 0.03171563414841159,
-    "rimPairsTheJunctionHolds": 40,
-    "foldDepthMax": 0.020693432522153284,
-    "foldDepthMean": 0.008875286867174438,
+    "rimPairsTheJunctionHolds": 0,
+    "foldDepthMax": 0.020727798066009093,
+    "foldDepthMean": 0.008943290270120328,
     "middleRowOutsideTheIntake": 64,
     "rim": {
       "bodyBoundaryEdges": 164,
@@ -72,7 +73,7 @@
     "foldOutsideTheSolid": 64,
     "foldOutsideTheSolidAndTheMeasuredLumen": 5,
     "sectionExcessOfTheRimRows": 1.0203485670190846,
-    "sectionExcessOfTheFoldedRow": 1.0118266148867232
+    "sectionExcessOfTheFoldedRow": 1.0118269967921962
   },
   "eyes": {
     "inset": 0.0025,
