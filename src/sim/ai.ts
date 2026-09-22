@@ -1,7 +1,7 @@
 import { add, clamp, dist, distXZ, dot, heading, len3, norm, scale as vscale, sub, TAU, v3, type Rng, type Vec3 } from '../shared/math';
 import { bandOf, isAlive, isHidden, lengthOf } from './actors';
 import { RULES } from './era-rules';
-import { columnY, DIP_CHANCE, keepClear } from './locomotion';
+import { columnY, DIP_CHANCE, fitsColumn, keepClear } from './locomotion';
 import { creature } from './creatures';
 import type { Actor, BrainState, InputFrame, WorldEvent } from './types';
 import { emptyInput } from './types';
@@ -56,8 +56,16 @@ function pickWander(a: Actor, b: BrainState, rng: Rng, radius: number) {
   // the sea has one edge: nothing wanders up the beach
   const shore = shoreDistance(x, z);
   if (shore < 28) z -= 28 - shore;
-  const ground = sampleHeight(x, z);
+  let ground = sampleHeight(x, z);
   const L = lengthOf(a);
+  // ...and a big body wants water as well as sea. The shore is one edge and the shallows are the
+  // other: a body that does not fit the column where it was headed is sent further out, which is
+  // where the water is, rather than left to cruise a shelf it does not fit in. Hunting is not
+  // routed through here at all, so a giant still follows something inshore — it simply does not
+  // *live* there. Costs nothing where the target already fits, which is almost always.
+  if (!creature(a.creature).ground) {
+    for (let i = 0; i < 4 && !fitsColumn(ground, SURFACE_Y, L); i++) { z -= 26; ground = sampleHeight(x, z); }
+  }
   const y = RULES ? RULES.wanderY(a, ground, rng)
     : creature(a.creature).ground ? ground
     : columnY(ground, SURFACE_Y, L, rng, L > 2.5 && rng() < DIP_CHANCE);
