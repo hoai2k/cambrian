@@ -1,3 +1,4 @@
+import { drawsOralGeometry } from '../shared/oral-geometry';
 import { ClipQueuedBadge, ModelStatusBadge } from '../shared/ModelStatusBadge';
 import { CreaturePortrait } from '../app/CreaturePortrait';
 import { useEffect, useRef, useState } from 'react';
@@ -152,6 +153,8 @@ export function Viewer() {
   const [stageId, setStageId] = useState<string>(() => opening(initial.current.key, initial.current.mode));
   const requestedId = useRef('');
   const def = specimenByKey.get(id)!;
+  /** A greenlit mouth is part of the animal: drawn, and with no switch offered over it. */
+  const oralGreenlit = drawsOralGeometry(def.id);
   const choices = stages(def);
   const stage = choices.find(o => o.id === stageId) ?? choices[0];
   const showPuppet = stage.kind === 'twin';
@@ -175,6 +178,7 @@ export function Viewer() {
    * comparing mouths means comparing across animals.
    */
   const [oralGeometry, setOralGeometry] = useState(false);
+
   const [hasOral, setHasOral] = useState(false);
   const [active, setActive] = useState('');
   const [loop, setLoop] = useState(false);
@@ -372,7 +376,10 @@ export function Viewer() {
 
   useEffect(() => { sceneRef.current?.setSpeed(speed); }, [speed]);
   useEffect(() => { sceneRef.current?.setScheme(schemeId); }, [schemeId]);
-  useEffect(() => { sceneRef.current?.setOralGeometry(oralGeometry); }, [oralGeometry, loadedId]);
+  // A greenlit body's mouth is simply part of it, so the scene is told to draw it and the switch
+  // below is not offered: a control that asks whether to show the animal's own anatomy reads as
+  // a body still under review, which these four no longer are.
+  useEffect(() => { sceneRef.current?.setOralGeometry(oralGreenlit || oralGeometry); }, [oralGreenlit, oralGeometry, loadedId]);
   useEffect(() => {
     try { sessionStorage.setItem(STORE_KEY, JSON.stringify(picks)); } catch { /* private mode: picks stay in memory */ }
   }, [picks]);
@@ -515,7 +522,7 @@ export function Viewer() {
           </select>
         </label>}
         {choices.length > 1 && <p className="hint">Swapping holds the view and the animation time, so a difference between two of these reads as movement. Missing clips return to rest.</p>}
-        {hasOral && <><label className="toggle">
+        {hasOral && !oralGreenlit && <><label className="toggle">
           <input type="checkbox" checked={oralGeometry} onChange={(e) => setOralGeometry(e.target.checked)} />
           <span>Mouth geometry</span>
         </label>
