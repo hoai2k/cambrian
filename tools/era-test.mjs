@@ -3,10 +3,10 @@ import fs from 'node:fs';
 import { build } from 'esbuild';
 
 const result = await build({
-  stdin: { contents: "export * from './src/content'; export * from './src/content/era'; export * from './src/content/asset-paths'; export { CAMBRIAN } from './src/content/cambrian'; export { DEVONIAN } from './src/content/devonian'; export { TRIASSIC } from './src/content/triassic'; export { SHARED_STRINGS, mergeStrings } from './src/content/strings'; export { CAMBRIAN_PENDING } from './src/content/cambrian/model-status'; export { default as DEVONIAN_PENDING } from './src/content/devonian/pending-refinements.json'; export { default as TRIASSIC_PENDING } from './src/content/triassic/pending-refinements.json';", resolveDir: process.cwd() },
+  stdin: { contents: "export * from './src/content'; export * from './src/content/era'; export * from './src/content/asset-paths'; export { CAMBRIAN } from './src/content/cambrian'; export { DEVONIAN } from './src/content/devonian'; export { TRIASSIC } from './src/content/triassic'; export { SHARED_STRINGS, mergeStrings } from './src/content/strings'; export { CAMBRIAN_PENDING } from './src/content/cambrian/model-status'; export { default as DEVONIAN_PENDING } from './src/content/devonian/pending-refinements.json'; export { default as TRIASSIC_PENDING } from './src/content/triassic/pending-refinements.json'; export { SPECIMENS } from './src/viewer/catalogue';", resolveDir: process.cwd() },
   bundle: true, platform: 'node', format: 'esm', write: false,
 });
-const { ACTIVE_ERA: era, defineEra, createAssetPaths, SHARED_STRINGS, mergeStrings, CAMBRIAN, DEVONIAN, TRIASSIC, CAMBRIAN_PENDING, DEVONIAN_PENDING, TRIASSIC_PENDING } = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString('base64')}`);
+const { ACTIVE_ERA: era, defineEra, createAssetPaths, SHARED_STRINGS, mergeStrings, CAMBRIAN, DEVONIAN, TRIASSIC, CAMBRIAN_PENDING, DEVONIAN_PENDING, TRIASSIC_PENDING, SPECIMENS } = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString('base64')}`);
 assert.equal(era.id, 'cambrian');
 assert.equal(era.creatures.length, 21);
 assert.equal(era.defaults.player, 'anomalocaris');
@@ -142,3 +142,40 @@ for (let i = 0; i < FACTS.length; i++) for (let j = i + 1; j < FACTS.length; j++
   assert.ok(!FACTS[i].some((f) => FACTS[j].includes(f)), 'two eras are showing the same loading line');
 }
 console.log('PASS: the shared and per-era text tables, with every era override landing on a key the shared table has');
+
+// ---- what each game offers, and what it only keeps ----
+// Three words on a creature's card keep it off a pick screen, and each says something different:
+// `shore` stands on the beach and strikes into the water, `npc` is an ordinary animal the sea
+// holds and does not offer, and `shelved` is not in that game at all and is kept so the specimen
+// viewer can still show the body that was built for it. Counted rather than listed, because the
+// point is the shape of the pick screen: eighteen in each game, which is three rows of six.
+const STANDING = (c) => (c.shelved ? 'SHELVED' : c.shore ? 'SHORE ANIMAL' : c.npc ? 'NPC' : undefined);
+for (const [name, e] of [['Cambrian', CAMBRIAN], ['Devonian', DEVONIAN], ['Triassic', TRIASSIC]]) {
+  const offered = e.creatures.filter((c) => !STANDING(c) && (e.assets.standInsPlayable || !e.assets.standIns?.[c.id]));
+  assert.equal(offered.length, 18, `${name}: the pick screen offers 18 animals, which is three rows of six (got ${offered.length})`);
+  // A shelved animal is out of the sea as well as off the screen, which is the whole of what
+  // separates it from an NPC and what lets its roster entry stay without putting it in the water.
+  for (const c of e.creatures.filter((x) => x.shelved)) {
+    assert.ok(!c.shore && !c.npc, `${name}: ${c.id} is shelved, so it needs no second word for being kept back`);
+  }
+  // The preload lists are what a player is most likely to reach for, so every id on them has to be
+  // something they can actually reach for: a full body and two portraits fetched ahead of time for
+  // an animal that is not on the pick screen is bandwidth spent on a tile nobody will see. The
+  // Devonian's boot list named Bothriolepis the day it became an NPC.
+  const offers = new Set(offered.map((c) => c.id));
+  for (const id of [e.defaults.player, ...e.defaults.boot, ...e.defaults.title]) {
+    assert.ok(offers.has(id), `${name}: ${id} is preloaded for the pick screen but is not offered on it`);
+  }
+}
+// The viewer lists every body a game has, so "can I play this?" has to be answered there: the ones
+// a player cannot pick sort to the end of their collection and carry the word in their role line.
+for (const c of new Set(SPECIMENS.map((r) => r.collection))) {
+  const rows = SPECIMENS.filter((r) => r.collection === c);
+  const first = rows.findIndex((r) => r.notPlayable);
+  if (first < 0) continue;
+  assert.ok(first > 0, `${c}: a collection cannot be nothing but animals a player is not offered`);
+  assert.ok(rows.slice(first).every((r) => r.notPlayable), `${c}: an animal a player can pick sits after one they cannot`);
+  assert.ok(rows.slice(first).every((r) => r.role.includes(r.notPlayable)),
+    `${c}: a kept-back animal's role line does not say which kind it is`);
+}
+console.log('PASS: three pick screens of eighteen, and the viewer keeps what it does not offer at the end of each list');

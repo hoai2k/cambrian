@@ -6,23 +6,33 @@ export type { CreatureId, AbilityId, CreatureDef, MoveDef } from '../content/cre
 export const CREATURES = ACTIVE_ERA.creatures;
 export const CREATURE_IDS = CREATURES.map((c) => c.id);
 /**
- * The creatures a player may pick. An era whose models arrive in batches lets the rest of the
- * roster borrow a delivered body in the world (ACTIVE_ERA.assets.standIns), but a borrowed body
- * has no portrait of its own, so those creatures stay off the selection screen until their own
- * model lands. Ecology, bots and the simulation still use the whole roster.
- */
-/**
- * The animals the *sea* is populated with: the roster minus the shore animals.
+ * The animals the *sea* is populated with: the roster minus the shore animals and the shelved ones.
  *
  * A `shore: true` creature stands on the beach and strikes into the water (`src/sim/triassic/
  * shore.ts` places them, one per post, pinned and brainless). It is not a swimmer, so it has no
  * business in the ambient draw — and it was in it, because that draw took the whole roster: the
  * Triassic was spawning hatchling Tanystropheus out in open water with ordinary brains, walking
  * animals swimming around biting people. Ecology and bots take this rather than `CREATURES`.
+ *
+ * A `shelved: true` creature is dropped for a different reason: the game does not have that animal
+ * any more. Its entry is kept so the specimen viewer can still show the body that was built for it,
+ * and the sea is where that stops being true.
  */
-export const WILD = CREATURES.filter((c) => !c.shore);
+export const WILD = CREATURES.filter((c) => !c.shelved && !c.shore);
 export const WILD_IDS = WILD.map((c) => c.id);
-export const PLAYABLE = CREATURES.filter((c) => !c.shore && (ACTIVE_ERA.assets.standInsPlayable || !ACTIVE_ERA.assets.standIns?.[c.id]));
+/**
+ * The creatures a player may pick: what the sea holds, minus the animals it holds and does not
+ * offer.
+ *
+ * It is drawn from `WILD` rather than from `CREATURES` because a pick has to be something the sea
+ * has — a shelved animal is in no sea and a shore animal is not a swimmer, and neither was ever a
+ * candidate. What this drops on top of that is `npc`: an animal that is in the water, hunts and is
+ * hunted, and is simply not one of the parts on offer.
+ *
+ * An era whose models arrive in batches also keeps the rest of its roster off this list until each
+ * body lands (`ACTIVE_ERA.assets.standIns`), because a borrowed body has no portrait of its own.
+ */
+export const PLAYABLE = WILD.filter((c) => !c.npc && (ACTIVE_ERA.assets.standInsPlayable || !ACTIVE_ERA.assets.standIns?.[c.id]));
 export const PLAYABLE_IDS = PLAYABLE.map((c) => c.id);
 /**
  * The roster plays at the animals' natural sizes; *Equivalent sizing* is the option that flattens
