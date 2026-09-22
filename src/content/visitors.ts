@@ -104,7 +104,9 @@ export const recordableIds = (era: EraId): string[] =>
 export function visitorsFrom(era: EraId): Visitor[] {
   return ROSTERS[era]
     // A shore animal never leaves the beach at home and would have nothing to do in another sea.
-    .filter((c) => !c.shore)
+    // An animal that is not pickable cannot be taken to the top of anything, so it can never be
+    // earned — `npc` is in the water and off the pick screen, `shelved` is not in the game at all.
+    .filter((c) => !c.shore && !c.npc && !c.shelved)
     .map((c) => makeVisitor(era, c));
 }
 

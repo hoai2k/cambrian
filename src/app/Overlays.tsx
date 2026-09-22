@@ -1,4 +1,4 @@
-import { hasEquivalentSizing } from '../sim/creatures';
+import { hasEquivalentSizing, PLAYABLE } from '../sim/creatures';
 import { RULES } from '../sim/era-rules';
 import { ACTIVE_ERA } from '../content';
 import { useEffect, useRef } from 'react';
@@ -105,7 +105,11 @@ export function Discoveries({ codex, fresh }: { codex: Codex; fresh: Codex }) {
   const seenBiome = new Set(codex.biomes), newBiome = new Set(fresh.biomes);
   const seenMark = new Set(codex.landmarks), newMark = new Set(fresh.landmarks);
   const newApex = new Set(fresh.apex);
-  const roster = ACTIVE_ERA.creatures, d = TEXT.discoveries;
+  // The animals a player can take to the top, which is what an apex card records — `PLAYABLE`
+  // rather than the whole roster, because a sea also holds animals nobody is offered (`npc`) and
+  // an era's entries outlive the game's use of them (`shelved`). A card for one of those would be
+  // a square that never fills, and it would be in the denominator of "N of M species" as well.
+  const roster = PLAYABLE, d = TEXT.discoveries;
   return (
     <div className="discoveries">
       <div className="discovery-head">

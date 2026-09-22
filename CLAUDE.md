@@ -422,6 +422,29 @@ unless the user explicitly asks for a PR. Steps:
   Nothing synthesises a stand-in for a sound that has not loaded — it stays quiet and the file is
   fetched; anything genuinely missing goes in `docs/audio-requests.md`. Only creatures with their own delivered model are pickable
   (`PLAYABLE` in `src/sim/creatures.ts`); the rest borrow a body in the world but stay off the roster.
+- **A roster is a menu, not a census, and three words on a creature's card decide how far into the
+  game it reaches.** `WILD` is what the sea holds and `PLAYABLE` is drawn *from* `WILD`, because a
+  pick has to be something the sea has. `shore` stands on the beach and strikes into the water;
+  `npc` is an ordinary swimmer the world spawns, hunts and is hunted by, and never offers — being
+  worth meeting is not the same as being worth playing, and every animal on a pick screen costs
+  every other one a share of the player's attention; `shelved` is not in that game at all, and its
+  roster entry is kept only so the specimen viewer can still show the body that was built for it,
+  which is what puts it in no sea (deleting the entry would take the animal's name, group, portrait
+  and model paths with it). All three games now offer **eighteen**, which is `gridColumns`' three
+  rows of six: the Cambrian keeps Odontogriphus, Ctenorhabdotus and Vetulicola in the water,
+  the Devonian Bothriolepis, Cheirolepis and Rhinodipterus, and the Triassic Cartorhynchus, with
+  Askeptosaurus and Hybodus shelved. `npm run eras` counts all three off the flags and checks that
+  nothing on a preload list is an animal the pick screen does not offer — the Devonian's `boot`
+  named Bothriolepis the day it stopped being pickable, which is a full body and two portraits
+  fetched ahead of time for a tile nobody sees. Three consequences worth knowing: the preload queue
+  is `WILD_IDS` (a shelved body is a download the game can never use), the codex's apex strip is
+  `PLAYABLE` (a card for an animal nobody can take to the top is a square that never fills, and it
+  would be in the denominator of "N of M species" as well), and `visitorsFrom` drops them too,
+  since an animal that cannot be picked can never be taken to the top of anything.
+  The specimen viewer shows every body a game has, so it answers "can I play this?" separately: a
+  kept-back animal sorts to the **end** of its collection and carries the word in its role line
+  (`TRIASSIC · NPC · SWIMMER · The bottom-worker`), stably, so the roster's own order inside each
+  half is untouched and an animal moved on or off the pick screen moves here by itself.
 - Devonian gameplay lives in `src/sim/devonian/` and Triassic gameplay in `src/sim/triassic/`; both
   reach the shared simulation only through the `RULES?.` hooks in `src/sim/era-rules.ts`. Do not
   branch on the era inside `game.ts`/`combat.ts`; add a hook. With `RULES` undefined the Cambrian
@@ -749,9 +772,18 @@ unless the user explicitly asks for a PR. Steps:
   nothing else in every case, which is why both cephalopods have none. Authored geometry in a mouth
   is a cost (it is invented shape on a Tripo body, against the simplicity bar), so it is justified
   per animal by a gape that actually shows through, never added as a matter of course.
-  **None of it is drawn at present**: `src/shared/oral-geometry.ts` is the one classifier, the game
-  hides everything it matches and the viewer's *Mouth geometry* switch starts off, so what is on
-  screen is the mouth each generation arrived with. The simulation reaches a mouth through
+  **Whether it is drawn is a verdict per animal, not a state of the roster.** `src/shared/oral-geometry.ts`
+  is the one classifier and `src/shared/oral-greenlit.json` the one list: a body a human has greenlit
+  draws its mouth, everything else is still hidden and shows the mouth its generation arrived with.
+  Hiding everything was right while the whole construction was under review and wrong the moment any
+  one body passed it, because the review is of *this animal's* mouth. A greenlit body is also offered
+  no *Mouth geometry* switch in the viewer — its mouth is part of it now, and a control asking whether
+  to draw an animal's own anatomy reads as a body still under review. The list is a JSON file rather
+  than a constant because **three languages have to agree about it**: the runtime reads it through
+  that module, `hidden-parts.mjs` imports it, and `gape-solid.py` and `mouth-space.py` load it — and
+  those last two are the tools that answer *what does a player see*. A greenlist only the runtime knew
+  about would leave them hiding what the game draws, which is the exact failure `--as-drawn` exists to
+  fix. The simulation reaches a mouth through
   `anchor_mouth` and `anchor_mouth_inside`, which are bones, so none of this is load-bearing.
   Whatever fills a mouth, the proof is unchanged and proving it needs care: render at full gape against a
   saturated backdrop *with and without* a backface-cull shim and compare the two, because comparing

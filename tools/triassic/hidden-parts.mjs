@@ -21,6 +21,7 @@ import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
 import { ORAL_GEOMETRY, isOralGeometryNamed } from '../../src/shared/oral-geometry.ts';
+import { drawsOralGeometry } from '../../src/shared/oral-geometry.ts';
 
 const check = process.argv.includes('--check');
 const DIR = 'public/assets/triassic/creatures';
@@ -33,6 +34,7 @@ const given = process.argv.slice(2).filter((a) => !a.startsWith('--'));
 const ids = given.length ? given : JSON.parse(fs.readFileSync('tools/triassic/shipped.json', 'utf8')).creatures;
 const failures = [];
 let hidden = 0;
+let drawn = 0;   // oral parts on greenlit bodies: present, and deliberately visible
 for (const id of ids) {
   for (const suffix of given.length ? [''] : ['', '.puppet', '.lod1']) {
     const file = given.length ? id : `${DIR}/${id}${suffix}.glb`;
@@ -44,6 +46,9 @@ for (const id of ids) {
       const mats = mesh.listPrimitives().map((p) => p.getMaterial()?.getName());
       const byNode = ORAL_GEOMETRY.test(node.getName()) || ORAL_GEOMETRY.test(mesh.getName());
       if (!byNode && !isOralGeometryNamed(mesh.getName(), mats)) continue;
+      // A greenlit body's oral geometry is drawn, so it is not hidden and must not be counted as
+      // such -- this count is the roster-wide statement of what the game leaves out.
+      if (drawsOralGeometry(id)) { drawn++; continue; }
       hidden++;
       const verts = mesh.listPrimitives().reduce((s, p) => s + p.getAttribute('POSITION').getCount(), 0);
       const why = byNode ? 'name' : 'material';
@@ -54,6 +59,7 @@ for (const id of ids) {
   }
 }
 console.log(`${hidden} hidden meshes across ${ids.length} bodies (authored, twin and LOD)`);
+if (drawn) console.log(`${drawn} oral meshes drawn on greenlit bodies (authored, twin and LOD)`);
 if (failures.length) {
   for (const f of failures) console.error('FAIL ' + f);
   process.exit(1);

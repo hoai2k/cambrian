@@ -186,6 +186,24 @@ export interface CreatureDef {
    */
   shore?: boolean;
   /**
+   * An animal the sea keeps and the pick screen does not offer. It spawns, it is hunted, it hunts,
+   * bots wear it and the ecology counts it — everything except being somebody. A roster is a menu
+   * rather than a census: an animal can be worth meeting without being worth *playing*, and three
+   * or four of those on a pick screen cost every other animal a share of the player's attention.
+   * `shore` says the same thing about a beach animal and says much more besides (where it stands,
+   * how it strikes, which clips it runs); this says only that, for a swimmer that is otherwise
+   * ordinary.
+   */
+  npc?: boolean;
+  /**
+   * An animal this game no longer has at all: in no sea, on no screen, and reached only by the
+   * specimen viewer. A body that has been built, rigged and checked goes on being worth looking at
+   * after the game has stopped using it, and deleting the roster entry would take its name, its
+   * group, its portrait and its model paths with it — so the entry stays and the sea lets go of it
+   * (`WILD` in src/sim/creatures.ts, which is what populates the world).
+   */
+  shelved?: boolean;
+  /**
    * How a new player of this species arrives. Everything hatches from an egg on the sand in cover;
    * `live` additionally puts a grown adult of its own kind beside the hatchling for the first
    * minute, which is the parental care the fossils' viviparity implies for these animals
