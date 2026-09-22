@@ -451,8 +451,9 @@ units on a body 3 units long.
   reviewer looking for a land gait will not find one.
 - **The mouth is aimed rather than measured, and this body's mouth geometry is not greenlit.** The
   groove the generation drew is 26 vertices two thousandths deep and was never going to say where
-  the jaw joint is; a human's aim replaced it (the aimed re-cut, 22 September 2026) and the body agrees with the reviewer about
-  the one thing it can be asked, which is where the middle of its head is. What is still open is a
+  the jaw joint is; a human's aim replaced it (22 September 2026) and the body agrees with the
+  reviewer about the one thing it can be asked, which is where the middle of its head is. What is
+  still open is a
   *look*: this animal is not in `src/shared/oral-greenlit.json`, so nobody has yet ruled on whether
   its mouth reads as a mouth. It is worth ruling on rather than assuming, because unlike a lining
   the caps are part of the body meshes and are drawn whatever that list says — the greenlist
@@ -466,9 +467,15 @@ units on a body 3 units long.
 - Cartorhynchus is **not** in `tools/triassic/shipped.json` and its preview badge is **not**
   cleared. It is registered in `src/content/triassic/review-bodies.json`.
 - **There are no eye globes**, as on every Triassic body delivered so far.
-- **Only the twin's portrait is written** (`public/assets/triassic/creatures/cartorhynchus.puppet.png`),
-  beside the other delivered bodies that carry one. The authored body's roster cards are not:
-  until a human decides this animal ships, the placeholder cards cut from the canonical pose
-  stay where they are.
+- **Superseded:** this body *is* in `tools/triassic/shipped.json` and all five of its portraits are
+  published (T3D-07), so the two bullets above about a placeholder card and a twin-only portrait
+  were true when they were written and are not now. `publish-portraits.mjs --check` is what keeps
+  them current, and it is in `npm run triassic`.
+- **The roster-wide `docs/triassic/throat-audit.json` is stale for this body** and deliberately not
+  refreshed here: it still lists an `Oral_cavity_lining` and a `Seated_jaw_hinge_tissue` against the
+  old sha256. Running that tool for one animal silently overwrites the whole roster's report, and
+  two other bodies were being rebuilt beside this one, so a sweep taken now would bake their
+  in-flight state. It is a roster-wide re-run for after the batch merges; nothing in
+  `npm run triassic` reads it.
 - Living colours, soft tissues and movements are artistic reconstruction. World travel, grip and
   capture rules remain engine-owned.
