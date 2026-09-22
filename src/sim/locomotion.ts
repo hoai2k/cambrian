@@ -169,3 +169,21 @@ export function columnY(ground: number, surface: number, L: number, rng: () => n
  * account now and then.
  */
 export const keepClear = (L: number) => Math.max(0, (L - 2.5) * 1.1);
+
+/**
+ * How much water a body needs over the seabed for that water to be somewhere it can *be*.
+ *
+ * A swimmer is not a fish in a jar: it needs room to turn, room to keep off the sand and room for
+ * something else to pass over it, and half again its own length is about the least that reads as
+ * water rather than as an animal wedged between the floor and the sky. A seventeen-unit
+ * Shonisaurus over twelve units of Triassic shelf is not a big animal in the shallows, it is a
+ * mistake — and the gate that was supposed to stop it measured the *depth alone* (`headroom`),
+ * which says nothing about the body standing in it.
+ */
+export const COLUMN_FIT = 1.5;
+
+/** The longest body the water between `ground` and `surface` can hold. */
+export const columnHolds = (ground: number, surface: number) => Math.max(0, (surface - ground) / COLUMN_FIT);
+
+/** Whether a body of length `L` fits the column over `ground`. */
+export const fitsColumn = (ground: number, surface: number, L: number) => surface - ground >= L * COLUMN_FIT;

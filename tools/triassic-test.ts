@@ -853,5 +853,42 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
   }
 }
 
+// --- nothing is spawned into water that cannot hold it ---
+{
+  // The Triassic is where this shows, because it is the era whose floor actually sinks by biome:
+  // ten units of water over the shallows, thirteen over a nursery, thirty over the shelf. The
+  // size band an ambient spawn is drawn from is a fraction of each species' *own* adult length, so
+  // it says nothing about how long the animal is — a Shonisaurus drawn mid is still eight units of
+  // ichthyosaur — and the only gate was `headroom`, a fixed 13.5 units of water that a shelf
+  // clears with room to spare. A player hatching inshore met seventeen-unit giants standing in
+  // water shallower than they were long.
+  const { columnHolds } = await import('../src/sim/locomotion');
+  let checked = 0, worst = 0, worstId = '';
+  for (const seed of [31, 77, 512]) {
+    const g = new Game('reef', [{ creature: 'ceratites', device: 'keyboard', ready: true }], seed);
+    const p = g.players[0];
+    // Inshore, where the water is shallowest and the hatchling actually starts.
+    p.pos = { x: 40, y: SURFACE_Y - 4, z: shoreZ(40) - 70 };
+    const seen = new Set<number>();
+    for (let i = 0; i < 60 * 90; i++) {
+      tick(g);
+      for (const o of g.actors) {
+        // A shore animal stands on the beach by design and is not in the water at all — and an
+      // earlier block in this suite leaves them switched on.
+      if (o.controller !== 'ambient' || seen.has(o.id) || creature(o.creature).shore) continue;
+        seen.add(o.id);
+        // Measured where it was put, on the frame it appeared: an animal is free to swim into the
+        // shallows afterwards, and a body passing over a shelf is not the thing under test.
+        const holds = columnHolds(sampleHeight(o.pos.x, o.pos.z), SURFACE_Y);
+        const over = lengthOf(o) / Math.max(holds, 1e-3);
+        if (over > worst) { worst = over; worstId = `${o.creature} ${lengthOf(o).toFixed(1)} long in ${(holds * 1.5).toFixed(1)} of water`; }
+        checked++;
+      }
+    }
+  }
+  ok(checked > 40, `enough ambient spawns to say anything (${checked})`);
+  ok(worst <= 1.001, `every ambient body fits the water it was put in (worst ${worst.toFixed(2)}: ${worstId})`);
+}
+
 console.log(`\nall ${passes} Triassic checks passed`);
 void CREATURES; void biomeAt; void nurseryAt;

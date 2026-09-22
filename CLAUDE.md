@@ -1297,6 +1297,31 @@ unless the user explicitly asks for a PR. Steps:
   no approaching one to ride it. A fed giant notices — the head comes round, which is the tell — and
   goes back to its route; how often one is hungry follows the hour and the water it is over
   (`appetiteAt`), which is where the rhythm of the day is set. `npm run hunt` covers both halves.
+- **A giant is a giant to you whatever brain it is carrying, and the water has to hold it.** Two
+  faults met in the Triassic shallows and read as one: hatchlings eaten with no warning by
+  Shonisaurus standing in water shallower than they were long. *The warning* (`updateHunted` in
+  `src/sim/game.ts`) chose its ramp by `brain.kind === 'giant'` — which is the **patrol** brain only
+  the handful of named `GIANTS` are given. Every other big animal in the sea is an ambient spawn
+  with an ordinary `needs` brain, so a seventeen-unit ichthyosaur hunting a hatchling was scored
+  like a small predator: range capped at 40 units, no floor while hunting, 0.04 at thirty-four
+  units where the giant ramp gives 0.81 — about a second of warning before a body that size
+  arrives. The ramp now follows `bandOf`, what the animal is *to the body it is chasing*, and the
+  brain kind only ever widens it. *The water*: `headroom` is a fixed 13.5 units and a size band is
+  a fraction of each species' **own** adult length, so neither says how long the animal actually
+  is — a Shonisaurus drawn mid is still eight units of ichthyosaur. `columnHolds`/`fitsColumn` in
+  `src/sim/locomotion.ts` (`COLUMN_FIT`, half again the body) are what a spawn is measured against
+  now: the body is drawn down to what the column holds, and where not even the smallest of that
+  kind fits, another *kind* is drawn rather than the spawn being given up — the shallows are not
+  empty, they are small. `pickWander` sends a body that does not fit its next target further out,
+  the same way it already refuses to wander up the beach; hunting is not routed through there, so a
+  giant still follows you inshore, it simply does not *live* there. Without the gate a 10.4-unit
+  Helicoprion was placed in 9 units of water; with it the worst fit over three seeds is exactly 1.
+  `npm run hunt` holds the warning and `npm run triassic` the water.
+- **A mouthful taken on contact is the player's own act.** Wildlife swallows a swarm fish or a
+  small ambient body whole, and nothing else: `consumeSnacks` and `attackHits` both require the
+  victim to be `swarm` or `ambient`, so a player or a bot is never taken whole however close it
+  swims to a mouth — it is bitten for, and a grip is a grip with a bar on it. `npm run hunt` swims
+  a hatchling into a giant's jaws for two seconds to keep it that way.
 - **Being eaten is the end of the chase.** The hunt warning — the arrow, the eye, the line — is a
   reading of the *live* world, and `updateHunted` only ever runs on a body that can still act, so a
   corpse kept whatever score it died holding and went on saying something was hunting it. It is

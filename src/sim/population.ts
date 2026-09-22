@@ -85,8 +85,11 @@ export function drawBand(rng: Rng, p: AreaProfile): SizeBand {
 export function bandScale(rng: Rng, band: SizeBand): number {
   const [lo, hi] = SIZE_BANDS[band];
   const f = band === 'large' ? rng() * rng() : rng();
-  return clamp(lo + f * (hi - lo), 0.28, 2.4);
+  return clamp(lo + f * (hi - lo), SMALLEST_BAND, 2.4);
 }
+
+/** The smallest an ambient body is ever drawn at, whatever band it came from. */
+export const SMALLEST_BAND = 0.28;
 
 /**
  * How much of the water above a point is open water, 0 at the surface and 1 in the deep. Used to

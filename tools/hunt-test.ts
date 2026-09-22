@@ -159,6 +159,61 @@ for (const [creatureId, mode, scale] of [['waptia', 'rise', 0.25], ['anomalocari
     `band ${bandOf(p, rival)}`);
 }
 
+// --- a giant is a giant to you whatever brain it is carrying ---
+{
+  const { makeBrain } = await import('../src/sim/ai');
+  // The warning ramp used to be chosen by `brain.kind`, which is the *patrol* brain only the
+  // handful of named giants are given. Every other big animal in the sea is an ambient spawn with
+  // an ordinary `needs` brain, so a seventeen-unit ichthyosaur bearing down on a hatchling was
+  // scored like a small predator: capped at forty units of range and no floor while hunting, which
+  // works out at about a second of warning before a body that size arrives. What decides the ramp
+  // is the band — what the animal is to the body it is chasing.
+  const g = new Game('reef', [{ creature: 'opabinia', device: 'keyboard', ready: true }], 5);
+  const p = g.players[0]; p.scale = 1; applyScaleStats(p, false); p.pos = { ...OPEN }; p.spawnProtect = 1e9;
+  for (const o of [...g.actors]) if (o.controller !== 'player') g.remove(o);
+  const big = g.spawn('anomalocaris', 'ambient', { x: OPEN.x, y: OPEN.y + 2, z: OPEN.z + 34 }, 3.2);
+  big.brain = makeBrain('needs', { ...big.pos }, g.rng, {});
+  big.brain.goal = 'hunt'; big.brain.target = p.id; big.brain.detection.set(p.id, 3);
+  run(g, emptyInput(), 1);
+  const far = p.hunted;
+  check('a hunting giant is a warning from a long way off', bandOf(p, big) === 'giant' && far >= 0.5,
+    `band ${bandOf(p, big)} hunted ${far.toFixed(2)} at ${dist(p.pos, big.pos).toFixed(0)} units`);
+  // ...and it still tightens as the thing closes, which is what the eye fills with.
+  big.pos = { x: OPEN.x, y: OPEN.y + 2, z: OPEN.z + 10 };
+  big.brain.goal = 'hunt'; big.brain.target = p.id;
+  run(g, emptyInput(), 1);
+  check('...and a warning that tightens as it arrives', p.hunted > far, `${far.toFixed(2)} -> ${p.hunted.toFixed(2)}`);
+  // A body its own size gets the small-predator ramp it always had: this is about giants.
+  const g2 = new Game('reef', [{ creature: 'opabinia', device: 'keyboard', ready: true }], 5);
+  const q = g2.players[0]; q.scale = 1; applyScaleStats(q, false); q.pos = { ...OPEN }; q.spawnProtect = 1e9;
+  for (const o of [...g2.actors]) if (o.controller !== 'player') g2.remove(o);
+  const peer = g2.spawn('opabinia', 'ambient', { x: OPEN.x, y: OPEN.y, z: OPEN.z + 34 }, 1);
+  peer.brain = makeBrain('needs', { ...peer.pos }, g2.rng, {});
+  peer.brain.goal = 'hunt'; peer.brain.target = q.id; peer.brain.detection.set(q.id, 3);
+  run(g2, emptyInput(), 1);
+  check('something your own size is not a giant warning', bandOf(q, peer) === 'rival' && q.hunted < 0.5,
+    `band ${bandOf(q, peer)} hunted ${q.hunted.toFixed(2)}`);
+}
+
+// --- nothing in the sea swallows a player whole ---
+{
+  // Taking a mouthful on contact is the player's own act and nobody else's: wildlife eats a swarm
+  // fish and a small ambient body that way, and anything steered has to be bitten for. A giant
+  // swimming over a hatchling, and one biting it, must both leave a body to fight for.
+  const g = new Game('reef', [{ creature: 'waptia', device: 'keyboard', ready: true }], 12);
+  const p = g.players[0]; g.skipHatch(); p.pos = { ...OPEN }; p.spawnProtect = 0; p.hp = p.hpMax;
+  const big = g.spawn('anomalocaris', 'ambient', { x: OPEN.x, y: OPEN.y, z: OPEN.z + 1 }, 3.2);
+  big.brain = undefined;
+  const m = new Map([[0, { ...emptyInput() } as InputFrame]]);
+  for (let i = 0; i < 120; i++) {
+    big.pos = { x: p.pos.x, y: p.pos.y, z: p.pos.z + 0.4 };   // mouth to nose, every frame
+    big.vel = { x: 0, y: 0, z: 0 };
+    g.step(1 / 60, m); g.events.length = 0;
+  }
+  check('a giant does not swallow a player it swims into', isAlive(p) && p.state !== 'swallowed',
+    `state ${p.state} hp ${p.hp.toFixed(0)}/${p.hpMax.toFixed(0)}`);
+}
+
 // --- being eaten is the end of the chase ---
 {
   // The warning used to keep the last score it had, because the scan only ever *raises* `best` and
