@@ -14,8 +14,8 @@ import { SpatialHash } from './spatial';
 import { clampMark, deathMark, fillOf, ladderFill, ladderMark, ladderRung, ladderScale, LADDER_TOP, MARK_NEAR_TOP, placeOnLadder } from './ladder';
 import { emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
 import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, RISE_RATE, sampleCurrent, sampleHeight, shoreDistance, shoreZ, type StaticContact, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
-import { areaProfile, bandScale, drawBand, headroom, PASSER_BY } from './population';
-import { columnY, DIP_CHANCE, DRIFT_CURRENT, driftRise, flipLaunch, FLIP_STAMINA, PULSE_CYCLE, pulseRefilling, pulseThrust, punting, rowWalkCurrent } from './locomotion';
+import { areaProfile, bandScale, drawBand, headroom, PASSER_BY, SMALLEST_BAND } from './population';
+import { columnHolds, columnY, DIP_CHANCE, DRIFT_CURRENT, driftRise, flipLaunch, FLIP_STAMINA, PULSE_CYCLE, pulseRefilling, pulseThrust, punting, rowWalkCurrent } from './locomotion';
 import { amphibious, ASHORE_WADE, ashoreInput, breathesAir, landSpeed, onFoot, stepBeach, wadeAt, WALL_EASE, WALL_WADE, type BeachContext } from './beach';
 import { TEXT } from '../shared/text';
 
@@ -779,8 +779,8 @@ export class Game implements AiWorld {
   }
 
   private spawnAmbient(initial = false, near?: Vec3) {
-    const c = WILD_IDS[Math.floor(this.rng() * WILD_IDS.length)];
-    const def = creature(c);
+    let c = WILD_IDS[Math.floor(this.rng() * WILD_IDS.length)];
+    let def = creature(c);
     const anchor = near ?? this.randomAnchor();
     // One spawn in five is simply something big going past, up in the water and regardless of what
     // the seabed under it holds: swimming up is always a way to find a larger animal, whatever
@@ -805,6 +805,24 @@ export class Game implements AiWorld {
       // out where the bottom drops away and what is inshore is half grown at most.
       if (band === 'large' && headroom(g) < 0.45) band = 'mid';
       s = bandScale(this.rng, band);
+      // ...and then the column decides, because a band is a fraction of each species' *own* adult
+      // length and so says nothing about how long the animal actually is. A Shonisaurus drawn mid
+      // is still eight units of ichthyosaur and one drawn large is seventeen, and `headroom`'s
+      // fixed 13.5 units of water let either of them stand on a Triassic shelf with thirteen —
+      // which is what a player meets as a giant appearing in the shallows. The water has to hold
+      // the body, so the animal is drawn down to what fits.
+      const room = columnHolds(g, SURFACE_Y);
+      if (def.adultLength * SMALLEST_BAND > room) {
+        // Water too shallow for *this* species is not water with nothing in it: the shallows are
+        // not empty, they are small. Redraw from the kinds that do fit — the same sort of body, so
+        // a crawler is still a crawler and a passer-by is still a swimmer — rather than giving up
+        // the spawn and thinning the inshore sea.
+        const pool = WILD_IDS.filter((id) => !!creature(id).ground === !!def.ground && creature(id).adultLength * SMALLEST_BAND <= room);
+        if (!pool.length) continue;
+        c = pool[Math.floor(this.rng() * pool.length)];
+        def = creature(c);
+      }
+      s = Math.min(s, room / def.adultLength);
       // A crawler goes on the sand. A swimmer goes where a body its size belongs: small animals
       // anywhere in the column including the bottom, a big one up in the water where it can be
       // seen passing (`columnY`), with the occasional pass down over the floor.
@@ -2972,10 +2990,19 @@ export class Game implements AiWorld {
       const v = o.brain.detection.get(a.id) ?? 0;
       const hunting = o.brain.target === a.id && o.brain.goal === 'hunt';
       const d = dist(a.pos, o.pos);
-      const range = Math.min(creature(o.creature).sense * lengthOf(o) + 6, o.brain.kind === 'giant' ? 70 : 40);
+      // **A giant is a giant to you whatever brain it is carrying.** This used to ask
+      // `brain.kind === 'giant'`, which is the *patrol* brain the handful of named giants are
+      // given — every other big animal in the sea is ambient and carries an ordinary `needs`
+      // brain, so a seventeen-unit Shonisaurus bearing down on a hatchling was scored like a
+      // small predator: a range capped at forty units and no floor at all while it hunted, which
+      // on a body that size and that fast is about a second of warning before the bite. What
+      // decides the ramp is the *band* — what this animal is to the body it is chasing — and the
+      // brain kind only ever widens it.
+      const huge = band === 'giant' || o.brain.kind === 'giant';
+      const range = Math.min(creature(o.creature).sense * lengthOf(o) + 6, huge ? 70 : 40);
       // giants ramp with their detection score; smaller predators ramp with distance while actively chasing
       const noticing = o.brain.target === a.id && o.brain.goal === 'notice';
-      const score = clamp(o.brain.kind === 'giant' ? Math.max(noticing ? 0.35 : 0, hunting ? Math.max(0.6, clamp(1.3 - d / range, 0.5, 1)) : Math.min(v / 4, 0.45)) : hunting ? clamp(1.1 - d / (range * 0.8), 0, 1) : 0, 0, 1);
+      const score = clamp(huge ? Math.max(noticing ? 0.35 : 0, hunting ? Math.max(0.6, clamp(1.3 - d / range, 0.5, 1)) : Math.min(v / 4, 0.45)) : hunting ? clamp(1.1 - d / (range * 0.8), 0, 1) : 0, 0, 1);
       if (score > best) { best = score; hunter = o.id; }
     }
     const wasHunted = a.hunted >= 0.98 || a.wasHunted;

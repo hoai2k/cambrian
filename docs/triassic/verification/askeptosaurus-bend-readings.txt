@@ -3,8 +3,8 @@ control, because the mode opens on the original pose and must not be a cage: the
 chain's answer, the per-joint table and the corrected-body warning all need this rig.
 
 span {"base":[-0.11821353435516269,0.06593340214443089,-1.249007895283835],"tip":[-0.5712837576866145,0.14068608136319938,-0.6199536063191484]}
-bone   body → chest         -0.7° in the bend plane · 24.6° out of it · 24.6° in all
-bone   tail_00 → chest      -10.7° in the bend plane · 9.1° out of it · 11.0° in all
-bone   chest → neck_00      +0.1° in the bend plane · 56.9° out of it · 56.9° in all
-geometry  53.32° in plane, 53.32° in all
+bone   body → chest         +0.7° in the bend plane · 24.6° out of it · 24.6° in all
+bone   tail_00 → chest      +10.7° in the bend plane · 9.1° out of it · 11.0° in all
+bone   chest → neck_00      -0.1° in the bend plane · 56.9° out of it · 56.9° in all
+geometry  -53.32° in plane, 53.32° in all
 spread across the three trunk readings: 45.9°
