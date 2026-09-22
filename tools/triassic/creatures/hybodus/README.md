@@ -1,21 +1,33 @@
 # Hybodus — the S taken out of a generated shark, on a twenty-four joint rig
 
-**Status: built, measured and rendered; not shipped.** `hybodus` is deliberately *not* in
-`tools/triassic/shipped.json` and its preview badge in
-`src/content/triassic/pending-refinements.json` is untouched, so nothing in the game has changed.
-The animal still borrows its Devonian stand-in in play. This directory is the candidate and the
-evidence for it; a human decides whether it ships.
+**Status: shipped, and shelved off the pick screen.** `hybodus` is in
+`tools/triassic/shipped.json`, so the game draws this body; the animal carries `shelved: true` in
+`src/content/triassic/creatures.ts`, which keeps it out of the roster and in the specimen viewer.
+This directory is the body and the evidence for it.
+
+**The head is cut again.** T3D-32A took the cut out entirely and ran the mouth as a bone turning
+inside one closed surface, which measured **0 px through and 0 opened as drawn on every clip**;
+on 22 September 2026 the owner asked for that change to be reverted, and it has been. What ships
+is the construction that stood before it — the labelled jaw cut, the hinge cap, the rim fold, the
+post-cut seal and the two rigid oral shells — and it leaks. The numbers are in
+[T3D-36](#t3d-36--the-cut-put-back-at-the-owners-request) at the foot of this file; read that
+section beside [T3D-32A](#t3d-32a--the-head-is-not-cut-at-all), which is now the record of a
+construction this body no longer carries.
 
 The delivered pair keeps the generation's fusiform trunk, its two spined dorsal fins, its broad
 pectorals, its pelvics and anal fin and its heterocercal tail, on one 24-joint skeleton with the
-same three sockets and **23 byte-for-byte identical decoded animation performances**. The twin is
+same three sockets and **24 byte-for-byte identical decoded animation performances**. The twin is
 also the runtime LOD.
 
 | Delivery | Triangles | Vertices | Packaged bytes |
 | --- | ---: | ---: | ---: |
-| `hybodus.glb` — worked Tripo body | 22,161 | 13,223 | 1,836,388 |
-| `hybodus.puppet.glb` — procedural twin | 7,984 | 4,027 | 1,314,436 |
-| `hybodus.lod1.glb` — byte-identical twin alias | 7,984 | 4,027 | 1,314,436 |
+| `hybodus.glb` — worked Tripo body | 22,161 | 13,223 | 1,852,840 |
+| `hybodus.puppet.glb` — procedural twin | 7,984 | 4,027 | 1,325,848 |
+| `hybodus.lod1.glb` — byte-identical twin alias | 7,984 | 4,027 | 1,325,848 |
+
+Twenty-three of those clips are the builder's; the twenty-fourth is the shore `Flop`, applied to
+all three files by `tools/creatures/motion/apply.mjs`, which also keeps `hybodus.json`'s `clips`
+and `looping` arrays in step. The byte counts are the packaged files after that gait lands.
 
 The reduced model is **36.0 %** of the authored triangles, inside the contract's 40 %. The model is
 5.000 engine authoring units long, faces +Z in glTF and uses +Y up; the research registry
@@ -533,15 +545,109 @@ closed shell.
 measure and says so. `idle-bones` every joint owns skin. `oral-shell-audit` reports no lining on
 authored, twin or LOD. `Flop` re-applied with `apply.mjs`.
 
+> **Superseded — this construction is not what ships.** T3D-36 reverted it at the owner's request
+> and the cut, the cap, the fold, the seal and the two shells are all back. Everything above is
+> kept because it is the measurement that justified taking them out, and it is the argument
+> anybody putting them out again would have to make a second time. What the body on disk now
+> measures is [T3D-36](#t3d-36--the-cut-put-back-at-the-owners-request).
+
 **A hidden part that wears the skin is freight on the twin.** The lining took a *copy of the body
 pigmentation material* — the right rule for an authored patch, and it carries the 2048² albedo and
 normal maps — and it was exported with the twin group as well. Retiring it took
 `hybodus.lod1.glb` (= the twin, byte for byte) from **1,315,816 to 672,796 bytes, −48.9 %**, on a
 body whose twin is vertex-coloured and needs no texture at all.
 
-**Known, and not this row's:** `audit.mjs --package --decode` cannot complete on this body once the
-`Flop` is applied. The shore gait is written to the authored body only, so authored/twin clip parity
-fails (24 against 23) before anything is audited; `_pipeline/paired-audit.mjs` also asserts that a
-`root` channel does not *exist* where `rig.mjs` only requires it not to move. Five Triassic bodies
-are affected and the fix is central. The audit was run and passed on the rebuilt triplet **before**
-the gait was re-applied.
+**Known, and since fixed centrally:** at the time this row landed, `audit.mjs --package --decode`
+could not complete on this body once the `Flop` was applied — the shore gait was written to the
+authored file alone, so authored/twin clip parity failed (24 against 23) before anything was
+audited, and `_pipeline/paired-audit.mjs` asserted that a `root` channel did not *exist* where
+`rig.mjs` only requires it not to move. Both were fixed for the whole era in T3D-33: `apply.mjs`
+writes the gait to the family and keeps the manifest in step, `declaredClips` reads the expected
+count off that manifest rather than off a frozen literal, and `assertRootStill` measures the root's
+drift from its own rest transform. The audit now runs to completion with the gait in place, which
+is how this revert was verified.
+
+## T3D-36 — the cut put back, at the owner's request
+
+The owner said Hybodus' mouth was not working well and asked for the last change to it to be
+reverted. `build.py` is restored verbatim to its state before T3D-32A (`a6d184c^`) and the body
+rebuilt from it, so what ships again is the labelled jaw cut, `T.cap_cut` over the hinge
+cross-section, `T.rim_flange` on the lip rim, the pre-cut `T.seal_seams` pass and the two rigid
+`T.oral_shells` — palate on the skull, floor on the jaw. Nothing was re-engineered on the way back;
+the point of a revert is to land the old construction, not a third one.
+
+Everything T3D-32A and later landed *beside* the mouth is kept, because a revert of the mouth is
+not a revert of anything else. The body carries the same **24** clips it did before, `Flop`
+included, re-applied to the authored body, the twin and the LOD1 with `apply.mjs`, which also put
+`Flop` back into `hybodus.json`'s `clips` and `looping`. The twin and the LOD1 are byte-identical.
+`audit.mjs --package --decode` passes with the gait in place — the central fix from T3D-33 — where
+the T3D-32A row above had to run it before the gait.
+
+### What it costs, measured
+
+`gape-solid.py` over **every clip whose jaw leaves the shut pose**, at each clip's own peak gape,
+rather than the roster sweep's three-clip sample. `--as-drawn` is the verdict, because that is the
+body a player sees; the plain run is what the file contains. The three legacy rows at the bottom
+are the phases T3D-32A recorded its before-numbers at, and they reproduce them exactly — which is
+the check that the revert landed the old construction and not something near it.
+
+| Shot | `--as-drawn` through | `--as-drawn` opened | plain through | plain opened | uncut body (T3D-32A) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `Bite@0.167` (peak) | **1,073** | **2,328** | 1 | 963 | 0 / 0 |
+| `Grab@0.1` (peak) | 158 | 518 | 46 | 405 | 0 / 0 |
+| `Shake@0.6` (peak) | 142 | 497 | 52 | 409 | 0 / 0 |
+| `Heavy@0.5` (peak) | 0 | 0 | 0 | 0 | 0 / 0 |
+| `Attack@0.433` (peak) | 0 | 0 | 0 | 0 | 0 / 0 |
+| `Eat@1.2` (peak) | 0 | 0 | 0 | 0 | 0 / 0 |
+| `Flop@0.133` (peak) | 0 | 0 | 0 | 44 | 0 / 0 |
+| `Ability@0.5` (peak) | 0 | 0 | 0 | 0 | 0 / 0 |
+| the seven clips that only stir the jaw | 0 | 0 | 0 | 0 | 0 / 0 |
+| `Heavy@0.4` (T3D-32A's phase) | **1,346** | **2,833** | 0 | 1,046 | 0 / 0 |
+| `Bite@0.133` (T3D-32A's phase) | **1,261** | **2,670** | 2 | 1,028 | 0 / 0 |
+| `Attack@0.333` (T3D-32A's phase) | **875** | **1,985** | 2 | 901 | 0 / 0 |
+
+The seven that only stir the jaw are `Breath`, `Death`, `SpineBrace`, `Guard`, `Idle`, `Swim` and
+`Sprint`; none of them lifts the jaw past neutral and none of them opens a pixel either way. The
+record, with both runs' per-shot rows, is [`gape-solid.json`](gape-solid.json), folded into
+`validation.json` by the builder.
+
+**Two things worth reading off that table.** The leak is not at the widest gape: `Heavy` and
+`Attack` are clean at their own peaks and leak worst a tenth of a second earlier, which is the
+mid-swing where the rigid floor has left the mandible's rim behind and the flange has not yet come
+round to cover it. And the plain run barely sees it — 52 px against 1,346 — because the two rigid
+shells *are* what stands in the gap, and the runtime hides them: this is the `--as-drawn` lesson
+verbatim, on the body it was written about.
+
+Everything else is unchanged or better than the uncut body:
+
+| Measure | Reverted body | Uncut body (T3D-32A) |
+| --- | --- | --- |
+| worst skin edge stretch | **5.93×** (`Shake`, `skull`) | 5.93× (same edge) |
+| `skin-tears.mjs` mouth region | `jaw` 2.55× in `Heavy`, `skull` 5.93× in `Shake` | same |
+| `lag.mjs` jaw cut | 345 rest-coincident pairs; **0 open past 0.2 %**, worst 0.00 % of a body | no seam to measure |
+| `lag.mjs` jaw follows its bone | `Bite`/`Attack`/`Heavy`/`Eat` **1.00 / 1.00 / 1.00 / 1.00** | 0.98 / 0.99 / 0.99 / 0.97 |
+| `idle-bones.mjs` | every joint owns skin | every joint owns skin |
+| `oral-shell-audit.mjs` | separate closed rigid palate/floor on all three variants | no lining on any variant |
+| twin / LOD1 packaged bytes | 1,325,848 | 672,796 |
+
+That last row is the other price, and it is the one T3D-32A found rather than caused: the lining
+wears a *copy of the body pigmentation material*, which carries the 2048² albedo and normal maps,
+and it is exported with the twin group — so a vertex-coloured twin that needs no texture at all
+carries two of them, and the LOD doubles in size. Retiring the lining is what took it to 672,796
+bytes; putting the lining back puts the freight back.
+
+**One line in `hybodus.json` is wrong, and it is wrong verbatim.** The restored builder writes the
+viewer caveat *"The only authored surface is the oral lining: one skinned sac that closes the
+gape"*, which is the text that stood at `a6d184c^` and has not described this body since T3D-12A
+ported it to `T.oral_shells` — what it actually carries is a palate rigid on the skull and a floor
+rigid on the jaw, which is what `oral-shell-audit.mjs` reports. It is left as the revert produced
+it rather than corrected, because correcting it means editing the builder and rebuilding, and this
+row's whole contract is that `build.py` is `a6d184c^` and nothing else. Fix it in whichever
+direction the mouth goes next.
+
+**Not re-engineered, deliberately.** The leak above is the construction the owner asked for, and
+the routes out of it are the ones T3D-32A wrote down: span the rim (`T.cap_mouth` refuses this one
+— sixteen of its vertices carry four boundary edges where the interlocking tooth roots bring two
+runs of the rim to a point), or take the cut out again. Which of those to do, or whether to do
+neither, is a decision about the animal rather than about the pipeline, and it belongs to whoever
+looked at the mouth and said it was not working.
