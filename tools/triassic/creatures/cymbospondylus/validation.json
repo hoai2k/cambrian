@@ -828,9 +828,9 @@
       "radiusOuter": 0.06119582561443898
     }
   },
-  "authoredTriangles": 20600,
-  "twinTriangles": 7982,
-  "twinTriangleFraction": 0.3874757281553398,
+  "authoredTriangles": 20380,
+  "twinTriangles": 7702,
+  "twinTriangleFraction": 0.37791952894995096,
   "twinRemeshTriangles": 56404,
   "twinDecimateRatio": 0.11701297760009766,
   "twinVerticesHeldBackFromRelaxation": 9104,
@@ -2109,223 +2109,198 @@
     ],
     "restSlitMaxHalfDepthRaw": 0.008698060374491867,
     "restSlitMaxHalfDepthOverHeadDepth": 0.2486526974285586,
-    "liningCoverage": [
-      [
-        -0.4356,
-        1.004,
-        0.95
-      ],
-      [
-        -0.4331,
-        0.95,
-        0.95
-      ],
-      [
-        -0.4306,
-        0.95,
-        0.95
-      ],
-      [
-        -0.4281,
-        0.95,
-        0.95
-      ],
-      [
-        -0.4256,
-        0.95,
-        0.95
-      ],
-      [
-        -0.4231,
-        0.95,
-        0.95
-      ],
-      [
-        -0.4206,
-        0.95,
-        0.95
-      ],
-      [
-        -0.4181,
-        0.95,
-        0.95
-      ],
-      [
-        -0.4156,
-        0.95,
-        0.95
-      ],
-      [
-        -0.4131,
-        0.95,
-        0.95
-      ],
-      [
-        -0.4106,
-        0.95,
-        0.95
-      ],
-      [
-        -0.4081,
-        0.95,
-        0.95
-      ],
-      [
-        -0.4056,
-        0.95,
-        0.95
-      ],
-      [
-        -0.4031,
-        0.95,
-        0.95
-      ],
-      [
-        -0.4006,
-        0.95,
-        0.95
-      ],
-      [
-        -0.3981,
-        0.95,
-        0.95
-      ],
-      [
-        -0.3956,
-        0.95,
-        0.95
-      ],
-      [
-        -0.3931,
-        0.95,
-        0.95
-      ],
-      [
-        -0.3906,
-        0.95,
-        0.95
-      ],
-      [
-        -0.3881,
-        0.95,
-        0.95
-      ],
-      [
-        -0.3856,
-        0.95,
-        0.95
-      ],
-      [
-        -0.3831,
-        0.95,
-        0.95
-      ],
-      [
-        -0.3806,
-        0.95,
-        0.95
-      ],
-      [
-        -0.3781,
-        0.95,
-        0.95
-      ],
-      [
-        -0.3756,
-        0.95,
-        0.965
-      ],
-      [
-        -0.3731,
-        0.95,
-        1.057
-      ],
-      [
-        -0.3706,
-        0.95,
-        1.054
-      ],
-      [
-        -0.3681,
-        0.95,
-        1.083
-      ],
-      [
-        -0.3656,
-        0.95,
-        1.051
-      ],
-      [
-        -0.3631,
-        0.95,
-        1.071
-      ],
-      [
-        -0.3606,
-        0.95,
-        1.139
-      ],
-      [
-        -0.3581,
-        0.95,
-        1.075
-      ],
-      [
-        -0.3556,
-        0.95,
-        1.153
-      ],
-      [
-        -0.3531,
-        0.95,
-        1.213
-      ],
-      [
-        -0.3506,
-        0.95,
-        1.223
-      ],
-      [
-        -0.3481,
-        0.95,
-        1.265
-      ],
-      [
-        -0.3456,
-        0.95,
-        1.305
-      ],
-      [
-        -0.3431,
-        0.95,
-        1.338
-      ],
-      [
-        -0.3406,
-        0.95,
-        1.359
-      ],
-      [
-        -0.3381,
-        0.95,
-        1.42
-      ],
-      [
-        -0.3356,
-        0.95,
-        1.44
-      ],
-      [
-        -0.3331,
-        0.95,
-        1.484
-      ],
-      [
-        -0.3306,
-        0.987,
-        1.583
-      ]
-    ],
+    "cutRim": {
+      "Cymbospondylus authored body": {
+        "boundaryEdgesInRegion": 125,
+        "boundaryEdgesElsewhere": 14,
+        "loops": [
+          {
+            "vertices": 112,
+            "closed": true,
+            "box": [
+              [
+                -0.03317,
+                0.03708
+              ],
+              [
+                -0.3525,
+                -0.31056
+              ],
+              [
+                0.00545,
+                0.03297
+              ]
+            ],
+            "reach": 0.04194,
+            "verticesOnTheSeam": 59
+          },
+          {
+            "vertices": 13,
+            "closed": true,
+            "box": [
+              [
+                -0.00323,
+                0.00551
+              ],
+              [
+                -0.34454,
+                -0.32512
+              ],
+              [
+                0.03129,
+                0.03295
+              ]
+            ],
+            "reach": 0.01942,
+            "verticesOnTheSeam": 11
+          }
+        ],
+        "shared": {
+          "bodyBoundaryEdges": 125,
+          "shellBoundaryEdges": 127,
+          "sharedVertices": 125,
+          "sharedEdges": 125,
+          "verticesWithoutTwoSharedEdges": 0,
+          "cycles": [
+            112,
+            13
+          ]
+        }
+      },
+      "Cymbospondylus procedural volume twin": {
+        "boundaryEdgesInRegion": 110,
+        "boundaryEdgesElsewhere": 0,
+        "loops": [
+          {
+            "vertices": 101,
+            "closed": true,
+            "box": [
+              [
+                -0.03805,
+                0.04136
+              ],
+              [
+                -0.44954,
+                -0.31056
+              ],
+              [
+                0.00084,
+                0.03708
+              ]
+            ],
+            "reach": 0.13898,
+            "verticesOnTheSeam": 64
+          },
+          {
+            "vertices": 9,
+            "closed": true,
+            "box": [
+              [
+                -0.00434,
+                0.00652
+              ],
+              [
+                -0.45206,
+                -0.45206
+              ],
+              [
+                0.02066,
+                0.03128
+              ]
+            ],
+            "reach": 0.0,
+            "verticesOnTheSeam": 0
+          }
+        ],
+        "shared": {
+          "bodyBoundaryEdges": 110,
+          "shellBoundaryEdges": 110,
+          "sharedVertices": 110,
+          "sharedEdges": 110,
+          "verticesWithoutTwoSharedEdges": 0,
+          "cycles": [
+            101,
+            9
+          ]
+        }
+      }
+    },
+    "seamWeb": {
+      "note": "This generation arrived partially open (cut_rim case 2): the cut runs deeper than the modelled mouth does, so what it left open is the run of rim it drew through solid head behind the pocket, and the two copies of that run part when the jaw opens. The web is the ruled surface between them; it spans the rim and nothing else, so nothing in front of the commissure is touched. Hidden in play and in the viewer by src/shared/oral-geometry.ts, which is what it is named for.",
+      "gapeMeasuredFromTheClips": 0.6,
+      "interiorAlbedo": {
+        "lumenWallVertices": 280,
+        "meanInteriorColour": [
+          0.1932,
+          0.1015,
+          0.0711
+        ],
+        "meanColourElsewhereOnTheBody": [
+          0.2179,
+          0.2123,
+          0.1695
+        ],
+        "method": "inverse distance over the 4 nearest vertices of the measured lumen wall (a vertex whose own outward normal, cast back into the mesh, meets the wall opposite); nothing outside that set is ever sampled"
+      },
+      "perBody": {
+        "Cymbospondylus authored body": {
+          "cycles": [
+            112,
+            13
+          ],
+          "vertices": 375,
+          "faces": 250,
+          "flippedFaces": 125,
+          "gapeRadians": 0.6,
+          "fold": 0.3,
+          "floorRaw": 0.0072,
+          "partingAtGapeMax": 0.1529081374057705,
+          "partingAtGapeMean": 0.04366174033769296,
+          "rimPairsTheJunctionHolds": 55,
+          "foldDepthMax": 0.04587244122173115,
+          "foldDepthMean": 0.014529432535539505,
+          "middleRowOutsideTheIntake": 10,
+          "parity": {
+            "rimPairs": 125,
+            "worstRestPositionDifference": 0.0,
+            "worstWeightDifference": 0.0
+          },
+          "worstDepthProbeRaw": -0.00031799377757124603,
+          "sectionExcessOfTheRimRows": 1.0869937628581663,
+          "sectionExcessOfTheFoldedRow": 1.0787104525141018,
+          "foldOutsideTheSolid": 10,
+          "foldNeitherInTheFleshNorInTheMouth": []
+        },
+        "Cymbospondylus procedural volume twin": {
+          "cycles": [
+            101,
+            9
+          ],
+          "vertices": 330,
+          "faces": 220,
+          "flippedFaces": 110,
+          "gapeRadians": 0.6,
+          "fold": 0.3,
+          "floorRaw": 0.0072,
+          "partingAtGapeMax": 0.5026778433136747,
+          "partingAtGapeMean": 0.19522980734411913,
+          "rimPairsTheJunctionHolds": 39,
+          "foldDepthMax": 0.07226727995284368,
+          "foldDepthMean": 0.019726543251373317,
+          "middleRowOutsideTheIntake": 0,
+          "parity": {
+            "rimPairs": 110,
+            "worstRestPositionDifference": 0.0,
+            "worstWeightDifference": 0.0
+          },
+          "worstDepthProbeRaw": -0.0060250237584114075,
+          "sectionExcessOfTheRimRows": 1.2510098600989847,
+          "sectionExcessOfTheFoldedRow": 1.2034442872083015,
+          "foldOutsideTheSolid": 0,
+          "foldNeitherInTheFleshNorInTheMouth": []
+        }
+      }
+    },
     "toothPatches": [
       {
         "vertices": 38,
@@ -2371,10 +2346,6 @@
     "toothPatchesStraddlingTheCut": [],
     "authoredToothRows": [],
     "oralPartSeating": [
-      {
-        "part": "Oral cavity lining",
-        "worstDepthRaw": -0.007893048226833344
-      },
       {
         "part": "Seated jaw hinge tissue",
         "worstDepthRaw": 0.0037527079693973064

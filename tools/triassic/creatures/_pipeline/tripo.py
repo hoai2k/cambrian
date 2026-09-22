@@ -2676,3 +2676,49 @@ def ray_parity_inside(bvh, p, dirs=None, eps=3e-5, limit=8.):
                 break
         odd += n % 2
     return odd * 2 > len(dirs)
+
+
+def cavity_pigment(o, indices, pigment, scale=1., k=4, power=2.):
+    """The albedo of the **inside of the mouth**, as a sampler over the lumen's own wall.
+
+    `cap_mouth` takes its UVs and colours off the rim, which is right where the whole rim is a cut.
+    On a generation that arrived partially open it is not: more than half of Cymbospondylus' rim is
+    outer cheek, and a fill that samples there wears the flank into a surface that is the inside of
+    a mouth. So the sample set is the set `cavity_vertices` measured -- every vertex whose own
+    outward normal, cast back into the mesh, meets the wall opposite -- and nothing else. Inverse
+    distance over the nearest `k` of them rather than the nearest one, so the albedo runs across the
+    fill instead of stepping between the vertices it came from.
+
+    `scale` converts the fill's coordinates back into the raw frame the measurement was taken in.
+    Returns (sampler, report); the report carries the mean colour of the interior set beside the
+    mean colour of the rest of the head, which is how a reader can see the set is the mouth.
+    """
+    from mathutils.kdtree import KDTree
+    pts = [o.data.vertices[i].co.copy() for i in indices]
+    assert len(pts) >= k, ('too few lumen wall vertices to sample an interior albedo', len(pts))
+    kd = KDTree(len(pts))
+    for j, p in enumerate(pts):
+        kd.insert(p, j)
+    kd.balance()
+    cols = [np.array(pigment(p)[:4], dtype=np.float64) for p in pts]
+
+    def sample(p):
+        num, den = np.zeros(4), 0.
+        for _co, j, d in kd.find_n(Vector(p) / scale, k):
+            w = 1. / max(d, 1e-6) ** power
+            num += cols[j] * w
+            den += w
+        c = num / den if den else np.array([1., 1., 1., 1.])
+        c[3] = 1.
+        return tuple(float(x) for x in c)
+
+    inside = set(indices)
+    rest = [np.array(pigment(v.co)[:3]) for v in o.data.vertices if v.index not in inside][::37]
+    report = {'lumenWallVertices': len(pts),
+              'meanInteriorColour': [round(float(x), 4) for x in np.mean(cols, axis=0)[:3]],
+              'meanColourElsewhereOnTheBody': [round(float(x), 4) for x in np.mean(rest, axis=0)]
+              if rest else None,
+              'method': 'inverse distance over the %d nearest vertices of the measured lumen wall '
+                        '(a vertex whose own outward normal, cast back into the mesh, meets the '
+                        'wall opposite); nothing outside that set is ever sampled' % k}
+    return sample, report
