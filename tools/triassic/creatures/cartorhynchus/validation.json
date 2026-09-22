@@ -828,9 +828,9 @@
       "radiusOuter": 0.09572745557726973
     }
   },
-  "authoredTriangles": 21156,
-  "twinTriangles": 7754,
-  "twinTriangleFraction": 0.36651540934013993,
+  "authoredTriangles": 21182,
+  "twinTriangles": 7352,
+  "twinTriangleFraction": 0.3470871494665282,
   "twinRemeshTriangles": 129272,
   "twinDecimateRatio": 0.04950801283121109,
   "twinVerticesHeldBackFromRelaxation": 11910,
@@ -1048,12 +1048,12 @@
       },
       "pecR": {
         "chain": {
-          "worstOverL": 0.020085004955933926,
+          "worstOverL": 0.020085004956238026,
           "atPhase": 0.3333333333333333,
           "vertices": 1132
         },
         "fore_upper_R": {
-          "worstOverL": 0.009760359357887409,
+          "worstOverL": 0.009760359361449653,
           "atPhase": 0.3333333333333333,
           "vertices": 501
         },
@@ -1094,12 +1094,12 @@
       },
       "pecR": {
         "chain": {
-          "worstOverL": 0.02552759636726538,
+          "worstOverL": 0.025527596382214857,
           "atPhase": 0.3333333333333333,
           "vertices": 1132
         },
         "fore_upper_R": {
-          "worstOverL": 0.01223718486079567,
+          "worstOverL": 0.012237184898575776,
           "atPhase": 0.3333333333333333,
           "vertices": 501
         },
@@ -1131,11 +1131,11 @@
     "pecR": {
       "vertices": 1132,
       "chainWeight": 1053.0825579941084,
-      "trunkWeight": 78.91032628108678,
+      "trunkWeight": 78.91032624259788,
       "perTrunkBone": {
-        "neck": 0.00011441129481681855,
-        "chest": 29.097279093201678,
-        "body": 48.658158273997515,
+        "neck": 0.00011446221287769731,
+        "chest": 29.09727898889355,
+        "body": 48.658158288898676,
         "tail_00": 1.1547745025927725
       }
     }
@@ -1342,7 +1342,7 @@
     "Idle": [
       [
         -0.9368380904197693,
-        -1.104051947593689,
+        -1.1040558815002441,
         -0.711525559425354
       ],
       [
@@ -1402,7 +1402,7 @@
     "Dive": [
       [
         -0.9081653356552124,
-        -1.1075226068496704,
+        -1.10752534866333,
         -0.7066321969032288
       ],
       [
@@ -1438,7 +1438,7 @@
     "Bite": [
       [
         -0.9351420402526855,
-        -1.263879418373108,
+        -1.2638823986053467,
         -0.7058985829353333
       ],
       [
@@ -1474,7 +1474,7 @@
     "Death": [
       [
         -1.1169474124908447,
-        -1.135425090789795,
+        -1.135450005531311,
         -1.1557750701904297
       ],
       [
@@ -1486,7 +1486,7 @@
     "Guard": [
       [
         -0.9846218228340149,
-        -1.1235212087631226,
+        -1.1235228776931763,
         -0.7008436918258667
       ],
       [
@@ -1498,7 +1498,7 @@
     "Parry": [
       [
         -0.8953793048858643,
-        -1.10637629032135,
+        -1.1062957048416138,
         -0.9279263019561768
       ],
       [
@@ -1510,7 +1510,7 @@
     "Dodge": [
       [
         -0.8998202085494995,
-        -1.1337968111038208,
+        -1.1337541341781616,
         -1.0089235305786133
       ],
       [
@@ -1558,7 +1558,7 @@
     "Grab": [
       [
         -0.9159268140792847,
-        -1.2775521278381348,
+        -1.2774969339370728,
         -0.7700179815292358
       ],
       [
@@ -1594,7 +1594,7 @@
     "Haul": [
       [
         -0.9551369547843933,
-        -1.710700511932373,
+        -1.7107610702514648,
         -0.7659634351730347
       ],
       [
@@ -1619,15 +1619,15 @@
   "weights": {
     "Cartorhynchus authored body": {
       "maxInfluences": 4,
-      "vertices": 10156,
+      "vertices": 10597,
       "verticesPerBone": {
         "fore_tip_R": 598,
         "fore_mid_R": 1005,
-        "fore_upper_R": 1789,
-        "neck": 2114,
-        "skull": 1138,
-        "chest": 4215,
-        "body": 5165,
+        "fore_upper_R": 1790,
+        "neck": 2333,
+        "skull": 1348,
+        "chest": 4423,
+        "body": 5196,
         "tail_02": 3007,
         "tail_00": 3082,
         "tail_03": 2949,
@@ -1644,25 +1644,25 @@
         "hind_upper_L": 1079,
         "hind_mid_L": 451,
         "hind_tip_L": 255,
-        "jaw": 164
+        "jaw": 163
       },
       "jawJunction": {
-        "cutRimPairs": 39,
+        "cutRimPairs": 40,
         "lipPairs": 59,
         "rimReach": 0.06641808656947282,
         "rimDepth": 0.026245182380080223,
-        "dz": 0.008748394126693407,
+        "dz": 0.026245182380080223,
         "band": 0.015,
         "back": 0.06,
         "throat": 1.0,
-        "shellVertices": 198,
-        "shellFullJaw": 161,
-        "bodyThroatVertices": 147
+        "shellVertices": 427,
+        "shellFullJaw": 333,
+        "bodyThroatVertices": 132
       }
     },
     "Cartorhynchus procedural volume twin": {
       "maxInfluences": 4,
-      "vertices": 3418,
+      "vertices": 3680,
       "verticesPerBone": {
         "tail_04": 657,
         "caudal_lower": 217,
@@ -1677,35 +1677,35 @@
         "hind_mid_R": 179,
         "hind_tip_R": 115,
         "hind_tip_L": 115,
-        "body": 2077,
-        "chest": 1410,
-        "neck": 764,
+        "body": 2116,
+        "chest": 1536,
+        "neck": 890,
         "fore_upper_R": 643,
         "fore_mid_R": 380,
         "fore_tip_R": 242,
         "fore_upper_L": 602,
-        "skull": 419,
+        "skull": 539,
         "jaw": 77,
         "fore_mid_L": 369,
         "fore_tip_L": 234
       },
       "jawJunction": {
-        "cutRimPairs": 26,
+        "cutRimPairs": 27,
         "lipPairs": 35,
         "rimReach": 0.0665069800358933,
         "rimDepth": 0.026010440662503242,
-        "dz": 0.008670146887501081,
+        "dz": 0.026010440662503242,
         "band": 0.015,
         "back": 0.06,
         "throat": 1.0,
-        "shellVertices": 108,
-        "shellFullJaw": 92,
-        "bodyThroatVertices": 69
+        "shellVertices": 249,
+        "shellFullJaw": 198,
+        "bodyThroatVertices": 60
       }
     }
   },
   "maxInfluences": 4,
-  "meanInfluences": 3.8244437895977605,
+  "meanInfluences": 3.753519646984661,
   "mouth": {
     "method": "aimed by hand in the viewer's mouth editor (docs/triassic/mouths/cartorhynchus-mouth.json); the modelled cavity -- a shallow groove, 26 vertices on the snout against 193 on Placodus -- is measured beside it and no longer cuts",
     "note": "The cut is aimed by hand and no longer measured. Placodus' geometric method returns 63 vertices over the whole front third and only 26 of them on the rostrum -- one band two thousandths deep, which is the lip this generation drew rather than the joint its jaw turns about. A reviewer aimed the plane and the hinge on the shipped body in the viewer's mouth editor; the groove is still measured, and what the two disagree about is in mouthCutDeviation.",
@@ -1866,76 +1866,501 @@
     ],
     "restSlitMaxHalfDepthRaw": 0.006027693051181651,
     "restSlitMaxHalfDepthOverHeadDepth": 0.1378525081977003,
-    "liningCoverage": [
+    "oralGeometry": "none: the cut is capped with its own rim and domed into each half (T.cap_cut at the hinge cross-section, then T.cap_mouth along the mouth line), and the closed sac lining and the seated hinge ellipsoid this body shipped with are gone",
+    "cutRim": {
+      "Cartorhynchus authored body": {
+        "skull": {
+          "boundaryEdgesInRegion": 98,
+          "boundaryEdgesElsewhere": 18,
+          "loops": [
+            {
+              "vertices": 91,
+              "closed": true,
+              "box": [
+                [
+                  -0.06455,
+                  0.05305
+                ],
+                [
+                  -0.35736,
+                  -0.27546
+                ],
+                [
+                  0.01993,
+                  0.06852
+                ]
+              ],
+              "reach": 0.0819,
+              "verticesOnTheSeam": 0
+            },
+            {
+              "vertices": 7,
+              "closed": true,
+              "box": [
+                [
+                  -0.05147,
+                  -0.04796
+                ],
+                [
+                  -0.31309,
+                  -0.30095
+                ],
+                [
+                  0.05406,
+                  0.05733
+                ]
+              ],
+              "reach": 0.01214,
+              "verticesOnTheSeam": 0
+            }
+          ]
+        },
+        "jaw": {
+          "boundaryEdgesInRegion": 100,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 91,
+              "closed": true,
+              "box": [
+                [
+                  -0.06455,
+                  0.05305
+                ],
+                [
+                  -0.35736,
+                  -0.27546
+                ],
+                [
+                  0.01993,
+                  0.06852
+                ]
+              ],
+              "reach": 0.0819,
+              "verticesOnTheSeam": 0
+            },
+            {
+              "vertices": 7,
+              "closed": true,
+              "box": [
+                [
+                  -0.05147,
+                  -0.04796
+                ],
+                [
+                  -0.31309,
+                  -0.30095
+                ],
+                [
+                  0.05406,
+                  0.05733
+                ]
+              ],
+              "reach": 0.01214,
+              "verticesOnTheSeam": 0
+            },
+            {
+              "vertices": 3,
+              "closed": false,
+              "box": [
+                [
+                  -0.0242,
+                  -0.02253
+                ],
+                [
+                  -0.34443,
+                  -0.34371
+                ],
+                [
+                  0.0525,
+                  0.05383
+                ]
+              ],
+              "reach": 0.00072,
+              "verticesOnTheSeam": 0
+            }
+          ]
+        }
+      },
+      "Cartorhynchus procedural volume twin": {
+        "skull": {
+          "boundaryEdgesInRegion": 61,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 61,
+              "closed": true,
+              "box": [
+                [
+                  -0.06464,
+                  0.05225
+                ],
+                [
+                  -0.35989,
+                  -0.27546
+                ],
+                [
+                  0.02016,
+                  0.06923
+                ]
+              ],
+              "reach": 0.08444,
+              "verticesOnTheSeam": 1
+            }
+          ]
+        },
+        "jaw": {
+          "boundaryEdgesInRegion": 61,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 61,
+              "closed": true,
+              "box": [
+                [
+                  -0.06464,
+                  0.05225
+                ],
+                [
+                  -0.35989,
+                  -0.27546
+                ],
+                [
+                  0.02016,
+                  0.06923
+                ]
+              ],
+              "reach": 0.08444,
+              "verticesOnTheSeam": 1
+            }
+          ]
+        }
+      }
+    },
+    "caps": {
+      "Cartorhynchus authored body": {
+        "skullAtHinge": 39,
+        "jawAtHinge": 39,
+        "palate": {
+          "rimEdges": 61,
+          "capped": true,
+          "faces": 513,
+          "domedVertices": 228,
+          "deepestRaw": 0.014208,
+          "dome": 0.3,
+          "rounds": 2,
+          "firstNewVertex": 9942,
+          "rimVertices": 61,
+          "cycles": [
+            54,
+            7
+          ]
+        },
+        "floor": {
+          "rimEdges": 61,
+          "capped": true,
+          "faces": 513,
+          "domedVertices": 228,
+          "deepestRaw": 0.014208,
+          "dome": 0.3,
+          "rounds": 2,
+          "firstNewVertex": 199,
+          "rimVertices": 61,
+          "cycles": [
+            54,
+            7
+          ]
+        }
+      },
+      "Cartorhynchus procedural volume twin": {
+        "skullAtHinge": 26,
+        "jawAtHinge": 26,
+        "palate": {
+          "rimEdges": 37,
+          "capped": true,
+          "faces": 315,
+          "domedVertices": 140,
+          "deepestRaw": 0.014789,
+          "dome": 0.3,
+          "rounds": 2,
+          "firstNewVertex": 3291,
+          "rimVertices": 37,
+          "cycles": [
+            37
+          ]
+        },
+        "floor": {
+          "rimEdges": 37,
+          "capped": true,
+          "faces": 315,
+          "domedVertices": 140,
+          "deepestRaw": 0.014789,
+          "dome": 0.3,
+          "rounds": 2,
+          "firstNewVertex": 109,
+          "rimVertices": 37,
+          "cycles": [
+            37
+          ]
+        }
+      }
+    },
+    "capSeating": {
+      "Cartorhynchus authored body": {
+        "capVertices": 456,
+        "worstHullClearanceRaw": 0.0018492029707496943,
+        "outsideTheSectionHull": 0,
+        "outsideByRayParity": 47
+      },
+      "Cartorhynchus procedural volume twin": {
+        "capVertices": 280,
+        "worstHullClearanceRaw": -0.0013513544747283165,
+        "outsideTheSectionHull": 6,
+        "outsideByRayParity": 108
+      }
+    },
+    "seamMarginMinRaw": 0.008465900906039082,
+    "seamEntersTheHeadAtY": -0.359529935375173,
+    "seamProfile": [
       [
-        -0.3452,
-        0.317,
-        0.196
+        -0.3632,
+        -0.00771,
+        0.03041
       ],
       [
-        -0.3432,
-        0.246,
-        0.153
+        -0.3614,
+        -0.00036,
+        0.03061
+      ],
+      [
+        -0.3595,
+        0.00555,
+        0.03224
+      ],
+      [
+        -0.3577,
+        0.00847,
+        0.0333
+      ],
+      [
+        -0.3559,
+        0.00903,
+        0.0341
+      ],
+      [
+        -0.354,
+        0.00925,
+        0.03634
+      ],
+      [
+        -0.3522,
+        0.00867,
+        0.0388
+      ],
+      [
+        -0.3504,
+        0.00868,
+        0.0398
+      ],
+      [
+        -0.3485,
+        0.01058,
+        0.04068
+      ],
+      [
+        -0.3467,
+        0.01235,
+        0.04189
+      ],
+      [
+        -0.3449,
+        0.01216,
+        0.04336
+      ],
+      [
+        -0.343,
+        0.01271,
+        0.04411
       ],
       [
         -0.3412,
-        0.528,
-        0.327
+        0.01326,
+        0.04651
       ],
       [
-        -0.3392,
-        0.458,
-        0.284
+        -0.3394,
+        0.01312,
+        0.04787
       ],
       [
-        -0.3372,
-        0.458,
-        0.284
+        -0.3375,
+        0.01333,
+        0.04921
       ],
       [
-        -0.3352,
-        0.528,
-        0.327
+        -0.3357,
+        0.01423,
+        0.05107
       ],
       [
-        -0.3332,
-        0.528,
-        0.327
+        -0.3338,
+        0.01458,
+        0.05243
       ],
       [
-        -0.3312,
-        0.528,
-        0.327
+        -0.332,
+        0.01509,
+        0.05391
       ],
       [
-        -0.3292,
-        0.528,
-        0.327
+        -0.3302,
+        0.01501,
+        0.05618
       ],
       [
-        -0.3272,
-        0.528,
-        0.327
+        -0.3283,
+        0.01442,
+        0.05819
       ],
       [
-        -0.3252,
-        0.598,
-        0.371
+        -0.3265,
+        0.01394,
+        0.05973
       ],
       [
-        -0.3232,
-        0.528,
-        0.327
+        -0.3247,
+        0.01457,
+        0.06126
       ],
       [
-        -0.3212,
-        0.528,
-        0.327
+        -0.3228,
+        0.01677,
+        0.06183
+      ],
+      [
+        -0.321,
+        0.01716,
+        0.06234
       ],
       [
         -0.3192,
-        0.528,
-        0.327
+        0.01687,
+        0.06325
+      ],
+      [
+        -0.3173,
+        0.01716,
+        0.06477
+      ],
+      [
+        -0.3155,
+        0.01869,
+        0.06667
+      ],
+      [
+        -0.3137,
+        0.01945,
+        0.06736
+      ],
+      [
+        -0.3118,
+        0.01916,
+        0.06839
+      ],
+      [
+        -0.31,
+        0.01914,
+        0.06949
+      ],
+      [
+        -0.3082,
+        0.01957,
+        0.07047
+      ],
+      [
+        -0.3063,
+        0.02035,
+        0.07137
+      ],
+      [
+        -0.3045,
+        0.02118,
+        0.07271
+      ],
+      [
+        -0.3027,
+        0.02258,
+        0.07533
+      ],
+      [
+        -0.3008,
+        0.02255,
+        0.077
+      ],
+      [
+        -0.299,
+        0.02297,
+        0.07928
+      ],
+      [
+        -0.2972,
+        0.02393,
+        0.08234
+      ],
+      [
+        -0.2953,
+        0.02381,
+        0.08488
+      ],
+      [
+        -0.2935,
+        0.02328,
+        0.08621
+      ],
+      [
+        -0.2917,
+        0.02291,
+        0.08699
+      ],
+      [
+        -0.2898,
+        0.02425,
+        0.08891
+      ],
+      [
+        -0.288,
+        0.02562,
+        0.0916
+      ],
+      [
+        -0.2861,
+        0.02484,
+        0.0939
+      ],
+      [
+        -0.2843,
+        0.02487,
+        0.09519
+      ],
+      [
+        -0.2825,
+        0.0255,
+        0.0962
+      ],
+      [
+        -0.2806,
+        0.02765,
+        0.09805
+      ],
+      [
+        -0.2788,
+        0.02948,
+        0.09977
+      ],
+      [
+        -0.277,
+        0.02967,
+        0.10101
       ]
     ],
     "toothPatches": [
@@ -2141,23 +2566,13 @@
       }
     ],
     "toothPatchesStraddlingTheCut": [],
-    "authoredToothRows": [],
-    "oralPartSeating": [
-      {
-        "part": "Oral cavity lining",
-        "worstDepthRaw": -0.01808178797364235
-      },
-      {
-        "part": "Seated jaw hinge tissue",
-        "worstDepthRaw": 0.005332384258508682
-      }
-    ]
+    "authoredToothRows": []
   },
   "envelope": {
     "maximumEnvelopeDifference": 0.04287433624267578,
     "maximumEnvelopeDifferenceFractionOfBodyLength": 0.01429144541422526,
-    "surfaceDistanceMax": 0.1084677055478096,
-    "surfaceDistanceP95": 0.008336523547768593,
+    "surfaceDistanceMax": 0.043422117829322815,
+    "surfaceDistanceP95": 0.008261102251708502,
     "envelopeTolerance": 0.12
   },
   "anchors": {
