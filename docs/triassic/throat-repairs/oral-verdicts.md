@@ -144,3 +144,30 @@ worth saying so because neither of T3D-31's constructions survives it: the autho
 the only thing that makes an aperture at all. The routes out are a mouth-closed regeneration, or
 `jaw_field_uncut` on the authored body with the cut kept on the twin — which has to answer what the
 bind pose is on a body whose closing rotation is currently baked into a labelled mandible shell.
+
+## Greenlit — the game draws these mouths (22 September 2026)
+
+A human reviewed four bodies in the viewer and greenlit the mouth geometry they were already built
+with, keeping their shape as it stands. They are listed in `src/shared/oral-greenlit.json`, which is
+the one source the runtime, `hidden-parts.mjs`, `gape-solid.py` and `mouth-space.py` all read; the
+rest of the roster is still hidden and still shows the mouth its generation arrived with.
+
+`gape-solid.py --as-drawn` at the widest opening clips, before (the lining hidden, which is what the
+roster sweep measured) and after (the lining drawn, which is what a player now sees). `through` is
+opened backdrop the silhouette encloses; `opened` is every pixel whose only surface is a back face,
+and on a mouth held wide from the side it is the larger and the more honest of the two.
+
+| body | clips | `opened` before | `opened` after | `through` after |
+|---|---|---:|---:|---:|
+| Mystriosuchus | Heavy@0.5, Ability@0.4, Bite@0.1 | 7,716 / 7,734 / 7,577 | **0 / 0 / 0** | 0 |
+| Keichousaurus | Bite@0.2, Heavy@0.133, Eat@0.967 | 4,375 / 4,353 / 4,267 | **34 / 35 / 35** | 0 |
+| Mixosaurus | Heavy@0.367, Bite@0.067, Attack@0.267 | 3,697 / 3,337 / 2,861 | **44 / 40 / 37** | 0 |
+| Hupehsuchus | Ability@0.667, Gulp@0.467, Heavy@0.467 | 4,784 / 4,444 / 4,215 | **175 / 149 / 98** | 0 |
+
+All four pass the tool's own bar (0 px through the body against a tolerance of 12) and every one
+improved by one to two orders of magnitude, which is the evidence the greenlight was right rather
+than a preference: what those thousands of pixels were, was an open mouth with nothing closing it.
+Mystriosuchus closes completely. Hupehsuchus keeps the largest residue, still 96 % down.
+
+Counted across the roster, hiding drops from 75 oral meshes to 51 with 24 now drawn — 75 − 51 = 24,
+so the change moved exactly these four bodies' parts and nothing else (`hidden-parts.mjs --check`).

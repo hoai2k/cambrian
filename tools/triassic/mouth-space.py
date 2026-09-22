@@ -23,6 +23,7 @@ The backdrop is a flat mid grey that appears nowhere on the animals. CYCLES on t
 """
 import bpy
 import os
+import json
 import re
 import sys
 from mathutils import Matrix, Vector
@@ -55,7 +56,11 @@ bg = s.world.node_tree.nodes['Background']
 bg.inputs[0].default_value = (.36, .36, .36, 1)
 bg.inputs[1].default_value = .6
 
-if not SHOW_ORAL:
+# Per animal, not roster-wide: a greenlit mouth is drawn in the game, so the picture that claims
+# to be what a player sees has to draw it too. Same list the runtime reads.
+GREENLIT = {g['id'] for g in json.loads(
+    (ROOT / 'src/shared/oral-greenlit.json').read_text())['greenlit']}
+if not SHOW_ORAL and ID not in GREENLIT:
     for o in list(s.objects):
         if o.type != 'MESH':
             continue
