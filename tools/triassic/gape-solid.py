@@ -42,6 +42,14 @@ LOCAL = ROOT / 'local/triassic-authoring' / ID
 OUT = LOCAL / ('gape-solid-as-drawn' if '--as-drawn' in sys.argv else 'gape-solid')
 OUT.mkdir(parents=True, exist_ok=True)
 
+# Hiding is per animal, not roster-wide: a mouth a human has greenlit is drawn in the game, so
+# an --as-drawn run must draw it too. The list is src/shared/oral-greenlit.json, which the
+# runtime reads through the same file -- a tool that hid what the game draws would put this
+# proof back exactly where it was before --as-drawn existed.
+GREENLIT = {g['id'] for g in json.loads(
+    (ROOT / 'src/shared/oral-greenlit.json').read_text())['greenlit']}
+HIDE_ORAL = AS_DRAWN and ID not in GREENLIT
+
 # A backdrop the animal cannot produce: full-intensity magenta. Every one of these bodies is a brown
 # or grey hide over a dark red mouth, so any magenta pixel inside the silhouette is background seen
 # through the animal.
@@ -127,7 +135,7 @@ def render_pass(culled, shots):
     s = scene_setup()
     if culled:
         cull_shim()
-    if AS_DRAWN:
+    if HIDE_ORAL:
         for o in list(s.objects):
             if o.type != 'MESH':
                 continue

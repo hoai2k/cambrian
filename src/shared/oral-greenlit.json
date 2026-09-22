@@ -1,0 +1,9 @@
+{
+  "note": "Creatures whose authored mouth geometry has been greenlit by a human and is DRAWN in the game. Everything not listed here is still hidden by src/shared/oral-geometry.ts. This file is the one source: TypeScript imports it, tools/triassic/hidden-parts.mjs imports it, and gape-solid.py and mouth-space.py read it, because a tool that asks 'what does a player see' has to agree with the runtime or the as-drawn proof stops being a proof. Per-body verdicts and their evidence live in docs/triassic/throat-repairs/oral-verdicts.md.",
+  "greenlit": [
+    { "id": "hupehsuchus", "on": "2026-09-22" },
+    { "id": "keichousaurus", "on": "2026-09-22" },
+    { "id": "mixosaurus", "on": "2026-09-22" },
+    { "id": "mystriosuchus", "on": "2026-09-22" }
+  ]
+}

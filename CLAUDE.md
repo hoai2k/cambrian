@@ -749,9 +749,18 @@ unless the user explicitly asks for a PR. Steps:
   nothing else in every case, which is why both cephalopods have none. Authored geometry in a mouth
   is a cost (it is invented shape on a Tripo body, against the simplicity bar), so it is justified
   per animal by a gape that actually shows through, never added as a matter of course.
-  **None of it is drawn at present**: `src/shared/oral-geometry.ts` is the one classifier, the game
-  hides everything it matches and the viewer's *Mouth geometry* switch starts off, so what is on
-  screen is the mouth each generation arrived with. The simulation reaches a mouth through
+  **Whether it is drawn is a verdict per animal, not a state of the roster.** `src/shared/oral-geometry.ts`
+  is the one classifier and `src/shared/oral-greenlit.json` the one list: a body a human has greenlit
+  draws its mouth, everything else is still hidden and shows the mouth its generation arrived with.
+  Hiding everything was right while the whole construction was under review and wrong the moment any
+  one body passed it, because the review is of *this animal's* mouth. A greenlit body is also offered
+  no *Mouth geometry* switch in the viewer — its mouth is part of it now, and a control asking whether
+  to draw an animal's own anatomy reads as a body still under review. The list is a JSON file rather
+  than a constant because **three languages have to agree about it**: the runtime reads it through
+  that module, `hidden-parts.mjs` imports it, and `gape-solid.py` and `mouth-space.py` load it — and
+  those last two are the tools that answer *what does a player see*. A greenlist only the runtime knew
+  about would leave them hiding what the game draws, which is the exact failure `--as-drawn` exists to
+  fix. The simulation reaches a mouth through
   `anchor_mouth` and `anchor_mouth_inside`, which are bones, so none of this is load-bearing.
   Whatever fills a mouth, the proof is unchanged and proving it needs care: render at full gape against a
   saturated backdrop *with and without* a backface-cull shim and compare the two, because comparing
