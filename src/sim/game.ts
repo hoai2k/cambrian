@@ -18,6 +18,8 @@ import { areaProfile, bandScale, drawBand, headroom, PASSER_BY, SMALLEST_BAND } 
 import { columnHolds, columnY, DIP_CHANCE, DRIFT_CURRENT, driftRise, flipLaunch, FLIP_STAMINA, PULSE_CYCLE, pulseRefilling, pulseThrust, punting, rowWalkCurrent } from './locomotion';
 import { amphibious, ASHORE_WADE, ashoreInput, breathesAir, landSpeed, onFoot, stepBeach, wadeAt, WALL_EASE, WALL_WADE, type BeachContext } from './beach';
 import { TEXT } from '../shared/text';
+import { CAMBRIAN_LADDER, hitSeconds, HUNGER_DRAIN, hungerWorth, STARVE_TIME, SURVIVAL_DEATH_COST, SURVIVAL_TOP_SECONDS } from './survival';
+import { healRate, PLANT_HEAL } from './effort';
 
 /** Everything the simulation says out loud; the words are in `src/content/strings.ts`. */
 const SAY = TEXT.sim;
@@ -921,14 +923,21 @@ export class Game implements AiWorld {
     }
     if (this.mode === 'survival') {
       for (const a of this.actors) if ((a.controller === 'player' || a.controller === 'bot') && isAlive(a)) {
-        a.hunger = Math.max(0, a.hunger - dt * 0.45);
-        if (a.hunger === 0) { kill(this.hitCtx, a); continue; }
-        this.gainSurvivalXp(a, dt * 0.5);
+        a.hunger = Math.max(0, a.hunger - dt * HUNGER_DRAIN);
+        // An empty stomach eats the body rather than ending it on the frame the bar meets zero:
+        // seconds of visibly going under, the way drowning is, and a meal in time stops it.
+        if (a.hunger === 0) {
+          a.hp -= (a.hpMax / STARVE_TIME) * dt;
+          if (a.hp <= 0) { a.hp = 0; kill(this.hitCtx, a); continue; }
+        }
+        this.gainSurvivalXp(a, dt / SURVIVAL_TOP_SECONDS);
       }
       for (const e of this.events.slice(eventStart)) if (e.kind === 'hit' && e.other != null) {
         const attacker = this.idMap.get(e.actor), victim = this.idMap.get(e.other);
-        if (attacker && victim && (attacker.controller === 'player' || attacker.controller === 'bot') && lengthOf(victim) >= lengthOf(attacker) * 0.8)
-          this.gainSurvivalXp(attacker, Math.max(1, e.strength ?? 1) * (lengthOf(victim) >= lengthOf(attacker) * 1.35 ? 4 : 2));
+        if (!attacker || !victim || (attacker.controller !== 'player' && attacker.controller !== 'bot')) continue;
+        const ratio = lengthOf(victim) / Math.max(lengthOf(attacker), 1e-3);
+        const secs = hitSeconds(e.strength ?? 0, ratio, attacker.controller === 'player' && victim.controller === 'player');
+        this.gainSurvivalXp(attacker, secs / SURVIVAL_TOP_SECONDS);
       }
     }
     this.resolveActorOverlap();
@@ -1074,7 +1083,7 @@ export class Game implements AiWorld {
     // wherever in a rung it lands. The era hook still runs first for everything else a respawn
     // resets; the ladder itself is settled here so all three games price a death the same way.
     if (RULES) RULES.onRespawn(this, a);
-    if (this.mode === 'survival') placeOnLadder(this, a, Math.max(0, ladderRung(this, a) - 1));
+    if (this.mode === 'survival') placeOnLadder(this, a, clampMark(ladderMark(this, a) - SURVIVAL_DEATH_COST));
     else if (this.mode !== 'reef') placeOnLadder(this, a, deathMark(ladderMark(this, a)));
     else if (!RULES) a.nutrition *= 0.5;
     if (this.mode === 'hunted' && this.isHunter(a.player) && !RULES) { a.scale = 3.0; a.tier = 3; }
@@ -1256,10 +1265,14 @@ export class Game implements AiWorld {
     a.holdT = Math.max(0, a.holdT - dt);
     a.sinceHit += dt;
     // Out of the fight for a few seconds and health comes back: run, hide, recover, return.
-    if (a.sinceHit > 6 && a.hp < a.hpMax && a.state !== 'dead' && input.burst <= 0.1 && a.burstT <= 0 && !input.dash && a.state !== 'dodge' && (RULES?.canRecoverHealth?.(this, a) ?? true)) {
+    // Out of the fight for a few seconds and health comes back: run, hide, recover, return. Faster
+    // beside a plant, paused while sprinting or dashing, and in Survival paused on an empty stomach.
+    const resting = a.sinceHit > 6 && a.hp < a.hpMax && a.state !== 'dead' && input.burst <= 0.1 && a.burstT <= 0 && !input.dash && a.state !== 'dodge'
+      && !(this.mode === 'survival' && a.hunger <= 0);
+    if (resting && (RULES?.canRecoverHealth?.(this, a) ?? true)) {
       const nearPlant = this.world.floraHash.query(a.pos.x, a.pos.z, this.world.floraReach + L * 0.5 + 1.5, this.scratchFlora)
         .some((f) => Math.hypot(a.pos.x - f.pos.x, a.pos.z - f.pos.z) <= f.R + L * 0.5 + 1.5 && a.pos.y >= f.pos.y - L * 0.5 && a.pos.y <= f.pos.y + f.H + L * 0.5);
-      a.hp = Math.min(a.hpMax, a.hp + a.hpMax * (a.controller === 'player' || a.controller === 'bot' ? 0.0175 : 0.01) * (nearPlant ? 2 : 1) * dt);
+      a.hp = Math.min(a.hpMax, a.hp + a.hpMax * healRate(a, this.mode) * (nearPlant ? PLANT_HEAL : 1) * dt);
     }
     if (a.brain) a.brain.courage = Math.min(1, a.brain.courage + 0.05 * dt);
 
@@ -1545,7 +1558,6 @@ export class Game implements AiWorld {
     // Everything the animal *decides* — aim, sense, the heavy button, the dash, the guard, the
     // attacks, and the state machine that runs each of them to its end.
     this.stepActions(a, input, dt, { def, L, sf, justLight, justHeavy, justAbility, justDodge, justGuard, justLock, justSense, justDash, paddling, bursting, dir, mag, locked, jets, relief, freeClimb });
-    a.stamina = a.staminaMax;
   }
 
   /**
@@ -1554,9 +1566,6 @@ export class Game implements AiWorld {
    * afford — whether this body is sprinting, paddling, or out of breath altogether.
    */
   private stepUpkeep(a: Actor, input: InputFrame, dt: number, def: ReturnType<typeof creature>, L: number, dir: Vec3, mag: number, justLight: boolean, justHeavy: boolean, justAbility: boolean, justDash: boolean) {
-    // Effort has no separate meter. Health recovery carries the cost of exertion.
-    a.stamina = a.staminaMax;
-    a.exhausted = 0;
     // Timers
     a.stateT += dt;
     a.iframes = Math.max(0, a.iframes - dt);
@@ -1634,7 +1643,7 @@ export class Game implements AiWorld {
     if (bursting && !freeBurst) a.stamina = Math.max(0, a.stamina - BURST_STAMINA * burstIn * dt * (1 - relief));
     else if (a.state === 'guard') a.stamina -= 3 * dt;
     else if (a.hideMode !== 'camouflage') a.stamina = Math.min(a.staminaMax, a.stamina + (speed < 0.4 ? 24 : 14) * dt * (a.state === 'free' ? 1 : 0.5) * (RULES?.staminaRegen(this, a) ?? 1));
-    a.stamina = a.staminaMax;
+    if (a.stamina <= 0) { a.stamina = 0; if (a.exhausted === 0 && !freeClimb) a.exhausted = 1.6; }
     return { speed, burstIn, paddling, bursting, freeBurst, relief, emptyClimb, freeClimb };
   }
 
@@ -2769,7 +2778,7 @@ export class Game implements AiWorld {
 
   private expansionContext() {
     return { hit: this.hitCtx, nearby: (pos: Vec3, radius: number) => this.nearby(pos, radius), silt: this.silt,
-      allies: (a: Actor, b: Actor) => this.mode === 'rise' && a.controller === 'player' && b.controller === 'player' };
+      allies: (a: Actor, b: Actor) => (this.mode === 'rise' || this.mode === 'survival') && a.controller === 'player' && b.controller === 'player' };
   }
 
   /** Internal animation state for native heavy specials; Y never calls this. */
@@ -2885,14 +2894,23 @@ export class Game implements AiWorld {
     if (c.eatBites < 1 || c.eaten <= 0) c.eatBites = bitesFor(a, c);
   }
 
+  /**
+   * Whether a Survival body has room to eat. Any room at all: the meal tops the bar up to full and
+   * the rest is left. It used to ask whether the *whole* meal fitted, and a kill half again your
+   * own length is worth the full bar, so it could only be eaten at exactly zero hunger — which is
+   * starving — and a peer-sized kill waited until you were half empty.
+   */
   private canEat(a: Actor, food: Actor): boolean {
-    return this.mode !== 'survival' || (a.controller !== 'player' && a.controller !== 'bot') || (a.hunger + Math.min(100, this.nutritionValue(a, food)) * (1 - food.eaten) <= 100);
+    void food;
+    return this.mode !== 'survival' || (a.controller !== 'player' && a.controller !== 'bot') || a.hunger < 100;
   }
 
-  private gainSurvivalXp(a: Actor, amount: number) {
-    if (a.state === 'dead' || a.state === 'swallowed') return;
-    if (RULES) RULES.onNutrition(this, a, amount, undefined);
-    else { a.nutrition += amount; this.checkTierUp(a); }
+  /** Survival growth: `fraction` of the whole ladder, in whichever units this game keeps it. */
+  private gainSurvivalXp(a: Actor, fraction: number) {
+    if (a.state === 'dead' || a.state === 'swallowed' || fraction <= 0) return;
+    if (RULES?.survivalGrow) RULES.survivalGrow(this, a, fraction);
+    else if (RULES) RULES.onNutrition(this, a, fraction * CAMBRIAN_LADDER, undefined);
+    else { a.nutrition += fraction * CAMBRIAN_LADDER; this.checkTierUp(a); }
   }
 
   private consumeSnacks(a: Actor, L: number, def: ReturnType<typeof creature>) {
@@ -2964,8 +2982,14 @@ export class Game implements AiWorld {
   private gainNutrition(a: Actor, food: Actor | undefined, amount: number) {
     if (a.controller !== 'player' && a.controller !== 'bot') { a.hp = Math.min(a.hpMax, a.hp + amount * 0.5); return; }
     if (this.mode === 'survival') {
-      if (food) a.hunger = Math.min(100, a.hunger + amount);
-      else return;
+      // Every way of feeding fills the stomach — a kill, a carcass, a bloom, a grazed mat, a
+      // giant's bones. Only the first two have a body to measure; the rest arrive as an amount
+      // already, and leaving them out starved every grazer and filter feeder whatever it did.
+      if (food) {
+        const whole = Math.max(this.nutritionValue(a, food), 1e-3);
+        const ratio = lengthOf(food) / Math.max(lengthOf(a), 1e-3);
+        a.hunger = Math.min(100, a.hunger + amount * hungerWorth(ratio, whole) / whole);
+      } else a.hunger = Math.min(100, a.hunger + amount);
       return;
     }
     if (this.mode === 'reef' && a.tier >= 4) return;
@@ -3217,7 +3241,12 @@ export class Game implements AiWorld {
 
   private scoreHeader(): ScoreHeader {
     switch (this.mode) {
-      case 'survival': return { title: 'Survival', detail: 'Grow over time. Fight peers for XP and eat when hungry.' };
+      case 'survival': {
+        const chasing = this.players.filter((p) => !p.carriedTop);
+        if (this.endless || !chasing.length) return { title: SAY.board.survivalTitle, detail: SAY.board.reefWon };
+        const held = Math.max(0, ...this.players.map((p, i) => (p.carriedTop ? 0 : this.progress[i].apexT)));
+        return { title: SAY.board.survivalTitle, detail: held > 0 ? SAY.board.apexHeld(Math.floor(held), APEX_HOLD_SECONDS) : SAY.board.survivalGoal };
+      }
       case 'hunted': {
         const giant = this.hunterIndex >= 0 ? this.players[this.hunterIndex] : undefined;
         return {
@@ -3421,7 +3450,7 @@ export class Game implements AiWorld {
       // by `bankLadderTop`, when the run is actually finished.
       // A victory lap banks nothing. Somebody who came in on the top rung is revisiting a run they
       // already finished, not making progress, and their record already says so.
-      if ((this.mode === 'rise' || this.mode === 'survival') && !p.carriedTop) this.markLadder(p, rung >= LADDER_TOP && this.mode === 'rise' ? MARK_NEAR_TOP : ladderMark(this, p));
+      if ((this.mode === 'rise' || this.mode === 'survival') && !p.carriedTop) this.markLadder(p, rung >= LADDER_TOP ? MARK_NEAR_TOP : ladderMark(this, p));
     }
   }
 
@@ -3492,7 +3521,9 @@ export class Game implements AiWorld {
   private updateModes(dt: number) {
     RULES?.updateModes(this, dt);
     switch (this.mode) {
-      case 'survival': break;
+      // Survival's goal is Rise's: reach the top and hold it. The results screen and the choice to
+      // carry on follow from the state this sets, exactly as they do for Rise.
+      case 'survival':
       case 'rise': {
         this.players.forEach((p, i) => {
           const pr = this.progress[i];

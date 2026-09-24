@@ -57,7 +57,7 @@ export const DEVONIAN = defineEra({
     // The same three modes as the Cambrian, in the same order: this era changes the sea and the
     // animals in it, not what a match is.
     { id: 'rise', name: 'Rise', blurb: 'Hatch as a hatchling. Eat, grow, fight, hide. Reach Prime and hold it for ninety seconds. Share the feast with the others, or eat them.', players: '1–4' },
-    { id: 'survival', name: 'Survival', blurb: 'Grow over time and faster by fighting peers or giants. Hunt creatures to keep hunger above zero; starvation costs a tier.', players: '1–4' },
+    { id: 'survival', name: 'Survival', blurb: 'Grow with time, and faster by fighting animals your size or bigger. Eat to keep hunger up: an empty stomach costs health, and every death costs a rung. Reach the top and hold it.', players: '1–4' },
     { id: 'reef', name: 'Reef', blurb: 'No goal. Any animal, fully grown, and the Devonian coast to swim in.', players: '1–4 sandbox' },
   ],
 

@@ -77,7 +77,7 @@ export const TRIASSIC = defineEra({
   modes: [
     // The same three modes as the other eras: the sea and the animals change, not what a match is.
     { id: 'rise', name: 'Rise', blurb: 'Hatch on the sea floor. Feed, dive, grow. Reach Prime and hold it for ninety seconds. Share the feast with the others, or eat them.', players: '1–4' },
-    { id: 'survival', name: 'Survival', blurb: 'Grow over time and faster by fighting peers or giants. Hunt creatures to keep hunger above zero; starvation costs a tier.', players: '1–4' },
+    { id: 'survival', name: 'Survival', blurb: 'Grow with time, and faster by fighting animals your size or bigger. Eat to keep hunger up: an empty stomach costs health, and every death costs a rung. Reach the top and hold it.', players: '1–4' },
     { id: 'reef', name: 'Reef', blurb: 'No goal. Any animal, fully grown, and the Triassic platform to swim in, from the gypsum flats to the black basin.', players: '1–4 sandbox' },
   ],
 

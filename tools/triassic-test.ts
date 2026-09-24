@@ -26,7 +26,7 @@ const { forceOccupancy } = await import('../src/sim/triassic/shore');
 void setShoreAnimals;
 const { brokeSurface, isAlive, lengthOf, bandOf, swimCeiling } = await import('../src/sim/actors');
 const { PLAYABLE, WILD, WILD_IDS, creature, CREATURES } = await import('../src/sim/creatures');
-const { emptyInput } = await import('../src/sim/types');
+const { emptyInput, MODE_IDS } = await import('../src/sim/types');
 const { sampleHeight, shoreZ, shoreDistance, SURFACE_Y, FLOOR_DEPTH, biomeAt, nurseryAt, groundHeight, LIGHT_WINDOW_Y } = await import('../src/sim/world');
 type InputFrame = import('../src/sim/types').InputFrame;
 type CreatureId = import('../src/sim/creatures').CreatureId;
@@ -56,7 +56,7 @@ ok(PLAYABLE.every((c) => !c.shore && !c.npc && !c.shelved), 'and none of the thr
 ok(WILD.every((c) => !c.shelved), 'a shelved animal is in no sea');
 ok(SHELVED.every((c) => !WILD_IDS.includes(c.id)), 'and the ambient draw cannot reach one');
 ok(NPCS.every((c) => WILD_IDS.includes(c.id)), 'an NPC is in the sea, which is the whole of what it is');
-ok(TRIASSIC.modes.map((m) => m.id).join() === 'rise,hunted,reef', 'the same three modes as the other eras, Rise first');
+ok(TRIASSIC.modes.map((m) => m.id).join() === MODE_IDS.join(), `the same modes as the other eras, Rise first (${TRIASSIC.modes.map((m) => m.id).join()})`);
 for (const r of [1, 2, 3, 4]) ok(PLAYABLE.some((c) => c.rung === r), `rung ${r} has at least one playable animal`);
 for (const c of TRIASSIC.creatures) {
   ok(!!c.kind && c.kind.length <= 20, `${c.id} has a short everyday group (${c.kind ?? 'missing'})`);

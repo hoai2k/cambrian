@@ -117,7 +117,7 @@ function updateAir(g: Game, a: Actor, dt: number) {
     a.vel.y = Math.max(a.vel.y, RISE_RATE * speedFactor(a.scale) * AIR_CLIMB_FLOOR);
   }
   // drowning: out of air and out of effort together, for long enough to see it happen
-  if (!up && t.air <= 0 && isAlive(a)) {
+  if (!up && t.air <= 0 && a.stamina <= 0 && isAlive(a)) {
     t.drownT += dt;
     a.hp = Math.max(0, a.hp - (a.hpMax / DROWN_TIME) * dt);
     a.sinceHit = 0;
@@ -317,6 +317,7 @@ export const TRIASSIC_RULES: EraRules = {
   },
 
   onNutrition,
+  survivalGrow: (g, a, fraction) => DEVONIAN_RULES.survivalGrow!(g, a, fraction),
 
   /**
    * Armour with a facing. `all` is a shell or a full carapace; `dorsal` plates on the back are hit
