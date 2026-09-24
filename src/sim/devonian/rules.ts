@@ -291,6 +291,10 @@ export const DEVONIAN_RULES: EraRules = {
     gain(g, a, d, k);
   },
 
+  survivalGrow(g, a, fraction) {
+    gain(g, a, devActor(g, a), fraction * STAGE_AT[PRIME_STAGE]);
+  },
+
   armour(attacker, victim, dir) {
     const vdef = creature(victim.creature);
     void dir;
@@ -331,10 +335,10 @@ export const DEVONIAN_RULES: EraRules = {
   },
 
   updateModes(g, dt) {
-    // Rise: grow through the five stages on what you catch, then hold Prime. The shared `rise`
+    // Rise and Survival: grow through the five stages, then hold Prime. The shared `rise`
     // case in game.ts wins on tier, which the Devonian never advances — it grows in stages — so
     // it never fires there and the era decides this one.
-    if (g.mode !== 'rise') return;
+    if (g.mode !== 'rise' && g.mode !== 'survival') return;
     for (const a of players(g)) {
       const d = devActor(g, a);
       // Somebody who came in on the top rung has already done this; the clock is not theirs to

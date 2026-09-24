@@ -1420,6 +1420,31 @@ unless the user explicitly asks for a PR. Steps:
   `spawnAmbient` draws from it; `spawnPreyFor` still keeps food of your own size within reach, and
   `PASSER_BY` sends a large animal through the upper water whatever the seabed holds. Ambient brains
   wander within ~32 units of where they spawned, so a population stays in its biome.
+- **Survival grows you with time and feeds you with food, and those are two different bars.**
+  The mode is Rise's shape — hatch, climb, hold the top for `APEX_HOLD_SECONDS` / `HOLD_TO_WIN`,
+  results screen, carry on — with growth and food pulled apart: the ladder fills on a clock and on
+  fighting, and eating fills a `hunger` bar that drains and does nothing else. Its numbers live
+  together in `src/sim/survival.ts` because each is priced against the others, and three things in
+  it have already been got wrong once. **Growth is a fraction of the whole ladder**
+  (`SURVIVAL_TOP_SECONDS`, ten minutes hatchling to top on time alone), handed to the era through
+  `RULES.survivalGrow` so each game turns it into its own units: pushed through the Devonian's and
+  Triassic's `FEED` weights as if it were a meal, a flat rate made a rung-4 predator take thirty-one
+  minutes where a rung-1 snack took five, because those weights exist to even out *meal size*.
+  **Every way of feeding fills the stomach** — a kill, a carcass, a bloom, a grazed mat, a giant's
+  bones — and the last three arrive with no body (`gainNutrition(a, undefined, …)`), so a branch
+  that only credited food with a body starved every grazer and filter feeder in all three games.
+  **Any room is room to eat** (`canEat` is `hunger < 100`, the meal tops up and the rest is left):
+  asking whether the *whole* meal fitted put anything half again your length out of reach until
+  hunger was exactly zero. Hunger is paid on the size ratio rather than its square (`hungerWorth`),
+  or the prey a hatchling actually meets is a second or two of food each. Empty is not death on
+  the frame: `STARVE_TIME` seconds of health going, and the bar flashes from `HUNGER_LOW`. Hit
+  growth is the hit's own strength, never floored (a ping off a shell pays nothing), from things at
+  least `PEER_RATIO` your size, and never from a team-mate — Survival is co-op, so `allies` covers
+  it and two players cannot farm each other. A death costs `SURVIVAL_DEATH_COST`, a whole rung
+  measured from where you stood (`ladderMark − 1`, not the start of the rung below). Stamina is
+  unchanged in every mode; what the mode adds to recovery is `effort.ts` — health back at half the
+  usual rate in Survival, twice as fast beside a plant in every mode, and paused while sprinting or
+  dashing. `npm run survival` holds all of it, the two eras in their own processes.
 - **A death costs half the rung you are standing on, not the rung you had climbed.** `DEATH_COST`
   and `deathMark`/`placeOnLadder` in `src/sim/ladder.ts`, applied centrally in `respawn` so all
   three games price it the same way and an era hook only resets the rest of what a respawn resets.

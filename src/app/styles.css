@@ -1212,4 +1212,9 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 }
 
 .bar.hunger i { background: linear-gradient(90deg, #c77342, #f5c968); }
-.health-recovery-off { font-size: .72em; color: var(--ember); }
+.bar.hunger.low i { animation: hunger-flash 1.1s ease-in-out infinite; }
+.bar.hunger.starving { box-shadow: 0 0 0 1px var(--ember); animation: hunger-flash .6s ease-in-out infinite; }
+.hunger-note { font-size: .72em; color: #f5c968; }
+.hunger-note.starving { color: var(--ember); font-weight: 600; }
+@keyframes hunger-flash { 50% { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) { .bar.hunger.low i, .bar.hunger.starving { animation: none; } }

@@ -42,7 +42,7 @@ type InputFrame = import('../src/sim/types').InputFrame;
 type Mode = import('../src/sim/types').Mode;
 import { heading } from '../src/shared/math';
 import { wrapAngle } from '../src/shared/math';
-import { isCoop } from '../src/sim/types';
+import { isCoop, MODE_IDS } from '../src/sim/types';
 type CreatureId = import('../src/sim/creatures').CreatureId;
 
 const DT = 1 / 60;
@@ -53,7 +53,7 @@ const ok = (cond: unknown, msg: string) => { assert.ok(cond, msg); passes++; };
 
 // ---- the pack ----
 ok(DEVONIAN.creatures.length === 21, 'roster is the 21 subjects of the brief');
-ok(DEVONIAN.modes.map((m) => m.id).join() === 'rise,hunted,reef', 'the same three modes as the Cambrian, Rise first');
+ok(DEVONIAN.modes.map((m) => m.id).join() === MODE_IDS.join(), `the same modes as the Cambrian, Rise first (${DEVONIAN.modes.map((m) => m.id).join()})`);
 for (const r of [1, 2, 3, 4]) ok(DEVONIAN.creatures.some((c) => c.rung === r), `rung ${r} has at least one animal`);
 const paths = createAssetPaths(DEVONIAN);
 for (const id of DEVONIAN_SHIPPED) {
