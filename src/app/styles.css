@@ -1210,3 +1210,6 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
   .screen-select .toolbar { bottom: 8px; gap: 6px; }
   .screen-select .icon-button { width: 38px; height: 38px; border-radius: 11px; }
 }
+
+.bar.hunger i { background: linear-gradient(90deg, #c77342, #f5c968); }
+.health-recovery-off { font-size: .72em; color: var(--ember); }

@@ -18,7 +18,7 @@ export const CAMBRIAN = defineEra({
   strings: CAMBRIAN_STRINGS,
   modes: [
     { id: 'rise', name: 'Rise', blurb: 'Hatch as a larva. Eat, grow, fight, hide. Reach Apex and hold it for ninety seconds. Share the feast with the others, or eat them.', players: '1–4' },
-    { id: 'hunted', name: 'Hunter & Hunted', blurb: 'Everyone takes a turn as the giant. On yours, catch as many of the small ones as you can; on theirs, hide, bait and grow out of reach. Most caught wins.', players: '2–4 asymmetric' },
+    { id: 'survival', name: 'Survival', blurb: 'Grow over time and faster by fighting peers or giants. Hunt creatures to keep hunger above zero; starvation costs a tier.', players: '1–4' },
     { id: 'reef', name: 'Reef', blurb: 'No goal. Start as an adult with every move unlocked and just be an animal in the Cambrian.', players: '1–4 sandbox' },
   ],
   creatures: CAMBRIAN_CREATURES,

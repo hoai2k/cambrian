@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import { selectEra } from '../src/content';
+import { DEVONIAN } from '../src/content/devonian';
+import { TRIASSIC } from '../src/content/triassic';
+const era = process.argv[2];
+selectEra(era === 'triassic' ? TRIASSIC : DEVONIAN);
+const { Game } = await import('../src/sim/game');
+const { PLAYABLE_IDS } = await import('../src/sim/creatures');
+const { ladderMark, ladderRung, placeOnLadder } = await import('../src/sim/ladder');
+const { emptyInput } = await import('../src/sim/types');
+const setup = [{ creature: PLAYABLE_IDS[0], device: 'keyboard' as const, ready: true }];
+const g = new Game('survival', setup, 83);
+g.skipHatch();
+const p = g.players[0];
+p.spawnProtect = 1000;
+const before = ladderMark(g, p);
+for (let i = 0; i < 120; i++) { g.step(1 / 60, new Map([[0, emptyInput()]])); g.events.length = 0; }
+assert(ladderMark(g, p) > before, `${era}: timed XP advances the era's ladder`);
+assert(p.hunger < 100, `${era}: hunger falls`);
+placeOnLadder(g, p, 3.4);
+(g as unknown as { respawn(a: typeof p): void }).respawn(p);
+assert.equal(ladderRung(g, p), 2, `${era}: respawn drops a tier`);
+console.log(`PASS ${era} Survival growth, hunger and tier loss`);

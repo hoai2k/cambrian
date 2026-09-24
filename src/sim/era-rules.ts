@@ -151,6 +151,8 @@ export interface EraRules {
    * the moment they touch the surface, which is also where the bar is handed back whole.
    */
   staminaRegen(g: Game, a: Actor): number;
+  /** Whether this body can recover health in its current breathing state. */
+  canRecoverHealth?(g: Game, a: Actor): boolean;
   /**
    * How much of the stamina a sprint or a dash in this direction is given to the body for nothing,
    * 0..1. 1 is free — and free enough that an empty bar does not stop it, in which case only the

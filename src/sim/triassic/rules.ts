@@ -117,7 +117,7 @@ function updateAir(g: Game, a: Actor, dt: number) {
     a.vel.y = Math.max(a.vel.y, RISE_RATE * speedFactor(a.scale) * AIR_CLIMB_FLOOR);
   }
   // drowning: out of air and out of effort together, for long enough to see it happen
-  if (!up && t.air <= 0 && a.stamina <= 0 && isAlive(a)) {
+  if (!up && t.air <= 0 && isAlive(a)) {
     t.drownT += dt;
     a.hp = Math.max(0, a.hp - (a.hpMax / DROWN_TIME) * dt);
     a.sinceHit = 0;
@@ -428,6 +428,11 @@ export const TRIASSIC_RULES: EraRules = {
     }
     if (!def.warmBlooded && def.breathing !== 'gill') k *= 1 - (1 - COLD_REGEN) * clamp(coldAt(a), 0, 1);
     return k;
+  },
+  canRecoverHealth(g, a) {
+    if (!breathesAir(a)) return true;
+    const t = triActor(g, a);
+    return a.grabbedBy < 0 && (t.atSurface || t.air > 0);
   },
 
   /** The climb is free for an air-breather: there is always a way back to the surface, however spent. */

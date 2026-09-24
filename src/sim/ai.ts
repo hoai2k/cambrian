@@ -3,12 +3,13 @@ import { bandOf, isAlive, isHidden, lengthOf } from './actors';
 import { RULES } from './era-rules';
 import { columnY, DIP_CHANCE, fitsColumn, keepClear } from './locomotion';
 import { creature } from './creatures';
-import type { Actor, BrainState, InputFrame, WorldEvent } from './types';
+import type { Actor, BrainState, InputFrame, Mode, WorldEvent } from './types';
 import { emptyInput } from './types';
 import { biomeAt, dangerAt, LIGHT_WINDOW_Y, microbialAt, nurseryFactor, sampleHeight, shoreDistance, SURFACE_Y, type Cover, type WorldData } from './world';
 import { appetiteAt, huntInterval } from './daynight';
 
 export interface AiWorld {
+  mode?: Mode;
   actors: Actor[];
   byId(id: number): Actor | undefined;
   nearby(pos: Vec3, r: number): Actor[];
@@ -286,7 +287,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     // a fed animal simply gets on with its life — and shorter or longer again for the water it is
     // in, so the channel and the basin are hungry places and a flat of sunlit sand is not. Bots
     // are competitors in a versus match rather than wildlife, so they are always hungry.
-    const hungry = competitor || b.hunger > huntInterval(g.time, here) * (0.7 + b.appetite * 0.6) || a.hp < a.hpMax * 0.45;
+    const hungry = competitor || b.hunger > huntInterval(g.time, here) * (g.mode === 'survival' ? 0.8 : 1) * (0.7 + b.appetite * 0.6) || a.hp < a.hpMax * 0.45;
     const predatory = !def.diet || (competitor && def.diet !== 'filter');
     const attacker = a.lastHitBy >= 0 ? g.byId(a.lastHitBy) : undefined;
     // Whatever else it was doing, something that just bit it has its attention — whatever size it
@@ -296,7 +297,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     const struck = !!attacker && isAlive(attacker) && a.sinceHit < 4;
     // Which of the two it picks. Anything much bigger is run from, and so is anything at all once
     // the animal has been beaten down or has no fight left in it.
-    const outmatched = struck && (bandOf(a, attacker!) === 'giant' || a.hp <= a.hpMax * 0.3 || b.courage <= 0);
+    const outmatched = struck && (bandOf(a, attacker!) === 'giant' || a.hp <= a.hpMax * (g.mode === 'survival' ? 0.15 : 0.3) || b.courage <= (g.mode === 'survival' ? -0.6 : 0));
     // Running away is only an answer if it works. An animal that has been swimming from something
     // for a couple of seconds and is *still* being bitten by it has not got away, and nothing in
     // the sea keeps holding its line while something chews on it: it turns and fights, whatever
@@ -567,7 +568,7 @@ export function thinkGiant(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
   // did; at dusk and dawn it is every twenty seconds or so, and the whole sea knows it.
   // ...and where it is doing it. A giant cruising over the basin comes down far oftener than one
   // over a sunlit flat, which is what makes the deep water read as the deep water.
-  const hungry = b.hunger > (14 + (a.id % 6)) / Math.max(0.12, appetiteAt(g.time, dangerAt(a.pos.x, a.pos.z)));
+  const hungry = b.hunger > (14 + (a.id % 6)) * (g.mode === 'survival' ? 0.8 : 1) / Math.max(0.12, appetiteAt(g.time, dangerAt(a.pos.x, a.pos.z)));
   const shadow = a.controller === 'shadow';
 
   // Routed: enough bites from something smaller and even a giant backs off for a while.

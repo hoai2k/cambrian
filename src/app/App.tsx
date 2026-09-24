@@ -209,7 +209,7 @@ export function App() {
   const lastInputRef = useRef(0);
   /**
    * The record as this device holds it: biomes, landmarks, species taken to the top, and the
-   * furthest rung each creature has reached in Rise. Held in state as well as in storage because
+   * furthest rung each creature has reached in Rise or Survival. Held in state as well as in storage because
    * the select screen badges the growth record and offers to start from it, and both have to
    * change the moment a match improves on them.
    */
@@ -221,7 +221,7 @@ export function App() {
    *
    * Kept as the intent rather than as a rung, so that walking the cursor across a creature with no
    * record and back again does not quietly switch the choice off. It is resolved against the
-   * record — and against the mode, since only Rise grows you — at the moment a match starts.
+   * record and the current mode at the moment a match starts.
    */
   const [carry, setCarry] = useState<boolean[]>([]);
   const carryRef = useRef<boolean[]>([]);
@@ -429,11 +429,10 @@ export function App() {
 
   /**
    * The setups as the simulation wants them: the roster plus, for anyone who asked and has a record
-   * to draw on, the rung to hatch at. Only Rise grows a player through the ladder, so only Rise
-   * carries anything on; every other mode hands out its own body and the field is left off.
+   * to draw on, the rung to hatch at. Rise and Survival share the earned ladder record.
    */
   const withCarry = useCallback((ps: PlayerSetup[]) => ps.map((p, i) => {
-    const mark = modeRef.current === 'rise' && carryRef.current[i] ? clampMark(recordRef.current.best[p.creature] ?? 0) : 0;
+    const mark = (modeRef.current === 'rise' || modeRef.current === 'survival') && carryRef.current[i] ? clampMark(recordRef.current.best[p.creature] ?? 0) : 0;
     return { ...p, startRung: mark > 0 ? mark : 0 };
   }), []);
 
@@ -677,7 +676,7 @@ export function App() {
    */
   const toggleCarry = useCallback((index: number) => {
     const p = playersRef.current[index];
-    if (!p || modeRef.current !== 'rise' || !(recordRef.current.best[p.creature] ?? 0)) return;
+    if (!p || (modeRef.current !== 'rise' && modeRef.current !== 'survival') || !(recordRef.current.best[p.creature] ?? 0)) return;
     const next = [...carryRef.current];
     next[index] = !next[index];
     setCarryBoth(next); audio.play(next[index] ? 'ui-confirm' : 'ui-back');

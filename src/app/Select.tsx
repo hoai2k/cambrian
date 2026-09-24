@@ -325,7 +325,7 @@ export function SelectScreen(p: Props) {
                       animal is from and how to look through the others you have earned. */}
                   {pl.visitorScale
                     ? <p className="visitor-note">{C.visitorNote(p.visitorOrigin?.(pl.creature) ?? ERA_NAME.devonian)}</p>
-                    : <BestRun mark={p.best[def.id]} carrying={!!p.carry[i]} rise={p.mode === 'rise'} scheme={s} onToggle={() => p.onCarry(i)} />}
+                    : <BestRun mark={p.best[def.id]} carrying={!!p.carry[i]} rise={p.mode === 'rise' || p.mode === 'survival'} scheme={s} onToggle={() => p.onCarry(i)} />}
                   {!compact && (
                     <>
                       <div className="stats">

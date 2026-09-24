@@ -116,21 +116,9 @@ function SensePanel({ p }: { p: PlayerHud }) {
         <div className="bars">
           <div className="name-row"><b>{def.name}</b><span className="tier-name">{p.tierName}</span>{p.protect && <span className="protect">{COPY.protected}</span>}</div>
           <div className="bar hp"><i style={{ width: `${(p.hp / p.hpMax) * 100}%` }} /></div>
-          <div className={`bar stamina ${p.exhausted ? 'exhausted' : ''}`}>
-            <i style={{ width: `${(p.stamina / p.staminaMax) * 100}%` }} />
-            {/* The era's one new rule, on the bar it is about. An air-breather's stamina does not
-                come back under water and fills at the surface, and the bar said nothing about
-                either — so the game said it in a sentence, twice, and then in a sound once a
-                second. A mark on the bar says it continuously and silently: barred while the
-                recovery is off, an arrow up once the bar is spent and the fix is the surface. */}
-            {/* The mark is now about the breath being *gone*, which is the only state that stops
-                recovery. While there is air in the chest a lung is simply a lung. */}
-            {p.era?.air && !p.era.atSurface && (p.era.airLeft ?? 1) <= 0
-              && <i className={`air-mark ${p.stamina < p.staminaMax * 0.25 ? 'urgent' : ''}`}
-                   role="img"
-                   aria-label={p.stamina < p.staminaMax * 0.25 ? COPY.airSurfaceNow : COPY.airRecoveryOff}
-                   style={{ maskImage: `url(${appBase()}${assetPaths.ui(p.stamina < p.staminaMax * 0.25 ? 'air-surface.svg' : 'air-recovery-off.svg')})` }} />}
-          </div>
+          {p.hunger != null && <div className="bar hunger" role="img" aria-label={`Hunger ${Math.round(p.hunger)} percent`}><i style={{ width: `${p.hunger}%` }} /></div>}
+          {p.era?.air && !p.era.atSurface && (p.era.airLeft ?? 1) <= 0 &&
+            <span className="health-recovery-off" role="status">Health recovery paused until you surface</span>}
           {/* The breath being held, under the bar it governs. It is a clock on a dive rather than a
               second health bar, so it is thin and quiet until its last minute, when it flashes. */}
           {p.era?.airLeft != null && (

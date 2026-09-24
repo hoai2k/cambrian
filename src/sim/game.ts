@@ -50,8 +50,8 @@ export interface Discovery {
   landmarks: Set<LandmarkKind>;
   apex: Set<CreatureId>;
   /**
-   * The furthest rung of the growth ladder each creature has been taken to in Rise this match
-   * (see src/sim/ladder.ts). Rise is the mode that is *about* growing up, so it is the one whose
+   * The furthest rung of the growth ladder each creature has been taken to in Rise or Survival
+   * (see src/sim/ladder.ts). These modes grow the player, so their shared
    * high-water mark is worth keeping: the shell folds this into its stored record, shows it on
    * the creature's card, and offers to start there next time instead of as a hatchling.
    */
@@ -498,7 +498,7 @@ export class Game implements AiWorld {
     this.world = new World(seed);
     const nursery = nurseryAt(0);
     this.world.loadAround(nursery);
-    this.hitCtx = { events: this.events, byId: (id) => this.idMap.get(id), time: 0, rng: this.rng, armour: RULES ? (att, vic, dir) => RULES!.armour(att, vic, dir) : undefined };
+    this.hitCtx = { events: this.events, byId: (id) => this.idMap.get(id), time: 0, rng: this.rng, armour: RULES ? (att, vic, dir) => RULES!.armour(att, vic, dir) : undefined, canEat: (pred, food) => this.canEat(pred, food) };
     this.beachCtx = { events: this.events, hitCtx: this.hitCtx };
     // One turn as the giant each. A single human plays the mode exactly as it was before.
     this.huntTurns = mode === 'hunted' ? Math.max(1, setups.length) : 1;
@@ -508,11 +508,11 @@ export class Game implements AiWorld {
       // Rise can start you part-grown, at the furthest rung you have taken this creature to before.
       // Both eras derive everything else from the body scale — the Cambrian's tier through
       // `tierForScale`, the Devonian's stage through `stageForScale` — so one number does it.
-      const carry = mode === 'rise' ? clampMark(s.startRung ?? 0) : 0;
+      const carry = mode === 'rise' || mode === 'survival' ? clampMark(s.startRung ?? 0) : 0;
       // A visitor arrives at the size it finishes its own game at, whatever this one's ladder or
       // mode would have said. That is the reward, and it is deliberately not balanced.
       const startScale = s.visitorScale ?? (carry > 0 ? ladderScale(s.creature, carry)
-        : RULES ? RULES.startScale(mode, this.eraRoleIndex(i), s.creature) : mode === 'rise' ? tierScale(s.creature, 0) : mode === 'hunted' ? (this.isHunter(i) ? 3.0 : tierScale(s.creature, 1)) : mode === 'reef' ? tierScale(s.creature, 2) : tierScale(s.creature, 1));
+        : RULES ? RULES.startScale(mode === 'survival' ? 'rise' : mode, this.eraRoleIndex(i), s.creature) : mode === 'rise' || mode === 'survival' ? tierScale(s.creature, 0) : mode === 'hunted' ? (this.isHunter(i) ? 3.0 : tierScale(s.creature, 1)) : mode === 'reef' ? tierScale(s.creature, 2) : tierScale(s.creature, 1));
       const a = this.spawn(s.creature, 'player', this.spawnPoint(nursery, s.creature, startScale, i), startScale, i);
       // Arriving on the top rung means the goal is already behind you: no clock, just the sea.
       a.carriedTop = carry >= LADDER_TOP;
@@ -550,7 +550,7 @@ export class Game implements AiWorld {
     // Last, because an era's init sets its own growth state from the body it finds: a mark that
     // carries a part-filled meter has to be applied on top of that, not before it.
     setups.forEach((s, i) => {
-      const fill = mode === 'rise' ? fillOf(s.startRung ?? 0) : 0;
+      const fill = mode === 'rise' || mode === 'survival' ? fillOf(s.startRung ?? 0) : 0;
       if (fill > 0) ladderFill(this, this.players[i], fill);
     });
   }
@@ -903,6 +903,7 @@ export class Game implements AiWorld {
     this.time += dt; this.hitCtx.time = this.time;
     this.stepIndex++;
     // Snapshot every transform so the renderer can interpolate across this step.
+    const eventStart = this.events.length;
     for (const a of this.actors) {
       const t = a.prevT;
       t.x = a.pos.x; t.y = a.pos.y; t.z = a.pos.z; t.yaw = a.yaw; t.pitch = a.pitch; t.bank = a.bank;
@@ -917,6 +918,18 @@ export class Game implements AiWorld {
       // Nothing with a brain plans to be on the sand, so a body that is has one idea: the sea.
       const input = a.controller === 'player' ? (inputs.get(a.player) ?? emptyInput()) : ashoreInput(a, a.brain ? think(this, a, dt) : emptyInput());
       this.updateActor(a, input, dt);
+    }
+    if (this.mode === 'survival') {
+      for (const a of this.actors) if ((a.controller === 'player' || a.controller === 'bot') && isAlive(a)) {
+        a.hunger = Math.max(0, a.hunger - dt * 0.45);
+        if (a.hunger === 0) { kill(this.hitCtx, a); continue; }
+        this.gainSurvivalXp(a, dt * 0.5);
+      }
+      for (const e of this.events.slice(eventStart)) if (e.kind === 'hit' && e.other != null) {
+        const attacker = this.idMap.get(e.actor), victim = this.idMap.get(e.other);
+        if (attacker && victim && (attacker.controller === 'player' || attacker.controller === 'bot') && lengthOf(victim) >= lengthOf(attacker) * 0.8)
+          this.gainSurvivalXp(attacker, Math.max(1, e.strength ?? 1) * (lengthOf(victim) >= lengthOf(attacker) * 1.35 ? 4 : 2));
+      }
     }
     this.resolveActorOverlap();
     stepFlora(this.world, dt);
@@ -947,7 +960,7 @@ export class Game implements AiWorld {
       kill(this.hitCtx, a, pred);
       a.eaten = 1;                                        // nothing left to scavenge
       const val = this.nutritionValue(pred, a);
-      this.gainNutrition(pred, a, val); pred.eats++; pred.hp = Math.min(pred.hpMax, pred.hp + val * 0.5);
+      if (this.canEat(pred, a)) { this.gainNutrition(pred, a, val); pred.eats++; pred.hp = Math.min(pred.hpMax, pred.hp + val * 0.5); }
       if (a.controller === 'player' || a.controller === 'bot') a.respawnT = a.stateDur; else this.remove(a);
     }
   }
@@ -1061,12 +1074,14 @@ export class Game implements AiWorld {
     // wherever in a rung it lands. The era hook still runs first for everything else a respawn
     // resets; the ladder itself is settled here so all three games price a death the same way.
     if (RULES) RULES.onRespawn(this, a);
-    if (this.mode !== 'reef') placeOnLadder(this, a, deathMark(ladderMark(this, a)));
+    if (this.mode === 'survival') placeOnLadder(this, a, Math.max(0, ladderRung(this, a) - 1));
+    else if (this.mode !== 'reef') placeOnLadder(this, a, deathMark(ladderMark(this, a)));
     else if (!RULES) a.nutrition *= 0.5;
     if (this.mode === 'hunted' && this.isHunter(a.player) && !RULES) { a.scale = 3.0; a.tier = 3; }
     applyScaleStats(a, false);
     a.eaten = 0;
     a.stamina = a.staminaMax; a.poise = a.poiseMax;
+    a.hunger = 100;
     // Back near another player (the party stays together in an endless sea), or failing that where
     // you died.
     let ref = a.pos, refD = Infinity;
@@ -1241,7 +1256,11 @@ export class Game implements AiWorld {
     a.holdT = Math.max(0, a.holdT - dt);
     a.sinceHit += dt;
     // Out of the fight for a few seconds and health comes back: run, hide, recover, return.
-    if (a.sinceHit > 6 && a.hp < a.hpMax && a.state !== 'dead') a.hp = Math.min(a.hpMax, a.hp + a.hpMax * (a.controller === 'player' || a.controller === 'bot' ? 0.035 : 0.02) * dt);
+    if (a.sinceHit > 6 && a.hp < a.hpMax && a.state !== 'dead' && input.burst <= 0.1 && a.burstT <= 0 && !input.dash && a.state !== 'dodge' && (RULES?.canRecoverHealth?.(this, a) ?? true)) {
+      const nearPlant = this.world.floraHash.query(a.pos.x, a.pos.z, this.world.floraReach + L * 0.5 + 1.5, this.scratchFlora)
+        .some((f) => Math.hypot(a.pos.x - f.pos.x, a.pos.z - f.pos.z) <= f.R + L * 0.5 + 1.5 && a.pos.y >= f.pos.y - L * 0.5 && a.pos.y <= f.pos.y + f.H + L * 0.5);
+      a.hp = Math.min(a.hpMax, a.hp + a.hpMax * (a.controller === 'player' || a.controller === 'bot' ? 0.0175 : 0.01) * (nearPlant ? 2 : 1) * dt);
+    }
     if (a.brain) a.brain.courage = Math.min(1, a.brain.courage + 0.05 * dt);
 
     if (a.state !== 'ability') a.abilityActive = (a.state === 'guard' || a.state === 'parry') && DEFENSIVE_SPECIALS.has(def.ability);
@@ -1526,6 +1545,7 @@ export class Game implements AiWorld {
     // Everything the animal *decides* — aim, sense, the heavy button, the dash, the guard, the
     // attacks, and the state machine that runs each of them to its end.
     this.stepActions(a, input, dt, { def, L, sf, justLight, justHeavy, justAbility, justDodge, justGuard, justLock, justSense, justDash, paddling, bursting, dir, mag, locked, jets, relief, freeClimb });
+    a.stamina = a.staminaMax;
   }
 
   /**
@@ -1534,6 +1554,9 @@ export class Game implements AiWorld {
    * afford — whether this body is sprinting, paddling, or out of breath altogether.
    */
   private stepUpkeep(a: Actor, input: InputFrame, dt: number, def: ReturnType<typeof creature>, L: number, dir: Vec3, mag: number, justLight: boolean, justHeavy: boolean, justAbility: boolean, justDash: boolean) {
+    // Effort has no separate meter. Health recovery carries the cost of exertion.
+    a.stamina = a.staminaMax;
+    a.exhausted = 0;
     // Timers
     a.stateT += dt;
     a.iframes = Math.max(0, a.iframes - dt);
@@ -1611,7 +1634,7 @@ export class Game implements AiWorld {
     if (bursting && !freeBurst) a.stamina = Math.max(0, a.stamina - BURST_STAMINA * burstIn * dt * (1 - relief));
     else if (a.state === 'guard') a.stamina -= 3 * dt;
     else if (a.hideMode !== 'camouflage') a.stamina = Math.min(a.staminaMax, a.stamina + (speed < 0.4 ? 24 : 14) * dt * (a.state === 'free' ? 1 : 0.5) * (RULES?.staminaRegen(this, a) ?? 1));
-    if (a.stamina <= 0) { a.stamina = 0; if (a.exhausted === 0 && !freeClimb) a.exhausted = 1.6; }
+    a.stamina = a.staminaMax;
     return { speed, burstIn, paddling, bursting, freeBurst, relief, emptyClimb, freeClimb };
   }
 
@@ -2096,7 +2119,7 @@ export class Game implements AiWorld {
       }
     } else if (a.state === 'eating') {
       const c = a.eatingTarget >= 0 ? this.idMap.get(a.eatingTarget) : undefined;
-      if (!c || c.state !== 'dead' || c.eaten >= 1 || dist(a.pos, c.pos) > L * 0.8 + lengthOf(c) * 0.6 || (a.controller === 'player' && !input.light && a.stateT > 0.3)) {
+      if (!c || c.state !== 'dead' || c.eaten >= 1 || !this.canEat(a, c) || dist(a.pos, c.pos) > L * 0.8 + lengthOf(c) * 0.6 || (a.controller === 'player' && !input.light && a.stateT > 0.3)) {
         a.state = 'free'; a.stateT = 0; a.eatingTarget = -1;
       } else {
         const ratio = lengthOf(c) / L;
@@ -2854,11 +2877,22 @@ export class Game implements AiWorld {
   }
 
   private startEating(a: Actor, c: Actor) {
+    if (!this.canEat(a, c)) return;
     a.state = 'eating'; a.stateT = 0; a.eatingTarget = c.id;
     a.lockTarget = -1;
     // The body's own bite count: whoever takes the first bite sizes it, and a carcass already
     // half eaten keeps the count it was opened with.
     if (c.eatBites < 1 || c.eaten <= 0) c.eatBites = bitesFor(a, c);
+  }
+
+  private canEat(a: Actor, food: Actor): boolean {
+    return this.mode !== 'survival' || (a.controller !== 'player' && a.controller !== 'bot') || (a.hunger + Math.min(100, this.nutritionValue(a, food)) * (1 - food.eaten) <= 100);
+  }
+
+  private gainSurvivalXp(a: Actor, amount: number) {
+    if (a.state === 'dead' || a.state === 'swallowed') return;
+    if (RULES) RULES.onNutrition(this, a, amount, undefined);
+    else { a.nutrition += amount; this.checkTierUp(a); }
   }
 
   private consumeSnacks(a: Actor, L: number, def: ReturnType<typeof creature>) {
@@ -2892,6 +2926,7 @@ export class Game implements AiWorld {
    * evaporating as you reached it rather than as being caught.
    */
   private takeWhole(a: Actor, o: Actor) {
+    if (!this.canEat(a, o)) { kill(this.hitCtx, o, a); return; }
     // A fish out of a school is a mouthful taken in passing, and a cloud of them is how a filter
     // feeder eats: no ceremony there either, or crossing a shoal would be a hundred performances.
     if (o.controller === 'swarm' || (a.controller !== 'player' && a.controller !== 'bot')) { this.consume(a, o); return; }
@@ -2904,6 +2939,7 @@ export class Game implements AiWorld {
   }
 
   private consume(a: Actor, o: Actor) {
+    if (!this.canEat(a, o)) { kill(this.hitCtx, o, a); return; }
     kill(this.hitCtx, o, a);
     o.eaten = 1;
     const val = this.nutritionValue(a, o);
@@ -2927,6 +2963,11 @@ export class Game implements AiWorld {
 
   private gainNutrition(a: Actor, food: Actor | undefined, amount: number) {
     if (a.controller !== 'player' && a.controller !== 'bot') { a.hp = Math.min(a.hpMax, a.hp + amount * 0.5); return; }
+    if (this.mode === 'survival') {
+      if (food) a.hunger = Math.min(100, a.hunger + amount);
+      else return;
+      return;
+    }
     if (this.mode === 'reef' && a.tier >= 4) return;
     a.nutrition += amount;
     // co-op share
@@ -3176,6 +3217,7 @@ export class Game implements AiWorld {
 
   private scoreHeader(): ScoreHeader {
     switch (this.mode) {
+      case 'survival': return { title: 'Survival', detail: 'Grow over time. Fight peers for XP and eat when hungry.' };
       case 'hunted': {
         const giant = this.hunterIndex >= 0 ? this.players[this.hunterIndex] : undefined;
         return {
@@ -3379,7 +3421,7 @@ export class Game implements AiWorld {
       // by `bankLadderTop`, when the run is actually finished.
       // A victory lap banks nothing. Somebody who came in on the top rung is revisiting a run they
       // already finished, not making progress, and their record already says so.
-      if (this.mode === 'rise' && !p.carriedTop) this.markLadder(p, rung >= LADDER_TOP ? MARK_NEAR_TOP : rung);
+      if ((this.mode === 'rise' || this.mode === 'survival') && !p.carriedTop) this.markLadder(p, rung >= LADDER_TOP && this.mode === 'rise' ? MARK_NEAR_TOP : ladderMark(this, p));
     }
   }
 
@@ -3396,7 +3438,7 @@ export class Game implements AiWorld {
    * the shared code can see for itself.
    */
   bankLadderTop(p: Actor) {
-    if (this.mode !== 'rise') return;
+    if (this.mode !== 'rise' && this.mode !== 'survival') return;
     this.discovery.best.set(p.creature, LADDER_TOP);
   }
 
@@ -3450,6 +3492,7 @@ export class Game implements AiWorld {
   private updateModes(dt: number) {
     RULES?.updateModes(this, dt);
     switch (this.mode) {
+      case 'survival': break;
       case 'rise': {
         this.players.forEach((p, i) => {
           const pr = this.progress[i];
