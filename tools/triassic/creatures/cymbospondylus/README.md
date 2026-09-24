@@ -101,7 +101,7 @@ being remodelled by hand. What it costs is recorded here and in `validation.json
 `mouth.hingeY` and `mouth.jawFrontY` are the measurement, and the skull is a quarter too long for
 the animal in the books.
 
-## The mouth: a measured cut, and a cavity that is lined
+## The mouth: a measured cut, and the cut's own seam filled
 
 **Method: the geometric one.** Placodus' measurement — every head vertex casts its own outward
 normal back into the mesh over 0.030 raw units, and a vertex that hits is looking across the slit
@@ -122,6 +122,83 @@ and finds 4 patches, the largest 0.0045 raw proud. **None of them straddles the 
 (`toothPatchesStraddlingTheCut` is empty), which is the fault Placodus shipped and had to correct.
 No dentition was authored: CLAUDE.md allows a tooth as an exception that has to justify itself, and
 a row that the generation already carries does not need one.
+
+**The lining and the hinge envelope are retired (T3D-34), and the cut's own seam is filled
+instead.** What used to stand here was a one-sac lining wound into the cavity and a fitted ellipsoid
+at the hinge, and neither survives its own measurement:
+
+- the sac is the form CLAUDE.md names as the one that reads as **a mouthful of gum**, and it is
+  hidden in play anyway, so it was showing a reviewer the wrong thing the moment the viewer's
+  *Mouth geometry* switch went on;
+- the ellipsoid covered "the square the cut leaves at the back of the mandible", and since
+  `T.jaw_junction` landed there **is** no square: the hinge cross-section is the one run of the rim
+  whose two copies the junction holds together, asserted equal weight for weight. Measured as
+  drawn — which is how it is drawn, because the runtime hides it — this head reads **1 px through**
+  at its widest gape with the plug already invisible. With the switch on it was a black blister
+  standing proud of the cheek beside the mouth it was not filling.
+
+**What the cut actually left open**, measured rather than assumed (`T.cut_rim`, in
+`validation.json` as `mouth.cutRim`): one closed loop of **112 vertices**, 59 of them on the seam,
+reaching **0.042** of a body back from the hinge on a mouth **0.1375** long, plus a 13-vertex loop
+the generation's own slit contributes. The twin's is 101 + 9. Forward of the commissure the two jaws
+are already separate sheets and the seam plane passes between them without touching either, so
+nothing there was cut and nothing there needs anything — this generation is `cut_rim`'s **case 2**,
+and `cap_mouth` over the whole boundary would seal its modelled mouth shut.
+
+**The fill is the ruled surface between the two copies of that rim** (`T.seam_web`; the whole
+argument is in `_pipeline/tripo.py` above the function and in
+`docs/triassic/throat-repairs/oral-verdicts.md`). It closes by construction: every boundary vertex
+is a rim vertex's own rest position and own weight dictionary, and linear blend skinning is a
+function of those two alone, so the web's boundary *is* the two halves' rims in every pose — worst
+rest-position difference 0.0, worst weight difference 0.0, asserted rather than rendered. 250 faces
+on the authored body, 220 on the twin. The fold into the flesh is `0.30` of how far the two copies
+actually part at the widest gape the clips reach (`SEAM_GAPE`, checked against them), floored and
+capped by a cast inwards on the pre-cut intake, and **smoothed four passes round each cycle** —
+unsmoothed it came out corrugated and read as a grille.
+
+It wears the **lumen's** albedo and not the cheek's: 280 vertices whose own outward normal meets the
+wall opposite, mean (0.193, 0.102, 0.071) against (0.218, 0.212, 0.170) for the rest of the body.
+More than half this rim is outer skin, so sampling the rim — which is what `cap_mouth` does, rightly,
+where the whole rim is a cut — would have dragged the flank into the inside of a mouth.
+
+It is **off**: named so `src/shared/oral-geometry.ts` matches it, so the game hides it and the
+viewer's switch starts with it hidden. It is the only thing that switch turns on for this animal.
+
+As drawn, with it hidden (the shipped state) and shown, at every clip that opens the jaw, and how
+much backdrop it covers in a single-sided render:
+
+| clip | hidden `through`/`opened` | shown | backdrop covered |
+| --- | ---: | ---: | ---: |
+| `Heavy@0.6` | 1 / 744 | 155 / 155 | **3,114** |
+| `Lunge@0.7333` | 3 / 719 | 143 / 143 | 2,954 |
+| `Eat@0.4333` | 0 / 750 | 146 / 146 | 2,626 |
+| `Bite@0.1667` | 0 / 647 | 116 / 116 | 2,224 |
+| `Ability@0.3667` | 113 / 308 | 68 / 68 | 944 |
+| `Attack@0.4667` | 106 / 286 | 61 / 61 | 884 |
+| `Hit@0.3` | 113 / 301 | 64 / 64 | 879 |
+| `Stagger@0.6` | 122 / 319 | 76 / 76 | 889 |
+| `Death@2.0` | 99 / 244 | 55 / 55 | 704 |
+| `Breathe@1.6` | 19 / 19 | 16 / 16 | 8 |
+| `Breath@1.3` | 0 / 0 | 0 / 0 | 0 |
+
+The hidden column is unchanged from what shipped, and that is checkable rather than asserted: the
+visible geometry is byte-identical to the previous build's, attribute for attribute. `through` rising
+on the clips whose hidden figure was near zero is the enclosure test, not the mouth — the web closes
+the route from the hole to the frame edge, so what was reachable surround becomes enclosed backdrop.
+Skin 2.48x unchanged; worst including oral geometry 9.98x → 2.79x; twin fraction 38.76 % → 36.79 %.
+
+Sheets: `docs/triassic/verification/cymbospondylus-mouth-space.png` (shipped) and
+`-mouth-space-seam-web.png` (with the switch on).
+
+**The aimed cut is measured, not adopted.** `docs/triassic/mouths/cymbospondylus-mouth.json` is this
+body's first human-aimed cut. Its hinge sits **0.047 of a body behind** the one this builder
+measures — a rig change, not a cut change — and its plane runs 0.0028–0.0044 of a body below the
+measured lip line, where this builder's own record says a *straight* cut would have deviated from
+its measured curve by 0.0007. The comparison is
+`docs/triassic/verification/cymbospondylus-aimed-cut-vs-measured.json`;
+`npm run triassic:mouth` refuses the file until it is re-aimed at the body that ships.
+
+### The lining as it was, before T3D-34
 
 **The lining.** One closed lining on the cavity's own measured section — 26 stations by 14, from
 0.004 behind the hinge to 0.006 past the mandible's front, at 95 % of the measured half width and

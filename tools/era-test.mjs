@@ -3,10 +3,10 @@ import fs from 'node:fs';
 import { build } from 'esbuild';
 
 const result = await build({
-  stdin: { contents: "export * from './src/content'; export * from './src/content/era'; export * from './src/content/asset-paths'; export { CAMBRIAN } from './src/content/cambrian'; export { DEVONIAN } from './src/content/devonian'; export { TRIASSIC } from './src/content/triassic'; export { SHARED_STRINGS, mergeStrings } from './src/content/strings'; export { CAMBRIAN_PENDING } from './src/content/cambrian/model-status'; export { default as DEVONIAN_PENDING } from './src/content/devonian/pending-refinements.json'; export { default as TRIASSIC_PENDING } from './src/content/triassic/pending-refinements.json';", resolveDir: process.cwd() },
+  stdin: { contents: "export * from './src/content'; export * from './src/content/era'; export * from './src/content/asset-paths'; export { CAMBRIAN } from './src/content/cambrian'; export { DEVONIAN } from './src/content/devonian'; export { TRIASSIC } from './src/content/triassic'; export { SHARED_STRINGS, mergeStrings } from './src/content/strings'; export { CAMBRIAN_PENDING } from './src/content/cambrian/model-status'; export { default as DEVONIAN_PENDING } from './src/content/devonian/pending-refinements.json'; export { default as TRIASSIC_PENDING } from './src/content/triassic/pending-refinements.json'; export { SPECIMENS, SPECIMEN_SECTIONS } from './src/viewer/catalogue';", resolveDir: process.cwd() },
   bundle: true, platform: 'node', format: 'esm', write: false,
 });
-const { ACTIVE_ERA: era, defineEra, createAssetPaths, SHARED_STRINGS, mergeStrings, CAMBRIAN, DEVONIAN, TRIASSIC, CAMBRIAN_PENDING, DEVONIAN_PENDING, TRIASSIC_PENDING } = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString('base64')}`);
+const { ACTIVE_ERA: era, defineEra, createAssetPaths, SHARED_STRINGS, mergeStrings, CAMBRIAN, DEVONIAN, TRIASSIC, CAMBRIAN_PENDING, DEVONIAN_PENDING, TRIASSIC_PENDING, SPECIMENS, SPECIMEN_SECTIONS } = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString('base64')}`);
 assert.equal(era.id, 'cambrian');
 assert.equal(era.creatures.length, 21);
 assert.equal(era.defaults.player, 'anomalocaris');
@@ -142,3 +142,67 @@ for (let i = 0; i < FACTS.length; i++) for (let j = i + 1; j < FACTS.length; j++
   assert.ok(!FACTS[i].some((f) => FACTS[j].includes(f)), 'two eras are showing the same loading line');
 }
 console.log('PASS: the shared and per-era text tables, with every era override landing on a key the shared table has');
+
+// ---- what each game offers, and what it only keeps ----
+// Three words on a creature's card keep it off a pick screen, and each says something different:
+// `shore` stands on the beach and strikes into the water, `npc` is an ordinary animal the sea
+// holds and does not offer, and `shelved` is not in that game at all and is kept so the specimen
+// viewer can still show the body that was built for it. Counted rather than listed, because the
+// point is the shape of the pick screen: eighteen in each game, which is three rows of six.
+const STANDING = (c) => (c.shelved ? 'SHELVED' : c.shore ? 'SHORE ANIMAL' : c.npc ? 'NPC' : undefined);
+for (const [name, e] of [['Cambrian', CAMBRIAN], ['Devonian', DEVONIAN], ['Triassic', TRIASSIC]]) {
+  const offered = e.creatures.filter((c) => !STANDING(c) && (e.assets.standInsPlayable || !e.assets.standIns?.[c.id]));
+  assert.equal(offered.length, 18, `${name}: the pick screen offers 18 animals, which is three rows of six (got ${offered.length})`);
+  // A shelved animal is out of the sea as well as off the screen, which is the whole of what
+  // separates it from an NPC and what lets its roster entry stay without putting it in the water.
+  for (const c of e.creatures.filter((x) => x.shelved)) {
+    assert.ok(!c.shore && !c.npc, `${name}: ${c.id} is shelved, so it needs no second word for being kept back`);
+  }
+  // The preload lists are what a player is most likely to reach for, so every id on them has to be
+  // something they can actually reach for: a full body and two portraits fetched ahead of time for
+  // an animal that is not on the pick screen is bandwidth spent on a tile nobody will see. The
+  // Devonian's boot list named Bothriolepis the day it became an NPC.
+  const offers = new Set(offered.map((c) => c.id));
+  for (const id of [e.defaults.player, ...e.defaults.boot, ...e.defaults.title]) {
+    assert.ok(offers.has(id), `${name}: ${id} is preloaded for the pick screen but is not offered on it`);
+  }
+}
+// The viewer lists every body a game has, so "can I play this?" has to be answered there: the ones
+// a player cannot pick sort into named sections after the unlabelled playable one, each alphabetised
+// on its own, and a kept-back animal's role line still says which kind it is.
+const SECTION_ORDER = [undefined, 'Visitors', 'NPCs', 'Unfinished'];
+for (const { id: c, sections } of SPECIMEN_SECTIONS) {
+  assert.ok(sections.length > 0, `${c}: a collection is listed but has no specimens`);
+  assert.equal(sections[0].title, undefined, `${c}: the first section is the playable roster and carries no heading`);
+  // The titles present must appear in this relative order, whichever are missing.
+  let cursor = 0;
+  for (const section of sections) {
+    const at = SECTION_ORDER.indexOf(section.title, cursor);
+    assert.ok(at >= 0, `${c}: '${section.title}' is out of order`);
+    cursor = at + 1;
+  }
+  for (const section of sections) {
+    const names = section.rows.map((r) => r.name);
+    const sorted = [...names].sort((a, b) => a.localeCompare(b));
+    assert.deepEqual(names, sorted, `${c}: section '${section.title ?? '(roster)'}' is not alphabetised (${names.join(', ')})`);
+    for (const r of section.rows) {
+      if (section.title === 'Visitors') {
+        assert.ok(r.offRoster, `${c}: ${r.name} sits under Visitors but is not a standing guest`);
+      } else if (section.title === 'NPCs' || section.title === 'Unfinished') {
+        assert.ok(r.notPlayable, `${c}: ${r.name} sits under ${section.title} but carries no standing`);
+        assert.ok(r.role.includes(r.notPlayable), `${c}: ${r.name}'s role line does not say which kind it is`);
+        assert.equal(section.title === 'Unfinished', r.notPlayable === 'SHELVED',
+          `${c}: ${r.name} (${r.notPlayable}) is filed under the wrong section`);
+      } else {
+        assert.ok(!r.offRoster && !r.notPlayable, `${c}: ${r.name} is in the playable section but is kept back`);
+      }
+    }
+  }
+}
+// A props collection carries none of these flags, and must render as exactly the one unlabelled
+// section rather than a run of empty headings.
+for (const { id: c, sections } of SPECIMEN_SECTIONS.filter((s) => s.id.endsWith('-props'))) {
+  assert.equal(sections.length, 1, `${c}: a props collection has no NPC, shelved or visitor flags, so it is one section`);
+  assert.equal(sections[0].title, undefined, `${c}: a props collection's one section carries no heading`);
+}
+console.log('PASS: three pick screens of eighteen, and the viewer sections what it does not offer into alphabetised, correctly-ordered headings after the roster');

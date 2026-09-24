@@ -422,6 +422,29 @@ unless the user explicitly asks for a PR. Steps:
   Nothing synthesises a stand-in for a sound that has not loaded — it stays quiet and the file is
   fetched; anything genuinely missing goes in `docs/audio-requests.md`. Only creatures with their own delivered model are pickable
   (`PLAYABLE` in `src/sim/creatures.ts`); the rest borrow a body in the world but stay off the roster.
+- **A roster is a menu, not a census, and three words on a creature's card decide how far into the
+  game it reaches.** `WILD` is what the sea holds and `PLAYABLE` is drawn *from* `WILD`, because a
+  pick has to be something the sea has. `shore` stands on the beach and strikes into the water;
+  `npc` is an ordinary swimmer the world spawns, hunts and is hunted by, and never offers — being
+  worth meeting is not the same as being worth playing, and every animal on a pick screen costs
+  every other one a share of the player's attention; `shelved` is not in that game at all, and its
+  roster entry is kept only so the specimen viewer can still show the body that was built for it,
+  which is what puts it in no sea (deleting the entry would take the animal's name, group, portrait
+  and model paths with it). All three games now offer **eighteen**, which is `gridColumns`' three
+  rows of six: the Cambrian keeps Odontogriphus, Ctenorhabdotus and Vetulicola in the water,
+  the Devonian Bothriolepis, Cheirolepis and Rhinodipterus, and the Triassic Cartorhynchus, with
+  Askeptosaurus and Hybodus shelved. `npm run eras` counts all three off the flags and checks that
+  nothing on a preload list is an animal the pick screen does not offer — the Devonian's `boot`
+  named Bothriolepis the day it stopped being pickable, which is a full body and two portraits
+  fetched ahead of time for a tile nobody sees. Three consequences worth knowing: the preload queue
+  is `WILD_IDS` (a shelved body is a download the game can never use), the codex's apex strip is
+  `PLAYABLE` (a card for an animal nobody can take to the top is a square that never fills, and it
+  would be in the denominator of "N of M species" as well), and `visitorsFrom` drops them too,
+  since an animal that cannot be picked can never be taken to the top of anything.
+  The specimen viewer shows every body a game has, so it answers "can I play this?" separately: a
+  kept-back animal sorts to the **end** of its collection and carries the word in its role line
+  (`TRIASSIC · NPC · SWIMMER · The bottom-worker`), stably, so the roster's own order inside each
+  half is untouched and an animal moved on or off the pick screen moves here by itself.
 - Devonian gameplay lives in `src/sim/devonian/` and Triassic gameplay in `src/sim/triassic/`; both
   reach the shared simulation only through the `RULES?.` hooks in `src/sim/era-rules.ts`. Do not
   branch on the era inside `game.ts`/`combat.ts`; add a hook. With `RULES` undefined the Cambrian
@@ -749,9 +772,18 @@ unless the user explicitly asks for a PR. Steps:
   nothing else in every case, which is why both cephalopods have none. Authored geometry in a mouth
   is a cost (it is invented shape on a Tripo body, against the simplicity bar), so it is justified
   per animal by a gape that actually shows through, never added as a matter of course.
-  **None of it is drawn at present**: `src/shared/oral-geometry.ts` is the one classifier, the game
-  hides everything it matches and the viewer's *Mouth geometry* switch starts off, so what is on
-  screen is the mouth each generation arrived with. The simulation reaches a mouth through
+  **Whether it is drawn is a verdict per animal, not a state of the roster.** `src/shared/oral-geometry.ts`
+  is the one classifier and `src/shared/oral-greenlit.json` the one list: a body a human has greenlit
+  draws its mouth, everything else is still hidden and shows the mouth its generation arrived with.
+  Hiding everything was right while the whole construction was under review and wrong the moment any
+  one body passed it, because the review is of *this animal's* mouth. A greenlit body is also offered
+  no *Mouth geometry* switch in the viewer — its mouth is part of it now, and a control asking whether
+  to draw an animal's own anatomy reads as a body still under review. The list is a JSON file rather
+  than a constant because **three languages have to agree about it**: the runtime reads it through
+  that module, `hidden-parts.mjs` imports it, and `gape-solid.py` and `mouth-space.py` load it — and
+  those last two are the tools that answer *what does a player see*. A greenlist only the runtime knew
+  about would leave them hiding what the game draws, which is the exact failure `--as-drawn` exists to
+  fix. The simulation reaches a mouth through
   `anchor_mouth` and `anchor_mouth_inside`, which are bones, so none of this is load-bearing.
   Whatever fills a mouth, the proof is unchanged and proving it needs care: render at full gape against a
   saturated backdrop *with and without* a backface-cull shim and compare the two, because comparing
@@ -849,6 +881,38 @@ unless the user explicitly asks for a PR. Steps:
   at 0.20 / 0.30 / 0.38 / 0.50 of the head's half depth at the hinge, with the mandible still
   travelling 0.96–1.00 of its own joint at every one; it ships at 0.50, where the worst edge is no
   longer in the mouth at all and the figure is exactly the 2.54x the cut body shipped.
+- **A generation that arrived *partially* open is filled at the seam and nowhere else**
+  (`T.seam_rim`, `T.seam_web`). That is `cut_rim`'s case 2 and neither of the other two
+  constructions fits it: the cut runs *deeper than the modelled mouth does*, so there is nothing to
+  fill at the front — where `cap_mouth` over the whole boundary would seal the generation's own
+  lumen shut — and there is a hole at the back, where the cut drew a rim through solid head.
+  Cymbospondylus' mouth is 0.14 of a body long and its cut left a rim over only the back **0.042**;
+  Shonisaurus' is 0.196 and 0.078. `jaw_junction` holds the two copies of that rim together **only
+  at the hinge cross-section** (55 pairs of 125, 40 of 164); everywhere else they part by design,
+  which on a body cut at its own lip is the mouth opening and on these two is the mouth opening
+  *plus* a hole into the head. The fill is therefore not a cap over an aperture but the **ruled
+  surface between the two copies of the rim**, and it closes by construction for a reason that
+  needs no render: every boundary vertex is a rim vertex's own rest position and own weight
+  dictionary, and linear blend skinning is a function of those two alone, so the web's boundary
+  *is* the halves' rims in every pose — worst difference 0.0 on both counts, asserted in
+  `seam_web_parity` rather than rendered. It also answers "fill only where the cut went through"
+  **by construction rather than by a bound**, because the web's extent is the rim's extent and a
+  rim exists only where the cut passed through surface. Three things it paid for. The albedo comes
+  from the **lumen's own wall** (`cavity_vertices`/`cavity_pigment` — every vertex whose outward
+  normal, cast back into the mesh, meets the wall opposite, which is what makes it interior), not
+  from the rim: more than half of Cymbospondylus' rim is outer cheek, and `cap_mouth`'s rim
+  sampling — right where the whole rim is a cut — would drag the flank into the inside of a mouth.
+  The fold that keeps the mesh from being degenerate at a shut mouth is **smoothed along the rim**,
+  because its depth follows the parting and its direction the rim's normal and both jump between
+  neighbours: unsmoothed it came out corrugated and read as a grille rather than as tissue.
+  And **ray parity cannot judge that fold** — a modelled mouth is an invagination and a parted rim
+  is a slot, so both read as outside the solid — so the parity count is recorded and what is
+  asserted is the head's own measured section. `gape-solid.py --show` is how a hidden fill is
+  measured *as the viewer's switch draws it*, beside the as-drawn run that measures the game.
+  Retired with it: Cymbospondylus' one-sac `Oral cavity lining` and its `Seated jaw hinge tissue`,
+  the second because since `jaw_junction` there is no square at the back of the mandible to cover
+  and it read as a black blister on the cheek the moment the switch went on. Record and both gape
+  tables: `docs/triassic/throat-repairs/oral-verdicts.md`.
 - **`gape-solid.py` was proving a body the game does not draw, and `--as-drawn` is the fix.** The
   runtime hides everything `src/shared/oral-geometry.ts` matches — every lining, every hinge plug —
   so a gape closed *by* one of those parts passes the proof and still shows a hole to a player.

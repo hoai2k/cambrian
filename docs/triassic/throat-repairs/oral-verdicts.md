@@ -42,6 +42,12 @@ continuous skin.
 Three widest-opening clips per body, `--as-drawn`, on the shipped packaged files. **`opened` is the
 column to read.** Nothing here is a claim about every camera: it is one side-on framing per clip.
 
+**Nor about every clip, and on one body that mattered.** Three is a sample, and the three widest
+are not where a leak is worst: Cartorhynchus reads 2 px through on its three and **36 px on the
+sixteen its `paired-audit.json` reports a non-zero gape for** — at `Guard`, `Grab` and `Swim`,
+which no sweep was ever going to take. Where a body is being ported rather than surveyed, run every
+clip the audit says opens the jaw.
+
 | Body | worst `through` | worst `opened` | note |
 | --- | ---: | ---: | --- |
 | **Nothosaurus** | **0** | **0** | ported in T3D-31: capped with its own rim |
@@ -54,11 +60,11 @@ column to read.** Nothing here is a claim about every camera: it is one side-on 
 | Odontochelys | 6 | 236 | |
 | Placodus | 23 | 454 | |
 | Saurichthys | 123 | 523 | **measured and recorded in T3D-32C, not re-cut**: the authored body and its twin are different kinds of generation and `T.cap_mouth` refuses on the authored half by construction — see [the README](../../../tools/triassic/creatures/saurichthys/README.md#the-cut-is-earning-its-place--measured-t3d-32c). Its pectorals and its twin's textures were repaired in the same pass. |
-| Cartorhynchus | 2 | 693 | |
+| **Cartorhynchus** | **1** | **1** | ported on 22 September 2026 on a human's re-aimed cut (`mouths/cartorhynchus-mouth.json`): capped with its own rim, no front bound, no lining, no hinge plug. Measured over **all sixteen** clips that open its jaw rather than the three this table samples, where the shipped body read **36 / 693** and the same re-aim on the sac read **189 / 2,155**. The one pixel is at `Guard`, a 0.06-rad gape; every wide gape is 0 / 0 |
 | Cymbospondylus | 4 | 933 | |
 | Archelon | 1 | 1,262 | |
 | **Macrocnemus** | **0** | **0** | ported in T3D-32B: arrived shut, capped with its own rim on a *fitted* cut (was 934 / 2,594 over **all twelve** opening clips) |
-| **Hybodus** | **0** | **0** | ported in T3D-32A: not cut at all (was 1,346 / 2,833) |
+| Hybodus | **1,346** | **2,833** | **reverted in T3D-36 at the owner's request.** T3D-32A took the cut out and read 0 / 0; the mouth was reported as not working well and `build.py` is restored verbatim to `a6d184c^` — the labelled cut, `T.cap_cut`, `T.rim_flange`, the pre-cut `T.seal_seams` and the two rigid `T.oral_shells`. Measured over **all fifteen** clips whose jaw leaves the shut pose rather than the three this table samples: the worst is `Heavy@0.4` 1,346 / 2,833, then `Bite@0.133` 1,261 / 2,670, `Bite@0.167` (its own peak) 1,073 / 2,328, `Attack@0.333` 875 / 1,985, `Grab@0.1` 158 / 518 and `Shake@0.6` 142 / 497; everything else 0 / 0, `Heavy` and `Attack` included at their own peaks. Plain run 52 / 1,046 — the rigid shells *are* what stands in the gap and the runtime hides them, which is the `--as-drawn` lesson on the body it was written about. Not re-engineered: the routes out are in [the README](../../../tools/triassic/creatures/hybodus/README.md#t3d-36--the-cut-put-back-at-the-owners-request) and the decision is the owner's |
 | Mixosaurus | 0 | 3,697 | |
 | **Atopodentatus** | **0** | **0** | ported in T3D-32A: capped with its own rim (was 3,738 / 4,494) |
 | Keichousaurus | 2 | 4,375 | |
@@ -144,3 +150,181 @@ worth saying so because neither of T3D-31's constructions survives it: the autho
 the only thing that makes an aperture at all. The routes out are a mouth-closed regeneration, or
 `jaw_field_uncut` on the authored body with the cut kept on the twin — which has to answer what the
 bind pose is on a body whose closing rotation is currently baked into a labelled mandible shell.
+
+## Greenlit — the game draws these mouths (22 September 2026)
+
+A human reviewed four bodies in the viewer and greenlit the mouth geometry they were already built
+with, keeping their shape as it stands. They are listed in `src/shared/oral-greenlit.json`, which is
+the one source the runtime, `hidden-parts.mjs`, `gape-solid.py` and `mouth-space.py` all read; the
+rest of the roster is still hidden and still shows the mouth its generation arrived with.
+
+`gape-solid.py --as-drawn` at the widest opening clips, before (the lining hidden, which is what the
+roster sweep measured) and after (the lining drawn, which is what a player now sees). `through` is
+opened backdrop the silhouette encloses; `opened` is every pixel whose only surface is a back face,
+and on a mouth held wide from the side it is the larger and the more honest of the two.
+
+| body | clips | `opened` before | `opened` after | `through` after |
+|---|---|---:|---:|---:|
+| Mystriosuchus | Heavy@0.5, Ability@0.4, Bite@0.1 | 7,716 / 7,734 / 7,577 | **0 / 0 / 0** | 0 |
+| Keichousaurus | Bite@0.2, Heavy@0.133, Eat@0.967 | 4,375 / 4,353 / 4,267 | **34 / 35 / 35** | 0 |
+| Mixosaurus | Heavy@0.367, Bite@0.067, Attack@0.267 | 3,697 / 3,337 / 2,861 | **44 / 40 / 37** | 0 |
+| Hupehsuchus | Ability@0.667, Gulp@0.467, Heavy@0.467 | 4,784 / 4,444 / 4,215 | **175 / 149 / 98** | 0 |
+
+All four pass the tool's own bar (0 px through the body against a tolerance of 12) and every one
+improved by one to two orders of magnitude, which is the evidence the greenlight was right rather
+than a preference: what those thousands of pixels were, was an open mouth with nothing closing it.
+Mystriosuchus closes completely. Hupehsuchus keeps the largest residue, still 96 % down.
+
+Counted across the roster, hiding drops from 75 oral meshes to 51 with 24 now drawn — 75 − 51 = 24,
+so the change moved exactly these four bodies' parts and nothing else (`hidden-parts.mjs --check`).
+
+## T3D-34: the seam web — a fill for a generation that arrived *partially* open
+
+Two bodies were reported as showing "holes in the geometry near the back of the mouth ... for
+creatures that have a mouth rendered already partially open". They are `cut_rim`'s **case 2** and
+neither of T3D-31's two constructions fits them, which is why this is a third one.
+
+**What is open, measured.** On both animals the cut runs *deeper than the generation's own mouth
+does*. Cymbospondylus' mouth is 0.1375 of a body long and its cut left a rim over only the back
+**0.042**; Shonisaurus' reaches 0.196 and its rim runs over the back **0.078**. Forward of the
+commissure the two jaws are already separate sheets and the seam passes between them without
+touching either — so there is nothing to fill at the front, and `cap_mouth` over the whole boundary
+would seal the modelled mouth shut. Behind it the cut drew a rim through solid head, and
+`T.jaw_junction` holds the two copies of that rim together **only at the hinge cross-section**
+(55 of 125 pairs on Cymbospondylus, 40 of 164 on Shonisaurus, where it asserts their weights equal).
+Everywhere else they part by design, which is the mouth opening — and on these two it is the mouth
+opening *plus* a hole into the head along the run the cut made.
+
+**The construction, and why it closes by construction.** `T.seam_web` is the **ruled surface between
+the two copies of the rim** (`T.seam_rim` finds them as ordered cycles and refuses anything that is
+not a set of closed curves). Three rows per rim point — the skull side, the jaw side, and a middle
+row folded into the flesh so the mesh is not degenerate at a shut mouth. Every boundary vertex is a
+rim vertex's **own rest position and own weight dictionary**, and linear blend skinning is a function
+of those two alone, so the web's boundary curves *are* the two halves' rims in every pose: worst
+rest-position difference **0.0**, worst weight difference **0.0** on all three bodies
+(`T.seam_web_parity` asserts it). Every boundary edge of the web is therefore a boundary edge of a
+half, and the union has no open edge along the cut, at rest and at full gape alike — by algebra
+rather than by a render, which is the bar `cap_mouth` set and the one Cartorhynchus' 51 px failed.
+
+It also answers *fill only where the cut went through* **by construction rather than by a bound**:
+the web's extent is the rim's extent, and a rim exists only where the cut passed through surface.
+
+**The albedo is the lumen's, not the cheek's.** `cap_mouth` inverse-distance weights off the rim,
+which is right where the whole rim is a cut. Here it is not: more than half of Cymbospondylus' rim is
+outer cheek. So `T.cavity_pigment` samples only the set `T.cavity_vertices` measured — every vertex
+whose own outward normal, cast back into the mesh, meets the wall opposite, which is what makes it
+interior (nothing on the outside of an animal has the animal in front of it). 280 such vertices on
+Cymbospondylus, mean colour **(0.193, 0.102, 0.071)** against **(0.218, 0.212, 0.170)** for the rest
+of the body; 1,215 on Shonisaurus, **(0.390, 0.381, 0.369)** against **(0.450, 0.455, 0.461)**.
+
+**The fold is smoothed along the rim, and that was not a nicety.** Its depth follows the parting and
+its direction the rim's own normal, both of which jump between neighbours — so a fold taken per
+vertex came out corrugated, and a corrugated ribbon at the back of a mouth reads as a grille rather
+than as tissue. Four passes of a [1 2 1] filter round each cycle took it out and took
+Cymbospondylus' shown `opened` from 431 to **155** at `Heavy`. The rim itself is never moved, so the
+smoothing cannot open the seam.
+
+**It is off.** Both webs are named so `src/shared/oral-geometry.ts` matches them, so the game hides
+them and the viewer's *Mouth geometry* switch starts with them hidden. Nothing here is turned on.
+
+### What the switch now shows, per body
+
+| | Cymbospondylus | Shonisaurus |
+| --- | --- | --- |
+| rim the cut drew twice | 125 shared vertices, 125 shared edges, 0 without two; cycles 112 + 13 (twin 101 + 9) | 164 shared vertices, 164 shared edges, 0 without two; one cycle |
+| of those, held by the junction | 55 | 40 |
+| web | 250 faces / 375 vertices (twin 220 / 330) | 328 faces / 492 vertices, authored body only |
+| parity (rest position, weights) | 0.0, 0.0 | 0.0, 0.0 |
+| fold, deepest / mean (of 6.0 units) | 0.0441 / 0.0147 | 0.0207 / 0.0089 |
+| retired with it | `Oral cavity lining` **and** `Seated jaw hinge tissue` | — (it carried none) |
+| skin (`skin-tears.mjs`) | 2.48x, unchanged | 1.44x, unchanged |
+| worst including oral geometry | 9.98x → **2.79x** | 1.44x, unchanged |
+| `lag.mjs` cut | 0 open past 0.2 % | 0 open past 0.2 % |
+| twin triangle fraction | 38.76 % → 36.79 % | unchanged |
+
+Shonisaurus' twin gets no web, and that is a fact about the twin rather than an omission: its
+rostrum is two separate closed lofts, so it has no cut and nothing open. `package-audit.mjs` asserts
+exactly that.
+
+### The gape, as drawn, hidden and shown
+
+`gape-solid.py --as-drawn` at the measured peak of every clip that opens the jaw, on the shipped
+files. **The shipped (hidden) column cannot have moved**: the visible geometry of both bodies is
+byte-identical to `main`'s — every attribute digest equal, and the six eye meshes' index buffers
+differ only in meshopt's ordering, with identical triangle sets. `--show "seam web"` is the same run
+with the web drawn, which is what the viewer's switch shows.
+
+**Read `opened`.** `through` is opened backdrop the *silhouette encloses*, and the web closes the
+route to the frame edge, so on a clip whose hole previously reached the edge `through` rises while
+the hole itself shrinks — an enclosure artefact of the metric, not a regression. The honest figure
+for "what did the fill cover" is the last column: backdrop in the hidden culled pass that is skin in
+the shown one.
+
+| Cymbospondylus | hidden `through`/`opened` | shown `through`/`opened` | backdrop the web covers |
+| --- | ---: | ---: | ---: |
+| `Heavy@0.6` | 1 / 744 | 155 / **155** | **3,114** |
+| `Lunge@0.7333` | 3 / 719 | 143 / **143** | 2,954 |
+| `Eat@0.4333` | 0 / 750 | 146 / **146** | 2,626 |
+| `Bite@0.1667` | 0 / 647 | 116 / **116** | 2,224 |
+| `Ability@0.3667` | 113 / 308 | **68** / **68** | 944 |
+| `Attack@0.4667` | 106 / 286 | **61** / **61** | 884 |
+| `Hit@0.3` | 113 / 301 | **64** / **64** | 879 |
+| `Stagger@0.6` | 122 / 319 | **76** / **76** | 889 |
+| `Death@2.0` | 99 / 244 | **55** / **55** | 704 |
+| `Breathe@1.6` | 19 / 19 | 16 / 16 | 8 |
+| `Breath@1.3` | 0 / 0 | 0 / 0 | 0 |
+
+| Shonisaurus | hidden `through`/`opened` | shown `through`/`opened` | backdrop the web covers |
+| --- | ---: | ---: | ---: |
+| `Heavy@0.3333` | 6 / 1,863 | 1,671 / 1,671 | **4,747** |
+| `Attack@0.2333` | 5 / 1,478 | 1,305 / 1,305 | 3,821 |
+| `Bite@0.1667` | 306 / 381 | **248** / **248** | 884 |
+| `Eat@0.6` | 9 / 13 | **2** / **5** | 13 |
+
+The web opens nothing of its own: 0–3 px on Cymbospondylus and 0–10 on Shonisaurus go the other way,
+all of it antialiasing along its own edge.
+
+**What is left on Shonisaurus is not the cut.** The 1,671 px at `Heavy` are the generation's own
+modelled lumen seen from outside with every back face culled — the inside of the upper jaw's pocket,
+which is a back face from any camera outside the mouth, on a body whose skin exports `doubleSided`.
+Filling that would mean filling the modelled mouth, which is exactly what this construction must not
+do. Its `Bite` figure is the sliver along the tooth row at the commissure this table has described
+since T3D-14, and the web took it from 306 to 248 without being aimed at it.
+
+Sheets: `docs/triassic/verification/<id>-mouth-space.png` (the shipped state) and
+`-mouth-space-seam-web.png` (with the switch on).
+
+### Does this overturn "neither"?
+
+**No, and one thing in the record was wrong.** The verdicts above are about a *lining* — a palate, a
+floor, a sac — and neither body gets one. Shonisaurus' "neither" stands exactly as written: it
+carries no lining, and the pixels its table describes are the generation's own gape and the slivers
+at the tooth row. What the seam web is, is the optional geometry a reviewer asked to *look* at, and
+it is off until they have.
+
+The wrong thing was in a brief rather than in this file: Cymbospondylus was believed to carry no
+lining. It carried the **one-sac `Oral cavity lining`** — the form CLAUDE.md names as the one that
+reads as a mouthful of gum — and a `Seated jaw hinge tissue` ellipsoid. Both are now retired, and
+both were measured before they went: as drawn, which is how they are drawn, that head reads 1 px
+through at its widest gape with the plug already invisible, so it closed nothing a player could see;
+and with the switch on it was a black blister standing proud of the cheek beside the mouth it was not
+filling. Cymbospondylus' *Mouth geometry* switch now shows the seam web and nothing else.
+
+### The aimed cut, measured rather than adopted
+
+`docs/triassic/mouths/cymbospondylus-mouth.json` is that body's first human-aimed cut
+(`mouth-cut/1`, 22 September). It was **not** adopted, and the reason is a measurement rather than a
+preference (`docs/triassic/verification/cymbospondylus-aimed-cut-vs-measured.json`, both cuts carried
+into the builder's own raw frame):
+
+- the aimed **hinge** sits **0.047 of a body behind** the builder's, which is a rig change and not a
+  cut change — the `jaw` bone, every clip drawn on it, the anchors and the junction all move with it;
+- the aimed **plane** runs 0.0028–0.0044 of a body *below* the line the builder measures off the
+  generation's own cavity, station by station. For scale, this builder records that a *straight* cut
+  would have deviated from its measured curve by **0.0007** — so the disagreement is a height, six
+  times the whole curve-versus-straight difference, and not a shape.
+
+`npm run triassic:mouth` now refuses the file anyway ("the body has changed since the cut was aimed
+... aim the cut again"), which is the right answer: a cut aimed at a body with a one-sac lining in it
+should be re-aimed at the body that ships. The comparison is on the record so that whoever re-aims it
+is arguing with numbers.

@@ -1,7 +1,8 @@
+import { drawsOralGeometry } from '../shared/oral-geometry';
 import { ClipQueuedBadge, ModelStatusBadge } from '../shared/ModelStatusBadge';
 import { CreaturePortrait } from '../app/CreaturePortrait';
-import { useEffect, useRef, useState } from 'react';
-import { COLLECTIONS, isPropCollection, paletteFor, SPECIMENS, specimenByKey, type CollectionId, type ViewerSpecimen } from './catalogue';
+import { Fragment, useEffect, useRef, useState } from 'react';
+import { COLLECTIONS, isPropCollection, paletteFor, SPECIMEN_SECTIONS, SPECIMENS, specimenByKey, type CollectionId, type ViewerSpecimen } from './catalogue';
 import { scheme, SLOT_LABEL, type Slot } from '../shared/palettes';
 import { ASSET_BASE, createViewerScene, isReplaced, replacedName, type PlaybackState, type ViewerScene } from './scene';
 import { SculptEditor } from './sculpt/SculptEditor';
@@ -152,6 +153,8 @@ export function Viewer() {
   const [stageId, setStageId] = useState<string>(() => opening(initial.current.key, initial.current.mode));
   const requestedId = useRef('');
   const def = specimenByKey.get(id)!;
+  /** A greenlit mouth is part of the animal: drawn, and with no switch offered over it. */
+  const oralGreenlit = drawsOralGeometry(def.id);
   const choices = stages(def);
   const stage = choices.find(o => o.id === stageId) ?? choices[0];
   const showPuppet = stage.kind === 'twin';
@@ -160,6 +163,7 @@ export function Viewer() {
   const showGenerated = stage.kind === 'generated';
   const modelPath = stage.model;
   const roster = SPECIMENS.filter(c => c.collection === collection);
+  const sections = SPECIMEN_SECTIONS.find(s => s.id === collection)?.sections ?? [];
   // Both eras are on this page, so a specimen's palette comes from its own pack, not ACTIVE_ERA.
   const defaultScheme = (key: string) => {
     const c = specimenByKey.get(key)!;
@@ -175,6 +179,7 @@ export function Viewer() {
    * comparing mouths means comparing across animals.
    */
   const [oralGeometry, setOralGeometry] = useState(false);
+
   const [hasOral, setHasOral] = useState(false);
   const [active, setActive] = useState('');
   const [loop, setLoop] = useState(false);
@@ -372,7 +377,10 @@ export function Viewer() {
 
   useEffect(() => { sceneRef.current?.setSpeed(speed); }, [speed]);
   useEffect(() => { sceneRef.current?.setScheme(schemeId); }, [schemeId]);
-  useEffect(() => { sceneRef.current?.setOralGeometry(oralGeometry); }, [oralGeometry, loadedId]);
+  // A greenlit body's mouth is simply part of it, so the scene is told to draw it and the switch
+  // below is not offered: a control that asks whether to show the animal's own anatomy reads as
+  // a body still under review, which these four no longer are.
+  useEffect(() => { sceneRef.current?.setOralGeometry(oralGreenlit || oralGeometry); }, [oralGreenlit, oralGeometry, loadedId]);
   useEffect(() => {
     try { sessionStorage.setItem(STORE_KEY, JSON.stringify(picks)); } catch { /* private mode: picks stay in memory */ }
   }, [picks]);
@@ -483,17 +491,22 @@ export function Viewer() {
           </label>
         </header>
         <ul>
-          {roster.map((c) => (
-            <li key={c.key}>
-              <button className={`specimen ${c.key === id ? 'active' : ''}`} aria-pressed={c.key === id} onClick={() => setId(c.key)}>
-                <>{c.image ? <img src={`${ASSET_BASE}${c.image}`} alt="" draggable={false}/> : <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={ASSET_BASE} schemeId={picks[c.key] ?? defaultScheme(c.key)} alt="" draggable={false} />}</>
-                <span>
-                  <b>{c.name}</b>
-                  <small>{c.species}</small>
-                  <ModelStatusBadge status={c.modelStatus} note={c.modelNote} compact />
-                </span>
-              </button>
-            </li>
+          {sections.map((section) => (
+            <Fragment key={section.title ?? '\u0000roster'}>
+              {section.title && <li className="specimen-heading"><h3>{section.title}</h3></li>}
+              {section.rows.map((c) => (
+                <li key={c.key}>
+                  <button className={`specimen ${c.key === id ? 'active' : ''}`} aria-pressed={c.key === id} onClick={() => setId(c.key)}>
+                    <>{c.image ? <img src={`${ASSET_BASE}${c.image}`} alt="" draggable={false}/> : <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={ASSET_BASE} schemeId={picks[c.key] ?? defaultScheme(c.key)} alt="" draggable={false} />}</>
+                    <span>
+                      <b>{c.name}</b>
+                      <small>{c.species}</small>
+                      <ModelStatusBadge status={c.modelStatus} note={c.modelNote} compact />
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </Fragment>
           ))}
         </ul>
       </aside>
@@ -515,7 +528,7 @@ export function Viewer() {
           </select>
         </label>}
         {choices.length > 1 && <p className="hint">Swapping holds the view and the animation time, so a difference between two of these reads as movement. Missing clips return to rest.</p>}
-        {hasOral && <><label className="toggle">
+        {hasOral && !oralGreenlit && <><label className="toggle">
           <input type="checkbox" checked={oralGeometry} onChange={(e) => setOralGeometry(e.target.checked)} />
           <span>Mouth geometry</span>
         </label>

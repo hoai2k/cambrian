@@ -37,10 +37,26 @@ SHOTS = [(c, float(t)) for c, t in (a.split('@') for a in argv[1:] if '@' in a)]
 # remains, because it is what the file contains and it is what every earlier verdict measured.
 AS_DRAWN = '--as-drawn' in argv
 ORAL = re.compile(r'lining|mouth[ _]interior|hinge[ _]tissue|beak|palate', re.I)
+# **What the viewer's *Mouth geometry* switch turns on is a question of its own.** A body whose oral
+# geometry is off in play still has to be judged with it *drawn*, because that is what a reviewer is
+# shown and what they are deciding about. `--show <pattern>` keeps matching meshes visible through an
+# `--as-drawn` run, so the pair is "as the game draws it" and "as the switch draws it" rather than
+# "the file" and "the game". The pattern is matched the way the classifier is, on the mesh's own name
+# and its materials'.
+SHOW = re.compile(argv[argv.index('--show') + 1], re.I) if '--show' in argv else None
 ROOT = Path(__file__).resolve().parents[2]
 LOCAL = ROOT / 'local/triassic-authoring' / ID
-OUT = LOCAL / ('gape-solid-as-drawn' if '--as-drawn' in sys.argv else 'gape-solid')
+OUT = LOCAL / (('gape-solid-as-drawn' + ('-showing' if SHOW else ''))
+               if '--as-drawn' in sys.argv else 'gape-solid')
 OUT.mkdir(parents=True, exist_ok=True)
+
+# Hiding is per animal, not roster-wide: a mouth a human has greenlit is drawn in the game, so
+# an --as-drawn run must draw it too. The list is src/shared/oral-greenlit.json, which the
+# runtime reads through the same file -- a tool that hid what the game draws would put this
+# proof back exactly where it was before --as-drawn existed.
+GREENLIT = {g['id'] for g in json.loads(
+    (ROOT / 'src/shared/oral-greenlit.json').read_text())['greenlit']}
+HIDE_ORAL = AS_DRAWN and ID not in GREENLIT
 
 # A backdrop the animal cannot produce: full-intensity magenta. Every one of these bodies is a brown
 # or grey hide over a dark red mouth, so any magenta pixel inside the silhouette is background seen
@@ -127,12 +143,12 @@ def render_pass(culled, shots):
     s = scene_setup()
     if culled:
         cull_shim()
-    if AS_DRAWN:
+    if HIDE_ORAL:
         for o in list(s.objects):
             if o.type != 'MESH':
                 continue
             names = [o.name] + [m.name for m in o.data.materials if m]
-            if any(ORAL.search(n) for n in names):
+            if any(ORAL.search(n) for n in names) and not (SHOW and any(SHOW.search(n) for n in names)):
                 o.hide_render = True
     rig = next(o for o in s.objects if o.type == 'ARMATURE')
     for tr in rig.animation_data.nla_tracks:
@@ -215,7 +231,8 @@ def enclosed_backdrop(px, w, h):
     return [i for i in range(w * h) if is_bg(i) and not seen[i]]
 
 
-report = {'id': ID, 'backdrop': list(BACKDROP), 'asDrawn': AS_DRAWN, 'shots': []}
+report = {'id': ID, 'backdrop': list(BACKDROP), 'asDrawn': AS_DRAWN,
+          'showing': argv[argv.index('--show') + 1] if SHOW else None, 'shots': []}
 for (clip, t, fa), (_, _, fb) in zip(solid, culled):
     a = bpy.data.images.load(fa)
     b = bpy.data.images.load(fb)

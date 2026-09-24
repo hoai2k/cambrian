@@ -40,6 +40,24 @@ const TRIASSIC_REFINEMENTS = refinementTables(triassicPending as PendingRefineme
 const TRIASSIC_PATHS = createAssetPaths(TRIASSIC);
 
 export type CollectionId = 'cambrian' | 'devonian' | 'devonian-props' | 'triassic' | 'triassic-props';
+/**
+ * The three ways a modelled animal can be in a game and not be a thing to play.
+ *
+ * `SHORE ANIMAL` stands on the beach and strikes into the water. `NPC` is an ordinary swimmer the
+ * sea keeps and the pick screen does not offer. `SHELVED` is not in the game at all any more, and
+ * is here because a built body goes on being worth looking at after the roster has let go of it.
+ */
+export type Standing = 'NPC' | 'SHELVED' | 'SHORE ANIMAL';
+const standingOf = (c: { shore?: boolean; npc?: boolean; shelved?: boolean }): Standing | undefined =>
+  c.shelved ? 'SHELVED' : c.shore ? 'SHORE ANIMAL' : c.npc ? 'NPC' : undefined;
+/** The sentence each of those adds to the specimen's own description. A shore animal's role says it. */
+const STANDING_NOTE: Record<Standing, string> = {
+  NPC: 'In the sea but off the pick screen: the world spawns it, it hunts and is hunted, and no player wears it.',
+  SHELVED: 'No longer in this game. The body was built, rigged and checked, so it stays here to be looked at.',
+  'SHORE ANIMAL': '',
+};
+/** The role line, with the standing in it where there is one: "TRIASSIC · NPC · SWIMMER · The bottom-worker". */
+const roleLine = (parts: readonly (string | undefined)[]) => parts.filter(Boolean).join(' \u00b7 ');
 export interface ViewerSpecimen {
   key: string;
   id: string;
@@ -101,6 +119,13 @@ export interface ViewerSpecimen {
   /** What the builder moved, in words, for the hint beside the control. */
   origPoseChanged?: readonly string[];
   /**
+   * What keeps this animal off its game's pick screen, where something does. The viewer shows
+   * every body a game has, and "can I play this?" is a different question from "does this exist?" —
+   * so the word goes in the role line and these rows sort to the end of their collection, behind
+   * the animals a player is actually offered.
+   */
+  notPlayable?: Standing;
+  /**
    * True for a subject that is being built but is on no era's roster — see
    * `src/content/triassic/expansion.json`. It borrows no body, because it is in no sea: where it
    * ends up is the open question, so the viewer must not offer a "borrowed body in play" stage
@@ -119,6 +144,12 @@ export interface ViewerSpecimen {
   looping: readonly string[];
 }
 const DEVONIAN_KIND = new Map(DEVONIAN_CREATURES.map(c => [c.id as string, { kind: c.kind, kindNote: c.kindNote }]));
+/**
+ * What keeps a Devonian animal off that game's pick screen, by id. A specimen row is a model and
+ * carries no roster flags of its own, so this comes off the roster entry the row is the same
+ * animal as — the same place its `kind` comes from.
+ */
+const DEVONIAN_STANDING = new Map(DEVONIAN_CREATURES.map(c => [c.id as string, standingOf(c)]).filter(([, v]) => v) as [string, Standing][]);
 /** The raw generated body of each animal still waiting for one, by id. */
 const TRIASSIC_PREVIEW = new Map((previewBodies as { id: string; model: string; yaw: number; lengthUnits: number | null; sha256: string }[])
   .map(b => [b.id, b]));
@@ -160,11 +191,13 @@ export const COLLECTIONS: readonly { id: CollectionId; name: string }[] = [
  */
 export const isPropCollection = (c: CollectionId | undefined): boolean => c === 'devonian-props' || c === 'triassic-props';
 
-export const SPECIMENS: readonly ViewerSpecimen[] = [
+const LISTED: readonly ViewerSpecimen[] = [
   ...CREATURES.map(c => ({
     key: `cambrian:${c.id}`, id: c.id, collection: 'cambrian' as const,
-    name: c.name, species: c.species, kind: c.kind, kindNote: c.kindNote, role: `${c.ground ? 'SEAFLOOR' : 'SWIMMER'} · ${c.role}`,
-    provenance: c.provenance ?? 'Burgess Shale', description: '',
+    name: c.name, species: c.species, kind: c.kind, kindNote: c.kindNote,
+    role: roleLine([standingOf(c), c.ground ? 'SEAFLOOR' : 'SWIMMER', c.role]),
+    notPlayable: standingOf(c),
+    provenance: c.provenance ?? 'Burgess Shale', description: standingOf(c) ? STANDING_NOTE[standingOf(c)!] : '',
     modelStatus: CAMBRIAN_MODEL_STATUS[c.id as CambrianCreatureId], modelNote: CAMBRIAN_MODEL_NOTES[c.id as CambrianCreatureId],
     clipNotes: CAMBRIAN_CLIP_NOTES[c.id as CambrianCreatureId],
     model: assetPaths.model(c.id), lod: assetPaths.model(c.id, 1), displayLength: c.adultLength,
@@ -175,8 +208,10 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     collection: (c.category === 'prop' ? 'devonian-props' : 'devonian') as CollectionId,
     // A specimen is the same animal as the roster entry, so it borrows that entry's group.
     name: c.name, species: c.species, kind: DEVONIAN_KIND.get(c.id)?.kind, kindNote: DEVONIAN_KIND.get(c.id)?.kindNote,
-    role: c.category === 'prop' ? 'DEVONIAN · SCENERY' : 'DEVONIAN · SPECIMEN',
-    provenance: c.provenance, description: c.description,
+    role: c.category === 'prop' ? 'DEVONIAN · SCENERY' : roleLine(['DEVONIAN', DEVONIAN_STANDING.get(c.id), 'SPECIMEN']),
+    notPlayable: c.category === 'prop' ? undefined : DEVONIAN_STANDING.get(c.id),
+    provenance: c.provenance,
+    description: [DEVONIAN_STANDING.get(c.id) && STANDING_NOTE[DEVONIAN_STANDING.get(c.id)!], c.description].filter(Boolean).join(' '),
     modelStatus: DEVONIAN_REFINEMENTS.modelStatus[c.id], modelNote: DEVONIAN_REFINEMENTS.modelNotes[c.id],
     clipNotes: DEVONIAN_REFINEMENTS.clipNotes[c.id], model: c.model, lod: c.lod, image: c.image, displayLength: 4,
     lengthMeters: c.lengthMeters, looping: c.looping,
@@ -186,8 +221,10 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
   ...TRIASSIC_CREATURES.map(c => ({
     key: `triassic:${c.id}`, id: c.id, collection: 'triassic' as const,
     name: c.name, species: c.species, kind: c.kind, kindNote: c.kindNote,
-    role: `TRIASSIC · ${c.shore ? 'SHORE ANIMAL' : c.ground ? 'SEAFLOOR' : 'SWIMMER'} · ${c.role}`,
-    provenance: c.locality ?? 'Triassic', description: TRIASSIC.assets.standIns?.[c.id] ? `Borrowed body: ${String(TRIASSIC.assets.standIns[c.id]).replace('devonian/', 'Devonian ')}. ${c.tagline}` : c.tagline,
+    role: roleLine(['TRIASSIC', standingOf(c), c.shore ? undefined : c.ground ? 'SEAFLOOR' : 'SWIMMER', c.role]),
+    notPlayable: standingOf(c),
+    provenance: c.locality ?? 'Triassic',
+    description: [standingOf(c) && STANDING_NOTE[standingOf(c)!], TRIASSIC.assets.standIns?.[c.id] ? `Borrowed body: ${String(TRIASSIC.assets.standIns[c.id]).replace('devonian/', 'Devonian ')}. ${c.tagline}` : c.tagline].filter(Boolean).join(' '),
     modelStatus: TRIASSIC_REFINEMENTS.modelStatus[c.id], modelNote: TRIASSIC_REFINEMENTS.modelNotes[c.id],
     clipNotes: TRIASSIC_REFINEMENTS.clipNotes[c.id],
     // A body in review is this animal's own; only without one does the roster path apply, and for
@@ -268,6 +305,45 @@ export const SPECIMENS: readonly ViewerSpecimen[] = [
     displayLength: 4, lengthMeters: c.lengthMeters, looping: c.looping,
   })),
 ];
+/** The heading a non-playable section carries. The playable section at the head of every collection carries none. */
+export type SpecimenSectionTitle = 'Visitors' | 'NPCs' | 'Unfinished';
+export interface SpecimenSection { title?: SpecimenSectionTitle; rows: readonly ViewerSpecimen[] }
+const byName = (a: ViewerSpecimen, b: ViewerSpecimen) => a.name.localeCompare(b.name);
+/**
+ * Which of a collection's four sections a specimen falls in, keyed on the flags rather than on a
+ * list of names, so an animal moved on or off the pick screen moves here by itself. The order
+ * matches how a player meets these animals climbing the ladder: what they can pick, then what they
+ * can only visit, then what the sea keeps without ever offering, then what no sea holds any more.
+ */
+const SECTION_OF = (c: ViewerSpecimen): 0 | 1 | 2 | 3 =>
+  c.offRoster ? 1 : c.notPlayable === 'SHELVED' ? 3 : c.notPlayable ? 2 : 0;
+const SECTION_TITLES: readonly (SpecimenSectionTitle | undefined)[] = [undefined, 'Visitors', 'NPCs', 'Unfinished'];
+/**
+ * The order the page walks: each collection in turn, and inside a collection up to four sections —
+ * the playable roster with no heading, the off-roster standing guests under *Visitors*, the NPCs
+ * and shore animals the sea keeps and never offers under *NPCs*, and the shelved bodies no game
+ * holds any more under *Unfinished* — each one alphabetised by name on its own.
+ *
+ * The viewer shows every body a game has, which now includes bodies the game keeps and never
+ * offers — an NPC in the water, a shelved animal that is only here, a shore animal on the beach, a
+ * standing guest earned nowhere — and left where they were authored they sat in the middle of the
+ * list with nothing saying why the roster does not have them. An empty section is left out
+ * entirely, which is what keeps a props collection — carrying none of these flags — down to its one
+ * unlabelled section rather than a run of empty headings.
+ */
+export const SPECIMEN_SECTIONS: readonly { id: CollectionId; sections: readonly SpecimenSection[] }[] =
+  COLLECTIONS.map(({ id }) => {
+    const buckets: ViewerSpecimen[][] = [[], [], [], []];
+    for (const c of LISTED) if (c.collection === id) buckets[SECTION_OF(c)].push(c);
+    return {
+      id,
+      sections: buckets
+        .map((rows, i) => ({ title: SECTION_TITLES[i], rows: [...rows].sort(byName) }))
+        .filter(s => s.rows.length > 0),
+    };
+  });
+export const SPECIMENS: readonly ViewerSpecimen[] =
+  SPECIMEN_SECTIONS.flatMap(({ sections }) => sections.flatMap(s => s.rows));
 export const specimenByKey = new Map(SPECIMENS.map(c => [c.key, c]));
 
 

@@ -15,8 +15,13 @@ const anchors=JSON.parse(fs.readFileSync(`${here}/anchors.json`));
 const feeding=new Set(['Bite','Attack','Heavy','Eat']);
 const meta=JSON.parse(fs.readFileSync(`${out}/shonisaurus.json`));
 const buildReport=JSON.parse(fs.readFileSync(`${here}/build-report.json`));
-// The runtime's oral classifier (src/shared/oral-geometry.ts): this animal ships nothing it would match.
+// The runtime's oral classifier (src/shared/oral-geometry.ts). This animal carries **one** thing it
+// matches and no palate, floor, throat tube or tooth row: the seam web, the ruled surface between
+// the two copies of the rim the mandible split drew through solid head behind the modelled gape.
+// It is hidden in play like all oral geometry; the point of naming it here is that nothing *else*
+// may appear, which is the verdict this body has always shipped under.
 const ORAL=/lining|mouth[ _]interior|hinge[ _]tissue|beak|palate/i;
+const SEAM_WEB='Mouth interior seam web';
 const numDigest=a=>hash(Buffer.from(new Float64Array(arr(a)).buffer));
 function skeleton(doc){const skin=doc.getRoot().listSkins()[0];return {joints:skin.listJoints().map(n=>({name:n.getName(),parent:n.getParentNode()?.getName(),translation:n.getTranslation(),rotation:n.getRotation(),scale:n.getScale()})),inverseBind:numDigest(skin.getInverseBindMatrices())};}
 function geometry(doc){return doc.getRoot().listMeshes().map(m=>({name:m.getName(),primitives:m.listPrimitives().map(p=>({triangles:(p.getIndices()?.getCount()??p.getAttribute('POSITION').getCount())/3,attributes:p.listSemantics().sort().map(s=>[s,numDigest(p.getAttribute(s))])}))}));}
@@ -37,7 +42,10 @@ function removeNeutralExportNoise(doc){
 }
 function check(doc,label){
  const root=doc.getRoot(), animations=root.listAnimations(),names=animations.map(a=>a.getName());assert.deepEqual([...names].sort(),[...meta.clips].sort());
- for(const n of root.listNodes())if(n.getMesh())for(const p of n.getMesh().listPrimitives())assert(!ORAL.test(`${n.getName()} ${n.getMesh().getName()} ${p.getMaterial()?.getName()??''}`),`${label} ${n.getName()}: oral geometry shipped on an animal that carries none`);
+ for(const n of root.listNodes())if(n.getMesh())for(const p of n.getMesh().listPrimitives())assert(n.getName()===SEAM_WEB||!ORAL.test(`${n.getName()} ${n.getMesh().getName()} ${p.getMaterial()?.getName()??''}`),`${label} ${n.getName()}: oral geometry beyond the seam web, on an animal that carries none`);
+ // The twin's rostrum is two separate closed lofts, so it has no cut and nothing to fill: the web
+ // belongs to the authored body alone, and that is a fact about the twin rather than an omission.
+ assert.equal(root.listNodes().filter(n=>n.getName()===SEAM_WEB).length,label==='full'?1:0,`${label}: the seam web belongs to the authored body alone`);
  const signatures=new Set();let weights=0,tris=0;const winding=[];
  for(const m of root.listMeshes())for(const p of m.listPrimitives()){
   tris+=(p.getIndices()?.getCount()??p.getAttribute('POSITION').getCount())/3;
@@ -75,7 +83,7 @@ for(const [src,suffix]of [['full',''],['puppet','.puppet']]){
 }
 assert.deepEqual(skeleton(docs.full),skeleton(docs.puppet));assert.deepEqual(clips(docs.full),clips(docs.puppet));assert.deepEqual(results.full.sockets,results.puppet.sockets);assert(results.puppet.triangles<results.full.triangles*.4);
 fs.copyFileSync(`${out}/shonisaurus.puppet.glb`,`${out}/shonisaurus.lod1.glb`);
-fs.writeFileSync(`${here}/validation.json`,JSON.stringify({passed:true,exactSkeletonParity:true,exactAnimationParity:true,exactSocketParity:true,losslessAnimationPackaging:true,losslessMeshAttributePackaging:true,nonfeedingJawMotion:false,mouthOpeningClips:[...feeding],oralGeometry:'none',eyes:buildReport.eyes,...results},null,2)+'\n');
+fs.writeFileSync(`${here}/validation.json`,JSON.stringify({passed:true,exactSkeletonParity:true,exactAnimationParity:true,exactSocketParity:true,losslessAnimationPackaging:true,losslessMeshAttributePackaging:true,nonfeedingJawMotion:false,mouthOpeningClips:[...feeding],oralGeometry:buildReport.oralGeometry,eyes:buildReport.eyes,...results},null,2)+'\n');
 console.log(JSON.stringify({full:results.full.bytes,puppet:results.puppet.bytes,fullTriangles:results.full.triangles,puppetTriangles:results.puppet.triangles,bones:results.full.bones,clips:meta.clips.length,parity:'exact'},null,2));
 
 for(const kind of ['full','puppet']){const doc=docs[kind];for(const ext of doc.getRoot().listExtensionsUsed())if(ext.extensionName==='EXT_meshopt_compression')ext.dispose();await io.write(`${base}/shonisaurus.${kind}.decoded.glb`,doc);}

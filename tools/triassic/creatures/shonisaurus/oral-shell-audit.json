@@ -1,0 +1,30 @@
+{
+  "id": "shonisaurus",
+  "verdict": "no oral lining: nothing to be mixed",
+  "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present. A body with no lining mesh is reported as such, with the hidden oral parts it does carry listed, and all three variants must agree.",
+  "models": [
+    {
+      "variant": "authored",
+      "sha256": "4faf939d563f67413f70377727f7602851ddc55b59bbfba3d43fb7d029b66226",
+      "meshes": [],
+      "otherOralMeshes": [
+        "Mouth interior seam web"
+      ],
+      "oralShells": "none"
+    },
+    {
+      "variant": ".puppet",
+      "sha256": "8543b55dd7f48a31a2dc934cca48eeb3ed6194aa04b7315dd2734360de084dfb",
+      "meshes": [],
+      "otherOralMeshes": [],
+      "oralShells": "none"
+    },
+    {
+      "variant": ".lod1",
+      "sha256": "8543b55dd7f48a31a2dc934cca48eeb3ed6194aa04b7315dd2734360de084dfb",
+      "meshes": [],
+      "otherOralMeshes": [],
+      "oralShells": "none"
+    }
+  ]
+}
