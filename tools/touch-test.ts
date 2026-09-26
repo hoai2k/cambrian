@@ -74,11 +74,19 @@ const fresh = () => ({ s: freshTouch(), t: 0 });
   down(s, 2, 'water', 402, 201, 0.06 + DOUBLE / 2, true, SIZE);
   const second = read(s, 0.06 + DOUBLE / 2);
   check('holding the second tap pursues the animal', second.pursue && second.heavies === 0);
+  check('the pursuit begins as an edge', second.pursuitStart && !read(s, 0.25).pursuitStart);
   check('the pursuit lasts while held', read(s, 0.5).pursue);
   up(s, 2, 0.55);
   check('lifting ends the pursuit', !read(s, 0.56).pursue);
   check('...and it is not also a dash', second.dash === false);
   check('a creature tap uses the target mark', first.marker === 'target' && second.marker === 'target');
+}
+{
+  const { s } = fresh();
+  down(s, 1, 'water', 400, 200, 0, 73, SIZE); up(s, 1, 0.04);
+  down(s, 2, 'water', 400, 200, 0.08, -1, SIZE); up(s, 2, 0.11);
+  const f = read(s, 0.12);
+  check('quick creature double-tap keeps the first creature through a missed frame', f.pursuitStart && !f.pursue && f.pursuitTargetId === 73);
 }
 {
   // Over open water there is nothing to pounce at, so the same gesture is the dash — which is
@@ -345,7 +353,7 @@ check('an owed edge fires on a frame with no arrivals', meterEdge(1, 0).fire ===
 // ---------------------------------------------------------------- folding into the controls
 
 const fold = (t: Partial<ReturnType<typeof read>> & { light?: boolean; heavy?: boolean } = {}): RawControls => applyTouch(emptyControls(), {
-  dx: 0, dy: 0, zoom: 0, bites: 0, heavies: 0, swim: false, secondary: undefined, dash: false, pursue: false,
+  dx: 0, dy: 0, zoom: 0, bites: 0, heavies: 0, swim: false, secondary: undefined, dash: false, pursue: false, pursuitStart: false, pursuitTargetId: undefined,
   dragging: false, ndc: undefined, marker: undefined, swapped: false, pinching: false, light: false, heavy: false, ...t,
 });
 

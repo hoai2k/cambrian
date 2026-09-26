@@ -510,9 +510,9 @@ export class Engine {
     this.touch.attach(container);
     this.touch.targetAt = (ndc) => {
       const game = this.game, cs = this.cams[0], p = game?.players[0];
-      if (!game || !cs || !p) return false;
+      if (!game || !cs || !p) return -1;
       this.updateAim(cs, p, p.aiming, 0, ndc);
-      return this.pointingAt(game, p, cs) !== 'none';
+      return this.pointingAt(game, p, cs) !== 'none' ? cs.aimTarget : -1;
     };
     this.touch.onSwap = (sec) => { this.cb.onSecondary?.(sec); };
     this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.sand.points, this.tracks.mesh, this.splash.group, this.mouthfuls.group, this.eggs.group);
@@ -559,6 +559,7 @@ export class Engine {
   setOrientationBlocked(blocked: boolean) { this.orientationBlocked = blocked; this.syncPointer(); }
   private syncPointer() {
     const playing = this.pointerWanted && !this.paused && !this.orientationBlocked && !this.attract;
+    if (this.paused || this.orientationBlocked || this.attract) this.pursuitTargets.clear();
     this.mouse.want(playing);
     // The fingers stand down for exactly the same reasons the mouse does: paused, in a dialog, on
     // the results screen or back at the menus, a tap belongs to whatever button it landed on.
@@ -758,12 +759,19 @@ export class Engine {
     // separate thing the middle button asks for (`updateAim` still blends on `c.aim`).
     const cursor = this.cursorDir(cs);
     if (cursor) { f.aim = true; f.aimTarget = cs.aimTarget; }
-    const pursuing = this.setups[a.player]?.device === 'touch' ? this.touchFrame?.pursue : this.mouseLook && this.mouseFrame?.pursue;
-    if (pursuing) {
+    const touchPursuit = this.setups[a.player]?.device === 'touch';
+    if (touchPursuit) {
+      if (this.touchFrame?.pursuitStart) { this.pursuitTargets.set(a.player, this.touchFrame.pursuitTargetId ?? cs.aimTarget); a.pursuit = undefined; }
+      else if (this.pursuitTargets.get(a.player) === -1 && (this.touchFrame?.bites || !this.touchFrame?.ndc)) this.pursuitTargets.delete(a.player);
+    } else if (this.mouseLook && this.mouseFrame?.pursue) {
       if (!this.pursuitTargets.has(a.player)) this.pursuitTargets.set(a.player, cs.aimTarget);
-      const target = this.pursuitTargets.get(a.player) ?? -1;
-      if (target >= 0) { f.pursueTarget = target; f.aim = true; f.aimTarget = target; }
     } else this.pursuitTargets.delete(a.player);
+    if (this.pursuitTargets.has(a.player)) {
+      const target = this.pursuitTargets.get(a.player) ?? -1;
+      const victim = target >= 0 ? this.game?.byId(target) : undefined;
+      if ((a.pursuit?.target === target && a.pursuit.spent) || !isAlive(a) || !victim || !isAlive(victim) || isHidden(victim)) this.pursuitTargets.set(a.player, -1);
+      else { f.pursueTarget = target; f.pursueDash = touchPursuit; f.aim = true; f.aimTarget = target; }
+    }
     // The right button — or a double-tap on the water — dashes at what is being pointed at: the dash
     // takes its direction from the stick through the camera, so for those frames the camera's forward
     // *is* the pointing ray and a neutral stick is pushed forward along it. Held, the body keeps
@@ -2006,7 +2014,9 @@ export class Engine {
       let aim: PlayerHud['aim'];
       // On a mouse the *cursor* is the crosshair (`src/shared/cursors.ts`), so the reticle is off:
       // two crosshairs on one screen, one of them nailed to the middle, is worse than either alone.
-      if (p.aiming && cs && !this.mouseLook && !this.touchFrame?.pursue) {
+      const chaseId = this.touchPlay ? this.pursuitTargets.get(i) : undefined;
+      const chasing = chaseId != null && chaseId >= 0;
+      if (p.aiming && cs && !this.mouseLook && !chasing && chaseId !== -1) {
         const t = lockA && isAlive(lockA) ? lockA : undefined;
         const heavyMove = game.heavyMove(p);
         // A finger keeps the reticle and takes it *with* it. The mouse has a cursor doing this job
@@ -2016,8 +2026,17 @@ export class Engine {
         const at = this.touchPlay && !this.touchFrame?.pursue ? this.touchFrame?.ndc : undefined;
         aim = { hasTarget: !!t, inRange: !!t && p.aimInRange, name: t ? creature(t.creature).name : undefined, color: t ? BAND_COLOR[bandOf(p, t)] : '#eefaf6', band: t ? bandOf(p, t) : undefined, ready: heavyMove.ready, action: heavyMove.name, at: at ? { x: at.x, y: at.y } : undefined };
       }
-      const touchMark = this.touchPlay && !this.touchFrame?.pursue && this.touchFrame?.marker && this.touchFrame.ndc
-        ? { kind: this.touchFrame.marker, at: this.touchFrame.ndc } : undefined;
+      let touchMark: PlayerHud['touchMark'];
+      if (chasing && cs) {
+        const victim = game.byId(chaseId);
+        if (victim && isAlive(victim)) {
+          const screen = new THREE.Vector3(victim.pos.x, victim.pos.y, victim.pos.z).project(cs.camera);
+          if (screen.z >= -1 && screen.z <= 1 && Math.abs(screen.x) <= 1 && Math.abs(screen.y) <= 1)
+            touchMark = { kind: 'target', at: { x: screen.x, y: screen.y } };
+        }
+      } else if (chaseId !== -1 && this.touchPlay && this.touchFrame?.marker && this.touchFrame.ndc) {
+        touchMark = { kind: this.touchFrame.marker, at: this.touchFrame.ndc };
+      }
       return {
         index: i, creature: p.creature, color: PLAYER_COLORS[i % 4], alive: p.state !== 'dead', aim, touchMark,
         scheme,

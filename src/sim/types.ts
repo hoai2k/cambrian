@@ -50,6 +50,8 @@ export interface InputFrame {
   touchDash?: boolean;
   /** Held double click/tap: track this exact creature until the bite lands. */
   pursueTarget?: number;
+  /** Touch double-tap commits a dash-length chase; mouse pursuit remains held until release. */
+  pursueDash?: boolean;
   /** LT held: aim mode. The renderer decides what the centred crosshair is over and passes it here. */
   aim: boolean; aimTarget: number;
   lookX: number; lookY: number;
@@ -129,6 +131,8 @@ export interface Actor {
   hitDone: Set<number>;
   iframes: number;
   lockTarget: number;
+  /** One committed double-tap attack, bounded by a normal dash's travel. */
+  pursuit?: { target: number; last: Vec3; traveled: number; max: number; spent: boolean };
   guardHeld: number;
   abilityCd: number; abilityT: number; abilityActive: boolean;
   hideMode: 'none' | 'descending' | 'burrowed' | 'camouflage';

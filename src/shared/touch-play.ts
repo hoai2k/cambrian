@@ -35,7 +35,7 @@
  * depends on what the first tap was over — which is the mouse's rule for its own held button, that
  * a pounce needs something to pounce *at*:
  *
- *   - over an animal it is the **heavy**: the pounce, the lunge, whatever that animal's heavy is;
+ *   - over an animal it commits to a fast, tracking bite, bounded by one dash's travel;
  *   - over open water it is the **dash**, aimed at that water. A double-tap commits to the full
  *     crossing even if the second finger lifts before the next frame; holding still works too.
  *
@@ -137,6 +137,8 @@ export interface Finger {
    * which is the only thing that knows — the same fact `MousePlay.aimingAt` is told each frame.
    */
   onTarget: boolean;
+  /** Exact creature from the first tap, when the renderer can identify it. */
+  targetId?: number;
   /** Pixels of sideways travel banked on the secondary pad since the last step of the ring. */
   swiped: number;
 }
@@ -146,13 +148,16 @@ export interface TouchState {
   /** Live fingers by identifier, in arrival order. */
   touches: Map<number, Finger>;
   /** The last completed tap: when it lifted, and whether it was over something. */
-  lastTap: { t: number; onTarget: boolean } | undefined;
+  lastTap: { t: number; onTarget: boolean; targetId?: number } | undefined;
   /** Index into `SECONDARY`: which action the secondary pad is currently holding. */
   slot: number;
   /** Bites banked since the last `read`, as a count so two taps in one frame are two bites. */
   bites: number;
   /** Heavies banked since the last `read`. */
   heavies: number;
+  /** A creature double-tap begins a committed pursuit, even if released before a frame. */
+  pursuits: number;
+  pursuitTargetId: number | undefined;
   /** A double-tap commits to a full dash even if the second finger lifts before a render frame. */
   dashPulse: number;
   dashReadAt: number | undefined;
@@ -170,7 +175,7 @@ export interface TouchState {
 }
 
 export const freshTouch = (slot = 0): TouchState => ({
-  touches: new Map(), lastTap: undefined, slot, bites: 0, heavies: 0, dashPulse: 0, dashReadAt: undefined, aim: undefined, swaps: 0,
+  touches: new Map(), lastTap: undefined, slot, bites: 0, heavies: 0, pursuits: 0, pursuitTargetId: undefined, dashPulse: 0, dashReadAt: undefined, aim: undefined, swaps: 0,
   pinchSep: undefined,
 });
 
@@ -233,25 +238,28 @@ export function down(
   zone: Zone,
   x: number, y: number,
   t: number,
-  onTarget: boolean,
+  onTarget: boolean | number,
   size: { w: number; h: number },
 ): void {
   // A duplicate identifier means the previous touch with it was never released — a lost `touchend`,
   // which happens. Drop the stale one rather than keeping two of it.
   s.touches.delete(id);
-  const touch: Finger = { id, zone, role: 'pending', t0: t, x0: x, y0: y, x, y, moved: 0, dx: 0, dy: 0, onTarget, swiped: 0 };
+  const targetId = typeof onTarget === 'number' && onTarget >= 0 ? onTarget : undefined;
+  const targeted = typeof onTarget === 'number' ? onTarget >= 0 : onTarget;
+  const touch: Finger = { id, zone, role: 'pending', t0: t, x0: x, y0: y, x, y, moved: 0, dx: 0, dy: 0, onTarget: targeted, targetId, swiped: 0 };
   if (zone === 'swim') touch.role = 'swim';
   else if (zone === 'secondary') touch.role = 'secondary';
   else {
     // Water. The aim point follows the newest finger on the water, because that is the one the
     // player is pointing with.
-    s.aim = { ...toNdc(x, y, size.w, size.h), t, marker: onTarget ? 'target' : undefined };
+    s.aim = { ...toNdc(x, y, size.w, size.h), t, marker: targeted ? 'target' : undefined };
     const tap = s.lastTap;
     if (tap && t - tap.t <= DOUBLE) {
       // The first tap chooses whether the held second tap pursues a creature or dashes in water.
       touch.role = tap.onTarget ? 'heavy' : 'dash';
       s.aim.marker = touch.role === 'dash' ? 'zoom' : 'target';
-      if (!tap.onTarget) { s.dashPulse = 0.42; s.dashReadAt = undefined; }
+      if (tap.onTarget) { s.pursuits++; s.pursuitTargetId = tap.targetId ?? targetId; }
+      else { s.dashPulse = 0.42; s.dashReadAt = undefined; }
       // A double-tap is consumed: three taps are a double-tap and then a fresh single, not two
       // overlapping doubles.
       s.lastTap = undefined;
@@ -299,7 +307,7 @@ export function up(s: TouchState, id: number, t: number): void {
   // down because staying still is only known once the finger is gone.
   if (p.role === 'pending' && p.moved <= DRAG && t - p.t0 <= TAP_TIME) {
     s.bites++;
-    s.lastTap = { t, onTarget: p.onTarget };
+    s.lastTap = { t, onTarget: p.onTarget, targetId: p.targetId };
   }
 }
 
@@ -307,7 +315,7 @@ export function up(s: TouchState, id: number, t: number): void {
 export function clear(s: TouchState): void {
   s.touches.clear();
   s.lastTap = undefined;
-  s.bites = 0; s.heavies = 0;
+  s.bites = 0; s.heavies = 0; s.pursuits = 0; s.pursuitTargetId = undefined;
   s.dashPulse = 0; s.dashReadAt = undefined;
   s.aim = undefined;
   s.pinchSep = undefined;
@@ -331,6 +339,9 @@ export interface TouchFrame {
   dash: boolean;
   /** The second tap is held on a creature: pursue that creature until a bite lands. */
   pursue: boolean;
+  /** One creature double-tap began, retained across frames until read. */
+  pursuitStart: boolean;
+  pursuitTargetId: number | undefined;
   /** A swipe is turning the camera, so the follow camera stands aside. */
   dragging: boolean;
   /** Where the player is pointing, in NDC, while it has not lapsed. */
@@ -404,7 +415,7 @@ export function read(s: TouchState, t: number, lookSpeed = 1): TouchFrame {
     dx: dx * SENSITIVITY * lookSpeed, dy: dy * SENSITIVITY * lookSpeed,
     zoom,
     bites: s.bites, heavies: s.heavies,
-    swim, secondary, dash, pursue: [...s.touches.values()].some((p) => p.role === 'heavy'), dragging,
+    swim, secondary, dash, pursue: [...s.touches.values()].some((p) => p.role === 'heavy'), pursuitStart: s.pursuits > 0, pursuitTargetId: s.pursuitTargetId, dragging,
     // The aim point lapses on its own clock, so a bite fired on a lift still aims where the finger
     // was and a hand taken off the glass hands aiming back to the middle of the screen.
     ndc: s.aim && t - s.aim.t <= AIM_HOLD ? { x: s.aim.x, y: s.aim.y } : undefined,
@@ -412,7 +423,7 @@ export function read(s: TouchState, t: number, lookSpeed = 1): TouchFrame {
     swapped: s.swaps > 0,
     pinching,
   };
-  s.bites = 0; s.heavies = 0; s.swaps = 0;
+  s.bites = 0; s.heavies = 0; s.pursuits = 0; s.pursuitTargetId = undefined; s.swaps = 0;
   // A tap that nothing followed is spent: it cannot pair with a touch that arrives much later.
   if (s.lastTap && t - s.lastTap.t > DOUBLE) s.lastTap = undefined;
   return f;

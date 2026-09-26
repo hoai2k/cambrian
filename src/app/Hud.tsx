@@ -173,7 +173,7 @@ function SensePanel({ p }: { p: PlayerHud }) {
       {p.scheme === 'touch' && (p.touchMark || p.aim) && (() => {
         const mark = p.touchMark;
         const at = mark?.at ?? p.aim?.at;
-        const kind = mark?.kind ?? (p.aim?.hasTarget ? (p.aim.band === 'snack' || p.aim.band === 'prey' ? 'edible' : 'attack') : 'idle');
+        const kind = mark?.kind === 'target' ? 'attack' : mark?.kind ?? (p.aim?.hasTarget ? (p.aim.band === 'snack' || p.aim.band === 'prey' ? 'edible' : 'attack') : 'idle');
         return <img className="touch-cursor" src={cursorImageFor(kind)} alt=""
           style={{ left: at ? `${(at.x + 1) * 50}%` : '50%', top: at ? `${(1 - at.y) * 50}%` : '50%' }} />;
       })()}

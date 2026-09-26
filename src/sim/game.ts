@@ -1253,7 +1253,7 @@ export class Game implements AiWorld {
     // while you are hanging off it; held down it still closes a grip on what is already in reach,
     // which is the deliberate hold `graspT` is timing, but it is never a way to stop biting.
     const holder = a.controller === 'player';
-    a.graspHold = holder && (input.heavy || input.ability);
+    a.graspHold = holder && (input.heavy || input.ability) && !input.pursueDash;
     const gripArmed = holder && (input.light || input.heavy || input.ability);
     a.graspT = gripArmed ? a.graspT + dt : 0;
     if (!gripArmed) a.graspSpent = false;
@@ -1855,6 +1855,24 @@ export class Game implements AiWorld {
    */
   private stepActions(a: Actor, input: InputFrame, dt: number, s: Step) {
     const { def, L, sf, justLight, justHeavy, justAbility, justDodge, justGuard, justLock, justSense, justDash, paddling, bursting, dir, mag, locked, jets, relief, freeClimb } = s;
+    if (input.pursueTarget != null && input.pursueDash) {
+      if (a.pursuit?.target !== input.pursueTarget) {
+        // Use the same launch speed and duration as a normal dash, including floor resistance.
+        const gap = a.pos.y - groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders);
+        const dashSpeed = def.tailFlip ? flipLaunch(a)
+          : (L * 9.5 + 7) * (def.id === 'waptia' ? 1.2 : 1) * punting(a, gap);
+        const dashLength = dashSpeed * (def.tailFlip ? 0.5 : 0.42);
+        a.pursuit = { target: input.pursueTarget, last: { ...a.pos }, traveled: 0, max: dashLength, spent: false };
+      } else if (!a.pursuit.spent) {
+        a.pursuit.traveled += dist(a.pos, a.pursuit.last);
+        a.pursuit.last = { ...a.pos };
+        if (a.pursuit.traveled >= a.pursuit.max) a.pursuit.spent = true;
+      }
+    } else a.pursuit = undefined;
+    const chaseTarget = a.pursuit?.spent ? undefined : input.pursueTarget;
+    if (a.pursuit?.spent && a.state === 'pounce' && a.lockTarget === a.pursuit.target) {
+      a.state = 'free'; a.stateT = 0; a.vel = v3();
+    }
     // The grip is only ever asked about below, inside the block a free body reaches. Say so first,
     // so a recording of a frame that never got there reads as the reason it did not rather than as
     // whatever the last frame that did happened to say.
@@ -1867,7 +1885,7 @@ export class Game implements AiWorld {
       // Aim (LT held): the camera owns the crosshair; whatever it reports is the target. Bots toggle lock.
       if (a.controller === 'player') {
         a.aiming = input.aim;
-        a.lockTarget = input.pursueTarget ?? (input.aim ? input.aimTarget : -1);
+        a.lockTarget = chaseTarget ?? (input.aim ? input.aimTarget : -1);
         if (input.aim) this.flag(a, 'lock');
       } else if (justLock) {
         if (a.lockTarget >= 0) a.lockTarget = -1;
@@ -1895,13 +1913,13 @@ export class Game implements AiWorld {
       // attack that sometimes stuck. Nothing in reach and the button does what it always did.
       // A grip that closed takes the button; one still closing does not, because the pounce is the
       // other way of arriving at the same hold — it lunges, and what it lands on it takes hold of.
-      const grasped = this.tryGrasp(a, def, L, input.heavy || input.ability) === 'took';
+      const grasped = !input.pursueDash && (this.tryGrasp(a, def, L, input.heavy || input.ability) === 'took');
       // Heavy (RT): the emergence strike, the creature's special, or the pounce — all of it in one
       // place, so a charge out of a sprint (below) or out of a dash reaches exactly the same move.
       // Sprinting makes it a charge: it aims along the line of travel and costs extra stamina.
       if (grasped) { /* the grip took the button */ }
-      else if (input.pursueTarget != null && a.controller === 'player') {
-        const target = this.idMap.get(input.pursueTarget);
+      else if (chaseTarget != null && a.controller === 'player') {
+        const target = this.idMap.get(chaseTarget);
         if (target && isAlive(target) && !isHidden(target)) this.startPounce(a, target, L, sf, true);
       }
       else if (justHeavy && this.heavyAction(a, def, L, sf, locked, bursting)) { /* the button was taken */ }
@@ -1951,9 +1969,13 @@ export class Game implements AiWorld {
     } else if (a.state === 'attack' && a.move) {
       const m = a.move;
       const total = m.windup + m.active + m.recovery;
-      // The first tap can already have begun a bite when the second tap declares a dash. Let that
-      // touch gesture take over immediately; otherwise its one dash edge is lost in the windup.
-      if (justDash && input.touchDash && !a.ashore && (a.stamina >= 10 || freeClimb) && (a.exhausted === 0 || freeClimb) && a.dashCd === 0) {
+      // The first tap can already be winding up a bite. A creature double-tap commits to its
+      // target now, just as a water double-tap takes over immediately for the dash.
+      const chase = input.pursueDash && chaseTarget != null ? this.idMap.get(chaseTarget) : undefined;
+      if (chase && isAlive(chase) && !isHidden(chase)) {
+        a.move = undefined;
+        this.startPounce(a, chase, L, sf, true);
+      } else if (justDash && input.touchDash && !a.ashore && (a.stamina >= 10 || freeClimb) && (a.exhausted === 0 || freeClimb) && a.dashCd === 0) {
         a.dashUsed = true;
         a.move = undefined;
         this.startDash(a, def, mag > 0.3 ? dir : vscale(heading(a.yaw), jets || def.tailFlip ? -1 : 1), L, sf, relief);
@@ -1975,13 +1997,15 @@ export class Game implements AiWorld {
       // turned as they close on it. While the button is down the lunge keeps its legs: it re-aims
       // at wherever the animal is now, every frame, until it arrives. Paid for once when it
       // started, because it is one act however long the swim to it takes.
-      if (t && isAlive(t) && input.pursueTarget === t.id) a.stateDur = a.stateT + 0.2;
+      if (t && isAlive(t) && chaseTarget === t.id) a.stateDur = a.stateT + 0.2;
       if (t && isAlive(t) && a.graspHold && !a.graspSpent && a.grabbing < 0 && a.rideHost < 0
         && (bandOf(a, t) === 'threat' || bandOf(a, t) === 'giant')) a.stateDur = a.stateT + 0.2;
       if (t && isAlive(t) && a.stateT < a.stateDur) {
         // home in hard on the target; impact when the mouth reaches it
         const to = sub(t.pos, a.pos); const d = len3(to);
-        const speed = Math.max(def.speed * sf * 3.2, 9 * Math.sqrt(sf));
+        const speed = chaseTarget === t.id && a.pursuit
+          ? Math.max(def.speed * sf * 3.2, a.pursuit.max / (def.tailFlip ? 0.5 : 0.42))
+          : Math.max(def.speed * sf * 3.2, 9 * Math.sqrt(sf));
         const dirTo = norm(to);
         a.vel = vscale(dirTo, speed);
         a.yaw = yawOf(dirTo); a.pitch = def.ground ? a.pitch : clamp(-Math.asin(clamp(dirTo.y, -1, 1)) * 0.8, -0.9, 0.9);
@@ -2248,7 +2272,7 @@ export class Game implements AiWorld {
     // wiped the target on the first frame and left the animal stopped where it started.
     if (a.lockTarget >= 0) {
       const t = this.idMap.get(a.lockTarget);
-      const reaching = (a.state === 'pounce' && input.pursueTarget === a.lockTarget) || a.state === 'pounce' && a.graspHold && !!t
+      const reaching = (a.state === 'pounce' && chaseTarget === a.lockTarget) || a.state === 'pounce' && a.graspHold && !!t
         && (bandOf(a, t) === 'threat' || bandOf(a, t) === 'giant');
       if (!t || !isAlive(t) || isHidden(t) || (!a.aiming && !reaching && dist(a.pos, t.pos) > 16 + L * 8)) a.lockTarget = -1;
     }

@@ -48,7 +48,7 @@ export class TouchPlay {
   /** Whether there is something worth attacking where the player is pointing. Written each frame. */
   private overTarget = false;
   /** Test the actual new touch point; the previous frame's target may be somewhere else. */
-  targetAt: ((ndc: { x: number; y: number }) => boolean) | null = null;
+  targetAt: ((ndc: { x: number; y: number }) => number) | null = null;
   /** Edges the simulation has not been handed yet: see `read`. */
   private owedBites = 0;
   private owedHeavies = 0;
