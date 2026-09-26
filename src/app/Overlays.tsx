@@ -276,7 +276,7 @@ function SettingsPage({ settings, onSettings }: { settings: Settings; onSettings
       <label className="setting-row">
         <span>{t.detail} <small>{t.detailNote}</small></span>
         <div className="seg">
-          {(['high', 'low'] as const).map((q) => <button key={q} aria-pressed={settings.quality === q} onClick={() => onSettings({ ...settings, quality: q })}>{q === 'high' ? t.qualityHigh : t.qualityLow}</button>)}
+          {(['high', 'low'] as const).map((q) => <button key={q} aria-pressed={settings.quality === q} onClick={() => onSettings({ ...settings, quality: q, qualityExplicit: true })}>{q === 'high' ? t.qualityHigh : t.qualityLow}</button>)}
         </div>
       </label>
       <label className="setting-row" htmlFor="look-speed">

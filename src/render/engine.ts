@@ -20,6 +20,7 @@ import { amphibious, breathesAir, STRAND_BREATH, STRAND_LOW } from '../sim/beach
 import { AssetQueue, type AssetProgress } from './assets';
 import { fillOf, ladderName } from '../sim/ladder';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
+import { mobileDevonian } from '../shared/mobile-memory';
 import { Edges } from '../shared/edges';
 import { SAND_COLORS } from '../shared/environment-colors';
 import { Attachments } from './attachments';
@@ -465,6 +466,7 @@ export class Engine {
   private alpha = 1;
   private tmpPos = new THREE.Vector3(); private tmpPred = new THREE.Vector3();
   quality: Quality;
+  private readonly conserveMemory = mobileDevonian();
 
   constructor(private container: HTMLElement, quality: Quality, private cb: EngineCallbacks) {
     this.quality = quality;
@@ -504,10 +506,10 @@ export class Engine {
     });
     this.assets.prioritize([...ACTIVE_ERA.defaults.boot], 'boot');
   }
-  readonly assets = new AssetQueue();
+  readonly assets = new AssetQueue(this.conserveMemory);
   private bootDone = false; private bootStart = performance.now();
   /** Tell the loader which creatures are most likely to be needed next. */
-  prioritize(creatures: CreatureId[], phase: 'boot' | 'title' | 'select' | 'playing') { this.assets.prioritize(creatures, phase); }
+  prioritize(creatures: CreatureId[], phase: 'boot' | 'title' | 'select' | 'playing', committed: CreatureId[] = []) { this.assets.prioritize(creatures, phase, committed); }
 
   private onResize() {
     const w = this.container.clientWidth || 1, h = this.container.clientHeight || 1;
@@ -1275,7 +1277,7 @@ export class Engine {
     // you. Weighting keeps a giant eighty units off (the thing that matters most at any moment)
     // ahead of the chaff while lifting what is within reach above the small and far.
     candidates.sort((x, y) => y.size * (y.d < nearAlways ? NEAR_RANK : 1) - x.size * (x.d < nearAlways ? NEAR_RANK : 1));
-    const cap = Math.round((this.quality === 'high' ? 88 : 56) / (0.6 + 0.4 * players));
+    const cap = Math.round((this.conserveMemory ? 32 : this.quality === 'high' ? 88 : 56) / (0.6 + 0.4 * players));
     // Full-detail bodies are the most expensive thing in the frame — they are skinned on the CPU
     // and drawn again into the shadow map, once per viewport — and how expensive depends entirely
     // on the era: a Devonian placoderm is 105k triangles where a Cambrian arthropod is 55k, and
@@ -1290,6 +1292,9 @@ export class Engine {
       let v = this.views.get(a.id);
       const size = lengthOf(a) / d;
       let wantLod: Lod = a.controller === 'player' ? 0 : v ? (v.lod === 0 ? (size < 0.05 ? 1 : 0) : (size > 0.075 ? 0 : 1)) : (size < 0.06 ? 1 : 0);
+      // On Devonian touch devices, keep the full skinned body for the player only. Streaming
+      // full NPCs over a long match otherwise retains the entire 269 MB compressed roster.
+      if (this.conserveMemory && a.controller !== 'player') wantLod = 1;
       // The budget only ever demotes: your own body, and anything already at full detail whose
       // share is still affordable, keep it.
       const full = loadedSync(a.creature, 0);
@@ -1297,7 +1302,12 @@ export class Engine {
         if (full && spent + full.tris > budget) wantLod = 1;
       }
       if (wantLod === 0) spent += full?.tris ?? 0;
-      if (wantLod === 1 && !loadedSync(a.creature, 1)) { void ensureLoaded(a.creature, undefined, 1); wantLod = 0; }
+      if (wantLod === 1 && !loadedSync(a.creature, 1)) {
+        void ensureLoaded(a.creature, undefined, 1);
+        // Use an already resident full body while its LOD arrives, but do not start a second,
+        // much larger download just because the small body has not finished loading yet.
+        if (loadedSync(a.creature, 0)) wantLod = 0;
+      }
       // A view is built for one creature at one detail level. Both can change under it: the level
       // with distance, and the creature itself when a player changes body mid-match.
       if (v && (v.lod !== wantLod || v.creatureId !== a.creature)) { v.dispose(); this.views.delete(a.id); v = undefined; }

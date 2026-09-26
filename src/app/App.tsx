@@ -30,6 +30,7 @@ import { toolbarPlace } from './toolbar-place';
 import { menuScheme } from '../shared/controls';
 import { SECONDARY, type Secondary } from '../shared/touch-play';
 import { rosterCap } from '../shared/small-screen';
+import { mobileDevonian } from '../shared/mobile-memory';
 import { RotateHint, TouchPads } from './TouchPads';
 import { useSmallScreen } from './use-small-screen';
 import { assignSeatSchemes } from '../shared/seat-schemes';
@@ -46,6 +47,8 @@ export type DialogKind = null | 'help' | 'settings';
  */
 export interface Settings {
   quality: Quality; lookSpeed: number; invertY: boolean; volume: number; muted: boolean; music: boolean;
+  /** Distinguishes a deliberate high setting from the old automatic high default on mobile. */
+  qualityExplicit?: boolean;
   equivalentSizing: boolean; shoreAnimals: boolean;
   /**
    * What the touch player's secondary pad is set to, and how many touch matches they have played.
@@ -75,8 +78,17 @@ const startScale = (v: Visitor) => (v.standing ? undefined : v.scale);
 const MODES: Mode[] = ACTIVE_ERA.modes.map((m) => m.id);
 const SETTINGS_KEY = ACTIVE_ERA.copy.settingsKey;
 const defaultSettings = (): Settings => {
-  try { const s = localStorage.getItem(SETTINGS_KEY); if (s) return { ...{ quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false, shoreAnimals: false, secondary: 'aim' as Secondary, touchMatches: 0 }, ...JSON.parse(s) }; } catch { /* ignore */ }
-  return { quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false, shoreAnimals: false, secondary: 'aim' as Secondary, touchMatches: 0 };
+  // Existing settings often contain the old automatic 'high' default. Start Devonian touch
+  // sessions on low even then; players can still raise quality explicitly in Settings.
+  const defaults: Settings = { quality: mobileDevonian() ? 'low' : 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false, shoreAnimals: false, secondary: 'aim', touchMatches: 0 };
+  try {
+    const s = localStorage.getItem(SETTINGS_KEY);
+    if (s) {
+      const saved = JSON.parse(s) as Partial<Settings>;
+      return { ...defaults, ...saved, quality: mobileDevonian() && !saved.qualityExplicit ? 'low' : saved.quality ?? defaults.quality };
+    }
+  } catch { /* ignore */ }
+  return defaults;
 };
 
 /**
@@ -901,7 +913,7 @@ export function App() {
       const committed = players.filter((p) => p.ready).map((p) => p.creature);
       const hovered = players.filter((p) => !p.ready).map((p) => p.creature);
       const neighbours = players.flatMap((p) => { const i = CREATURE_IDS.indexOf(p.creature); return [i + 1, i - 1, i + cols, i - cols].filter((j) => j >= 0 && j < n).map((j) => CREATURE_IDS[j]); });
-      e.prioritize([...new Set([...committed, ...hovered, ...neighbours])], 'select');
+      e.prioritize([...new Set([...committed, ...hovered, ...neighbours])], 'select', committed);
     } else e.prioritize([...new Set(players.map((p) => p.creature))], 'playing');
   }, [screen, players, loaded]);
 

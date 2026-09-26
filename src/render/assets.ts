@@ -51,13 +51,17 @@ const base = () => appBase();
 
 export class AssetQueue {
   private items = new Map<string, AssetItem>();
+  private wanted: Set<CreatureId>;
+  private lodWanted: Set<CreatureId>;
   private active = 0;
   private concurrency = 2;
   private listeners = new Set<(p: AssetProgress) => void>();
   readonly ready = new Set<CreatureId>();
   private disposed = false;
 
-  constructor() {
+  constructor(private readonly conserveMemory = false) {
+    this.wanted = new Set<CreatureId>(conserveMemory ? [ACTIVE_ERA.defaults.player] : ACTIVE_ERA.defaults.boot);
+    this.lodWanted = new Set<CreatureId>([ACTIVE_ERA.defaults.player, ...ACTIVE_ERA.defaults.title]);
     const B = base();
     // A creature still borrowing another's body has no art of its own either; the pick screen
     // falls back to a placeholder for it at render time. Requesting images that are not there
@@ -127,8 +131,13 @@ export class AssetQueue {
     put('select', creaturePortrait(id, 'select').src, SELECT_SIZE, 255);
   }
 
-  prioritize(creatures: CreatureId[], phase: 'boot' | 'title' | 'select' | 'playing') {
-    for (const id of creatures) this.wanted.add(id);
+  prioritize(creatures: CreatureId[], phase: 'boot' | 'title' | 'select' | 'playing', committed: CreatureId[] = []) {
+    if (this.conserveMemory) {
+      // Browsing the roster uses portraits. A confirmed choice is worth preloading, while
+      // merely hovering dozens of animals must not leave dozens of full rigs resident.
+      if (phase === 'select') for (const id of committed) this.wanted.add(id);
+      if (phase === 'playing') for (const id of creatures) this.wanted.add(id);
+    } else for (const id of creatures) this.wanted.add(id);
     const order = [...creatures, ...WILD_IDS.filter((c) => !creatures.includes(c))];
     order.forEach((id, i) => {
       // A visitor from another game is not on this era's list and so has no queue entry of its
@@ -168,13 +177,13 @@ export class AssetQueue {
    * and hoovering all of it up behind the title screen is felt as lag on every frame that has to
    * share the main thread with a meshopt decode.
    */
-  private wanted = new Set<CreatureId>(ACTIVE_ERA.defaults.boot);
-
   private pump() {
     if (this.disposed || !this.idle) return;
     while (this.active < this.concurrency) {
       const next = [...this.items.values()]
-        .filter((i) => i.status === 'queued' && (i.kind !== 'glb' || this.wanted.has(i.key.slice(4) as CreatureId)))
+        .filter((i) => i.status === 'queued' &&
+          (i.kind !== 'glb' || this.wanted.has(i.key.slice(4) as CreatureId)) &&
+          (!this.conserveMemory || i.kind !== 'lod' || this.lodWanted.has(i.key.slice(4) as CreatureId)))
         .sort((a, b) => a.priority - b.priority)[0];
       if (!next) break;
       void this.run(next);
