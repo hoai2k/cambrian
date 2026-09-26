@@ -61,6 +61,10 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 
 /* ---------- Select ---------- */
 .select { position: absolute; inset: 0; display: grid; grid-template-rows: auto 1fr auto; z-index: 10; padding: 18px 22px 80px; background: linear-gradient(180deg, rgba(6,22,28,.78), rgba(6,22,28,.35) 40%, rgba(6,22,28,.78)); animation: fade-in .4s both; }
+/* The picker footer and icon toolbar share the bottom row. Reserve the toolbar's width at the
+   right of the footer so Dive In sits beside it and the roster gets the old clearance back. */
+.screen-select .select { padding-bottom: 18px; }
+.screen-select .select-footer { min-height: 44px; padding-right: 212px; }
 .select-header { display: grid; grid-template-columns: auto 1fr; grid-template-areas: 'brand modes' 'blurb blurb'; gap: 8px 24px; align-items: center; }
 /*
  * The mark in the corner does two jobs: the emblem goes back to the title (which is why there is
@@ -1057,6 +1061,9 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
   /* The pick screen. It already goes to one column under 1000px; what is left is the padding, the
      header's own furniture and the crew card, which is the tallest thing on the screen. */
   .select { padding: 10px 12px 64px; gap: 8px; }
+  .screen-select .select { padding-bottom: 10px; }
+  .screen-select .select-footer { padding-right: 212px; }
+  .screen-select .toolbar-right { right: 12px; bottom: 10px; }
   .select-header { gap: 8px; }
   .mode-blurb { display: none; }
   .header-logo { width: 104px; }
@@ -1087,6 +1094,14 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
   /* Menu buttons are tapped, so they get a thumb's worth of height wherever they are. */
   .menu-buttons button, .ghost, .icon-button { min-height: 44px; }
   .icon-button { width: 44px; }
+}
+
+@media (max-width: 430px) {
+  .screen-select .toolbar { gap: 4px; }
+  .screen-select .toolbar-right { right: 12px; }
+  .screen-select .icon-button { width: 36px; }
+  .screen-select .select-footer { padding-right: 164px; }
+  .screen-select .start-button { padding: 9px 10px; font-size: 11px; letter-spacing: .06em; }
 }
 
 /* A window that is short *and* narrow — a phone on its side — has the least room of anything, and
@@ -1191,6 +1206,8 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
    * name. It goes back to one row, and the chips to the height of their own words.
    */
   .select { padding: 8px 10px 42px; gap: 6px; }
+  .screen-select .select { padding-bottom: 8px; }
+  .screen-select .select-footer { padding-right: 178px; }
   .select-header { grid-template-columns: auto minmax(0, 1fr); grid-template-areas: 'brand modes'; align-items: center; gap: 10px; }
   .header-logo { width: 88px; }
   .mode-chip { min-height: 36px; padding: 3px 8px; }
@@ -1205,16 +1222,19 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
   .cell { padding: 3px 4px 4px; }
   .cell-name { font-size: 10.5px; }
   .select-footer { gap: 6px; }
-  /*
-   * And the icons move to the *other* corner, on this screen only. The toolbar and the footer both
-   * want the bottom right, and normally the picker's 80 pixels of bottom padding keeps them apart —
-   * 80 pixels is a quarter of this window, so instead of buying the clearance the footer's Dive In
-   * is simply given the corner and the icons take the empty one. Only on the picker: in a match the
-   * bottom left is where the swim pad lives, and the two must not be in the same place.
-   */
-  .screen-select .toolbar-right { right: auto; left: 10px; }
-  .screen-select .toolbar { bottom: 8px; gap: 6px; }
+  /* Keep the compact toolbar on the same row as Dive In. */
+  .screen-select .toolbar-right { right: 10px; bottom: 8px; }
+  .screen-select .toolbar { gap: 6px; }
   .screen-select .icon-button { width: 38px; height: 38px; border-radius: 11px; }
+}
+
+/* Four roster rows on a short landscape phone fit when the portraits and gutters give back a few
+   pixels each. Taller screens keep the full-size cards. */
+@media (max-height: 399px) and (min-aspect-ratio: 1/1) {
+  .screen-select .roster-grid { gap: 6px; }
+  .screen-select .cell { padding: 2px 4px 3px; }
+  .screen-select .cell img { height: 36px; }
+  .screen-select .cell-name { font-size: 10px; }
 }
 
 .bar.hunger i { background: linear-gradient(90deg, #c77342, #f5c968); }
