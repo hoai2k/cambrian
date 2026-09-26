@@ -160,7 +160,7 @@ function sandColorAt(x: number, z: number): THREE.Color {
   return SAND_SWATCH.copy(c);
 }
 
-interface CamState { showBoard: boolean; hatchShot: number; breathT: number; rideBlend: number; yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; climbHold: number; followHold: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
+interface CamState { showBoard: boolean; hatchShot: number; breathT: number; rideBlend: number; yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; climbHold: number; followHold: number; floorCloseT: number; floorCloseBlend: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
 /** Per-player teleport menu state: opened with D-pad down, steered with the D-pad or stick, A confirms, B closes. */
 /**
  * The D-pad-down menu. A list of places to go, plus one entry that opens a second page: the roster,
@@ -216,6 +216,18 @@ export const magnificationDistance = (L: number) => L * 1.45 + 1.15 + Math.max(0
  * animal rather than inside its own ribs.
  */
 const CAMERA_SAND = 0.45, CAMERA_CLOSE = 0.9;
+/** Keep the closer seafloor framing until the player has been clear of the bottom for ten seconds. */
+export const FLOOR_CLOSE_HOLD = 10;
+export const seafloorCloseHold = (hold: number, floorGap: number, length: number, dt: number): number =>
+  floorGap < Math.max(2, length * 1.5) ? FLOOR_CLOSE_HOLD : Math.max(0, hold - dt);
+
+/** Cap an upward shot so the creature's upper body remains inside the bottom of the view. */
+export function keepCreatureInFrame(cameraY: number, lookY: number, lookRange: number, creatureY: number, creatureRange: number, fov: number): number {
+  const creatureAngle = Math.atan2(creatureY - cameraY, Math.max(0.01, creatureRange));
+  const highestLookAngle = creatureAngle + fov * Math.PI / 360 * 0.88;
+  const lookAngle = Math.atan2(lookY - cameraY, Math.max(0.01, lookRange));
+  return lookAngle > highestLookAngle ? cameraY + Math.tan(highestLookAngle) * lookRange : lookY;
+}
 
 /**
  * Fit the camera onto its arm with the seabed in the way.
@@ -663,7 +675,7 @@ export class Engine {
     this.cams = setups.map((_, i) => {
       const p = this.game!.players[i];
       const cam = new THREE.PerspectiveCamera(60, 1, 0.08, 420);
-      const cs: CamState = { showBoard: false, hatchShot: -1, breathT: 0, rideBlend: 0, yaw: p.yaw, pitch: 0.2, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, climbHold: 0, followHold: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4(), tele: freshTele() };
+      const cs: CamState = { showBoard: false, hatchShot: -1, breathT: 0, rideBlend: 0, yaw: p.yaw, pitch: 0.2, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, climbHold: 0, followHold: 0, floorCloseT: 0, floorCloseBlend: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4(), tele: freshTele() };
       cam.position.copy(cs.pos); cam.lookAt(cs.look);
       return cs;
     });
@@ -734,7 +746,7 @@ export class Engine {
     const fwd = this.tmpV.copy(cs.look).sub(cs.camera.position).normalize();
     f.camYaw = Math.atan2(fwd.x, fwd.z);
     f.camPitch = swimPitch(-Math.asin(clamp(fwd.y, -1, 1)));
-    f.burst = c.burst; f.dash = c.dash;
+    f.burst = c.burst; f.dash = c.dash; f.touchDash = this.setups[a.player]?.device === 'touch' && !!this.touchFrame?.dash;
     f.rise = c.rise; f.sink = c.sink;
     f.light = c.light; f.heavy = c.heavy; f.ability = c.ability; f.dodge = c.dodge; f.guard = c.guard; f.lock = c.lock; f.sense = c.sense;
     f.aim = c.aim; f.aimTarget = c.aim ? cs.aimTarget : -1;
@@ -1191,11 +1203,14 @@ export class Engine {
     // Follow where the creature is drawn, not where the simulation last put it.
     const pp = this.renderPos(p, this.tmpPos);
     const def = creature(p.creature);
+    const floorGap = pp.y - sampleHeight(pp.x, pp.z);
+    cs.floorCloseT = seafloorCloseHold(cs.floorCloseT, floorGap, L, dt);
+    cs.floorCloseBlend = damp(cs.floorCloseBlend, cs.floorCloseT > 0 ? 1 : 0, 2, dt);
     const target = p.lockTarget >= 0 ? this.game!.byId(p.lockTarget) : undefined;
     const locked = !!target && isAlive(target) && !p.aiming;
     cs.lockBlend = damp(cs.lockBlend, locked ? 1 : 0, 5, dt);
     // Magnification: camera distance and framing scale with body length so the world re-reads at every tier.
-    let dist = magnificationDistance(L) * cs.zoom * (1 - AIM_CLOSER * cs.aimBlend);
+    let dist = magnificationDistance(L) * cs.zoom * (1 - AIM_CLOSER * cs.aimBlend) * (1 - 0.22 * cs.floorCloseBlend);
     if (p.state === 'dead') dist *= 1.5;
     // In the egg the animal is a fraction of its hatched size and the camera would be pressed
     // against the shell. Frame the egg instead, and ease back in as the body comes out of it.
@@ -1304,15 +1319,26 @@ export class Engine {
     const fit = fitCameraArm(lookAt.y + L * 0.18, pitch, dist, L * CAMERA_CLOSE,
       (d) => { place(d); return sampleHeight(desired.x, desired.z) + CAMERA_SAND; },
       ceiling);
+    if (fit.dist < dist - 0.05 || fit.lift > 0.05) cs.floorCloseT = FLOOR_CLOSE_HOLD;
     place(fit.dist);
     desired.y = fit.y;
     // The rig had to be lifted off its arm, so the look point goes with it rather than the view
     // tipping flat: you see *past* your own creature into the water above, which is the whole point
     // of aiming up from the floor. Not while locked on — there the target is the shot.
     if (!locked) lookAt.y += clamp(fit.lift, -L * 1.5, L * 1.5);
+    if (!locked && !pred && cs.pitch < -0.2) {
+      const range = Math.hypot(lookAt.x - desired.x, lookAt.z - desired.z);
+      const bodyRange = Math.hypot(pp.x - desired.x, pp.z - desired.z);
+      lookAt.y = keepCreatureInFrame(desired.y, lookAt.y, range, pp.y + L * 0.3, bodyRange, cs.camera.fov);
+    }
     const k = jumped ? 1 : p.state === 'dodge' ? 5 : 7;
     if (jumped) { cs.pos.copy(desired); cs.look.copy(lookAt); }
     else { cs.pos.lerp(desired, 1 - Math.exp(-k * dt)); cs.look.lerp(lookAt, 1 - Math.exp(-10 * dt)); }
+    if (!locked && !pred && cs.pitch < -0.2) {
+      const range = Math.hypot(cs.look.x - cs.pos.x, cs.look.z - cs.pos.z);
+      const bodyRange = Math.hypot(pp.x - cs.pos.x, pp.z - cs.pos.z);
+      cs.look.y = keepCreatureInFrame(cs.pos.y, cs.look.y, range, pp.y + L * 0.3, bodyRange, cs.camera.fov);
+    }
     cs.shake = Math.max(0, cs.shake - dt * 2.2);
     const sh = cs.shake * cs.shake * 0.35;
     cs.camera.position.copy(cs.pos).add(this.tmpV.set((Math.random() - 0.5) * sh, (Math.random() - 0.5) * sh, (Math.random() - 0.5) * sh));

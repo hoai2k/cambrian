@@ -269,6 +269,24 @@ try {
   }
   assert.ok(dashed, 'a double-tap on open water should dash');
 
+  // A real double-tap has two quick releases. Its second finger can be gone before the renderer
+  // gets another frame, especially on a phone; it must still carry the creature across the water.
+  await settled();
+  const dashStart = await page.evaluate(() => {
+    const p = window.__cambrian.game.players[0];
+    p.dashCd = 0; p.stamina = p.staminaMax; p.vel = { x: 0, y: 0, z: 0 };
+    p.spawnProtect = 999; p.pos.y += 8;
+    return { ...p.pos };
+  });
+  await gesture(
+    ['touchStart', [{ x: 390, y: 150, id: 15 }]], ['touchEnd', []],
+    ['touchStart', [{ x: 390, y: 150, id: 16 }]], ['touchEnd', []],
+  );
+  await frames(8);
+  const dashEnd = await page.evaluate(() => ({ ...window.__cambrian.game.players[0].pos }));
+  assert.ok(Math.hypot(dashEnd.x - dashStart.x, dashEnd.z - dashStart.z) > 1,
+    'a released double-tap must commit to a visible dash');
+
   // 9. The secondary pad. Held on aim it aims; swiped, it becomes something else and *stays* that,
   //    across a release — the choice is meant to outlive the press that made it.
   await settled();

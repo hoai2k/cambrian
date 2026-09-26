@@ -90,7 +90,18 @@ const fresh = () => ({ s: freshTouch(), t: 0 });
   check('a dash shows the movement icon', f.marker === 'zoom');
   check('...and it runs for as long as the finger is down', read(s, 0.6).dash === true);
   up(s, 2, 0.7);
-  check('...and stops when it lifts', read(s, 0.71).dash === false);
+  check('...and release cannot brake the committed crossing', read(s, 0.71).dash === true);
+  for (let i = 0; i < 6; i++) read(s, 0.8 + i * 0.08);
+  check('...then the dash ends without a held finger', read(s, 1.3).dash === false);
+}
+{
+  const { s } = fresh();
+  down(s, 1, 'water', 400, 200, 0, false, SIZE); up(s, 1, 0.04);
+  read(s, 0.05);
+  down(s, 2, 'water', 420, 180, 0.08, false, SIZE); up(s, 2, 0.11);
+  const firstFrame = read(s, 0.2);
+  check('a quick double-tap survives both fingers lifting before the next frame', firstFrame.dash && firstFrame.marker === 'zoom');
+  check('...and keeps the second tap as its direction', !!firstFrame.ndc && near(firstFrame.ndc.x, toNdc(420, 180, SIZE.w, SIZE.h).x, 1e-9));
 }
 {
   const { s } = fresh();

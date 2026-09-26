@@ -36,14 +36,14 @@
  * a pounce needs something to pounce *at*:
  *
  *   - over an animal it is the **heavy**: the pounce, the lunge, whatever that animal's heavy is;
- *   - over open water it is the **dash**, aimed at that water and running for as long as the finger
- *     stays down, because the dash is as long as it is held and a finger is a thing you can hold.
+ *   - over open water it is the **dash**, aimed at that water. A double-tap commits to the full
+ *     crossing even if the second finger lifts before the next frame; holding still works too.
  *
  * The first tap of a double-tap still bites, and that is deliberate rather than a concession. The
  * alternative is to sit on every bite for `DOUBLE` seconds to find out whether a second tap is
  * coming, which taxes the common move to pay for the rare one; a bite that is a quarter of a second
  * late is a bite that missed. So a double-tap is strictly *additive* — bite, then pounce — which is
- * a combination a player would want anyway.
+ * a combination a player would want anyway. A dash takes over a bite that is still winding up.
  *
  * A **swipe** — past `DRAG` of travel — is the camera, and from then on that touch is only the
  * camera. Same threshold in spirit as `MousePlay.DRAG`, coarser in pixels because a fingertip is.
@@ -153,6 +153,9 @@ export interface TouchState {
   bites: number;
   /** Heavies banked since the last `read`. */
   heavies: number;
+  /** A double-tap commits to a full dash even if the second finger lifts before a render frame. */
+  dashPulse: number;
+  dashReadAt: number | undefined;
   /** The aim point, in normalised device coordinates (-1..1, y up), and when it was last touched. */
   aim: { x: number; y: number; t: number; marker?: 'target' | 'zoom' } | undefined;
   /** How many times the ring has been stepped, so a caller can notice and make a noise about it. */
@@ -167,7 +170,7 @@ export interface TouchState {
 }
 
 export const freshTouch = (slot = 0): TouchState => ({
-  touches: new Map(), lastTap: undefined, slot, bites: 0, heavies: 0, aim: undefined, swaps: 0,
+  touches: new Map(), lastTap: undefined, slot, bites: 0, heavies: 0, dashPulse: 0, dashReadAt: undefined, aim: undefined, swaps: 0,
   pinchSep: undefined,
 });
 
@@ -251,6 +254,7 @@ export function down(
       touch.role = tap.onTarget ? 'heavy' : 'dash';
       s.aim.marker = touch.role === 'dash' ? 'zoom' : 'target';
       if (tap.onTarget) s.heavies++;
+      else { s.dashPulse = 0.42; s.dashReadAt = undefined; }
       // A double-tap is consumed: three taps are a double-tap and then a fresh single, not two
       // overlapping doubles.
       s.lastTap = undefined;
@@ -307,6 +311,7 @@ export function clear(s: TouchState): void {
   s.touches.clear();
   s.lastTap = undefined;
   s.bites = 0; s.heavies = 0;
+  s.dashPulse = 0; s.dashReadAt = undefined;
   s.aim = undefined;
   s.pinchSep = undefined;
 }
@@ -325,7 +330,7 @@ export interface TouchFrame {
   swim: boolean;
   /** The secondary pad is held, and what it is set to. `undefined` when nothing holds it. */
   secondary: Secondary | undefined;
-  /** A dash is running: a double-tap on water whose second finger is still down. */
+  /** A dash is running: a committed double-tap on water, or its second finger still held. */
   dash: boolean;
   /** A swipe is turning the camera, so the follow camera stands aside. */
   dragging: boolean;
@@ -347,6 +352,14 @@ export interface TouchFrame {
  */
 export function read(s: TouchState, t: number, lookSpeed = 1): TouchFrame {
   let dx = 0, dy = 0, dragging = false, swim = false, dash = false;
+  if (s.dashPulse > 0) {
+    // The simulation caps a slow rendered frame at 80 ms. Spend the gesture on the same clock so
+    // a quick double-tap still crosses the full distance when the phone misses several frames.
+    if (s.dashReadAt !== undefined) s.dashPulse = Math.max(0, s.dashPulse - Math.min(0.08, Math.max(0, t - s.dashReadAt)));
+    s.dashReadAt = t;
+    if (s.dashPulse > 0 && s.aim?.marker === 'zoom') s.aim.t = t;
+  }
+  dash = s.dashPulse > 0;
   let secondary: Secondary | undefined;
   /**
    * The fingers that are working the view: on the water, and not spoken for as a dash, a tap that

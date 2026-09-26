@@ -1947,13 +1947,21 @@ export class Game implements AiWorld {
     } else if (a.state === 'attack' && a.move) {
       const m = a.move;
       const total = m.windup + m.active + m.recovery;
-      if (a.stateT >= m.windup && a.stateT < m.windup + m.active) this.attackHits(a, m, L);
-      // cancel recovery into dodge, or chain lights
-      if (a.stateT > m.windup + m.active + m.recovery * 0.45 && (justDodge || (justDash && mag > 0.3)) && a.stamina >= 10) { a.dashUsed = true; this.startDodge(a, def, dir, mag, L, sf); }
-      else if (a.stateT >= total) { a.state = 'free'; a.stateT = 0; a.move = undefined; }
-      else if (a.moveKind === 'light' && justLight && a.stateT > m.windup + m.active + m.recovery * 0.35 && a.stamina >= 6) {
-        const nm = a.combo === 2 ? { ...def.light, damage: def.light.damage * 1.6, poise: def.light.poise * 1.8, knockback: def.light.knockback * 2, recovery: def.light.recovery + 0.12 } : def.light;
-        a.stateT = 0; a.move = nm; a.hitDone.clear(); a.stamina -= staminaCost(a, nm.stamina); a.combo = (a.combo + 1) % 3; a.comboT = 0.9;
+      // The first tap can already have begun a bite when the second tap declares a dash. Let that
+      // touch gesture take over immediately; otherwise its one dash edge is lost in the windup.
+      if (justDash && input.touchDash && !a.ashore && (a.stamina >= 10 || freeClimb) && (a.exhausted === 0 || freeClimb) && a.dashCd === 0) {
+        a.dashUsed = true;
+        a.move = undefined;
+        this.startDash(a, def, mag > 0.3 ? dir : vscale(heading(a.yaw), jets || def.tailFlip ? -1 : 1), L, sf, relief);
+      } else {
+        if (a.stateT >= m.windup && a.stateT < m.windup + m.active) this.attackHits(a, m, L);
+        // cancel recovery into dodge, or chain lights
+        if (a.stateT > m.windup + m.active + m.recovery * 0.45 && (justDodge || (justDash && mag > 0.3)) && a.stamina >= 10) { a.dashUsed = true; this.startDodge(a, def, dir, mag, L, sf); }
+        else if (a.stateT >= total) { a.state = 'free'; a.stateT = 0; a.move = undefined; }
+        else if (a.moveKind === 'light' && justLight && a.stateT > m.windup + m.active + m.recovery * 0.35 && a.stamina >= 6) {
+          const nm = a.combo === 2 ? { ...def.light, damage: def.light.damage * 1.6, poise: def.light.poise * 1.8, knockback: def.light.knockback * 2, recovery: def.light.recovery + 0.12 } : def.light;
+          a.stateT = 0; a.move = nm; a.hitDone.clear(); a.stamina -= staminaCost(a, nm.stamina); a.combo = (a.combo + 1) % 3; a.comboT = 0.9;
+        }
       }
     } else if (a.state === 'pounce') {
       const t = a.lockTarget >= 0 ? this.idMap.get(a.lockTarget) : undefined;
