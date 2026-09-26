@@ -49,6 +49,16 @@ export interface InputFrame {
   /** LT held: aim mode. The renderer decides what the centred crosshair is over and passes it here. */
   aim: boolean; aimTarget: number;
   lookX: number; lookY: number;
+  /**
+   * A turn of the body the player asked for directly, in radians of yaw, applied once and whole.
+   *
+   * Only a touch swipe sets it: there the swipe turns the camera and the animal *together*, by the
+   * same angle on the same frame. Left to the follow camera, a swipe turned the view, the body stayed
+   * where it was, and the camera then swung back round behind it — which reads as the creature
+   * turning the opposite way from the finger. Absent everywhere else, so every other scheme takes
+   * exactly its old path.
+   */
+  turn?: number;
 }
 
 export const emptyInput = (): InputFrame => ({
