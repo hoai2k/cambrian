@@ -35,6 +35,65 @@ for (const camYaw of [0, 0.7, 2.4, -1.9]) {
   const b = drive('waptia', camYaw, 0, -1);
   check(`camYaw ${camYaw.toFixed(1)}: stick down -> toward camera`, b.onFwd < -1, `fwd=${b.onFwd.toFixed(2)}`);
 }
+// A touch swipe turns the body *with* the camera (`InputFrame.turn`): the same angle, at once and
+// whole, rather than easing after the view at the animal's own turn rate. Left to the follow camera
+// the view went round, the body stayed, and the camera swung back — which reads as the creature
+// turning the opposite way from the finger.
+{
+  const wrap = (x: number) => Math.atan2(Math.sin(x), Math.cos(x));
+  const setup = () => {
+    const g = new Game('reef', [{ creature: 'waptia', device: 'touch', ready: true }], 42);
+    const p = g.players[0];
+    p.pos = { x: 10, y: 8, z: 10 }; p.vel = { x: 0, y: 0, z: 0 }; p.spawnProtect = 99;
+    g.skipHatch();
+    return { g, p };
+  };
+  const step = (g: Game, f: InputFrame) => { g.step(1 / 60, new Map([[0, f]])); g.events.length = 0; };
+  {
+    const { g, p } = setup();
+    for (let i = 0; i < 30; i++) step(g, { ...emptyInput(), camYaw: p.yaw });
+    const y0 = p.yaw;
+    step(g, { ...emptyInput(), camYaw: p.yaw, turn: 0.6 });
+    check('a swipe turns a resting body by exactly that', Math.abs(wrap(p.yaw - y0 - 0.6)) < 0.02, `turned ${wrap(p.yaw - y0).toFixed(3)} of 0.600`);
+    const y1 = p.yaw;
+    for (let i = 0; i < 30; i++) step(g, { ...emptyInput(), camYaw: p.yaw });
+    check('...and it stays turned: nothing pulls it back', Math.abs(wrap(p.yaw - y1)) < 0.02, `drift ${wrap(p.yaw - y1).toFixed(3)}`);
+    const y2 = p.yaw;
+    step(g, { ...emptyInput(), camYaw: p.yaw, turn: -0.4 });
+    check('the other way turns it the other way', Math.abs(wrap(p.yaw - y2 + 0.4)) < 0.02, `turned ${wrap(p.yaw - y2).toFixed(3)} of -0.400`);
+  }
+  {
+    // Swimming, the travel goes round with the heading, or the heading chases the old velocity back.
+    // Measured against the same step without the swipe, because a swimming heading is always easing
+    // a little onto its travel and that is the animal, not the swipe.
+    const run = (turn: number) => {
+      const { g, p } = setup();
+      for (let i = 0; i < 60; i++) step(g, { ...emptyInput(), my: 1, camYaw: p.yaw });
+      const y0 = p.yaw, cam = p.yaw;
+      step(g, { ...emptyInput(), my: 1, camYaw: cam + turn, turn });
+      return { g, p, d: wrap(p.yaw - y0) };
+    };
+    const base = run(0).d;
+    const { p, d } = run(0.8);
+    check('a swimming body turns with the swipe', Math.abs(d - base - 0.8) < 0.02, `turned ${d.toFixed(3)}, ${(d - base).toFixed(3)} beyond the animal's own of 0.800`);
+    const { g: g2, p: p2 } = setup();
+    for (let i = 0; i < 60; i++) step(g2, { ...emptyInput(), my: 1, camYaw: p2.yaw });
+    const head = () => Math.atan2(p2.vel.x, p2.vel.z);
+    const v0 = head();
+    step(g2, { ...emptyInput(), my: 1, camYaw: p2.yaw + 0.8, turn: 0.8 });
+    void p;
+    check('...and its travel turns with it', Math.abs(wrap(head() - v0 - 0.8)) < 0.1, `travel ${wrap(head() - v0).toFixed(3)} of 0.800`);
+  }
+  {
+    // Every other scheme sends no turn and takes exactly its old path.
+    const { g, p } = setup();
+    for (let i = 0; i < 30; i++) step(g, { ...emptyInput(), camYaw: p.yaw });
+    const y0 = p.yaw;
+    for (let i = 0; i < 30; i++) step(g, { ...emptyInput(), camYaw: y0 + 1 });
+    check('with no turn a resting body holds its heading', Math.abs(wrap(p.yaw - y0)) < 0.02, `drift ${wrap(p.yaw - y0).toFixed(3)}`);
+  }
+}
+
 // crawlers use the same basis, flattened
 const c = drive('olenoides', 1.1, 1, 0, 2);
 check('crawler: stick right -> screen right', c.onRight > 0.5 && c.onRight > Math.abs(c.onFwd), `right=${c.onRight.toFixed(2)} fwd=${c.onFwd.toFixed(2)}`);

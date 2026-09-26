@@ -127,6 +127,18 @@ Touch takes the **follow camera**, for the same reason the mouse has it: with no
 is steering the view frame to frame, so left alone it would stay pointing wherever the animal last
 turned away from. It eases round behind the body and stands aside for `FOLLOW_HOLD` after a swipe.
 
+**A sideways swipe turns the animal with the camera**, by the same angle on the same frame. It used to
+turn only the view: the body stayed where it was, and once the swipe ended the follow camera swung the
+view back round behind it — so what the player saw was the creature turning the *opposite* way from
+their finger. The turn travels as an input (`InputFrame.turn`, radians of yaw, set only for a touch
+seat) so `src/sim` stays deterministic and a recording carries it, and the sim applies it whole and at
+once rather than at the animal's own turn rate, rotating the body's travel with it so the heading does
+not chase the old velocity straight back. Not while something else owns the heading — a lock, a ride,
+a dash's own line, a grip. A frame is not a step, so the engine banks what a frame collected
+(`pendingTurn`) and hands it to the **first** sub-step that runs, and only that one: the input map is
+reused for every sub-step, and a turn left on it was applied three times over — which the browser
+harness caught as the body turning *the other way*, 5.3 radians round a 1.8 radian swipe.
+
 It does **not** take the cursor's edge tilt (`edgePitch`). A hovering cursor is idle information — it
 is somewhere whether or not the player is doing anything with it — and a finger is the opposite: it is
 only on the glass while it is being used, and while it is, its travel is *already* the camera. Reading

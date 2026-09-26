@@ -194,22 +194,33 @@ try {
   //    the swipe can do.
   const swipeYaw = async (from, to, id) => {
     await settled();
-    const y0 = (await state()).camYaw;
+    const s0 = await state(); const y0 = s0.camYaw, b0 = s0.yaw;
     await touch('touchStart', [{ x: from, y: 180, id }]);
     const step = from < to ? 20 : -20;
     for (let x = from; step > 0 ? x <= to : x >= to; x += step) await touch('touchMove', [{ x, y: 180, id }]);
     await frames(2);
-    const y1 = (await state()).camYaw;
+    const s1 = await state(); const y1 = s1.camYaw, b1 = s1.yaw;
     await touch('touchEnd', []);
     await frames(2);
     // Shortest way round, so a swipe across the ±π seam is not read as a swipe most of the way back.
-    return Math.atan2(Math.sin(y1 - y0), Math.cos(y1 - y0));
+    const wrap = (d) => Math.atan2(Math.sin(d), Math.cos(d));
+    swipes.push({ cam: wrap(y1 - y0), body: wrap(b1 - b0) });
+    return wrap(y1 - y0);
   };
+  const swipes = [];
   const leftward = await swipeYaw(560, 300, 2);
   const rightward = await swipeYaw(220, 480, 3);
   assert.ok(Math.abs(leftward) > 0.15, `a swipe should turn the camera (moved ${leftward.toFixed(3)})`);
   assert.ok(Math.abs(rightward) > 0.15, `and so should one the other way (moved ${rightward.toFixed(3)})`);
   assert.ok(leftward * rightward < 0, `opposite swipes must turn the view opposite ways (${leftward.toFixed(3)} and ${rightward.toFixed(3)})`);
+  // ...and the **animal turns with it**, the same way by the same angle. Left to the follow camera the
+  // view went round, the body stayed, and the camera then swung back behind it — which read as the
+  // creature turning the opposite way from the finger. A body a frame behind its camera is allowed a
+  // little slack; one turning the other way, or not at all, is the bug.
+  for (const { cam, body } of swipes) {
+    assert.ok(cam * body > 0, `the body must turn the same way as the camera (camera ${cam.toFixed(3)}, body ${body.toFixed(3)})`);
+    assert.ok(Math.abs(body - cam) < Math.max(0.08, Math.abs(cam) * 0.15), `the body must turn by the camera's angle (camera ${cam.toFixed(3)}, body ${body.toFixed(3)})`);
+  }
   assert.equal((await state()).state, 'free', 'a swipe must not attack');
 
   // 7. A tap on the water is a bite — wherever it lands. Biting at the water ahead of you is a real

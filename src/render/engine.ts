@@ -431,6 +431,13 @@ export class Engine {
   private touchPlay = false;
   /** What the fingers did this frame, kept between `controlsFor` and the camera, as the mouse's is. */
   private touchFrame: ReturnType<TouchPlay['read']> | undefined;
+  /**
+   * Body yaw a touch swipe has asked for and no simulation step has taken yet, per seat. A frame is
+   * not a step — at 60 fps some frames run none — and a swipe's turn is a distance rather than a
+   * rate, so what a frame with no step collected has to be carried to the next one that has, or the
+   * body would fall behind the camera it is meant to turn with.
+   */
+  private pendingTurn = new Map<number, number>();
   /** Scratch for the ray from the camera through the cursor. */
   private tmpRay = new THREE.Vector3();
   /** The CSS cursor currently set, so the style is only written when it changes. */
@@ -610,6 +617,7 @@ export class Engine {
     this.tracks.clear(); this.printed.clear();
     this.eggs.dispose();
     this.cams = [];
+    this.pendingTurn.clear();
     this.game = undefined;
   }
 
@@ -698,6 +706,12 @@ export class Engine {
         const menuOpen = running && p ? this.updateTeleMenu(game, i, c) : false;
         // While the teleport menu is up the creature drifts: A and B belong to the menu.
         if (p && running) inputs.set(i, menuOpen ? this.toInput(emptyControls(), this.cams[i], p) : this.toInput(c, this.cams[i], p));
+        // A swipe turns the animal with the camera: the same angle the view is about to take below,
+        // with the same sign convention (the follow camera eases `cs.yaw` onto the body's `yaw`), so
+        // the two stay locked together rather than the view going round and the body being left.
+        if (s.device === 'touch' && running && !menuOpen && c.lookDX) {
+          this.pendingTurn.set(i, (this.pendingTurn.get(i) ?? 0) - c.lookDX * this.lookSpeed);
+        }
         // Camera orbit. The right stick is the ONLY thing that turns the camera: yaw is absolute
         // and never follows the creature's heading, so swimming back does not swing the view.
         // Increasing yaw rotates the view left, so a rightward stick decreases it.
@@ -781,7 +795,11 @@ export class Engine {
       this.acc += dt;
       let steps = 0;
       while (this.acc >= 1 / 60 && steps < 3) {
+        // The banked swipe goes to the first step and only the first: the input map is reused for
+        // every sub-step, and a turn left on the frame would be a turn three times over.
+        if (steps === 0) for (const [i, t] of this.pendingTurn) { const f = inputs.get(i); if (f) f.turn = t; }
         game.step(1 / 60, inputs);
+        if (steps === 0) { for (const f of inputs.values()) f.turn = undefined; this.pendingTurn.clear(); }
         // The match recorder (`?debug=game`), after the step so it sees what the step decided. It
         // is a no-op unless a recording is running, and it never writes to the simulation.
         if (recordingPhase() === 'recording') {

@@ -1523,6 +1523,18 @@ export class Game implements AiWorld {
     // leading and a ctenophore's combs beat any way at all, so the stick moves them without
     // pointing them. Aiming still does, which is the branch above.
     else if (hv > 0.35 && a.state !== 'grabbed' && def.swimStyle !== 'omnidirectional') targetYaw = yawOf(facing);
+    // A turn asked for outright (a touch swipe, `InputFrame.turn`) is the body going round with the
+    // camera, exactly and at once, rather than easing after it at the animal's own turn rate. Its
+    // travel goes round with it, or the heading would chase the old velocity straight back. Not
+    // while something else owns the heading: a lock, a ride, a dash's own line, a grip.
+    const asked = input.turn && a.controller === 'player' && !backingOff && !(locked && isAlive(locked)) && a.rideHost < 0
+      && (a.state === 'free' || a.state === 'guard' || a.state === 'attack') ? input.turn : 0;
+    if (asked) {
+      a.yaw = wrapAngle(a.yaw + asked);
+      const c = Math.cos(asked), s = Math.sin(asked), vx = a.vel.x, vz = a.vel.z;
+      a.vel.x = vx * c + vz * s; a.vel.z = -vx * s + vz * c;
+      targetYaw = wrapAngle(targetYaw + asked);
+    }
     const dy = wrapAngle(targetYaw - a.yaw);
     const tr = def.turnRate * (a.state === 'attack' ? 0.5 : 1) * (1 + hv * 0.05) * (giantish ? 0.45 : 1) * (sw?.turn ?? 1);
     const turn = clamp(dy * 6, -tr, tr);

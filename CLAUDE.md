@@ -299,6 +299,14 @@ unless the user explicitly asks for a PR. Steps:
   stick steers the view) but **not** `edgePitch` and not the pad's pitch drift: a hovering cursor is
   idle information and a finger is the opposite — it is only on the glass while it is being used, and
   while it is, its travel is *already* the camera.
+  **A sideways swipe turns the animal with the camera**, the same angle on the same frame, carried as
+  `InputFrame.turn` (touch seats only, so every other scheme takes its old path and `src/sim` stays
+  deterministic). Turning only the view left the body behind, and the follow camera then swung back
+  round it — which reads as the creature turning the *opposite* way from the finger. The sim applies
+  it whole, rotates the travel with it so the heading does not chase the old velocity back, and stands
+  aside for a lock, a ride, a dash or a grip. The engine banks a frame's turn (`pendingTurn`) and hands
+  it to the **first sub-step only**: the input map is reused across sub-steps, and a turn left on it
+  ran three times — the harness saw the body go 5.3 radians round a 1.8 radian swipe, i.e. backwards.
   **Gestures and drawn buttons are two channels and the split is load-bearing.** No gesture may reach
   a menu action — a tap aimed at the sea must not also answer what a menu is asking, which is the line
   `tools/menu-bindings-test.ts` already held for the mouse. But travel opens a *menu* that has to be
