@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
+    "mobile:memory": "esbuild tools/mobile-memory-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/mobile-memory-test.mjs --log-level=error && node node_modules/.cache/mobile-memory-test.mjs",
     "check": "node tools/check-creature-assets.mjs",
     "palettes": "node tools/palette-test.mjs",
     "bindings": "esbuild tools/menu-bindings-test.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/menu-bindings.mjs && node node_modules/.cache/menu-bindings.mjs",

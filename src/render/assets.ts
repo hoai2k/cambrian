@@ -59,7 +59,7 @@ export class AssetQueue {
   readonly ready = new Set<CreatureId>();
   private disposed = false;
 
-  constructor(private readonly conserveMemory = false) {
+  constructor(private conserveMemory = false) {
     this.wanted = new Set<CreatureId>(conserveMemory ? [ACTIVE_ERA.defaults.player] : ACTIVE_ERA.defaults.boot);
     this.lodWanted = new Set<CreatureId>([ACTIVE_ERA.defaults.player, ...ACTIVE_ERA.defaults.title]);
     const B = base();
@@ -99,6 +99,17 @@ export class AssetQueue {
    * finishes either way, so nothing is torn in half.
    */
   private idle = true;
+  setConserveMemory(on: boolean) {
+    if (on === this.conserveMemory) return;
+    this.conserveMemory = on;
+    if (on) {
+      this.wanted = new Set<CreatureId>([ACTIVE_ERA.defaults.player]);
+      this.lodWanted = new Set<CreatureId>([ACTIVE_ERA.defaults.player, ...ACTIVE_ERA.defaults.title]);
+    } else {
+      for (const id of ACTIVE_ERA.defaults.boot) this.wanted.add(id);
+    }
+    this.pump();
+  }
   setIdle(idle: boolean) {
     if (idle === this.idle) return;
     this.idle = idle;

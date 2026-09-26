@@ -20,7 +20,7 @@ import { amphibious, breathesAir, STRAND_BREATH, STRAND_LOW } from '../sim/beach
 import { AssetQueue, type AssetProgress } from './assets';
 import { fillOf, ladderName } from '../sim/ladder';
 import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
-import { mobileDevonian } from '../shared/mobile-memory';
+import { conserveCreatureMemory } from '../shared/mobile-memory';
 import { Edges } from '../shared/edges';
 import { SAND_COLORS } from '../shared/environment-colors';
 import { Attachments } from './attachments';
@@ -468,9 +468,11 @@ export class Engine {
   private alpha = 1;
   private tmpPos = new THREE.Vector3(); private tmpPred = new THREE.Vector3();
   quality: Quality;
-  private readonly conserveMemory = mobileDevonian();
+  private conserveMemory: boolean;
 
   constructor(private container: HTMLElement, quality: Quality, private cb: EngineCallbacks) {
+    this.conserveMemory = conserveCreatureMemory(quality);
+    this.assets = new AssetQueue(this.conserveMemory);
     this.quality = quality;
     this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, quality === 'high' ? 1.5 : 1));
@@ -514,7 +516,7 @@ export class Engine {
     });
     this.assets.prioritize([...ACTIVE_ERA.defaults.boot], 'boot');
   }
-  readonly assets = new AssetQueue(this.conserveMemory);
+  readonly assets: AssetQueue;
   private bootDone = false; private bootStart = performance.now();
   /** Tell the loader which creatures are most likely to be needed next. */
   prioritize(creatures: CreatureId[], phase: 'boot' | 'title' | 'select' | 'playing', committed: CreatureId[] = []) { this.assets.prioritize(creatures, phase, committed); }
@@ -526,6 +528,11 @@ export class Engine {
   }
 
   setQuality(q: Quality) {
+    const conserve = conserveCreatureMemory(q);
+    if (conserve !== this.conserveMemory) {
+      this.conserveMemory = conserve;
+      this.assets.setConserveMemory(conserve);
+    }
     if (q === this.quality) return;
     this.quality = q;
     this.renderer.shadowMap.enabled = q === 'high';
@@ -1362,8 +1369,8 @@ export class Engine {
       let v = this.views.get(a.id);
       const size = lengthOf(a) / d;
       let wantLod: Lod = a.controller === 'player' ? 0 : v ? (v.lod === 0 ? (size < 0.05 ? 1 : 0) : (size > 0.075 ? 0 : 1)) : (size < 0.06 ? 1 : 0);
-      // On Devonian touch devices, keep the full skinned body for the player only. Streaming
-      // full NPCs over a long match otherwise retains the entire 269 MB compressed roster.
+      // On low-quality touch play in the large-model eras, keep full skinned bodies for players
+      // only. The NPCs use decimated copies so a long match does not retain the whole roster.
       if (this.conserveMemory && a.controller !== 'player') wantLod = 1;
       // The budget only ever demotes: your own body, and anything already at full detail whose
       // share is still affordable, keep it.

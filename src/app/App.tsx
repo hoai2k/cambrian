@@ -30,7 +30,7 @@ import { toolbarPlace } from './toolbar-place';
 import { menuScheme } from '../shared/controls';
 import { SECONDARY, type Secondary } from '../shared/touch-play';
 import { rosterCap } from '../shared/small-screen';
-import { mobileDevonian } from '../shared/mobile-memory';
+import { qualityForDevice } from '../shared/mobile-memory';
 import { RotateHint, TouchPads } from './TouchPads';
 import { useSmallScreen } from './use-small-screen';
 import { assignSeatSchemes } from '../shared/seat-schemes';
@@ -78,14 +78,13 @@ const startScale = (v: Visitor) => (v.standing ? undefined : v.scale);
 const MODES: Mode[] = ACTIVE_ERA.modes.map((m) => m.id);
 const SETTINGS_KEY = ACTIVE_ERA.copy.settingsKey;
 const defaultSettings = (): Settings => {
-  // Existing settings often contain the old automatic 'high' default. Start Devonian touch
-  // sessions on low even then; players can still raise quality explicitly in Settings.
-  const defaults: Settings = { quality: mobileDevonian() ? 'low' : 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false, shoreAnimals: false, secondary: 'aim', touchMatches: 0 };
+  // Re-evaluate old automatic defaults against this device; an explicit Settings choice wins.
+  const defaults: Settings = { quality: qualityForDevice(undefined), lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false, shoreAnimals: false, secondary: 'aim', touchMatches: 0 };
   try {
     const s = localStorage.getItem(SETTINGS_KEY);
     if (s) {
       const saved = JSON.parse(s) as Partial<Settings>;
-      return { ...defaults, ...saved, secondary: SECONDARY.includes(saved.secondary as Secondary) ? saved.secondary! : 'aim', quality: mobileDevonian() && !saved.qualityExplicit ? 'low' : saved.quality ?? defaults.quality };
+      return { ...defaults, ...saved, secondary: SECONDARY.includes(saved.secondary as Secondary) ? saved.secondary! : 'aim', quality: qualityForDevice(saved) };
     }
   } catch { /* ignore */ }
   return defaults;

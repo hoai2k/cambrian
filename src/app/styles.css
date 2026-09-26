@@ -545,7 +545,9 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
   .mode-picker { justify-content: flex-start; }
   .help-columns { grid-template-columns: 1fr; }
 }
-@media (prefers-reduced-motion: reduce) { * { animation-duration: .01ms !important; } }
+/* A near-zero duration on an infinite animation flashes or jumps every frame. Keep reduced-motion
+   screens still instead, including the start pulse and the floating creature portrait. */
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; } }
 
 /*
  * The creature card on a laptop screen. Its copy column was overflowing by 150-250 px and
