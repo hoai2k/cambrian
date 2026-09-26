@@ -27,7 +27,7 @@ export const CAMBRIAN = defineEra({
   // docs/research/cambrian-sizes.md.
   naturalSizes: NATURAL_SIZES.sizes,
   defaults: {
-    player: 'anomalocaris',
+    player: CAMBRIAN_CREATURES[0].id,
     boot: ['anomalocaris', 'waptia', 'marrella', 'opabinia', 'canadia', 'olenoides', 'hallucigenia', 'wiwaxia'],
     title: ['anomalocaris', 'waptia', 'opabinia', 'marrella'],
   },

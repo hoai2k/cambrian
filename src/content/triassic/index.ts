@@ -83,9 +83,9 @@ export const TRIASSIC = defineEra({
 
   creatures: TRIASSIC_CREATURES,
   defaults: {
-    player: 'nothosaurus',
-    boot: ['nothosaurus', 'mixosaurus', 'cymbospondylus', 'placodus', 'saurichthys'],
-    title: ['cymbospondylus', 'nothosaurus', 'mixosaurus', 'rhaeticosaurus'],
+    player: TRIASSIC_CREATURES[0].id,
+    boot: ['dinocephalosaurus', 'nothosaurus', 'mixosaurus', 'cymbospondylus', 'placodus'],
+    title: ['dinocephalosaurus', 'cymbospondylus', 'nothosaurus', 'mixosaurus'],
   },
   ecology: { schools: SNACK_SCHOOLS, giants: GIANTS, shadow: { creature: 'shonisaurus', scale: 1.0 } },
   environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, flora: FLORA_DENSITY, floraProps: FLORA_PROPS, shoreFlora: SHORE_FLORA, surfaceY: SURFACE_Y, floorDepth: FLOOR_DEPTH, biomePlates: BIOME_PLATES },

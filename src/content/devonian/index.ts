@@ -63,7 +63,7 @@ export const DEVONIAN = defineEra({
 
   creatures: DEVONIAN_CREATURES,
   defaults: {
-    player: 'coccosteus',
+    player: DEVONIAN_CREATURES[0].id,
     // Delivered specimens only: these drive card and model preloading, and a creature that is still
     // borrowing a body has no portrait to load. Add each one here as its own model lands.
     // What the title screen swims and what the player is most likely to pick. The rest of the
@@ -72,7 +72,7 @@ export const DEVONIAN = defineEra({
     // Pickable animals only: this list is what a player is most likely to reach for, and
     // Bothriolepis stood in it until it became an NPC — in the water and off the pick screen,
     // so no longer something to fetch a full body and a portrait for ahead of time.
-    boot: ['coccosteus', 'dunkleosteus', 'cladoselache', 'doryaspis', 'stethacanthus'],
+    boot: ['dunkleosteus', 'coccosteus', 'cladoselache', 'doryaspis', 'stethacanthus'],
     title: ['dunkleosteus', 'cladoselache', 'coccosteus', 'doryaspis'],
   },
   ecology: { schools: SNACK_SCHOOLS, giants: GIANTS, shadow: { creature: 'titanichthys', scale: 1.0 } },

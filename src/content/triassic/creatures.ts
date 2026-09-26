@@ -21,6 +21,24 @@ const heavy = (name: string, o: Partial<MoveDef> = {}): MoveDef => ({
 const nibble = (name: string): MoveDef => ({ name, windup: 0.2, active: 0.15, recovery: 0.3, damage: 1, poise: 2, knockback: 0.3, stamina: 4, lunge: 0.1 });
 
 export const TRIASSIC_CREATURES: readonly CreatureDef[] = [
+  // The initial selection leads the roster even though its rung sits below the giants.
+  {
+    id: 'dinocephalosaurus', name: 'Dinocephalosaurus', species: 'D. orientalis',
+    kind: 'Long-necked reptile', kindNote: 'An archosauromorph, a cousin of the crocodile and dinosaur line, that went fully marine: thirty-two neck bones, paddle limbs, and live birth.',
+    locality: 'Middle Triassic · Luoping, Yunnan',
+    tagline: 'The body stays behind the rock. The head does not.',
+    eggShell: 'leathery', role: 'The reach', ground: false, adultLength: 10.22, rung: 3, breathing: 'air', birth: 'live', neckReach: 2.0, riseRate: 1.0,
+    speed: 8, burst: 3.07, agility: 3.5, turnRate: 3.91, glide: 0.25,
+    hp: 170, poise: 70, stamina: 125, defense: 0.05, sense: 12,
+    color: '#5c5a3c', accent: '#b0a880',
+    light: light('Snap', { damage: 11, windup: 0.1 }),
+    heavy: heavy('Neck strike', { damage: 30, lunge: 0.6, windup: 0.3, recovery: 0.55 }),
+    ability: 'neckStrike', abilityDuration: 1.0, abilityName: 'Neck strike', abilityCooldown: 9,
+    abilityDesc: 'The head snaps to the locked target two body lengths away while the body stays put behind cover.',
+    passive: 'Comes up to breathe head-first: its blow rings no radar.',
+    weakness: 'The neck is the target. A hit on it counts as from behind, and a giant’s hold on it is a hold on a body that cannot get its head up.',
+    canGuard: false,
+  },
   // ---------------------------------------------------------------- Rung IV · Giants
   {
     id: 'cymbospondylus', name: 'Cymbospondylus', species: 'C. youngorum',
@@ -73,23 +91,6 @@ export const TRIASSIC_CREATURES: readonly CreatureDef[] = [
     passive: 'Lying on the sand spends nothing; an ambush can wait as long as its patience lasts.',
     weakness: 'A cruise slower than the fishes it eats. Its game is the wait.',
     canGuard: true,
-  },
-  {
-    id: 'dinocephalosaurus', name: 'Dinocephalosaurus', species: 'D. orientalis',
-    kind: 'Long-necked reptile', kindNote: 'An archosauromorph, a cousin of the crocodile and dinosaur line, that went fully marine: thirty-two neck bones, paddle limbs, and live birth.',
-    locality: 'Middle Triassic · Luoping, Yunnan',
-    tagline: 'The body stays behind the rock. The head does not.',
-    eggShell: 'leathery', role: 'The reach', ground: false, adultLength: 10.22, rung: 3, breathing: 'air', birth: 'live', neckReach: 2.0, riseRate: 1.0,
-    speed: 8, burst: 3.07, agility: 3.5, turnRate: 3.91, glide: 0.25,
-    hp: 170, poise: 70, stamina: 125, defense: 0.05, sense: 12,
-    color: '#5c5a3c', accent: '#b0a880',
-    light: light('Snap', { damage: 11, windup: 0.1 }),
-    heavy: heavy('Neck strike', { damage: 30, lunge: 0.6, windup: 0.3, recovery: 0.55 }),
-    ability: 'neckStrike', abilityDuration: 1.0, abilityName: 'Neck strike', abilityCooldown: 9,
-    abilityDesc: 'The head snaps to the locked target two body lengths away while the body stays put behind cover.',
-    passive: 'Comes up to breathe head-first: its blow rings no radar.',
-    weakness: 'The neck is the target. A hit on it counts as from behind, and a giant’s hold on it is a hold on a body that cannot get its head up.',
-    canGuard: false,
   },
   {
     id: 'helicoprion', name: 'Helicoprion', species: 'H. davisii (Permian relict)',
