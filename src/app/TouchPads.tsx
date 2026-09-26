@@ -69,8 +69,8 @@ export function TouchPads({ secondary, hint, swapped, teleportOpen, onPause }: {
 }
 
 /**
- * The phone portrait gate covers the app until it is rotated. The engine stops behind it.
+ * Active play stops behind this gate. Pausing opens the normal menu in either orientation.
  */
-export function RotateHint() {
-  return <div className="rotate-gate" role="status"><p>{TEXT.hud.rotate}</p></div>;
+export function RotateHint({ onPause }: { onPause: () => void }) {
+  return <div className="rotate-gate"><p role="status">{TEXT.hud.rotate}</p><button type="button" onClick={onPause}>{TEXT.hud.pads.pause}</button></div>;
 }

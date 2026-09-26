@@ -1,5 +1,5 @@
 import { ACTIVE_ERA } from '../content';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { audio } from '../audio/audio';
 import { gamepads, readGamepad, type RawControls } from '../input/input';
 import type { AssetProgress } from '../render/assets';
@@ -182,6 +182,7 @@ export function App() {
   const padCount = padIndices.length;
   /** How much room this window has, and whether a finger is what is working it. */
   const small = useSmallScreen(padCount);
+  const orientationBlocked = small.rotate && screen === 'playing' && !paused && dialog === null;
   /**
    * Which device the one local seat joins on.
    *
@@ -328,7 +329,7 @@ export function App() {
       },
     });
     engineRef.current = engine;
-    engine.setOrientationBlocked(small.rotate);
+    engine.setOrientationBlocked(false);
     // Visitors stream like anything else. Queued here rather than where they are registered,
     // because the queue builds its URLs from `assetPaths` and there is no queue to add them to
     // until the engine exists.
@@ -338,7 +339,7 @@ export function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => { engineRef.current?.setOrientationBlocked(small.rotate); }, [small.rotate]);
+  useLayoutEffect(() => { engineRef.current?.setOrientationBlocked(orientationBlocked); }, [orientationBlocked]);
 
   useEffect(() => {
     engineRef.current?.setQuality(settings.quality);
@@ -1099,7 +1100,7 @@ export function App() {
           <button aria-label={TEXT.common.dismiss} onClick={() => { setNotice(''); setError(''); }}>×</button>
         </div>
       )}
-      {small.rotate && <RotateHint />}
+      {orientationBlocked && <RotateHint onPause={() => { setPausedBoth(true); audio.play('ui-confirm'); }} />}
     </main>
   );
 }
