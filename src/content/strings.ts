@@ -965,7 +965,7 @@ export const SHARED_STRINGS: GameStrings = {
       travel: 'Travel',
       scores: 'Scores',
     },
-    rotate: 'Turn your device sideways for the whole sea',
+    rotate: 'Turn your phone sideways to play',
   },
 
   feedback: {

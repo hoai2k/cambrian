@@ -68,22 +68,13 @@ export const touchFirst = (coarse: boolean, hover: boolean, pads: number): boole
   coarse && !hover && pads === 0;
 
 /**
- * Whether to ask the player to turn the device round.
+ * Whether to gate play until a phone is turned sideways.
  *
- * The sea is a wide thing to look at and the HUD hangs off the corners of a wide frame, so portrait
- * is the worse way to hold a phone for this — but it is *playable*, and a screen that refuses to
- * draw until it is rotated is worse than a narrow one. So this is a hint and never a gate: the game
- * runs, and a line says it would be better the other way up.
- *
- * Only for a touch session, and only when the window is properly tall rather than merely upright.
- * The ratio is 3:2 on purpose: a phone held up is 2.16 (390×844) or thereabouts and every tablet in
- * portrait is 1.33, so this catches the shape that is actually a problem and leaves alone the one
- * that is merely taller than it is wide. A 4:3 tablet upright has plenty of room for this game and
- * being nagged about it would be wrong.
+ * Only for a touch session narrower than 600 CSS pixels. The width distinguishes phones from
+ * tablets; every portrait phone is blocked, even when its viewport is nearly square.
  */
-export const ROTATE_RATIO = 1.5;
 export const rotateHint = (w: number, h: number, touch: boolean): boolean =>
-  touch && h > w * ROTATE_RATIO;
+  touch && w < 600 && h > w;
 
 /**
  * Which way to cut a two-player split.

@@ -16,6 +16,7 @@ import { COMPACT_H, COMPACT_W, MIN_TILE, layoutFor, rosterCap, rotateHint, split
 import { applyTouch } from '../src/input/touch';
 import { emptyControls, type RawControls } from '../src/input/input';
 import { btn, key, menuScheme, schemeForDevice, type Action } from '../src/shared/controls';
+import { cursorFor, cursorImageFor } from '../src/shared/cursors';
 
 let failed = 0;
 const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(66)} ${d}`); if (!ok) failed++; };
@@ -74,6 +75,7 @@ const fresh = () => ({ s: freshTouch(), t: 0 });
   const second = read(s, 0.06 + DOUBLE / 2);
   check('double-tapping an animal is the heavy', second.heavies === 1, `heavies=${second.heavies}`);
   check('...and it is not also a dash', second.dash === false);
+  check('a creature tap uses the target mark', first.marker === 'target' && second.marker === 'target');
 }
 {
   // Over open water there is nothing to pounce at, so the same gesture is the dash — which is
@@ -85,6 +87,7 @@ const fresh = () => ({ s: freshTouch(), t: 0 });
   down(s, 2, 'water', 402, 201, 0.1, false, SIZE);
   const f = read(s, 0.1);
   check('double-tapping open water is the dash', f.dash === true && f.heavies === 0);
+  check('a dash shows the movement icon', f.marker === 'zoom');
   check('...and it runs for as long as the finger is down', read(s, 0.6).dash === true);
   up(s, 2, 0.7);
   check('...and stops when it lifts', read(s, 0.71).dash === false);
@@ -230,6 +233,7 @@ check('the touch ring keeps sense on instead of offering a toggle', SECONDARY.le
   const f = read(s, 0);
   const want = toNdc(585, 90, SIZE.w, SIZE.h);
   check('a finger on the water is the aim point', !!f.ndc && near(f.ndc.x, want.x, 1e-9) && near(f.ndc.y, want.y, 1e-9));
+  check('an ordinary water tap draws no target', f.marker === undefined);
   check('...and it is in NDC, y up', want.y > 0 && want.x > 0);
   up(s, 1, 0.05);
   // It has to outlive the finger, because the bite fires on the lift and the finger is gone by then.
@@ -328,7 +332,7 @@ check('an owed edge fires on a frame with no arrivals', meterEdge(1, 0).fire ===
 
 const fold = (t: Partial<ReturnType<typeof read>> & { light?: boolean; heavy?: boolean } = {}): RawControls => applyTouch(emptyControls(), {
   dx: 0, dy: 0, zoom: 0, bites: 0, heavies: 0, swim: false, secondary: undefined, dash: false,
-  dragging: false, ndc: undefined, swapped: false, pinching: false, light: false, heavy: false, ...t,
+  dragging: false, ndc: undefined, marker: undefined, swapped: false, pinching: false, light: false, heavy: false, ...t,
 });
 
 check('the swim pad is forward on the stick', fold({ swim: true }).my === 1);
@@ -409,11 +413,14 @@ check('a touch laptop being used with its trackpad does not', touchFirst(true, t
 check('a pad in the session wins, as it does over the mouse', touchFirst(true, false, 1) === false);
 
 check('a tall phone is asked to turn round', rotateHint(390, 844, true) === true);
+check('a short portrait phone is gated too', rotateHint(540, 600, true) === true);
+check('a narrow portrait tablet may still play', rotateHint(600, 960, true) === false);
 check('a landscape phone is not', rotateHint(780, 360, true) === false);
 check('a 4:3 tablet upright is not nagged', rotateHint(820, 1093, true) === false);
 check('...nor a 3:2 one', rotateHint(800, 1200, true) === false);
 check('a big phone held up is', rotateHint(430, 932, true) === true);
 check('and a desktop window is never asked', rotateHint(390, 844, false) === false);
+check('touch marks reuse the mouse art', cursorFor('zoom').includes(cursorImageFor('zoom')) && cursorFor('target').includes(cursorImageFor('target')));
 
 // The roster's columns. `gridColumns` packs the whole roster into three rows, which is a rule about
 // a laptop: the Triassic's 26 animals are nine columns, and nine columns of a phone is a 36-pixel

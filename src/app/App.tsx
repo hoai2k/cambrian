@@ -329,6 +329,7 @@ export function App() {
       },
     });
     engineRef.current = engine;
+    engine.setOrientationBlocked(small.rotate);
     // Visitors stream like anything else. Queued here rather than where they are registered,
     // because the queue builds its URLs from `assetPaths` and there is no queue to add them to
     // until the engine exists.
@@ -337,6 +338,8 @@ export function App() {
     return () => { engine.dispose(); engineRef.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => { engineRef.current?.setOrientationBlocked(small.rotate); }, [small.rotate]);
 
   useEffect(() => {
     engineRef.current?.setQuality(settings.quality);
@@ -1085,7 +1088,6 @@ export function App() {
           onPause={() => { setPausedBoth(true); audio.play('ui-confirm'); }}
         />
       )}
-      {screen === 'playing' && small.rotate && <RotateHint />}
       {screen === 'playing' && paused && <PauseMenu items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} board={small.touch && pauseScores ? engineRef.current?.pauseScoreboard() : undefined} />}
       {screen === 'results' && hud && <Results snapshot={hud} players={players} record={record} fresh={fresh} items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
 
@@ -1098,6 +1100,7 @@ export function App() {
           <button aria-label={TEXT.common.dismiss} onClick={() => { setNotice(''); setError(''); }}>×</button>
         </div>
       )}
+      {small.rotate && <RotateHint />}
     </main>
   );
 }

@@ -8,7 +8,7 @@ import { layoutFor, rotateHint, touchFirst, type Layout } from '../shared/small-
  * touch`; this is the part that has to ask the browser. Nothing in `src/app` measured the window
  * before — the layout was entirely CSS — so this is the first place that does, and it exists because
  * three things that are *not* styling depend on the same numbers: whether the on-screen pads are
- * drawn, which seat the local player takes, and whether to mention turning the device round.
+ * drawn, which seat the local player takes, and whether a phone is gated until landscape.
  *
  * `matchMedia` for the pointer and `resize` for the size, because they are different questions.
  * `(pointer: coarse)` and `(hover: hover)` are about the hardware and change when a mouse is plugged
@@ -26,7 +26,7 @@ export interface SmallScreen {
   width: number; height: number;
   /** A finger is the pointer and no pad is connected: the pads are drawn and touch plays. */
   touch: boolean;
-  /** This window is much taller than it is wide, and the player could usefully turn it round. */
+  /** A small phone is in portrait and gameplay is blocked until landscape. */
   rotate: boolean;
 }
 

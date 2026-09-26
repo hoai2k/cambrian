@@ -42,7 +42,7 @@ export interface PlayerHud {
   abilityName: string; abilityReady: number; abilityActive: boolean; abilityUnlocked: boolean;
   lock?: { name: string; kind?: string; band: Band; hp: number; color: string };
   aim?: {
-    hasTarget: boolean; inRange: boolean; name?: string; color: string; ready: boolean;
+    hasTarget: boolean; inRange: boolean; name?: string; color: string; band?: Band; ready: boolean;
     /** What RT does for this creature: POUNCE, or the special's own name. */ action: string;
     /**
      * Where to draw it, in normalised device coordinates (-1..1, y up), when that is not the middle
@@ -53,6 +53,7 @@ export interface PlayerHud {
      */
     at?: { x: number; y: number };
   };
+  touchMark?: { kind: 'target' | 'zoom'; at: { x: number; y: number } };
   /** Sense is on: the band glyphs and the radar are drawn. */
   senseOn: boolean;
   hunted: number; hunterAngle: number | null; hunterName?: string; hunterState: 'none' | 'noticed' | 'hunting'; inCover: boolean; still: boolean;
@@ -450,6 +451,7 @@ export class Engine {
   private acc = 0;
   private disposed = false;
   private paused = false;
+  private orientationBlocked = false;
   private hudT = 0;
   /** The pause button, per device: `onMenu` fires on the press, never on the hold. */
   private menuEdges = new Map<string, Edges>();
@@ -490,6 +492,12 @@ export class Engine {
     // The fingers listen on the window rather than on this element (see `TouchPlay.attach`), but the
     // element is still what a touch's position is measured against, so it is handed over the same way.
     this.touch.attach(container);
+    this.touch.targetAt = (ndc) => {
+      const game = this.game, cs = this.cams[0], p = game?.players[0];
+      if (!game || !cs || !p) return false;
+      this.updateAim(cs, p, p.aiming, 0, ndc);
+      return this.pointingAt(game, p, cs) !== 'none';
+    };
     this.touch.onSwap = (sec) => { this.cb.onSecondary?.(sec); audio.play('ui-move'); };
     this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.sand.points, this.tracks.mesh, this.splash.group, this.mouthfuls.group, this.eggs.group);
     (window as any).__cambrian = this;
@@ -527,12 +535,13 @@ export class Engine {
   }
   setLook(speed: number, invert: boolean) { this.lookSpeed = speed; this.invertY = invert; }
   setPaused(p: boolean) { this.paused = p; this.syncPointer(); }
+  setOrientationBlocked(blocked: boolean) { this.orientationBlocked = blocked; this.syncPointer(); }
   private syncPointer() {
-    const playing = this.pointerWanted && !this.paused && !this.attract;
+    const playing = this.pointerWanted && !this.paused && !this.orientationBlocked && !this.attract;
     this.mouse.want(playing);
     // The fingers stand down for exactly the same reasons the mouse does: paused, in a dialog, on
     // the results screen or back at the menus, a tap belongs to whatever button it landed on.
-    this.touch.want(this.touchPlay && !this.paused && !this.attract);
+    this.touch.want(this.touchPlay && !this.paused && !this.orientationBlocked && !this.attract);
     // Paused, in a dialog, on the results screen or back at the menus, the cursor belongs to the
     // buttons again: a targeting reticle over a *Quit to title* is a lie about what a click does.
     if (!playing) { this.cursorNow = ''; this.container.style.cursor = ''; }
@@ -750,6 +759,8 @@ export class Engine {
     this.fpsFrames++; this.fpsT += dtReal; if (this.fpsT > 1) { this.fps = this.fpsFrames / this.fpsT; this.fpsFrames = 0; this.fpsT = 0; }
     const game = this.game;
     if (!game) return;
+    // The portrait phone screen may stream assets, but neither simulation nor rendering runs behind it.
+    if (this.orientationBlocked) return;
     const running = !this.paused;
     const dt = running ? dtReal : 0;
     this.time += dt;
@@ -1044,12 +1055,12 @@ export class Engine {
    * a right-button dash goes down. Undefined when the mouse is not playing or has not moved yet,
    * and every caller then falls back to the way it worked before.
    */
-  private cursorDir(cs: CamState): THREE.Vector3 | undefined {
+  private cursorDir(cs: CamState, point?: { x: number; y: number }): THREE.Vector3 | undefined {
     // Either pointer will do, because the rule is about pointing rather than about hardware:
     // whatever the player has aimed at is what the attacks go to. The mouse's cursor is always
     // somewhere; a finger's aim point lapses a moment after the hand comes off the glass, and then
     // there is nothing pointing and aiming goes back to the middle of the screen.
-    const ndc = this.mouseFrame?.ndc ?? this.touchFrame?.ndc;
+    const ndc = point ?? this.mouseFrame?.ndc ?? this.touchFrame?.ndc;
     if ((!this.mouseLook && !this.touchPlay) || !ndc) return undefined;
     return this.tmpRay.set(ndc.x, ndc.y, 0.5).unproject(cs.camera).sub(cs.camera.position).normalize();
   }
@@ -1083,14 +1094,14 @@ export class Engine {
     if (want !== this.cursorNow) { this.cursorNow = want; this.container.style.cursor = want; }
   }
 
-  private updateAim(cs: CamState, p: Actor | undefined, aiming: boolean, dt: number) {
+  private updateAim(cs: CamState, p: Actor | undefined, aiming: boolean, dt: number, point?: { x: number; y: number }) {
     if (!p || !this.game) { cs.aimBlend = 0; cs.aimTarget = -1; return; }
     const wasAiming = cs.aimBlend > 0.5 || cs.aimSnapT > 0;
     cs.aimBlend = damp(cs.aimBlend, aiming ? 1 : 0, 9, dt);
     // On a mouse the crosshair is the cursor, so a target is picked every frame whether or not aim
     // mode's framing is on: pointing at an animal *is* aiming at it, and the camera shift is a
     // separate thing the middle button asks for.
-    const cursor = this.cursorDir(cs);
+    const cursor = this.cursorDir(cs, point);
     if (!aiming && !cursor) { cs.aimTarget = -1; cs.aimSnapT = 0; return; }
     const L = lengthOf(p);
     const range = this.game.pounceRange(p) * 2.4;
@@ -1962,10 +1973,12 @@ export class Engine {
         // where its aim axis is. Touch is the third case and needs both halves: a mark to aim by,
         // standing where the player last pointed, and back in the middle once that has lapsed.
         const at = this.touchPlay ? this.touchFrame?.ndc : undefined;
-        aim = { hasTarget: !!t, inRange: !!t && p.aimInRange, name: t ? creature(t.creature).name : undefined, color: t ? BAND_COLOR[bandOf(p, t)] : '#eefaf6', ready: heavyMove.ready, action: heavyMove.name, at: at ? { x: at.x, y: at.y } : undefined };
+        aim = { hasTarget: !!t, inRange: !!t && p.aimInRange, name: t ? creature(t.creature).name : undefined, color: t ? BAND_COLOR[bandOf(p, t)] : '#eefaf6', band: t ? bandOf(p, t) : undefined, ready: heavyMove.ready, action: heavyMove.name, at: at ? { x: at.x, y: at.y } : undefined };
       }
+      const touchMark = this.touchPlay && this.touchFrame?.marker && this.touchFrame.ndc
+        ? { kind: this.touchFrame.marker, at: this.touchFrame.ndc } : undefined;
       return {
-        index: i, creature: p.creature, color: PLAYER_COLORS[i % 4], alive: p.state !== 'dead', aim,
+        index: i, creature: p.creature, color: PLAYER_COLORS[i % 4], alive: p.state !== 'dead', aim, touchMark,
         scheme,
         hp: p.hp, hpMax: p.hpMax, hunger: game.mode === 'survival' ? p.hunger : undefined, stamina: p.stamina, staminaMax: p.staminaMax, exhausted: p.exhausted > 0,
         tier: p.tier, tierName: era ? `${era.stage} · ${era.rungName}` : TIER_NAMES[p.tier], // The ring means the same thing in both eras: how close the next moult is, full when it lands.

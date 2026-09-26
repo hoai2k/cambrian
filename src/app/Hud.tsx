@@ -12,6 +12,7 @@ import { appBase } from '../shared/base';
 import { fillControls, key, type Scheme } from '../shared/controls';
 import { TEXT } from '../shared/text';
 import { HUNGER_LOW } from '../sim/survival';
+import { cursorImageFor } from '../shared/cursors';
 
 /** Every word this panel says; see `src/content/strings.ts`. */
 const COPY = TEXT.hud;
@@ -169,10 +170,15 @@ function SensePanel({ p }: { p: PlayerHud }) {
       </div>
       {p.ashore && p.alive && <ShoreStatus stranded={p.strandLeft != null} low={!!p.strandLow} />}
       {p.era && <EraStatus era={p.era} alive={p.alive} ashore={p.ashore} />}
-      {p.aim && (
-        // `left`/`top` are the CSS default of 50% unless the snapshot names a point: touch takes the
-        // reticle to wherever the player last tapped, because there that is the aim axis. NDC is
-        // y-up and the screen is y-down, hence the flip.
+      {p.scheme === 'touch' && (p.touchMark || p.aim) && (() => {
+        const mark = p.touchMark;
+        const at = mark?.at ?? p.aim?.at;
+        const kind = mark?.kind ?? (p.aim?.hasTarget ? (p.aim.band === 'snack' || p.aim.band === 'prey' ? 'edible' : 'attack') : 'idle');
+        return <img className="touch-cursor" src={cursorImageFor(kind)} alt=""
+          style={{ left: at ? `${(at.x + 1) * 50}%` : '50%', top: at ? `${(1 - at.y) * 50}%` : '50%' }} />;
+      })()}
+      {p.aim && p.scheme !== 'touch' && (
+        // Gamepad aim uses the centre; touch has its own mouse-style SVG mark above.
         <div
           className={`aim ${p.aim.hasTarget ? 'on-target' : ''} ${p.aim.inRange ? 'in-range' : ''} ${p.aim.ready ? '' : 'cooling'} ${p.aim.at ? 'aim-pointed' : ''}`}
           style={{

@@ -69,12 +69,8 @@ export function TouchPads({ secondary, hint, swapped, teleportOpen, onPause }: {
 }
 
 /**
- * The one line asking a player to turn a very tall window round.
- *
- * A hint and never a gate: the game runs in portrait, and a screen that refused to draw until it was
- * rotated would be worse than a narrow one. It sits over the sea rather than in front of it and goes
- * away by itself, because a message that has to be dismissed is a message in the way.
+ * The phone portrait gate covers the app until it is rotated. The engine stops behind it.
  */
 export function RotateHint() {
-  return <p className="rotate-hint" role="status">{TEXT.hud.rotate}</p>;
+  return <div className="rotate-gate" role="status"><p>{TEXT.hud.rotate}</p></div>;
 }

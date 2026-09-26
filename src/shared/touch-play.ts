@@ -73,8 +73,8 @@
  * already plays by. So the last water touch's position is the aim point, and it **outlives the
  * finger** by `AIM_HOLD`: the bite fires on the lift, when the finger is already gone, so a point
  * that vanished with it would aim every tap at nothing. Past `AIM_HOLD` it lapses and aiming goes
- * back to the middle of the screen, where the reticle is — which is why the reticle stays on in
- * touch play and is off in mouse play. A cursor is always somewhere; a finger usually is not.
+ * back to the middle of the screen while aim mode is held. The HUD only draws a touch mark for a
+ * creature tap, a dash, or aim mode. A cursor is always somewhere; a finger usually is not.
  *
  * Pure: no DOM, no clock of its own, no `Math.random`. Times are passed in, positions are passed
  * in, and `src/input/touch.ts` is the adapter that reads the events off an element. That split is
@@ -154,7 +154,7 @@ export interface TouchState {
   /** Heavies banked since the last `read`. */
   heavies: number;
   /** The aim point, in normalised device coordinates (-1..1, y up), and when it was last touched. */
-  aim: { x: number; y: number; t: number } | undefined;
+  aim: { x: number; y: number; t: number; marker?: 'target' | 'zoom' } | undefined;
   /** How many times the ring has been stepped, so a caller can notice and make a noise about it. */
   swaps: number;
   /**
@@ -242,13 +242,14 @@ export function down(
   else {
     // Water. The aim point follows the newest finger on the water, because that is the one the
     // player is pointing with.
-    s.aim = { ...toNdc(x, y, size.w, size.h), t };
+    s.aim = { ...toNdc(x, y, size.w, size.h), t, marker: onTarget ? 'target' : undefined };
     const tap = s.lastTap;
     if (tap && t - tap.t <= DOUBLE) {
       // The second half of a double-tap. Which of the two it is was settled by the *first* tap: the
       // question "is there something to pounce at" was asked where the player aimed, and the second
       // tap is a confirmation rather than a new aim.
       touch.role = tap.onTarget ? 'heavy' : 'dash';
+      s.aim.marker = touch.role === 'dash' ? 'zoom' : 'target';
       if (tap.onTarget) s.heavies++;
       // A double-tap is consumed: three taps are a double-tap and then a fresh single, not two
       // overlapping doubles.
@@ -270,7 +271,8 @@ export function move(s: TouchState, id: number, x: number, y: number, size: { w:
   // A dash aims at its own finger: moving it re-aims the dash, which is the mouse's right-button
   // rule verbatim and is better than letting the same finger also turn the camera.
   if (p.role === 'dash' || p.role === 'drag' || p.role === 'pending') {
-    s.aim = { ...toNdc(p.x, p.y, size.w, size.h), t };
+    s.aim = { ...toNdc(p.x, p.y, size.w, size.h), t,
+      marker: p.role === 'dash' ? 'zoom' : p.role === 'pending' && p.onTarget ? 'target' : undefined };
   }
   if (p.zone === 'secondary') {
     // Sideways on the pad steps the ring, and that touch stops being the action: travel changes
@@ -329,6 +331,8 @@ export interface TouchFrame {
   dragging: boolean;
   /** Where the player is pointing, in NDC, while it has not lapsed. */
   ndc: { x: number; y: number } | undefined;
+  /** Gesture feedback. An ordinary tap on water never draws a mark. */
+  marker: 'target' | 'zoom' | undefined;
   /** The ring stepped this frame: worth a click and a label. */
   swapped: boolean;
   /** Two fingers are working the view together, so the zoom is theirs and the reticle stands down. */
@@ -355,6 +359,7 @@ export function read(s: TouchState, t: number, lookSpeed = 1): TouchFrame {
     else if (p.role === 'swim') swim = true;
     else if (p.role === 'secondary') secondary = secondaryOf(s);
     else if (p.role === 'dash') dash = true;
+    if ((p.role === 'dash' || (p.role === 'pending' && p.onTarget)) && s.aim?.marker) s.aim.t = t;
   }
   // A pinch needs two fingers on the water and at least one of them actually moving: two fingers
   // resting are two taps waiting to happen, and calling that a pinch would zoom the view every time
@@ -391,6 +396,7 @@ export function read(s: TouchState, t: number, lookSpeed = 1): TouchFrame {
     // The aim point lapses on its own clock, so a bite fired on a lift still aims where the finger
     // was and a hand taken off the glass hands aiming back to the middle of the screen.
     ndc: s.aim && t - s.aim.t <= AIM_HOLD ? { x: s.aim.x, y: s.aim.y } : undefined,
+    marker: s.aim && t - s.aim.t <= AIM_HOLD ? s.aim.marker : undefined,
     swapped: s.swaps > 0,
     pinching,
   };

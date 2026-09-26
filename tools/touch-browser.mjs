@@ -243,6 +243,7 @@ try {
     await settled();
   }
   assert.equal(bit, 'light', `a tap bites (got ${bit})`);
+  assert.equal(await page.locator('.touch-cursor').count(), 0, 'an open-water tap should not flash a target icon');
 
   // 8. A double-tap on open water is the dash, and it is the *second* finger that does it — so this
   //    also proves the pair is being recognised as a pair rather than as two taps.
@@ -259,6 +260,8 @@ try {
     });
     await doubleTapDown(390, 150, 5, 6);
     await frames(6);
+    assert.ok(await page.locator('.touch-cursor').count(), 'a held dash should show its movement icon');
+    assert.ok((await page.locator('.touch-cursor').getAttribute('src'))?.includes('svg'), 'the dash uses the mouse SVG art');
     dashed = await page.evaluate(() => window.__dodge);
     await touch('touchEnd', []);
     await frames(6);

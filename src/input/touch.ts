@@ -1,7 +1,7 @@
 import { emptyControls, type RawControls } from './input';
 import {
   SECONDARY, clear, down, freshTouch, meterEdge, move, read, secondaryOf, up,
-  type Secondary, type TouchFrame, type TouchState, type Zone,
+  toNdc, type Secondary, type TouchFrame, type TouchState, type Zone,
 } from '../shared/touch-play';
 
 /**
@@ -47,6 +47,8 @@ export class TouchPlay {
   private mine = new Set<number>();
   /** Whether there is something worth attacking where the player is pointing. Written each frame. */
   private overTarget = false;
+  /** Test the actual new touch point; the previous frame's target may be somewhere else. */
+  targetAt: ((ndc: { x: number; y: number }) => boolean) | null = null;
   /** Edges the simulation has not been handed yet: see `read`. */
   private owedBites = 0;
   private owedHeavies = 0;
@@ -115,7 +117,9 @@ export class TouchPlay {
       const zone = this.zoneOf(touch.target ?? e.target);
       if (!zone) continue;
       const p = this.at(touch);
-      down(this.state, touch.identifier, zone, p.x, p.y, t, this.overTarget, size);
+      const onTarget = zone === 'water' && this.targetAt
+        ? this.targetAt(toNdc(p.x, p.y, size.w, size.h)) : this.overTarget;
+      down(this.state, touch.identifier, zone, p.x, p.y, t, onTarget, size);
       this.mine.add(touch.identifier);
       took = true;
     }
