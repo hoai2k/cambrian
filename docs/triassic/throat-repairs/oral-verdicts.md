@@ -71,8 +71,8 @@ clip the audit says opens the jaw.
 | Hupehsuchus | 38 | 4,784 | |
 | Coelophysis | 3 | 7,276 | |
 | Mystriosuchus | 1 | 7,734 | |
-| Aphaneramma | 5 | 10,730 | |
-| Birgeria | 4 | **15,357** | measured at last in T3D-33 — the assertion that blocked it read a *constant* root channel as root motion. `Gape@0.467` 4/15,357, `Ability@0.467` 4/8,416, `Heavy@0.533` 2/7,239. The widest `opened` left on the roster, and the widest gape on it: nothing through the head, a mouth a single-sided runtime draws as a hole. Not re-cut here; it is the rollout's remaining work |
+| Aphaneramma | 6 | 10,730 | T3D-36 re-seated its shells; `opened` is unchanged because the runtime hides them, and what moved is what a *reviewer* sees — see the T3D-36 section |
+| Birgeria | 4 | **15,350** | measured at last in T3D-33 — the assertion that blocked it read a *constant* root channel as root motion. The widest `opened` left on the roster, and the widest gape on it: nothing through the head, a mouth a single-sided runtime draws as a hole. T3D-36 re-seated its shells and left the cut alone, so this column is unchanged; it is still the rollout's remaining work |
 | **Henodus** | **0** | **0** | ported in T3D-32B: the cut makes the aperture, capped with its own rim fanned to a sunk hub (was 407 / 462). T3D-19's fringe pixels were **not** the fringe — a ray through every one of them meets one back face of the mandible and nothing else |
 | Dinocephalosaurus | **120** | 197 | its verdict was **neither**, and it is still right about the lining — but the `Seated jaw hinge tissue` that closes its hinge cross-section is hidden in play, so as drawn the head is open there |
 | Ceratites, Phragmoteuthis | — | — | no jaw and no mouth drawn; settled in T3D-02a and T3D-12B and unaffected by any of this |
@@ -84,6 +84,64 @@ measured it three ways and concluded correctly that the **sac** closed nothing t
 not already closing; what nobody asked was whether the hinge plug is drawn. It is not. So the
 verdict "neither" is right about a *lining* and wrong about the mouth: what that head needs is its
 hinge cross-section capped with its own vertices, which is `T.cap_cut`, and no lining at all.
+
+## T3D-36: two shells that came out through the cheek
+
+**A body can pass every gape proof there is and still show its mouth on the outside of its face.**
+`gape-solid.py` counts backdrop the cull *opened*; a shell that stands proud of a cheek draws
+*lining* pixels over *skin*, which is not backdrop and which no count on this page was measuring.
+Both bodies were doing it, and a reviewer saw it before any instrument did.
+
+The instrument is a render and a ray. Painted an emissive marker the animal cannot produce, each
+head is photographed from four units away on both flanks and from above, and every marker pixel is
+a pixel of mouth a camera outside the animal can see. Where one appears, the camera's own ray is
+cast through it and every surface on the line is asked, which is `CLAUDE.md`'s rule about a failing
+pixel and which is what says whether the lining is genuinely the first surface or merely near it.
+
+| Body | marker pixels at rest, before → after | what they were | what is left |
+| --- | ---: | --- | --- |
+| **Birgeria** | **14,868 → 2,010** | a blob on the cheek in front of the eye and a line running back along it; 36 of 816 lining vertices with no skin outboard of them at all, the worst 0.28 % of a body out | the thin line along the lip, which this generation's modelled slit is *meant* to show |
+| **Aphaneramma** | **9,714 → 7,817** | scattered patches under and behind the eye, above the real mouth line; the closest lining vertex 0.0003 of a body from the skin and 255 of 720 within 0.004 | the cut's own rim along the mouth line, one polygon thick at a grazing angle down a long snout |
+
+**Why nothing failed.** Both builders seated their shells with `depth()`, a signed
+nearest-surface probe — the tool `CLAUDE.md` says cannot seat anything beside a modelled mouth,
+because it answers about the lumen's own wall. On Birgeria it read the lining as inside at every
+station but three. On Aphaneramma it was worse than wrong: the fit shrank a vertex towards the
+mouth's axis in twelve steps and, where twelve were not enough, **returned it at 0.615 of the way
+out regardless** — a shrink with a floor under it, and the floor is where the geometry came out.
+
+**What replaced it** is the question itself: *can this point be seen from outside the animal?* A
+point strictly inside a closed surface meets skin along every direction; a point outside escapes
+along at least one. Twenty-six directions — the cube's faces, edges and corners — against the closed
+intake surface, taken before the cut opens the head.
+
+**Twenty-six and not four, and not a parity vote.** Both were tried first and both agreed with the
+old answer. Four *axis* reaches ask about x and z when the direction out of a cheek is oblique, and
+Aphaneramma's snout is yawed 17.5°: asked along the axes, **371 of its 720 vertices read as inside
+the head** while a camera drew them on the cheek. A three-ray parity vote is no better for a point
+sitting a thousandth off a surface, which is where every one of these vertices lives.
+
+**And a point *on* the skin is not outside it.** That distinction is the whole balance of the seat,
+and both one-number answers were built and measured. What has to reach the skin is the shell's
+*width*, because that is what a line of sight into the gape passes beside; a clearance everywhere
+takes that width away and Birgeria's gape opened from 417 to 3,516 px. A touch everywhere leaves
+the palate lying on the inside of a thin snout, which on Aphaneramma a camera drew as a slab over
+the whole rostrum. So the clearance is asked of the shell's far side and the touch of its width.
+
+Body skin and the jaw cut are unchanged on both (3.46x and 4.43x; 0.00 % open), and the plain gape
+moves by 417 → 481 px on Birgeria and not at all on Aphaneramma.
+
+### And the aimed cuts are read rather than cut on, which is also a measurement
+
+Both animals were re-aimed in the viewer's mouth editor in the same pass
+(`docs/triassic/mouths/`), and both builders now read the file, fit the frame to it and record the
+disagreement — and keep cutting on their own measured line. Cut on the aimed planes, Birgeria's
+gape opens **2,130 px** against 417 and Aphaneramma's **4,229** against 0, because a lining fitted
+to one mouth line does not close an aperture cut on another. Building the shells about the
+generation's own reading while cutting on the plane recovered about half of Birgeria's and no more.
+What closes a mouth cut where a human aimed it is the cut's **own rim** — `T.cap_cut` and
+`T.cap_mouth`, which is why Cartorhynchus was ported to the cap on the day it took its aimed cut.
+Neither of these two has been ported; that is this table's remaining work on both of them.
 
 ## T3D-31: the three ported bodies
 

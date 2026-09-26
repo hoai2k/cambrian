@@ -168,12 +168,75 @@ Hupehsuchus 5.79x, Hybodus 5.93x. **Every one of the 26 joints owns skin** (`idl
 
 `gape-solid.py`, at full gape on five clips against a saturated backdrop, with and without a
 backface-cull shim: **0 pixels of backdrop seen through the body**, against a tolerance of 12 of
-378,000. One closed skinned lining — roof on the skull, floor on the jaw, wall stretching between
-them, wound inwards, superellipse power 2.8 because a temnospondyl's skull is very flat and very
-wide and an ellipse at that aspect ratio narrows to nothing exactly where the mandible's rim reaches
-at full gape. The skin is double-sided behind it as a backstop, and the lining is not culled either:
+378,000. The mouth is a rigid palate on the skull and a rigid floor on the jaw, overlapping behind
+the hinge and each closed on its own (`T.oral_shells`, since T3D-08D — the one-sac form this
+paragraph used to describe is the thing CLAUDE.md says not to rebuild), at superellipse power 2.8
+because a temnospondyl's skull is very flat and very wide and an ellipse at that aspect ratio
+narrows to nothing exactly where the mandible's rim reaches at full gape. The skin is double-sided behind it as a backstop, and the lining is not culled either:
 a sac buried inside a head is never seen from outside whatever its winding, and culling it takes
 away the floor exactly when something is looking up into an open mouth.
+
+### The shells came out through the cheek, and the fit gave up rather than failing
+
+`gape-solid.py` counts backdrop seen *through* the body; a shell that comes out through a cheek
+draws lining pixels over *skin*, which that proof passes at 0 px and a reviewer sees at once.
+Painted an emissive marker and photographed from four units away, the shipped head shows **9,714
+marker pixels** from outside at rest — scattered patches under and behind the eye, above the real
+mouth line. A ray cast through them (`CLAUDE.md`'s rule: ask every surface on the line rather than
+re-read renders) finds the **lining first on almost every one of them**.
+
+The cause is in the fit, and it is a shrink with a floor under it: `fit_lining_point` pulled a
+vertex towards the mouth's axis in twelve steps of 3.5 % and, where twelve were not enough,
+**returned it at 0.615 of the way out regardless**. Nothing failed. Worse, the test it shrank
+against — `depth()`, a signed nearest-surface probe — is satisfied by a *ten-thousandth* of a body,
+and on a flat wide skull with thin flesh over the lumen that is no clearance at all: 255 of the 720
+vertices sat within 0.004 of a body of the skin and the closest was **0.0003**.
+
+What replaced it is the question itself: **can this point be seen from outside the animal?** A point
+strictly inside a closed surface meets skin along every direction; a point outside escapes along at
+least one. Twenty-six directions — the cube's faces, edges and corners — cast against the closed
+intake surface, and the walk towards the axis has no floor under it any more.
+
+**Twenty-six and not four, and this animal is the reason.** Four *axis* reaches ask about x and z,
+and on a snout yawed 17.5° the direction out of the cheek is neither: asked along the axes, **371 of
+the 720 vertices read as inside the head** while a camera four units away drew them on the cheek.
+And a point *on* the skin is not outside it — what has to reach the skin is the shell's width,
+because that is what a line of sight into the gape passes beside — so a vertex within `ORAL_BAND` of
+the mouth line may sit on the skin to within `ORAL_TOUCH` and one outside that band must be
+`ORAL_MARGIN` inside it. Both one-number answers were built and measured: a touch everywhere left
+the palate lying on the inside of this thin snout, which a camera drew as a green slab over the
+whole rostrum.
+
+| | shipped | rebuilt |
+| --- | ---: | ---: |
+| closest lining vertex to the skin | 0.0003 of a body | **0.0008** |
+| vertices within 0.004 of a body of the skin | 255 of 720 | **10** |
+| marker pixels seen from outside at rest | 9,714 | **7,817** |
+| vertices pulled in by the seat | — | 112, worst 0.0088 raw |
+| body skin (`skin-tears.mjs`) | 4.43x | **4.43x** |
+| jaw cut (`lag.mjs`) | 0.00 % | **0.00 %** |
+| gape, plain | 0 / 0 | **0 / 0** |
+
+The patches are gone; what the 7,817 still counts is the **cut's own rim** along the mouth line,
+one polygon thick and at a grazing angle down the length of a long snout, which is Macrocnemus'
+19 px in a larger frame and is the line of the mouth rather than a hole in the cheek.
+
+### The aimed cut is read, and it is not cut on
+
+A reviewer aimed a cut plane and a hinge on this exact shipped body in the viewer's mouth editor
+(`docs/triassic/mouths/aphaneramma-mouth.json`). The builder reads it, fits the frame against it —
+the document's own bounding box against this build's, worst disagreement **1.5e-08** — and records
+what the two disagree about in `validation.json`. The reviewer's plane is worth having: it carries
+**−17.5° of yaw** on a +16.2° line, and this generation's long snout is *turned*, so a term in x is
+exactly what the painted read cannot express, `T.bisect_on_curve` shearing the head by −seam(y).
+
+**Cutting on it is a separate piece of work and the measurement says so.** Built that way this
+body's gape opens **4,229 px of `opened by culling`** at full gape against **0** on the painted
+line's own cut, and the shells built about the aimed line rather than the painted one read 7,163.
+The mandible the plane takes is a different shape from the one the shells were fitted to. What
+closes a mouth cut where a human aimed it is the cut's **own rim** (`T.cap_cut` and `T.cap_mouth`),
+the construction Cartorhynchus was ported to on the day it took its aimed cut and which this body
+has never been ported to.
 
 ## The performance
 

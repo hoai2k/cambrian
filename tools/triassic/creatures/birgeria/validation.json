@@ -2075,6 +2075,194 @@
       "-0.3018": -0.0018,
       "-0.2993": 0.00045
     },
+    "oralShellSeating": {
+      "vertices": 816,
+      "pulled": 48,
+      "unseated": 6,
+      "maxPullRaw": 0.034103045952495435,
+      "standingOnTheLumen": 7,
+      "shellVertices": 816
+    },
+    "oralShellSeatingMethod": "every shell vertex asked of the closed intake surface along the cube's 26 directions -- a point inside meets skin along every one -- with a touch of 0.0010 of a body allowed within 0.45 of the local half height of the mouth line, where the shell's width has to reach the skin, and 0.0030 of clearance outside that band. Asserted over the vertices the helper wrote and again over the exported mesh.",
+    "hingeEnvelope": {
+      "fit": 0.6666666666666667,
+      "radii": [
+        0.08305456681460578,
+        0.034,
+        0.07214537201836171
+      ],
+      "centreRaw": [
+        -0.020773031262085594,
+        -0.2847968361377715,
+        0.017732946918447894
+      ],
+      "seatedBy": "the 26 directions and the depth probe, both"
+    },
+    "aimedCut": {
+      "file": "docs/triassic/mouths/birgeria-mouth.json",
+      "appliesTo": "built",
+      "sha256": "134d7f01fd21e04cd01b62a36b30d537c49455e9bab335437e902c5df5f7da7d",
+      "consumed": false,
+      "note": "Read as a review. Cut on, this body's gape opens 2,130 px of opened-by-culling against 417 on the generation's own slit, because a lining fitted to one mouth line does not close an aperture cut on another; what closes an aimed cut is the cut's own rim (T.cap_cut/T.cap_mouth), which this body has not been ported to. T3D-32's rollout.",
+      "frameFitWorstRaw": 1.1920928955078125e-07,
+      "hingeCentreRaw": [
+        -0.02242339961230755,
+        -0.2893224060535431,
+        -0.014411799609661102
+      ],
+      "planeNormalRaw": [
+        0.1661950647830963,
+        0.5303951501846313,
+        0.8313003182411194
+      ],
+      "mouthLineForwardRaw": [
+        0.041283003985881805,
+        -0.846027135848999,
+        0.5315390825271606
+      ],
+      "hingeAxisRaw": [
+        0.9852284789085388,
+        -0.05402102693915367,
+        -0.16250108182430267
+      ],
+      "pitchDegrees": 32.109,
+      "yawDegrees": 2.794,
+      "rollDegrees": -11.061,
+      "mandibleVerticesInTheDocument": 731,
+      "hingeAheadOfTheSlitRaw": -0.007474430084228434,
+      "belowTheSlitMaxRaw": 0.025622728624362084,
+      "belowTheSlitAtTheSnoutRaw": -0.0039786973886669075,
+      "perStation": [
+        [
+          -0.3818,
+          -0.00398
+        ],
+        [
+          -0.3793,
+          -0.00289
+        ],
+        [
+          -0.3768,
+          -0.00197
+        ],
+        [
+          -0.3743,
+          -0.00121
+        ],
+        [
+          -0.3718,
+          -0.00053
+        ],
+        [
+          -0.3693,
+          0.00012
+        ],
+        [
+          -0.3668,
+          0.0007
+        ],
+        [
+          -0.3643,
+          0.00097
+        ],
+        [
+          -0.3618,
+          0.00066
+        ],
+        [
+          -0.3593,
+          -0.00026
+        ],
+        [
+          -0.3493,
+          0.00333
+        ],
+        [
+          -0.3468,
+          0.00226
+        ],
+        [
+          -0.3443,
+          0.00166
+        ],
+        [
+          -0.3418,
+          0.00144
+        ],
+        [
+          -0.3393,
+          0.00131
+        ],
+        [
+          -0.3368,
+          0.00098
+        ],
+        [
+          -0.3343,
+          0.00056
+        ],
+        [
+          -0.3318,
+          0.00017
+        ],
+        [
+          -0.3293,
+          -0.00011
+        ],
+        [
+          -0.3268,
+          -0.00027
+        ],
+        [
+          -0.3243,
+          -0.00033
+        ],
+        [
+          -0.3218,
+          -0.00033
+        ],
+        [
+          -0.3193,
+          -0.00025
+        ],
+        [
+          -0.3168,
+          6e-05
+        ],
+        [
+          -0.3143,
+          0.00085
+        ],
+        [
+          -0.3118,
+          0.00248
+        ],
+        [
+          -0.3093,
+          0.0052
+        ],
+        [
+          -0.3068,
+          0.00894
+        ],
+        [
+          -0.3043,
+          0.01329
+        ],
+        [
+          -0.3018,
+          0.01773
+        ],
+        [
+          -0.2993,
+          0.02186
+        ],
+        [
+          -0.2968,
+          0.02562
+        ]
+      ]
+    },
     "toothPatches": [
       {
         "vertices": 63,
@@ -2222,11 +2410,15 @@
     "oralPartSeating": [
       {
         "part": "Oral cavity lining",
-        "worstDepthRaw": -0.01168354693800211
+        "worstDepthRaw": -0.01168354693800211,
+        "vertices": 816,
+        "verticesVisibleFromOutside": 0
       },
       {
         "part": "Seated jaw hinge tissue",
-        "worstDepthRaw": 0.010037008672952652
+        "worstDepthRaw": 0.010037008672952652,
+        "vertices": 164,
+        "verticesVisibleFromOutside": 0
       }
     ]
   },

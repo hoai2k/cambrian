@@ -136,7 +136,7 @@ edge dominated by `jaw` and by `skull`.
 | archelon | yes | 0.24 % → 0.00 % | 1.01 (1.00) → 1.01 (1.00) | 3.86x → 3.86x | 1.19x → 1.44x | 1.26x → 1.26x |
 | askeptosaurus | no | 0.00 % → 0.00 % | 1.00 (1.02) → 1.00 (1.02) | 1.10x → 1.10x | 1.00x → 1.00x | 1.01x → 1.01x |
 | atopodentatus | yes | 0.26 % → 0.00 % | 1.12 (1.00) → 1.12 (1.00) | 3.90x → 3.90x | 3.90x → 3.90x | 1.62x → 1.62x |
-| birgeria | yes | 0.07 % → 0.00 % | 1.00 (0.99) → 1.00 (0.99) | 3.46x → 3.46x | 1.45x → 1.80x | 1.31x → 1.31x |
+| birgeria | yes | 0.07 % → 0.00 % | 1.00 (0.99) → 1.00 (0.99) | 3.46x → 3.46x | 1.45x → 1.50x | 1.31x → 1.31x |   <!-- T3D-36 re-seated the oral shells; the cut and the junction are untouched and the mouth-region jaw edge came back from 1.80x to 1.50x -->
 | cartorhynchus | yes | 2.02 % → 0.00 % | 1.04 (1.00) → 1.04 (1.00) | 3.72x → 3.72x | 1.00x → 1.46x | 1.27x → 1.29x |
 | ceratites | no | no shell → no shell | 1.03 (nan) → 1.03 (nan) | 7.73x → 7.73x | 1.36x → 1.36x | 1.61x → 1.61x |
 | coelophysis | no | 0.01 % → 0.01 % | 0.99 (0.99) → 0.99 (0.99) | 7.74x → 7.74x | 3.56x → 3.56x | 7.74x → 7.74x |

@@ -116,6 +116,82 @@ The mouth interior is dark (0.22, 0.095, 0.085) because this generation models i
 **open**: with the mouth shut the lining is visible along the whole lip line, exactly as the inside
 of a fish's lip is, and at the era's usual value it read as a bright pink band drawn on the snout.
 
+### The shells came out through the cheek, and nothing in the build could see it
+
+Every fault in the table above is a *hole*: backdrop seen through the body. The lining had another
+kind of fault the whole time and no number here could see it — it **came out through the cheek**,
+which draws lining pixels over skin rather than backdrop, so `gape-solid.py` passed it at 1 px
+while a reviewer was looking at a pink blob in front of the eye.
+
+The measurement, on the shipped body: **36 of the 816 lining vertices had no skin outboard of them
+on their own side**, the worst 0.28 % of a body from the nearest surface — 2.8 % of the head's own
+half width. Painted an emissive marker and photographed from four units away, the shipped head
+shows **14,868 marker pixels** from outside at rest (7,101 left, 4,590 right, 3,177 top): a blob on
+the cheek in front of the eye and a line running back along it, besides the thin line along the lip
+that this animal is *meant* to show.
+
+The seating test the build carried could not fail on it, and its failure is the `np.interp` lesson
+in a second dress. `depth()` is a signed nearest-surface probe, and beside a modelled slit it
+answers about the lumen's own wall rather than about the skull — it read the lining as inside at
+every station but three. What replaced it is **the question itself**: can this point be seen from
+outside the animal? A point strictly inside a closed surface meets skin along *every* direction; a
+point outside escapes along at least one. Twenty-six directions — the cube's faces, edges and
+corners — cast against the closed intake surface taken before the cut opens the head.
+
+**Twenty-six and not four, and not a parity vote.** Both were tried here first and both agreed with
+the old answer. Four *axis* reaches ask about x and z when the direction out of a cheek is oblique;
+a three-ray parity vote is unreliable for a point sitting a thousandth off a surface, which is
+where every one of these vertices lives. The cheapest way to see that both are wrong is the one
+`CLAUDE.md` prescribes: cast the camera's own ray through a failing pixel and ask every surface on
+the line. Done on the shipped body, the first surface on almost every marker pixel is the lining.
+
+**And a point *on* the skin is not outside it.** That distinction is the whole balance of the seat,
+and both one-number answers were built and measured. What has to reach the skin is the shell's
+*width*, because that is what a line of sight into the gape passes beside; asking for a clearance
+everywhere took that width away and the gape opened from 417 to 3,516 px. Asking for a touch
+everywhere left the palate lying on the inside of the skin. So a vertex within `ORAL_BAND` of the
+mouth line may sit **on** the skin to within `ORAL_TOUCH`, the mesh's own edge length here, and one
+outside that band must be `ORAL_MARGIN` inside it.
+
+| | shipped | rebuilt |
+| --- | ---: | ---: |
+| lining vertices with no skin outboard | 36 of 816 | **0** |
+| worst, from the nearest surface | 0.0028 of a body | **0** |
+| marker pixels seen from outside at rest | 14,868 | **2,010** |
+| vertices pulled in by the seat | — | 48, worst 0.034 raw |
+| vertices standing on the modelled slit | — | 7 |
+| body skin (`skin-tears.mjs`) | 3.46x | **3.46x** |
+| jaw cut (`lag.mjs`) | 0.00 % | **0.00 %** |
+
+What is left of the 2,010 is the line along the mouth itself — the lining seen in the slit the
+generation models open, which is the thing this material's darkness was chosen for.
+
+The hinge envelope is seated by **both** tests now, the twenty-six directions and the old `depth()`
+clearance, so the repair can only make it smaller: the rays alone would have grown it, and a bigger
+plug at the corner of the mouth is the failure the other way round.
+
+### The aimed cut is read, and it is not cut on
+
+A reviewer aimed a cut plane and a hinge on this exact shipped body in the viewer's mouth editor
+(`docs/triassic/mouths/birgeria-mouth.json`). The builder reads it, fits the frame against it — the
+document's own bounding box against this build's, six numbers, worst disagreement **1.2e-07** on a
+body five units long — and records what the two disagree about in `validation.json`'s `aimedCut` and
+`mouthCutDeviation`. The reviewer's line is pitched **+32.1°** where the modelled slit's own ramp
+reads +25.4°, carries **+2.8° of yaw and −11.1° of roll** (which a curve of y cannot express at all,
+since `T.bisect_on_curve` shears the head by −seam(y)), and puts the hinge 9.95 % of the body back
+from the nose where the slit peters out at 9.20 %.
+
+**Cutting on it is a separate piece of work and the measurement says so.** Built that way — plane
+bisect, the document's own half-spaces, the junction's rim widened to the band the oblique plane
+needs — this body's gape opens **2,130 px of `opened by culling`** at full gape against **417** on
+the slit's own line, because the mandible the plane takes is a different shape from the one the
+lining was fitted to and a tube about a mouth line does not close an aperture it was not measured
+from. Building the shells about the generation's own slit while cutting on the plane recovered half
+of that (3,511 → 2,130) and no more. What closes a mouth cut where a human aimed it is the cut's
+**own rim** (`T.cap_cut` and `T.cap_mouth`), the construction Cartorhynchus was ported to on the day
+it took its aimed cut and which this body has never been ported to — T3D-32's rollout, which
+`docs/triassic/throat-repairs/oral-verdicts.md` already names this animal as the remaining work for.
+
 ## The performance
 
 **Thunniform**, which is what the roster says this animal is (`thunniform: true`), and the audit

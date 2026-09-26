@@ -1128,6 +1128,33 @@ unless the user explicitly asks for a PR. Steps:
   a closed surface crosses it an odd number of times on the way out, which uses no normals and no
   table — with a second parity test against the lining sac, because a modelled open mouth is an
   invagination and a point in the lumen is outside the solid by construction.
+- **Seating a *shell* is one step past that, and the exact question is "can this point be seen from
+  outside the animal".** A point strictly inside a closed surface meets skin along every direction;
+  a point outside escapes along at least one. So it is **twenty-six directions** — the cube's faces,
+  edges and corners — and not a handful, and three things were tried first and all three agreed with
+  the answer that was wrong. `depth()` is the `np.interp` lesson's own trap. **Four *axis* reaches**
+  ask about x and z when the direction out of a cheek is oblique: Aphaneramma's snout is yawed 17.5°
+  and 371 of its 720 oral vertices read as inside the head along the axes while a camera four units
+  away drew them on its cheek. And a **three-ray parity vote** is unreliable for a point sitting a
+  thousandth off a surface, which is where every one of these vertices lives. What tells you all
+  three are wrong is a picture and a ray: paint the oral meshes an emissive marker, photograph the
+  head from outside, and cast the camera's own ray through a marker pixel to ask every surface on
+  the line — the same rule as the failing-pixel one above, asked of geometry rather than of a gape.
+  **And a point *on* the skin is not outside it**, which is the whole balance: what has to reach the
+  skin is a shell's *width*, because that is what a line of sight into the gape passes beside, so the
+  clearance is asked of the shell's far side and a *touch* of the mesh's own edge length of its
+  width. Both one-number answers cost a number: a clearance everywhere opened Birgeria's gape from
+  417 to 3,516 px, and a touch everywhere left Aphaneramma's palate lying on the inside of a thin
+  snout for a camera to draw as a slab over the whole rostrum.
+- **An aimed cut is not a drop-in on a body whose mouth is a lining.** A reviewer's plane moves the
+  mouth line, so the mandible it cuts is a different shape from the one the lining was fitted to,
+  and a tube about a mouth line does not close an aperture it was not measured from: cut on their
+  aimed planes, Birgeria's gape opens 2,130 px of `opened by culling` against 417 on its own slit's
+  line and Aphaneramma's 4,229 against 0, and building the shells about the generation's own reading
+  while cutting on the plane recovers about half of it. What closes a mouth cut where a human aimed
+  it is the cut's **own rim** (`T.cap_cut`/`T.cap_mouth`), which is why Cartorhynchus was ported to
+  the cap on the day its builder took its aimed cut. Until a body is ported, an aimed file is the
+  other thing `docs/triassic/mouths/README.md` says it can be — a review, read and measured against.
 
 - **On a generation that arrived gaping, a mouth built about the mouth line is built in the water.**
   The shared shells (`T.oral_shells`) put the palate and the floor about one `seam` -- the mid-height

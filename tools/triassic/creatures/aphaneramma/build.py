@@ -310,6 +310,77 @@ _SEAM_WORST = min(d for _y, d in _SEAM_DEPTHS)
 assert _SEAM_WORST > -.004, ('the mouth seam leaves the head', _SEAM_WORST,
                              [r for r in _SEAM_DEPTHS if r[1] < -.004])
 
+# --------------------------------------------------- the aimed cut, read and measured ----
+# **A reviewer aimed a cut plane and a hinge on this exact shipped body** in the viewer's mouth
+# editor (`docs/triassic/mouths/aphaneramma-mouth.json`, `docs/viewer-mouth.md`). The file is read
+# here and what this build's own reading disagrees with it about is recorded -- and the cut is
+# **not** taken on it, which is a measurement rather than a preference.
+#
+# The reviewer's plane is worth having: it carries **-17.5 deg of yaw** on a +16.2 deg line, and
+# this generation's long snout is *turned*, so a term in x is exactly what the painted read below
+# cannot express -- `T.bisect_on_curve` shears the head by -seam(y), and no curve of y survives
+# that. Cut on it, though, the mouth opens: `gape-solid.py` reads **4,229 px of `opened by
+# culling`** at full gape against **0** on the painted line's own cut, because the mandible the
+# plane takes is a different shape from the one the shells were fitted to and a tube about a mouth
+# line does not close an aperture it was not measured from. Both halves of that were built and
+# measured -- the shells on the aimed line (7,163 px) and on the painted one (4,229) -- and neither
+# recovers it.
+#
+# What closes a mouth cut where a human aimed it is the cut's **own rim** (`T.cap_cut` and
+# `T.cap_mouth`, CLAUDE.md), which is the construction Cartorhynchus was ported to on the day it
+# took its aimed cut and which this body has never been ported to. Until then the aimed file is a
+# **review** rather than a cut, which is the other use `docs/triassic/mouths/README.md` names for
+# these documents, and the numbers below say how far apart the human and the generation are.
+AIMED_MOUTH = 'docs/triassic/mouths/aphaneramma-mouth.json'
+_doc = json.loads(open(os.path.join(ROOT, AIMED_MOUTH)).read())
+assert _doc['schema'] == 'mouth-cut/1' and _doc['id'] == ID, (_doc.get('schema'), _doc.get('id'))
+assert _doc['appliesTo'] == 'built', _doc['appliesTo']
+assert (_doc['frame']['axis'], _doc['frame']['forward'], _doc['frame']['up']) == ('z', 1, 'y')
+
+
+def from_gltf_point(q):
+    """The export frame into this builder's. `tx` scales by SCALE and the glTF exporter's
+    `export_yup` sends Blender (x, y, z) to glTF (x, z, -y); this is that, inverted."""
+    return Vector((q[0] / SCALE, -q[2] / SCALE, q[1] / SCALE))
+
+
+def from_gltf_dir(d):
+    return Vector((d[0], -d[2], d[1]))
+
+
+# **A direction handed in from outside is in the file's frame, so fit the frame rather than assume
+# it.** The map above is the exporter's own convention and not a measurement, so it is checked
+# against something the document measured on the shipped file and this build can measure on the
+# intake: the bounding box over every vertex. Six numbers, and if the head end or the up axis were
+# the other way round they would disagree by a body length rather than by a rounding.
+_lo, _hi = raw_co.min(0) * SCALE, raw_co.max(0) * SCALE
+FRAME_CHECK = float(max(
+    abs(a - b) for a, b in
+    zip([_lo[0], _lo[2], -_hi[1], _hi[0], _hi[2], -_lo[1]],
+        list(_doc['mouth']['box']['lo']) + list(_doc['mouth']['box']['hi']))))
+assert FRAME_CHECK < 1e-3 * BODY_LENGTH, ('the aimed cut is not in this body\'s frame', FRAME_CHECK)
+
+CUT_P = from_gltf_point(_doc['plane']['point'])
+CUT_N = from_gltf_dir(_doc['plane']['normal']).normalized()
+CUT_F = from_gltf_dir(_doc['plane']['forward']).normalized()
+CUT_AXIS = from_gltf_dir(_doc['hinge']['axis']).normalized()
+assert abs(CUT_N.dot(CUT_F)) < 1e-4, CUT_N.dot(CUT_F)
+assert CUT_N.z > .5 and CUT_F.y < -.5, (tuple(CUT_N), tuple(CUT_F))   # up out of the mouth, and forward
+AIMED_HINGE_Y = float(CUT_P.y)
+
+
+def aimed_seam(y):
+    """The aimed plane read on the body's own measured centreline -- the reviewer's mouth line."""
+    return float(CUT_P.z - (CUT_N.x * (cx(y) - CUT_P.x) + CUT_N.y * (y - CUT_P.y)) / CUT_N.z)
+
+
+# What the human and the generation disagree about, station by station over the painted read.
+AIMED_VS_PAINTED = [(float(y), seam(float(y)) - aimed_seam(float(y))) for y in _py]
+AIMED_BELOW_PAINTED_MAX = float(max(d for _y, d in AIMED_VS_PAINTED))
+AIMED_VS_PAINTED_OVER_HEAD_DEPTH = float(max(
+    abs(d) / max(head_half_depth(y), 1e-4) for y, d in AIMED_VS_PAINTED))
+HINGE_AHEAD_OF_THE_TYPED_STATION = float(HINGE_Y - AIMED_HINGE_Y)
+
 SNOUT_CO, PROUD, PATCHES = T.protrusions(auth, y_front=HEAD_BACK, floor=.0020)
 
 
@@ -681,14 +752,76 @@ def mouth_section(y):
     return w, h
 
 
+# ----------------------------------------------------- seating the shells, by ray parity ----
+# **What the shells were missing was a containment test that could fail**, and this one failed in
+# the worst way a test can: it gave up. The old `fit_lining_point` shrank a vertex towards the
+# mouth's axis in twelve steps of 3.5 % and, where twelve were not enough, **returned it at 0.615
+# of the way out regardless**. Nothing failed. Worse, the test it shrank against -- `depth()`, a
+# signed nearest-surface probe -- is satisfied by a *ten-thousandth* of a body, and on a flat wide
+# skull with thin flesh over the lumen that is no clearance at all: 255 of the 720 vertices sat
+# within 0.004 of a body of the skin and the closest was 0.0003. Painted an emissive marker, the
+# shipped head shows **9,714 pixels** of mouth from four units away, in patches under and behind
+# the eye and above the real mouth line, and a ray cast through them -- `CLAUDE.md`'s rule, ask
+# every surface on the line rather than re-read renders -- meets the lining first on almost every
+# one.
+#
+# What replaced it is the question itself: **can this point be seen from outside the animal?** A
+# point strictly inside a closed surface meets skin along every direction; a point outside escapes
+# along at least one. Twenty-six directions -- the cube's faces, edges and corners -- against the
+# closed intake surface, and the walk towards the axis has no floor under it any more.
+#
+# **Twenty-six and not four, and this animal is the reason.** Four *axis* reaches ask about x and
+# z, and the direction out of this cheek is neither: the snout is yawed 17.5 degrees. Asked along
+# the axes, 371 of the 720 vertices read as inside the head while a camera drew them on the cheek.
+_SEAT_DIRS = tuple(Vector((a, b, c)).normalized()
+                   for a in (-1, 0, 1) for b in (-1, 0, 1) for c in (-1, 0, 1)
+                   if (a, b, c) != (0, 0, 0))
+# **A point *on* the skin is not outside it, and that distinction is the whole balance of the
+# seat.** What has to reach the skin is the shell's *width*, because that is what a line of sight
+# into the gape passes beside (`T.oral_shells`); what must not pass it is the shell's surface. Both
+# one-number answers were built and measured: a clearance everywhere took the mouth's own width
+# away, and a touch everywhere left the palate lying on the inside of a thin snout, which a camera
+# drew as a slab over the whole rostrum. So a vertex within `ORAL_BAND` of the mouth line -- the
+# band that carries the width -- may sit **on** the skin to within `ORAL_TOUCH`, the mesh's own
+# edge length here, and one outside that band must be `ORAL_MARGIN` inside it.
+ORAL_TOUCH = .0010
+ORAL_MARGIN = .0030
+ORAL_BAND = .45
+
+
+def seated_ok(q, margin=0.):
+    if any(bvh_auth.ray_cast(q, d, 3.)[0] is None for d in _SEAT_DIRS):
+        if bvh_auth.find_nearest(q)[3] > ORAL_TOUCH:
+            return False
+    return not margin or bvh_auth.find_nearest(q)[3] >= margin
+
+
+def seat_margin(q, y):
+    _w, h = mouth_section(y)
+    return 0. if abs(float(q.z) - seam(y)) <= ORAL_BAND * h else ORAL_MARGIN
+
+
+SEATED = {'vertices': 0, 'pulled': 0, 'unseated': 0, 'maxPullRaw': 0.}
+
+
 def fit_lining_point(p, y):
-    c = Vector((cx(y), y, seam(y)))
-    d = Vector(p) - c
-    for k in range(12):
-        q = c + d * (1. - k * .035)
-        if depth(q) > .0006:
-            return q
-    return c + d * .615
+    """Pulled in towards the mouth's own axis at its own height until it is inside, and **all the
+    way if that is what it takes**."""
+    SEATED['vertices'] += 1
+    m = seat_margin(Vector(p), y)
+    q = Vector(p)
+    if seated_ok(q, m):
+        return q
+    c = Vector((cx(y), q.y, seam(y)))
+    for i in range(1, 41):
+        r = Vector(p) + (c - Vector(p)) * (i / 40.)
+        if seated_ok(r, m):
+            SEATED['pulled'] += 1
+            SEATED['maxPullRaw'] = max(SEATED['maxPullRaw'], (r - Vector(p)).length)
+            return r
+    SEATED['unseated'] += 1
+    SEATED['maxPullRaw'] = max(SEATED['maxPullRaw'], (c - Vector(p)).length)
+    return c
 
 
 def lining_jaw_blend(p):
@@ -715,6 +848,14 @@ lining, lining_raw = T.lining('Oral cavity lining', rig, tx, seam, mouth_section
                               MOUTH_BACK, MOUTH_FRONT, lining_jaw_blend, mouth_mat,
                               rings=30, ring=24, centre_x=cx, power=LINING_POWER,
                               fit=fit_lining_point, room=mouth_room)
+# **The proof, not the intention.** Every vertex the helper actually wrote is re-asked, because the
+# seat is a hook inside `oral_shells` and an assertion over the points it returned is the only
+# thing that says the hook reached all of them.
+ORAL_OUTSIDE = [i for i, q in enumerate(lining_raw)
+                if not seated_ok(Vector(q), seat_margin(Vector(q), float(q[1])))]
+assert not ORAL_OUTSIDE, ('oral shell vertices are outside the head', len(ORAL_OUTSIDE),
+                          [tuple(round(float(c), 4) for c in lining_raw[i]) for i in ORAL_OUTSIDE[:6]])
+SEATED['shellVertices'] = len(lining_raw)
 oralparts = [lining]
 mouth_cover = []
 for r in PAINTED:
@@ -741,7 +882,10 @@ for step in range(24):
                      HINGE_CENTRE[1] + HINGE_R[1] * k * math.sin(b) * math.sin(a),
                      HINGE_CENTRE[2] + HINGE_R[2] * k * math.cos(b)))
              for a in np.linspace(0, 2 * pi, 20) for b in np.linspace(0, pi, 11)]
-    if min(depth(q) for q in probe) > .0030:
+    # **Both tests, so the plug can only get smaller.** The twenty-six directions above are the
+    # honest containment check; the old `depth()` clearance is kept beside it, so this repair
+    # cannot grow the plug and the shipped size is the one the gape proof already passed.
+    if min(depth(q) for q in probe) > .0030 and all(seated_ok(q, .0030) for q in probe):
         HINGE_FIT = k
         break
 assert HINGE_FIT > .3, ('the hinge envelope could not be seated', HINGE_FIT)
@@ -770,12 +914,22 @@ mo.object = rig
 hinge.parent = rig
 oralparts.append(hinge)
 
+# **Containment is asserted by the rays and `depth()` is only recorded.** The probe was the whole
+# of the old check and it was not asked of the shells at all -- `measuredRoom` waved them through --
+# so a fifth of the lining stood out of the cheek with nothing in the build to say so.
 oral_seating = []
 for o in oralparts:
     worst = min(depth(Vector(v.co[:]) / SCALE) for v in o.data.vertices)
-    oral_seating.append({'part': o.name, 'worstDepthRaw': float(worst)})
-    if not o.get('measuredRoom'):
-        assert worst > -.012, ('mouth geometry breaks the skin', o.name, worst)
+    outside = [v.index for v in o.data.vertices
+               if not seated_ok(Vector(v.co[:]) / SCALE,
+                                seat_margin(Vector(v.co[:]) / SCALE, v.co[1] / SCALE)
+                                if o is lining else 0.)]
+    oral_seating.append({'part': o.name, 'worstDepthRaw': float(worst),
+                         'vertices': len(o.data.vertices),
+                         'verticesVisibleFromOutside': len(outside)})
+    assert not outside, ('mouth geometry breaks the skin', o.name, len(outside),
+                         [tuple(round(c / SCALE, 4) for c in o.data.vertices[i].co[:])
+                          for i in outside[:6]])
 
 # ------------------------------------------------------- measured paired profile ----
 AUTH_GROUP = [auth, parts['lower jaw'][auth.name]]
@@ -1422,6 +1576,39 @@ report = {
         'paintedLineFlankDisagreementMaxOverRadius': PAINTED_DISAGREEMENT,
         'seamExtrapolatedFrom': READ_BACK, 'seamExtrapolationSlope': float(_slope),
         'liningCoverage': mouth_cover, 'liningFitFactors': LINING_FIT,
+        'oralShellSeating': SEATED,
+        'oralShellSeatingMethod':
+            'every shell vertex asked of the closed intake surface along the cube\'s 26 '
+            'directions -- a point inside meets skin along every one -- with a touch of '
+            '%.4f of a body allowed within %.2f of the local half height of the mouth line, '
+            'where the shell\'s width has to reach the skin, and %.4f of clearance outside that '
+            'band. Asserted over the vertices the helper wrote and again over the exported mesh.'
+            % (ORAL_TOUCH, ORAL_BAND, ORAL_MARGIN),
+        'hingeEnvelope': {'fit': HINGE_FIT, 'radii': [float(r) for r in HINGE_R],
+                          'centreRaw': [float(c) for c in HINGE_CENTRE],
+                          'seatedBy': 'the 26 directions and the depth probe, both'},
+        # The reviewer's aimed cut, read and measured against this build's own line. **Not cut
+        # on**: see the note beside `AIMED_MOUTH`.
+        'aimedCut': {
+            'file': AIMED_MOUTH, 'appliesTo': _doc['appliesTo'], 'sha256': _doc['sha256'],
+            'consumed': False,
+            'note': 'Read as a review. Cut on, this body\'s gape opens 4,229 px of opened-by-'
+                    'culling against 0 on the painted line\'s own cut; what closes an aimed cut '
+                    'is the cut\'s own rim (T.cap_cut/T.cap_mouth), which this body has not been '
+                    'ported to. T3D-32\'s rollout.',
+            'frameFitWorstRaw': FRAME_CHECK,
+            'hingeCentreRaw': [float(v) for v in CUT_P],
+            'planeNormalRaw': [float(v) for v in CUT_N],
+            'mouthLineForwardRaw': [float(v) for v in CUT_F],
+            'hingeAxisRaw': [float(v) for v in CUT_AXIS],
+            'pitchDegrees': _doc['plane']['pitchDegrees'],
+            'yawDegrees': _doc['plane']['yawDegrees'],
+            'rollDegrees': _doc['plane']['rollDegrees'],
+            'mandibleVerticesInTheDocument': _doc['sides']['mandible'],
+            'hingeAheadOfTheTypedStationRaw': HINGE_AHEAD_OF_THE_TYPED_STATION,
+            'belowThePaintedLineMaxRaw': AIMED_BELOW_PAINTED_MAX,
+            'worstOverLocalHeadHalfDepth': AIMED_VS_PAINTED_OVER_HEAD_DEPTH,
+            'perStation': [[round(y, 4), round(d, 5)] for y, d in AIMED_VS_PAINTED]},
         'toothPatches': tooth_report, 'toothPatchesStraddlingTheCut': straddling,
         'authoredToothRows': [], 'oralPartSeating': oral_seating,
     },
