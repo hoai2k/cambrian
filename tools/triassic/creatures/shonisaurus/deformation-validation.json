@@ -62,7 +62,7 @@
       "station": -2.004736842105263,
       "full": [
         0.296726986912493,
-        -0.28284005901750137,
+        -0.29337949680081843,
         0.34570106862925576
       ],
       "puppet": [
@@ -72,7 +72,7 @@
       ],
       "absoluteError": [
         0.00019111474855776356,
-        0.00038276829685168767,
+        0.010156669486465375,
         0.007378361157013902
       ]
     },
@@ -367,19 +367,19 @@
   ],
   "surfaceDistances": {
     "fullToPuppet": {
-      "p50": 0.004245545249432325,
-      "p95": 0.038389022089540946,
+      "p50": 0.004332339158281684,
+      "p95": 0.03822030238807201,
       "max": 0.11313711851835251
     },
     "puppetToFull": {
-      "p50": 8.024520781191313e-08,
+      "p50": 8.429369557916289e-08,
       "p95": 0.04011568948626517,
-      "max": 0.19539274275302887
+      "max": 0.20055240392684937
     }
   },
   "signedVolume": {
-    "full": 3.327598611146413,
-    "puppet": 3.2452516222779217
+    "full": 3.299871607538851,
+    "puppet": 3.244314687627783
   },
   "finRootSeating": {
     "pectoral0L": {
@@ -413,14 +413,6 @@
     "Ability": [
       {
         "object": "Shonisaurus authored skin",
-        "phase": 0,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
         "phase": 0,
         "maxTravel": 0.0,
         "stretch99": 1.0,
@@ -495,22 +487,14 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.1057005601311796,
-        "stretch99": 1.036439896505568,
+        "stretch99": 1.0357238174514183,
         "stretchMax": 1.5793357602768265,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
-        "maxTravel": 0.1033064724155745,
-        "stretch99": 1.0000295660919605,
-        "stretchMax": 1.0000866230341043,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.2,
-        "maxTravel": 0.04156232566975423,
+        "maxTravel": 0.04111584733952598,
         "stretch99": 1.0488248224120351,
         "stretchMax": 1.0753249129258047,
         "edgesOver5x": 0
@@ -575,22 +559,14 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.16149651633368214,
-        "stretch99": 1.0519813949328298,
+        "stretch99": 1.0508845319868845,
         "stretchMax": 1.796364359993538,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
-        "maxTravel": 0.157750417622615,
-        "stretch99": 1.0000367751416792,
-        "stretchMax": 1.0001578748795639,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.35,
-        "maxTravel": 0.06205966004511457,
+        "maxTravel": 0.061380187364647516,
         "stretch99": 1.0699740840284337,
         "stretchMax": 1.106852004560626,
         "edgesOver5x": 0
@@ -655,22 +631,14 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.17008916727821588,
-        "stretch99": 1.0520715539993137,
+        "stretch99": 1.0510782907906275,
         "stretchMax": 1.7770218132291362,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.16607900493135594,
-        "stretch99": 1.0000254852575972,
-        "stretchMax": 1.000163986390514,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.5,
-        "maxTravel": 0.06437138625957683,
+        "maxTravel": 0.06365921626167176,
         "stretch99": 1.0689688933289612,
         "stretchMax": 1.1065254512758151,
         "edgesOver5x": 0
@@ -735,22 +703,14 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.1446947673568996,
-        "stretch99": 1.0474234218047989,
+        "stretch99": 1.0465746128183007,
         "stretchMax": 1.738779406146623,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
-        "maxTravel": 0.14135601211562357,
-        "stretch99": 1.0000373363163677,
-        "stretchMax": 1.0001230662576877,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.7,
-        "maxTravel": 0.05596168962745526,
+        "maxTravel": 0.055352761786718885,
         "stretch99": 1.0631496932473157,
         "stretchMax": 1.0970675827889858,
         "edgesOver5x": 0
@@ -813,14 +773,6 @@
       },
       {
         "object": "Shonisaurus authored skin",
-        "phase": 1,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
         "phase": 1,
         "maxTravel": 0.0,
         "stretch99": 1.0,
@@ -902,14 +854,6 @@
         "edgesOver5x": 0
       },
       {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
         "object": "Puppet measured trunk",
         "phase": 0,
         "maxTravel": 0.0,
@@ -976,17 +920,9 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
-        "maxTravel": 0.27985155054120064,
-        "stretch99": 1.0232688917485504,
-        "stretchMax": 2.036843378654265,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
         "maxTravel": 0.4025727298462334,
-        "stretch99": 1.0353935348384466,
-        "stretchMax": 1.1636826528739967,
+        "stretch99": 1.027885413536389,
+        "stretchMax": 3.2386812616883898,
         "edgesOver5x": 0
       },
       {
@@ -1056,17 +992,9 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
-        "maxTravel": 0.34207220381572184,
-        "stretch99": 1.0255215810724685,
-        "stretchMax": 1.5098096234794496,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
         "maxTravel": 0.3672639068630361,
-        "stretch99": 1.0341028718604885,
-        "stretchMax": 1.1604443175438344,
+        "stretch99": 1.0323123946246975,
+        "stretchMax": 3.197713927728476,
         "edgesOver5x": 0
       },
       {
@@ -1137,16 +1065,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.1573585032691466,
-        "stretch99": 1.0113826734484503,
+        "stretch99": 1.0112535877731255,
         "stretchMax": 1.4315153474821563,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.05071289726107767,
-        "stretch99": 1.0001848969257714,
-        "stretchMax": 1.000953605136342,
         "edgesOver5x": 0
       },
       {
@@ -1217,16 +1137,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.027036106811925788,
-        "stretch99": 1.0075297690783596,
+        "stretch99": 1.0073865003099687,
         "stretchMax": 1.073731943378876,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
-        "maxTravel": 0.007000692121100427,
-        "stretch99": 1.000032491707274,
-        "stretchMax": 1.000074068243666,
         "edgesOver5x": 0
       },
       {
@@ -1295,14 +1207,6 @@
       },
       {
         "object": "Shonisaurus authored skin",
-        "phase": 1,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
         "phase": 1,
         "maxTravel": 0.0,
         "stretch99": 1.0,
@@ -1384,14 +1288,6 @@
         "edgesOver5x": 0
       },
       {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
         "object": "Puppet measured trunk",
         "phase": 0,
         "maxTravel": 0.0,
@@ -1458,17 +1354,9 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
-        "maxTravel": 0.07337144621900812,
-        "stretch99": 1.010590505957399,
-        "stretchMax": 1.1746325749182964,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
         "maxTravel": 0.31133670013783155,
-        "stretch99": 1.0279074529867454,
-        "stretchMax": 1.134716683508445,
+        "stretch99": 1.014303356782695,
+        "stretchMax": 2.868676811005596,
         "edgesOver5x": 0
       },
       {
@@ -1538,17 +1426,9 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
-        "maxTravel": 0.13565683152711588,
-        "stretch99": 1.0140822265619545,
-        "stretchMax": 1.2532942837054233,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
         "maxTravel": 0.2834766590095977,
-        "stretch99": 1.0256639186184255,
-        "stretchMax": 1.1251526059989163,
+        "stretch99": 1.0170742208385197,
+        "stretchMax": 2.744248030826909,
         "edgesOver5x": 0
       },
       {
@@ -1619,16 +1499,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.15105992141139674,
-        "stretch99": 1.0115582755089347,
+        "stretch99": 1.0114029313064339,
         "stretchMax": 1.3560126188745159,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.015463495559724745,
-        "stretch99": 1.0001458949405708,
-        "stretchMax": 1.0007578979867282,
         "edgesOver5x": 0
       },
       {
@@ -1699,16 +1571,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.024247547223668724,
-        "stretch99": 1.0066888134000385,
+        "stretch99": 1.0066094354738417,
         "stretchMax": 1.0494801878065283,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
-        "maxTravel": 0.006301936060711189,
-        "stretch99": 1.0000317401023109,
-        "stretchMax": 1.0000927439401184,
         "edgesOver5x": 0
       },
       {
@@ -1777,14 +1641,6 @@
       },
       {
         "object": "Shonisaurus authored skin",
-        "phase": 1,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
         "phase": 1,
         "maxTravel": 0.0,
         "stretch99": 1.0,
@@ -1866,14 +1722,6 @@
         "edgesOver5x": 0
       },
       {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
         "object": "Puppet measured trunk",
         "phase": 0,
         "maxTravel": 0.0,
@@ -1941,22 +1789,14 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.10220771785562704,
-        "stretch99": 1.0248530808021938,
+        "stretch99": 1.0243232917616794,
         "stretchMax": 1.4310795609933147,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
-        "maxTravel": 0.10036893682424934,
-        "stretch99": 1.0000247101488595,
-        "stretchMax": 1.0000981217167955,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.2,
-        "maxTravel": 0.051031254935079845,
+        "maxTravel": 0.05064836007914684,
         "stretch99": 1.0331683477448115,
         "stretchMax": 1.0516362231922247,
         "edgesOver5x": 0
@@ -2021,22 +1861,14 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.10019595358684147,
-        "stretch99": 1.0244449647823404,
+        "stretch99": 1.0239346311762887,
         "stretchMax": 1.4287448332353074,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
-        "maxTravel": 0.09839379243213033,
-        "stretch99": 1.0000340236601057,
-        "stretchMax": 1.0001375820765972,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.35,
-        "maxTravel": 0.05002345351012202,
+        "maxTravel": 0.04965050053990055,
         "stretch99": 1.0326343760577545,
         "stretchMax": 1.0506545098750886,
         "edgesOver5x": 0
@@ -2101,16 +1933,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.04760787602651022,
-        "stretch99": 1.0036424269217332,
+        "stretch99": 1.0035919077634328,
         "stretchMax": 1.1020225986651229,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.0005343450717897318,
-        "stretch99": 1.0000294378053323,
-        "stretchMax": 1.0000821517842158,
         "edgesOver5x": 0
       },
       {
@@ -2181,22 +2005,14 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.04051093420556795,
-        "stretch99": 1.014487625794648,
+        "stretch99": 1.014208571194113,
         "stretchMax": 1.0558012514477122,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
-        "maxTravel": 0.03964830991714343,
-        "stretch99": 1.0000372718706436,
-        "stretchMax": 1.0001141124637027,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.7,
-        "maxTravel": 0.01698072177190619,
+        "maxTravel": 0.016894441933524237,
         "stretch99": 1.0189089049017939,
         "stretchMax": 1.0303090558552164,
         "edgesOver5x": 0
@@ -2259,14 +2075,6 @@
       },
       {
         "object": "Shonisaurus authored skin",
-        "phase": 1,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
         "phase": 1,
         "maxTravel": 0.0,
         "stretch99": 1.0,
@@ -2348,14 +2156,6 @@
         "edgesOver5x": 0
       },
       {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
         "object": "Puppet measured trunk",
         "phase": 0,
         "maxTravel": 0.0,
@@ -2423,16 +2223,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.06127032214490146,
-        "stretch99": 1.0032288541381442,
+        "stretch99": 1.0031827815003755,
         "stretchMax": 1.0343148287951096,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
-        "maxTravel": 0.014587209243853986,
-        "stretch99": 1.0000244455706266,
-        "stretchMax": 1.000055801001058,
         "edgesOver5x": 0
       },
       {
@@ -2503,16 +2295,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.5786540214348664,
-        "stretch99": 1.009653053141466,
+        "stretch99": 1.0095309747809893,
         "stretchMax": 1.4471782272908118,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
-        "maxTravel": 0.14126415474654463,
-        "stretch99": 1.000026669310022,
-        "stretchMax": 1.0001960574727446,
         "edgesOver5x": 0
       },
       {
@@ -2583,16 +2367,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 1.344447154616437,
-        "stretch99": 1.0146703666899997,
+        "stretch99": 1.014423662665157,
         "stretchMax": 1.9066438145180915,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.3347938601862942,
-        "stretch99": 1.00003851834755,
-        "stretchMax": 1.000126648896382,
         "edgesOver5x": 0
       },
       {
@@ -2663,16 +2439,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 2.2096392313959274,
-        "stretch99": 1.0168532571638829,
+        "stretch99": 1.0166148827895736,
         "stretchMax": 2.3841640527475025,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
-        "maxTravel": 0.5482620715059533,
-        "stretch99": 1.0000390007955866,
-        "stretchMax": 1.0001195237922909,
         "edgesOver5x": 0
       },
       {
@@ -2743,16 +2511,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 1,
         "maxTravel": 2.5034863623476995,
-        "stretch99": 1.0192662619881672,
+        "stretch99": 1.0189377717999524,
         "stretchMax": 2.5934633662965165,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 1,
-        "maxTravel": 0.6181738189206021,
-        "stretch99": 1.000034263201073,
-        "stretchMax": 1.000130521987624,
         "edgesOver5x": 0
       },
       {
@@ -2830,14 +2590,6 @@
         "edgesOver5x": 0
       },
       {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
         "object": "Puppet measured trunk",
         "phase": 0,
         "maxTravel": 0.0,
@@ -2905,16 +2657,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.4690627943547832,
-        "stretch99": 1.0221508404200805,
+        "stretch99": 1.0218432602588645,
         "stretchMax": 2.047235702724354,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
-        "maxTravel": 0.34743414085963853,
-        "stretch99": 1.000026431545001,
-        "stretchMax": 1.0001616127790622,
         "edgesOver5x": 0
       },
       {
@@ -2985,16 +2729,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.6819966504709503,
-        "stretch99": 1.03332952967813,
+        "stretch99": 1.032750560686528,
         "stretchMax": 2.75521741208091,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
-        "maxTravel": 0.5030406322378916,
-        "stretch99": 1.0000264860092656,
-        "stretchMax": 1.0001459846808134,
         "edgesOver5x": 0
       },
       {
@@ -3065,16 +2801,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.695765228383492,
-        "stretch99": 1.0332368021465659,
+        "stretch99": 1.0328116157781055,
         "stretchMax": 2.888398427197358,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.5029775000698511,
-        "stretch99": 1.0000391691478334,
-        "stretchMax": 1.000090181947393,
         "edgesOver5x": 0
       },
       {
@@ -3145,16 +2873,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.5661751902590632,
-        "stretch99": 1.0264083388066632,
+        "stretch99": 1.0258833776107958,
         "stretchMax": 2.354611978944913,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
-        "maxTravel": 0.418756948169728,
-        "stretch99": 1.0000266013947217,
-        "stretchMax": 1.0000662147463866,
         "edgesOver5x": 0
       },
       {
@@ -3223,14 +2943,6 @@
       },
       {
         "object": "Shonisaurus authored skin",
-        "phase": 1,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
         "phase": 1,
         "maxTravel": 0.0,
         "stretch99": 1.0,
@@ -3312,14 +3024,6 @@
         "edgesOver5x": 0
       },
       {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
         "object": "Puppet measured trunk",
         "phase": 0,
         "maxTravel": 0.0,
@@ -3387,22 +3091,14 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.35853800366675237,
-        "stretch99": 1.0412313636339425,
+        "stretch99": 1.040819664412611,
         "stretchMax": 1.8335407784029274,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
-        "maxTravel": 0.35408308156263635,
-        "stretch99": 1.000026205757441,
-        "stretchMax": 1.0001153861731478,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.2,
-        "maxTravel": 0.22770046945326972,
+        "maxTravel": 0.22675686201041387,
         "stretch99": 1.0485418634558479,
         "stretchMax": 1.1436243031320517,
         "edgesOver5x": 0
@@ -3467,22 +3163,14 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.7668380122312813,
-        "stretch99": 1.09466652903752,
+        "stretch99": 1.0938924799653038,
         "stretchMax": 3.2683040111055464,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
-        "maxTravel": 0.6935182347471087,
-        "stretch99": 1.0000352139144861,
-        "stretchMax": 1.0001195481293883,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.35,
-        "maxTravel": 0.5163326721769683,
+        "maxTravel": 0.5146879320991548,
         "stretch99": 1.115135903763943,
         "stretchMax": 1.3246243977051573,
         "edgesOver5x": 0
@@ -3547,22 +3235,14 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.8828179385167363,
-        "stretch99": 1.0662235403741724,
+        "stretch99": 1.0656374110961426,
         "stretchMax": 3.1014781420888653,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.87625758201351,
-        "stretch99": 1.0000378322937882,
-        "stretchMax": 1.0001162256078937,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.5,
-        "maxTravel": 0.6925104780692327,
+        "maxTravel": 0.6907121175736712,
         "stretch99": 1.075888248021435,
         "stretchMax": 1.2004939582810357,
         "edgesOver5x": 0
@@ -3627,22 +3307,14 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.5578468137539004,
-        "stretch99": 1.033117140984329,
+        "stretch99": 1.032529497713885,
         "stretchMax": 2.22024036052039,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
-        "maxTravel": 0.5532148632235405,
-        "stretch99": 1.0000417506237835,
-        "stretchMax": 1.0001229769555118,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.7,
-        "maxTravel": 0.4233413873432997,
+        "maxTravel": 0.42209778329215547,
         "stretch99": 1.0398895635623089,
         "stretchMax": 1.1148661787315004,
         "edgesOver5x": 0
@@ -3705,14 +3377,6 @@
       },
       {
         "object": "Shonisaurus authored skin",
-        "phase": 1,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
         "phase": 1,
         "maxTravel": 0.0,
         "stretch99": 1.0,
@@ -3789,16 +3453,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0,
         "maxTravel": 0.0555424326480756,
-        "stretch99": 1.0044486485862774,
+        "stretch99": 1.0043914136091099,
         "stretchMax": 1.074187941655808,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0,
-        "maxTravel": 0.0006234015088187967,
-        "stretch99": 1.0000295927768343,
-        "stretchMax": 1.0000762743897171,
         "edgesOver5x": 0
       },
       {
@@ -3868,17 +3524,9 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
-        "maxTravel": 0.024207963150811047,
-        "stretch99": 1.0037696075135063,
-        "stretchMax": 1.026440657780582,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
         "maxTravel": 0.2133326785251721,
-        "stretch99": 1.0186780574543903,
-        "stretchMax": 1.0858847328790262,
+        "stretch99": 1.0049776740843648,
+        "stretchMax": 2.219459286804202,
         "edgesOver5x": 0
       },
       {
@@ -3948,17 +3596,9 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
-        "maxTravel": 0.036379084054015805,
-        "stretch99": 1.0119113177582433,
-        "stretchMax": 1.0979735758754636,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
         "maxTravel": 0.1376352237801089,
-        "stretch99": 1.0130519386725234,
-        "stretchMax": 1.0637517496989561,
+        "stretch99": 1.0137749343770368,
+        "stretchMax": 1.9131659899383593,
         "edgesOver5x": 0
       },
       {
@@ -4029,16 +3669,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.05554178116423917,
-        "stretch99": 1.0042508280373141,
+        "stretch99": 1.0041938428608579,
         "stretchMax": 1.1191051993689802,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.000623402199314045,
-        "stretch99": 1.0000309571494805,
-        "stretchMax": 1.000082631396402,
         "edgesOver5x": 0
       },
       {
@@ -4108,17 +3740,9 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
-        "maxTravel": 0.02420627747569444,
-        "stretch99": 1.0039645858650283,
-        "stretchMax": 1.0242820766036504,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
         "maxTravel": 0.21333500303244887,
-        "stretch99": 1.0186762339527544,
-        "stretchMax": 1.0858785512461315,
+        "stretch99": 1.005183817145082,
+        "stretchMax": 2.2194568762859777,
         "edgesOver5x": 0
       },
       {
@@ -4189,16 +3813,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 1,
         "maxTravel": 0.0555424326480756,
-        "stretch99": 1.0044486485862774,
+        "stretch99": 1.0043914136091099,
         "stretchMax": 1.074187941655808,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 1,
-        "maxTravel": 0.0006234015088187967,
-        "stretch99": 1.0000295927768343,
-        "stretchMax": 1.0000762743897171,
         "edgesOver5x": 0
       },
       {
@@ -4271,16 +3887,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0,
         "maxTravel": 0.0714096069202457,
-        "stretch99": 1.0057240615088097,
+        "stretch99": 1.0056528788106054,
         "stretchMax": 1.0960979749857633,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0,
-        "maxTravel": 0.0008015179413375426,
-        "stretch99": 1.00001547641571,
-        "stretchMax": 1.0000742251486623,
         "edgesOver5x": 0
       },
       {
@@ -4351,16 +3959,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.054221719373333414,
-        "stretch99": 1.0118462451900925,
+        "stretch99": 1.0116176125512646,
         "stretchMax": 1.2013180021284495,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
-        "maxTravel": 0.020223325821234633,
-        "stretch99": 1.000026183477137,
-        "stretchMax": 1.0000688835556588,
         "edgesOver5x": 0
       },
       {
@@ -4431,16 +4031,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.06805987616962333,
-        "stretch99": 1.0100277467690562,
+        "stretch99": 1.0099098307672503,
         "stretchMax": 1.1788371103516746,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
-        "maxTravel": 0.01662763300658863,
-        "stretch99": 1.0000259803646019,
-        "stretchMax": 1.0000921216858898,
         "edgesOver5x": 0
       },
       {
@@ -4511,16 +4103,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.07140852608183475,
-        "stretch99": 1.0054663586930266,
+        "stretch99": 1.0054005328365059,
         "stretchMax": 1.1533424848065443,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.0008015170100283177,
-        "stretch99": 1.000015240909209,
-        "stretchMax": 1.0000537619124534,
         "edgesOver5x": 0
       },
       {
@@ -4591,16 +4175,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.054445514546684524,
-        "stretch99": 1.0108656058480476,
+        "stretch99": 1.010712367349625,
         "stretchMax": 1.0480268799051733,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
-        "maxTravel": 0.020439165115834074,
-        "stretch99": 1.0000268418383598,
-        "stretchMax": 1.0001066365671516,
         "edgesOver5x": 0
       },
       {
@@ -4671,16 +4247,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 1,
         "maxTravel": 0.0714096069202457,
-        "stretch99": 1.0057240615088097,
+        "stretch99": 1.0056528788106054,
         "stretchMax": 1.0960979749857633,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 1,
-        "maxTravel": 0.0008015179413375426,
-        "stretch99": 1.00001547641571,
-        "stretchMax": 1.0000742251486623,
         "edgesOver5x": 0
       },
       {
@@ -4758,14 +4326,6 @@
         "edgesOver5x": 0
       },
       {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
         "object": "Puppet measured trunk",
         "phase": 0,
         "maxTravel": 0.0,
@@ -4833,22 +4393,14 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.025981669853422193,
-        "stretch99": 1.0103530757223316,
+        "stretch99": 1.0101085599216066,
         "stretchMax": 1.177440512418902,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
-        "maxTravel": 0.025428460743321887,
-        "stretch99": 1.0000258277280412,
-        "stretchMax": 1.000084989392498,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.2,
-        "maxTravel": 0.010889234425102711,
+        "maxTravel": 0.010834387805957406,
         "stretch99": 1.0139735116345352,
         "stretchMax": 1.0217024786135083,
         "edgesOver5x": 0
@@ -4913,16 +4465,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.06100441724193554,
-        "stretch99": 1.0246829098838077,
+        "stretch99": 1.0241396906787683,
         "stretchMax": 1.4314051447087899,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
-        "maxTravel": 0.05970544937868051,
-        "stretch99": 1.0000393554956277,
-        "stretchMax": 1.0002191526952862,
         "edgesOver5x": 0
       },
       {
@@ -4993,16 +4537,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.07711437015086539,
-        "stretch99": 1.0312119393545638,
+        "stretch99": 1.0306746196078318,
         "stretchMax": 1.552732081199731,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.0754699746238603,
-        "stretch99": 1.0000362169501384,
-        "stretchMax": 1.000123423012098,
         "edgesOver5x": 0
       },
       {
@@ -5073,22 +4609,14 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.05123585025209563,
-        "stretch99": 1.0204393015266249,
+        "stretch99": 1.020053802181867,
         "stretchMax": 1.3580033918730905,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
-        "maxTravel": 0.050144278065158206,
-        "stretch99": 1.000041852882135,
-        "stretchMax": 1.0001235261274855,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.7,
-        "maxTravel": 0.021497331885938872,
+        "maxTravel": 0.021365612453390657,
         "stretch99": 1.027415062986439,
         "stretchMax": 1.042301651421004,
         "edgesOver5x": 0
@@ -5151,14 +4679,6 @@
       },
       {
         "object": "Shonisaurus authored skin",
-        "phase": 1,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
         "phase": 1,
         "maxTravel": 0.0,
         "stretch99": 1.0,
@@ -5235,16 +4755,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0,
         "maxTravel": 0.165467719438633,
-        "stretch99": 1.0208403624082374,
+        "stretch99": 1.0205620687391634,
         "stretchMax": 2.0271458619141085,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0,
-        "maxTravel": 0.016558450214005566,
-        "stretch99": 1.0000233578298232,
-        "stretchMax": 1.0000782164962374,
         "edgesOver5x": 0
       },
       {
@@ -5315,16 +4827,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.16345659128510748,
-        "stretch99": 1.0207313355603993,
+        "stretch99": 1.0204822639345097,
         "stretchMax": 2.013042046563642,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
-        "maxTravel": 0.016768188227805972,
-        "stretch99": 1.0000245900592049,
-        "stretchMax": 1.0000788398475267,
         "edgesOver5x": 0
       },
       {
@@ -5395,16 +4899,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.1552869226412537,
-        "stretch99": 1.020293859831696,
+        "stretch99": 1.0200770551674545,
         "stretchMax": 1.9907160186776076,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
-        "maxTravel": 0.016764121883886457,
-        "stretch99": 1.0000258626773666,
-        "stretchMax": 1.000078962273266,
         "edgesOver5x": 0
       },
       {
@@ -5475,16 +4971,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.14797103273911594,
-        "stretch99": 1.020054501592354,
+        "stretch99": 1.019791634417898,
         "stretchMax": 1.9730178055496497,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.016558146075263565,
-        "stretch99": 1.0000262965441509,
-        "stretchMax": 1.0000783756497948,
         "edgesOver5x": 0
       },
       {
@@ -5555,16 +5043,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.15032094740630403,
-        "stretch99": 1.0201565998240718,
+        "stretch99": 1.0199004423090667,
         "stretchMax": 1.9837676709183718,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
-        "maxTravel": 0.01676911850084346,
-        "stretch99": 1.0000234483995973,
-        "stretchMax": 1.0000783093358157,
         "edgesOver5x": 0
       },
       {
@@ -5635,16 +5115,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 1,
         "maxTravel": 0.165467719438633,
-        "stretch99": 1.0208403624082374,
+        "stretch99": 1.0205620687391634,
         "stretchMax": 2.0271458619141085,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 1,
-        "maxTravel": 0.016558450214005566,
-        "stretch99": 1.0000233578298232,
-        "stretchMax": 1.0000782164962374,
         "edgesOver5x": 0
       },
       {
@@ -5722,14 +5194,6 @@
         "edgesOver5x": 0
       },
       {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
         "object": "Puppet measured trunk",
         "phase": 0,
         "maxTravel": 0.0,
@@ -5796,17 +5260,9 @@
       {
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
-        "maxTravel": 0.39401289574521137,
-        "stretch99": 1.03299034301771,
-        "stretchMax": 2.6383234650288547,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
         "maxTravel": 0.46942566296857363,
-        "stretch99": 1.0437440362980936,
-        "stretchMax": 1.1867083603769664,
+        "stretch99": 1.0399314500219732,
+        "stretchMax": 3.563173801343242,
         "edgesOver5x": 0
       },
       {
@@ -5877,16 +5333,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.6417477283795857,
-        "stretch99": 1.043718620597577,
-        "stretchMax": 1.985150533007858,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
-        "maxTravel": 0.4365977617651515,
-        "stretch99": 1.036526565585131,
-        "stretchMax": 1.1665365134714114,
+        "stretch99": 1.0525910543197294,
+        "stretchMax": 3.2745035033961436,
         "edgesOver5x": 0
       },
       {
@@ -5957,16 +5405,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.1650865905227195,
-        "stretch99": 1.0112855948977943,
+        "stretch99": 1.011168847010128,
         "stretchMax": 1.4826724100670068,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.07337649266205648,
-        "stretch99": 1.0002040011258755,
-        "stretchMax": 1.0010700141490143,
         "edgesOver5x": 0
       },
       {
@@ -6037,16 +5477,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.029915537635718848,
-        "stretch99": 1.0077562233463735,
+        "stretch99": 1.0076180674485726,
         "stretchMax": 1.0908567718317914,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
-        "maxTravel": 0.007993928828845793,
-        "stretch99": 1.0000156977494152,
-        "stretchMax": 1.0000809990075037,
         "edgesOver5x": 0
       },
       {
@@ -6115,14 +5547,6 @@
       },
       {
         "object": "Shonisaurus authored skin",
-        "phase": 1,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
         "phase": 1,
         "maxTravel": 0.0,
         "stretch99": 1.0,
@@ -6204,14 +5628,6 @@
         "edgesOver5x": 0
       },
       {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
         "object": "Puppet measured trunk",
         "phase": 0,
         "maxTravel": 0.0,
@@ -6279,16 +5695,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.18396983273177805,
-        "stretch99": 1.0442177725117172,
+        "stretch99": 1.0432665934734857,
         "stretchMax": 2.598331136488982,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
-        "maxTravel": 0.12730706400666966,
-        "stretch99": 1.0000388709236188,
-        "stretchMax": 1.0001360687402623,
         "edgesOver5x": 0
       },
       {
@@ -6359,16 +5767,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.23808527356286371,
-        "stretch99": 1.0479090994413218,
+        "stretch99": 1.046802582893738,
         "stretchMax": 2.6360171079932533,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
-        "maxTravel": 0.15051002267235264,
-        "stretch99": 1.0000271230856659,
-        "stretchMax": 1.0000800800268053,
         "edgesOver5x": 0
       },
       {
@@ -6439,16 +5839,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.15938632786235976,
-        "stretch99": 1.0233785482678823,
+        "stretch99": 1.023026888622669,
         "stretchMax": 1.3253718180853085,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.06264185288112316,
-        "stretch99": 1.000040426882575,
-        "stretchMax": 1.0001180063069286,
         "edgesOver5x": 0
       },
       {
@@ -6519,16 +5911,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.03985954428331536,
-        "stretch99": 1.0149416438114827,
+        "stretch99": 1.0147991185365997,
         "stretchMax": 1.053966366193096,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
-        "maxTravel": 0.014870992695193302,
-        "stretch99": 1.0000335250204777,
-        "stretchMax": 1.000071877980098,
         "edgesOver5x": 0
       },
       {
@@ -6597,14 +5981,6 @@
       },
       {
         "object": "Shonisaurus authored skin",
-        "phase": 1,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
         "phase": 1,
         "maxTravel": 0.0,
         "stretch99": 1.0,
@@ -6681,16 +6057,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0,
         "maxTravel": 0.04760835541431108,
-        "stretch99": 1.0038087422159179,
+        "stretch99": 1.0037629044859508,
         "stretchMax": 1.0633469320582123,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0,
-        "maxTravel": 0.0005343443812957731,
-        "stretch99": 1.0000338130031539,
-        "stretchMax": 1.0000715499022783,
         "edgesOver5x": 0
       },
       {
@@ -6761,16 +6129,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.019804630230488465,
-        "stretch99": 1.0032473869406118,
+        "stretch99": 1.003202598807117,
         "stretchMax": 1.022192969582918,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
-        "maxTravel": 0.0031509208438294154,
-        "stretch99": 1.0000169085263004,
-        "stretchMax": 1.0000412082630656,
         "edgesOver5x": 0
       },
       {
@@ -6841,16 +6201,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.03230855080829755,
-        "stretch99": 1.0038929778447572,
+        "stretch99": 1.00383357491649,
         "stretchMax": 1.0866150414964186,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
-        "maxTravel": 0.003109081245400723,
-        "stretch99": 1.000029311626223,
-        "stretchMax": 1.0001160785266299,
         "edgesOver5x": 0
       },
       {
@@ -6921,16 +6273,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.04760787602651022,
-        "stretch99": 1.0036424269217332,
+        "stretch99": 1.0035919077634328,
         "stretchMax": 1.1020225986651229,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.0005343450717897318,
-        "stretch99": 1.0000294378053323,
-        "stretchMax": 1.0000821517842158,
         "edgesOver5x": 0
       },
       {
@@ -7001,16 +6345,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.019802933594713135,
-        "stretch99": 1.003435405063907,
+        "stretch99": 1.003383369276394,
         "stretchMax": 1.0215502787781323,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
-        "maxTravel": 0.0031509176336863864,
-        "stretch99": 1.0000156135599318,
-        "stretchMax": 1.0000506444878994,
         "edgesOver5x": 0
       },
       {
@@ -7081,16 +6417,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 1,
         "maxTravel": 0.04760835541431108,
-        "stretch99": 1.0038087422159179,
+        "stretch99": 1.0037629044859508,
         "stretchMax": 1.0633469320582123,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 1,
-        "maxTravel": 0.0005343443812957731,
-        "stretch99": 1.0000338130031539,
-        "stretchMax": 1.0000715499022783,
         "edgesOver5x": 0
       },
       {
@@ -7168,14 +6496,6 @@
         "edgesOver5x": 0
       },
       {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
         "object": "Puppet measured trunk",
         "phase": 0,
         "maxTravel": 0.0,
@@ -7243,22 +6563,14 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.17850180432886215,
-        "stretch99": 1.0574336134964786,
+        "stretch99": 1.0563075129807482,
         "stretchMax": 2.249147039128128,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
-        "maxTravel": 0.16600589967983248,
-        "stretch99": 1.0000276795299152,
-        "stretchMax": 1.0001372791172696,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.2,
-        "maxTravel": 0.07330832948643065,
+        "maxTravel": 0.07293811313036386,
         "stretch99": 1.0683607710970646,
         "stretchMax": 1.1117575690019674,
         "edgesOver5x": 0
@@ -7323,22 +6635,14 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.2621491595642415,
-        "stretch99": 1.0811918451409752,
+        "stretch99": 1.0795780885470703,
         "stretchMax": 2.7470562236197047,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
-        "maxTravel": 0.24630045328785516,
-        "stretch99": 1.0000369814512204,
-        "stretchMax": 1.0001928992197304,
         "edgesOver5x": 0
       },
       {
         "object": "Puppet measured trunk",
         "phase": 0.35,
-        "maxTravel": 0.11177282338938026,
+        "maxTravel": 0.1111997520508357,
         "stretch99": 1.0990927004692268,
         "stretchMax": 1.1584819253262433,
         "edgesOver5x": 0
@@ -7403,16 +6707,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.15232814558846305,
-        "stretch99": 1.0310646903120153,
+        "stretch99": 1.0306849371924198,
         "stretchMax": 3.270248341134784,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.09878990001470463,
-        "stretch99": 1.0000335818396044,
-        "stretchMax": 1.000089342947744,
         "edgesOver5x": 0
       },
       {
@@ -7483,16 +6779,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.07092303039875054,
-        "stretch99": 1.0154605812973994,
+        "stretch99": 1.0150775120514746,
         "stretchMax": 2.296919313824461,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
-        "maxTravel": 0.019732643779603938,
-        "stretch99": 1.0000250120060272,
-        "stretchMax": 1.0000843330002758,
         "edgesOver5x": 0
       },
       {
@@ -7561,14 +6849,6 @@
       },
       {
         "object": "Shonisaurus authored skin",
-        "phase": 1,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
         "phase": 1,
         "maxTravel": 0.0,
         "stretch99": 1.0,
@@ -7650,14 +6930,6 @@
         "edgesOver5x": 0
       },
       {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
         "object": "Puppet measured trunk",
         "phase": 0,
         "maxTravel": 0.0,
@@ -7725,16 +6997,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.46854889392828136,
-        "stretch99": 1.0302610627372157,
+        "stretch99": 1.0298752849380777,
         "stretchMax": 1.613715796752702,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
-        "maxTravel": 0.34732227484365563,
-        "stretch99": 1.0000249613113212,
-        "stretchMax": 1.0001056471579801,
         "edgesOver5x": 0
       },
       {
@@ -7805,16 +7069,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.6808828673832014,
-        "stretch99": 1.042208088284411,
+        "stretch99": 1.0416626772034758,
         "stretchMax": 1.766536275099333,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
-        "maxTravel": 0.502805409059975,
-        "stretch99": 1.0000230774484242,
-        "stretchMax": 1.0000625869501467,
         "edgesOver5x": 0
       },
       {
@@ -7885,16 +7141,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.6917963034063059,
-        "stretch99": 1.0417715807283852,
+        "stretch99": 1.0413205138861028,
         "stretchMax": 1.7409149528130137,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.5027425642728404,
-        "stretch99": 1.0000388770127615,
-        "stretchMax": 1.0001476792895243,
         "edgesOver5x": 0
       },
       {
@@ -7965,16 +7213,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.5648909265384207,
-        "stretch99": 1.0370953324977545,
+        "stretch99": 1.0366562299222148,
         "stretchMax": 1.7326720342720048,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
-        "maxTravel": 0.41859084063314017,
-        "stretch99": 1.0000277036231953,
-        "stretchMax": 1.0000727900855428,
         "edgesOver5x": 0
       },
       {
@@ -8043,14 +7283,6 @@
       },
       {
         "object": "Shonisaurus authored skin",
-        "phase": 1,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
         "phase": 1,
         "maxTravel": 0.0,
         "stretch99": 1.0,
@@ -8127,16 +7359,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0,
         "maxTravel": 0.6114256742396088,
-        "stretch99": 1.051451500438541,
+        "stretch99": 1.0509654858867414,
         "stretchMax": 1.950436421864354,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0,
-        "maxTravel": 0.006901948624239824,
-        "stretch99": 1.0000206992031715,
-        "stretchMax": 1.0000574443327306,
         "edgesOver5x": 0
       },
       {
@@ -8207,16 +7431,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.20800946025127534,
-        "stretch99": 1.0452102932067278,
+        "stretch99": 1.0444999561627568,
         "stretchMax": 1.3001806321960767,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
-        "maxTravel": 0.042417802917575874,
-        "stretch99": 1.000031384185858,
-        "stretchMax": 1.0001151291582429,
         "edgesOver5x": 0
       },
       {
@@ -8287,16 +7503,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.43590563585194114,
-        "stretch99": 1.0526037853787056,
+        "stretch99": 1.0518372782630054,
         "stretchMax": 2.2157731924893374,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
-        "maxTravel": 0.038772460370803646,
-        "stretch99": 1.0000317518632926,
-        "stretchMax": 1.0000924391564303,
         "edgesOver5x": 0
       },
       {
@@ -8367,16 +7575,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.6030425346848688,
-        "stretch99": 1.0485606908029663,
+        "stretch99": 1.0479886350320946,
         "stretchMax": 2.366539734424387,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.011178914283907803,
-        "stretch99": 1.000038231937319,
-        "stretchMax": 1.000104870465898,
         "edgesOver5x": 0
       },
       {
@@ -8447,16 +7647,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.25947888210189135,
-        "stretch99": 1.0460699835085705,
+        "stretch99": 1.045575076183212,
         "stretchMax": 1.2832330746958864,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
-        "maxTravel": 0.04057176124532452,
-        "stretch99": 1.0000232505939004,
-        "stretchMax": 1.0000700694661446,
         "edgesOver5x": 0
       },
       {
@@ -8527,16 +7719,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 1,
         "maxTravel": 0.6114256742396088,
-        "stretch99": 1.051451500438541,
+        "stretch99": 1.0509654858867414,
         "stretchMax": 1.950436421864354,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 1,
-        "maxTravel": 0.006901948624239824,
-        "stretch99": 1.0000206992031715,
-        "stretchMax": 1.0000574443327306,
         "edgesOver5x": 0
       },
       {
@@ -8614,14 +7798,6 @@
         "edgesOver5x": 0
       },
       {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
         "object": "Puppet measured trunk",
         "phase": 0,
         "maxTravel": 0.0,
@@ -8689,16 +7865,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.07073146681480004,
-        "stretch99": 1.01008178344674,
+        "stretch99": 1.0099312180332045,
         "stretchMax": 1.1740384212164983,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
-        "maxTravel": 0.04224938357451576,
-        "stretch99": 1.0000404675522638,
-        "stretchMax": 1.0001083185389223,
         "edgesOver5x": 0
       },
       {
@@ -8769,16 +7937,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.2944595884283654,
-        "stretch99": 1.0423383669396513,
+        "stretch99": 1.0412773996699212,
         "stretchMax": 2.423834795473493,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
-        "maxTravel": 0.13126693745705056,
-        "stretch99": 1.000024274095073,
-        "stretchMax": 1.0001088156825064,
         "edgesOver5x": 0
       },
       {
@@ -8849,16 +8009,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.1646198255771566,
-        "stretch99": 1.0119566010171464,
+        "stretch99": 1.0118130337760853,
         "stretchMax": 1.3310999236500847,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.07224992695273322,
-        "stretch99": 1.0000344269558923,
-        "stretchMax": 1.0001233669155396,
         "edgesOver5x": 0
       },
       {
@@ -8929,16 +8081,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.13436973651318934,
-        "stretch99": 1.0270076719081203,
+        "stretch99": 1.0265465331945758,
         "stretchMax": 1.5612780416585503,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
-        "maxTravel": 0.08232025141616425,
-        "stretch99": 1.0000274479835838,
-        "stretchMax": 1.0002418225060719,
         "edgesOver5x": 0
       },
       {
@@ -9007,14 +8151,6 @@
       },
       {
         "object": "Shonisaurus authored skin",
-        "phase": 1,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
         "phase": 1,
         "maxTravel": 0.0,
         "stretch99": 1.0,
@@ -9091,16 +8227,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0,
         "maxTravel": 0.39580381903335055,
-        "stretch99": 1.0326312606624095,
+        "stretch99": 1.0323206141903003,
         "stretchMax": 1.5907008278144599,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0,
-        "maxTravel": 0.004452872603070134,
-        "stretch99": 1.0000178725694662,
-        "stretchMax": 1.0000423775045917,
         "edgesOver5x": 0
       },
       {
@@ -9171,16 +8299,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.15222444573192415,
-        "stretch99": 1.0282486115825644,
+        "stretch99": 1.0278573045287003,
         "stretchMax": 1.193761239122824,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
-        "maxTravel": 0.02673517447141753,
-        "stretch99": 1.0000235754208187,
-        "stretchMax": 1.0000795653381198,
         "edgesOver5x": 0
       },
       {
@@ -9251,16 +8371,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.266251667743708,
-        "stretch99": 1.033367683546163,
+        "stretch99": 1.0328439848578364,
         "stretchMax": 1.7444597310444436,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
-        "maxTravel": 0.026113704344084648,
-        "stretch99": 1.000023976867502,
-        "stretchMax": 1.0000634750573554,
         "edgesOver5x": 0
       },
       {
@@ -9331,16 +8443,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.39577061213002024,
-        "stretch99": 1.031151661265276,
+        "stretch99": 1.0307822836193545,
         "stretchMax": 1.8613372827864507,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.004452874033204991,
-        "stretch99": 1.0000175464399463,
-        "stretchMax": 1.0000561308715659,
         "edgesOver5x": 0
       },
       {
@@ -9411,16 +8515,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.15205103230112088,
-        "stretch99": 1.0297690624130327,
+        "stretch99": 1.0293797508162488,
         "stretchMax": 1.1938226817073025,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
-        "maxTravel": 0.026734855873235836,
-        "stretch99": 1.0000210409651888,
-        "stretchMax": 1.0000633639715237,
         "edgesOver5x": 0
       },
       {
@@ -9491,16 +8587,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 1,
         "maxTravel": 0.39580381903335055,
-        "stretch99": 1.0326312606624095,
+        "stretch99": 1.0323206141903003,
         "stretchMax": 1.5907008278144599,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 1,
-        "maxTravel": 0.004452872603070134,
-        "stretch99": 1.0000178725694662,
-        "stretchMax": 1.0000423775045917,
         "edgesOver5x": 0
       },
       {
@@ -9578,14 +8666,6 @@
         "edgesOver5x": 0
       },
       {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
         "object": "Puppet measured trunk",
         "phase": 0,
         "maxTravel": 0.0,
@@ -9653,16 +8733,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 1.0013996105758178,
-        "stretch99": 1.049137287368102,
+        "stretch99": 1.0484081984869422,
         "stretchMax": 2.204563638874361,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
-        "maxTravel": 0.4642156646036675,
-        "stretch99": 1.0000269783422975,
-        "stretchMax": 1.0001728553414557,
         "edgesOver5x": 0
       },
       {
@@ -9733,16 +8805,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 1.4817854786865194,
-        "stretch99": 1.0734950879761809,
+        "stretch99": 1.0728638531213406,
         "stretchMax": 2.9486732946623495,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
-        "maxTravel": 0.6505384444042803,
-        "stretch99": 1.0000425711730252,
-        "stretchMax": 1.0002630624067337,
         "edgesOver5x": 0
       },
       {
@@ -9813,16 +8877,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 1.5549187881519906,
-        "stretch99": 1.0738089521895788,
+        "stretch99": 1.0731072295989934,
         "stretchMax": 3.0013164708823554,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.6443503057272838,
-        "stretch99": 1.000037120648523,
-        "stretchMax": 1.0001766916446582,
         "edgesOver5x": 0
       },
       {
@@ -9893,16 +8949,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 1.186350119992982,
-        "stretch99": 1.0546402079777148,
+        "stretch99": 1.0541562100668365,
         "stretchMax": 2.333992015942509,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
-        "maxTravel": 0.519401465627985,
-        "stretch99": 1.0000406869227771,
-        "stretchMax": 1.0001377803266287,
         "edgesOver5x": 0
       },
       {
@@ -9971,14 +9019,6 @@
       },
       {
         "object": "Shonisaurus authored skin",
-        "phase": 1,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
         "phase": 1,
         "maxTravel": 0.0,
         "stretch99": 1.0,
@@ -10060,14 +9100,6 @@
         "edgesOver5x": 0
       },
       {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
         "object": "Puppet measured trunk",
         "phase": 0,
         "maxTravel": 0.0,
@@ -10135,16 +9167,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 1.032694887084482,
-        "stretch99": 1.0479905974514774,
+        "stretch99": 1.0475020261425025,
         "stretchMax": 2.3302797120449115,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.2,
-        "maxTravel": 0.4566853382112005,
-        "stretch99": 1.0000345135308464,
-        "stretchMax": 1.0000894090048,
         "edgesOver5x": 0
       },
       {
@@ -10215,16 +9239,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 1.348158093450793,
-        "stretch99": 1.064051155205774,
+        "stretch99": 1.063488145619645,
         "stretchMax": 2.807823178100534,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.35,
-        "maxTravel": 0.6349720679431545,
-        "stretch99": 1.0000344110188215,
-        "stretchMax": 1.0001139882331813,
         "edgesOver5x": 0
       },
       {
@@ -10295,16 +9311,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 1.2735928781162635,
-        "stretch99": 1.065088298693326,
+        "stretch99": 1.064387469873416,
         "stretchMax": 2.7217598735453215,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.5,
-        "maxTravel": 0.6411627523124814,
-        "stretch99": 1.000036764007395,
-        "stretchMax": 1.0001627913792044,
         "edgesOver5x": 0
       },
       {
@@ -10375,16 +9383,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 1.1340168134186408,
-        "stretch99": 1.058558522680473,
+        "stretch99": 1.057872834639977,
         "stretchMax": 2.461994952863498,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
-        "phase": 0.7,
-        "maxTravel": 0.5323961648903905,
-        "stretch99": 1.000034990061304,
-        "stretchMax": 1.0001879318086953,
         "edgesOver5x": 0
       },
       {
@@ -10453,14 +9453,6 @@
       },
       {
         "object": "Shonisaurus authored skin",
-        "phase": 1,
-        "maxTravel": 0.0,
-        "stretch99": 1.0,
-        "stretchMax": 1.0,
-        "edgesOver5x": 0
-      },
-      {
-        "object": "Shonisaurus authored jaw",
         "phase": 1,
         "maxTravel": 0.0,
         "stretch99": 1.0,

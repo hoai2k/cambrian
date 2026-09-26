@@ -52,7 +52,7 @@ LOOPS = ['Idle', 'Swim', 'Sprint', 'Guard', 'Eat', 'Grab', 'Breathe']
 auth, intake = T.load_raw(RAW, NAME + ' authored body')
 sample_albedo, luminance_at, albedo_sha, skin_material = T.retain_albedo(
     auth, NAME + ' body pigmentation', roughness=.66)
-skin_material.use_backface_culling = False    # the backstop behind the cut, see the seam web
+skin_material.use_backface_culling = False    # the modelled lumen is seen from outside the mouth
 frame = T.measure_frame(auth, head_is_positive_pca=True, luminance_at=luminance_at)
 # Anything this build authors wears the creature's own texture, sampled through the generation's
 # UVs at the nearest point of the intake surface. Snapshot it now, before any cut.
@@ -109,26 +109,25 @@ MOUTH_METHOD = 'modelled cavity'
 assert len(CAV) > 120, ('the mouth cavity did not measure', len(CAV))
 MY, MID, WIDE, TALL = T.cavity_profile(CAV, Y0 + .002, Y0 + .18, .0025, .006)
 assert len(MY) > 20, len(MY)
-# The same measurement kept as *indices*, because the seam web has to wear the inside of the mouth
-# and the only way to know a sample is interior is that the vertex it comes from has the animal in
-# front of it. Taken before the cut, like the pigment sampler.
+# The wall of that lumen, kept as *indices* — every vertex whose own outward normal, cast back into
+# the mesh, meets the wall opposite, which is what makes it interior. Nothing is built out of it any
+# more; it is recorded because it is the measurement that says this mouth exists, and it is what
+# separated this generation from the twin below.
 CAV_WALL = T.cavity_vertices(auth, lambda p: p.y < Y0 + .34 * (Y1 - Y0), gap=MOUTH_GAP)
-interior_pigment, INTERIOR = T.cavity_pigment(auth, CAV_WALL, pigment, scale=SCALE)
 assert len(CAV_WALL) > 120, ('the lumen wall did not measure', len(CAV_WALL))
-# Positions snapshotted now: the bisect and the split renumber this mesh's vertices.
-CAV_WALL_CO = [auth.data.vertices[i].co.copy() for i in CAV_WALL]
 
 
 def seam(y):
-    """The mouth line: the mid height of the measured cavity, station by station. A curve, which
-    is why the cut is taken by shearing the head onto it rather than by a tilted plane."""
+    """The mouth line: the mid height of the measured cavity, station by station. A curve, and the
+    jaw's weight field ramps across it rather than a plane being cut along it."""
     return float(np.interp(y, MY, MID))
 
 
-# What a straight cut would have cost, recorded for comparison with the curve that is actually used.
+# What a straight mouth line would have cost, recorded for comparison with the curve the weight
+# field actually ramps across.
 _ramp = np.polyfit(MY, MID, 1)
 RAMP_DEVIATION_RAW = float(np.max(np.abs(MID - np.polyval(_ramp, MY))))
-CUT_DEVIATION_RAW = 0.   # the cut is the measurement, station for station
+CUT_DEVIATION_RAW = 0.   # the mouth line is the measurement, station for station
 
 
 HINGE_Y = float(MY[-1])
@@ -141,7 +140,7 @@ SNOUT_CO, PROUD, PATCHES = T.protrusions(auth, y_front=Y0 + .20, floor=.0022)
 
 # The centreline table is 61 stations over a whole body, smoothed five wide, and that is too
 # coarse for a rostrum that tapers: it reads the snout wider than it is. So the head gets its own
-# fine profile, and the seam web's fold is bounded against that rather than against the body's.
+# fine profile, which is what the jaw band is a fraction of and what any seating is judged against.
 _HY = np.linspace(Y0 + .002, HINGE_Y + .02, 48)
 _HW, _HD = [], []
 for _y in _HY:
@@ -310,33 +309,104 @@ puppet, puppet_thickness, twin_report, bvh_src = T.build_twin(
     auth, thickness, NAME + ' procedural volume twin', VOXEL, PUPPET_TRIANGLE_TARGET,
     sample_albedo, thin=THIN, band=.020, roughness=.70)
 
-# The closed intake surface of each body, snapshotted **before** the cut opens it: a containment
-# test asked after the cut says every vertex is outside. The twin is a voxel resurfacing and is its
-# own surface, so it gets its own -- the authored body's would answer about a different animal.
-INTAKE = {o.name: BVHTree.FromPolygons([v.co.copy() for v in o.data.vertices],
-                                       [list(pl.vertices) for pl in o.data.polygons],
-                                       all_triangles=False)
-          for o in (auth, puppet)}
+# ------------------------------------------------- the jaw is not cut off at all ----
+# **This generation arrived with a real mouth in it, so the cut was buying nothing at the front and
+# paying for a rim at the back.** `T.cut_rim` measured exactly that on the body this replaces: one
+# closed loop of 112 vertices on the authored half, reaching **0.042** of a body back from the hinge
+# on a mouth **0.1375** long, 59 of them on the seam. Forward of the commissure the upper and lower
+# jaws are already separate sheets and the seam plane passed between them without touching either;
+# behind it the cut drew a rim through solid head, and closing that rim was the whole job of the
+# `Oral cavity lining`, then of the `Seated jaw hinge tissue`, then of the seam web.
+#
+# So the body stays **one surface** and the mouth opening is a bone turning inside skin, which is
+# what every other joint on this animal already is (`T.jaw_field_uncut`, and Mosasaurus is the
+# worked example). Nothing is cut, so nothing can part: `lag.mjs` has no seam to measure here and
+# says so, and what takes its place as the thing to watch is the commissure in `skin-tears.mjs`.
+#
+# **The twin is a different kind of generation and it is measured, not assumed.** It is a voxel
+# resurfacing of the authored body, and at 0.0045 raw units the occupancy field bridges the gape:
+# `T.mouth_cavity` finds **zero** interior vertices on it at a 0.030 gap and zero at 0.060, where the
+# authored body answers with 280. Its old cut therefore ran through solid head over the *whole* mouth
+# (that loop reached 0.139, against the authored body's 0.042) — the cut made its only aperture, and
+# the web was closing the hole behind it. Uncut, the twin has no mouth to open and its jaw swings
+# inside a closed head; it is the 7,986-triangle stand-in the game draws at LOD range and the
+# paired-volume witness, and CLAUDE.md's rule is that authored geometry inside a mouth has to earn
+# itself on a gape a player can see. It does not earn itself here, so the twin goes uncut with the
+# body it is a twin of, and the two carry one weight field.
+TWIN_CAVITY = {'authored': len(CAV), 'authoredLumenWall': len(CAV_WALL),
+               'twinAtTheSameGap': len(T.mouth_cavity(puppet, front_fraction=.34, gap=MOUTH_GAP)),
+               'twinAtTwiceTheGap': len(T.mouth_cavity(puppet, front_fraction=.34, gap=.060))}
+assert TWIN_CAVITY['twinAtTheSameGap'] == 0, TWIN_CAVITY
 
-# --------------------------------------------------------------------- cut the jaw ----
+# What either body leaves open at the mouth now that nothing cuts it, measured rather than claimed.
+# `cut_rim` over the head reports every boundary edge there is, and what it must not find any more
+# is **the cut**: a loop with vertices on the mouth line, running the length of the commissure. What
+# it does still find is the generation's own — one open 3-vertex chain 0.0009 of a body across,
+# inside the mouth, which the intake has always carried and which no cut made. So the assertion is
+# on the two properties a cut rim has and a pinhole does not: nothing sits on the seam, and nothing
+# reaches. A count alone would be the `np.interp` mistake in another costume — an assertion whose
+# message says something it does not test.
+UNCUT_RIM = {o.name: T.cut_rim(o, lambda p: p.y < HINGE_Y + .05, seam=seam, axis=1)
+             for o in (auth, puppet)}
+for n, r in UNCUT_RIM.items():
+    for loop in r['loops']:
+        assert loop['verticesOnTheSeam'] == 0, ('a rim still sits on the mouth line', n, loop)
+        assert loop['reach'] < .010, ('a rim still runs along the mouth', n, loop)
+
+
+# `is_jaw` survives as a classifier — it is a predicate on a position, and the tooth report uses it
+# to say which jaw each measured tooth patch belongs to. It cuts nothing.
 def is_jaw(c):
     return JAW_FRONT_Y - .004 < c.y < HINGE_Y and c.z < seam(c.y) - 1e-7
 
 
-parts = {}
-SEAM_CYCLES, SEAM_RIM = {}, {}
-for o in (auth, puppet):
-    T.bisect_on_curve(o, seam, HINGE_Y, JAW_FRONT_Y - .004, margin=.03)
-    T.split_part(o, 'lower jaw', is_jaw, parts)
-    # **What the cut actually left open**, measured rather than assumed, and on this generation the
-    # answer is the whole reason the seam web exists: one closed loop of 112 vertices reaching 0.042
-    # of a body back from the hinge on a mouth 0.14 long, because forward of the commissure the two
-    # jaws are already separate sheets and the seam passes between them without touching either.
-    # `cut_rim` reports it; `seam_rim` is the same boundary as ordered cycles of the pairs
-    # `split_part` drew twice, which is what the web spans.
-    SEAM_RIM[o.name] = T.cut_rim(o, lambda p: p.y < HINGE_Y + .05, seam=seam, axis=1)
-    SEAM_CYCLES[o.name], SEAM_RIM[o.name]['shared'] = T.seam_rim(
-        o, parts['lower jaw'][o.name], within=lambda p: p.y < HINGE_Y + .05)
+# How far a point is **below the mouth line**, and the answer is in units of the head's own section
+# at that station rather than in raw units. `np.interp` holds `seam`'s end value behind the hinge
+# and in front of the first open station, which is what the band wants.
+#
+# **The section is why this is a ratio and not a distance, and it took a metric to see it.**
+# Mosasaurus' band is a constant fraction of the head's half depth *at the hinge*, and its own
+# comment admits what that means further forward -- "about a sixth of the gape at the snout". This
+# rostrum is 0.027 raw half deep at the hinge and about a third of that at the tip, so no constant
+# band is right at both ends: wide enough not to pinch the corner of the mouth is wider than the
+# whole mandible at the snout, where it leaves the lower tooth row taking a *fraction* of the jaw's
+# rotation. A ratio narrows with the rostrum and keeps the tooth row rigid where the mandible is
+# thin. It is CLAUDE.md's limb-blend lesson in another place: a blend is a fraction of what it is
+# blending across, never a number.
+def below_mouth_line(c):
+    return (seam(c[1]) - c[2]) / max(head_half_depth(c[1]), 1e-4)
+
+
+# The band the commissure stretches over, as a fraction of the head's own half depth at each
+# station. It is the one number with a cost either way -- too wide and the front of the mandible
+# takes only part of the jaw's rotation; too narrow and the whole swing is carried by a strip of
+# skin where the two lips meet, which is where linear blend skinning pinches.
+#
+# **And `lag.mjs`' own `follows` cannot see the first of those, which is the reason this sweep is
+# recorded against a second measurement.** That figure is accumulated over the ball of vertices
+# round the *joint*, and it reads 1.00 at every band from 0.20 to 1.20 while the tooth row at the
+# snout goes from taking all of the jaw's rotation to taking **45 %** of it. What the sweep is
+# measured against instead is the front fifth of the mandible's own reach: how far that skin
+# actually travels between the rest pose and the clip's widest gape, over how far a rigid rotation
+# of the `jaw` bone would have carried it. A count that does not move under a correction is a count
+# about something else.
+#
+# Swept both ways, against `skin-tears.mjs` (ranked on skin) and that travel at `Bite@0.1667`:
+#
+#     constant band (x the half depth at the hinge)      as a fraction of the local half depth
+#     0.08  11.26x  1.000        0.38   9.58x  0.825     0.20  11.60x  0.999
+#     0.12  11.26x  1.000        0.50   7.43x  0.713     0.25  10.19x  0.987
+#     0.18  10.76x  0.991        0.70   6.77x  0.562     0.30   8.88x  0.965   <-- ships
+#     0.25  10.26x  0.942        0.90   5.22x  0.446     0.35   9.82x  0.936
+#     0.30  10.05x  0.900        1.20   3.15x  ~0.3      0.50  10.50x  0.841
+#
+# The constant band's skin figure falls all the way to 3.15x and **every bit of that is the mouth
+# not opening**: at 0.90 the shipped-looking 5.22x is a jaw whose tooth row takes 45 % of its own
+# bone. The ratio at 0.30 is the best pair on the table -- the tooth row keeps 0.965 of its travel,
+# inside Mosasaurus' own 0.96--1.00 bar, at 8.88x.
+JAW_BAND_FRACTION = float(os.environ.get('CYMBO_JAW_BAND', '0.30'))
+JAW_BAND = JAW_BAND_FRACTION
+JAW_BEHIND = .030
 
 # Every measured tooth patch must belong whole to one jaw or the other. Placodus' first delivery
 # cut its chisels in half with a straight ramp; the measurement is what stops that happening here.
@@ -369,8 +439,7 @@ for o, thin in ((auth, thickness), (puppet, puppet_thickness)):
     lookup = {}
     for i, v in enumerate(o.data.vertices):
         lookup[i] = float(thin[i]) if i < len(thin) else THIN * 2
-    shell = parts['lower jaw'][o.name]
-    for part in (o, shell):
+    for part in (o,):
         for n in B:
             part.vertex_groups.new(name=n)
     # Every gate in `weights()` -- the blade threshold, the limb radius, the height off the axis --
@@ -381,15 +450,16 @@ for o, thin in ((auth, thickness), (puppet, puppet_thickness)):
     # it, whatever the gates decided.
     raw_weights = [weights(v.co, lookup[v.index]) for v in o.data.vertices]
     relaxed = T.relax_weights(o, raw_weights, passes=3, hold=.45)
-    # The mandible is skinned *into* the head rather than rigid against it: one field over both
-    # parts, the throat under the hinge following the jaw and the shell ramping to full jaw over
-    # `band` from the cut rim, so the two copies of every rim vertex carry the same weights and the
-    # cut cannot open (`T.jaw_junction`; `tools/triassic/lag.mjs` measures the seam it closes).
-    body_w, shell_w, JUNCTION[o.name] = T.jaw_junction(
-        o, shell, relaxed, B['jaw'][0], rear=lambda p: abs(p.y - HINGE_Y) < 1e-5,
-        upper_jaw=lambda p: p.y < HINGE_Y and p.z >= seam(p.y) - 1e-6, axis=(0., -1., 0.))
+    # The mandible is not a shell and there is no junction to close: one field over one surface,
+    # full jaw below the mouth line and forward of the hinge, blending through the commissure
+    # (`T.jaw_field_uncut`). The relaxation still runs first, because every gate in `weights()` is
+    # still a per-vertex decision; the jaw share is added after it because it is a smooth function
+    # of position and needs no smoothing.
+    body_w, JUNCTION[o.name] = T.jaw_field_uncut(
+        o, relaxed, B['jaw'][0], below_mouth_line, axis=(0., -1., 0.),
+        band=JAW_BAND, behind=JAW_BEHIND)
     counts, owners = [], {}
-    for part, field in ((o, body_w), (shell, shell_w)):
+    for part, field in ((o, body_w),):
         for v in part.data.vertices:
             w = field[v.index]
             counts.append(len(w))
@@ -401,138 +471,35 @@ for o, thin in ((auth, thickness), (puppet, puppet_thickness)):
             v.co = tx(v.co)
         for p in part.data.polygons:
             p.use_smooth = True
-        mod = part.modifiers.new('Shared articulated skeleton' if part is o else 'Mandible into the head', 'ARMATURE')
+        mod = part.modifiers.new('Shared articulated skeleton', 'ARMATURE')
         mod.object = rig
         part.parent = rig
     influences.extend(counts)
     weight_report[o.name] = {'maxInfluences': max(counts), 'vertices': len(counts),
                              'verticesPerBone': owners, 'jawJunction': JUNCTION[o.name]}
 
-# ------------------------------------------------------------ the mouth interior ----
-# **The one-sac lining is retired.** It was a tube wound into the mouth whose wall stretched between
-# the jaws, and CLAUDE.md is explicit about what that reads as on screen: a mouthful of gum. It also
-# was not closing the thing this generation actually leaves open. What the cut leaves open here is
-# the run of rim it drew through solid head behind the modelled pocket, and the fill for that is the
-# seam web below -- taken from the body's own rim, spanning the cut and nothing else.
+# --------------------------------------------------------- the mouth interior ----
+# **Nothing is built here, and that is the verdict rather than an omission.** This body used to
+# carry a one-sac `Oral cavity lining` — the form CLAUDE.md names as the one that reads as a
+# mouthful of gum — then a `Seated jaw hinge tissue` ellipsoid, then a seam web spanning the two
+# copies of the cut rim. All three existed to close what the *cut* opened. With no cut there is
+# nothing open: `UNCUT_RIM` above reports zero boundary edges over the whole head on both bodies,
+# and what a player sees inside the gape is the palate, floor and commissure the generation
+# modelled. `package-audit`/`oral-shell-audit.mjs` refuse any mesh or material the runtime's oral
+# classifier would match, on either variant.
+#
+# **No authored dentition either.** A Tripo body is worked, not authored: this generation carries
+# its own tooth relief along the jaw margins — `protrusions()` finds it and `toothPatches` in
+# validation.json records every patch — so the row that ships is the generated one, and the only
+# thing this build does about the teeth is check that the mouth line does not saw through one,
+# which is the fault Placodus shipped.
 oralparts = []
-
-# **No authored dentition.** A Tripo body is worked, not authored: the generation's surface detail
-# is beyond what hand modelling here would match, and CLAUDE.md allows a tooth only as an exception
-# that has to justify itself. This generation already carries its own tooth relief along the jaw
-# margins -- `protrusions()` finds it and `toothPatches` in validation.json records every patch --
-# so the row that ships is the generated one, and the only thing this build does about the teeth is
-# check that the measured cut does not saw through one, which is the fault Placodus shipped.
 tooth_rows = []
 
-# **The seated hinge ellipsoid is retired too.** It existed to cover "the square the cut leaves at
-# the back of the mandible", and since `T.jaw_junction` landed there is no square: the hinge
-# cross-section is the one run of the rim whose two copies the junction holds together, asserted
-# equal weight for weight, so the surface is continuous across it in every pose. Measured as drawn
-# -- which is how it is drawn, because the runtime hides it -- this head reads 1 px through at its
-# widest gape with the plug already invisible, so it was closing nothing a player could see. And it
-# is the one thing the viewer's *Mouth geometry* switch showed that a reviewer would have had to
-# discount: a black blister standing proud of the cheek beside the mouth it was not filling.
-
-# ----------------------------------------------- the cut's own seam, filled (optional) ----
-# **This generation arrived partially open, and the cut goes deeper than its mouth does.** That is
-# `cut_rim`'s case 2, and the measurement above is the whole diagnosis: the mouth is 0.14 of a body
-# long and the cut left a rim over only the back 0.042, because forward of the commissure the two
-# jaws are already separate sheets and the seam plane passes between them without touching either.
-# Nothing at the front was cut and nothing there needs anything; what the cut *did* do is draw a rim
-# through solid head behind the modelled pocket, and `jaw_junction` holds the two copies of that rim
-# together only at the hinge cross-section (`rear`). Everywhere else they part by design -- which is
-# the mouth opening on a body cut at its own lip, and on this one is the mouth opening *plus* a hole
-# into the head along the run the cut made.
-#
-# `T.seam_web` fills exactly that run and nothing else, because the run is the rim and the rim is
-# where the web is. It is **off**: named so `src/shared/oral-geometry.ts` matches it, so the game
-# hides it and the viewer's *Mouth geometry* switch starts with it hidden. It is the **only** thing
-# that switch turns on for this animal now -- the one-sac lining and the hinge ellipsoid are both
-# retired -- so what a reviewer is shown is the fill and nothing beside it.
-SEAM_GAPE = .60                      # Heavy's peak; asserted against the clips once they are built
-SEAM_FOLD, SEAM_FLOOR = .30, .0012
-seam_mat = T.vertex_colour_material(NAME + ' mouth interior seam', roughness=.62)
-JAW_TURN = arm.bones['jaw'].matrix_local.to_3x3() @ Vector((1., 0., 0.))
-
-
-def seam_room(p, d):
-    """How much head there is along the fold, cast **inwards from the rim** on the intake surface
-    as it was before the cut. `depth_probe` cannot answer this beside a modelled cavity -- it signs
-    by the nearest surface's normal and the nearest surface in a mouth is the lumen's own wall -- so
-    this is a cast, and the fold is capped at a fraction of what it returns."""
-    q = Vector(p) / SCALE
-    d = Vector(d).normalized()
-    hit = bvh_auth.ray_cast(q + d * 1e-5, d, .25)
-    return ((hit[0] - q).length if hit[0] is not None else .02) * SCALE
-
-
-SEAM_WEB, SEAM_WEB_REPORT = {}, {}
-for o, label in ((auth, ''), (puppet, ' (twin)')):
-    web, rep = T.seam_web(
-        'Mouth interior seam web' + label, o, parts['lower jaw'][o.name], SEAM_CYCLES[o.name],
-        tx(B['jaw'][0]), JAW_TURN, SEAM_GAPE, interior_pigment, seam_mat, rig=rig,
-        fold=SEAM_FOLD, floor=SEAM_FLOOR * SCALE, room=seam_room, cap=.45,
-        inside=(lambda bvh: lambda p: T.ray_parity_inside(bvh, Vector(p) / SCALE))(INTAKE[o.name]))
-    rep['parity'] = T.seam_web_parity(web, o, parts['lower jaw'][o.name], SEAM_CYCLES[o.name])
-    # The fold is bounded by the head's **own measured section**, not by a nearest-surface probe:
-    # beside a modelled cavity `depth()` answers about the lumen's wall. Recorded, and asserted
-    # against the section rather than against the probe.
-    worst_probe = min(depth(Vector(v.co[:]) / SCALE) for v in web.data.vertices)
-
-    def section_excess(v):
-        q = Vector(v.co[:]) / SCALE
-        return max(abs(q.x - cx(q.y)) / max(head_half_width(q.y), 1e-6),
-                   abs(q.z - cz(q.y)) / max(head_half_depth(q.y), 1e-6))
-
-    # The rows the web copies off the body *are* body vertices, so what they say about the section
-    # is a calibration of the metric and not a fault: the head's measured half width and half depth
-    # are 90th percentiles, so real skin stands outside them. What has to be judged is the folded
-    # middle row, and it is judged against the skin it was folded from rather than against 1.0.
-    skin_worst = max(section_excess(v) for v in web.data.vertices if v.index % 3 != 1)
-    fold_worst = max(section_excess(v) for v in web.data.vertices if v.index % 3 == 1)
-    rep['worstDepthProbeRaw'] = float(worst_probe)
-    rep['sectionExcessOfTheRimRows'] = float(skin_worst)
-    rep['sectionExcessOfTheFoldedRow'] = float(fold_worst)
-    assert fold_worst <= skin_worst + 1e-9, (
-        'the folded row stands further outside the head\'s own measured section than the skin it '
-        'was folded from', o.name, fold_worst, skin_worst)
-    # **Ray parity cannot tell three different things apart here**, and that is the lesson rather
-    # than a nuisance. A modelled mouth is an invagination, so a point in the lumen crosses the
-    # surface an even number of times on the way out and reads as outside the solid; and where the
-    # bind pose already parts the two copies of the rim, the fold's own base sits in that parting,
-    # which is a slot in the surface and so is outside it too -- spanning that slot is what the web
-    # is for. So the parity count is **recorded**, with how much of it the measured lumen accounts
-    # for, and what is asserted is the head's own measured section, which uses no normals at all.
-    outside_lumen = 0
-    for v in web.data.vertices:
-        if v.index % 3 != 1:
-            continue
-        q = Vector(v.co[:]) / SCALE
-        if T.ray_parity_inside(INTAKE[o.name], q):
-            continue
-        if min((q - c).length for c in CAV_WALL_CO) < MOUTH_GAP:
-            continue
-        outside_lumen += 1
-    rep['foldOutsideTheSolid'] = rep['middleRowOutsideTheIntake']
-    rep['foldOutsideTheSolidAndTheMeasuredLumen'] = outside_lumen
-    SEAM_WEB[o.name] = web
-    SEAM_WEB_REPORT[o.name] = rep
-
-oral_seating = []
-for o in oralparts:
-    worst = min(depth(Vector(v.co[:]) / SCALE) for v in o.data.vertices)
-    oral_seating.append({'part': o.name, 'worstDepthRaw': float(worst)})
-    # A loose bound, and deliberately so. Placodus records why: a point in the **lumen** of a
-    # modelled mouth is outside the closed shell, so a nearest-surface test reads backwards
-    # exactly where oral geometry lives. This catches gross errors -- a part built on the file's
-    # midline instead of the measured one came out at -0.019 here -- and the real check on the
-    # gape is the measured see-through in mouth-views.py.
-    if not o.get('measuredRoom'):
-        assert worst > -.012, ('mouth geometry breaks the skin', o.name, worst)
 
 # ------------------------------------------------------- measured paired profile ----
-AUTH_GROUP = [auth, parts['lower jaw'][auth.name]]
-PUP_GROUP = [puppet, parts['lower jaw'][puppet.name]]
+AUTH_GROUP = [auth]
+PUP_GROUP = [puppet]
 profile, worst_envelope = T.paired_profile(AUTH_GROUP, PUP_GROUP,
                                            (Y0 + .006) * SCALE, (Y1 - .006) * SCALE,
                                            ENVELOPE_TOLERANCE, stations=21)
@@ -843,7 +810,7 @@ for clip, duration in CLIPS.items():
     for f in np.linspace(0, last, 13):
         scene.frame_set(int(f))
         dg = bpy.context.evaluated_depsgraph_get()
-        for o in AUTH_GROUP + PUP_GROUP + oralparts + list(SEAM_WEB.values()):
+        for o in AUTH_GROUP + PUP_GROUP:
             ev = o.evaluated_get(dg)
             me = ev.to_mesh()
             co = np.array([v.co[:] for v in me.vertices])
@@ -855,10 +822,6 @@ for clip, duration in CLIPS.items():
 
 for c in LOOPS:
     assert seams[c] < 1e-6, (c, seams[c])
-# The seam web's fold is sized on a gape, and that gape has to be the body's own. Measured off the
-# clips the builder just wrote rather than named twice.
-assert MAX_GAPE <= SEAM_GAPE + 1e-9, ('a clip opens wider than the seam web was measured at',
-                                      MAX_GAPE, SEAM_GAPE)
 reset()
 scene.frame_set(0)
 
@@ -869,7 +832,7 @@ open(os.path.join(HERE, 'anchors.json'), 'w').write(json.dumps({ID: anchors}, in
 tri = lambda o: sum(len(p.vertices) - 2 for p in o.data.polygons)
 for group, suffix, body in ((AUTH_GROUP, '', auth), (PUP_GROUP, '.puppet', puppet)):
     bpy.ops.object.select_all(action='DESELECT')
-    for o in group + [rig] + sockets + oralparts + [SEAM_WEB[body.name]]:
+    for o in group + [rig] + sockets:
         o.select_set(True)
     bpy.context.view_layer.objects.active = rig
     path = os.path.join(OUT, ID + suffix + '.glb')
@@ -877,10 +840,8 @@ for group, suffix, body in ((AUTH_GROUP, '', auth), (PUP_GROUP, '.puppet', puppe
     T.patch_glb(path, anchors)
 shutil.copyfile(os.path.join(OUT, ID + '.puppet.glb'), os.path.join(OUT, ID + '.lod1.glb'))
 
-authored_tris = sum(tri(o) for o in AUTH_GROUP) + sum(tri(o) for o in oralparts) \
-    + tri(SEAM_WEB[auth.name])
-puppet_tris = sum(tri(o) for o in PUP_GROUP) + sum(tri(o) for o in oralparts) \
-    + tri(SEAM_WEB[puppet.name])
+authored_tris = sum(tri(o) for o in AUTH_GROUP)
+puppet_tris = sum(tri(o) for o in PUP_GROUP)
 meta = {
     'id': ID, 'name': NAME, 'species': 'Cymbospondylus youngorum',
     'provenance': 'Middle Triassic · Fossil Hill Member, Augusta Mountains, Nevada',
@@ -903,7 +864,10 @@ meta = {
         'lies 18.3 degrees across the file axes, and its roll was read off the countershading '
         'rather than transported, as Dinocephalosaurus requires.',
         'The mouth line is the measured mid height of the modelled oral cavity, found by casting '
-        'every head vertex normal back into the mesh. The cut runs deeper than that mouth does, and what it left open is closed by the seam web -- the ruled surface between the two copies of the cut rim, hidden in play like all oral geometry. The one-sac lining is retired.',
+        'every head vertex normal back into the mesh. The jaw is not cut off: this generation '
+        'modelled a palate, a floor and a commissure, so the mouth already exists and the bone '
+        'turns inside one continuous skin, with a measured band at the corner that stretches. No '
+        'oral geometry of any kind is authored or shipped.',
         'The twin resurfaces a 0.0052-unit voxel occupancy field of the authored body, relaxes it '
         'and reduces the new topology. It reuses no source vertex or face.',
         'The generation gives this animal a skull about 0.15 of its length against the 0.11 the '
@@ -973,19 +937,20 @@ report = {
         # would measure a cavity a large fraction of the head deep here; this one measures a slit.
         'restSlitMaxHalfDepthRaw': float(np.max(TALL)),
         'restSlitMaxHalfDepthOverHeadDepth': float(np.max(TALL) / max(half_depth(HINGE_Y), 1e-6)),
-        'cutRim': SEAM_RIM,
-        'seamWeb': {'note': 'This generation arrived partially open (cut_rim case 2): the cut runs '
-                            'deeper than the modelled mouth does, so what it left open is the run '
-                            'of rim it drew through solid head behind the pocket, and the two '
-                            'copies of that run part when the jaw opens. The web is the ruled '
-                            'surface between them; it spans the rim and nothing else, so nothing '
-                            'in front of the commissure is touched. Hidden in play and in the '
-                            'viewer by src/shared/oral-geometry.ts, which is what it is named for.',
-                    'gapeMeasuredFromTheClips': MAX_GAPE, 'interiorAlbedo': INTERIOR,
-                    'perBody': SEAM_WEB_REPORT},
+        'construction': 'uncut (T.jaw_field_uncut): the generation arrived with a modelled '
+                        'palate, floor and commissure, so nothing is cut and the mouth opening is '
+                        'the jaw bone turning inside one continuous surface. Full jaw below the '
+                        'measured mouth line and forward of the hinge, full skull above it, and a '
+                        'band at the commissure that stretches.',
+        'lumenWallVertices': len(CAV_WALL),
+        'twinCavity': TWIN_CAVITY,
+        'boundaryAtTheMouth': UNCUT_RIM,
+        'jawBandFractionOfTheHeadsOwnHalfDepthAtEachStation': JAW_BAND_FRACTION,
+        'jawBandRaw': JAW_BAND, 'jawBehindRaw': JAW_BEHIND,
+        'gapeMeasuredFromTheClips': MAX_GAPE,
         'toothPatches': tooth_report,
-        'toothPatchesStraddlingTheCut': straddling, 'authoredToothRows': tooth_rows,
-        'oralPartSeating': oral_seating,
+        'toothPatchesStraddlingTheMouthLine': straddling, 'authoredToothRows': tooth_rows,
+        'oralParts': [o.name for o in oralparts],
     },
     'envelope': {k: profile_report[k] for k in
                  ('maximumEnvelopeDifference', 'maximumEnvelopeDifferenceFractionOfBodyLength',
@@ -1000,7 +965,10 @@ print('CYMBO_REPORT', json.dumps({k: report[k] for k in
       ('authoredTriangles', 'twinTriangles', 'twinTriangleFraction', 'bones', 'maxInfluences')}))
 print('CYMBO_ENVELOPE', json.dumps(report['envelope']))
 print('CYMBO_MOUTH', json.dumps({k: report['mouth'][k] for k in
-      ('method', 'cavityVertices', 'hingeY', 'jawFrontY', 'toothPatchesStraddlingTheCut')}))
+      ('method', 'cavityVertices', 'hingeY', 'jawFrontY', 'twinCavity',
+       'jawBandFractionOfTheHeadsOwnHalfDepthAtEachStation', 'jawBandRaw', 'gapeMeasuredFromTheClips',
+       'toothPatchesStraddlingTheMouthLine')}))
+print('CYMBO_JAWFIELD', json.dumps(JUNCTION))
 print('CYMBO_POSE', json.dumps({'spine': {k: v for k, v in POSE_DEVIATION['spine'].items() if k != 'perStation'},
       'tail': {k: v for k, v in POSE_DEVIATION['tail'].items() if k != 'perStation'},
       'limbAsymmetry': LIMB_ASYMMETRY.get('allPairs')}))

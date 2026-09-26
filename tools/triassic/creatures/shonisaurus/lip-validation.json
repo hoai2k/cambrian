@@ -1,24 +1,21 @@
 {
-  "file": "/Users/hoai/Documents/Stuff/Generations/cambrian/local/expansion-repo/local/triassic-authoring/shonisaurus/shonisaurus.shared-rig.blend",
+  "file": "/home/user/cambrian/.claude/worktrees/agent-a3872ab23cc9fca61/local/triassic-authoring/shonisaurus/shonisaurus.shared-rig.blend",
   "triangles": 113904,
-  "method": "Geometric skinned face normal versus mean-weight transported rest normal; rostral/head mask author Y < -1.75; fractional frame evaluation. Counts all authored cutaneous meshes.",
+  "method": "Inversion is the neighbour test: a face that has turned inside out points the opposite way to the faces it shares edges with, which uses no weights at all. The mean-weight transported rest normal is reported beside it -- it is exact only where a face's three vertices share one transform, so on the blended commissure it reads strain rather than inversion, and it is what every earlier verdict on this animal measured. Rostral/head mask author Y < -1.75; fractional frame evaluation; all authored cutaneous meshes.",
   "samples": [
     {
       "clip": "Idle",
       "seconds": 0.0,
       "phase": 0.0,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999885541409,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999803786517,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985499121712735,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9999999790285551,
           "maximumRestArea": 0
         }
       ]
@@ -27,18 +24,15 @@
       "clip": "Idle",
       "seconds": 0.32000000000000006,
       "phase": 0.10000000000000002,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999987055408,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999958507019,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.998539544572588,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9999999798596,
           "maximumRestArea": 0
         }
       ]
@@ -47,18 +41,15 @@
       "clip": "Idle",
       "seconds": 0.35,
       "phase": 0.109375,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.999999995649319,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999948394732,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985488750724079,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9999999905520033,
           "maximumRestArea": 0
         }
       ]
@@ -67,18 +58,15 @@
       "clip": "Idle",
       "seconds": 0.6400000000000001,
       "phase": 0.20000000000000004,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.999999998728598,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999945196598,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985414644972108,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9999999784429702,
           "maximumRestArea": 0
         }
       ]
@@ -87,18 +75,15 @@
       "clip": "Idle",
       "seconds": 0.8,
       "phase": 0.25,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.999999995494029,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999815934507,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985456758538073,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9999999486513486,
           "maximumRestArea": 0
         }
       ]
@@ -107,18 +92,15 @@
       "clip": "Idle",
       "seconds": 1.1199999999999999,
       "phase": 0.3499999999999999,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999969552937,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999559896731,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985471498996343,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9999999506786039,
           "maximumRestArea": 0
         }
       ]
@@ -127,18 +109,15 @@
       "clip": "Idle",
       "seconds": 1.4400000000000002,
       "phase": 0.45,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999884429349,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999600529463,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985479770071353,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9999999536429945,
           "maximumRestArea": 0
         }
       ]
@@ -147,18 +126,15 @@
       "clip": "Idle",
       "seconds": 1.6,
       "phase": 0.5,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999936977927,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999825463057,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985421838724132,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9999999825271791,
           "maximumRestArea": 0
         }
       ]
@@ -167,18 +143,15 @@
       "clip": "Idle",
       "seconds": 2.08,
       "phase": 0.65,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999927850972,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999851949631,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985444445661987,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9999999851949632,
           "maximumRestArea": 0
         }
       ]
@@ -187,18 +160,15 @@
       "clip": "Idle",
       "seconds": 2.7199999999999998,
       "phase": 0.85,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999928039451,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999767526208,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985456701637813,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9999998644956594,
           "maximumRestArea": 0
         }
       ]
@@ -207,18 +177,15 @@
       "clip": "Idle",
       "seconds": 3.2,
       "phase": 1.0,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999885541409,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999803786517,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985499121712735,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9999999790285551,
           "maximumRestArea": 0
         }
       ]
@@ -227,17 +194,14 @@
       "clip": "Bite",
       "seconds": 0.0,
       "phase": 0.0,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999999999996,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985414734712228,
+          "flaggedByTheMeanWeightTest": 0,
           "worstDot": 0.9999999999999996,
           "maximumRestArea": 0
         }
@@ -247,19 +211,16 @@
       "clip": "Bite",
       "seconds": 0.060000000000000005,
       "phase": 0.1,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 17,
+      "flaggedByTheMeanWeightTest": 18,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.995727284054996,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999957425083784,
-          "maximumRestArea": 0
+          "invertedFaces": 17,
+          "worstNeighbourAgreement": -0.9985434244295825,
+          "flaggedByTheMeanWeightTest": 18,
+          "worstDot": -0.8128255952970267,
+          "maximumRestArea": 0.00010701993796665109
         }
       ]
     },
@@ -267,19 +228,16 @@
       "clip": "Bite",
       "seconds": 0.12000000000000001,
       "phase": 0.2,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 8,
+      "flaggedByTheMeanWeightTest": 313,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9715596763142299,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999721174154259,
-          "maximumRestArea": 0
+          "invertedFaces": 8,
+          "worstNeighbourAgreement": -0.9985213190186243,
+          "flaggedByTheMeanWeightTest": 313,
+          "worstDot": -0.9997757960418788,
+          "maximumRestArea": 0.0005029927701377034
         }
       ]
     },
@@ -287,19 +245,16 @@
       "clip": "Bite",
       "seconds": 0.15,
       "phase": 0.25,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 8,
+      "flaggedByTheMeanWeightTest": 334,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9658538622602705,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999653272975684,
-          "maximumRestArea": 0
+          "invertedFaces": 8,
+          "worstNeighbourAgreement": -0.9985375867909967,
+          "flaggedByTheMeanWeightTest": 334,
+          "worstDot": -0.9998191761778153,
+          "maximumRestArea": 0.0005029927701377034
         }
       ]
     },
@@ -307,19 +262,16 @@
       "clip": "Bite",
       "seconds": 0.21,
       "phase": 0.35,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 8,
+      "flaggedByTheMeanWeightTest": 284,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9766743688866395,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999748517034853,
-          "maximumRestArea": 0
+          "invertedFaces": 8,
+          "worstNeighbourAgreement": -0.9985379617764701,
+          "flaggedByTheMeanWeightTest": 284,
+          "worstDot": -0.9997060696916427,
+          "maximumRestArea": 0.0005029927701377034
         }
       ]
     },
@@ -327,19 +279,16 @@
       "clip": "Bite",
       "seconds": 0.26999999999999996,
       "phase": 0.44999999999999996,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 3,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9986053894163929,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999984115408659,
-          "maximumRestArea": 0
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985275720390299,
+          "flaggedByTheMeanWeightTest": 3,
+          "worstDot": -0.6526584696526926,
+          "maximumRestArea": 7.010436763732082e-06
         }
       ]
     },
@@ -347,18 +296,15 @@
       "clip": "Bite",
       "seconds": 0.3,
       "phase": 0.5,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999985133646392,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.999999930592057,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.998528080133638,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9984428476222941,
           "maximumRestArea": 0
         }
       ]
@@ -367,18 +313,15 @@
       "clip": "Bite",
       "seconds": 0.35,
       "phase": 0.5833333333333334,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.999999992519587,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999990665043745,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985343982757338,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9999990664858783,
           "maximumRestArea": 0
         }
       ]
@@ -387,18 +330,15 @@
       "clip": "Bite",
       "seconds": 0.39,
       "phase": 0.65,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999963354449,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999996624686215,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985553372556009,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.99999966246296,
           "maximumRestArea": 0
         }
       ]
@@ -407,18 +347,15 @@
       "clip": "Bite",
       "seconds": 0.51,
       "phase": 0.85,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.999999994019714,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.99999998899379,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985468472714908,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9999999760914613,
           "maximumRestArea": 0
         }
       ]
@@ -427,17 +364,14 @@
       "clip": "Bite",
       "seconds": 0.6,
       "phase": 1.0,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999999999996,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985414734712228,
+          "flaggedByTheMeanWeightTest": 0,
           "worstDot": 0.9999999999999996,
           "maximumRestArea": 0
         }
@@ -447,17 +381,14 @@
       "clip": "Attack",
       "seconds": 0.0,
       "phase": 0.0,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999999999996,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985414734712228,
+          "flaggedByTheMeanWeightTest": 0,
           "worstDot": 0.9999999999999996,
           "maximumRestArea": 0
         }
@@ -467,19 +398,16 @@
       "clip": "Attack",
       "seconds": 0.1,
       "phase": 0.1,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 17,
+      "flaggedByTheMeanWeightTest": 49,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9935809103388402,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999895107353781,
-          "maximumRestArea": 0
+          "invertedFaces": 17,
+          "worstNeighbourAgreement": -0.9985413857898482,
+          "flaggedByTheMeanWeightTest": 49,
+          "worstDot": -0.9522204345766718,
+          "maximumRestArea": 0.0001339305061258052
         }
       ]
     },
@@ -487,19 +415,16 @@
       "clip": "Attack",
       "seconds": 0.2,
       "phase": 0.2,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 8,
+      "flaggedByTheMeanWeightTest": 381,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9502224138440151,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999558231436417,
-          "maximumRestArea": 0
+          "invertedFaces": 8,
+          "worstNeighbourAgreement": -0.9985368238727939,
+          "flaggedByTheMeanWeightTest": 381,
+          "worstDot": -0.9998758101118292,
+          "maximumRestArea": 0.0005029927701377034
         }
       ]
     },
@@ -507,19 +432,16 @@
       "clip": "Attack",
       "seconds": 0.25,
       "phase": 0.25,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 8,
+      "flaggedByTheMeanWeightTest": 392,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9441995888170264,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999481568334221,
-          "maximumRestArea": 0
+          "invertedFaces": 8,
+          "worstNeighbourAgreement": -0.9985343609714679,
+          "flaggedByTheMeanWeightTest": 392,
+          "worstDot": -0.9998877592519513,
+          "maximumRestArea": 0.0005029927701377034
         }
       ]
     },
@@ -527,19 +449,16 @@
       "clip": "Attack",
       "seconds": 0.35,
       "phase": 0.35,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 8,
+      "flaggedByTheMeanWeightTest": 353,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9611843819616088,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999597574852848,
-          "maximumRestArea": 0
+          "invertedFaces": 8,
+          "worstNeighbourAgreement": -0.9985294314290106,
+          "flaggedByTheMeanWeightTest": 353,
+          "worstDot": -0.9998421580541569,
+          "maximumRestArea": 0.0005029927701377034
         }
       ]
     },
@@ -547,19 +466,16 @@
       "clip": "Attack",
       "seconds": 0.45,
       "phase": 0.45,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 16,
+      "flaggedByTheMeanWeightTest": 4,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9978994810246626,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999975911079011,
-          "maximumRestArea": 0
+          "invertedFaces": 16,
+          "worstNeighbourAgreement": -0.9985302229474333,
+          "flaggedByTheMeanWeightTest": 4,
+          "worstDot": -0.7250354536476891,
+          "maximumRestArea": 9.979106487407046e-06
         }
       ]
     },
@@ -567,18 +483,15 @@
       "clip": "Attack",
       "seconds": 0.5,
       "phase": 0.5,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999976833200181,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999993346395548,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985328967587473,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9974923229078873,
           "maximumRestArea": 0
         }
       ]
@@ -587,18 +500,15 @@
       "clip": "Attack",
       "seconds": 0.65,
       "phase": 0.65,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999889921091,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999959164701021,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985338657079398,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9999959163894794,
           "maximumRestArea": 0
         }
       ]
@@ -607,17 +517,14 @@
       "clip": "Attack",
       "seconds": 0.85,
       "phase": 0.85,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999924809655,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985444445661987,
+          "flaggedByTheMeanWeightTest": 0,
           "worstDot": 0.9999999623798551,
           "maximumRestArea": 0
         }
@@ -627,17 +534,14 @@
       "clip": "Attack",
       "seconds": 1.0,
       "phase": 1.0,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999999999996,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985414734712228,
+          "flaggedByTheMeanWeightTest": 0,
           "worstDot": 0.9999999999999996,
           "maximumRestArea": 0
         }
@@ -647,17 +551,14 @@
       "clip": "Heavy",
       "seconds": 0.0,
       "phase": 0.0,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999999999996,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985414734712228,
+          "flaggedByTheMeanWeightTest": 0,
           "worstDot": 0.9999999999999996,
           "maximumRestArea": 0
         }
@@ -667,19 +568,16 @@
       "clip": "Heavy",
       "seconds": 0.13333333333333333,
       "phase": 0.1,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 15,
+      "flaggedByTheMeanWeightTest": 90,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9917726326981267,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.999983007757653,
-          "maximumRestArea": 0
+          "invertedFaces": 15,
+          "worstNeighbourAgreement": -0.9985274722566383,
+          "flaggedByTheMeanWeightTest": 90,
+          "worstDot": -0.9753752965513539,
+          "maximumRestArea": 0.0001339305061258052
         }
       ]
     },
@@ -687,19 +585,16 @@
       "clip": "Heavy",
       "seconds": 0.26666666666666666,
       "phase": 0.2,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 8,
+      "flaggedByTheMeanWeightTest": 401,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9354893664484343,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999349307713542,
-          "maximumRestArea": 0
+          "invertedFaces": 8,
+          "worstNeighbourAgreement": -0.9985370503743378,
+          "flaggedByTheMeanWeightTest": 401,
+          "worstDot": -0.9999007155774251,
+          "maximumRestArea": 0.0005029927701377034
         }
       ]
     },
@@ -707,19 +602,16 @@
       "clip": "Heavy",
       "seconds": 0.3333333333333333,
       "phase": 0.25,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 8,
+      "flaggedByTheMeanWeightTest": 414,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.927580595885008,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999356201289872,
-          "maximumRestArea": 0
+          "invertedFaces": 8,
+          "worstNeighbourAgreement": -0.9985503781997364,
+          "flaggedByTheMeanWeightTest": 414,
+          "worstDot": -0.9999095510955787,
+          "maximumRestArea": 0.0005029927701377034
         }
       ]
     },
@@ -727,19 +619,16 @@
       "clip": "Heavy",
       "seconds": 0.35,
       "phase": 0.2625,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 8,
+      "flaggedByTheMeanWeightTest": 415,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9275779382801852,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999332317144964,
-          "maximumRestArea": 0
+          "invertedFaces": 8,
+          "worstNeighbourAgreement": -0.9985568899923133,
+          "flaggedByTheMeanWeightTest": 415,
+          "worstDot": -0.9999095635699494,
+          "maximumRestArea": 0.0005029927701377034
         }
       ]
     },
@@ -747,19 +636,16 @@
       "clip": "Heavy",
       "seconds": 0.4666666666666667,
       "phase": 0.35,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 8,
+      "flaggedByTheMeanWeightTest": 390,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9485151235525014,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999478729268444,
-          "maximumRestArea": 0
+          "invertedFaces": 8,
+          "worstNeighbourAgreement": -0.9985314055422033,
+          "flaggedByTheMeanWeightTest": 390,
+          "worstDot": -0.9998795202309253,
+          "maximumRestArea": 0.0005029927701377034
         }
       ]
     },
@@ -767,19 +653,16 @@
       "clip": "Heavy",
       "seconds": 0.6,
       "phase": 0.45,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 16,
+      "flaggedByTheMeanWeightTest": 4,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9975644277287294,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999972058606087,
-          "maximumRestArea": 0
+          "invertedFaces": 16,
+          "worstNeighbourAgreement": -0.9985498039995846,
+          "flaggedByTheMeanWeightTest": 4,
+          "worstDot": -0.7445164160001687,
+          "maximumRestArea": 9.979106487407046e-06
         }
       ]
     },
@@ -787,18 +670,15 @@
       "clip": "Heavy",
       "seconds": 0.6666666666666666,
       "phase": 0.5,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999971002080265,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999986115997317,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985451640314177,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9967605505847877,
           "maximumRestArea": 0
         }
       ]
@@ -807,18 +687,15 @@
       "clip": "Heavy",
       "seconds": 0.8666666666666667,
       "phase": 0.65,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.999999963256982,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.999991252783128,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985612461940192,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9999912390817314,
           "maximumRestArea": 0
         }
       ]
@@ -827,18 +704,15 @@
       "clip": "Heavy",
       "seconds": 1.1333333333333333,
       "phase": 0.85,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999921030194,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999883809904,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.998541995490565,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9999999855448714,
           "maximumRestArea": 0
         }
       ]
@@ -847,17 +721,14 @@
       "clip": "Heavy",
       "seconds": 1.3333333333333333,
       "phase": 1.0,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999999999996,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985414734712228,
+          "flaggedByTheMeanWeightTest": 0,
           "worstDot": 0.9999999999999996,
           "maximumRestArea": 0
         }
@@ -867,18 +738,15 @@
       "clip": "Eat",
       "seconds": 0.0,
       "phase": 0.0,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999931524465,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999830782769,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985379491394565,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9999999830780788,
           "maximumRestArea": 0
         }
       ]
@@ -887,19 +755,16 @@
       "clip": "Eat",
       "seconds": 0.24000000000000002,
       "phase": 0.1,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 16,
+      "flaggedByTheMeanWeightTest": 4,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9978806907272879,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999916528255196,
-          "maximumRestArea": 0
+          "invertedFaces": 16,
+          "worstNeighbourAgreement": -0.9985450507977426,
+          "flaggedByTheMeanWeightTest": 4,
+          "worstDot": -0.7265237220875225,
+          "maximumRestArea": 9.979106487407046e-06
         }
       ]
     },
@@ -907,19 +772,16 @@
       "clip": "Eat",
       "seconds": 0.35,
       "phase": 0.14583333333333334,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 17,
+      "flaggedByTheMeanWeightTest": 60,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9931227691397749,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999971895443319,
-          "maximumRestArea": 0
+          "invertedFaces": 17,
+          "worstNeighbourAgreement": -0.9985337090341024,
+          "flaggedByTheMeanWeightTest": 60,
+          "worstDot": -0.9602925039124501,
+          "maximumRestArea": 0.0001339305061258052
         }
       ]
     },
@@ -927,19 +789,16 @@
       "clip": "Eat",
       "seconds": 0.48000000000000004,
       "phase": 0.2,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 8,
+      "flaggedByTheMeanWeightTest": 202,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9851827090438777,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999982584284197,
-          "maximumRestArea": 0
+          "invertedFaces": 8,
+          "worstNeighbourAgreement": -0.9985326982280012,
+          "flaggedByTheMeanWeightTest": 202,
+          "worstDot": -0.9992885936266344,
+          "maximumRestArea": 0.0005029927701377034
         }
       ]
     },
@@ -947,19 +806,16 @@
       "clip": "Eat",
       "seconds": 0.6,
       "phase": 0.25,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 8,
+      "flaggedByTheMeanWeightTest": 248,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9815730066465403,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999798164680457,
-          "maximumRestArea": 0
+          "invertedFaces": 8,
+          "worstNeighbourAgreement": -0.998547586370446,
+          "flaggedByTheMeanWeightTest": 248,
+          "worstDot": -0.9995638394706976,
+          "maximumRestArea": 0.0005029927701377034
         }
       ]
     },
@@ -967,19 +823,16 @@
       "clip": "Eat",
       "seconds": 0.84,
       "phase": 0.35,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 18,
+      "flaggedByTheMeanWeightTest": 70,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9925282766309897,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999455283484465,
-          "maximumRestArea": 0
+          "invertedFaces": 18,
+          "worstNeighbourAgreement": -0.9995998754323021,
+          "flaggedByTheMeanWeightTest": 70,
+          "worstDot": -0.9679032497967829,
+          "maximumRestArea": 0.0001339305061258052
         }
       ]
     },
@@ -987,18 +840,15 @@
       "clip": "Eat",
       "seconds": 1.0799999999999998,
       "phase": 0.44999999999999996,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 16,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.999824959234583,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999898965580821,
+          "invertedFaces": 16,
+          "worstNeighbourAgreement": -0.9985350571302403,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.478309933432229,
           "maximumRestArea": 0
         }
       ]
@@ -1007,18 +857,15 @@
       "clip": "Eat",
       "seconds": 1.2,
       "phase": 0.5,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999936178253,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999870143004,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985449929600415,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9999999794224611,
           "maximumRestArea": 0
         }
       ]
@@ -1027,19 +874,16 @@
       "clip": "Eat",
       "seconds": 1.56,
       "phase": 0.65,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 18,
+      "flaggedByTheMeanWeightTest": 70,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.992528759726965,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.999997735407236,
-          "maximumRestArea": 0
+          "invertedFaces": 18,
+          "worstNeighbourAgreement": -0.9995941769773983,
+          "flaggedByTheMeanWeightTest": 70,
+          "worstDot": -0.9678898307897448,
+          "maximumRestArea": 0.0001339305061258052
         }
       ]
     },
@@ -1047,19 +891,16 @@
       "clip": "Eat",
       "seconds": 2.04,
       "phase": 0.85,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 18,
+      "flaggedByTheMeanWeightTest": 70,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9925285028374083,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999454924467676,
-          "maximumRestArea": 0
+          "invertedFaces": 18,
+          "worstNeighbourAgreement": -0.9995996096647664,
+          "flaggedByTheMeanWeightTest": 70,
+          "worstDot": -0.967908803449333,
+          "maximumRestArea": 0.0001339305061258052
         }
       ]
     },
@@ -1067,18 +908,15 @@
       "clip": "Eat",
       "seconds": 2.4,
       "phase": 1.0,
-      "invertedMouthFaces": 0,
+      "invertedMouthFaces": 14,
+      "flaggedByTheMeanWeightTest": 0,
       "parts": [
         {
-          "mesh": "Shonisaurus authored jaw",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999931524465,
-          "maximumRestArea": 0
-        },
-        {
           "mesh": "Shonisaurus authored skin",
-          "invertedFaces": 0,
-          "worstDot": 0.9999999830782769,
+          "invertedFaces": 14,
+          "worstNeighbourAgreement": -0.9985379491394565,
+          "flaggedByTheMeanWeightTest": 0,
+          "worstDot": 0.9999999830780788,
           "maximumRestArea": 0
         }
       ]

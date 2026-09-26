@@ -13,55 +13,67 @@
     "Eat"
   ],
   "oralGeometry": {
-    "cycles": [
-      164
-    ],
-    "vertices": 492,
-    "faces": 328,
-    "flippedFaces": 139,
-    "gapeRadians": 0.45,
-    "fold": 0.3,
-    "floorRaw": 0.0072,
-    "smoothingPasses": 4,
-    "partingAtGapeMax": 0.0991222311372577,
-    "partingAtGapeMean": 0.03171563414841159,
-    "rimPairsTheJunctionHolds": 0,
-    "foldDepthMax": 0.020727798066009093,
-    "foldDepthMean": 0.008943290270120328,
-    "middleRowOutsideTheIntake": 64,
-    "rim": {
-      "bodyBoundaryEdges": 164,
-      "shellBoundaryEdges": 168,
-      "sharedVertices": 164,
-      "sharedEdges": 164,
-      "verticesWithoutTwoSharedEdges": 0,
-      "cycles": [
-        164
+    "construction": "uncut (T.jaw_field_uncut): the generation modelled a palate, a floor and a commissure, so nothing is cut and the mouth opening is the jaw bone turning inside one continuous surface. Full jaw below the measured mouth line and forward of the hinge, full skull above it, and a band at the commissure that stretches.",
+    "authoredParts": [],
+    "lumenWallVertices": 1215,
+    "mouthLine": {
+      "measuredVersusTheTypedLipLineMaxRaw": 0.009147111483013537,
+      "measuredVersusTheTypedLipLineMeanRaw": 0.0036196564939589048,
+      "atTheHingeMeasuredRaw": -0.009452888516986465,
+      "atTheHingeTypedRaw": -0.018600000000000002,
+      "stations": 57,
+      "yRange": [
+        0.296,
+        0.49150000000000016
+      ],
+      "measuredFromY": 0.35500000000000004,
+      "joinOffsetRaw": 0.009147111483013537,
+      "stationsCarriedBackOnTheTypedLine": 17,
+      "restSlitMaxHalfDepthRaw": 0.011991033917959217,
+      "restSlitMaxHalfDepthOverHeadDepth": 0.40820020839532756
+    },
+    "boundaryAtTheMouth": {
+      "boundaryEdgesInRegion": 4,
+      "boundaryEdgesElsewhere": 12,
+      "loops": [
+        {
+          "vertices": 5,
+          "closed": false,
+          "box": [
+            [
+              -0.02839,
+              -0.02668
+            ],
+            [
+              0.32747,
+              0.32816
+            ],
+            [
+              -0.04808,
+              -0.04784
+            ]
+          ],
+          "reach": 0.00069,
+          "verticesOnTheSeam": 0
+        }
       ]
     },
-    "interiorAlbedo": {
-      "lumenWallVertices": 1215,
-      "meanInteriorColour": [
-        0.3902,
-        0.3808,
-        0.3692
-      ],
-      "meanColourElsewhereOnTheBody": [
-        0.4495,
-        0.4547,
-        0.4607
-      ],
-      "method": "inverse distance over the 4 nearest vertices of the measured lumen wall (a vertex whose own outward normal, cast back into the mesh, meets the wall opposite); nothing outside that set is ever sampled"
-    },
-    "parity": {
-      "rimPairs": 164,
-      "worstRestPositionDifference": 0,
-      "worstWeightDifference": 0
-    },
-    "foldOutsideTheSolid": 64,
-    "foldOutsideTheSolidAndTheMeasuredLumen": 5,
-    "sectionExcessOfTheRimRows": 1.0203485670190846,
-    "sectionExcessOfTheFoldedRow": 1.0118269967921962
+    "jawBandFractionOfHeadHalfDepthAtTheHinge": 0.1,
+    "jawBandRaw": 0.005070183459593324,
+    "jawBehindRaw": 0.03,
+    "gapeMeasuredFromTheClips": 0.45,
+    "field": {
+      "Shonisaurus authored skin": {
+        "vertices": 56954,
+        "fullJaw": 2171,
+        "blended": 924,
+        "band": 0.005070183459593324,
+        "behind": 0.03,
+        "throat": 1,
+        "reach": null,
+        "uncut": true
+      }
+    }
   },
   "eyes": {
     "inset": 0.0025,
@@ -158,8 +170,8 @@
   },
   "full": {
     "closedSurfaceWinding": [],
-    "triangles": 116720,
-    "weightedVertices": 62223,
+    "triangles": 116064,
+    "weightedVertices": 61561,
     "bones": 21,
     "clips": [
       {
@@ -339,8 +351,8 @@
         }
       }
     ],
-    "bytes": 7389160,
-    "sha256": "4faf939d563f67413f70377727f7602851ddc55b59bbfba3d43fb7d029b66226"
+    "bytes": 7386000,
+    "sha256": "d1b23382f980ab9726da29ba96c2384ee59f8a0c88e7775894a264afc308dc3f"
   },
   "puppet": {
     "closedSurfaceWinding": [
@@ -356,7 +368,7 @@
       },
       {
         "mesh": "Puppet measured trunk",
-        "signedVolume": 2.9286169256213266,
+        "signedVolume": 2.9276799909711877,
         "doubleSided": false
       },
       {
@@ -566,7 +578,7 @@
         }
       }
     ],
-    "bytes": 560968,
-    "sha256": "8543b55dd7f48a31a2dc934cca48eeb3ed6194aa04b7315dd2734360de084dfb"
+    "bytes": 561748,
+    "sha256": "3c335d6564517b0795cfcc53c6f03d87b91cf5aec07783b2c252172bb5dcf421"
   }
 }

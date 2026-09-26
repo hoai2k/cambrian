@@ -5,23 +5,21 @@
   "models": [
     {
       "variant": "authored",
-      "sha256": "4faf939d563f67413f70377727f7602851ddc55b59bbfba3d43fb7d029b66226",
+      "sha256": "d1b23382f980ab9726da29ba96c2384ee59f8a0c88e7775894a264afc308dc3f",
       "meshes": [],
-      "otherOralMeshes": [
-        "Mouth interior seam web"
-      ],
+      "otherOralMeshes": [],
       "oralShells": "none"
     },
     {
       "variant": ".puppet",
-      "sha256": "8543b55dd7f48a31a2dc934cca48eeb3ed6194aa04b7315dd2734360de084dfb",
+      "sha256": "3c335d6564517b0795cfcc53c6f03d87b91cf5aec07783b2c252172bb5dcf421",
       "meshes": [],
       "otherOralMeshes": [],
       "oralShells": "none"
     },
     {
       "variant": ".lod1",
-      "sha256": "8543b55dd7f48a31a2dc934cca48eeb3ed6194aa04b7315dd2734360de084dfb",
+      "sha256": "3c335d6564517b0795cfcc53c6f03d87b91cf5aec07783b2c252172bb5dcf421",
       "meshes": [],
       "otherOralMeshes": [],
       "oralShells": "none"

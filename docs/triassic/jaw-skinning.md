@@ -364,3 +364,32 @@ the body pigmentation material*, which is the right rule for an authored patch a
 body whose twin needs no texture at all. Atopodentatus' parts wore a flat colour and a vertex-colour
 material, so there was nothing to lose there: its twin goes 875,528 → 891,384 bytes, up by the caps'
 own geometry.
+
+
+## Shonisaurus and Cymbospondylus: no jaw cut at all (T3D-36)
+
+Both bodies stopped cutting the mandible off. There is no rim, no junction and no seam, so the row
+that matters here is the **commissure**: the band of skin between full `jaw` below the measured
+mouth line and full `skull` above it, which is what now carries the gape.
+
+| | band (× head half depth at the hinge) | band, raw | behind | full jaw / blended vertices | skin | mouth-region skin, `jaw` / `skull` | jaw follows `Bite`/`Attack`/`Heavy`/`Eat` |
+| --- | ---: | ---: | ---: | ---: | ---: | --- | --- |
+| Cymbospondylus, authored | 0.90 | 0.0247 | 0.030 | 131 / 376 of 9,585 | 5.22x | 4.86x / 5.22x | 1.00 / 1.00 / 1.00 / 0.97 |
+| Cymbospondylus, twin | 0.90 | 0.0247 | 0.030 | 74 / 98 of 3,302 | — | — | — |
+| Shonisaurus, authored | 0.10 | 0.0051 | 0.030 | 2,171 / 924 of 56,954 | 1.80x | 1.80x / 1.65x | 0.96 / 0.99 / 0.99 / 0.93 |
+
+The full sweeps, and why each value ships, are in
+`docs/triassic/throat-repairs/oral-verdicts.md` under T3D-36. Two things from them are worth
+repeating here because they are about the band rather than about these two animals.
+
+**A band is bounded from above by whatever else uses the same field.** Shonisaurus shuts its
+baked-open generation in bind geometry through this field, so a band wider than about a quarter of
+the head's half depth never reaches 1 at the mandible's own lip and the animal ships with its mouth
+ajar — 3,596 of 14,400 lateral rays through the rostrum at 0.75. Nothing in `skin-tears.mjs`,
+`lag.mjs` or the paired audit sees that; `mouth-closure-audit.py` does.
+
+**And the thing the band trades against is not always the corner of the mouth.** On Cymbospondylus
+it is the *front*: its lumen is a slit 0.249 of the head deep, the two lips are joined round the
+front of it by a short run of skin, and uncut that run carries the mandible's whole tip travel. The
+worst edge sits at the snout tip at every band up to 0.5, which is why widening helps there and why
+a band scaled by the head's local half depth — narrow at the snout — is worse at matched follow.

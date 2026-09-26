@@ -1,7 +1,7 @@
 """Shonisaurus measured-volume puppet and authored intake on one literal rig.
 Blender 5.2; run from repository root. Raw input is immutable.
 """
-import bpy,bmesh,json,math,hashlib,sys
+import bpy,bmesh,json,math,hashlib,os,sys
 import numpy as np
 from mathutils import Vector, Matrix
 from mathutils.bvhtree import BVHTree
@@ -155,39 +155,117 @@ for n in mat.node_tree.nodes:
 source.data.color_attributes['Color'].data.foreach_set('color_srgb',np.ones(len(source.data.loops)*4,dtype=np.float32))
 mapdir=HERE/'maps';mapdir.mkdir(exist_ok=True)
 im.filepath_raw=str(mapdir/'source-albedo.png');im.file_format='PNG';im.save()
-# The mandible is a separate anatomical owner. No cutaneous triangle crosses
-# skull/jaw ownership: soft weights on a thin lip caused inverted triangles when
-# its baked-open form was closed in bind geometry and then opened in attacks.
-def is_mandible(center):
- x,y,z=center
- line=float(np.interp(y,[.305,.33,.37,.395,.5],[-.027,-.017,-.005,-.0015,-.0015]))
- return y>.326 and z<line
-# ------------------------------------------------ what the mandible split left open ----
-# **This generation arrived partially open**, which `T.cut_rim` calls case 2: the rostrum carries a
-# real modelled gap from the commissure forward, and the mandible label runs *behind* it into solid
-# head. So the split leaves one closed rim loop over the back of the mouth only, and the two copies
-# of it -- `split_part`'s here is a face-label split, but it duplicates every rim vertex the same
-# way -- part when the jaw opens, because `weights()` gives the mandible's copy a jaw share and the
-# skull's copy none. Behind that run is the inside of the head. `T.seam_web` fills exactly it.
+# ----------------------------------------------- the mandible is not cut off at all ----
+# **This generation modelled a mouth, so the split was buying nothing at the front and paying for a
+# rim at the back.** Measured on the body this replaces, with `T.cut_rim`: the face-label split left
+# **one closed loop of 164 vertices** reaching **0.0779** of a body, from y 0.322 to 0.400, on a
+# mouth that runs from y 0.302 to the snout at 0.498 -- 0.196 long. Forward of the commissure the
+# upper and lower jaws are already separate sheets of the generation's own surface and the label
+# boundary passed between them without touching either; behind it the label ran through solid head,
+# and the two copies of that run parted when the jaw opened. Closing them was the whole job of the
+# seam web, and of the palate, floor and throat tube before it.
 #
-# The measurement first, on the uncut body: the lumen's own wall, which is what the fill wears.
+# So the body stays **one surface** and the mouth opening is a bone turning inside skin, which is
+# what every other joint on this animal already is (`T.jaw_field_uncut`; Mosasaurus is the worked
+# example and Cymbospondylus is this batch's other one). Nothing is cut, so nothing can part:
+# `lag.mjs` has no seam to measure here and says so.
+#
+# The mouth's own measurement, and it is a measurement rather than the typed table the label used.
+# `T.cavity_vertices` is the lumen's wall -- every vertex whose own outward normal, cast back into
+# the mesh, meets the wall opposite, which is what makes it interior -- and `cavity_profile` reads
+# the mid height of it station by station. The typed lip line the split used is kept only to record
+# how far the two disagree (`mouthLineDeviation` in build-report.json).
 CAV_WALL=T.cavity_vertices(source,lambda p:p.y>.30,gap=.030)
 assert len(CAV_WALL)>80,('the lumen wall did not measure',len(CAV_WALL))
-CAV_WALL_CO=[source.data.vertices[i].co.copy()for i in CAV_WALL]
-INTAKE_RAW=BVHTree.FromPolygons([v.co.copy()for v in source.data.vertices],
-                                [list(p.vertices)for p in source.data.polygons],all_triangles=False)
-interior_raw,INTERIOR=T.cavity_pigment(source,CAV_WALL,lambda p:tuple(nearest_color(p)),scale=1.)
-jaw_mesh=source.copy();jaw_mesh.data=source.data.copy();jaw_mesh.name='Shonisaurus authored jaw';bpy.context.collection.objects.link(jaw_mesh);jaw_mesh['region']='mandible'
-for ob,keep_jaw in [(source,False),(jaw_mesh,True)]:
- bm=bmesh.new();bm.from_mesh(ob.data)
- remove=[f for f in bm.faces if is_mandible(f.calc_center_median())!=keep_jaw]
- bmesh.ops.delete(bm,geom=remove,context='FACES')
- loose=[v for v in bm.verts if not v.link_faces]
- if loose:bmesh.ops.delete(bm,geom=loose,context='VERTS')
- bm.to_mesh(ob.data);bm.free();ob.data.update()
-source['region']='authored_upper';authored=[source,jaw_mesh]
-SEAM_CYCLES,SEAM_RIM=T.seam_rim(source,jaw_mesh,within=lambda p:p.y>.29)
-print('SHONI_SEAM_RIM',json.dumps(SEAM_RIM),flush=True)
+CAV=np.array([source.data.vertices[i].co[:]for i in CAV_WALL])
+MY,MID,WIDE,TALL=T.cavity_profile(CAV,.306,.494,.0035,.006)
+assert len(MY)>20,('the mouth line did not measure',len(MY))
+HINGE_RAW=(0,.326,-.013)                 # the jaw bone's own head, in raw coordinates
+def typed_lip(y):
+ """The lip line this builder has always typed, five points read off the generation by hand. It is
+ no longer the mouth line -- it is the reference the measured one is checked against, and it is what
+ carries the line back behind the commissure, where there is no lumen left to measure."""
+ return float(np.interp(y,[.305,.33,.37,.395,.5],[-.027,-.017,-.005,-.0015,-.0015]))
+# **The measured line stops at the commissure and the hinge is behind it.** The modelled lumen runs
+# forward from y 0.3555; behind that the head is solid, and the jaw bone sits at 0.326 with the
+# field tapering for another 0.030 behind that. `np.interp` would hold the commissure's own height
+# all the way back, which is the clamping lesson in miniature: an answer outside the table that
+# looks like an answer inside it. Extending the measured line along its own fitted slope is worse
+# rather than better -- the rear stations are a short noisy run where the lumen is closing, and the
+# fit sends the line *up* to -0.0013 at the hinge where the typed lip says -0.0186. So behind the
+# join the line is the typed one, offset to meet the measurement exactly at the join: measured
+# where there is a mouth to measure, the human's line behind it, and continuous across.
+_JOIN=float(MY[0]);_OFF=float(MID[0])-typed_lip(_JOIN)
+_EY=np.arange(.296,_JOIN-1e-9,.0035)
+MY=np.r_[_EY,MY];MID=np.r_[np.array([typed_lip(float(y))+_OFF for y in _EY]),MID]
+def seam(y):
+ """The mouth line: the measured mid height of the modelled lumen where there is one, carried back
+ behind the commissure on the typed lip line. The jaw's weight field ramps across it; nothing is
+ cut along it."""
+ return float(np.interp(y,MY,MID))
+# The head's own fine section, which `JAW_BAND` is a fraction of. The body's centreline table is
+# too coarse for a rostrum that tapers.
+_HY=np.linspace(.302,.498,26);_HW=[];_HD=[]
+for _y in _HY:
+ _m=np.abs(points[:,1]-_y)<.006
+ _q=points[_m]if _m.sum()>5 else points[np.abs(points[:,1]-_y)<.015]
+ _HW.append(float(np.quantile(np.abs(_q[:,0]),.90)));_HD.append(float(np.quantile(np.abs(_q[:,2]),.90)))
+def head_half_depth(y):return float(np.interp(y,_HY,_HD))
+MOUTH_LINE_DEVIATION={'measuredVersusTheTypedLipLineMaxRaw':float(max(abs(seam(y)-typed_lip(y))for y in MY if y>=_JOIN)),
+                      'measuredVersusTheTypedLipLineMeanRaw':float(np.mean([abs(seam(y)-typed_lip(y))for y in MY if y>=_JOIN])),
+                      'atTheHingeMeasuredRaw':seam(.326),'atTheHingeTypedRaw':typed_lip(.326),
+                      'stations':len(MY),'yRange':[float(MY[0]),float(MY[-1])],
+                      'measuredFromY':_JOIN,'joinOffsetRaw':_OFF,'stationsCarriedBackOnTheTypedLine':len(_EY),
+                      'restSlitMaxHalfDepthRaw':float(np.max(TALL)),
+                      'restSlitMaxHalfDepthOverHeadDepth':float(np.max(TALL)/max(np.interp(.40,_HY,_HD),1e-6))}
+def below_mouth_line(c):
+ """How far a point is below the mouth line, positive under it. `np.interp` holds `seam`'s end
+ value behind the hinge and in front of the last open station, which is what the band wants."""
+ return seam(c[1])-c[2]
+# The band the commissure stretches over, in units of the head's own half depth at the hinge, which
+# is Mosasaurus' measure. Too wide and the front of the mandible takes only part of the jaw's
+# rotation, so the lower tooth row lags the bone it is drawn on; too narrow and the whole swing is
+# carried by a strip of skin where the two lips meet.
+#
+# **And on this body the band has a third cost, which is the one that decides it.** `close_rest`
+# shuts the generation's baked-open mouth in bind geometry through this same field, so a vertex only
+# closes by its own jaw share -- and the mandible's dorsal margin sits one lumen half depth (0.012
+# raw at its widest) below the mouth line. A band much wider than that never reaches 1 there, the
+# lip never meets the palate, and the animal ships with its mouth ajar: `mouth-closure-audit.py`
+# read **3,596 of 14,400 lateral rays passing clean through the rostrum**, a 0.098-unit aperture, at
+# a band of 0.75. That bounds the band from above at about 0.24 whatever else is true.
+#
+# Swept inside that bound, against the closure, `skin-tears.mjs`, `lag.mjs` and the repaired
+# `lip-audit.py` (see its own docstring -- the old mean-weight test cannot read a blend band and
+# reports hundreds of faces that agree with every neighbour they have):
+#
+#     band   skin    jaw follows Bite/Attack/Heavy/Eat   mouth shut   inverted rest / worst posed
+#     0.06   1.81x   0.98 0.99 0.99 0.95                 yes          29 / 29
+#     0.10   1.80x   0.96 0.99 0.99 0.93                 yes          14 / 18
+#     0.15   1.44x   0.96 0.98 0.99 0.91                 yes          31 / 31
+#     0.20   3.80x   0.96 0.98 0.99 0.91                 yes          49 / 49
+#     0.24   3.64x   0.96 0.99 0.99 0.92                 yes          40 / 40
+#     0.75   1.44x   0.94 0.98 0.99 0.87                 NO           0 / 0
+#
+# The shipped split body reads 1.44x, 0.98/0.99/0.99/0.95, shut, and a constant **8** inverted faces
+# at every frame including its own bind pose -- that floor is the intake mesh's own and no weighting
+# moves it. 0.10 is the value with the fewest inversions of any that shuts the mouth, and its follow
+# is within 0.02 of the split body's at every clip.
+JAW_BAND_FRACTION=float(os.environ.get('SHONI_JAW_BAND','0.10'))
+JAW_BAND=JAW_BAND_FRACTION*head_half_depth(.326)
+JAW_BEHIND=.030
+source['region']='authored';authored=[source]
+# What the head leaves open now that nothing cuts it. `cut_rim` reports every boundary edge there
+# is, and what it must not find any more is **the split**: a loop with vertices on the mouth line,
+# running the length of the commissure. So the assertion is on the two properties a cut rim has and
+# a pinhole in a generation does not -- it reaches, and it sits on the seam -- rather than on a
+# count, which would be an assertion whose message says something it does not test.
+UNCUT_RIM=T.cut_rim(source,lambda p:p.y>.29,seam=seam,axis=1)
+for _loop in UNCUT_RIM['loops']:
+ assert _loop['verticesOnTheSeam']==0,('a rim still sits on the mouth line',_loop)
+ assert _loop['reach']<.010,('a rim still runs along the mouth',_loop)
+print('SHONI_UNCUT_RIM',json.dumps(UNCUT_RIM),flush=True)
+print('SHONI_MOUTH_LINE',json.dumps(MOUTH_LINE_DEVIATION),flush=True)
 
 # No oral geometry. A palate, a floor, a throat-and-cheeks tube and two rows of conical teeth used
 # to be authored here, and all of it was invented shape inside a Tripo body whose mouth is closed
@@ -269,13 +347,14 @@ def axial(y):
  return blend({'spine5':1},{'caudal':1},ramp(-y,.415,.46))
 def weights(p,region=''):
  x,y,z=p;a=axial(y);side='L'if x<0 else'R';x=abs(x)
- if region=='upper'or(region=='authored_upper'and y>.305):return {'skull':1}
+ # The two procedural rostra are separate closed lofts with the modelled gap between them, so
+ # they carry their own owner and no band: there is no seam there to open.
+ if region=='upper':return {'skull':1}
  if region=='lower':return blend(axial(y),{'jaw':1},ramp(y,.315,.35))
- if region=='mandible':return blend({'skull':1},{'jaw':1},ramp(y,.326,.360))
- if y>.305:
-  line=float(np.interp(y,[.305,.33,.37,.395,.5],[-.027,-.017,-.005,-.0015,-.0015]))
-  jaw=ramp(y,.305,.356)*(1-ramp(z,line-.003,line+.003))
-  if jaw>0:return blend(a,{'jaw':1},jaw)
+ # The authored body's jaw share is **not** here. It is one smooth field over the whole uncut
+ # surface (`T.jaw_field_uncut`, applied below), because the old branch -- a 0.006-wide ramp in z
+ # about a typed lip line -- is exactly the thin strip CLAUDE.md warns about, and it is what folded
+ # the lip triangles inside out and cost this animal its mandible split in the first place.
  if .17<y<.28 and x>.065 and z<-.035:
   fw=blend({'pectoral0'+side:1},{'pectoral1'+side:1},ramp(x,.15,.25));return blend(a,fw,ramp(x,.070,.13))
  if -.20<y<-.065 and x>.032 and z<.035:
@@ -294,16 +373,24 @@ def close_rest(p,weight=1.):
  yr=-p.y/S;seated.z+=S*.0045*math.exp(-((yr-.395)/.050)**2)
  return p.lerp(seated,weight)
 allmesh=authored+puppets+features
-weight_report={}
+weight_report={};JAW_FIELD={}
 for o in allmesh:
  for n in B:o.vertex_groups.new(name=n)
+ field=[weights(v.co,o.get('region',''))for v in o.data.vertices]
+ if o is source:
+  # One field over one surface: full jaw below the measured mouth line and forward of the hinge,
+  # full skull above it, and a band at the commissure that stretches. This runs while the mesh is
+  # still in raw coordinates, which is the frame `HINGE_RAW` and `seam()` are in.
+  field,JAW_FIELD[o.name]=T.jaw_field_uncut(o,field,HINGE_RAW,below_mouth_line,axis=(0.,1.,0.),
+                                            band=JAW_BAND,behind=JAW_BEHIND)
  for v in o.data.vertices:
-  w=weights(v.co,o.get('region',''));w=dict(sorted(w.items(),key=lambda t:-t[1])[:4]);total=sum(w.values());assert total>0
+  w=field[v.index];w=dict(sorted(w.items(),key=lambda t:-t[1])[:4]);total=sum(w.values());assert total>0
   for n,q in w.items():o.vertex_groups[n].add([v.index],q/total,'REPLACE')
   v.co=close_rest(vworld(v.co),w.get('jaw',0)/total)
  for p in o.data.polygons:p.use_smooth=True
  mod=o.modifiers.new('Shared anatomical armature','ARMATURE');mod.object=rig;o.parent=rig
  weight_report[o.name]={'vertices':len(o.data.vertices),'triangles':sum(len(p.vertices)-2 for p in o.data.polygons),'maxInfluences':max(len(v.groups)for v in o.data.vertices)}
+print('SHONI_JAW_FIELD',json.dumps(JAW_FIELD),flush=True)
 # Seat the procedural mandibular upper half directly against its own upper
 # rostrum underside. This closes the contact surface across the width, including
 # the coarse proxy's lip edge, instead of leaving a visible slit under the lip.
@@ -328,68 +415,36 @@ for o in puppets:
  bm.to_mesh(o.data);bm.free();o.data.update();winding_report[o.name]={'signedVolumeBefore':before,'signedVolumeAfter':after,'outward':True}
 # Performance specification is a separate reproducible source.
 sys.path.insert(0,str(HERE));from performance import CLIPS,LOOPS,pose
-# ------------------------------------------------------ the cut's own seam, filled ----
-# The web goes on the authored body alone, and that is a fact about the twin rather than an
-# omission: this animal's procedural rostrum is two separate closed lofts, `Puppet upper rostrum`
-# and `Puppet lower rostrum`, so there is no cut there and nothing open to fill.
+# ------------------------------------------------------------- the mouth interior ----
+# **Nothing is built here, and that is a verdict rather than an omission.** A palate, a floor, a
+# throat-and-cheeks tube and two rows of conical teeth were authored here once; then a seam web
+# spanning the two copies of the rim the mandible split drew. All of it existed to close what a
+# *cut* opened, and there is no cut: `UNCUT_RIM` above reports no boundary anywhere along the mouth
+# line, and what a player sees inside the gape is the palate, floor and commissure the generation
+# modelled. `package-audit.mjs` refuses any node, mesh or material the runtime's oral classifier
+# would match, on either body.
 #
-# It is **off**: named so `src/shared/oral-geometry.ts` matches it, so the game hides it and the
-# viewer's *Mouth geometry* switch starts with it hidden. It is here to be looked at and judged.
-SEAM_FOLD,SEAM_FLOOR=.30,.0012
-# The gape the fold is sized on is the body's own, read off `performance.pose` rather than named.
-SEAM_GAPE=max(abs(float(pose(clip,f/max(1,round(d*30)),list(B))['jaw']['rotation'][0]))
-              for clip,d in CLIPS.items() for f in range(round(d*30)+1))
-assert SEAM_GAPE>.05,('no clip opens this jaw',SEAM_GAPE)
-def vraw(p):return Vector((-p[0]/S,-p[1]/S,p[2]/S))
-def seam_room(p,d):
- # Cast inwards on the intake surface as it was **before** the split: `depth_probe`'s normal sign
- # cannot answer beside a modelled cavity, where the nearest surface is the lumen's own wall.
- q=vraw(p);dr=Vector((-d[0],-d[1],d[2])).normalized()
- hit=INTAKE_RAW.ray_cast(q+dr*1e-5,dr,.25)
- return ((hit[0]-q).length if hit[0]is not None else .02)*S
-seam_mat=T.vertex_colour_material('Shonisaurus mouth interior seam',roughness=.62)
-JAW_TURN=arm.bones['jaw'].matrix_local.to_3x3()@Vector((1.,0.,0.))
-seam_web,SEAM_WEB=T.seam_web('Mouth interior seam web',source,jaw_mesh,SEAM_CYCLES,
-                             Vector(B['jaw']['head']),JAW_TURN,SEAM_GAPE,
-                             lambda p:interior_raw(vraw(p)),seam_mat,rig=rig,
-                             fold=SEAM_FOLD,floor=SEAM_FLOOR*S,room=seam_room,cap=.45,
-                             inside=lambda p:T.ray_parity_inside(INTAKE_RAW,vraw(p)))
-SEAM_WEB['rim']=SEAM_RIM;SEAM_WEB['interiorAlbedo']=INTERIOR
-SEAM_WEB['parity']=T.seam_web_parity(seam_web,source,jaw_mesh,SEAM_CYCLES)
-# **Ray parity cannot tell three different things apart here**, and that is the lesson rather than a
-# nuisance. A modelled mouth is an invagination, so a point in the lumen crosses the surface an even
-# number of times on the way out and reads as outside the solid; and this builder closes the
-# generation's own gape in bind geometry, so the two copies of the rim are already parted at rest and
-# the fold's base sits in that parting -- a slot in the surface, and spanning it is what the web is
-# for. So the parity count is recorded, with how much of it the measured lumen accounts for, and what
-# is asserted is the head's own measured section, which uses no normals at all.
-outside_lumen=0
-for v in seam_web.data.vertices:
- if v.index%3!=1:continue
- q=vraw(v.co)
- if T.ray_parity_inside(INTAKE_RAW,q):continue
- if min((q-c).length for c in CAV_WALL_CO)<.030:continue
- outside_lumen+=1
-SEAM_WEB['foldOutsideTheSolid']=SEAM_WEB['middleRowOutsideTheIntake']
-SEAM_WEB['foldOutsideTheSolidAndTheMeasuredLumen']=outside_lumen
-# The head's **own measured section**, not a normal-sign probe, is what bounds the fold -- and the
-# rows the web copies off the body are body vertices, so what they say about the section is the
-# metric's calibration rather than a fault. The folded row is judged against them.
-_HY=np.linspace(.302,.498,26);_HW=[];_HD=[]
-for _y in _HY:
- _m=np.abs(points[:,1]-_y)<.006
- _q=points[_m]if _m.sum()>5 else points[np.abs(points[:,1]-_y)<.015]
- _HW.append(float(np.quantile(np.abs(_q[:,0]),.90)));_HD.append(float(np.quantile(np.abs(_q[:,2]),.90)))
-def section_excess(v):
- q=vraw(v.co)
- return max(abs(q.x)/max(float(np.interp(q.y,_HY,_HW)),1e-6),
-            abs(q.z)/max(float(np.interp(q.y,_HY,_HD)),1e-6))
-SEAM_WEB['sectionExcessOfTheRimRows']=max(section_excess(v)for v in seam_web.data.vertices if v.index%3!=1)
-SEAM_WEB['sectionExcessOfTheFoldedRow']=max(section_excess(v)for v in seam_web.data.vertices if v.index%3==1)
-assert SEAM_WEB['sectionExcessOfTheFoldedRow']<=SEAM_WEB['sectionExcessOfTheRimRows']+1e-9,(
- 'the folded row stands further outside the head\'s own measured section than the skin it was '
- 'folded from',SEAM_WEB['sectionExcessOfTheFoldedRow'],SEAM_WEB['sectionExcessOfTheRimRows'])
-print('SHONI_SEAM_WEB',json.dumps(SEAM_WEB),flush=True)
+# The twin needs nothing either, and that is a fact about the twin: its rostrum is two separate
+# closed lofts, `Puppet upper rostrum` and `Puppet lower rostrum`, with the modelled gap between
+# them, so it has no seam of any kind.
+#
+# The gape is still measured off `performance.pose` rather than named, because the jaw-band sweep
+# and the gape proof are both quoted against it.
+JAW_GAPE=max(abs(float(pose(clip,f/max(1,round(d*30)),list(B))['jaw']['rotation'][0]))
+             for clip,d in CLIPS.items() for f in range(round(d*30)+1))
+assert JAW_GAPE>.05,('no clip opens this jaw',JAW_GAPE)
+ORAL_GEOMETRY={'construction':'uncut (T.jaw_field_uncut): the generation modelled a palate, a '
+                              'floor and a commissure, so nothing is cut and the mouth opening is '
+                              'the jaw bone turning inside one continuous surface. Full jaw below '
+                              'the measured mouth line and forward of the hinge, full skull above '
+                              'it, and a band at the commissure that stretches.',
+               'authoredParts':[], 'lumenWallVertices':len(CAV_WALL),
+               'mouthLine':MOUTH_LINE_DEVIATION, 'boundaryAtTheMouth':UNCUT_RIM,
+               'jawBandFractionOfHeadHalfDepthAtTheHinge':JAW_BAND_FRACTION,
+               'jawBandRaw':JAW_BAND,'jawBehindRaw':JAW_BEHIND,
+               'gapeMeasuredFromTheClips':JAW_GAPE,'field':JAW_FIELD}
+print('SHONI_ORAL',json.dumps({k:v for k,v in ORAL_GEOMETRY.items() if k!='construction'}),flush=True)
+
 for clip,duration in CLIPS.items():
  a=bpy.data.actions.new(clip);a.use_fake_user=True;rig.animation_data.action=a;last=round(duration*30)
  for f in range(last+1):
@@ -414,11 +469,11 @@ def export(obs,path):
  for o in obs+[rig]:o.select_set(True)
  bpy.context.view_layer.objects.active=rig
  bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_animations=True,export_animation_mode='ACTIONS',export_force_sampling=True,export_frame_range=False,export_skins=True,export_normals=True,export_tangents=True,export_texcoords=True,export_materials='EXPORT',export_vertex_color='NAME',export_vertex_color_name='Color',export_all_vertex_colors=False,export_yup=True,export_extras=True,export_morph=False)
-export(authored+features+[seam_web],LOCAL/'shonisaurus.full.uncompressed.glb');export(puppets+features,LOCAL/'shonisaurus.puppet.uncompressed.glb')
+export(authored+features,LOCAL/'shonisaurus.full.uncompressed.glb');export(puppets+features,LOCAL/'shonisaurus.puppet.uncompressed.glb')
 # Authoring file carries both geometries; collection visibility is set by review.py.
 bpy.ops.wm.save_as_mainfile(filepath=str(LOCAL/'shonisaurus.shared-rig.blend'))
 meta={'id':'shonisaurus','name':'Shonisaurus','species':'Shonisaurus popularis','provenance':'Late Triassic · Berlin-Ichthyosaur, Nevada','description':'Deep-bodied shastasaurid with long paired flippers, slender rostrum and lateral tail propulsion. Authored Tripo body and measured procedural volume puppet share the exact armature and actions.','lengthMeters':14,'modelLength':6,'locomotion':'Swim','clips':list(CLIPS),'looping':list(LOOPS),'anchors':[a['name']for a in anchors],'sources':['docs/triassic/canonical/shonisaurus.png','tools/triassic/creatures/shonisaurus/tripo-raw/shonisaurus.raw.glb'],'notes':['Authored skin retains source UV albedo with white COLOR_0 and restrained normal strength 0.15; procedural skin uses measured source pigment.','Procedural geometry is rebuilt from measured radial/spanning sections, not mesh decimation.','Bind geometry has a sealed mouth; only Bite, Attack, Heavy and Eat open it.','No authored oral geometry: the closed generation shows no backdrop through its gape, so the mouth is its anchors and the lip rims and tooth forms the generation drew. The eye globes sit where the albedo paints the eyes, seated 0.0025 raw under the skin along its normal.','Shared clips are applied verbatim to the authored and procedural exports. Oral articulation and swimming performance are inferred soft-tissue behaviour.']}
 existing=json.loads((OUT/'shonisaurus.json').read_text())if(OUT/'shonisaurus.json').exists()else{}
 meta={**existing,**meta}
 (OUT/'shonisaurus.json').write_text(json.dumps(meta,indent=2)+'\n')
-(HERE/'build-report.json').write_text(json.dumps({'materialCorrection':{'authoredAlbedo':'original UV texture; white COLOR_0','normalStrength':.15,'roughness':.7,'puppetMaterialUnchanged':True},'authoredMandibleSeparation':{'frontOwner':'jaw','upperLipOwner':'skull','rearHingeRawY':[.326,.360],'trianglesPreserved':True},'rawSHA256':hashlib.sha256(RAW.read_bytes()).hexdigest(),'closedRestJawAngleRadians':CLOSED_REST_ANGLE,'puppetLipContactFit':{'vertices':puppet_lip_seated,'maximumModelDisplacement':puppet_lip_max},'chinSurgery':{'adjustedVertices':chin_count,'maximumRawLengthDisplacement':chin_max},'oralGeometry':SEAM_WEB,'eyes':eye_report,'closedSurfaceWinding':winding_report,'rawVertices':len(points),'rawTriangles':raw_triangles,'meshes':weight_report,'bones':len(B),'clips':list(CLIPS),'profileSections':len(profile)},indent=2)+'\n')
+(HERE/'build-report.json').write_text(json.dumps({'materialCorrection':{'authoredAlbedo':'original UV texture; white COLOR_0','normalStrength':.15,'roughness':.7,'puppetMaterialUnchanged':True},'mandible':{'construction':'uncut: one continuous surface, one weight field (T.jaw_field_uncut)','bandFractionOfHeadHalfDepthAtTheHinge':JAW_BAND_FRACTION,'bandRaw':JAW_BAND,'behindRaw':JAW_BEHIND},'rawSHA256':hashlib.sha256(RAW.read_bytes()).hexdigest(),'closedRestJawAngleRadians':CLOSED_REST_ANGLE,'puppetLipContactFit':{'vertices':puppet_lip_seated,'maximumModelDisplacement':puppet_lip_max},'chinSurgery':{'adjustedVertices':chin_count,'maximumRawLengthDisplacement':chin_max},'oralGeometry':ORAL_GEOMETRY,'eyes':eye_report,'closedSurfaceWinding':winding_report,'rawVertices':len(points),'rawTriangles':raw_triangles,'meshes':weight_report,'bones':len(B),'clips':list(CLIPS),'profileSections':len(profile)},indent=2)+'\n')

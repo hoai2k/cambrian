@@ -15,13 +15,12 @@ const anchors=JSON.parse(fs.readFileSync(`${here}/anchors.json`));
 const feeding=new Set(['Bite','Attack','Heavy','Eat']);
 const meta=JSON.parse(fs.readFileSync(`${out}/shonisaurus.json`));
 const buildReport=JSON.parse(fs.readFileSync(`${here}/build-report.json`));
-// The runtime's oral classifier (src/shared/oral-geometry.ts). This animal carries **one** thing it
-// matches and no palate, floor, throat tube or tooth row: the seam web, the ruled surface between
-// the two copies of the rim the mandible split drew through solid head behind the modelled gape.
-// It is hidden in play like all oral geometry; the point of naming it here is that nothing *else*
-// may appear, which is the verdict this body has always shipped under.
+// The runtime's oral classifier (src/shared/oral-geometry.ts). This animal carries **nothing** it
+// matches: no palate, no floor, no throat tube, no tooth row, and since the mandible stopped being
+// cut off, no seam web either. The mouth is the one the generation modelled and the jaw is a bone
+// turning inside one continuous surface, so there is no rim for anything to close. That is the
+// verdict this body ships under and the point of naming it here is that nothing may appear.
 const ORAL=/lining|mouth[ _]interior|hinge[ _]tissue|beak|palate/i;
-const SEAM_WEB='Mouth interior seam web';
 const numDigest=a=>hash(Buffer.from(new Float64Array(arr(a)).buffer));
 function skeleton(doc){const skin=doc.getRoot().listSkins()[0];return {joints:skin.listJoints().map(n=>({name:n.getName(),parent:n.getParentNode()?.getName(),translation:n.getTranslation(),rotation:n.getRotation(),scale:n.getScale()})),inverseBind:numDigest(skin.getInverseBindMatrices())};}
 function geometry(doc){return doc.getRoot().listMeshes().map(m=>({name:m.getName(),primitives:m.listPrimitives().map(p=>({triangles:(p.getIndices()?.getCount()??p.getAttribute('POSITION').getCount())/3,attributes:p.listSemantics().sort().map(s=>[s,numDigest(p.getAttribute(s))])}))}));}
@@ -42,10 +41,11 @@ function removeNeutralExportNoise(doc){
 }
 function check(doc,label){
  const root=doc.getRoot(), animations=root.listAnimations(),names=animations.map(a=>a.getName());assert.deepEqual([...names].sort(),[...meta.clips].sort());
- for(const n of root.listNodes())if(n.getMesh())for(const p of n.getMesh().listPrimitives())assert(n.getName()===SEAM_WEB||!ORAL.test(`${n.getName()} ${n.getMesh().getName()} ${p.getMaterial()?.getName()??''}`),`${label} ${n.getName()}: oral geometry beyond the seam web, on an animal that carries none`);
- // The twin's rostrum is two separate closed lofts, so it has no cut and nothing to fill: the web
- // belongs to the authored body alone, and that is a fact about the twin rather than an omission.
- assert.equal(root.listNodes().filter(n=>n.getName()===SEAM_WEB).length,label==='full'?1:0,`${label}: the seam web belongs to the authored body alone`);
+ for(const n of root.listNodes())if(n.getMesh())for(const p of n.getMesh().listPrimitives())assert(!ORAL.test(`${n.getName()} ${n.getMesh().getName()} ${p.getMaterial()?.getName()??''}`),`${label} ${n.getName()}: oral geometry, on an animal that carries none`);
+ // The authored body is **one** cutaneous mesh. It was two while the mandible was cut off as its
+ // own object; uncut it is the generation's own single surface, which is what makes the mouth a
+ // joint rather than a seam.
+ assert.equal(root.listNodes().filter(n=>n.getName().startsWith('Shonisaurus authored')).length,label==='full'?1:0,`${label}: the authored skin is one uncut surface`);
  const signatures=new Set();let weights=0,tris=0;const winding=[];
  for(const m of root.listMeshes())for(const p of m.listPrimitives()){
   tris+=(p.getIndices()?.getCount()??p.getAttribute('POSITION').getCount())/3;

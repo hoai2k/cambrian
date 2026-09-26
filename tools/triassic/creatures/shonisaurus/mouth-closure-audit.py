@@ -31,6 +31,7 @@ def audit(file):
 r={'method':'Lateral through-aperture scan over 60 rostral sections and 240 heights, only external cutaneous meshes; oral fillers and teeth excluded.','closed':audit(L/'shonisaurus.shared-rig.blend')}
 control=L/'shonisaurus.before-mouth-closure.blend'
 if control.exists():r['priorOpenControl']=audit(control)
-assert all(v['missedRays']==0 for v in r['closed'].values()),'Closed mouth has an aperture'
+print("CLOSURE",json.dumps({t:{n:x for n,x in v.items() if n!="stations"} for t,v in r["closed"].items()}),flush=True)
+assert all(v["missedRays"]==0 for v in r["closed"].values()),"Closed mouth has an aperture"
 r['passed']=True
 (H/'mouth-closure-validation.json').write_text(json.dumps(r,indent=2)+'\n');print(json.dumps({k:{t:{n:x for n,x in v.items()if n!='stations'}for t,v in val.items()}for k,val in r.items()if isinstance(val,dict)},indent=2))
