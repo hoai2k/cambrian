@@ -53,13 +53,10 @@ export interface Settings {
   /**
    * What the touch player's secondary pad is set to, and how many touch matches they have played.
    *
-   * Both live here because both have to outlast a match: a player who plays as a hider should not
-   * have to swipe back to it every time they hatch, and the nudge that says the pad *can* be swiped
-   * has to stop appearing once they know. Not settings anybody edits in the settings panel — they are
-   * written by playing — but this is the one thing this game already persists, and giving them their
-   * own key would mean a second thing to keep in step.
+   * The chosen pad action outlasts a match, so a player who plays as a hider does not have to
+   * swipe back to it every time they hatch.
    */
-  secondary: Secondary; touchMatches: number;
+  secondary: Secondary;
 }
 
 /** The active era's modes, in its order; the first is the default selection. */
@@ -79,7 +76,7 @@ const MODES: Mode[] = ACTIVE_ERA.modes.map((m) => m.id);
 const SETTINGS_KEY = ACTIVE_ERA.copy.settingsKey;
 const defaultSettings = (): Settings => {
   // Re-evaluate old automatic defaults against this device; an explicit Settings choice wins.
-  const defaults: Settings = { quality: qualityForDevice(undefined), lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false, shoreAnimals: false, secondary: 'aim', touchMatches: 0 };
+  const defaults: Settings = { quality: qualityForDevice(undefined), lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false, shoreAnimals: false, secondary: 'aim' };
   try {
     const s = localStorage.getItem(SETTINGS_KEY);
     if (s) {
@@ -462,9 +459,6 @@ export function App() {
     // something they did not choose.
     engineRef.current.setSecondary(settingsRef.current.secondary);
     setSecondary(settingsRef.current.secondary);
-    // Count the touch matches, which is what retires the swipe nudge. Only the ones actually played
-    // on glass: a player who has only ever used a keyboard has not learned about the pad.
-    if (handRef.current === 'touch') setSettings((x) => ({ ...x, touchMatches: x.touchMatches + 1 }));
     engineRef.current.startMatch(modeRef.current, withCarry(ps));
     setPausedBoth(false);
     go('playing');
@@ -1081,7 +1075,6 @@ export function App() {
           secondary={secondary}
           // The nudge is worth one or two matches and then it is in the way. It also stands down the
           // moment the player swipes, because at that point they have plainly found it.
-          hint={settings.touchMatches <= 2 && settings.secondary === SECONDARY[0] && !swapped}
           swapped={swapped}
           teleportOpen={!!hud?.players.some((p) => p.teleport)}
           onPause={() => { setPausedBoth(true); }}

@@ -23,10 +23,8 @@ import type { Secondary } from '../shared/touch-play';
  * button is the exception and a real `<button>`: it leaves the game, which is the one thing that must
  * work however the page is being read.
  */
-export function TouchPads({ secondary, hint, swapped, teleportOpen, onPause }: {
+export function TouchPads({ secondary, swapped, teleportOpen, onPause }: {
   secondary: Secondary;
-  /** Say the pad can be swiped. True only for a player who has not yet discovered it. */
-  hint: boolean;
   /** The pad was just swapped: name what it is now, for a moment. */
   swapped: boolean;
   /** The travel menu is up, so the game pads stand down while the player chooses. */
@@ -37,11 +35,7 @@ export function TouchPads({ secondary, hint, swapped, teleportOpen, onPause }: {
   const label = COPY[secondary];
   return (
     <div className="touch-pads">
-      {/* A column: the nudge stands *above* the pads rather than beside them. Beside them it was in
-          the toolbar's corner, clipped and unreadable, which is a poor advertisement for a control
-          nobody has found yet. */}
       {!teleportOpen && <div className="touch-left">
-        {hint && <p className="touch-hint">{COPY.swapHint}</p>}
         <div className="touch-pad-row">
           <div className="touch-pad touch-swim" data-touch-zone="swim" aria-hidden="true">
             <span>{COPY.swim}</span>

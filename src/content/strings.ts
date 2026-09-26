@@ -438,11 +438,6 @@ export interface GameStrings {
       readonly sense: string;
       /** Spoken, and the title: what the pad does and how to change it. */
       readonly secondaryAria: (action: string) => string;
-      /**
-       * The one-off nudge that says the pad can be swiped, shown for the first few touch matches and
-       * never again. A control that can be changed and never says so is a control nobody changes.
-       */
-      readonly swapHint: string;
       /** Shown for a moment after a swipe lands, naming what the pad is now. */
       readonly swapped: (action: string) => string;
       readonly pause: string;
@@ -959,7 +954,6 @@ export const SHARED_STRINGS: GameStrings = {
       ability: 'HIDE',
       sense: 'SENSE',
       secondaryAria: (action) => `Hold for ${action}. Swipe the pad sideways to change it.`,
-      swapHint: 'Swipe this pad to change it',
       swapped: (action) => action,
       pause: 'Pause',
       travel: 'Travel',

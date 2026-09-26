@@ -225,7 +225,7 @@ function SensePanel({ p }: { p: PlayerHud }) {
         </div>
       )}
       {!p.modelReady && p.alive && <p className="hint">{COPY.modelLoading}</p>}
-      {p.hint && p.hunterState === 'none' && p.modelReady && <p className="hint">{fillControls(p.hint, s)}</p>}
+      {p.hint && p.hunterState === 'none' && p.modelReady && <p className="hint goal-hint">{fillControls(p.hint, s)}</p>}
       {/* Co-op: where a team-mate went down, and how long is left to reach them. */}
       {p.downedAllies.map((d) => (
         <div key={d.index} className="downed-arrow" style={{ color: d.color, transform: `rotate(${Math.atan2(d.x, -d.y) * 180 / Math.PI}deg)` }} aria-hidden>

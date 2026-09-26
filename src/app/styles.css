@@ -289,6 +289,7 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .chip.sense.ready .cool { background: #9be9ff; }
 .tally { display: flex; gap: .8em; color: var(--dim); font-size: .8em; letter-spacing: .06em; padding-bottom: .3em; }
 .hint { position: absolute; left: 50%; bottom: 5.4em; transform: translateX(-50%); margin: 0; padding: .6em 1.1em; border-radius: 1em; background: rgba(6,22,28,.72); border: 1px solid rgba(255,179,107,.5); color: var(--foam); font-weight: 700; font-size: 1em; white-space: nowrap; animation: rise-in-centred .4s both; max-width: 90%; text-overflow: ellipsis; overflow: hidden; }
+.goal-hint { top: 8em; bottom: auto; }
 .hint.danger { border-color: var(--coral); color: #ffd4da; }
 .marker { position: absolute; width: calc(.7em * var(--s)); height: calc(.7em * var(--s)); transform: translate(-50%, -50%) rotate(45deg); border: 2px solid currentColor; border-radius: 2px; opacity: .8; box-shadow: 0 0 8px currentColor; transition: left .1s linear, top .1s linear; }
 /* Only a mark that is *about* you blinks. It used to be every giant-band body on screen. */
@@ -948,7 +949,6 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .swipe-mark.left { left: 5px; border-right: 5px solid currentColor; }
 .swipe-mark.right { right: 5px; border-left: 5px solid currentColor; }
 
-.touch-hint { pointer-events: none; margin: 0; max-width: 10.5rem; font: 600 10.5px/1.35 var(--font-body); color: var(--mist); text-shadow: 0 1px 4px rgba(0, 0, 0, .85); animation: fade-in .4s both; }
 
 /* Pause takes the bottom-right corner while the icon toolbar is hidden during touch play. */
 .touch-btn {
@@ -1019,6 +1019,9 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
  */
 .is-touch .hud-bottom { bottom: 12.4em; }
 .is-touch .hint { bottom: 15.6em; }
+.is-touch .goal-hint { top: 10.5em; bottom: auto; }
+/* Keep the transient biome name above the goal line on short touch viewports. */
+.is-touch .biome-banner { top: 7%; }
 .is-touch .grip-panel { bottom: 18.2em; }
 .is-touch .death-note { bottom: 15.6em; }
 .is-touch .radar { top: 4.6em; }
