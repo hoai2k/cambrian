@@ -320,8 +320,7 @@ export function App() {
       onLoaded: () => setLoaded(true),
       onProgress: (p) => setProgress(p),
       // A swipe on the secondary pad. Remembered, so the choice outlasts the match, and flagged for a
-      // moment so the pad can say what it has become — a control that changes silently reads as one
-      // that did not change.
+      // moment so the pad can show what it has become without making a UI sound in the HUD.
       onSecondary: (sec) => {
         setSecondary(sec);
         setSettings((x) => ({ ...x, secondary: sec }));
@@ -1085,7 +1084,7 @@ export function App() {
           hint={settings.touchMatches <= 2 && settings.secondary === SECONDARY[0] && !swapped}
           swapped={swapped}
           teleportOpen={!!hud?.players.some((p) => p.teleport)}
-          onPause={() => { setPausedBoth(true); audio.play('ui-confirm'); }}
+          onPause={() => { setPausedBoth(true); }}
         />
       )}
       {screen === 'playing' && paused && <PauseMenu items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} board={small.touch && pauseScores ? engineRef.current?.pauseScoreboard() : undefined} />}
@@ -1100,7 +1099,7 @@ export function App() {
           <button aria-label={TEXT.common.dismiss} onClick={() => { setNotice(''); setError(''); }}>×</button>
         </div>
       )}
-      {orientationBlocked && <RotateHint onPause={() => { setPausedBoth(true); audio.play('ui-confirm'); }} />}
+      {orientationBlocked && <RotateHint onPause={() => { setPausedBoth(true); }} />}
     </main>
   );
 }

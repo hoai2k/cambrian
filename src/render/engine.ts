@@ -514,7 +514,7 @@ export class Engine {
       this.updateAim(cs, p, p.aiming, 0, ndc);
       return this.pointingAt(game, p, cs) !== 'none';
     };
-    this.touch.onSwap = (sec) => { this.cb.onSecondary?.(sec); audio.play('ui-move'); };
+    this.touch.onSwap = (sec) => { this.cb.onSecondary?.(sec); };
     this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.sand.points, this.tracks.mesh, this.splash.group, this.mouthfuls.group, this.eggs.group);
     (window as any).__cambrian = this;
     this.resize = new ResizeObserver(() => this.onResize());
