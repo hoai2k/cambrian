@@ -1867,7 +1867,7 @@ export class Game implements AiWorld {
       // Aim (LT held): the camera owns the crosshair; whatever it reports is the target. Bots toggle lock.
       if (a.controller === 'player') {
         a.aiming = input.aim;
-        a.lockTarget = input.aim ? input.aimTarget : -1;
+        a.lockTarget = input.pursueTarget ?? (input.aim ? input.aimTarget : -1);
         if (input.aim) this.flag(a, 'lock');
       } else if (justLock) {
         if (a.lockTarget >= 0) a.lockTarget = -1;
@@ -1900,6 +1900,10 @@ export class Game implements AiWorld {
       // place, so a charge out of a sprint (below) or out of a dash reaches exactly the same move.
       // Sprinting makes it a charge: it aims along the line of travel and costs extra stamina.
       if (grasped) { /* the grip took the button */ }
+      else if (input.pursueTarget != null && a.controller === 'player') {
+        const target = this.idMap.get(input.pursueTarget);
+        if (target && isAlive(target) && !isHidden(target)) this.startPounce(a, target, L, sf, true);
+      }
       else if (justHeavy && this.heavyAction(a, def, L, sf, locked, bursting)) { /* the button was taken */ }
       // Holding the grip button at something too big to bite keeps swimming at it until it has
       // hold of it. A lunge is one press and lasts about a second, which on a body that size is
@@ -1971,6 +1975,7 @@ export class Game implements AiWorld {
       // turned as they close on it. While the button is down the lunge keeps its legs: it re-aims
       // at wherever the animal is now, every frame, until it arrives. Paid for once when it
       // started, because it is one act however long the swim to it takes.
+      if (t && isAlive(t) && input.pursueTarget === t.id) a.stateDur = a.stateT + 0.2;
       if (t && isAlive(t) && a.graspHold && !a.graspSpent && a.grabbing < 0 && a.rideHost < 0
         && (bandOf(a, t) === 'threat' || bandOf(a, t) === 'giant')) a.stateDur = a.stateT + 0.2;
       if (t && isAlive(t) && a.stateT < a.stateDur) {
@@ -2243,7 +2248,7 @@ export class Game implements AiWorld {
     // wiped the target on the first frame and left the animal stopped where it started.
     if (a.lockTarget >= 0) {
       const t = this.idMap.get(a.lockTarget);
-      const reaching = a.state === 'pounce' && a.graspHold && !!t
+      const reaching = (a.state === 'pounce' && input.pursueTarget === a.lockTarget) || a.state === 'pounce' && a.graspHold && !!t
         && (bandOf(a, t) === 'threat' || bandOf(a, t) === 'giant');
       if (!t || !isAlive(t) || isHidden(t) || (!a.aiming && !reaching && dist(a.pos, t.pos) > 16 + L * 8)) a.lockTarget = -1;
     }

@@ -104,7 +104,7 @@ export type Zone = 'water' | 'swim' | 'secondary';
  *   - `pending`   a water touch that has neither travelled nor lifted: it could still be either.
  *   - `drag`      it travelled. The camera, for the rest of its life.
  *   - `dash`      it is the second half of a double-tap over open water. A dash, aimed at itself.
- *   - `heavy`     it is the second half of a double-tap over an animal. One edge, then inert.
+ *   - `heavy`     it is the second half of a double-tap over an animal. Held pursuit.
  *   - `swim`      it is on the forward pad.
  *   - `secondary` it is on the secondary pad, holding that pad's action.
  *   - `swap`      it is on the secondary pad and has travelled sideways: it changed the pad's
@@ -248,13 +248,10 @@ export function down(
     s.aim = { ...toNdc(x, y, size.w, size.h), t, marker: onTarget ? 'target' : undefined };
     const tap = s.lastTap;
     if (tap && t - tap.t <= DOUBLE) {
-      // The second half of a double-tap. Which of the two it is was settled by the *first* tap: the
-      // question "is there something to pounce at" was asked where the player aimed, and the second
-      // tap is a confirmation rather than a new aim.
+      // The first tap chooses whether the held second tap pursues a creature or dashes in water.
       touch.role = tap.onTarget ? 'heavy' : 'dash';
       s.aim.marker = touch.role === 'dash' ? 'zoom' : 'target';
-      if (tap.onTarget) s.heavies++;
-      else { s.dashPulse = 0.42; s.dashReadAt = undefined; }
+      if (!tap.onTarget) { s.dashPulse = 0.42; s.dashReadAt = undefined; }
       // A double-tap is consumed: three taps are a double-tap and then a fresh single, not two
       // overlapping doubles.
       s.lastTap = undefined;
@@ -332,6 +329,8 @@ export interface TouchFrame {
   secondary: Secondary | undefined;
   /** A dash is running: a committed double-tap on water, or its second finger still held. */
   dash: boolean;
+  /** The second tap is held on a creature: pursue that creature until a bite lands. */
+  pursue: boolean;
   /** A swipe is turning the camera, so the follow camera stands aside. */
   dragging: boolean;
   /** Where the player is pointing, in NDC, while it has not lapsed. */
@@ -405,7 +404,7 @@ export function read(s: TouchState, t: number, lookSpeed = 1): TouchFrame {
     dx: dx * SENSITIVITY * lookSpeed, dy: dy * SENSITIVITY * lookSpeed,
     zoom,
     bites: s.bites, heavies: s.heavies,
-    swim, secondary, dash, dragging,
+    swim, secondary, dash, pursue: [...s.touches.values()].some((p) => p.role === 'heavy'), dragging,
     // The aim point lapses on its own clock, so a bite fired on a lift still aims where the finger
     // was and a hand taken off the glass hands aiming back to the middle of the screen.
     ndc: s.aim && t - s.aim.t <= AIM_HOLD ? { x: s.aim.x, y: s.aim.y } : undefined,

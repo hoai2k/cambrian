@@ -35,7 +35,8 @@ export function distanceAtten(d: number, ref: number): number {
  * sound still gets through the window; see `play()` in audio.ts.
  */
 export const MIN_GAP: Record<string, number> = {
-  eat: 90, crunch: 90, hit: 45, 'hit-heavy': 45, 'hit-huge': 45, 'crunch-huge': 90,
+  eat: 90, crunch: 90, hit: 120, 'hit-heavy': 120, 'hit-huge': 120, 'crunch-huge': 90,
+  'ui-move': 160, parry: 120, armour: 120, armourPierce: 120, guardBreak: 120,
   burst: 220, 'burst-huge': 220, dodge: 120, 'dodge-huge': 120, silt: 200, stagger: 120,
 };
 

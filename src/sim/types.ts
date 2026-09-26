@@ -48,6 +48,8 @@ export interface InputFrame {
   dash: boolean;
   /** A touch double-tap may interrupt its own first tap's bite to begin the dash. */
   touchDash?: boolean;
+  /** Held double click/tap: track this exact creature until the bite lands. */
+  pursueTarget?: number;
   /** LT held: aim mode. The renderer decides what the centred crosshair is over and passes it here. */
   aim: boolean; aimTarget: number;
   lookX: number; lookY: number;

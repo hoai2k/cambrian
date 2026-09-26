@@ -64,7 +64,7 @@ const fresh = () => ({ s: freshTouch(), t: 0 });
 // ---------------------------------------------------------------- double-tap
 
 {
-  // Over an animal a double-tap is the heavy, and the first tap still bites: sitting on every bite
+  // Over an animal a held double-tap pursues it, and the first tap still bites: sitting on every bite
   // for DOUBLE seconds to find out whether a second is coming taxes the common move for the rare one.
   const { s } = fresh();
   down(s, 1, 'water', 400, 200, 0, true, SIZE);
@@ -73,7 +73,10 @@ const fresh = () => ({ s: freshTouch(), t: 0 });
   check('the first tap of a double-tap still bites', first.bites === 1 && first.heavies === 0);
   down(s, 2, 'water', 402, 201, 0.06 + DOUBLE / 2, true, SIZE);
   const second = read(s, 0.06 + DOUBLE / 2);
-  check('double-tapping an animal is the heavy', second.heavies === 1, `heavies=${second.heavies}`);
+  check('holding the second tap pursues the animal', second.pursue && second.heavies === 0);
+  check('the pursuit lasts while held', read(s, 0.5).pursue);
+  up(s, 2, 0.55);
+  check('lifting ends the pursuit', !read(s, 0.56).pursue);
   check('...and it is not also a dash', second.dash === false);
   check('a creature tap uses the target mark', first.marker === 'target' && second.marker === 'target');
 }
@@ -117,7 +120,7 @@ const fresh = () => ({ s: freshTouch(), t: 0 });
   down(s, 1, 'water', 400, 200, 0, true, SIZE); up(s, 1, 0.04); read(s, 0.05);
   down(s, 2, 'water', 400, 200, 0.06, true, SIZE); up(s, 2, 0.1);
   const two = read(s, 0.11);
-  check('the second tap of a double is spent', two.heavies === 1);
+  check('the second tap of a double is spent', two.bites === 0 && !two.dash);
   down(s, 3, 'water', 400, 200, 0.13, true, SIZE);
   check('...so a third tap starts again and is no heavy', read(s, 0.14).heavies === 0);
 }
@@ -342,13 +345,13 @@ check('an owed edge fires on a frame with no arrivals', meterEdge(1, 0).fire ===
 // ---------------------------------------------------------------- folding into the controls
 
 const fold = (t: Partial<ReturnType<typeof read>> & { light?: boolean; heavy?: boolean } = {}): RawControls => applyTouch(emptyControls(), {
-  dx: 0, dy: 0, zoom: 0, bites: 0, heavies: 0, swim: false, secondary: undefined, dash: false,
+  dx: 0, dy: 0, zoom: 0, bites: 0, heavies: 0, swim: false, secondary: undefined, dash: false, pursue: false,
   dragging: false, ndc: undefined, marker: undefined, swapped: false, pinching: false, light: false, heavy: false, ...t,
 });
 
 check('the swim pad is forward on the stick', fold({ swim: true }).my === 1);
 check('a tap is the light attack', fold({ light: true }).light === true);
-check('a double-tap on an animal is the heavy', fold({ heavy: true }).heavy === true);
+check('the dedicated heavy input still works', fold({ heavy: true }).heavy === true);
 check('a double-tap on water is the dash', fold({ dash: true }).dash === true && fold({ dash: true }).dodge === true);
 check('the pad on aim gives aim mode', fold({ secondary: 'aim' }).aim === true && fold({ secondary: 'aim' }).lock === true);
 check('the pad on guard guards', fold({ secondary: 'guard' }).guard === true);

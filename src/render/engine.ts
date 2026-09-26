@@ -404,6 +404,8 @@ export class Engine {
   private cams: CamState[] = [];
   /** Where the local views hear from, refreshed each frame; see `hearing()`. */
   private listeners: { pos: THREE.Vector3; right: THREE.Vector3; ref: number }[] = [];
+  /** A held double gesture keeps its original animal even after it leaves the pointer. */
+  private pursuitTargets = new Map<number, number>();
   private attractCam = new THREE.PerspectiveCamera(55, 1, 0.1, 400);
   private bubbles = new Bubbles();
   private mouthfuls = new Mouthfuls();
@@ -756,6 +758,12 @@ export class Engine {
     // separate thing the middle button asks for (`updateAim` still blends on `c.aim`).
     const cursor = this.cursorDir(cs);
     if (cursor) { f.aim = true; f.aimTarget = cs.aimTarget; }
+    const pursuing = this.setups[a.player]?.device === 'touch' ? this.touchFrame?.pursue : this.mouseLook && this.mouseFrame?.pursue;
+    if (pursuing) {
+      if (!this.pursuitTargets.has(a.player)) this.pursuitTargets.set(a.player, cs.aimTarget);
+      const target = this.pursuitTargets.get(a.player) ?? -1;
+      if (target >= 0) { f.pursueTarget = target; f.aim = true; f.aimTarget = target; }
+    } else this.pursuitTargets.delete(a.player);
     // The right button — or a double-tap on the water — dashes at what is being pointed at: the dash
     // takes its direction from the stick through the camera, so for those frames the camera's forward
     // *is* the pointing ray and a neutral stick is pushed forward along it. Held, the body keeps
@@ -1109,7 +1117,7 @@ export class Engine {
   private showCursor(m: ReturnType<MousePlay['read']>, game: Game, p: Actor | undefined, cs: CamState) {
     const over = this.pointingAt(game, p, cs);
     this.mouse.aimingAt(over !== 'none');
-    const want = cursorFor(cursorState(m, over));
+    const want = m.pursue ? 'none' : cursorFor(cursorState(m, over));
     if (want !== this.cursorNow) { this.cursorNow = want; this.container.style.cursor = want; }
   }
 
@@ -1807,7 +1815,7 @@ export class Engine {
         case 'swallow': { world('swallow', e.pos, 1.2); this.bubbles.emit(e.pos, 30, 1, 3, 0.09, 1.5); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 1, 1, 900); this.shake(e.player, 1.2); } break; }
         case 'disintegrate': { this.sparkles.emit(e.pos, Math.round(28 + (e.strength ?? 1) * 10), 0.5 + (e.strength ?? 1) * 0.25, 0.9, 0.06, 2.2); world('disintegrate', e.pos, 0.6); break; }
         case 'routed': { world('routed', e.pos, 0.8); this.impacts.spawn(e.pos, '#9ff6ff', 2.5, 0.6); break; }
-        case 'pounce': { this.impacts.spawn(e.pos, '#ffe08a', 1.2 + (e.strength ?? 1) * 0.5, 0.35); this.bubbles.emit(e.pos, 24, 0.9, 4, 0.08); world('pounce', e.pos, 1.3); if (e.player != null && e.player >= 0) { const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.7, 0.4, 140); this.shake(e.player, 0.6); } break; }
+        case 'pounce': { this.impacts.spawn(e.pos, '#ffe08a', 1.2 + (e.strength ?? 1) * 0.5, 0.35); this.bubbles.emit(e.pos, 24, 0.9, 4, 0.08); world('pounce', e.pos, 1.3); if (e.player != null && e.player >= 0) { if (this.pursuitTargets.get(e.player) === e.other) this.pursuitTargets.set(e.player, -1); const d = padOf(e.player); if (typeof d === 'number') rumble(d, 0.7, 0.4, 140); this.shake(e.player, 0.6); } break; }
         // A jet is a discrete shove — a nautiloid empties its funnel and stops — so it keeps its
         // sting. Ordinary sprinting is a bed instead (`audio.setSprint`, driven below from the
         // frame's own inputs): it is held down for minutes at a time, and one loud whoosh per press
@@ -1998,17 +2006,17 @@ export class Engine {
       let aim: PlayerHud['aim'];
       // On a mouse the *cursor* is the crosshair (`src/shared/cursors.ts`), so the reticle is off:
       // two crosshairs on one screen, one of them nailed to the middle, is worse than either alone.
-      if (p.aiming && cs && !this.mouseLook) {
+      if (p.aiming && cs && !this.mouseLook && !this.touchFrame?.pursue) {
         const t = lockA && isAlive(lockA) ? lockA : undefined;
         const heavyMove = game.heavyMove(p);
         // A finger keeps the reticle and takes it *with* it. The mouse has a cursor doing this job
         // and so draws none; a pad has no pointer at all and so draws it in the middle, which is
         // where its aim axis is. Touch is the third case and needs both halves: a mark to aim by,
         // standing where the player last pointed, and back in the middle once that has lapsed.
-        const at = this.touchPlay ? this.touchFrame?.ndc : undefined;
+        const at = this.touchPlay && !this.touchFrame?.pursue ? this.touchFrame?.ndc : undefined;
         aim = { hasTarget: !!t, inRange: !!t && p.aimInRange, name: t ? creature(t.creature).name : undefined, color: t ? BAND_COLOR[bandOf(p, t)] : '#eefaf6', band: t ? bandOf(p, t) : undefined, ready: heavyMove.ready, action: heavyMove.name, at: at ? { x: at.x, y: at.y } : undefined };
       }
-      const touchMark = this.touchPlay && this.touchFrame?.marker && this.touchFrame.ndc
+      const touchMark = this.touchPlay && !this.touchFrame?.pursue && this.touchFrame?.marker && this.touchFrame.ndc
         ? { kind: this.touchFrame.marker, at: this.touchFrame.ndc } : undefined;
       return {
         index: i, creature: p.creature, color: PLAYER_COLORS[i % 4], alive: p.state !== 'dead', aim, touchMark,
