@@ -229,8 +229,11 @@ export interface GameStrings {
      */
     readonly huntingHeading: string;
     readonly hunting: (b: HelpButtons) => string;
+    readonly touchControls: string;
+    readonly touchHunting: string;
     readonly seaHeading: string;
     readonly sea: (b: HelpButtons) => string;
+    readonly touchSea: string;
     readonly fightingHeading: string;
     readonly fighting: (b: HelpButtons) => string;
     /**
@@ -350,12 +353,18 @@ export interface GameStrings {
       /** The last entry, which opens the change-creature page. */
       readonly changeCreature: string;
       readonly changeCreatureDetail: string;
+      readonly dismiss: string;
+      readonly touchHint: string;
     };
     readonly swap: {
       readonly eyebrow: string;
       readonly keptProgress: string;
       readonly fullyGrown: string;
       readonly hatchling: string;
+      readonly touchHint: (index: number, count: number) => string;
+      readonly back: string;
+      readonly grownChoice: string;
+      readonly hatchlingChoice: string;
       /** Same key-cap marker as the teleport footer above. */
       readonly footer: (abilityKey: string, grown: boolean, index: number, count: number, confirmKey: string, backKey: string) => string;
     };
@@ -778,8 +787,11 @@ export const SHARED_STRINGS: GameStrings = {
     },
     huntingHeading: 'Hunting',
     hunting: (b) => `Hold **${b.aim}** to aim: the view moves over your shoulder and a crosshair sits at the centre of the screen. It snaps to nearby prey as you enter aim; after that, steer it with the ${b.pad ? 'right stick' : 'mouse'}. **${b.heavy}** performs your creature’s heavy move: snatch, seize, rake, crush, charge or feeding sweep. Creatures without a special heavy pounce toward aimed prey or lunge forward. **${b.guard}** blocks with the creature’s natural defense; tap for a parry. **${b.dash}** dashes: press it with a direction held to burst that way with a moment of invulnerability, far enough to clear a giant's bite — and it scales with your body, so a grown creature covers real ground. Press it with no direction and you dash along your own axis: ahead for most animals, and out behind for a shelled jetter, which is how it escapes. How long you hold it is how far you go, and how much stamina it costs: tap for a short shove, hold for the whole crossing. **${b.sprint}** sprints, **${b.rise}** rises — seafloor creatures hop with it, and holding it paddles them up into open water, where they swim — slower than a swimmer, but aimed with the camera and able to sprint and dash like anything else. Gaining height costs stamina, and a walker that stops asking to go anywhere settles back to the bottom. **${b.zoom}** pulls the camera in and out. **${b.sense}** turns Sense on and off: on, the size-band marks over creatures and the radar are drawn; off, nothing is drawn over the sea but the bar at the bottom. It is on to begin with, costs nothing and never runs out — turning it off is for the look of the thing.`,
+    touchControls: 'Hold SWIM to move where the camera looks. Swipe the water to turn, pinch to zoom, tap to bite, and double-tap to dash or pounce. Swipe the other pad to choose Aim, Guard or Hide. Sense is always on.',
+    touchHunting: 'Tap a creature to bite it. Double-tap a creature for its heavy move, or double-tap open water and hold the second touch to dash. Hold the secondary pad for Aim, Guard or Hide; swipe that pad sideways to change its action.',
     seaHeading: 'The sea',
     sea: (b) => `It has one edge: the shore you hatch beside. Swim along it and the world stays gentle; swim away from it and the biomes change, out to the deep water where the giants live. The radar at the top right shows anything big enough to hurt you, whatever is hunting you, the nearest shoals worth eating, your nursery and the shore. Creatures show only while they are inside its reach; the other players, your nursery and the shore sit hollow on the rim when they are past it, pointing the way. Press **${b.teleport}** for the teleport menu: back to your nursery, or straight to another player. Hold **${b.view}** for the scoreboard: everyone in the match, what they have done, and what this mode is asking of them.`,
+    touchSea: 'The radar shows nearby food, danger, your nursery and the shore. Tap Pause at the bottom right for Travel, Scores and settings. In Travel, tap a destination, swipe the list to scroll, or tap outside to close it. Swipe across the creature card to browse bodies and tap one to choose it.',
     huntingEraNote: '',
     seaEraNote: '',
     fightingEraNote: '',
@@ -877,12 +889,18 @@ export const SHARED_STRINGS: GameStrings = {
       cooling: (seconds) => `Ready in ${seconds} s`,
       changeCreature: 'Change creature',
       changeCreatureDetail: 'Swap bodies · each keeps what it has grown',
+      dismiss: 'Close travel menu',
+      touchHint: 'Tap a destination · swipe to scroll · tap outside to close',
     },
     swap: {
       eyebrow: 'CHANGE CREATURE',
       keptProgress: ' · your progress',
       fullyGrown: ' · fully grown',
       hatchling: ' · hatchling',
+      touchHint: (index, count) => `${index}/${count} · swipe to browse · tap creature to choose`,
+      back: 'Destinations',
+      grownChoice: 'Grown',
+      hatchlingChoice: 'Hatchling',
       footer: (abilityKey, grown, index, count, confirmKey, backKey) =>
         `${index}/${count} · **${abilityKey}** ${grown ? 'grown' : 'hatchling'} · **${confirmKey}** take it · **${backKey}** back`,
     },

@@ -545,6 +545,64 @@ export class Engine {
   get usingTouch() { return this.touchPlay; }
   /** Put the secondary pad back where the player left it last time. */
   setSecondary(s: Secondary) { this.touch.setSecondary(s); }
+  /** Touch menus use their visible choices directly; pad and keyboard edges still use updateTeleMenu. */
+  openTouchTravel(i = 0): boolean {
+    const p = this.game?.players[i], tele = this.cams[i]?.tele;
+    if (!p || !tele || !isAlive(p) || (p.state !== 'free' && p.state !== 'guard')) return false;
+    tele.open = true; tele.index = 0; tele.swap.open = false;
+    audio.play('ui-confirm');
+    return true;
+  }
+  closeTouchTravel(i = 0) {
+    const tele = this.cams[i]?.tele;
+    if (!tele?.open) return;
+    tele.open = false; tele.swap.open = false;
+    audio.play('ui-back');
+  }
+  touchTravelSelect(index: number, i = 0) {
+    const game = this.game, tele = this.cams[i]?.tele;
+    if (!game || !tele?.open || tele.swap.open) return;
+    const options = game.teleportOptions(i);
+    if (index === options.length) {
+      tele.swap.open = true; tele.swap.index = 0; tele.swap.grown = false;
+      audio.play('ui-confirm');
+    } else if (index >= 0 && index < options.length) {
+      tele.index = index;
+      if (game.teleport(i, options[index].dest)) { tele.open = false; audio.play('ui-start'); }
+      else audio.play('ui-back');
+    }
+  }
+  touchSwapStep(dir: number, i = 0) {
+    const game = this.game, swap = this.cams[i]?.tele.swap;
+    if (!game || !swap?.open) return;
+    const roster = game.swapOptions(i, swap.grown);
+    if (!roster.length) return;
+    swap.index = (swap.index + dir + roster.length) % roster.length;
+    void ensureLoaded(roster[swap.index].id, undefined, 0);
+    audio.play('ui-move');
+  }
+  touchSwapToggle(i = 0) {
+    const swap = this.cams[i]?.tele.swap;
+    if (!swap?.open) return;
+    swap.grown = !swap.grown;
+    swap.index = 0;
+    audio.play('ui-move');
+  }
+  touchSwapBack(i = 0) {
+    const swap = this.cams[i]?.tele.swap;
+    if (!swap?.open) return;
+    swap.open = false;
+    audio.play('ui-back');
+  }
+  touchSwapConfirm(i = 0) {
+    const game = this.game, tele = this.cams[i]?.tele;
+    if (!game || !tele?.swap.open) return;
+    const pick = game.swapOptions(i, tele.swap.grown)[tele.swap.index];
+    if (pick && !pick.current && game.changeCreature(i, pick.id, tele.swap.grown)) {
+      tele.open = false; tele.swap.open = false; audio.play('ui-start');
+    } else audio.play('ui-back');
+  }
+  pauseScoreboard(i = 0) { return this.game?.scoreboard(i); }
 
   /**
    * Carry a finished co-op match on rather than restarting it: same world, same bodies, same
@@ -626,8 +684,8 @@ export class Engine {
   private controlsFor(setup: PlayerSetup, index: number): RawControls {
     if (setup.device === 'touch') {
       // The keyboard is read underneath the fingers rather than instead of them. A tablet with a
-      // keyboard case is still a tablet, and a player who has one should not have to choose: every
-      // key binding stays live, and the pads are added beside them.
+      // keyboard case is still a tablet, and a player who has one should not have to choose. Sense
+      // is the exception: it stays on for touch play even if the keyboard has a Sense key.
       const c = this.keyboard.read(1);
       // One read per frame, for the mouse's reason: `read()` drains the swipes and the taps, so the
       // frame holds on to them for the camera and the aim after the controls have been folded.
@@ -635,6 +693,7 @@ export class Engine {
       // `lookDX`/`lookDY` below, exactly as it does for the mouse, and scaling here as well would
       // square it.
       this.touchFrame = this.touch.read();
+      c.sense = false;
       return applyTouch(c, this.touchFrame);
     }
     if (setup.device === 'keyboard') {

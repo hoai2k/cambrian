@@ -1,6 +1,6 @@
 import { emptyControls, type RawControls } from './input';
 import {
-  SECONDARY, clear, down, freshTouch, isButtonZone, meterEdge, move, read, secondaryOf, up,
+  SECONDARY, clear, down, freshTouch, meterEdge, move, read, secondaryOf, up,
   type Secondary, type TouchFrame, type TouchState, type Zone,
 } from '../shared/touch-play';
 
@@ -17,11 +17,11 @@ import {
  * ## Which touches are ours
  *
  * The zone a finger is in is read off the DOM at the **down**, from the nearest
- * `[data-touch-zone]` ancestor — which is how the on-screen pads declare themselves, as plain divs
- * with an attribute rather than with event handlers of their own. Anything inside the engine's own
+ * `[data-touch-zone]` ancestor — which is how the swim and secondary pads declare themselves, as
+ * plain divs with an attribute rather than event handlers. Anything inside the engine's own
  * container that is not a control is the water.
  *
- * Anything else is **not ours and is left entirely alone**: a tap on the toolbar, a menu button, a
+ * Anything else is **not ours and is left entirely alone**: a tap on the toolbar, a menu choice, a
  * dialog or a link is that element's, and swallowing it would make the game unplayable in the only
  * way that actually matters, which is not being able to get out of it. A touch that is not ours is
  * never entered into the state machine, so its move and end events are ignored too — which is why
@@ -103,7 +103,6 @@ export class TouchPlay {
     if (!el) return undefined;
     const declared = el.closest('[data-touch-zone]')?.getAttribute('data-touch-zone');
     if (declared === 'swim' || declared === 'secondary' || declared === 'water') return declared;
-    if (declared && isButtonZone(declared as Zone)) return declared as Zone;
     if (el.closest('button,a,dialog,input,select,textarea,[role="button"],[role="option"]')) return undefined;
     return this.el && (el === this.el || this.el.contains(el)) ? 'water' : undefined;
   }
@@ -227,12 +226,10 @@ export class TouchPlay {
  * Fold a frame of touch into a device's controls, as `applyMouse` folds a frame of mouse.
  *
  * The one place the two schemes differ in what they are *allowed* to reach: the mouse may not set
- * `ability`, `guard` or `sense`, because a mouse plays beside a keyboard and those have keys. A
- * finger has no keyboard to fall back on, so the secondary pad reaches all three — one at a time,
- * which is what the ring is. What stays out of reach is the same as ever and for the same reason:
- * `confirm`, `back`, `menu`, `view`, `teleport` and the shoulders belong to menus and are worked by
- * tapping the actual buttons, and `rise`/`sink` are the camera's job here (pitch the view and hold
- * swim, which is how the mouse climbs too).
+ * `ability` or `guard`, because a mouse plays beside a keyboard and those have keys. A
+ * finger has no keyboard to fall back on, so the secondary pad reaches both — one at a time,
+ * which is what the ring is. Menu actions are reached through React's pause and travel menus,
+ * while `rise` and `sink` are the camera's job here (pitch the view and hold swim).
  */
 export function applyTouch(c: RawControls, t: ReturnType<TouchPlay['read']>): RawControls {
   c.lookDX = t.dx; c.lookDY = t.dy; c.zoomDelta = t.zoom;
@@ -245,17 +242,7 @@ export function applyTouch(c: RawControls, t: ReturnType<TouchPlay['read']>): Ra
   if (t.secondary === 'aim') { c.aim = true; c.lock = true; }
   else if (t.secondary === 'guard') c.guard = true;
   else if (t.secondary === 'ability') c.ability = true;
-  else if (t.secondary === 'sense') c.sense = true;
-  // The drawn buttons, which are the other channel entirely (see `ButtonZone`). They are the one way
-  // a finger reaches a menu action, and they reach it because the player put a finger on a button
-  // that says so — never because a gesture over the sea happened to mean it. `up`/`down` are the
-  // D-pad's, because that is what the travel menu already walks on.
-  for (const b of t.buttons) {
-    if (b === 'up') { c.dup = true; c.lookY = -1; }
-    else if (b === 'down') { c.ddown = true; c.lookY = 1; }
-    else c[b] = true;
-  }
-  if (t.swim || t.light || t.heavy || t.dash || t.secondary || t.buttons.length) c.any = c.anyButton = true;
+  if (t.swim || t.light || t.heavy || t.dash || t.secondary) c.any = c.anyButton = true;
   return c;
 }
 

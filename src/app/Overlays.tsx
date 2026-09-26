@@ -3,6 +3,7 @@ import { RULES } from '../sim/era-rules';
 import { ACTIVE_ERA } from '../content';
 import { useEffect, useRef } from 'react';
 import type { HudSnapshot } from '../render/engine';
+import { Scoreboard } from './Hud';
 import { creature } from '../sim/creatures';
 import type { PlayerSetup } from '../sim/types';
 import { BIOMES } from '../sim/world';
@@ -46,13 +47,14 @@ export function MenuButtons({ items, sel, shown, onHover }: { items: MenuItem[];
   );
 }
 
-export function PauseMenu({ items, sel, shown, onHover }: { items: MenuItem[]; sel: number; shown: boolean; onHover: (i: number) => void }) {
+export function PauseMenu({ items, sel, shown, onHover, board }: { items: MenuItem[]; sel: number; shown: boolean; onHover: (i: number) => void; board?: NonNullable<HudSnapshot['players'][number]['board']> }) {
   return (
     <div className="overlay">
-      <div className="panel">
+      <div className="panel pause-panel">
         <p className="eyebrow">{TEXT.pause.eyebrow}</p>
         <h2>{TEXT.pause.heading}</h2>
         <MenuButtons items={items} sel={sel} shown={shown} onHover={onHover} />
+        {board && <div className="pause-scoreboard"><Scoreboard board={board} me={0} /></div>}
       </div>
     </div>
   );
@@ -232,13 +234,13 @@ function HelpPage({ scheme }: { scheme: Scheme }) {
         <span className="band threat">{t.bands.threat}</span> {t.bands.threatText}{' '}
         <span className="band giant">{t.bands.giant}</span> {t.bands.giantText} {t.bands.tail}
       </p>
-      {scheme === 'pad' ? <XboxDiagram /> : <KeyboardDiagram />}
+      {scheme === 'pad' ? <XboxDiagram /> : scheme === 'touch' ? <p>{t.touchControls}</p> : <KeyboardDiagram />}
       <div className="help-columns">
         <section>
           <h3>{t.huntingHeading}</h3>
-          <Prose text={t.hunting(b) + (t.huntingEraNote ? ` ${t.huntingEraNote}` : '')} />
+          <Prose text={(scheme === 'touch' ? t.touchHunting : t.hunting(b)) + (t.huntingEraNote ? ` ${t.huntingEraNote}` : '')} />
           <h3>{t.seaHeading}</h3>
-          <Prose text={t.sea(b) + (t.seaEraNote ? ` ${t.seaEraNote}` : '')} />
+          <Prose text={(scheme === 'touch' ? t.touchSea : t.sea(b)) + (t.seaEraNote ? ` ${t.seaEraNote}` : '')} />
           <h3>{t.fightingHeading}</h3>
           <Prose text={t.fighting(b) + (t.fightingEraNote ? ` ${t.fightingEraNote}` : '')} />
         </section>
@@ -251,7 +253,7 @@ function HelpPage({ scheme }: { scheme: Scheme }) {
           </>}
           <h3>{t.growingHeading}</h3>
           <Prose text={t.growing(b) + (t.growingEraNote ? ` ${t.growingEraNote}` : '')} />
-          {scheme === 'pad'
+          {scheme === 'touch' ? null : scheme === 'pad'
             ? <>
                 <h3>{t.keyboardHeading}</h3>
                 <p><b>1:</b> {t.keyboardPlayerOne}<br /><b>2:</b> {t.keyboardPlayerTwo}</p>

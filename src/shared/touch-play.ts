@@ -82,43 +82,20 @@
  */
 
 /** A secondary action the swappable pad can be set to. */
-export type Secondary = 'aim' | 'guard' | 'ability' | 'sense';
+export type Secondary = 'aim' | 'guard' | 'ability';
 
 /**
  * The ring the secondary pad walks, in the order a swipe steps through it.
  *
- * Four, and the same four on every animal. It is tempting to filter the ring by what the creature
- * in hand actually does, and it would be wrong: all four of these mean something for every body in
- * all three games (every animal aims, guards, hides and senses — what *changes* is the guard and
- * the hide, which is the point of them), and a ring whose length depends on the animal is a ring
- * whose muscle memory resets every time you pick a different one.
+ * Three, and the same three on every animal. Sense is permanently on for touch play, so it has no
+ * slot to toggle. The ring stays stable as the player changes creatures.
  *
  * `aim` leads because it is the one the pad starts on and the one a player reaches for first.
  */
-export const SECONDARY: readonly Secondary[] = ['aim', 'guard', 'ability', 'sense'];
-
-/**
- * An on-screen button, as opposed to a gesture.
- *
- * These exist because a handful of things in the game are reached by a button and cannot sensibly be
- * reached by anything else. Travel opens a *menu*, which then has to be walked and taken; the
- * scoreboard is a hold. A pad has buttons for all of them and a keyboard has keys; a finger has
- * neither, and inventing a gesture for each would be six gestures nobody could remember.
- *
- * So they are drawn as buttons and declared as such, and that distinction is load-bearing: a
- * **gesture** must never reach a menu action, or a tap aimed at the sea would also answer whatever a
- * menu was asking — that is the rule `tools/menu-bindings-test.ts` holds for the mouse and holds here.
- * A button is not a gesture. It is a thing the player deliberately put a finger on, it is only drawn
- * when it applies, and what it does is written on it.
- */
-export type ButtonZone = 'teleport' | 'view' | 'up' | 'down' | 'confirm' | 'back';
-
-export const BUTTON_ZONES: readonly ButtonZone[] = ['teleport', 'view', 'up', 'down', 'confirm', 'back'];
+export const SECONDARY: readonly Secondary[] = ['aim', 'guard', 'ability'];
 
 /** Which zone a touch went down in. Decided by the adapter from the element it hit. */
-export type Zone = 'water' | 'swim' | 'secondary' | ButtonZone;
-
-export const isButtonZone = (z: Zone): z is ButtonZone => (BUTTON_ZONES as readonly string[]).includes(z);
+export type Zone = 'water' | 'swim' | 'secondary';
 
 /**
  * What a touch turned out to be. Assigned at the down where the zone alone decides it, and
@@ -132,10 +109,8 @@ export const isButtonZone = (z: Zone): z is ButtonZone => (BUTTON_ZONES as reado
  *   - `secondary` it is on the secondary pad, holding that pad's action.
  *   - `swap`      it is on the secondary pad and has travelled sideways: it changed the pad's
  *                 action and fires nothing.
- *   - `button`    it is on one of the drawn buttons, and holds it. Travel does nothing to it: a
- *                 button is a button, and a finger sliding about on one has not changed its mind.
  */
-export type Role = 'pending' | 'drag' | 'dash' | 'heavy' | 'swim' | 'secondary' | 'swap' | 'button';
+export type Role = 'pending' | 'drag' | 'dash' | 'heavy' | 'swim' | 'secondary' | 'swap';
 
 /**
  * One finger, from its down to its lift.
@@ -264,7 +239,6 @@ export function down(
   const touch: Finger = { id, zone, role: 'pending', t0: t, x0: x, y0: y, x, y, moved: 0, dx: 0, dy: 0, onTarget, swiped: 0 };
   if (zone === 'swim') touch.role = 'swim';
   else if (zone === 'secondary') touch.role = 'secondary';
-  else if (isButtonZone(zone)) touch.role = 'button';
   else {
     // Water. The aim point follows the newest finger on the water, because that is the one the
     // player is pointing with.
@@ -355,8 +329,6 @@ export interface TouchFrame {
   dragging: boolean;
   /** Where the player is pointing, in NDC, while it has not lapsed. */
   ndc: { x: number; y: number } | undefined;
-  /** Which drawn buttons are held this frame. */
-  buttons: readonly ButtonZone[];
   /** The ring stepped this frame: worth a click and a label. */
   swapped: boolean;
   /** Two fingers are working the view together, so the zoom is theirs and the reticle stands down. */
@@ -372,7 +344,6 @@ export interface TouchFrame {
 export function read(s: TouchState, t: number, lookSpeed = 1): TouchFrame {
   let dx = 0, dy = 0, dragging = false, swim = false, dash = false;
   let secondary: Secondary | undefined;
-  const buttons: ButtonZone[] = [];
   /**
    * The fingers that are working the view: on the water, and not spoken for as a dash, a tap that
    * has already fired or a pad. Two of those at once is a pinch, which is the one gesture in the
@@ -384,7 +355,6 @@ export function read(s: TouchState, t: number, lookSpeed = 1): TouchFrame {
     else if (p.role === 'swim') swim = true;
     else if (p.role === 'secondary') secondary = secondaryOf(s);
     else if (p.role === 'dash') dash = true;
-    else if (p.role === 'button' && isButtonZone(p.zone) && !buttons.includes(p.zone)) buttons.push(p.zone);
   }
   // A pinch needs two fingers on the water and at least one of them actually moving: two fingers
   // resting are two taps waiting to happen, and calling that a pinch would zoom the view every time
@@ -417,7 +387,7 @@ export function read(s: TouchState, t: number, lookSpeed = 1): TouchFrame {
     dx: dx * SENSITIVITY * lookSpeed, dy: dy * SENSITIVITY * lookSpeed,
     zoom,
     bites: s.bites, heavies: s.heavies,
-    swim, secondary, dash, dragging, buttons,
+    swim, secondary, dash, dragging,
     // The aim point lapses on its own clock, so a bite fired on a lift still aims where the finger
     // was and a hand taken off the glass hands aiming back to the middle of the screen.
     ndc: s.aim && t - s.aim.t <= AIM_HOLD ? { x: s.aim.x, y: s.aim.y } : undefined,

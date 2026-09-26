@@ -85,7 +85,7 @@ const defaultSettings = (): Settings => {
     const s = localStorage.getItem(SETTINGS_KEY);
     if (s) {
       const saved = JSON.parse(s) as Partial<Settings>;
-      return { ...defaults, ...saved, quality: mobileDevonian() && !saved.qualityExplicit ? 'low' : saved.quality ?? defaults.quality };
+      return { ...defaults, ...saved, secondary: SECONDARY.includes(saved.secondary as Secondary) ? saved.secondary! : 'aim', quality: mobileDevonian() && !saved.qualityExplicit ? 'low' : saved.quality ?? defaults.quality };
     }
   } catch { /* ignore */ }
   return defaults;
@@ -144,6 +144,7 @@ export function App() {
   const modeRef = useRef<Mode>(MODES[0]);
   const [hud, setHud] = useState<HudSnapshot | null>(null);
   const [paused, setPaused] = useState(false);
+  const [pauseScores, setPauseScores] = useState(false);
   /** The recorder's state, mirrored into React so the pause menu's one button can name itself. */
   const [recPhase, setRecPhase] = useState(recordingPhase);
   const pausedRef = useRef(false);
@@ -944,6 +945,12 @@ export function App() {
     }
     if (screen === 'playing' && paused) {
       const items: MenuItem[] = [{ label: TEXT.pause.resume, run: () => setPausedBoth(false), primary: true }];
+      if (small.touch) {
+        items.push({ label: TEXT.hud.pads.travel, run: () => {
+          if (engineRef.current?.openTouchTravel()) setPausedBoth(false);
+        } });
+        items.push({ label: TEXT.hud.pads.scores, run: () => setPauseScores((open) => !open) });
+      }
       // The match recorder, and only when the URL asked for it (`?debug=game`). One button walking
       // through its own three states, because that is the whole of the tool: record, stop, hand it
       // over. Recording carries on while the menu is open — pausing to think is not a reason to
@@ -960,7 +967,8 @@ export function App() {
       return items;
     }
     return [];
-  }, [screen, paused, recPhase, hud?.canContinue, keepPlaying, playAgain, backToSelect]);
+  }, [screen, paused, small.touch, recPhase, hud?.canContinue, keepPlaying, playAgain, backToSelect]);
+  useEffect(() => { if (!paused) setPauseScores(false); }, [paused]);
   useEffect(() => { menuItemsRef.current = menuItems; }, [menuItems]);
   // The recorder stops itself when its buffer fills, so the menu reads the real state whenever it
   // opens rather than trusting what it last set.
@@ -1051,7 +1059,14 @@ export function App() {
         />
       )}
 
-      {(screen === 'playing' || screen === 'results') && hud && <Hud snapshot={hud} />}
+      {(screen === 'playing' || screen === 'results') && hud && <Hud snapshot={hud} touchTravel={small.touch ? {
+        dismiss: () => engineRef.current?.closeTouchTravel(),
+        select: (index) => engineRef.current?.touchTravelSelect(index),
+        swapStep: (dir) => engineRef.current?.touchSwapStep(dir),
+        swapToggle: () => engineRef.current?.touchSwapToggle(),
+        swapBack: () => engineRef.current?.touchSwapBack(),
+        swapConfirm: () => engineRef.current?.touchSwapConfirm(),
+      } : undefined} />}
       {/*
         * The pads are drawn only while the game is actually being played: paused, on the results
         * screen or in a dialog the fingers belong to the buttons, which is the same rule the mouse
@@ -1071,10 +1086,10 @@ export function App() {
         />
       )}
       {screen === 'playing' && small.rotate && <RotateHint />}
-      {screen === 'playing' && paused && <PauseMenu items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
+      {screen === 'playing' && paused && <PauseMenu items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} board={small.touch && pauseScores ? engineRef.current?.pauseScoreboard() : undefined} />}
       {screen === 'results' && hud && <Results snapshot={hud} players={players} record={record} fresh={fresh} items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
 
-      <Toolbar place={toolbar} isFs={isFs} muted={settings.muted} focus={focus.group === 'icons' ? focus.index : -1} onHelp={() => openDialog(dialog === 'help' ? null : 'help')} onSettings={() => openDialog(dialog === 'settings' ? null : 'settings')} onMute={() => setSettings((s) => ({ ...s, muted: !s.muted }))} onFullscreen={toggleFullscreen} />
+      {(!small.touch || screen !== 'playing' || paused) && <Toolbar place={toolbar} isFs={isFs} muted={settings.muted} focus={focus.group === 'icons' ? focus.index : -1} onHelp={() => openDialog(dialog === 'help' ? null : 'help')} onSettings={() => openDialog(dialog === 'settings' ? null : 'settings')} onMute={() => setSettings((s) => ({ ...s, muted: !s.muted }))} onFullscreen={toggleFullscreen} />}
       <Dialogs kind={dialog} onClose={() => openDialog(null)} settings={settings} onSettings={setSettings} scheme={scheme} />
 
       {(notice || error) && (

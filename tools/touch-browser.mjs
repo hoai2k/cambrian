@@ -143,6 +143,14 @@ try {
   const live = await state();
   assert.equal(live.usingTouch, true, 'the match should be a touch match');
   assert.equal(live.usingMouse, false, 'and the mouse should not also be playing it');
+  assert.equal(live.senseMode, true, 'sense starts on for touch play');
+  assert.equal(await page.locator('.hud-bottom .chip.ability, .hud-bottom .chip.sense').count(), 0, 'ability and sense HUD chips should be absent on touch');
+  assert.equal(await page.locator('.toolbar').count(), 0, 'the icon toolbar should be hidden during touch play');
+  assert.equal(await page.locator('[data-touch-zone="teleport"], [data-touch-zone="view"], .touch-menu').count(), 0, 'travel, scores and navigation buttons should not cover the sea');
+  await page.keyboard.down('i');
+  await frames(2);
+  await page.keyboard.up('i');
+  assert.equal((await state()).senseMode, true, 'a keyboard case cannot toggle sense off in a touch match');
 
   // 4. The pads are on screen, and they are big enough to hit with a thumb.
   const pads = await page.evaluate(() => Array.from(document.querySelectorAll('[data-touch-zone]')).map((el) => {
@@ -339,6 +347,26 @@ try {
   await page.locator('.panel').waitFor({ timeout: 15000 });
   // ...and the pads stand down while it is up, so a tap aimed at a menu button is that button's.
   assert.equal(await page.locator('.touch-pads').count(), 0, 'the pads should not be drawn over the pause menu');
+  assert.equal(await page.locator('.toolbar').count(), 1, 'the icon toolbar returns in the pause menu');
+  await page.getByRole('menuitem', { name: 'Scores' }).click();
+  await page.locator('.pause-scoreboard .scoreboard').waitFor({ timeout: 15000 });
+  await page.getByRole('menuitem', { name: 'Scores' }).click();
+  assert.equal(await page.locator('.pause-scoreboard').count(), 0, 'scores can be closed without leaving pause');
+  await page.getByRole('menuitem', { name: 'Travel' }).click();
+  await page.locator('.tele-menu').waitFor({ timeout: 15000 });
+  assert.equal(await page.locator('.tele-menu li button').count() > 0, true, 'travel destinations are tappable');
+  await page.locator('.tele-menu li button').last().click();
+  await page.locator('.swap-menu').waitFor({ timeout: 15000 });
+  const beforeSwap = await page.locator('.swap-menu .swap-body b').first().innerText();
+  const swapBounds = await page.locator('.swap-menu .swap-body button').boundingBox();
+  await touch('touchStart', [{ x: swapBounds.x + swapBounds.width * .7, y: swapBounds.y + swapBounds.height / 2, id: 51 }]);
+  await touch('touchMove', [{ x: swapBounds.x + swapBounds.width * .2, y: swapBounds.y + swapBounds.height / 2, id: 51 }]);
+  await touch('touchEnd', []);
+  await page.waitForFunction((name) => document.querySelector('.swap-menu .swap-body b')?.textContent !== name, beforeSwap, { timeout: 15000 });
+  await page.locator('.touch-tele-dismiss').click({ position: { x: 5, y: 5 } });
+  await page.locator('.tele-menu').waitFor({ state: 'detached', timeout: 15000 });
+  await page.locator('.touch-pause').click();
+  await page.locator('.panel').waitFor({ timeout: 15000 });
   // A tap on a real menu button is still that button's: the scheme must never swallow the way out.
   // The pause choices carry `role="menuitem"`, not `button` — which is also worth asserting, because
   // it is what a screen reader walks.
@@ -347,7 +375,7 @@ try {
   assert.equal(await page.locator('.touch-pads').count(), 1, 'and they come back when the game does');
 
   assert.deepEqual(errors, [], `the page logged errors: ${errors.join(' · ')}`);
-  console.log('PASS: a finger starts the game, swims, looks, bites, dashes, swaps its pad, holds two at once, pinches and pauses');
+  console.log('PASS: touch movement, always-on sense, uncluttered HUD, pause actions and tappable travel');
 } catch (e) {
   console.error('FAIL:', e.message);
   console.error(e.stack?.split('\n').slice(0, 6).join('\n'));

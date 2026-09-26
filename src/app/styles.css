@@ -403,6 +403,7 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 /* ---------- Overlays ---------- */
 .overlay { position: absolute; inset: 0; z-index: 20; display: grid; place-items: center; background: rgba(6,22,28,.55); backdrop-filter: blur(6px); animation: fade-in .25s both; }
 .panel { width: min(92vw, 640px); padding: 28px 30px; border-radius: 22px; background: rgba(6,22,28,.8); border: 1px solid rgba(238,250,246,.14); box-shadow: 0 30px 90px rgba(0,0,0,.5); }
+.panel.pause-panel { max-height: 92vh; overflow-y: auto; }
 /* A column with a scrolling middle: the heading and the choices are pinned, only the cards and the
    record scroll. The buttons were the last thing inside one tall scroller and fell off the bottom
    of a short window, which is the worst place to hide the only way out of the screen. */
@@ -886,7 +887,7 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
    and double-tap is a *move*, so a page that zoomed on it would take the pounce away. `TouchPlay`
    also calls `preventDefault`, and this is the half that has to be declarative: a passive listener
    cannot stop a scroll that has already started. */
-.is-touch, .is-touch .sea-canvas, .is-touch .hud-layer { touch-action: none; }
+.is-touch .sea-canvas, .is-touch .touch-pads { touch-action: none; }
 /* A long press on glass raises a selection or a context menu over the sea. Only inside the game:
    the dialogs have real text in them that a player may well want to copy. */
 .is-touch .shell > .sea-canvas, .is-touch .touch-pads { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
@@ -906,13 +907,7 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 }
 .touch-left { position: absolute; left: calc(.9rem + env(safe-area-inset-left)); bottom: calc(1rem + env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: flex-start; gap: .45rem; }
 .touch-pad-row { display: flex; align-items: flex-end; gap: .7rem; }
-/*
- * A **row**, not a column. Stacked, three buttons are 110 pixels down the right-hand edge, which is
- * exactly where the radar is — and the radar cannot move far, because below it is open sea a player
- * is trying to look at. In a row they take the strip of top edge the health bars do not reach (those
- * end 242 pixels in on the narrowest window this supports), and the radar drops just under them.
- */
-.touch-right { position: absolute; right: calc(.9rem + env(safe-area-inset-right)); top: calc(.7rem + env(safe-area-inset-top)); display: flex; gap: .35rem; align-items: flex-start; }
+.touch-right { position: absolute; right: calc(.9rem + env(safe-area-inset-right)); bottom: calc(1rem + env(safe-area-inset-bottom)); display: flex; }
 
 /*
  * A pad is round, big enough for a thumb, and see-through enough to be stood on top of the sea.
@@ -948,8 +943,7 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 
 .touch-hint { pointer-events: none; margin: 0; max-width: 10.5rem; font: 600 10.5px/1.35 var(--font-body); color: var(--mist); text-shadow: 0 1px 4px rgba(0, 0, 0, .85); animation: fade-in .4s both; }
 
-/* The small buttons: pause, travel, scores, and the four that walk the travel menu. Rectangular
-   rather than round, so they never read as something to hold the way the pads do. */
+/* Pause takes the bottom-right corner while the icon toolbar is hidden during touch play. */
 .touch-btn {
   pointer-events: auto; touch-action: none;
   min-width: 42px; min-height: 34px; padding: 0 .4rem;
@@ -960,8 +954,24 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
   text-shadow: 0 1px 3px rgba(0, 0, 0, .8);
 }
 .touch-pause { color: var(--foam); }
-.touch-menu { position: absolute; right: calc(.9rem + env(safe-area-inset-right)); bottom: calc(1rem + env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(2, auto); gap: .45rem; }
-.touch-take { color: var(--lagoon); border-color: color-mix(in srgb, var(--lagoon) 55%, transparent); }
+.touch-pause { min-width: 62px; min-height: 44px; }
+
+/* The menu catches outside taps without giving them to the swimming/attack surface. */
+.is-touch .hud-layer.touch-travel-open { z-index: 7; }
+.touch-tele-dismiss { position: absolute; inset: 0; z-index: 1; pointer-events: auto; background: transparent; border: 0; }
+.is-touch .tele-menu { z-index: 2; pointer-events: auto; width: min(90%, 28em); max-height: 82%; display: flex; flex-direction: column; }
+.is-touch .tele-menu ul { overflow-y: auto; min-height: 0; max-height: 55vh; touch-action: pan-y; overscroll-behavior: contain; }
+.is-touch .tele-menu li { padding: 0; opacity: 1; }
+.is-touch .tele-menu li button { width: 100%; padding: .55em .8em; text-align: left; display: grid; gap: .1em; border: 0; border-radius: .7em; background: transparent; }
+.is-touch .tele-menu li button:active { background: rgba(238,250,246,.12); }
+.is-touch .hud-bottom .chip.ability, .is-touch .hud-bottom .chip.sense { display: none; }
+.is-touch .swap-menu .swap-body { touch-action: pan-y; }
+.is-touch .swap-menu .swap-body button { width: 100%; display: flex; align-items: center; gap: .7em; text-align: left; background: transparent; border: 0; color: inherit; }
+.is-touch .swap-menu .swap-body button > div { display: grid; gap: .1em; min-width: 0; }
+.is-touch .swap-actions { display: flex; gap: .5em; justify-content: space-between; margin-top: .6em; }
+.is-touch .swap-actions button { border: 1px solid rgba(238,250,246,.25); border-radius: .6em; background: rgba(238,250,246,.08); padding: .45em .65em; }
+.pause-scoreboard { margin-top: 14px; max-height: 45vh; overflow: auto; }
+.pause-scoreboard .scoreboard { position: static; transform: none; width: 100%; max-height: none; pointer-events: auto; }
 
 /*
  * Nobody can join a touch session, so it does not offer. `Press A to join` is a *pad* prompt and it
