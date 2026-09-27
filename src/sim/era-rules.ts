@@ -109,6 +109,12 @@ export interface EraRules {
   step(g: Game, dt: number): void;
   /** Nutrition a player or bot just gained; `food` is the eaten actor when there is one. */
   onNutrition(g: Game, a: Actor, amount: number, food: Actor | undefined): void;
+  /**
+   * Survival's growth, which is not a meal: `fraction` of the whole ladder, hatchling to top. The
+   * era turns it into its own units without the food-chain weighting a meal goes through, so every
+   * animal climbs at the same pace in every game (`SURVIVAL_TOP_SECONDS`).
+   */
+  survivalGrow?(g: Game, a: Actor, fraction: number): void;
   /** When true the shared nutrition → tier growth runs; when false the era owns growth. */
   growthByNutrition: boolean;
   /** Damage multiplier from armour, enrolment or a withdrawn shell; 1 = none. `dir` points attacker → victim. */
@@ -151,6 +157,8 @@ export interface EraRules {
    * the moment they touch the surface, which is also where the bar is handed back whole.
    */
   staminaRegen(g: Game, a: Actor): number;
+  /** Whether this body can recover health in its current breathing state. */
+  canRecoverHealth?(g: Game, a: Actor): boolean;
   /**
    * How much of the stamina a sprint or a dash in this direction is given to the body for nothing,
    * 0..1. 1 is free — and free enough that an empty bar does not stop it, in which case only the

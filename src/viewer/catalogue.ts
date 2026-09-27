@@ -305,21 +305,45 @@ const LISTED: readonly ViewerSpecimen[] = [
     displayLength: 4, lengthMeters: c.lengthMeters, looping: c.looping,
   })),
 ];
+/** The heading a non-playable section carries. The playable section at the head of every collection carries none. */
+export type SpecimenSectionTitle = 'Visitors' | 'NPCs' | 'Unfinished';
+export interface SpecimenSection { title?: SpecimenSectionTitle; rows: readonly ViewerSpecimen[] }
+const byName = (a: ViewerSpecimen, b: ViewerSpecimen) => a.name.localeCompare(b.name);
 /**
- * The order the page walks: each collection in turn, and inside a collection the animals a player
- * can pick before the ones they cannot.
+ * Which of a collection's four sections a specimen falls in, keyed on the flags rather than on a
+ * list of names, so an animal moved on or off the pick screen moves here by itself. The order
+ * matches how a player meets these animals climbing the ladder: what they can pick, then what they
+ * can only visit, then what the sea keeps without ever offering, then what no sea holds any more.
+ */
+const SECTION_OF = (c: ViewerSpecimen): 0 | 1 | 2 | 3 =>
+  c.offRoster ? 1 : c.notPlayable === 'SHELVED' ? 3 : c.notPlayable ? 2 : 0;
+const SECTION_TITLES: readonly (SpecimenSectionTitle | undefined)[] = [undefined, 'Visitors', 'NPCs', 'Unfinished'];
+/**
+ * The order the page walks: each collection in turn, and inside a collection up to four sections —
+ * the playable roster with no heading, the off-roster standing guests under *Visitors*, the NPCs
+ * and shore animals the sea keeps and never offers under *NPCs*, and the shelved bodies no game
+ * holds any more under *Unfinished* — each one alphabetised by name on its own.
  *
  * The viewer shows every body a game has, which now includes bodies the game keeps and never
- * offers — an NPC in the water, a shelved animal that is only here, a shore animal on the beach —
- * and left where they were authored they sat in the middle of the list with nothing saying why the
- * roster does not have them. Sorting is stable within each half, so the roster's own order is
- * untouched and so is the order these were written in; and it is keyed on the flags rather than on
- * a list of names, so an animal moved on or off the pick screen moves here by itself.
+ * offers — an NPC in the water, a shelved animal that is only here, a shore animal on the beach, a
+ * standing guest earned nowhere — and left where they were authored they sat in the middle of the
+ * list with nothing saying why the roster does not have them. An empty section is left out
+ * entirely, which is what keeps a props collection — carrying none of these flags — down to its one
+ * unlabelled section rather than a run of empty headings.
  */
-export const SPECIMENS: readonly ViewerSpecimen[] = COLLECTIONS.flatMap(({ id }) => {
-  const rows = LISTED.filter(c => c.collection === id);
-  return [...rows.filter(c => !c.notPlayable), ...rows.filter(c => c.notPlayable)];
-});
+export const SPECIMEN_SECTIONS: readonly { id: CollectionId; sections: readonly SpecimenSection[] }[] =
+  COLLECTIONS.map(({ id }) => {
+    const buckets: ViewerSpecimen[][] = [[], [], [], []];
+    for (const c of LISTED) if (c.collection === id) buckets[SECTION_OF(c)].push(c);
+    return {
+      id,
+      sections: buckets
+        .map((rows, i) => ({ title: SECTION_TITLES[i], rows: [...rows].sort(byName) }))
+        .filter(s => s.rows.length > 0),
+    };
+  });
+export const SPECIMENS: readonly ViewerSpecimen[] =
+  SPECIMEN_SECTIONS.flatMap(({ sections }) => sections.flatMap(s => s.rows));
 export const specimenByKey = new Map(SPECIMENS.map(c => [c.key, c]));
 
 

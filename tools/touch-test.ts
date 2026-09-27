@@ -10,13 +10,13 @@
  */
 import {
   AIM_HOLD, DOUBLE, DRAG, PINCH_MIN, SECONDARY, SWAP, TAP_TIME,
-  BUTTON_ZONES, clear, down, freshTouch, isButtonZone, meterEdge, move, read, secondaryOf, stepSlot, toNdc, up,
-  type ButtonZone,
+  clear, down, freshTouch, meterEdge, move, read, secondaryOf, stepSlot, toNdc, up,
 } from '../src/shared/touch-play';
 import { COMPACT_H, COMPACT_W, MIN_TILE, layoutFor, rosterCap, rotateHint, splitAxis, touchFirst } from '../src/shared/small-screen';
 import { applyTouch } from '../src/input/touch';
 import { emptyControls, type RawControls } from '../src/input/input';
 import { btn, key, menuScheme, schemeForDevice, type Action } from '../src/shared/controls';
+import { cursorFor, cursorImageFor } from '../src/shared/cursors';
 
 let failed = 0;
 const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(66)} ${d}`); if (!ok) failed++; };
@@ -64,7 +64,7 @@ const fresh = () => ({ s: freshTouch(), t: 0 });
 // ---------------------------------------------------------------- double-tap
 
 {
-  // Over an animal a double-tap is the heavy, and the first tap still bites: sitting on every bite
+  // Over an animal a held double-tap pursues it, and the first tap still bites: sitting on every bite
   // for DOUBLE seconds to find out whether a second is coming taxes the common move for the rare one.
   const { s } = fresh();
   down(s, 1, 'water', 400, 200, 0, true, SIZE);
@@ -73,8 +73,20 @@ const fresh = () => ({ s: freshTouch(), t: 0 });
   check('the first tap of a double-tap still bites', first.bites === 1 && first.heavies === 0);
   down(s, 2, 'water', 402, 201, 0.06 + DOUBLE / 2, true, SIZE);
   const second = read(s, 0.06 + DOUBLE / 2);
-  check('double-tapping an animal is the heavy', second.heavies === 1, `heavies=${second.heavies}`);
+  check('holding the second tap pursues the animal', second.pursue && second.heavies === 0);
+  check('the pursuit begins as an edge', second.pursuitStart && !read(s, 0.25).pursuitStart);
+  check('the pursuit lasts while held', read(s, 0.5).pursue);
+  up(s, 2, 0.55);
+  check('lifting ends the pursuit', !read(s, 0.56).pursue);
   check('...and it is not also a dash', second.dash === false);
+  check('a creature tap uses the target mark', first.marker === 'target' && second.marker === 'target');
+}
+{
+  const { s } = fresh();
+  down(s, 1, 'water', 400, 200, 0, 73, SIZE); up(s, 1, 0.04);
+  down(s, 2, 'water', 400, 200, 0.08, -1, SIZE); up(s, 2, 0.11);
+  const f = read(s, 0.12);
+  check('quick creature double-tap keeps the first creature through a missed frame', f.pursuitStart && !f.pursue && f.pursuitTargetId === 73);
 }
 {
   // Over open water there is nothing to pounce at, so the same gesture is the dash — which is
@@ -86,9 +98,21 @@ const fresh = () => ({ s: freshTouch(), t: 0 });
   down(s, 2, 'water', 402, 201, 0.1, false, SIZE);
   const f = read(s, 0.1);
   check('double-tapping open water is the dash', f.dash === true && f.heavies === 0);
+  check('a dash shows the movement icon', f.marker === 'zoom');
   check('...and it runs for as long as the finger is down', read(s, 0.6).dash === true);
   up(s, 2, 0.7);
-  check('...and stops when it lifts', read(s, 0.71).dash === false);
+  check('...and release cannot brake the committed crossing', read(s, 0.71).dash === true);
+  for (let i = 0; i < 6; i++) read(s, 0.8 + i * 0.08);
+  check('...then the dash ends without a held finger', read(s, 1.3).dash === false);
+}
+{
+  const { s } = fresh();
+  down(s, 1, 'water', 400, 200, 0, false, SIZE); up(s, 1, 0.04);
+  read(s, 0.05);
+  down(s, 2, 'water', 420, 180, 0.08, false, SIZE); up(s, 2, 0.11);
+  const firstFrame = read(s, 0.2);
+  check('a quick double-tap survives both fingers lifting before the next frame', firstFrame.dash && firstFrame.marker === 'zoom');
+  check('...and keeps the second tap as its direction', !!firstFrame.ndc && near(firstFrame.ndc.x, toNdc(420, 180, SIZE.w, SIZE.h).x, 1e-9));
 }
 {
   const { s } = fresh();
@@ -104,7 +128,7 @@ const fresh = () => ({ s: freshTouch(), t: 0 });
   down(s, 1, 'water', 400, 200, 0, true, SIZE); up(s, 1, 0.04); read(s, 0.05);
   down(s, 2, 'water', 400, 200, 0.06, true, SIZE); up(s, 2, 0.1);
   const two = read(s, 0.11);
-  check('the second tap of a double is spent', two.heavies === 1);
+  check('the second tap of a double is spent', two.bites === 0 && !two.dash);
   down(s, 3, 'water', 400, 200, 0.13, true, SIZE);
   check('...so a third tap starts again and is no heavy', read(s, 0.14).heavies === 0);
 }
@@ -204,7 +228,7 @@ const fresh = () => ({ s: freshTouch(), t: 0 });
 }
 check('the ring wraps both ways', stepSlot(0, -1) === SECONDARY.length - 1 && stepSlot(SECONDARY.length - 1, 1) === 0);
 check('the ring holds every secondary once', new Set(SECONDARY).size === SECONDARY.length);
-check('the ring is the same length whatever the animal', SECONDARY.length === 4);
+check('the touch ring keeps sense on instead of offering a toggle', SECONDARY.length === 3 && !SECONDARY.includes('sense' as never));
 
 // ---------------------------------------------------------------- everything at once
 
@@ -231,6 +255,7 @@ check('the ring is the same length whatever the animal', SECONDARY.length === 4)
   const f = read(s, 0);
   const want = toNdc(585, 90, SIZE.w, SIZE.h);
   check('a finger on the water is the aim point', !!f.ndc && near(f.ndc.x, want.x, 1e-9) && near(f.ndc.y, want.y, 1e-9));
+  check('an ordinary water tap draws no target', f.marker === undefined);
   check('...and it is in NDC, y up', want.y > 0 && want.x > 0);
   up(s, 1, 0.05);
   // It has to outlive the finger, because the bite fires on the lift and the finger is gone by then.
@@ -328,18 +353,18 @@ check('an owed edge fires on a frame with no arrivals', meterEdge(1, 0).fire ===
 // ---------------------------------------------------------------- folding into the controls
 
 const fold = (t: Partial<ReturnType<typeof read>> & { light?: boolean; heavy?: boolean } = {}): RawControls => applyTouch(emptyControls(), {
-  dx: 0, dy: 0, zoom: 0, bites: 0, heavies: 0, swim: false, secondary: undefined, dash: false,
-  dragging: false, ndc: undefined, swapped: false, pinching: false, buttons: [], light: false, heavy: false, ...t,
+  dx: 0, dy: 0, zoom: 0, bites: 0, heavies: 0, swim: false, secondary: undefined, dash: false, pursue: false, pursuitStart: false, pursuitTargetId: undefined,
+  dragging: false, ndc: undefined, marker: undefined, swapped: false, pinching: false, light: false, heavy: false, ...t,
 });
 
 check('the swim pad is forward on the stick', fold({ swim: true }).my === 1);
 check('a tap is the light attack', fold({ light: true }).light === true);
-check('a double-tap on an animal is the heavy', fold({ heavy: true }).heavy === true);
+check('the dedicated heavy input still works', fold({ heavy: true }).heavy === true);
 check('a double-tap on water is the dash', fold({ dash: true }).dash === true && fold({ dash: true }).dodge === true);
 check('the pad on aim gives aim mode', fold({ secondary: 'aim' }).aim === true && fold({ secondary: 'aim' }).lock === true);
 check('the pad on guard guards', fold({ secondary: 'guard' }).guard === true);
 check('the pad on hide hides', fold({ secondary: 'ability' }).ability === true);
-check('the pad on sense senses', fold({ secondary: 'sense' }).sense === true);
+check('the touch pad never turns sense off', fold({ secondary: 'ability' }).sense === false);
 check('only one secondary at a time', Object.entries({ guard: fold({ secondary: 'guard' }) }).every(([, c]) => !c.ability && !c.aim && !c.sense));
 check('a swipe is already radians, so it goes in lookDX', fold({ dx: 0.3, dy: -0.2 }).lookDX === 0.3 && fold({ dx: 0.3, dy: -0.2 }).lookDY === -0.2);
 check('...and never in lookX, which is a rate', fold({ dx: 0.3 }).lookX === 0);
@@ -348,14 +373,11 @@ check('a pinch is a zoom exponent', fold({ zoom: -0.1 }).zoomDelta === -0.1);
 /**
  * What a **gesture** must not reach, and it is a different list from the mouse's.
  *
- * The mouse may not touch `ability`, `guard` or `sense` because a mouse plays beside a keyboard and
- * those have keys on it. A finger has no keyboard to fall back on, so the ring reaches all three —
- * one at a time.
+ * The mouse may not touch `ability` or `guard` because a mouse plays beside a keyboard. A finger
+ * reaches both from its pad; sense remains on and has no touch action.
  *
  * What no gesture may reach is anything belonging to a *menu*: a tap aimed at the sea must never also
- * answer whatever a menu is asking. Those are reached by the **drawn buttons** instead, which are a
- * separate, enumerated channel checked on its own below — a button is a thing the player deliberately
- * put a finger on, and what it does is written on it.
+ * answer whatever a menu is asking. The React pause and travel menus handle their own taps.
  *
  * `rise` and `sink` are on the list for a different reason: the camera covers them here (pitch the
  * view and hold swim), exactly as it does on a mouse.
@@ -365,67 +387,14 @@ const FORBIDDEN: (keyof RawControls)[] = [
   'dleft', 'dright', 'dup', 'ddown',
 ];
 const everything = fold({ swim: true, light: true, heavy: true, dash: true, secondary: 'aim', dx: 1, dy: 1, zoom: 1 });
-const alsoGuard = fold({ secondary: 'guard' }); const alsoHide = fold({ secondary: 'ability' }); const alsoSense = fold({ secondary: 'sense' });
+const alsoGuard = fold({ secondary: 'guard' }); const alsoHide = fold({ secondary: 'ability' });
 for (const f of FORBIDDEN) {
-  const reached = [everything, alsoGuard, alsoHide, alsoSense].some((c) => c[f] === true);
+  const reached = [everything, alsoGuard, alsoHide].some((c) => c[f] === true);
   check(`no gesture reaches ${f}`, !reached);
 }
 check('a finger never sprints: sprint is gone for players', everything.burst === 0);
 check('...and doing anything at all counts as a press', everything.any && everything.anyButton);
 check('doing nothing is not a press', fold().any === false);
-
-// ---------------------------------------------------------------- the drawn buttons
-
-{
-  // A finger on a drawn button holds it, and travel across it does nothing: a button is a button, and
-  // a finger sliding about on one has not changed its mind.
-  const { s } = fresh();
-  down(s, 1, 'teleport', 700, 40, 0, false, SIZE);
-  check('a drawn button is held', read(s, 0.01).buttons.includes('teleport'));
-  move(s, 1, 700 + DRAG * 4, 40, SIZE, 0.05);
-  const f = read(s, 0.05);
-  check('...and sliding on it does not turn the camera', f.dragging === false && f.dx === 0);
-  check('...and it is still held', f.buttons.includes('teleport'));
-  up(s, 1, 0.3);
-  check('...and it never ends in a bite', read(s, 0.31).bites === 0);
-  check('...and released it is let go', read(s, 0.32).buttons.length === 0);
-}
-{
-  // Several at once, because walking a menu is step-then-take and a hand has more than one finger.
-  const { s } = fresh();
-  down(s, 1, 'down', 700, 200, 0, false, SIZE);
-  down(s, 2, 'confirm', 740, 240, 0.01, false, SIZE);
-  const f = read(s, 0.02);
-  check('two drawn buttons held at once', f.buttons.includes('down') && f.buttons.includes('confirm'));
-  check('...and neither is listed twice', new Set(f.buttons).size === f.buttons.length);
-}
-check('every button zone is recognised as one', BUTTON_ZONES.every((b) => isButtonZone(b)));
-check('...and the gesture zones are not', !isButtonZone('water') && !isButtonZone('swim') && !isButtonZone('secondary'));
-
-/**
- * What each drawn button reaches, and nothing else. This is the enumerated channel: unlike a gesture
- * a button is *allowed* to reach a menu action, and the point of the table is that it reaches exactly
- * the one written on it and no more.
- */
-const BUTTON_DRIVES: Record<ButtonZone, (keyof RawControls)[]> = {
-  teleport: ['teleport'],
-  view: ['view'],
-  // The travel menu already walks on the D-pad, so that is what these are.
-  up: ['dup'],
-  down: ['ddown'],
-  confirm: ['confirm'],
-  back: ['back'],
-};
-for (const b of BUTTON_ZONES) {
-  const c = fold({ buttons: [b] });
-  for (const k of BUTTON_DRIVES[b]) check(`the ${b} button drives ${String(k)}`, c[k] === true);
-  const others = BUTTON_ZONES.filter((o) => o !== b).flatMap((o) => BUTTON_DRIVES[o]).filter((k) => !BUTTON_DRIVES[b].includes(k));
-  const stray = others.filter((k) => c[k] === true);
-  check(`...and nothing else`, stray.length === 0, stray.join(', '));
-}
-check('a drawn button never attacks', BUTTON_ZONES.every((b) => { const c = fold({ buttons: [b] }); return !c.light && !c.heavy && !c.dash && !c.ability && !c.guard; }));
-check('up and down walk a menu rather than pitching the body', fold({ buttons: ['up'] }).lookY === -1 && fold({ buttons: ['down'] }).lookY === 1);
-check('a drawn button counts as a press', fold({ buttons: ['teleport'] }).any === true);
 
 // ---------------------------------------------------------------- the labels
 
@@ -466,11 +435,14 @@ check('a touch laptop being used with its trackpad does not', touchFirst(true, t
 check('a pad in the session wins, as it does over the mouse', touchFirst(true, false, 1) === false);
 
 check('a tall phone is asked to turn round', rotateHint(390, 844, true) === true);
+check('a short portrait phone is gated too', rotateHint(540, 600, true) === true);
+check('a narrow portrait tablet may still play', rotateHint(600, 960, true) === false);
 check('a landscape phone is not', rotateHint(780, 360, true) === false);
 check('a 4:3 tablet upright is not nagged', rotateHint(820, 1093, true) === false);
 check('...nor a 3:2 one', rotateHint(800, 1200, true) === false);
 check('a big phone held up is', rotateHint(430, 932, true) === true);
 check('and a desktop window is never asked', rotateHint(390, 844, false) === false);
+check('touch marks reuse the mouse art', cursorFor('zoom').includes(cursorImageFor('zoom')) && cursorFor('target').includes(cursorImageFor('target')));
 
 // The roster's columns. `gridColumns` packs the whole roster into three rows, which is a rule about
 // a laptop: the Triassic's 26 animals are nine columns, and nine columns of a phone is a 36-pixel

@@ -64,7 +64,7 @@ clip the audit says opens the jaw.
 | Cymbospondylus | 4 | 933 | |
 | Archelon | 1 | 1,262 | |
 | **Macrocnemus** | **0** | **0** | ported in T3D-32B: arrived shut, capped with its own rim on a *fitted* cut (was 934 / 2,594 over **all twelve** opening clips) |
-| **Hybodus** | **0** | **0** | ported in T3D-32A: not cut at all (was 1,346 / 2,833) |
+| Hybodus | **1,346** | **2,833** | **reverted in T3D-36 at the owner's request.** T3D-32A took the cut out and read 0 / 0; the mouth was reported as not working well and `build.py` is restored verbatim to `a6d184c^` — the labelled cut, `T.cap_cut`, `T.rim_flange`, the pre-cut `T.seal_seams` and the two rigid `T.oral_shells`. Measured over **all fifteen** clips whose jaw leaves the shut pose rather than the three this table samples: the worst is `Heavy@0.4` 1,346 / 2,833, then `Bite@0.133` 1,261 / 2,670, `Bite@0.167` (its own peak) 1,073 / 2,328, `Attack@0.333` 875 / 1,985, `Grab@0.1` 158 / 518 and `Shake@0.6` 142 / 497; everything else 0 / 0, `Heavy` and `Attack` included at their own peaks. Plain run 52 / 1,046 — the rigid shells *are* what stands in the gap and the runtime hides them, which is the `--as-drawn` lesson on the body it was written about. Not re-engineered: the routes out are in [the README](../../../tools/triassic/creatures/hybodus/README.md#t3d-36--the-cut-put-back-at-the-owners-request) and the decision is the owner's |
 | Mixosaurus | 0 | 3,697 | |
 | **Atopodentatus** | **0** | **0** | ported in T3D-32A: capped with its own rim (was 3,738 / 4,494) |
 | Keichousaurus | 2 | 4,375 | |

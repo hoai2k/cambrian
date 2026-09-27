@@ -57,13 +57,13 @@ export const DEVONIAN = defineEra({
     // The same three modes as the Cambrian, in the same order: this era changes the sea and the
     // animals in it, not what a match is.
     { id: 'rise', name: 'Rise', blurb: 'Hatch as a hatchling. Eat, grow, fight, hide. Reach Prime and hold it for ninety seconds. Share the feast with the others, or eat them.', players: '1–4' },
-    { id: 'hunted', name: 'Hunter & Hunted', blurb: 'Everyone takes a turn as the big one, with the river mouth as the small ones\u2019 refuge. On your turn, catch as many as you can; on theirs, grow out of reach. Most caught wins.', players: '2–4 asymmetric' },
+    { id: 'survival', name: 'Survival', blurb: 'Grow with time, and faster by fighting animals your size or bigger. Eat to keep hunger up: an empty stomach costs health, and every death costs a rung. Reach the top and hold it.', players: '1–4' },
     { id: 'reef', name: 'Reef', blurb: 'No goal. Any animal, fully grown, and the Devonian coast to swim in.', players: '1–4 sandbox' },
   ],
 
   creatures: DEVONIAN_CREATURES,
   defaults: {
-    player: 'coccosteus',
+    player: DEVONIAN_CREATURES[0].id,
     // Delivered specimens only: these drive card and model preloading, and a creature that is still
     // borrowing a body has no portrait to load. Add each one here as its own model lands.
     // What the title screen swims and what the player is most likely to pick. The rest of the
@@ -72,7 +72,7 @@ export const DEVONIAN = defineEra({
     // Pickable animals only: this list is what a player is most likely to reach for, and
     // Bothriolepis stood in it until it became an NPC — in the water and off the pick screen,
     // so no longer something to fetch a full body and a portrait for ahead of time.
-    boot: ['coccosteus', 'dunkleosteus', 'cladoselache', 'doryaspis', 'stethacanthus'],
+    boot: ['dunkleosteus', 'coccosteus', 'cladoselache', 'doryaspis', 'stethacanthus'],
     title: ['dunkleosteus', 'cladoselache', 'coccosteus', 'doryaspis'],
   },
   ecology: { schools: SNACK_SCHOOLS, giants: GIANTS, shadow: { creature: 'titanichthys', scale: 1.0 } },

@@ -143,6 +143,14 @@ try {
   const live = await state();
   assert.equal(live.usingTouch, true, 'the match should be a touch match');
   assert.equal(live.usingMouse, false, 'and the mouse should not also be playing it');
+  assert.equal(live.senseMode, true, 'sense starts on for touch play');
+  assert.equal(await page.locator('.hud-bottom .chip.ability, .hud-bottom .chip.sense').count(), 0, 'ability and sense HUD chips should be absent on touch');
+  assert.equal(await page.locator('.toolbar').count(), 0, 'the icon toolbar should be hidden during touch play');
+  assert.equal(await page.locator('[data-touch-zone="teleport"], [data-touch-zone="view"], .touch-menu').count(), 0, 'travel, scores and navigation buttons should not cover the sea');
+  await page.keyboard.down('i');
+  await frames(2);
+  await page.keyboard.up('i');
+  assert.equal((await state()).senseMode, true, 'a keyboard case cannot toggle sense off in a touch match');
 
   // 4. The pads are on screen, and they are big enough to hit with a thumb.
   const pads = await page.evaluate(() => Array.from(document.querySelectorAll('[data-touch-zone]')).map((el) => {
@@ -194,22 +202,33 @@ try {
   //    the swipe can do.
   const swipeYaw = async (from, to, id) => {
     await settled();
-    const y0 = (await state()).camYaw;
+    const s0 = await state(); const y0 = s0.camYaw, b0 = s0.yaw;
     await touch('touchStart', [{ x: from, y: 180, id }]);
     const step = from < to ? 20 : -20;
     for (let x = from; step > 0 ? x <= to : x >= to; x += step) await touch('touchMove', [{ x, y: 180, id }]);
     await frames(2);
-    const y1 = (await state()).camYaw;
+    const s1 = await state(); const y1 = s1.camYaw, b1 = s1.yaw;
     await touch('touchEnd', []);
     await frames(2);
     // Shortest way round, so a swipe across the ±π seam is not read as a swipe most of the way back.
-    return Math.atan2(Math.sin(y1 - y0), Math.cos(y1 - y0));
+    const wrap = (d) => Math.atan2(Math.sin(d), Math.cos(d));
+    swipes.push({ cam: wrap(y1 - y0), body: wrap(b1 - b0) });
+    return wrap(y1 - y0);
   };
+  const swipes = [];
   const leftward = await swipeYaw(560, 300, 2);
   const rightward = await swipeYaw(220, 480, 3);
   assert.ok(Math.abs(leftward) > 0.15, `a swipe should turn the camera (moved ${leftward.toFixed(3)})`);
   assert.ok(Math.abs(rightward) > 0.15, `and so should one the other way (moved ${rightward.toFixed(3)})`);
   assert.ok(leftward * rightward < 0, `opposite swipes must turn the view opposite ways (${leftward.toFixed(3)} and ${rightward.toFixed(3)})`);
+  // ...and the **animal turns with it**, the same way by the same angle. Left to the follow camera the
+  // view went round, the body stayed, and the camera then swung back behind it — which read as the
+  // creature turning the opposite way from the finger. A body a frame behind its camera is allowed a
+  // little slack; one turning the other way, or not at all, is the bug.
+  for (const { cam, body } of swipes) {
+    assert.ok(cam * body > 0, `the body must turn the same way as the camera (camera ${cam.toFixed(3)}, body ${body.toFixed(3)})`);
+    assert.ok(Math.abs(body - cam) < Math.max(0.08, Math.abs(cam) * 0.15), `the body must turn by the camera's angle (camera ${cam.toFixed(3)}, body ${body.toFixed(3)})`);
+  }
   assert.equal((await state()).state, 'free', 'a swipe must not attack');
 
   // 7. A tap on the water is a bite — wherever it lands. Biting at the water ahead of you is a real
@@ -224,6 +243,7 @@ try {
     await settled();
   }
   assert.equal(bit, 'light', `a tap bites (got ${bit})`);
+  assert.equal(await page.locator('.touch-cursor').count(), 0, 'an open-water tap should not flash a target icon');
 
   // 8. A double-tap on open water is the dash, and it is the *second* finger that does it — so this
   //    also proves the pair is being recognised as a pair rather than as two taps.
@@ -240,12 +260,32 @@ try {
     });
     await doubleTapDown(390, 150, 5, 6);
     await frames(6);
+    assert.ok(await page.locator('.touch-cursor').count(), 'a held dash should show its movement icon');
+    assert.ok((await page.locator('.touch-cursor').getAttribute('src'))?.includes('svg'), 'the dash uses the mouse SVG art');
     dashed = await page.evaluate(() => window.__dodge);
     await touch('touchEnd', []);
     await frames(6);
     if (!dashed) await settled();
   }
   assert.ok(dashed, 'a double-tap on open water should dash');
+
+  // A real double-tap has two quick releases. Its second finger can be gone before the renderer
+  // gets another frame, especially on a phone; it must still carry the creature across the water.
+  await settled();
+  const dashStart = await page.evaluate(() => {
+    const p = window.__cambrian.game.players[0];
+    p.dashCd = 0; p.stamina = p.staminaMax; p.vel = { x: 0, y: 0, z: 0 };
+    p.spawnProtect = 999; p.pos.y += 8;
+    return { ...p.pos };
+  });
+  await gesture(
+    ['touchStart', [{ x: 390, y: 150, id: 15 }]], ['touchEnd', []],
+    ['touchStart', [{ x: 390, y: 150, id: 16 }]], ['touchEnd', []],
+  );
+  await frames(8);
+  const dashEnd = await page.evaluate(() => ({ ...window.__cambrian.game.players[0].pos }));
+  assert.ok(Math.hypot(dashEnd.x - dashStart.x, dashEnd.z - dashStart.z) > 1,
+    'a released double-tap must commit to a visible dash');
 
   // 9. The secondary pad. Held on aim it aims; swiped, it becomes something else and *stays* that,
   //    across a release — the choice is meant to outlive the press that made it.
@@ -328,6 +368,26 @@ try {
   await page.locator('.panel').waitFor({ timeout: 15000 });
   // ...and the pads stand down while it is up, so a tap aimed at a menu button is that button's.
   assert.equal(await page.locator('.touch-pads').count(), 0, 'the pads should not be drawn over the pause menu');
+  assert.equal(await page.locator('.toolbar').count(), 1, 'the icon toolbar returns in the pause menu');
+  await page.getByRole('menuitem', { name: 'Scores' }).click();
+  await page.locator('.pause-scoreboard .scoreboard').waitFor({ timeout: 15000 });
+  await page.getByRole('menuitem', { name: 'Scores' }).click();
+  assert.equal(await page.locator('.pause-scoreboard').count(), 0, 'scores can be closed without leaving pause');
+  await page.getByRole('menuitem', { name: 'Travel' }).click();
+  await page.locator('.tele-menu').waitFor({ timeout: 15000 });
+  assert.equal(await page.locator('.tele-menu li button').count() > 0, true, 'travel destinations are tappable');
+  await page.locator('.tele-menu li button').last().click();
+  await page.locator('.swap-menu').waitFor({ timeout: 15000 });
+  const beforeSwap = await page.locator('.swap-menu .swap-body b').first().innerText();
+  const swapBounds = await page.locator('.swap-menu .swap-body button').boundingBox();
+  await touch('touchStart', [{ x: swapBounds.x + swapBounds.width * .7, y: swapBounds.y + swapBounds.height / 2, id: 51 }]);
+  await touch('touchMove', [{ x: swapBounds.x + swapBounds.width * .2, y: swapBounds.y + swapBounds.height / 2, id: 51 }]);
+  await touch('touchEnd', []);
+  await page.waitForFunction((name) => document.querySelector('.swap-menu .swap-body b')?.textContent !== name, beforeSwap, { timeout: 15000 });
+  await page.locator('.touch-tele-dismiss').click({ position: { x: 5, y: 5 } });
+  await page.locator('.tele-menu').waitFor({ state: 'detached', timeout: 15000 });
+  await page.locator('.touch-pause').click();
+  await page.locator('.panel').waitFor({ timeout: 15000 });
   // A tap on a real menu button is still that button's: the scheme must never swallow the way out.
   // The pause choices carry `role="menuitem"`, not `button` — which is also worth asserting, because
   // it is what a screen reader walks.
@@ -336,7 +396,7 @@ try {
   assert.equal(await page.locator('.touch-pads').count(), 1, 'and they come back when the game does');
 
   assert.deepEqual(errors, [], `the page logged errors: ${errors.join(' · ')}`);
-  console.log('PASS: a finger starts the game, swims, looks, bites, dashes, swaps its pad, holds two at once, pinches and pauses');
+  console.log('PASS: touch movement, always-on sense, uncluttered HUD, pause actions and tappable travel');
 } catch (e) {
   console.error('FAIL:', e.message);
   console.error(e.stack?.split('\n').slice(0, 6).join('\n'));

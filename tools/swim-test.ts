@@ -8,7 +8,7 @@ import { applyScaleStats, bodyRadius, clearanceOf, climbHeight, climbRise, floor
 import { boulderQ, boulderTop, groundHeight, resolveStatic, rockRadius, sampleHeight, type Boulder, type StaticContact, type WorldData } from '../src/sim/world';
 import { creature } from '../src/sim/creatures';
 import { floraSize } from '../src/sim/flora';
-import { BREATH_PEEK, climbAimHold, DASH_AIM_GRACE, edgePitch, fitCameraArm, PITCH_DOWN, PITCH_UP, swimPitch } from '../src/render/engine';
+import { BREATH_PEEK, climbAimHold, DASH_AIM_GRACE, edgePitch, fitCameraArm, FLOOR_CLOSE_HOLD, keepCreatureInFrame, PITCH_DOWN, PITCH_UP, seafloorCloseHold, swimPitch } from '../src/render/engine';
 import { damp } from '../src/shared/math';
 
 let failed = 0;
@@ -306,6 +306,11 @@ const rockWorld = (boulders: Boulder[]) => ({
   check('aiming up pulls the camera in rather than tipping it flat', shortened.dist < 4 && shortened.dist > 1.2 && Math.abs(shortened.lift) < 0.01,
     `arm 5 → ${shortened.dist.toFixed(2)}, lift ${shortened.lift.toFixed(3)}`);
   check('...and the camera ends up out of the sand', shortened.y >= 0.45 - 1e-9, `y=${shortened.y.toFixed(2)} against sand at 0.45`);
+  const heldClose = seafloorCloseHold(0, 1, 3, 1 / 60);
+  check('the camera stays close while the creature is near the bottom', heldClose === FLOOR_CLOSE_HOLD, `${heldClose}s`);
+  check('clear water must last ten seconds before the camera backs out', seafloorCloseHold(heldClose, 9, 3, 9.9) > 0 && seafloorCloseHold(heldClose, 9, 3, 10) === 0, `${heldClose}s`);
+  const cappedLook = keepCreatureInFrame(0.45, 3.5, 1.5, 1.25, 1.5, 60);
+  check('an upward shot keeps the creature just inside the lower edge', cappedLook < 3.5 && Math.atan2(cappedLook - 0.45, 1.5) - Math.atan2(1.25 - 0.45, 1.5) < Math.PI / 6, `look ${cappedLook.toFixed(2)}`);
   const lifted = fitCameraArm(0.8, -0.95, 5, 1.2, sand(0.45), 39);   // 1.2 is the shortest arm for a 1.3-unit body
   check('aiming up from the floor lifts the rig once the arm runs out', lifted.dist <= 1.2 + 1e-9 && lifted.lift > 0.2,
     `arm ${lifted.dist.toFixed(2)}, lift ${lifted.lift.toFixed(2)}`);

@@ -140,7 +140,7 @@ export function makeActor(id: number, creatureId: CreatureId, controller: Contro
     // Math.random, or the same seed stops reproducing the same match.
     pos: { ...pos }, vel: v3(), yaw: 0, pitch: 0, bank: 0, roll: 0,
     scale, tier: tierForScale(creatureId, scale), nutrition: 0, ageGrowth: 0,
-    hp: 0, hpMax: 0, stamina: 0, staminaMax: 0, exhausted: 0, poise: 0, poiseMax: 0,
+    hp: 0, hpMax: 0, hunger: 100, stamina: 0, staminaMax: 0, exhausted: 0, poise: 0, poiseMax: 0,
     state: 'free', stateT: 0, stateDur: 0, combo: 0, comboT: 0, hitDone: new Set(),
     iframes: 0, lockTarget: -1, guardHeld: 0,
     hideMode: 'none', hideT: 0, hideCd: 0, camoStrength: 0, camoScheme: 'default', camoLabel: '', camoSource: -1, emergenceHeavy: false,

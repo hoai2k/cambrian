@@ -77,15 +77,15 @@ export const TRIASSIC = defineEra({
   modes: [
     // The same three modes as the other eras: the sea and the animals change, not what a match is.
     { id: 'rise', name: 'Rise', blurb: 'Hatch on the sea floor. Feed, dive, grow. Reach Prime and hold it for ninety seconds. Share the feast with the others, or eat them.', players: '1–4' },
-    { id: 'hunted', name: 'Hunter & Hunted', blurb: 'Everyone takes a turn as the big one, with the conifer shore as the small ones’ refuge — and the necks on it. On your turn, catch as many as you can; on theirs, grow out of reach. Most caught wins.', players: '2–4 asymmetric' },
+    { id: 'survival', name: 'Survival', blurb: 'Grow with time, and faster by fighting animals your size or bigger. Eat to keep hunger up: an empty stomach costs health, and every death costs a rung. Reach the top and hold it.', players: '1–4' },
     { id: 'reef', name: 'Reef', blurb: 'No goal. Any animal, fully grown, and the Triassic platform to swim in, from the gypsum flats to the black basin.', players: '1–4 sandbox' },
   ],
 
   creatures: TRIASSIC_CREATURES,
   defaults: {
-    player: 'nothosaurus',
-    boot: ['nothosaurus', 'mixosaurus', 'cymbospondylus', 'placodus', 'saurichthys'],
-    title: ['cymbospondylus', 'nothosaurus', 'mixosaurus', 'rhaeticosaurus'],
+    player: TRIASSIC_CREATURES[0].id,
+    boot: ['dinocephalosaurus', 'nothosaurus', 'mixosaurus', 'cymbospondylus', 'placodus'],
+    title: ['dinocephalosaurus', 'cymbospondylus', 'nothosaurus', 'mixosaurus'],
   },
   ecology: { schools: SNACK_SCHOOLS, giants: GIANTS, shadow: { creature: 'shonisaurus', scale: 1.0 } },
   environment: { biomeNames: BIOME_NAMES, biomeDanger: BIOME_DANGER, atmosphere: ATMOS, sandColors: SAND_COLORS, floraColors: FLORA_BASE, flora: FLORA_DENSITY, floraProps: FLORA_PROPS, shoreFlora: SHORE_FLORA, surfaceY: SURFACE_Y, floorDepth: FLOOR_DEPTH, biomePlates: BIOME_PLATES },

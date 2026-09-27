@@ -1,8 +1,8 @@
 import { drawsOralGeometry } from '../shared/oral-geometry';
 import { ClipQueuedBadge, ModelStatusBadge } from '../shared/ModelStatusBadge';
 import { CreaturePortrait } from '../app/CreaturePortrait';
-import { useEffect, useRef, useState } from 'react';
-import { COLLECTIONS, isPropCollection, paletteFor, SPECIMENS, specimenByKey, type CollectionId, type ViewerSpecimen } from './catalogue';
+import { Fragment, useEffect, useRef, useState } from 'react';
+import { COLLECTIONS, isPropCollection, paletteFor, SPECIMEN_SECTIONS, SPECIMENS, specimenByKey, type CollectionId, type ViewerSpecimen } from './catalogue';
 import { scheme, SLOT_LABEL, type Slot } from '../shared/palettes';
 import { ASSET_BASE, createViewerScene, isReplaced, replacedName, type PlaybackState, type ViewerScene } from './scene';
 import { SculptEditor } from './sculpt/SculptEditor';
@@ -163,6 +163,7 @@ export function Viewer() {
   const showGenerated = stage.kind === 'generated';
   const modelPath = stage.model;
   const roster = SPECIMENS.filter(c => c.collection === collection);
+  const sections = SPECIMEN_SECTIONS.find(s => s.id === collection)?.sections ?? [];
   // Both eras are on this page, so a specimen's palette comes from its own pack, not ACTIVE_ERA.
   const defaultScheme = (key: string) => {
     const c = specimenByKey.get(key)!;
@@ -490,17 +491,22 @@ export function Viewer() {
           </label>
         </header>
         <ul>
-          {roster.map((c) => (
-            <li key={c.key}>
-              <button className={`specimen ${c.key === id ? 'active' : ''}`} aria-pressed={c.key === id} onClick={() => setId(c.key)}>
-                <>{c.image ? <img src={`${ASSET_BASE}${c.image}`} alt="" draggable={false}/> : <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={ASSET_BASE} schemeId={picks[c.key] ?? defaultScheme(c.key)} alt="" draggable={false} />}</>
-                <span>
-                  <b>{c.name}</b>
-                  <small>{c.species}</small>
-                  <ModelStatusBadge status={c.modelStatus} note={c.modelNote} compact />
-                </span>
-              </button>
-            </li>
+          {sections.map((section) => (
+            <Fragment key={section.title ?? '\u0000roster'}>
+              {section.title && <li className="specimen-heading"><h3>{section.title}</h3></li>}
+              {section.rows.map((c) => (
+                <li key={c.key}>
+                  <button className={`specimen ${c.key === id ? 'active' : ''}`} aria-pressed={c.key === id} onClick={() => setId(c.key)}>
+                    <>{c.image ? <img src={`${ASSET_BASE}${c.image}`} alt="" draggable={false}/> : <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={ASSET_BASE} schemeId={picks[c.key] ?? defaultScheme(c.key)} alt="" draggable={false} />}</>
+                    <span>
+                      <b>{c.name}</b>
+                      <small>{c.species}</small>
+                      <ModelStatusBadge status={c.modelStatus} note={c.modelNote} compact />
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </Fragment>
           ))}
         </ul>
       </aside>

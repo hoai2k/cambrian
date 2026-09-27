@@ -21456,14 +21456,26 @@
     {
       "id": "hybodus",
       "variant": "authored",
-      "sha256": "cfad8caaaa68d496247ee541254933b14b0470743a98175c063bb3e389e00174",
-      "length": 4.999999881416193,
+      "sha256": "ba434d91d3475ad833c4211071765677aa34b84df027bcdd4591f88e307f1d1e",
+      "length": 4.999999860461436,
       "meshes": [
         {
           "name": "Hybodus_authored_body",
           "hiddenOral": false,
-          "vertices": 11577,
-          "mixedJawSkullVertices": 615
+          "vertices": 11902,
+          "mixedJawSkullVertices": 560
+        },
+        {
+          "name": "Hybodus_authored_body_lower_jaw",
+          "hiddenOral": false,
+          "vertices": 985,
+          "mixedJawSkullVertices": 118
+        },
+        {
+          "name": "Mouth_lining",
+          "hiddenOral": true,
+          "vertices": 336,
+          "mixedJawSkullVertices": 0
         }
       ],
       "clips": [
@@ -21477,8 +21489,8 @@
             "phase": 0.4166666666666667,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10501,
-              83
+              9964,
+              78
             ]
           },
           "mouthSkin": {
@@ -21488,99 +21500,131 @@
             "phase": 0.4166666666666667,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10501,
-              83
+              9964,
+              78
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000009683645,
+            "rest": 0.08075193505519138,
+            "posed": 0.08075193513338869,
+            "phase": 0.16666666666666666,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              191,
+              176
+            ]
           }
         },
         {
           "name": "Attack",
           "duration": 1,
           "skin": {
-            "ratio": 2.267100111845063,
-            "rest": 0.03347726653168499,
-            "posed": 0.07589631469825003,
-            "phase": 0.4166666666666667,
+            "ratio": 2.2627436800643,
+            "rest": 0.03465039389937764,
+            "posed": 0.07840495980755534,
+            "phase": 0,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              191,
-              7903
+              7591,
+              7922
             ]
           },
           "mouthSkin": {
-            "ratio": 2.267100111845063,
-            "rest": 0.03347726653168499,
-            "posed": 0.07589631469825003,
-            "phase": 0.4166666666666667,
+            "ratio": 2.2627436800643,
+            "rest": 0.03465039389937764,
+            "posed": 0.07840495980755534,
+            "phase": 0,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              191,
-              7903
+              7591,
+              7922
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000057667564,
+            "rest": 0.08075193505519138,
+            "posed": 0.08075193552086812,
+            "phase": 0.4583333333333333,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              191,
+              176
+            ]
           }
         },
         {
           "name": "Bite",
           "duration": 0.5,
           "skin": {
-            "ratio": 2.516513028573732,
-            "rest": 0.03347726653168499,
-            "posed": 0.08424597738802064,
+            "ratio": 2.6939730298278377,
+            "rest": 0.029967185508811334,
+            "posed": 0.08073078954058534,
             "phase": 0.3333333333333333,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              191,
-              7903
+              5359,
+              9545
             ]
           },
           "mouthSkin": {
-            "ratio": 2.516513028573732,
-            "rest": 0.03347726653168499,
-            "posed": 0.08424597738802064,
+            "ratio": 2.6939730298278377,
+            "rest": 0.029967185508811334,
+            "posed": 0.08073078954058534,
             "phase": 0.3333333333333333,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              191,
-              7903
+              5359,
+              9545
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000188310614,
+            "rest": 0.09665795457322816,
+            "posed": 0.09665795639340004,
+            "phase": 0.3333333333333333,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              181,
+              169
+            ]
           }
         },
         {
           "name": "Breath",
           "duration": 2.4000000953674316,
           "skin": {
-            "ratio": 1.579702176723141,
-            "rest": 0.04977034500371702,
-            "posed": 0.07862232233863348,
+            "ratio": 2.2627436800643,
+            "rest": 0.03465039389937764,
+            "posed": 0.07840495980755534,
             "phase": 0,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10509,
-              8595
+              7591,
+              7922
             ]
           },
           "mouthSkin": {
-            "ratio": 1.579702176723141,
-            "rest": 0.04977034500371702,
-            "posed": 0.07862232233863348,
+            "ratio": 2.2627436800643,
+            "rest": 0.03465039389937764,
+            "posed": 0.07840495980755534,
             "phase": 0,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10509,
-              8595
+              7591,
+              7922
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000006453376,
+            "rest": 0.1804031738873309,
+            "posed": 0.18040317400375186,
+            "phase": 0.375,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              48,
+              47
+            ]
           }
         },
         {
@@ -21593,8 +21637,8 @@
             "phase": 1,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10643,
-              2371
+              10095,
+              2245
             ]
           },
           "mouthSkin": {
@@ -21604,41 +21648,57 @@
             "phase": 1,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10643,
-              2371
+              10095,
+              2245
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000001062095167,
+            "rest": 0.09473975547677455,
+            "posed": 0.09473976553903819,
+            "phase": 1,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              204,
+              203
+            ]
           }
         },
         {
           "name": "Dive",
           "duration": 1.399999976158142,
           "skin": {
-            "ratio": 2.2503538734948836,
-            "rest": 0.033740088428815464,
-            "posed": 0.07592713868784479,
-            "phase": 0.5,
+            "ratio": 2.2645009724661933,
+            "rest": 0.03465039389937764,
+            "posed": 0.07846585068147732,
+            "phase": 0.3333333333333333,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              7138,
-              10643
+              7591,
+              7922
             ]
           },
           "mouthSkin": {
-            "ratio": 2.2503538734948836,
-            "rest": 0.033740088428815464,
-            "posed": 0.07592713868784479,
-            "phase": 0.5,
+            "ratio": 2.2645009724661933,
+            "rest": 0.03465039389937764,
+            "posed": 0.07846585068147732,
+            "phase": 0.3333333333333333,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              7138,
-              10643
+              7591,
+              7922
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000005665333,
+            "rest": 0.15944854192145902,
+            "posed": 0.15944854201179193,
+            "phase": 0.375,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              104,
+              89
+            ]
           }
         },
         {
@@ -21651,8 +21711,8 @@
             "phase": 0.5833333333333334,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10501,
-              83
+              9964,
+              78
             ]
           },
           "mouthSkin": {
@@ -21662,41 +21722,57 @@
             "phase": 0.5833333333333334,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10501,
-              83
+              9964,
+              78
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000281036956,
+            "rest": 0.11993451431752762,
+            "posed": 0.11993451768813071,
+            "phase": 0.5,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              146,
+              131
+            ]
           }
         },
         {
           "name": "Eat",
           "duration": 1.600000023841858,
           "skin": {
-            "ratio": 1.9877815206367881,
-            "rest": 0.04386868355288737,
-            "posed": 0.08720135850109252,
-            "phase": 0.75,
+            "ratio": 1.6737375629522324,
+            "rest": 0.05242548103765459,
+            "posed": 0.08774649686856247,
+            "phase": 0.25,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              11413,
-              5713
+              9837,
+              1899
             ]
           },
           "mouthSkin": {
-            "ratio": 1.9877815206367881,
-            "rest": 0.04386868355288737,
-            "posed": 0.08720135850109252,
-            "phase": 0.75,
+            "ratio": 1.6737375629522324,
+            "rest": 0.05242548103765459,
+            "posed": 0.08774649686856247,
+            "phase": 0.25,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              11413,
-              5713
+              9837,
+              1899
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000031958196,
+            "rest": 0.07563810101789106,
+            "posed": 0.07563810125961679,
+            "phase": 0.125,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              302,
+              316
+            ]
           }
         },
         {
@@ -21709,8 +21785,8 @@
             "phase": 0.4166666666666667,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10565,
-              4469
+              10024,
+              4239
             ]
           },
           "mouthSkin": {
@@ -21720,157 +21796,205 @@
             "phase": 0.4166666666666667,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10565,
-              4469
+              10024,
+              4239
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000062118446,
+            "rest": 0.09852877612765491,
+            "posed": 0.09852877673970035,
+            "phase": 0.75,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              69,
+              54
+            ]
           }
         },
         {
           "name": "Growth",
           "duration": 1.5,
           "skin": {
-            "ratio": 1.8458399805371173,
-            "rest": 0.043098999452827615,
-            "posed": 0.07955385631117655,
-            "phase": 0.5,
+            "ratio": 2.2641237679669852,
+            "rest": 0.03465039389937764,
+            "posed": 0.07845278039699914,
+            "phase": 0.3333333333333333,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              7676,
-              9242
+              7591,
+              7922
             ]
           },
           "mouthSkin": {
-            "ratio": 1.800747091307145,
-            "rest": 0.0454504363775343,
-            "posed": 0.08184474110548534,
-            "phase": 0.5,
+            "ratio": 2.2641237679669852,
+            "rest": 0.03465039389937764,
+            "posed": 0.07845278039699914,
+            "phase": 0.3333333333333333,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              5261,
-              270
+              7591,
+              7922
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000015904182,
+            "rest": 0.07529976865462629,
+            "posed": 0.07529976877438442,
+            "phase": 0.5,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              110,
+              95
+            ]
           }
         },
         {
           "name": "Guard",
           "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 1.579702176723141,
-            "rest": 0.04977034500371702,
-            "posed": 0.07862232233863348,
+            "ratio": 2.2627436800643,
+            "rest": 0.03465039389937764,
+            "posed": 0.07840495980755534,
             "phase": 0,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10509,
-              8595
+              7591,
+              7922
             ]
           },
           "mouthSkin": {
-            "ratio": 1.579702176723141,
-            "rest": 0.04977034500371702,
-            "posed": 0.07862232233863348,
+            "ratio": 2.2627436800643,
+            "rest": 0.03465039389937764,
+            "posed": 0.07840495980755534,
             "phase": 0,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10509,
-              8595
+              7591,
+              7922
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.000000001368443,
+            "rest": 0.24314045002926907,
+            "posed": 0.24314045036199292,
+            "phase": 0.25,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              21,
+              6
+            ]
           }
         },
         {
           "name": "Heavy",
           "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 2.5614979060282996,
-            "rest": 0.03347726653168499,
-            "posed": 0.08575194812046238,
+            "ratio": 2.772255676891756,
+            "rest": 0.029967185508811334,
+            "posed": 0.08307670014727059,
             "phase": 0.4166666666666667,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              191,
-              7903
+              5359,
+              9545
             ]
           },
           "mouthSkin": {
-            "ratio": 2.5614979060282996,
-            "rest": 0.03347726653168499,
-            "posed": 0.08575194812046238,
+            "ratio": 2.772255676891756,
+            "rest": 0.029967185508811334,
+            "posed": 0.08307670014727059,
             "phase": 0.4166666666666667,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              191,
-              7903
+              5359,
+              9545
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.000000005144604,
+            "rest": 0.11623614436275609,
+            "posed": 0.11623614496074502,
+            "phase": 0.4166666666666667,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              146,
+              145
+            ]
           }
         },
         {
           "name": "Hit",
           "duration": 0.6000000238418579,
           "skin": {
-            "ratio": 1.5797747553372603,
-            "rest": 0.04977034500371702,
-            "posed": 0.07862593460129809,
+            "ratio": 2.2645009368757187,
+            "rest": 0.03465039389937764,
+            "posed": 0.07846584944825336,
             "phase": 0.3333333333333333,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10509,
-              8595
+              7591,
+              7922
             ]
           },
           "mouthSkin": {
-            "ratio": 1.5797747553372603,
-            "rest": 0.04977034500371702,
-            "posed": 0.07862593460129809,
+            "ratio": 2.2645009368757187,
+            "rest": 0.03465039389937764,
+            "posed": 0.07846584944825336,
             "phase": 0.3333333333333333,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10509,
-              8595
+              7591,
+              7922
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000127440225,
+            "rest": 0.17204105182818666,
+            "posed": 0.17204105402068168,
+            "phase": 0.5,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              5,
+              6
+            ]
           }
         },
         {
           "name": "Idle",
           "duration": 2.5999999046325684,
           "skin": {
-            "ratio": 1.579702176723141,
-            "rest": 0.04977034500371702,
-            "posed": 0.07862232233863348,
+            "ratio": 2.2627436800643,
+            "rest": 0.03465039389937764,
+            "posed": 0.07840495980755534,
             "phase": 0,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10509,
-              8595
+              7591,
+              7922
             ]
           },
           "mouthSkin": {
-            "ratio": 1.579702176723141,
-            "rest": 0.04977034500371702,
-            "posed": 0.07862232233863348,
+            "ratio": 2.2627436800643,
+            "rest": 0.03465039389937764,
+            "posed": 0.07840495980755534,
             "phase": 0,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10509,
-              8595
+              7591,
+              7922
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000006635592,
+            "rest": 0.24314045002926907,
+            "posed": 0.24314045019060718,
+            "phase": 0.2916666666666667,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              21,
+              6
+            ]
           }
         },
         {
@@ -21883,8 +22007,8 @@
             "phase": 0.5,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10501,
-              83
+              9964,
+              78
             ]
           },
           "mouthSkin": {
@@ -21894,41 +22018,57 @@
             "phase": 0.5,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10501,
-              83
+              9964,
+              78
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000125445854,
+            "rest": 0.11599228618106196,
+            "posed": 0.11599228763613709,
+            "phase": 0.5,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              161,
+              146
+            ]
           }
         },
         {
           "name": "Rise",
           "duration": 1.399999976158142,
           "skin": {
-            "ratio": 1.5797748273667909,
-            "rest": 0.04977034500371702,
-            "posed": 0.07862593818623267,
+            "ratio": 2.2645009350964407,
+            "rest": 0.03465039389937764,
+            "posed": 0.07846584938660067,
             "phase": 0.3333333333333333,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10509,
-              8595
+              7591,
+              7922
             ]
           },
           "mouthSkin": {
-            "ratio": 1.5797748273667909,
-            "rest": 0.04977034500371702,
-            "posed": 0.07862593818623267,
+            "ratio": 2.2645009350964407,
+            "rest": 0.03465039389937764,
+            "posed": 0.07846584938660067,
             "phase": 0.3333333333333333,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10509,
-              8595
+              7591,
+              7922
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000005089469,
+            "rest": 0.1804031738873309,
+            "posed": 0.18040317397914654,
+            "phase": 0.375,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              48,
+              47
+            ]
           }
         },
         {
@@ -21941,8 +22081,8 @@
             "phase": 0.5416666666666666,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10643,
-              2371
+              10095,
+              2245
             ]
           },
           "mouthSkin": {
@@ -21952,186 +22092,242 @@
             "phase": 0.5416666666666666,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10643,
-              2371
+              10095,
+              2245
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000270360698,
+            "rest": 0.1423115587865046,
+            "posed": 0.14231156263404984,
+            "phase": 0.5833333333333334,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              155,
+              140
+            ]
           }
         },
         {
           "name": "SpineBrace",
           "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 1.5797009533036546,
-            "rest": 0.04977034500371702,
-            "posed": 0.07862226144862355,
+            "ratio": 2.262742896470995,
+            "rest": 0.03465039389937764,
+            "posed": 0.07840493265573867,
             "phase": 0,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10509,
-              8595
+              7591,
+              7922
             ]
           },
           "mouthSkin": {
-            "ratio": 1.5797009533036546,
-            "rest": 0.04977034500371702,
-            "posed": 0.07862226144862355,
+            "ratio": 2.262742896470995,
+            "rest": 0.03465039389937764,
+            "posed": 0.07840493265573867,
             "phase": 0,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10509,
-              8595
+              7591,
+              7922
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000004107301,
+            "rest": 0.1804031738873309,
+            "posed": 0.18040317396142794,
+            "phase": 0.3333333333333333,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              48,
+              47
+            ]
           }
         },
         {
           "name": "Sprint",
           "duration": 1.100000023841858,
           "skin": {
-            "ratio": 1.8669975759904727,
-            "rest": 0.043098999452827615,
-            "posed": 0.08046572750604386,
-            "phase": 0.20833333333333334,
+            "ratio": 2.268142424585319,
+            "rest": 0.03465039389937764,
+            "posed": 0.07859202843177075,
+            "phase": 0.041666666666666664,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              7676,
-              9242
+              7591,
+              7922
             ]
           },
           "mouthSkin": {
-            "ratio": 1.6752554602784302,
-            "rest": 0.053668041170963715,
-            "posed": 0.08990767901410456,
-            "phase": 0.20833333333333334,
+            "ratio": 2.268142424585319,
+            "rest": 0.03465039389937764,
+            "posed": 0.07859202843177075,
+            "phase": 0.041666666666666664,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              6199,
-              7827
+              7591,
+              7922
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000037736194,
+            "rest": 0.24314045002926907,
+            "posed": 0.2431404509467886,
+            "phase": 0.6666666666666666,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              21,
+              6
+            ]
           }
         },
         {
           "name": "Stagger",
           "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 1.584447604406642,
-            "rest": 0.04963186772316193,
-            "posed": 0.07863909391619125,
+            "ratio": 2.264500987264452,
+            "rest": 0.03465039389937764,
+            "posed": 0.07846585119424282,
             "phase": 0.3333333333333333,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              1944,
-              5107
+              7591,
+              7922
             ]
           },
           "mouthSkin": {
-            "ratio": 1.584447604406642,
-            "rest": 0.04963186772316193,
-            "posed": 0.07863909391619125,
+            "ratio": 2.264500987264452,
+            "rest": 0.03465039389937764,
+            "posed": 0.07846585119424282,
             "phase": 0.3333333333333333,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              1944,
-              5107
+              7591,
+              7922
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000127440225,
+            "rest": 0.17204105182818666,
+            "posed": 0.17204105402068168,
+            "phase": 0.5,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              5,
+              6
+            ]
           }
         },
         {
           "name": "Swim",
           "duration": 1.7999999523162842,
           "skin": {
-            "ratio": 1.579702176723141,
-            "rest": 0.04977034500371702,
-            "posed": 0.07862232233863348,
-            "phase": 0,
+            "ratio": 2.265488655346882,
+            "rest": 0.03465039389937764,
+            "posed": 0.07850007428234086,
+            "phase": 0.041666666666666664,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10509,
-              8595
+              7591,
+              7922
             ]
           },
           "mouthSkin": {
-            "ratio": 1.579702176723141,
-            "rest": 0.04977034500371702,
-            "posed": 0.07862232233863348,
-            "phase": 0,
+            "ratio": 2.265488655346882,
+            "rest": 0.03465039389937764,
+            "posed": 0.07850007428234086,
+            "phase": 0.041666666666666664,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              10509,
-              8595
+              7591,
+              7922
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000023664528,
+            "rest": 0.24314045002926907,
+            "posed": 0.24314045060464945,
+            "phase": 0.16666666666666666,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              21,
+              6
+            ]
           }
         },
         {
           "name": "TurnLeft",
           "duration": 1.600000023841858,
           "skin": {
-            "ratio": 2.0067580767995556,
-            "rest": 0.043098999452827615,
-            "posed": 0.08648926525394145,
-            "phase": 0.5,
+            "ratio": 2.2627436800643,
+            "rest": 0.03465039389937764,
+            "posed": 0.07840495980755534,
+            "phase": 0,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              7676,
-              9242
+              7591,
+              7922
             ]
           },
           "mouthSkin": {
-            "ratio": 1.778229375120395,
-            "rest": 0.053668041170963715,
-            "posed": 0.09543408731537845,
-            "phase": 0.5,
+            "ratio": 2.2627436800643,
+            "rest": 0.03465039389937764,
+            "posed": 0.07840495980755534,
+            "phase": 0,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              6199,
-              7827
+              7591,
+              7922
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000199103993,
+            "rest": 0.08368678123572305,
+            "posed": 0.08368678290196029,
+            "phase": 0.5,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              24,
+              38
+            ]
           }
         },
         {
           "name": "TurnRight",
           "duration": 1.600000023841858,
           "skin": {
-            "ratio": 1.6928605746855252,
-            "rest": 0.04639463898264839,
-            "posed": 0.07853965521049362,
+            "ratio": 2.383171047099713,
+            "rest": 0.03465039389937764,
+            "posed": 0.08257781551159732,
             "phase": 0.5,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              2564,
-              84
+              7591,
+              7922
             ]
           },
           "mouthSkin": {
-            "ratio": 1.6928605746855252,
-            "rest": 0.04639463898264839,
-            "posed": 0.07853965521049362,
+            "ratio": 2.383171047099713,
+            "rest": 0.03465039389937764,
+            "posed": 0.08257781551159732,
             "phase": 0.5,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              2564,
-              84
+              7591,
+              7922
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.000000019867599,
+            "rest": 0.08715319444750963,
+            "posed": 0.08715319617903435,
+            "phase": 0.5,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              25,
+              39
+            ]
           }
         },
         {
@@ -22144,8 +22340,8 @@
             "phase": 0.25,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              6199,
-              9943
+              5879,
+              9429
             ]
           },
           "mouthSkin": {
@@ -22155,12 +22351,20 @@
             "phase": 0.25,
             "mesh": "Hybodus_authored_body",
             "vertices": [
-              6199,
-              9943
+              5879,
+              9429
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000070583557,
+            "rest": 0.07563810101789106,
+            "posed": 0.07563810155177168,
+            "phase": 0.25,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              302,
+              316
+            ]
           }
         }
       ],
@@ -22171,8 +22375,8 @@
         "phase": 0.5416666666666666,
         "mesh": "Hybodus_authored_body",
         "vertices": [
-          10643,
-          2371
+          10095,
+          2245
         ],
         "clip": "Shake"
       }
@@ -22180,14 +22384,26 @@
     {
       "id": "hybodus",
       "variant": "puppet",
-      "sha256": "ca04f637d74f02000a91e2cee73601570115f7c52241f400f9b3380fa8c1bf91",
-      "length": 5.010320911969931,
+      "sha256": "40d6895bb0e0166d64647790d97675cb0fc190a2a40a9e0a21064540d655658d",
+      "length": 5.010320974632457,
       "meshes": [
         {
           "name": "Hybodus_procedural_volume_twin",
           "hiddenOral": false,
-          "vertices": 3252,
-          "mixedJawSkullVertices": 103
+          "vertices": 3516,
+          "mixedJawSkullVertices": 65
+        },
+        {
+          "name": "Hybodus_procedural_volume_twin_lower_jaw",
+          "hiddenOral": false,
+          "vertices": 175,
+          "mixedJawSkullVertices": 26
+        },
+        {
+          "name": "Mouth_lining",
+          "hiddenOral": true,
+          "vertices": 336,
+          "mixedJawSkullVertices": 0
         }
       ],
       "clips": [
@@ -22201,8 +22417,8 @@
             "phase": 0.4166666666666667,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2787,
-              2789
+              2746,
+              2748
             ]
           },
           "mouthSkin": {
@@ -22212,99 +22428,131 @@
             "phase": 0.4166666666666667,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2787,
-              2789
+              2746,
+              2748
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000009683645,
+            "rest": 0.08075193505519138,
+            "posed": 0.08075193513338869,
+            "phase": 0.16666666666666666,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              191,
+              176
+            ]
           }
         },
         {
           "name": "Attack",
           "duration": 1,
           "skin": {
-            "ratio": 2.7881401618921706,
-            "rest": 0.03510437657141134,
-            "posed": 0.09787592217693854,
-            "phase": 0.4166666666666667,
+            "ratio": 2.3897657648470934,
+            "rest": 0.03654304257726429,
+            "posed": 0.08732931209449589,
+            "phase": 0.16666666666666666,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              3093,
-              3094
+              2746,
+              2748
             ]
           },
           "mouthSkin": {
-            "ratio": 2.7881401618921706,
-            "rest": 0.03510437657141134,
-            "posed": 0.09787592217693854,
-            "phase": 0.4166666666666667,
+            "ratio": 2.3897657648470934,
+            "rest": 0.03654304257726429,
+            "posed": 0.08732931209449589,
+            "phase": 0.16666666666666666,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              3093,
-              3094
+              2746,
+              2748
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000057667564,
+            "rest": 0.08075193505519138,
+            "posed": 0.08075193552086812,
+            "phase": 0.4583333333333333,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              191,
+              176
+            ]
           }
         },
         {
           "name": "Bite",
           "duration": 0.5,
           "skin": {
-            "ratio": 3.1390513210850504,
-            "rest": 0.03510437657141134,
-            "posed": 0.11019443965235586,
-            "phase": 0.3333333333333333,
+            "ratio": 1.794271367143165,
+            "rest": 0.045228206879523516,
+            "posed": 0.08115167659115656,
+            "phase": 0.20833333333333334,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              3093,
-              3094
+              2043,
+              2042
             ]
           },
           "mouthSkin": {
-            "ratio": 3.1390513210850504,
-            "rest": 0.03510437657141134,
-            "posed": 0.11019443965235586,
-            "phase": 0.3333333333333333,
+            "ratio": 1.794271367143165,
+            "rest": 0.045228206879523516,
+            "posed": 0.08115167659115656,
+            "phase": 0.20833333333333334,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              3093,
-              3094
+              2043,
+              2042
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000188310614,
+            "rest": 0.09665795457322816,
+            "posed": 0.09665795639340004,
+            "phase": 0.3333333333333333,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              181,
+              169
+            ]
           }
         },
         {
           "name": "Breath",
           "duration": 2.4000000953674316,
           "skin": {
-            "ratio": 1.5099768351713945,
-            "rest": 0.07372486866583022,
-            "posed": 0.11132284386145704,
-            "phase": 0,
+            "ratio": 1.4579236107614488,
+            "rest": 0.06075781278622271,
+            "posed": 0.08858024979925794,
+            "phase": 0.5,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2907,
-              3111
+              1966,
+              1960
             ]
           },
           "mouthSkin": {
-            "ratio": 1.5099768351713945,
-            "rest": 0.07372486866583022,
-            "posed": 0.11132284386145704,
-            "phase": 0,
+            "ratio": 1.4579236107614488,
+            "rest": 0.06075781278622271,
+            "posed": 0.08858024979925794,
+            "phase": 0.5,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2907,
-              3111
+              1966,
+              1960
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000006453376,
+            "rest": 0.1804031738873309,
+            "posed": 0.18040317400375186,
+            "phase": 0.375,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              48,
+              47
+            ]
           }
         },
         {
@@ -22317,8 +22565,8 @@
             "phase": 1,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2775,
-              2756
+              2734,
+              2715
             ]
           },
           "mouthSkin": {
@@ -22328,12 +22576,20 @@
             "phase": 1,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2787,
-              2789
+              2746,
+              2748
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000001062095167,
+            "rest": 0.09473975547677455,
+            "posed": 0.09473976553903819,
+            "phase": 1,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              204,
+              203
+            ]
           }
         },
         {
@@ -22346,8 +22602,8 @@
             "phase": 0.5,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2787,
-              2789
+              2746,
+              2748
             ]
           },
           "mouthSkin": {
@@ -22357,12 +22613,20 @@
             "phase": 0.5,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2787,
-              2789
+              2746,
+              2748
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000005665333,
+            "rest": 0.15944854192145902,
+            "posed": 0.15944854201179193,
+            "phase": 0.375,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              104,
+              89
+            ]
           }
         },
         {
@@ -22375,8 +22639,8 @@
             "phase": 0.5833333333333334,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2083,
-              2082
+              2043,
+              2042
             ]
           },
           "mouthSkin": {
@@ -22386,41 +22650,57 @@
             "phase": 0.5833333333333334,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2083,
-              2082
+              2043,
+              2042
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000281036956,
+            "rest": 0.11993451431752762,
+            "posed": 0.11993451768813071,
+            "phase": 0.5,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              146,
+              131
+            ]
           }
         },
         {
           "name": "Eat",
           "duration": 1.600000023841858,
           "skin": {
-            "ratio": 2.401856708894881,
-            "rest": 0.03991365321843794,
-            "posed": 0.09586687575920894,
-            "phase": 0.75,
+            "ratio": 1.4278382059817196,
+            "rest": 0.05736105456844851,
+            "posed": 0.08190230524823304,
+            "phase": 0.375,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              1768,
-              1769
+              1974,
+              1971
             ]
           },
           "mouthSkin": {
-            "ratio": 2.401856708894881,
-            "rest": 0.03991365321843794,
-            "posed": 0.09586687575920894,
-            "phase": 0.75,
+            "ratio": 1.4278382059817196,
+            "rest": 0.05736105456844851,
+            "posed": 0.08190230524823304,
+            "phase": 0.375,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              1768,
-              1769
+              1974,
+              1971
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000031958196,
+            "rest": 0.07563810101789106,
+            "posed": 0.07563810125961679,
+            "phase": 0.125,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              302,
+              316
+            ]
           }
         },
         {
@@ -22433,8 +22713,8 @@
             "phase": 0.4166666666666667,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2787,
-              2789
+              2746,
+              2748
             ]
           },
           "mouthSkin": {
@@ -22444,12 +22724,20 @@
             "phase": 0.4166666666666667,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2787,
-              2789
+              2746,
+              2748
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000062118446,
+            "rest": 0.09852877612765491,
+            "posed": 0.09852877673970035,
+            "phase": 0.75,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              69,
+              54
+            ]
           }
         },
         {
@@ -22462,8 +22750,8 @@
             "phase": 0.5,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2103,
-              2104
+              2063,
+              2064
             ]
           },
           "mouthSkin": {
@@ -22473,128 +22761,168 @@
             "phase": 0.5,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2103,
-              2104
+              2063,
+              2064
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000015904182,
+            "rest": 0.07529976865462629,
+            "posed": 0.07529976877438442,
+            "phase": 0.5,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              110,
+              95
+            ]
           }
         },
         {
           "name": "Guard",
           "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 1.5099768351713945,
-            "rest": 0.07372486866583022,
-            "posed": 0.11132284386145704,
+            "ratio": 1.3335514155952222,
+            "rest": 0.06057328718965227,
+            "posed": 0.08077759287901672,
             "phase": 0,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2907,
-              3111
+              2911,
+              2900
             ]
           },
           "mouthSkin": {
-            "ratio": 1.5099768351713945,
-            "rest": 0.07372486866583022,
-            "posed": 0.11132284386145704,
+            "ratio": 1.3335514155952222,
+            "rest": 0.06057328718965227,
+            "posed": 0.08077759287901672,
             "phase": 0,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2907,
-              3111
+              2911,
+              2900
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.000000001368443,
+            "rest": 0.24314045002926907,
+            "posed": 0.24314045036199292,
+            "phase": 0.25,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              21,
+              6
+            ]
           }
         },
         {
           "name": "Heavy",
           "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 3.2024415583667687,
-            "rest": 0.03510437657141134,
-            "posed": 0.11241971441284442,
-            "phase": 0.4166666666666667,
+            "ratio": 2.4129234339900716,
+            "rest": 0.03654304257726429,
+            "posed": 0.08817556378397795,
+            "phase": 0.16666666666666666,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              3093,
-              3094
+              2746,
+              2748
             ]
           },
           "mouthSkin": {
-            "ratio": 3.2024415583667687,
-            "rest": 0.03510437657141134,
-            "posed": 0.11241971441284442,
-            "phase": 0.4166666666666667,
+            "ratio": 2.4129234339900716,
+            "rest": 0.03654304257726429,
+            "posed": 0.08817556378397795,
+            "phase": 0.16666666666666666,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              3093,
-              3094
+              2746,
+              2748
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.000000005144604,
+            "rest": 0.11623614436275609,
+            "posed": 0.11623614496074502,
+            "phase": 0.4166666666666667,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              146,
+              145
+            ]
           }
         },
         {
           "name": "Hit",
           "duration": 0.6000000238418579,
           "skin": {
-            "ratio": 1.5103653501580294,
-            "rest": 0.07372486866583022,
-            "posed": 0.1113514870778214,
+            "ratio": 1.3341228175699358,
+            "rest": 0.06057328718965227,
+            "posed": 0.08081220457493178,
             "phase": 0.3333333333333333,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2907,
-              3111
+              2911,
+              2900
             ]
           },
           "mouthSkin": {
-            "ratio": 1.5103653501580294,
-            "rest": 0.07372486866583022,
-            "posed": 0.1113514870778214,
+            "ratio": 1.3341228175699358,
+            "rest": 0.06057328718965227,
+            "posed": 0.08081220457493178,
             "phase": 0.3333333333333333,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2907,
-              3111
+              2911,
+              2900
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000127440225,
+            "rest": 0.17204105182818666,
+            "posed": 0.17204105402068168,
+            "phase": 0.5,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              5,
+              6
+            ]
           }
         },
         {
           "name": "Idle",
           "duration": 2.5999999046325684,
           "skin": {
-            "ratio": 1.5099768351713945,
-            "rest": 0.07372486866583022,
-            "posed": 0.11132284386145704,
+            "ratio": 1.3335514155952222,
+            "rest": 0.06057328718965227,
+            "posed": 0.08077759287901672,
             "phase": 0,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2907,
-              3111
+              2911,
+              2900
             ]
           },
           "mouthSkin": {
-            "ratio": 1.5099768351713945,
-            "rest": 0.07372486866583022,
-            "posed": 0.11132284386145704,
+            "ratio": 1.3335514155952222,
+            "rest": 0.06057328718965227,
+            "posed": 0.08077759287901672,
             "phase": 0,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2907,
-              3111
+              2911,
+              2900
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000006635592,
+            "rest": 0.24314045002926907,
+            "posed": 0.24314045019060718,
+            "phase": 0.2916666666666667,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              21,
+              6
+            ]
           }
         },
         {
@@ -22607,8 +22935,8 @@
             "phase": 0.5,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2775,
-              2756
+              2734,
+              2715
             ]
           },
           "mouthSkin": {
@@ -22618,41 +22946,57 @@
             "phase": 0.5,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2103,
-              2104
+              2063,
+              2064
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000125445854,
+            "rest": 0.11599228618106196,
+            "posed": 0.11599228763613709,
+            "phase": 0.5,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              161,
+              146
+            ]
           }
         },
         {
           "name": "Rise",
           "duration": 1.399999976158142,
           "skin": {
-            "ratio": 1.5103058957470032,
-            "rest": 0.07372486866583022,
-            "posed": 0.11134710380917688,
+            "ratio": 1.3341228363772895,
+            "rest": 0.06057328718965227,
+            "posed": 0.08081220571415502,
             "phase": 0.3333333333333333,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2907,
-              3111
+              2911,
+              2900
             ]
           },
           "mouthSkin": {
-            "ratio": 1.5103058957470032,
-            "rest": 0.07372486866583022,
-            "posed": 0.11134710380917688,
+            "ratio": 1.3341228363772895,
+            "rest": 0.06057328718965227,
+            "posed": 0.08081220571415502,
             "phase": 0.3333333333333333,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2907,
-              3111
+              2911,
+              2900
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000005089469,
+            "rest": 0.1804031738873309,
+            "posed": 0.18040317397914654,
+            "phase": 0.375,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              48,
+              47
+            ]
           }
         },
         {
@@ -22665,8 +23009,8 @@
             "phase": 0.5416666666666666,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2046,
-              2098
+              2006,
+              2058
             ]
           },
           "mouthSkin": {
@@ -22676,41 +23020,57 @@
             "phase": 0.5416666666666666,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2017,
-              2016
+              1977,
+              1976
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000270360698,
+            "rest": 0.1423115587865046,
+            "posed": 0.14231156263404984,
+            "phase": 0.5833333333333334,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              155,
+              140
+            ]
           }
         },
         {
           "name": "SpineBrace",
           "duration": 1.2000000476837158,
           "skin": {
-            "ratio": 1.5099756315339632,
-            "rest": 0.07372486866583022,
-            "posed": 0.11132275512344549,
-            "phase": 0,
+            "ratio": 1.4926366814760799,
+            "rest": 0.05329794582919358,
+            "posed": 0.07955446899197938,
+            "phase": 0.5,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2907,
-              3111
+              2301,
+              2300
             ]
           },
           "mouthSkin": {
-            "ratio": 1.5099756315339632,
-            "rest": 0.07372486866583022,
-            "posed": 0.11132275512344549,
-            "phase": 0,
+            "ratio": 1.4186270573733697,
+            "rest": 0.06018843067885764,
+            "posed": 0.08538493630186886,
+            "phase": 0.5,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2907,
-              3111
+              2822,
+              2819
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000004107301,
+            "rest": 0.1804031738873309,
+            "posed": 0.18040317396142794,
+            "phase": 0.3333333333333333,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              48,
+              47
+            ]
           }
         },
         {
@@ -22723,8 +23083,8 @@
             "phase": 0.25,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2083,
-              2082
+              2043,
+              2042
             ]
           },
           "mouthSkin": {
@@ -22734,12 +23094,20 @@
             "phase": 0.25,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2083,
-              2082
+              2043,
+              2042
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000037736194,
+            "rest": 0.24314045002926907,
+            "posed": 0.2431404509467886,
+            "phase": 0.6666666666666666,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              21,
+              6
+            ]
           }
         },
         {
@@ -22752,8 +23120,8 @@
             "phase": 0.3333333333333333,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2083,
-              2082
+              2043,
+              2042
             ]
           },
           "mouthSkin": {
@@ -22763,41 +23131,57 @@
             "phase": 0.3333333333333333,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2083,
-              2082
+              2043,
+              2042
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000127440225,
+            "rest": 0.17204105182818666,
+            "posed": 0.17204105402068168,
+            "phase": 0.5,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              5,
+              6
+            ]
           }
         },
         {
           "name": "Swim",
           "duration": 1.7999999523162842,
           "skin": {
-            "ratio": 1.5101714254307854,
-            "rest": 0.07372486866583022,
-            "posed": 0.11133719000277428,
-            "phase": 0.041666666666666664,
+            "ratio": 1.3897048088667567,
+            "rest": 0.06075781278622271,
+            "posed": 0.08443542460523983,
+            "phase": 0.75,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2907,
-              3111
+              1966,
+              1960
             ]
           },
           "mouthSkin": {
-            "ratio": 1.5101714254307854,
-            "rest": 0.07372486866583022,
-            "posed": 0.11133719000277428,
-            "phase": 0.041666666666666664,
+            "ratio": 1.3897048088667567,
+            "rest": 0.06075781278622271,
+            "posed": 0.08443542460523983,
+            "phase": 0.75,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2907,
-              3111
+              1966,
+              1960
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000023664528,
+            "rest": 0.24314045002926907,
+            "posed": 0.24314045060464945,
+            "phase": 0.16666666666666666,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              21,
+              6
+            ]
           }
         },
         {
@@ -22810,8 +23194,8 @@
             "phase": 0.5,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2787,
-              2789
+              2746,
+              2748
             ]
           },
           "mouthSkin": {
@@ -22821,12 +23205,20 @@
             "phase": 0.5,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2787,
-              2789
+              2746,
+              2748
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000199103993,
+            "rest": 0.08368678123572305,
+            "posed": 0.08368678290196029,
+            "phase": 0.5,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              24,
+              38
+            ]
           }
         },
         {
@@ -22839,8 +23231,8 @@
             "phase": 0.5,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2083,
-              2082
+              2043,
+              2042
             ]
           },
           "mouthSkin": {
@@ -22850,12 +23242,20 @@
             "phase": 0.5,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2083,
-              2082
+              2043,
+              2042
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.000000019867599,
+            "rest": 0.08715319444750963,
+            "posed": 0.08715319617903435,
+            "phase": 0.5,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              25,
+              39
+            ]
           }
         },
         {
@@ -22868,8 +23268,8 @@
             "phase": 0.25,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2775,
-              2756
+              2734,
+              2715
             ]
           },
           "mouthSkin": {
@@ -22879,12 +23279,20 @@
             "phase": 0.2916666666666667,
             "mesh": "Hybodus_procedural_volume_twin",
             "vertices": [
-              2787,
-              2789
+              2746,
+              2748
             ]
           },
           "hiddenOral": {
-            "ratio": 1
+            "ratio": 1.0000000070583557,
+            "rest": 0.07563810101789106,
+            "posed": 0.07563810155177168,
+            "phase": 0.25,
+            "mesh": "Mouth_lining",
+            "vertices": [
+              302,
+              316
+            ]
           }
         }
       ],
@@ -22895,8 +23303,8 @@
         "phase": 0.5416666666666666,
         "mesh": "Hybodus_procedural_volume_twin",
         "vertices": [
-          2017,
-          2016
+          1977,
+          1976
         ],
         "clip": "Shake"
       }

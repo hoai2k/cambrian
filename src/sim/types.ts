@@ -46,9 +46,25 @@ export interface InputFrame {
   lock: boolean; sense: boolean;
   /** LB: a sidestep dash in the stick direction, or along the body's own axis with a neutral stick. */
   dash: boolean;
+  /** A touch double-tap may interrupt its own first tap's bite to begin the dash. */
+  touchDash?: boolean;
+  /** Held double click/tap: track this exact creature until the bite lands. */
+  pursueTarget?: number;
+  /** Touch double-tap commits a dash-length chase; mouse pursuit remains held until release. */
+  pursueDash?: boolean;
   /** LT held: aim mode. The renderer decides what the centred crosshair is over and passes it here. */
   aim: boolean; aimTarget: number;
   lookX: number; lookY: number;
+  /**
+   * A turn of the body the player asked for directly, in radians of yaw, applied once and whole.
+   *
+   * Only a touch swipe sets it: there the swipe turns the camera and the animal *together*, by the
+   * same angle on the same frame. Left to the follow camera, a swipe turned the view, the body stayed
+   * where it was, and the camera then swung back round behind it — which reads as the creature
+   * turning the opposite way from the finger. Absent everywhere else, so every other scheme takes
+   * exactly its old path.
+   */
+  turn?: number;
 }
 
 export const emptyInput = (): InputFrame => ({
@@ -106,6 +122,8 @@ export interface Actor {
   scale: number;           // × adult model
   tier: Tier; nutrition: number; ageGrowth: number;
   hp: number; hpMax: number;
+  /** Survival only: food reserve, from 0 to 100. */
+  hunger: number;
   stamina: number; staminaMax: number; exhausted: number;
   poise: number; poiseMax: number;
   state: ActorState; stateT: number; stateDur: number;
@@ -113,6 +131,8 @@ export interface Actor {
   hitDone: Set<number>;
   iframes: number;
   lockTarget: number;
+  /** One committed double-tap attack, bounded by a normal dash's travel. */
+  pursuit?: { target: number; last: Vec3; traveled: number; max: number; spent: boolean };
   guardHeld: number;
   abilityCd: number; abilityT: number; abilityActive: boolean;
   hideMode: 'none' | 'descending' | 'burrowed' | 'camouflage';
@@ -297,15 +317,15 @@ export interface PlayerSetup {
   visitorScale?: number;
 }
 
-/** The three modes, shared by both eras: an era changes the sea and the animals, not the match. */
-export type Mode = 'rise' | 'hunted' | 'reef';
-export const MODE_IDS: readonly Mode[] = ['rise', 'hunted', 'reef'];
+/** Selectable modes plus the legacy hunted identifier retained for old match data and tests. */
+export type Mode = 'rise' | 'survival' | 'reef' | 'hunted';
+export const MODE_IDS: readonly Mode[] = ['rise', 'survival', 'reef'];
 /**
  * Modes that are not a contest between players. Their goal is a milestone rather than a win over
  * somebody, so meeting it need not take the sea away: these matches can carry on afterwards as a
  * free swim (`Game.continueMatch`). The versus mode — hunted — ends for good.
  */
-export const COOP_MODES: readonly Mode[] = ['rise', 'reef'];
+export const COOP_MODES: readonly Mode[] = ['rise', 'survival', 'reef'];
 export const isCoop = (m: Mode) => COOP_MODES.includes(m);
 
 export interface Prompt { text: string; t: number; }
