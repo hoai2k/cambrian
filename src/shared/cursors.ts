@@ -67,6 +67,10 @@ const CURSORS: Record<CursorState, string> = {
 /** The CSS `cursor` value for this state. `menu` is the empty string: the page's own pointer. */
 export const cursorFor = (s: CursorState): string => CURSORS[s];
 
+/** The same artwork as an image for touch, where a CSS mouse cursor is never visible. */
+export const cursorImageFor = (s: 'idle' | 'edible' | 'attack' | 'target' | 'zoom'): string =>
+  CURSORS[s].match(/^url\("([^"]+)"\)/)?.[1] ?? '';
+
 /**
  * Which cursor the match wants, from what the mouse is doing and what it is over.
  *

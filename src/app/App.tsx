@@ -1,5 +1,5 @@
 import { ACTIVE_ERA } from '../content';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { audio } from '../audio/audio';
 import { gamepads, readGamepad, type RawControls } from '../input/input';
 import type { AssetProgress } from '../render/assets';
@@ -30,6 +30,7 @@ import { toolbarPlace } from './toolbar-place';
 import { menuScheme } from '../shared/controls';
 import { SECONDARY, type Secondary } from '../shared/touch-play';
 import { rosterCap } from '../shared/small-screen';
+import { qualityForDevice } from '../shared/mobile-memory';
 import { RotateHint, TouchPads } from './TouchPads';
 import { useSmallScreen } from './use-small-screen';
 import { assignSeatSchemes } from '../shared/seat-schemes';
@@ -46,17 +47,16 @@ export type DialogKind = null | 'help' | 'settings';
  */
 export interface Settings {
   quality: Quality; lookSpeed: number; invertY: boolean; volume: number; muted: boolean; music: boolean;
+  /** Distinguishes a deliberate high setting from the old automatic high default on mobile. */
+  qualityExplicit?: boolean;
   equivalentSizing: boolean; shoreAnimals: boolean;
   /**
    * What the touch player's secondary pad is set to, and how many touch matches they have played.
    *
-   * Both live here because both have to outlast a match: a player who plays as a hider should not
-   * have to swipe back to it every time they hatch, and the nudge that says the pad *can* be swiped
-   * has to stop appearing once they know. Not settings anybody edits in the settings panel — they are
-   * written by playing — but this is the one thing this game already persists, and giving them their
-   * own key would mean a second thing to keep in step.
+   * The chosen pad action outlasts a match, so a player who plays as a hider does not have to
+   * swipe back to it every time they hatch.
    */
-  secondary: Secondary; touchMatches: number;
+  secondary: Secondary;
 }
 
 /** The active era's modes, in its order; the first is the default selection. */
@@ -75,8 +75,16 @@ const startScale = (v: Visitor) => (v.standing ? undefined : v.scale);
 const MODES: Mode[] = ACTIVE_ERA.modes.map((m) => m.id);
 const SETTINGS_KEY = ACTIVE_ERA.copy.settingsKey;
 const defaultSettings = (): Settings => {
-  try { const s = localStorage.getItem(SETTINGS_KEY); if (s) return { ...{ quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false, shoreAnimals: false, secondary: 'aim' as Secondary, touchMatches: 0 }, ...JSON.parse(s) }; } catch { /* ignore */ }
-  return { quality: 'high', lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false, shoreAnimals: false, secondary: 'aim' as Secondary, touchMatches: 0 };
+  // Re-evaluate old automatic defaults against this device; an explicit Settings choice wins.
+  const defaults: Settings = { quality: qualityForDevice(undefined), lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false, shoreAnimals: false, secondary: 'aim' };
+  try {
+    const s = localStorage.getItem(SETTINGS_KEY);
+    if (s) {
+      const saved = JSON.parse(s) as Partial<Settings>;
+      return { ...defaults, ...saved, secondary: SECONDARY.includes(saved.secondary as Secondary) ? saved.secondary! : 'aim', quality: qualityForDevice(saved) };
+    }
+  } catch { /* ignore */ }
+  return defaults;
 };
 
 /**
@@ -132,6 +140,7 @@ export function App() {
   const modeRef = useRef<Mode>(MODES[0]);
   const [hud, setHud] = useState<HudSnapshot | null>(null);
   const [paused, setPaused] = useState(false);
+  const [pauseScores, setPauseScores] = useState(false);
   /** The recorder's state, mirrored into React so the pause menu's one button can name itself. */
   const [recPhase, setRecPhase] = useState(recordingPhase);
   const pausedRef = useRef(false);
@@ -170,6 +179,7 @@ export function App() {
   const padCount = padIndices.length;
   /** How much room this window has, and whether a finger is what is working it. */
   const small = useSmallScreen(padCount);
+  const orientationBlocked = small.rotate && screen === 'playing' && !paused && dialog === null;
   /**
    * Which device the one local seat joins on.
    *
@@ -209,7 +219,7 @@ export function App() {
   const lastInputRef = useRef(0);
   /**
    * The record as this device holds it: biomes, landmarks, species taken to the top, and the
-   * furthest rung each creature has reached in Rise. Held in state as well as in storage because
+   * furthest rung each creature has reached in Rise or Survival. Held in state as well as in storage because
    * the select screen badges the growth record and offers to start from it, and both have to
    * change the moment a match improves on them.
    */
@@ -221,7 +231,7 @@ export function App() {
    *
    * Kept as the intent rather than as a rung, so that walking the cursor across a creature with no
    * record and back again does not quietly switch the choice off. It is resolved against the
-   * record — and against the mode, since only Rise grows you — at the moment a match starts.
+   * record and the current mode at the moment a match starts.
    */
   const [carry, setCarry] = useState<boolean[]>([]);
   const carryRef = useRef<boolean[]>([]);
@@ -307,8 +317,7 @@ export function App() {
       onLoaded: () => setLoaded(true),
       onProgress: (p) => setProgress(p),
       // A swipe on the secondary pad. Remembered, so the choice outlasts the match, and flagged for a
-      // moment so the pad can say what it has become — a control that changes silently reads as one
-      // that did not change.
+      // moment so the pad can show what it has become without making a UI sound in the HUD.
       onSecondary: (sec) => {
         setSecondary(sec);
         setSettings((x) => ({ ...x, secondary: sec }));
@@ -316,6 +325,7 @@ export function App() {
       },
     });
     engineRef.current = engine;
+    engine.setOrientationBlocked(false);
     // Visitors stream like anything else. Queued here rather than where they are registered,
     // because the queue builds its URLs from `assetPaths` and there is no queue to add them to
     // until the engine exists.
@@ -324,6 +334,8 @@ export function App() {
     return () => { engine.dispose(); engineRef.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useLayoutEffect(() => { engineRef.current?.setOrientationBlocked(orientationBlocked); }, [orientationBlocked]);
 
   useEffect(() => {
     engineRef.current?.setQuality(settings.quality);
@@ -429,11 +441,10 @@ export function App() {
 
   /**
    * The setups as the simulation wants them: the roster plus, for anyone who asked and has a record
-   * to draw on, the rung to hatch at. Only Rise grows a player through the ladder, so only Rise
-   * carries anything on; every other mode hands out its own body and the field is left off.
+   * to draw on, the rung to hatch at. Rise and Survival share the earned ladder record.
    */
   const withCarry = useCallback((ps: PlayerSetup[]) => ps.map((p, i) => {
-    const mark = modeRef.current === 'rise' && carryRef.current[i] ? clampMark(recordRef.current.best[p.creature] ?? 0) : 0;
+    const mark = (modeRef.current === 'rise' || modeRef.current === 'survival') && carryRef.current[i] ? clampMark(recordRef.current.best[p.creature] ?? 0) : 0;
     return { ...p, startRung: mark > 0 ? mark : 0 };
   }), []);
 
@@ -448,9 +459,6 @@ export function App() {
     // something they did not choose.
     engineRef.current.setSecondary(settingsRef.current.secondary);
     setSecondary(settingsRef.current.secondary);
-    // Count the touch matches, which is what retires the swipe nudge. Only the ones actually played
-    // on glass: a player who has only ever used a keyboard has not learned about the pad.
-    if (handRef.current === 'touch') setSettings((x) => ({ ...x, touchMatches: x.touchMatches + 1 }));
     engineRef.current.startMatch(modeRef.current, withCarry(ps));
     setPausedBoth(false);
     go('playing');
@@ -677,7 +685,7 @@ export function App() {
    */
   const toggleCarry = useCallback((index: number) => {
     const p = playersRef.current[index];
-    if (!p || modeRef.current !== 'rise' || !(recordRef.current.best[p.creature] ?? 0)) return;
+    if (!p || (modeRef.current !== 'rise' && modeRef.current !== 'survival') || !(recordRef.current.best[p.creature] ?? 0)) return;
     const next = [...carryRef.current];
     next[index] = !next[index];
     setCarryBoth(next); audio.play(next[index] ? 'ui-confirm' : 'ui-back');
@@ -902,7 +910,7 @@ export function App() {
       const committed = players.filter((p) => p.ready).map((p) => p.creature);
       const hovered = players.filter((p) => !p.ready).map((p) => p.creature);
       const neighbours = players.flatMap((p) => { const i = CREATURE_IDS.indexOf(p.creature); return [i + 1, i - 1, i + cols, i - cols].filter((j) => j >= 0 && j < n).map((j) => CREATURE_IDS[j]); });
-      e.prioritize([...new Set([...committed, ...hovered, ...neighbours])], 'select');
+      e.prioritize([...new Set([...committed, ...hovered, ...neighbours])], 'select', committed);
     } else e.prioritize([...new Set(players.map((p) => p.creature))], 'playing');
   }, [screen, players, loaded]);
 
@@ -933,6 +941,12 @@ export function App() {
     }
     if (screen === 'playing' && paused) {
       const items: MenuItem[] = [{ label: TEXT.pause.resume, run: () => setPausedBoth(false), primary: true }];
+      if (small.touch) {
+        items.push({ label: TEXT.hud.pads.travel, run: () => {
+          if (engineRef.current?.openTouchTravel()) setPausedBoth(false);
+        } });
+        items.push({ label: TEXT.hud.pads.scores, run: () => setPauseScores((open) => !open) });
+      }
       // The match recorder, and only when the URL asked for it (`?debug=game`). One button walking
       // through its own three states, because that is the whole of the tool: record, stop, hand it
       // over. Recording carries on while the menu is open — pausing to think is not a reason to
@@ -949,7 +963,8 @@ export function App() {
       return items;
     }
     return [];
-  }, [screen, paused, recPhase, hud?.canContinue, keepPlaying, playAgain, backToSelect]);
+  }, [screen, paused, small.touch, recPhase, hud?.canContinue, keepPlaying, playAgain, backToSelect]);
+  useEffect(() => { if (!paused) setPauseScores(false); }, [paused]);
   useEffect(() => { menuItemsRef.current = menuItems; }, [menuItems]);
   // The recorder stops itself when its buffer fills, so the menu reads the real state whenever it
   // opens rather than trusting what it last set.
@@ -1040,7 +1055,14 @@ export function App() {
         />
       )}
 
-      {(screen === 'playing' || screen === 'results') && hud && <Hud snapshot={hud} />}
+      {(screen === 'playing' || screen === 'results') && hud && <Hud snapshot={hud} touchTravel={small.touch ? {
+        dismiss: () => engineRef.current?.closeTouchTravel(),
+        select: (index) => engineRef.current?.touchTravelSelect(index),
+        swapStep: (dir) => engineRef.current?.touchSwapStep(dir),
+        swapToggle: () => engineRef.current?.touchSwapToggle(),
+        swapBack: () => engineRef.current?.touchSwapBack(),
+        swapConfirm: () => engineRef.current?.touchSwapConfirm(),
+      } : undefined} />}
       {/*
         * The pads are drawn only while the game is actually being played: paused, on the results
         * screen or in a dialog the fingers belong to the buttons, which is the same rule the mouse
@@ -1053,17 +1075,15 @@ export function App() {
           secondary={secondary}
           // The nudge is worth one or two matches and then it is in the way. It also stands down the
           // moment the player swipes, because at that point they have plainly found it.
-          hint={settings.touchMatches <= 2 && settings.secondary === SECONDARY[0] && !swapped}
           swapped={swapped}
           teleportOpen={!!hud?.players.some((p) => p.teleport)}
-          onPause={() => { setPausedBoth(true); audio.play('ui-confirm'); }}
+          onPause={() => { setPausedBoth(true); }}
         />
       )}
-      {screen === 'playing' && small.rotate && <RotateHint />}
-      {screen === 'playing' && paused && <PauseMenu items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
+      {screen === 'playing' && paused && <PauseMenu items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} board={small.touch && pauseScores ? engineRef.current?.pauseScoreboard() : undefined} />}
       {screen === 'results' && hud && <Results snapshot={hud} players={players} record={record} fresh={fresh} items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
 
-      <Toolbar place={toolbar} isFs={isFs} muted={settings.muted} focus={focus.group === 'icons' ? focus.index : -1} onHelp={() => openDialog(dialog === 'help' ? null : 'help')} onSettings={() => openDialog(dialog === 'settings' ? null : 'settings')} onMute={() => setSettings((s) => ({ ...s, muted: !s.muted }))} onFullscreen={toggleFullscreen} />
+      {(!small.touch || screen !== 'playing' || paused) && <Toolbar place={toolbar} isFs={isFs} muted={settings.muted} focus={focus.group === 'icons' ? focus.index : -1} onHelp={() => openDialog(dialog === 'help' ? null : 'help')} onSettings={() => openDialog(dialog === 'settings' ? null : 'settings')} onMute={() => setSettings((s) => ({ ...s, muted: !s.muted }))} onFullscreen={toggleFullscreen} />}
       <Dialogs kind={dialog} onClose={() => openDialog(null)} settings={settings} onSettings={setSettings} scheme={scheme} />
 
       {(notice || error) && (
@@ -1072,6 +1092,7 @@ export function App() {
           <button aria-label={TEXT.common.dismiss} onClick={() => { setNotice(''); setError(''); }}>×</button>
         </div>
       )}
+      {orientationBlocked && <RotateHint onPause={() => { setPausedBoth(true); }} />}
     </main>
   );
 }

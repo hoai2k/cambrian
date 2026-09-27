@@ -317,6 +317,7 @@ export const TRIASSIC_RULES: EraRules = {
   },
 
   onNutrition,
+  survivalGrow: (g, a, fraction) => DEVONIAN_RULES.survivalGrow!(g, a, fraction),
 
   /**
    * Armour with a facing. `all` is a shell or a full carapace; `dorsal` plates on the back are hit
@@ -428,6 +429,11 @@ export const TRIASSIC_RULES: EraRules = {
     }
     if (!def.warmBlooded && def.breathing !== 'gill') k *= 1 - (1 - COLD_REGEN) * clamp(coldAt(a), 0, 1);
     return k;
+  },
+  canRecoverHealth(g, a) {
+    if (!breathesAir(a)) return true;
+    const t = triActor(g, a);
+    return a.grabbedBy < 0 && (t.atSurface || t.air > 0);
   },
 
   /** The climb is free for an air-breather: there is always a way back to the surface, however spent. */

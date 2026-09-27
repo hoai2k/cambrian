@@ -11,20 +11,31 @@ import { CreaturePortrait } from './CreaturePortrait';
 import { appBase } from '../shared/base';
 import { fillControls, key, type Scheme } from '../shared/controls';
 import { TEXT } from '../shared/text';
+import { HUNGER_LOW } from '../sim/survival';
+import { cursorImageFor } from '../shared/cursors';
 
 /** Every word this panel says; see `src/content/strings.ts`. */
 const COPY = TEXT.hud;
 
-export function Hud({ snapshot }: { snapshot: HudSnapshot }) {
+export interface TouchTravelActions {
+  dismiss: () => void;
+  select: (index: number) => void;
+  swapStep: (dir: number) => void;
+  swapToggle: () => void;
+  swapBack: () => void;
+  swapConfirm: () => void;
+}
+
+export function Hud({ snapshot, touchTravel }: { snapshot: HudSnapshot; touchTravel?: TouchTravelActions }) {
   const W = snapshot.rects.reduce((m, r) => Math.max(m, r.x + r.w), 1);
   const H = snapshot.rects.reduce((m, r) => Math.max(m, r.y + r.h), 1);
   return (
-    <div className="hud-layer" aria-live="off">
+    <div className={`hud-layer ${touchTravel && snapshot.players.some((p) => p.teleport || p.swap) ? 'touch-travel-open' : ''}`} aria-live="off">
       {snapshot.players.map((p, i) => {
         const r = snapshot.rects[i]; if (!r) return null;
         return (
           <div key={i} className={`hud ${snapshot.players.length > 2 ? 'hud-quarter' : snapshot.players.length === 2 ? 'hud-half' : ''}`} style={{ left: `${(r.x / W) * 100}%`, top: `${(r.y / H) * 100}%`, width: `${(r.w / W) * 100}%`, height: `${(r.h / H) * 100}%`, ['--player' as string]: p.color }}>
-            <PlayerPanel p={p} />
+            <PlayerPanel p={p} touchTravel={p.scheme === 'touch' ? touchTravel : undefined} />
           </div>
         );
       })}
@@ -50,14 +61,15 @@ export function Hud({ snapshot }: { snapshot: HudSnapshot }) {
  * a death is a fade to black with no account of itself — and the grip, which is the player holding
  * a button down and is the one thing on the screen that says the button is doing anything.
  */
-function PlayerPanel({ p }: { p: PlayerHud }) {
+function PlayerPanel({ p, touchTravel }: { p: PlayerHud; touchTravel?: TouchTravelActions }) {
   const s = p.scheme;
   return (
     <>
       {p.senseOn && <SensePanel p={p} />}
       {!p.senseOn && <SenseOffMark s={s} />}
-      {p.teleport && <TeleportMenu t={p.teleport} s={s} />}
-      {p.swap && <SwapMenu swap={p.swap} s={s} />}
+      {touchTravel && (p.teleport || p.swap) && <button className="touch-tele-dismiss" aria-label={COPY.teleport.dismiss} onClick={touchTravel.dismiss} />}
+      {p.teleport && <TeleportMenu t={p.teleport} s={s} onSelect={touchTravel?.select} />}
+      {p.swap && <SwapMenu swap={p.swap} s={s} touchTravel={touchTravel} />}
       {p.board && <Scoreboard board={p.board} me={p.index} />}
       {p.grip && p.alive && <GripPanel grip={p.grip} s={s} />}
       <div className="fade" style={{ opacity: p.fade }} />
@@ -131,6 +143,11 @@ function SensePanel({ p }: { p: PlayerHud }) {
                    aria-label={p.stamina < p.staminaMax * 0.25 ? COPY.airSurfaceNow : COPY.airRecoveryOff}
                    style={{ maskImage: `url(${appBase()}${assetPaths.ui(p.stamina < p.staminaMax * 0.25 ? 'air-surface.svg' : 'air-recovery-off.svg')})` }} />}
           </div>
+          {/* Survival's stomach. Quiet while it is full enough; past HUNGER_LOW it flashes and says
+              so, and empty it says what it is costing — the health bar above it is going down. */}
+          {p.hunger != null && <div className={`bar hunger${p.hunger <= 0 ? ' starving' : p.hunger < HUNGER_LOW ? ' low' : ''}`} role="img" aria-label={COPY.hungerAria(Math.round(p.hunger))}><i style={{ width: `${p.hunger}%` }} /></div>}
+          {p.hunger != null && p.hunger < HUNGER_LOW &&
+            <span className={`hunger-note${p.hunger <= 0 ? ' starving' : ''}`} role="status">{p.hunger <= 0 ? COPY.starving : COPY.hungerLow}</span>}
           {/* The breath being held, under the bar it governs. It is a clock on a dive rather than a
               second health bar, so it is thin and quiet until its last minute, when it flashes. */}
           {p.era?.airLeft != null && (
@@ -153,10 +170,15 @@ function SensePanel({ p }: { p: PlayerHud }) {
       </div>
       {p.ashore && p.alive && <ShoreStatus stranded={p.strandLeft != null} low={!!p.strandLow} />}
       {p.era && <EraStatus era={p.era} alive={p.alive} ashore={p.ashore} />}
-      {p.aim && (
-        // `left`/`top` are the CSS default of 50% unless the snapshot names a point: touch takes the
-        // reticle to wherever the player last tapped, because there that is the aim axis. NDC is
-        // y-up and the screen is y-down, hence the flip.
+      {p.scheme === 'touch' && (p.touchMark || p.aim) && (() => {
+        const mark = p.touchMark;
+        const at = mark?.at ?? p.aim?.at;
+        const kind = mark?.kind === 'target' ? 'attack' : mark?.kind ?? (p.aim?.hasTarget ? (p.aim.band === 'snack' || p.aim.band === 'prey' ? 'edible' : 'attack') : 'idle');
+        return <img className="touch-cursor" src={cursorImageFor(kind)} alt=""
+          style={{ left: at ? `${(at.x + 1) * 50}%` : '50%', top: at ? `${(1 - at.y) * 50}%` : '50%' }} />;
+      })()}
+      {p.aim && p.scheme !== 'touch' && (
+        // Gamepad aim uses the centre; touch has its own mouse-style SVG mark above.
         <div
           className={`aim ${p.aim.hasTarget ? 'on-target' : ''} ${p.aim.inRange ? 'in-range' : ''} ${p.aim.ready ? '' : 'cooling'} ${p.aim.at ? 'aim-pointed' : ''}`}
           style={{
@@ -181,16 +203,16 @@ function SensePanel({ p }: { p: PlayerHud }) {
       <DayPhase day={p.day} />
       <Radar radar={p.radar} biome={p.biome} />
       <div className="hud-bottom">
-        <div className={`chip ability ${p.abilityUnlocked ? '' : 'locked'} ${p.abilityActive ? 'active' : ''}`} title={fillControls(hideDescription(def.id), s)}>
+        {s !== 'touch' && <div className={`chip ability ${p.abilityUnlocked ? '' : 'locked'} ${p.abilityActive ? 'active' : ''}`} title={fillControls(hideDescription(def.id), s)}>
           <span className="btn y">{key('ability', s)}</span>
           <span className="chip-label">{p.abilityUnlocked ? p.abilityName : COPY.hideChip}</span>
           <i className="cool" style={{ transform: `scaleX(${p.abilityUnlocked ? p.abilityReady : 0})` }} />
-        </div>
+        </div>}
         {/* Only ever drawn with sense on, so the chip is only ever the way out of it. */}
-        <div className="chip sense ready active" title={COPY.senseChipTitle}>
+        {s !== 'touch' && <div className="chip sense ready active" title={COPY.senseChipTitle}>
           <span className="btn dpad">{key('sense', s)}</span><span className="chip-label">{COPY.senseChip}</span>
           <i className="cool" style={{ transform: 'scaleX(1)' }} />
-        </div>
+        </div>}
         <div className="tally"><span>{COPY.tallyEaten(p.eats)}</span><span>{COPY.tallyKills(p.kills)}</span><span>{COPY.tallyEscapes(p.escapes)}</span></div>
       </div>
       {p.hunterState !== 'none' && (
@@ -203,7 +225,7 @@ function SensePanel({ p }: { p: PlayerHud }) {
         </div>
       )}
       {!p.modelReady && p.alive && <p className="hint">{COPY.modelLoading}</p>}
-      {p.hint && p.hunterState === 'none' && p.modelReady && <p className="hint">{fillControls(p.hint, s)}</p>}
+      {p.hint && p.hunterState === 'none' && p.modelReady && <p className="hint goal-hint">{fillControls(p.hint, s)}</p>}
       {/* Co-op: where a team-mate went down, and how long is left to reach them. */}
       {p.downedAllies.map((d) => (
         <div key={d.index} className="downed-arrow" style={{ color: d.color, transform: `rotate(${Math.atan2(d.x, -d.y) * 180 / Math.PI}deg)` }} aria-hidden>
@@ -287,38 +309,53 @@ function Keys({ text }: { text: string }) {
 }
 
 /** Where else you could be, and how far. Opened with the teleport button, so sense never hides it. */
-function TeleportMenu({ t, s }: { t: NonNullable<PlayerHud['teleport']>; s: Scheme }) {
+function TeleportMenu({ t, s, onSelect }: { t: NonNullable<PlayerHud['teleport']>; s: Scheme; onSelect?: (index: number) => void }) {
   return (
     <div className="tele-menu">
       <p className="eyebrow">{COPY.teleport.eyebrow}</p>
       <ul>
         {t.options.map((o, k) => (
           <li key={k} className={k === t.index ? 'sel' : ''}>
-            <b>{o.label}</b>
-            <span>{o.detail} · {fmtDist(o.distance)}</span>
+            {onSelect ? <button type="button" onClick={() => onSelect(k)}><b>{o.label}</b><span>{o.detail} · {fmtDist(o.distance)}</span></button>
+              : <><b>{o.label}</b><span>{o.detail} · {fmtDist(o.distance)}</span></>}
           </li>
         ))}
       </ul>
-      <small>{t.cooldown > 0 ? COPY.teleport.cooling(Math.ceil(t.cooldown)) : <Keys text={COPY.teleport.ready(key('confirm', s), key('back', s), key('teleport', s))} />}</small>
+      <small>{t.cooldown > 0 ? COPY.teleport.cooling(Math.ceil(t.cooldown)) : onSelect ? COPY.teleport.touchHint : <Keys text={COPY.teleport.ready(key('confirm', s), key('back', s), key('teleport', s))} />}</small>
     </div>
   );
 }
 
 /** The change-creature page of the same menu. */
-function SwapMenu({ swap, s }: { swap: NonNullable<PlayerHud['swap']>; s: Scheme }) {
+function SwapMenu({ swap, s, touchTravel }: { swap: NonNullable<PlayerHud['swap']>; s: Scheme; touchTravel?: TouchTravelActions }) {
+  const startX = useRef(0), swiped = useRef(false);
+  const body = <>
+    <CreaturePortrait creatureId={swap.creature} kind="thumb" assetBase={appBase()} alt="" draggable={false} loading="eager" />
+    <div>
+      <b>{swap.name}</b>
+      {swap.kind && <span className="swap-kind">{swap.kind}</span>}
+      <span className="swap-rung">{swap.rung}{swap.kept ? COPY.swap.keptProgress : swap.grown ? COPY.swap.fullyGrown : COPY.swap.hatchling}</span>
+      <i className="swap-fill"><b style={{ transform: `scaleX(${swap.fill})` }} /></i>
+    </div>
+  </>;
   return (
     <div className="tele-menu swap-menu">
       <p className="eyebrow">{COPY.swap.eyebrow}</p>
-      <div className="swap-body">
-        <CreaturePortrait creatureId={swap.creature} kind="thumb" assetBase={appBase()} alt="" draggable={false} loading="eager" />
-        <div>
-          <b>{swap.name}</b>
-          {swap.kind && <span className="swap-kind">{swap.kind}</span>}
-          <span className="swap-rung">{swap.rung}{swap.kept ? COPY.swap.keptProgress : swap.grown ? COPY.swap.fullyGrown : COPY.swap.hatchling}</span>
-          <i className="swap-fill"><b style={{ transform: `scaleX(${swap.fill})` }} /></i>
+      {touchTravel ? <>
+        <div className="swap-body"><button type="button"
+          onTouchStart={(e) => { startX.current = e.touches[0].clientX; swiped.current = false; }}
+          onTouchEnd={(e) => { const dx = e.changedTouches[0].clientX - startX.current; if (Math.abs(dx) > 35) { swiped.current = true; touchTravel.swapStep(dx < 0 ? 1 : -1); } }}
+          onClick={() => { if (swiped.current) { swiped.current = false; return; } touchTravel.swapConfirm(); }}>
+          {body}</button></div>
+        <small>{COPY.swap.touchHint(swap.index + 1, swap.count)}</small>
+        <div className="swap-actions">
+          <button type="button" onClick={touchTravel.swapBack}>{COPY.swap.back}</button>
+          <button type="button" onClick={touchTravel.swapToggle}>{swap.grown ? COPY.swap.grownChoice : COPY.swap.hatchlingChoice}</button>
         </div>
-      </div>
-      <small><kbd>◀▶</kbd> <Keys text={COPY.swap.footer(key('ability', s), swap.grown, swap.index + 1, swap.count, key('confirm', s), key('back', s))} /></small>
+      </> : <>
+        <div className="swap-body">{body}</div>
+        <small><kbd>◀▶</kbd> <Keys text={COPY.swap.footer(key('ability', s), swap.grown, swap.index + 1, swap.count, key('confirm', s), key('back', s))} /></small>
+      </>}
     </div>
   );
 }
@@ -351,7 +388,7 @@ function DeathNote({ p }: { p: PlayerHud }) {
  * mode is actually about, with the viewer's own row marked. Bots are on it too: in a mode where
  * they fill the empty seats they are as much of a rival as anyone.
  */
-function Scoreboard({ board, me }: { board: NonNullable<PlayerHud['board']>; me: number }) {
+export function Scoreboard({ board, me }: { board: NonNullable<PlayerHud['board']>; me: number }) {
   const { header, rows } = board;
   return (
     <div className="scoreboard">

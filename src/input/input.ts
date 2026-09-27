@@ -188,7 +188,8 @@ export class MousePlay {
   /** Where the cursor is, in NDC. Undefined until it has been over the canvas. */
   private ndc: { x: number; y: number } | undefined;
   /** The left press in progress: when it started, how far it has travelled, what it became. */
-  private press: { t: number; moved: number; dragging: boolean; targeted: boolean } | undefined;
+  private press: { t: number; moved: number; dragging: boolean; targeted: boolean; pursue: boolean } | undefined;
+  private lastClick = -Infinity;
   /** A completed click, waiting to be read as one bite. */
   private clicked = false;
   /**
@@ -213,7 +214,7 @@ export class MousePlay {
     if (p) {
       p.moved += Math.hypot(mx, my);
       // Past the threshold the press is a camera drag, and stays one until the button comes up.
-      if (!p.dragging && p.moved > MousePlay.DRAG) p.dragging = true;
+      if (!p.dragging && !p.pursue && p.moved > MousePlay.DRAG) p.dragging = true;
     }
     // Only a drag turns the camera. A bare mouse move is the cursor going somewhere, which is
     // aiming rather than looking — that is the whole difference between this and pointer lock.
@@ -233,7 +234,12 @@ export class MousePlay {
     // attack to make out there, so waiting `DRAG` pixels to find that out only costs the player the
     // start of the movement — and the whole point of a left button that both attacks and looks is
     // that it is never ambiguous about which. Over an animal, it is the attack until it travels.
-    if (e.button === 0) this.press = { t: performance.now() / 1000, moved: 0, dragging: !this.overTarget, targeted: this.overTarget };
+    if (e.button === 0) {
+      const now = performance.now() / 1000;
+      const pursue = this.overTarget && now - this.lastClick <= 0.28;
+      this.press = { t: now, moved: 0, dragging: !this.overTarget, targeted: this.overTarget, pursue };
+      this.lastClick = -Infinity;
+    }
   };
   private onUp = (e: MouseEvent) => {
     this.buttons.delete(e.button);
@@ -244,7 +250,10 @@ export class MousePlay {
     // move — it is how you attack something you have not pointed at — so the bite is never taken
     // away, only the heavy is. It is read once, on the frame after the release, because a bite is
     // an edge and not a state.
-    if (p && p.moved <= MousePlay.DRAG && performance.now() / 1000 - p.t < MousePlay.HOLD) this.clicked = true;
+    if (p && p.moved <= MousePlay.DRAG && performance.now() / 1000 - p.t < MousePlay.HOLD && !p.pursue) {
+      this.clicked = true;
+      if (p.targeted) this.lastClick = performance.now() / 1000;
+    }
   };
   private onContext = (e: Event) => { if (this.wanted) e.preventDefault(); };
   private onBlur = () => { this.buttons.clear(); this.press = undefined; };
@@ -266,7 +275,7 @@ export class MousePlay {
   want(on: boolean) {
     if (this.wanted === on) return;
     this.wanted = on;
-    if (!on) { this.buttons.clear(); this.press = undefined; this.clicked = false; this.dx = this.dy = this.wheel = 0; }
+    if (!on) { this.buttons.clear(); this.press = undefined; this.clicked = false; this.lastClick = -Infinity; this.dx = this.dy = this.wheel = 0; }
   }
 
   /** Everything the mouse has done since the last frame. Drains the deltas and the click. */
@@ -275,12 +284,14 @@ export class MousePlay {
     // A **hold is the heavy only over something**. With nothing under the cursor there is nothing
     // to pounce at, so holding the button there is the camera and only the camera — which is what
     // makes the one button unambiguous: what it does is decided by what you pointed it at.
-    const held = !!p && p.targeted && p.moved <= MousePlay.DRAG && performance.now() / 1000 - p.t >= MousePlay.HOLD;
+    const pursuing = !!p?.pursue;
+    const held = !!p && !p.pursue && p.targeted && p.moved <= MousePlay.DRAG && performance.now() / 1000 - p.t >= MousePlay.HOLD;
     const r = {
       dx: this.dx * MousePlay.SENSITIVITY, dy: this.dy * MousePlay.SENSITIVITY,
       zoom: this.wheel * MousePlay.WHEEL,
       /** The heavy: the left button held still past `HOLD`. */
       hold: held,
+      pursue: pursuing,
       /** One bite, on the frame after a click was completed. */
       click: this.clicked,
       /** Turning the camera this frame, so the follow camera knows to stand aside. */

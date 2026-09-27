@@ -42,7 +42,7 @@ type InputFrame = import('../src/sim/types').InputFrame;
 type Mode = import('../src/sim/types').Mode;
 import { heading } from '../src/shared/math';
 import { wrapAngle } from '../src/shared/math';
-import { isCoop } from '../src/sim/types';
+import { isCoop, MODE_IDS } from '../src/sim/types';
 type CreatureId = import('../src/sim/creatures').CreatureId;
 
 const DT = 1 / 60;
@@ -51,9 +51,28 @@ const tick = (g: InstanceType<typeof Game>, inputs: Map<number, InputFrame>) => 
 let passes = 0;
 const ok = (cond: unknown, msg: string) => { assert.ok(cond, msg); passes++; };
 
+// A quick touch double-tap often follows a bite from its first tap. It must still launch the
+// sea scorpion, even at the start of that bite's windup, and continue after the finger lifts.
+{
+  const g = new Game('reef', [{ creature: 'jaekelopterus', device: 'touch', ready: true }], 42);
+  g.skipHatch();
+  const p = g.players[0];
+  p.pos.y = sampleHeight(p.pos.x, p.pos.z) + 2;
+  p.vel = { x: 0, y: 0, z: 0 };
+  p.state = 'attack'; p.stateT = 0.02; p.move = creature('jaekelopterus').light;
+  p.stamina = p.staminaMax; p.dashCd = 0; p.prev.dash = false;
+  const origin = { ...p.pos };
+  const dash: InputFrame = { ...emptyInput(), dash: true, touchDash: true, my: 1, camYaw: p.yaw };
+  const inputs = new Map([[0, dash]]);
+  tick(g, inputs);
+  ok(p.state === 'dodge', 'Jaekelopterus touch dash interrupts the first tap bite');
+  for (let i = 0; i < 19; i++) tick(g, inputs);
+  ok(Math.hypot(p.pos.x - origin.x, p.pos.z - origin.z) > 1, 'Jaekelopterus travels across the floor during the committed dash');
+}
+
 // ---- the pack ----
 ok(DEVONIAN.creatures.length === 21, 'roster is the 21 subjects of the brief');
-ok(DEVONIAN.modes.map((m) => m.id).join() === 'rise,hunted,reef', 'the same three modes as the Cambrian, Rise first');
+ok(DEVONIAN.modes.map((m) => m.id).join() === MODE_IDS.join(), `the same modes as the Cambrian, Rise first (${DEVONIAN.modes.map((m) => m.id).join()})`);
 for (const r of [1, 2, 3, 4]) ok(DEVONIAN.creatures.some((c) => c.rung === r), `rung ${r} has at least one animal`);
 const paths = createAssetPaths(DEVONIAN);
 for (const id of DEVONIAN_SHIPPED) {
@@ -1034,7 +1053,7 @@ const { TIER_SCALE } = await import('../src/sim/types');
   const { slotFor } = await import('../src/shared/palettes');
   const { SCHEMES: DEV_SCHEMES, CREATURE_SCHEMES: DEV_DEFAULTS } = await import('../src/content/devonian/palettes');
   const dir = 'public/assets/devonian/creatures';
-  for (const f of fs.readdirSync(dir).filter((n) => n.endsWith('.glb') && !n.includes('.lod'))) {
+  for (const f of fs.readdirSync(dir).filter((n) => n.endsWith('.glb') && !n.startsWith('._') && !n.includes('.lod'))) {
     const id = f.replace('.glb', '');
     const buf = fs.readFileSync(`${dir}/${f}`);
     const json = JSON.parse(buf.subarray(20, 20 + buf.readUInt32LE(12)).toString());

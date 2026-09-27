@@ -1,28 +1,64 @@
 {
   "id": "hybodus",
-  "verdict": "no oral lining: nothing to be mixed",
+  "verdict": "separate closed rigid palate/floor",
   "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present. A body with no lining mesh is reported as such, with the hidden oral parts it does carry listed, and all three variants must agree.",
   "models": [
     {
       "variant": "authored",
-      "sha256": "cfad8caaaa68d496247ee541254933b14b0470743a98175c063bb3e389e00174",
-      "meshes": [],
+      "sha256": "ba434d91d3475ad833c4211071765677aa34b84df027bcdd4591f88e307f1d1e",
+      "meshes": [
+        {
+          "name": "Mouth lining",
+          "vertices": 336,
+          "triangles": {
+            "skull": 332,
+            "jaw": 332
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ],
       "otherOralMeshes": [],
-      "oralShells": "none"
+      "oralShells": "separate palate and floor"
     },
     {
       "variant": ".puppet",
-      "sha256": "ca04f637d74f02000a91e2cee73601570115f7c52241f400f9b3380fa8c1bf91",
-      "meshes": [],
+      "sha256": "40d6895bb0e0166d64647790d97675cb0fc190a2a40a9e0a21064540d655658d",
+      "meshes": [
+        {
+          "name": "Mouth lining",
+          "vertices": 336,
+          "triangles": {
+            "skull": 332,
+            "jaw": 332
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ],
       "otherOralMeshes": [],
-      "oralShells": "none"
+      "oralShells": "separate palate and floor"
     },
     {
       "variant": ".lod1",
-      "sha256": "ca04f637d74f02000a91e2cee73601570115f7c52241f400f9b3380fa8c1bf91",
-      "meshes": [],
+      "sha256": "40d6895bb0e0166d64647790d97675cb0fc190a2a40a9e0a21064540d655658d",
+      "meshes": [
+        {
+          "name": "Mouth lining",
+          "vertices": 336,
+          "triangles": {
+            "skull": 332,
+            "jaw": 332
+          },
+          "boundaryEdges": 0,
+          "mixedVertices": 0,
+          "bridgingTriangles": 0
+        }
+      ],
       "otherOralMeshes": [],
-      "oralShells": "none"
+      "oralShells": "separate palate and floor"
     }
   ]
 }

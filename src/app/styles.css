@@ -61,6 +61,10 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 
 /* ---------- Select ---------- */
 .select { position: absolute; inset: 0; display: grid; grid-template-rows: auto 1fr auto; z-index: 10; padding: 18px 22px 80px; background: linear-gradient(180deg, rgba(6,22,28,.78), rgba(6,22,28,.35) 40%, rgba(6,22,28,.78)); animation: fade-in .4s both; }
+/* The picker footer and icon toolbar share the bottom row. Reserve the toolbar's width at the
+   right of the footer so Dive In sits beside it and the roster gets the old clearance back. */
+.screen-select .select { padding-bottom: 18px; }
+.screen-select .select-footer { min-height: 44px; padding-right: 212px; }
 .select-header { display: grid; grid-template-columns: auto 1fr; grid-template-areas: 'brand modes' 'blurb blurb'; gap: 8px 24px; align-items: center; }
 /*
  * The mark in the corner does two jobs: the emblem goes back to the title (which is why there is
@@ -285,6 +289,7 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 .chip.sense.ready .cool { background: #9be9ff; }
 .tally { display: flex; gap: .8em; color: var(--dim); font-size: .8em; letter-spacing: .06em; padding-bottom: .3em; }
 .hint { position: absolute; left: 50%; bottom: 5.4em; transform: translateX(-50%); margin: 0; padding: .6em 1.1em; border-radius: 1em; background: rgba(6,22,28,.72); border: 1px solid rgba(255,179,107,.5); color: var(--foam); font-weight: 700; font-size: 1em; white-space: nowrap; animation: rise-in-centred .4s both; max-width: 90%; text-overflow: ellipsis; overflow: hidden; }
+.goal-hint { top: 8em; bottom: auto; }
 .hint.danger { border-color: var(--coral); color: #ffd4da; }
 .marker { position: absolute; width: calc(.7em * var(--s)); height: calc(.7em * var(--s)); transform: translate(-50%, -50%) rotate(45deg); border: 2px solid currentColor; border-radius: 2px; opacity: .8; box-shadow: 0 0 8px currentColor; transition: left .1s linear, top .1s linear; }
 /* Only a mark that is *about* you blinks. It used to be every giant-band body on screen. */
@@ -403,6 +408,7 @@ h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0
 /* ---------- Overlays ---------- */
 .overlay { position: absolute; inset: 0; z-index: 20; display: grid; place-items: center; background: rgba(6,22,28,.55); backdrop-filter: blur(6px); animation: fade-in .25s both; }
 .panel { width: min(92vw, 640px); padding: 28px 30px; border-radius: 22px; background: rgba(6,22,28,.8); border: 1px solid rgba(238,250,246,.14); box-shadow: 0 30px 90px rgba(0,0,0,.5); }
+.panel.pause-panel { max-height: 92vh; overflow-y: auto; }
 /* A column with a scrolling middle: the heading and the choices are pinned, only the cards and the
    record scroll. The buttons were the last thing inside one tall scroller and fell off the bottom
    of a short window, which is the worst place to hide the only way out of the screen. */
@@ -544,7 +550,9 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
   .mode-picker { justify-content: flex-start; }
   .help-columns { grid-template-columns: 1fr; }
 }
-@media (prefers-reduced-motion: reduce) { * { animation-duration: .01ms !important; } }
+/* A near-zero duration on an infinite animation flashes or jumps every frame. Keep reduced-motion
+   screens still instead, including the start pulse and the floating creature portrait. */
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; } }
 
 /*
  * The creature card on a laptop screen. Its copy column was overflowing by 150-250 px and
@@ -631,6 +639,7 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .aim.cooling i { opacity: .3; }
 .aim-label { position: absolute; left: 50%; top: 100%; transform: translate(-50%, .35em); white-space: nowrap; font: 700 .7em var(--font-display); letter-spacing: .14em; color: var(--foam); text-shadow: 0 0 6px rgba(0,0,0,.8); }
 .aim.in-range .aim-label { color: currentColor; }
+.touch-cursor { position: absolute; width: 32px; height: 32px; transform: translate(-50%, -50%); pointer-events: none; z-index: 5; filter: drop-shadow(0 0 3px #04141a); }
 
 .fade { position: absolute; inset: 0; background: #020a0d; pointer-events: none; z-index: 6; }
 
@@ -886,7 +895,7 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
    and double-tap is a *move*, so a page that zoomed on it would take the pounce away. `TouchPlay`
    also calls `preventDefault`, and this is the half that has to be declarative: a passive listener
    cannot stop a scroll that has already started. */
-.is-touch, .is-touch .sea-canvas, .is-touch .hud-layer { touch-action: none; }
+.is-touch .sea-canvas, .is-touch .touch-pads { touch-action: none; }
 /* A long press on glass raises a selection or a context menu over the sea. Only inside the game:
    the dialogs have real text in them that a player may well want to copy. */
 .is-touch .shell > .sea-canvas, .is-touch .touch-pads { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
@@ -906,13 +915,7 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 }
 .touch-left { position: absolute; left: calc(.9rem + env(safe-area-inset-left)); bottom: calc(1rem + env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: flex-start; gap: .45rem; }
 .touch-pad-row { display: flex; align-items: flex-end; gap: .7rem; }
-/*
- * A **row**, not a column. Stacked, three buttons are 110 pixels down the right-hand edge, which is
- * exactly where the radar is — and the radar cannot move far, because below it is open sea a player
- * is trying to look at. In a row they take the strip of top edge the health bars do not reach (those
- * end 242 pixels in on the narrowest window this supports), and the radar drops just under them.
- */
-.touch-right { position: absolute; right: calc(.9rem + env(safe-area-inset-right)); top: calc(.7rem + env(safe-area-inset-top)); display: flex; gap: .35rem; align-items: flex-start; }
+.touch-right { position: absolute; right: calc(.9rem + env(safe-area-inset-right)); bottom: calc(1rem + env(safe-area-inset-bottom)); display: flex; }
 
 /*
  * A pad is round, big enough for a thumb, and see-through enough to be stood on top of the sea.
@@ -946,10 +949,8 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .swipe-mark.left { left: 5px; border-right: 5px solid currentColor; }
 .swipe-mark.right { right: 5px; border-left: 5px solid currentColor; }
 
-.touch-hint { pointer-events: none; margin: 0; max-width: 10.5rem; font: 600 10.5px/1.35 var(--font-body); color: var(--mist); text-shadow: 0 1px 4px rgba(0, 0, 0, .85); animation: fade-in .4s both; }
 
-/* The small buttons: pause, travel, scores, and the four that walk the travel menu. Rectangular
-   rather than round, so they never read as something to hold the way the pads do. */
+/* Pause takes the bottom-right corner while the icon toolbar is hidden during touch play. */
 .touch-btn {
   pointer-events: auto; touch-action: none;
   min-width: 42px; min-height: 34px; padding: 0 .4rem;
@@ -960,8 +961,24 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
   text-shadow: 0 1px 3px rgba(0, 0, 0, .8);
 }
 .touch-pause { color: var(--foam); }
-.touch-menu { position: absolute; right: calc(.9rem + env(safe-area-inset-right)); bottom: calc(1rem + env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(2, auto); gap: .45rem; }
-.touch-take { color: var(--lagoon); border-color: color-mix(in srgb, var(--lagoon) 55%, transparent); }
+.touch-pause { min-width: 62px; min-height: 44px; }
+
+/* The menu catches outside taps without giving them to the swimming/attack surface. */
+.is-touch .hud-layer.touch-travel-open { z-index: 7; }
+.touch-tele-dismiss { position: absolute; inset: 0; z-index: 1; pointer-events: auto; background: transparent; border: 0; }
+.is-touch .tele-menu { z-index: 2; pointer-events: auto; width: min(90%, 28em); max-height: 82%; display: flex; flex-direction: column; }
+.is-touch .tele-menu ul { overflow-y: auto; min-height: 0; max-height: 55vh; touch-action: pan-y; overscroll-behavior: contain; }
+.is-touch .tele-menu li { padding: 0; opacity: 1; }
+.is-touch .tele-menu li button { width: 100%; padding: .55em .8em; text-align: left; display: grid; gap: .1em; border: 0; border-radius: .7em; background: transparent; }
+.is-touch .tele-menu li button:active { background: rgba(238,250,246,.12); }
+.is-touch .hud-bottom .chip.ability, .is-touch .hud-bottom .chip.sense { display: none; }
+.is-touch .swap-menu .swap-body { touch-action: pan-y; }
+.is-touch .swap-menu .swap-body button { width: 100%; display: flex; align-items: center; gap: .7em; text-align: left; background: transparent; border: 0; color: inherit; }
+.is-touch .swap-menu .swap-body button > div { display: grid; gap: .1em; min-width: 0; }
+.is-touch .swap-actions { display: flex; gap: .5em; justify-content: space-between; margin-top: .6em; }
+.is-touch .swap-actions button { border: 1px solid rgba(238,250,246,.25); border-radius: .6em; background: rgba(238,250,246,.08); padding: .45em .65em; }
+.pause-scoreboard { margin-top: 14px; max-height: 45vh; overflow: auto; }
+.pause-scoreboard .scoreboard { position: static; transform: none; width: 100%; max-height: none; pointer-events: auto; }
 
 /*
  * Nobody can join a touch session, so it does not offer. `Press A to join` is a *pad* prompt and it
@@ -977,18 +994,11 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .aim.aim-pointed { opacity: .85; }
 .aim.aim-pointed .aim-label { display: none; }
 
-/* Asked once, and it goes away by itself. Over the sea rather than in front of it: the game runs in
-   portrait, and a screen that refused to draw until it was turned round would be worse. */
-.rotate-hint {
-  /* Over the open middle of the sea, because the bottom of a portrait window is already carrying the
-     pads, the ability chips, the hint and the toolbar, and this is a line that arrives unasked. */
-  position: absolute; left: 50%; top: 38%; transform: translateX(-50%);
-  z-index: 7; margin: 0; padding: .5rem .85rem; max-width: 78%;
-  border-radius: 12px; background: rgba(6, 22, 28, .68); backdrop-filter: blur(8px);
-  border: 1px solid rgba(238, 250, 246, .16);
-  color: var(--foam); font: 600 12px/1.35 var(--font-body); text-align: center;
-  animation: fade-in .5s both;
-}
+/* Full-screen phone portrait gate. The engine also stops stepping and rendering while it is shown. */
+.rotate-gate { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem;
+  background: #06161c; color: var(--foam); text-align: center; padding: 2rem; }
+.rotate-gate p { margin: 0; max-width: 24rem; font: 700 clamp(18px, 5vw, 28px)/1.3 var(--font-display); }
+.rotate-gate button { min-width: 8rem; min-height: 44px; color: var(--foam); border: 1px solid currentColor; background: transparent; border-radius: .5rem; font: 700 1rem var(--font-display); }
 
 /* ---------- The compact layout ---------- */
 /*
@@ -1009,6 +1019,9 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
  */
 .is-touch .hud-bottom { bottom: 12.4em; }
 .is-touch .hint { bottom: 15.6em; }
+.is-touch .goal-hint { top: 10.5em; bottom: auto; }
+/* Keep the transient biome name above the goal line on short touch viewports. */
+.is-touch .biome-banner { top: 7%; }
 .is-touch .grip-panel { bottom: 18.2em; }
 .is-touch .death-note { bottom: 15.6em; }
 .is-touch .radar { top: 4.6em; }
@@ -1051,6 +1064,9 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
   /* The pick screen. It already goes to one column under 1000px; what is left is the padding, the
      header's own furniture and the crew card, which is the tallest thing on the screen. */
   .select { padding: 10px 12px 64px; gap: 8px; }
+  .screen-select .select { padding-bottom: 10px; }
+  .screen-select .select-footer { padding-right: 212px; }
+  .screen-select .toolbar-right { right: 12px; bottom: 10px; }
   .select-header { gap: 8px; }
   .mode-blurb { display: none; }
   .header-logo { width: 104px; }
@@ -1081,6 +1097,14 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
   /* Menu buttons are tapped, so they get a thumb's worth of height wherever they are. */
   .menu-buttons button, .ghost, .icon-button { min-height: 44px; }
   .icon-button { width: 44px; }
+}
+
+@media (max-width: 430px) {
+  .screen-select .toolbar { gap: 4px; }
+  .screen-select .toolbar-right { right: 12px; }
+  .screen-select .icon-button { width: 36px; }
+  .screen-select .select-footer { padding-right: 164px; }
+  .screen-select .start-button { padding: 9px 10px; font-size: 11px; letter-spacing: .06em; }
 }
 
 /* A window that is short *and* narrow — a phone on its side — has the least room of anything, and
@@ -1185,6 +1209,8 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
    * name. It goes back to one row, and the chips to the height of their own words.
    */
   .select { padding: 8px 10px 42px; gap: 6px; }
+  .screen-select .select { padding-bottom: 8px; }
+  .screen-select .select-footer { padding-right: 178px; }
   .select-header { grid-template-columns: auto minmax(0, 1fr); grid-template-areas: 'brand modes'; align-items: center; gap: 10px; }
   .header-logo { width: 88px; }
   .mode-chip { min-height: 36px; padding: 3px 8px; }
@@ -1199,14 +1225,25 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
   .cell { padding: 3px 4px 4px; }
   .cell-name { font-size: 10.5px; }
   .select-footer { gap: 6px; }
-  /*
-   * And the icons move to the *other* corner, on this screen only. The toolbar and the footer both
-   * want the bottom right, and normally the picker's 80 pixels of bottom padding keeps them apart —
-   * 80 pixels is a quarter of this window, so instead of buying the clearance the footer's Dive In
-   * is simply given the corner and the icons take the empty one. Only on the picker: in a match the
-   * bottom left is where the swim pad lives, and the two must not be in the same place.
-   */
-  .screen-select .toolbar-right { right: auto; left: 10px; }
-  .screen-select .toolbar { bottom: 8px; gap: 6px; }
+  /* Keep the compact toolbar on the same row as Dive In. */
+  .screen-select .toolbar-right { right: 10px; bottom: 8px; }
+  .screen-select .toolbar { gap: 6px; }
   .screen-select .icon-button { width: 38px; height: 38px; border-radius: 11px; }
 }
+
+/* Four roster rows on a short landscape phone fit when the portraits and gutters give back a few
+   pixels each. Taller screens keep the full-size cards. */
+@media (max-height: 399px) and (min-aspect-ratio: 1/1) {
+  .screen-select .roster-grid { gap: 6px; }
+  .screen-select .cell { padding: 2px 4px 3px; }
+  .screen-select .cell img { height: 36px; }
+  .screen-select .cell-name { font-size: 10px; }
+}
+
+.bar.hunger i { background: linear-gradient(90deg, #c77342, #f5c968); }
+.bar.hunger.low i { animation: hunger-flash 1.1s ease-in-out infinite; }
+.bar.hunger.starving { box-shadow: 0 0 0 1px var(--ember); animation: hunger-flash .6s ease-in-out infinite; }
+.hunger-note { font-size: .72em; color: #f5c968; }
+.hunger-note.starving { color: var(--ember); font-weight: 600; }
+@keyframes hunger-flash { 50% { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) { .bar.hunger.low i, .bar.hunger.starving { animation: none; } }

@@ -139,12 +139,8 @@ for (const m of MOUSE) {
  * The fingers, for a session played on glass. The same rule again — one gesture, one action, and
  * never a menu action — with one deliberate difference from the mouse.
  *
- * The mouse is forbidden `ability`, `guard` and `sense` because it plays *beside* a keyboard and
- * those have keys on it. A finger has no keyboard to fall back on, so the secondary pad reaches all
- * three, one at a time: that is what the swipe-to-swap ring is for, and forbidding them would leave
- * a touch player unable to hide or block at all. What is still out of reach is the same in kind — the
- * menu actions, which a finger works by tapping the buttons themselves — plus `rise` and `sink`,
- * which the camera covers here as it does on a mouse (pitch the view and hold swim).
+ * The secondary pad reaches aim, guard and hide; sense stays on. Menu actions are handled by
+ * React's pause and travel menus. The camera covers rise and sink (pitch the view and hold swim).
  */
 const TOUCH: { name: string; press: Partial<TouchFrameLike>; expect: (keyof RawControls)[] }[] = [
   { name: 'tap', press: { light: true }, expect: ['light'] },
@@ -154,13 +150,12 @@ const TOUCH: { name: string; press: Partial<TouchFrameLike>; expect: (keyof RawC
   { name: 'pad · aim', press: { secondary: 'aim' }, expect: ['aim', 'lock'] },
   { name: 'pad · guard', press: { secondary: 'guard' }, expect: ['guard'] },
   { name: 'pad · hide', press: { secondary: 'ability' }, expect: ['ability'] },
-  { name: 'pad · sense', press: { secondary: 'sense' }, expect: ['sense'] },
 ];
-const TOUCH_FORBIDDEN: (keyof RawControls)[] = ['confirm', 'back', 'menu', 'lb', 'rb', 'view', 'teleport', 'rise', 'sink', 'burst'];
+const TOUCH_FORBIDDEN: (keyof RawControls)[] = ['confirm', 'back', 'menu', 'lb', 'rb', 'view', 'teleport', 'rise', 'sink', 'burst', 'sense'];
 for (const m of TOUCH) {
   const c = applyTouch(emptyControls(), {
     dx: 0, dy: 0, zoom: 0, bites: 0, heavies: 0, swim: false, secondary: undefined, dash: false,
-    dragging: false, ndc: undefined, swapped: false, pinching: false, buttons: [], light: false, heavy: false, ...m.press,
+    dragging: false, ndc: undefined, swapped: false, pinching: false, light: false, heavy: false, ...m.press,
   });
   for (const k of m.expect) if (!c[k]) fail(`${m.name} does not drive "${String(k)}"`);
   for (const k of TOUCH_FORBIDDEN) if (c[k]) fail(`${m.name} drives the menu control "${String(k)}"`);
@@ -175,7 +170,7 @@ for (const a of TOUCH) for (const b of TOUCH) {
   if (a === b || !a.press.secondary || !b.press.secondary) continue;
   const c = applyTouch(emptyControls(), {
     dx: 0, dy: 0, zoom: 0, bites: 0, heavies: 0, swim: false, secondary: a.press.secondary, dash: false,
-    dragging: false, ndc: undefined, swapped: false, pinching: false, buttons: [], light: false, heavy: false,
+    dragging: false, ndc: undefined, swapped: false, pinching: false, light: false, heavy: false,
   });
   for (const k of b.expect) if (c[k]) fail(`the pad set to ${a.press.secondary} also drives ${b.press.secondary}'s "${String(k)}"`);
 }

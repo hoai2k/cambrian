@@ -229,8 +229,11 @@ export interface GameStrings {
      */
     readonly huntingHeading: string;
     readonly hunting: (b: HelpButtons) => string;
+    readonly touchControls: string;
+    readonly touchHunting: string;
     readonly seaHeading: string;
     readonly sea: (b: HelpButtons) => string;
+    readonly touchSea: string;
     readonly fightingHeading: string;
     readonly fighting: (b: HelpButtons) => string;
     /**
@@ -298,6 +301,9 @@ export interface GameStrings {
     /** An air-breather's two gauges. */
     readonly airBarAria: (percent: number, low: boolean) => string;
     readonly airRecoveryOff: string;
+    readonly hungerAria: (percent: number) => string;
+    readonly hungerLow: string;
+    readonly starving: string;
     readonly airSurfaceNow: string;
     /**
      * Out of the water, on the sand (`src/sim/beach.ts`). A water-breather has a minute on it and
@@ -347,12 +353,18 @@ export interface GameStrings {
       /** The last entry, which opens the change-creature page. */
       readonly changeCreature: string;
       readonly changeCreatureDetail: string;
+      readonly dismiss: string;
+      readonly touchHint: string;
     };
     readonly swap: {
       readonly eyebrow: string;
       readonly keptProgress: string;
       readonly fullyGrown: string;
       readonly hatchling: string;
+      readonly touchHint: (index: number, count: number) => string;
+      readonly back: string;
+      readonly grownChoice: string;
+      readonly hatchlingChoice: string;
       /** Same key-cap marker as the teleport footer above. */
       readonly footer: (abilityKey: string, grown: boolean, index: number, count: number, confirmKey: string, backKey: string) => string;
     };
@@ -426,11 +438,6 @@ export interface GameStrings {
       readonly sense: string;
       /** Spoken, and the title: what the pad does and how to change it. */
       readonly secondaryAria: (action: string) => string;
-      /**
-       * The one-off nudge that says the pad can be swiped, shown for the first few touch matches and
-       * never again. A control that can be changed and never says so is a control nobody changes.
-       */
-      readonly swapHint: string;
       /** Shown for a moment after a swipe lands, naming what the pad is now. */
       readonly swapped: (action: string) => string;
       readonly pause: string;
@@ -501,6 +508,8 @@ export interface GameStrings {
       readonly reefFree: string;
       readonly reefWon: string;
       readonly riseGoal: string;
+      readonly survivalTitle: string;
+      readonly survivalGoal: string;
       readonly apexHeld: (seconds: number, target: number) => string;
       readonly huntTurn: (turn: number, turns: number) => string;
       readonly huntingNow: (seat: number) => string;
@@ -773,18 +782,21 @@ export const SHARED_STRINGS: GameStrings = {
     },
     huntingHeading: 'Hunting',
     hunting: (b) => `Hold **${b.aim}** to aim: the view moves over your shoulder and a crosshair sits at the centre of the screen. It snaps to nearby prey as you enter aim; after that, steer it with the ${b.pad ? 'right stick' : 'mouse'}. **${b.heavy}** performs your creature’s heavy move: snatch, seize, rake, crush, charge or feeding sweep. Creatures without a special heavy pounce toward aimed prey or lunge forward. **${b.guard}** blocks with the creature’s natural defense; tap for a parry. **${b.dash}** dashes: press it with a direction held to burst that way with a moment of invulnerability, far enough to clear a giant's bite — and it scales with your body, so a grown creature covers real ground. Press it with no direction and you dash along your own axis: ahead for most animals, and out behind for a shelled jetter, which is how it escapes. How long you hold it is how far you go, and how much stamina it costs: tap for a short shove, hold for the whole crossing. **${b.sprint}** sprints, **${b.rise}** rises — seafloor creatures hop with it, and holding it paddles them up into open water, where they swim — slower than a swimmer, but aimed with the camera and able to sprint and dash like anything else. Gaining height costs stamina, and a walker that stops asking to go anywhere settles back to the bottom. **${b.zoom}** pulls the camera in and out. **${b.sense}** turns Sense on and off: on, the size-band marks over creatures and the radar are drawn; off, nothing is drawn over the sea but the bar at the bottom. It is on to begin with, costs nothing and never runs out — turning it off is for the look of the thing.`,
+    touchControls: 'Hold SWIM to move where the camera looks. Swipe the water to turn, pinch to zoom, tap to bite, and double-tap to dash or pounce. Swipe the other pad to choose Aim, Guard or Hide. Sense is always on.',
+    touchHunting: 'Tap a creature to bite it. Double-tap a creature for its heavy move, or double-tap open water and hold the second touch to dash. Hold the secondary pad for Aim, Guard or Hide; swipe that pad sideways to change its action.',
     seaHeading: 'The sea',
     sea: (b) => `It has one edge: the shore you hatch beside. Swim along it and the world stays gentle; swim away from it and the biomes change, out to the deep water where the giants live. The radar at the top right shows anything big enough to hurt you, whatever is hunting you, the nearest shoals worth eating, your nursery and the shore. Creatures show only while they are inside its reach; the other players, your nursery and the shore sit hollow on the rim when they are past it, pointing the way. Press **${b.teleport}** for the teleport menu: back to your nursery, or straight to another player. Hold **${b.view}** for the scoreboard: everyone in the match, what they have done, and what this mode is asking of them.`,
+    touchSea: 'The radar shows nearby food, danger, your nursery and the shore. Tap Pause at the bottom right for Travel, Scores and settings. In Travel, tap a destination, swipe the list to scroll, or tap outside to close it. Swipe across the creature card to browse bodies and tap one to choose it.',
     huntingEraNote: '',
     seaEraNote: '',
     fightingEraNote: '',
     growingEraNote: '',
     fightingHeading: 'Fighting',
-    fighting: (b) => `**${b.light}** chains three bites, the third hits hard. **${b.heavy}** is your heavy: the creature’s special if it has one, otherwise a pounce — either way a long committed lunge that carries you onto what you aimed at. The crosshair names it when it will connect. Press it while sprinting or mid-dash and it becomes a charge: it takes whatever is nearest the line you are travelling along, for extra stamina. **${b.guard}** held raises a shield; tapped as a hit lands, it parries and staggers them. Hits from behind or below hurt more. Stamina runs everything: an exhausted creature can't dash. Nothing dies in one bite unless it is far smaller than you: a peer takes a couple of hits, a giant needs about three good bites to kill you, and after six seconds out of the fight your health starts to return. Bite a bigger predator enough and it breaks off and runs.`,
+    fighting: (b) => `**${b.light}** chains three bites, the third hits hard. **${b.heavy}** is your heavy: the creature’s special if it has one, otherwise a pounce — either way a long committed lunge that carries you onto what you aimed at. The crosshair names it when it will connect. Press it while sprinting or mid-dash and it becomes a charge: it takes whatever is nearest the line you are travelling along, for extra stamina. **${b.guard}** held raises a shield; tapped as a hit lands, it parries and staggers them. Hits from behind or below hurt more. Stamina runs everything: an exhausted creature can't dash. Nothing dies in one bite unless it is far smaller than you: a peer takes a couple of hits, a giant needs about three good bites to kill you, and after six seconds out of the fight your health starts to return — twice as fast near seafloor plants, and not while you sprint or dash. Bite a bigger predator enough and it breaks off and runs.`,
     giantsHeading: 'Giants',
     giants: () => 'The big ones cruise high in the light and only dive when they are hungry. When one turns your way an eye fills at the top of your screen: stop moving, or slip under the sponges and hold still until it loses you. They are slow to turn and cannot get their heads into dense cover. Their bite is a slow heavy: dash the moment you see the wind-up. If one does catch you at zero health, it swallows you whole.',
     growingHeading: 'Growing',
-    growing: (b) => `The ring fills as you eat. Fill it, moult, get bigger. Kills of your own size are worth far more than plankton. Dying drops you a tier but keeps half your progress. **${b.ability}** hides at every size. Burrowers sink and bury for free; hide or heavy emerges with a free strike. Other creatures gradually copy the nearest plant, rock, seabed or creature colours, spending stamina. Idle camouflage slowly sinks: move in any direction to counter it. Attacking, blocking, sprinting or being hit reveals you.`,
+    growing: (b) => `In Rise the ring fills as you eat. In Survival it fills with time, and faster when you land hits on something your own size or bigger; eating refills hunger instead, from kills, carcasses, grazing and filter feeding alike. An empty stomach eats your health, and a death costs a whole rung. In Rise a death costs half a rung. In both, reach the top and hold it to finish. **${b.ability}** hides at every size. Burrowers sink and bury for free; hide or heavy emerges with a free strike. Other creatures gradually copy the nearest plant, rock, seabed or creature colours, spending stamina. Idle camouflage slowly sinks: move in any direction to counter it. Attacking, blocking, sprinting or being hit reveals you.`,
     padMenusHeading: 'Menus on a pad',
     padMenus: 'The stick and D-pad steer whatever the screen is about — the roster, a menu’s choices — and move by where the buttons actually are, so a row answers left and right. **LB** and **RB** step through every other button on the screen, one at a time, and round to the roster again: the other era on the title screen, the mode chips, and the icons in the corner from anywhere — so settings and fullscreen are reachable without a mouse. **A** takes the one you land on and **B** gives the sticks back. On a shared screen only the pad that reached for them follows; everyone else keeps picking.',
     keyboardHeading: 'Keyboard',
@@ -830,7 +842,10 @@ export const SHARED_STRINGS: GameStrings = {
     fullyGrown: 'fully grown',
     toNextMoult: (percent) => `${percent}% to the next moult`,
     airBarAria: (percent, low) => `Air ${percent}%${low ? ', surface soon' : ''}`,
-    airRecoveryOff: 'Out of air: no stamina recovery',
+    airRecoveryOff: 'Out of air: no stamina or health recovery',
+    hungerAria: (percent) => `Hunger ${percent} percent`,
+    hungerLow: 'Hungry: eat soon',
+    starving: 'Starving: eat now',
     airSurfaceNow: 'Surface for air',
     strandBarAria: (percent, low) => `Out of the water ${percent}%${low ? ', get back in' : ''}`,
     ashoreStranded: 'OUT OF THE WATER · flop back to the sea',
@@ -869,12 +884,18 @@ export const SHARED_STRINGS: GameStrings = {
       cooling: (seconds) => `Ready in ${seconds} s`,
       changeCreature: 'Change creature',
       changeCreatureDetail: 'Swap bodies · each keeps what it has grown',
+      dismiss: 'Close travel menu',
+      touchHint: 'Tap a destination · swipe to scroll · tap outside to close',
     },
     swap: {
       eyebrow: 'CHANGE CREATURE',
       keptProgress: ' · your progress',
       fullyGrown: ' · fully grown',
       hatchling: ' · hatchling',
+      touchHint: (index, count) => `${index}/${count} · swipe to browse · tap creature to choose`,
+      back: 'Destinations',
+      grownChoice: 'Grown',
+      hatchlingChoice: 'Hatchling',
       footer: (abilityKey, grown, index, count, confirmKey, backKey) =>
         `${index}/${count} · **${abilityKey}** ${grown ? 'grown' : 'hatchling'} · **${confirmKey}** take it · **${backKey}** back`,
     },
@@ -933,13 +954,12 @@ export const SHARED_STRINGS: GameStrings = {
       ability: 'HIDE',
       sense: 'SENSE',
       secondaryAria: (action) => `Hold for ${action}. Swipe the pad sideways to change it.`,
-      swapHint: 'Swipe this pad to change it',
       swapped: (action) => action,
       pause: 'Pause',
       travel: 'Travel',
       scores: 'Scores',
     },
-    rotate: 'Turn your device sideways for the whole sea',
+    rotate: 'Turn your phone sideways to play',
   },
 
   feedback: {
@@ -990,6 +1010,8 @@ export const SHARED_STRINGS: GameStrings = {
       reefFree: 'No goal. Just the sea.',
       reefWon: 'The reef is yours. Swim on.',
       riseGoal: 'Reach Apex and hold it for ninety seconds',
+      survivalTitle: 'Survival',
+      survivalGoal: 'Grow with time, fight to grow faster, eat to stay alive — then hold Apex for ninety seconds',
       apexHeld: (seconds, target) => `Apex held ${seconds} s of ${target}`,
       huntTurn: (turn, turns) => `Turn ${turn} of ${turns}`,
       huntingNow: (seat) => `Player ${seat} is hunting · most caught wins`,

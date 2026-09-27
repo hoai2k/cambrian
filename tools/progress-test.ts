@@ -111,9 +111,9 @@ const meterFill = (g: InstanceType<typeof Game>, a: import('../src/sim/types').A
   }
 }
 
-// ---- only Rise carries anything on ----
+// ---- Rise and Survival carry earned progress on ----
 {
-  for (const m of MODE_IDS.filter((x) => x !== 'rise')) {
+  for (const m of MODE_IDS.filter((x) => x === 'reef')) {
     const plain = new Game(m as Mode, setup(HERO), 7);
     const asked = new Game(m as Mode, setup(HERO, LADDER_TOP), 7);
     ok(Math.abs(plain.players[0].scale - asked.players[0].scale) < 1e-6,
@@ -136,7 +136,7 @@ const meterFill = (g: InstanceType<typeof Game>, a: import('../src/sim/types').A
   run(g, 1);
   ok(g.discovery.best.get(HERO) === 3, 'and it does not fall back when the body does');
 
-  for (const m of MODE_IDS.filter((x) => x !== 'rise')) {
+  for (const m of MODE_IDS.filter((x) => x === 'reef')) {
     const o = new Game(m as Mode, setup(HERO), 21);
     run(o, 1);
     ok(o.discovery.best.size === 0, `${m} records no growth: it never grew you`);

@@ -12,6 +12,7 @@ export interface HitContext {
   rng: () => number;
   /** An era's damage multiplier for armour plates, enrolment or a withdrawn shell (1 = none). */
   armour?: (attacker: Actor, victim: Actor, dir: Vec3) => number;
+  canEat?: (predator: Actor, food: Actor) => boolean;
 }
 
 /** Damage multiplier from relative size. Same size = 1. */
@@ -148,7 +149,7 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
 
   if (victim.hp <= 0) {
     // A clearly bigger predator swallows what it just killed; peers leave a corpse.
-    if (lengthOf(attacker) >= lengthOf(victim) * 1.35 && attacker.state !== 'dead') startSwallow(ctx, attacker, victim);
+    if (lengthOf(attacker) >= lengthOf(victim) * 1.35 && attacker.state !== 'dead' && (ctx.canEat?.(attacker, victim) ?? true)) startSwallow(ctx, attacker, victim);
     else kill(ctx, victim, attacker);
   }
   if (attacker.hp <= 0) kill(ctx, attacker, victim);
@@ -288,6 +289,7 @@ export function endRide(rider: Actor, host: Actor | undefined, shaken = false) {
 
 /** The victim is taken into the predator's mouth and gulped down over ~1.5 s, then it is gone. */
 export function startSwallow(ctx: HitContext, predator: Actor, victim: Actor) {
+  if (ctx.canEat && !ctx.canEat(predator, victim)) { kill(ctx, victim, predator); return; }
   victim.hp = 0;
   victim.state = 'swallowed'; victim.stateT = 0; victim.stateDur = 1.6;
   // In something's mouth: the chase is over even before the body is (see `kill`).

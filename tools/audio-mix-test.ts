@@ -49,7 +49,7 @@ for (let t = 0; t < SECONDS * 60; t++) {
     // Same rule as `play()`: inside the window a kind only retriggers for a louder sound.
     const gap = MIN_GAP[e.kind] ?? 0;
     const prev = lastPlayed[e.kind];
-    if (gap && prev && ms - prev.t < gap && a <= prev.vol * 1.15) continue;
+    if (gap && prev && ms - prev.t < gap && (ms - prev.t < Math.min(100, gap) || a <= prev.vol * 1.15)) continue;
     if (gap) lastPlayed[e.kind] = { t: ms, vol: a };
     heard[e.kind] = (heard[e.kind] ?? 0) + 1;
     volume[e.kind] = (volume[e.kind] ?? 0) + a;

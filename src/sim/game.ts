@@ -18,6 +18,8 @@ import { areaProfile, bandScale, drawBand, headroom, PASSER_BY, SMALLEST_BAND } 
 import { columnHolds, columnY, DIP_CHANCE, DRIFT_CURRENT, driftRise, flipLaunch, FLIP_STAMINA, PULSE_CYCLE, pulseRefilling, pulseThrust, punting, rowWalkCurrent } from './locomotion';
 import { amphibious, ASHORE_WADE, ashoreInput, breathesAir, landSpeed, onFoot, stepBeach, wadeAt, WALL_EASE, WALL_WADE, type BeachContext } from './beach';
 import { TEXT } from '../shared/text';
+import { CAMBRIAN_LADDER, hitSeconds, HUNGER_DRAIN, hungerWorth, STARVE_TIME, SURVIVAL_DEATH_COST, SURVIVAL_TOP_SECONDS } from './survival';
+import { healRate, PLANT_HEAL } from './effort';
 
 /** Everything the simulation says out loud; the words are in `src/content/strings.ts`. */
 const SAY = TEXT.sim;
@@ -50,8 +52,8 @@ export interface Discovery {
   landmarks: Set<LandmarkKind>;
   apex: Set<CreatureId>;
   /**
-   * The furthest rung of the growth ladder each creature has been taken to in Rise this match
-   * (see src/sim/ladder.ts). Rise is the mode that is *about* growing up, so it is the one whose
+   * The furthest rung of the growth ladder each creature has been taken to in Rise or Survival
+   * (see src/sim/ladder.ts). These modes grow the player, so their shared
    * high-water mark is worth keeping: the shell folds this into its stored record, shows it on
    * the creature's card, and offers to start there next time instead of as a hatchling.
    */
@@ -498,7 +500,7 @@ export class Game implements AiWorld {
     this.world = new World(seed);
     const nursery = nurseryAt(0);
     this.world.loadAround(nursery);
-    this.hitCtx = { events: this.events, byId: (id) => this.idMap.get(id), time: 0, rng: this.rng, armour: RULES ? (att, vic, dir) => RULES!.armour(att, vic, dir) : undefined };
+    this.hitCtx = { events: this.events, byId: (id) => this.idMap.get(id), time: 0, rng: this.rng, armour: RULES ? (att, vic, dir) => RULES!.armour(att, vic, dir) : undefined, canEat: (pred, food) => this.canEat(pred, food) };
     this.beachCtx = { events: this.events, hitCtx: this.hitCtx };
     // One turn as the giant each. A single human plays the mode exactly as it was before.
     this.huntTurns = mode === 'hunted' ? Math.max(1, setups.length) : 1;
@@ -508,11 +510,11 @@ export class Game implements AiWorld {
       // Rise can start you part-grown, at the furthest rung you have taken this creature to before.
       // Both eras derive everything else from the body scale — the Cambrian's tier through
       // `tierForScale`, the Devonian's stage through `stageForScale` — so one number does it.
-      const carry = mode === 'rise' ? clampMark(s.startRung ?? 0) : 0;
+      const carry = mode === 'rise' || mode === 'survival' ? clampMark(s.startRung ?? 0) : 0;
       // A visitor arrives at the size it finishes its own game at, whatever this one's ladder or
       // mode would have said. That is the reward, and it is deliberately not balanced.
       const startScale = s.visitorScale ?? (carry > 0 ? ladderScale(s.creature, carry)
-        : RULES ? RULES.startScale(mode, this.eraRoleIndex(i), s.creature) : mode === 'rise' ? tierScale(s.creature, 0) : mode === 'hunted' ? (this.isHunter(i) ? 3.0 : tierScale(s.creature, 1)) : mode === 'reef' ? tierScale(s.creature, 2) : tierScale(s.creature, 1));
+        : RULES ? RULES.startScale(mode === 'survival' ? 'rise' : mode, this.eraRoleIndex(i), s.creature) : mode === 'rise' || mode === 'survival' ? tierScale(s.creature, 0) : mode === 'hunted' ? (this.isHunter(i) ? 3.0 : tierScale(s.creature, 1)) : mode === 'reef' ? tierScale(s.creature, 2) : tierScale(s.creature, 1));
       const a = this.spawn(s.creature, 'player', this.spawnPoint(nursery, s.creature, startScale, i), startScale, i);
       // Arriving on the top rung means the goal is already behind you: no clock, just the sea.
       a.carriedTop = carry >= LADDER_TOP;
@@ -550,7 +552,7 @@ export class Game implements AiWorld {
     // Last, because an era's init sets its own growth state from the body it finds: a mark that
     // carries a part-filled meter has to be applied on top of that, not before it.
     setups.forEach((s, i) => {
-      const fill = mode === 'rise' ? fillOf(s.startRung ?? 0) : 0;
+      const fill = mode === 'rise' || mode === 'survival' ? fillOf(s.startRung ?? 0) : 0;
       if (fill > 0) ladderFill(this, this.players[i], fill);
     });
   }
@@ -903,6 +905,7 @@ export class Game implements AiWorld {
     this.time += dt; this.hitCtx.time = this.time;
     this.stepIndex++;
     // Snapshot every transform so the renderer can interpolate across this step.
+    const eventStart = this.events.length;
     for (const a of this.actors) {
       const t = a.prevT;
       t.x = a.pos.x; t.y = a.pos.y; t.z = a.pos.z; t.yaw = a.yaw; t.pitch = a.pitch; t.bank = a.bank;
@@ -917,6 +920,25 @@ export class Game implements AiWorld {
       // Nothing with a brain plans to be on the sand, so a body that is has one idea: the sea.
       const input = a.controller === 'player' ? (inputs.get(a.player) ?? emptyInput()) : ashoreInput(a, a.brain ? think(this, a, dt) : emptyInput());
       this.updateActor(a, input, dt);
+    }
+    if (this.mode === 'survival') {
+      for (const a of this.actors) if ((a.controller === 'player' || a.controller === 'bot') && isAlive(a)) {
+        a.hunger = Math.max(0, a.hunger - dt * HUNGER_DRAIN);
+        // An empty stomach eats the body rather than ending it on the frame the bar meets zero:
+        // seconds of visibly going under, the way drowning is, and a meal in time stops it.
+        if (a.hunger === 0) {
+          a.hp -= (a.hpMax / STARVE_TIME) * dt;
+          if (a.hp <= 0) { a.hp = 0; kill(this.hitCtx, a); continue; }
+        }
+        this.gainSurvivalXp(a, dt / SURVIVAL_TOP_SECONDS);
+      }
+      for (const e of this.events.slice(eventStart)) if (e.kind === 'hit' && e.other != null) {
+        const attacker = this.idMap.get(e.actor), victim = this.idMap.get(e.other);
+        if (!attacker || !victim || (attacker.controller !== 'player' && attacker.controller !== 'bot')) continue;
+        const ratio = lengthOf(victim) / Math.max(lengthOf(attacker), 1e-3);
+        const secs = hitSeconds(e.strength ?? 0, ratio, attacker.controller === 'player' && victim.controller === 'player');
+        this.gainSurvivalXp(attacker, secs / SURVIVAL_TOP_SECONDS);
+      }
     }
     this.resolveActorOverlap();
     stepFlora(this.world, dt);
@@ -947,7 +969,7 @@ export class Game implements AiWorld {
       kill(this.hitCtx, a, pred);
       a.eaten = 1;                                        // nothing left to scavenge
       const val = this.nutritionValue(pred, a);
-      this.gainNutrition(pred, a, val); pred.eats++; pred.hp = Math.min(pred.hpMax, pred.hp + val * 0.5);
+      if (this.canEat(pred, a)) { this.gainNutrition(pred, a, val); pred.eats++; pred.hp = Math.min(pred.hpMax, pred.hp + val * 0.5); }
       if (a.controller === 'player' || a.controller === 'bot') a.respawnT = a.stateDur; else this.remove(a);
     }
   }
@@ -1061,12 +1083,14 @@ export class Game implements AiWorld {
     // wherever in a rung it lands. The era hook still runs first for everything else a respawn
     // resets; the ladder itself is settled here so all three games price a death the same way.
     if (RULES) RULES.onRespawn(this, a);
-    if (this.mode !== 'reef') placeOnLadder(this, a, deathMark(ladderMark(this, a)));
+    if (this.mode === 'survival') placeOnLadder(this, a, clampMark(ladderMark(this, a) - SURVIVAL_DEATH_COST));
+    else if (this.mode !== 'reef') placeOnLadder(this, a, deathMark(ladderMark(this, a)));
     else if (!RULES) a.nutrition *= 0.5;
     if (this.mode === 'hunted' && this.isHunter(a.player) && !RULES) { a.scale = 3.0; a.tier = 3; }
     applyScaleStats(a, false);
     a.eaten = 0;
     a.stamina = a.staminaMax; a.poise = a.poiseMax;
+    a.hunger = 100;
     // Back near another player (the party stays together in an endless sea), or failing that where
     // you died.
     let ref = a.pos, refD = Infinity;
@@ -1229,7 +1253,7 @@ export class Game implements AiWorld {
     // while you are hanging off it; held down it still closes a grip on what is already in reach,
     // which is the deliberate hold `graspT` is timing, but it is never a way to stop biting.
     const holder = a.controller === 'player';
-    a.graspHold = holder && (input.heavy || input.ability);
+    a.graspHold = holder && (input.heavy || input.ability) && !input.pursueDash;
     const gripArmed = holder && (input.light || input.heavy || input.ability);
     a.graspT = gripArmed ? a.graspT + dt : 0;
     if (!gripArmed) a.graspSpent = false;
@@ -1241,7 +1265,15 @@ export class Game implements AiWorld {
     a.holdT = Math.max(0, a.holdT - dt);
     a.sinceHit += dt;
     // Out of the fight for a few seconds and health comes back: run, hide, recover, return.
-    if (a.sinceHit > 6 && a.hp < a.hpMax && a.state !== 'dead') a.hp = Math.min(a.hpMax, a.hp + a.hpMax * (a.controller === 'player' || a.controller === 'bot' ? 0.035 : 0.02) * dt);
+    // Out of the fight for a few seconds and health comes back: run, hide, recover, return. Faster
+    // beside a plant, paused while sprinting or dashing, and in Survival paused on an empty stomach.
+    const resting = a.sinceHit > 6 && a.hp < a.hpMax && a.state !== 'dead' && input.burst <= 0.1 && a.burstT <= 0 && !input.dash && a.state !== 'dodge'
+      && !(this.mode === 'survival' && a.hunger <= 0);
+    if (resting && (RULES?.canRecoverHealth?.(this, a) ?? true)) {
+      const nearPlant = this.world.floraHash.query(a.pos.x, a.pos.z, this.world.floraReach + L * 0.5 + 1.5, this.scratchFlora)
+        .some((f) => Math.hypot(a.pos.x - f.pos.x, a.pos.z - f.pos.z) <= f.R + L * 0.5 + 1.5 && a.pos.y >= f.pos.y - L * 0.5 && a.pos.y <= f.pos.y + f.H + L * 0.5);
+      a.hp = Math.min(a.hpMax, a.hp + a.hpMax * healRate(a, this.mode) * (nearPlant ? PLANT_HEAL : 1) * dt);
+    }
     if (a.brain) a.brain.courage = Math.min(1, a.brain.courage + 0.05 * dt);
 
     if (a.state !== 'ability') a.abilityActive = (a.state === 'guard' || a.state === 'parry') && DEFENSIVE_SPECIALS.has(def.ability);
@@ -1491,6 +1523,18 @@ export class Game implements AiWorld {
     // leading and a ctenophore's combs beat any way at all, so the stick moves them without
     // pointing them. Aiming still does, which is the branch above.
     else if (hv > 0.35 && a.state !== 'grabbed' && def.swimStyle !== 'omnidirectional') targetYaw = yawOf(facing);
+    // A turn asked for outright (a touch swipe, `InputFrame.turn`) is the body going round with the
+    // camera, exactly and at once, rather than easing after it at the animal's own turn rate. Its
+    // travel goes round with it, or the heading would chase the old velocity straight back. Not
+    // while something else owns the heading: a lock, a ride, a dash's own line, a grip.
+    const asked = input.turn && a.controller === 'player' && !backingOff && !(locked && isAlive(locked)) && a.rideHost < 0
+      && (a.state === 'free' || a.state === 'guard' || a.state === 'attack') ? input.turn : 0;
+    if (asked) {
+      a.yaw = wrapAngle(a.yaw + asked);
+      const c = Math.cos(asked), s = Math.sin(asked), vx = a.vel.x, vz = a.vel.z;
+      a.vel.x = vx * c + vz * s; a.vel.z = -vx * s + vz * c;
+      targetYaw = wrapAngle(targetYaw + asked);
+    }
     const dy = wrapAngle(targetYaw - a.yaw);
     const tr = def.turnRate * (a.state === 'attack' ? 0.5 : 1) * (1 + hv * 0.05) * (giantish ? 0.45 : 1) * (sw?.turn ?? 1);
     const turn = clamp(dy * 6, -tr, tr);
@@ -1811,6 +1855,24 @@ export class Game implements AiWorld {
    */
   private stepActions(a: Actor, input: InputFrame, dt: number, s: Step) {
     const { def, L, sf, justLight, justHeavy, justAbility, justDodge, justGuard, justLock, justSense, justDash, paddling, bursting, dir, mag, locked, jets, relief, freeClimb } = s;
+    if (input.pursueTarget != null && input.pursueDash) {
+      if (a.pursuit?.target !== input.pursueTarget) {
+        // Use the same launch speed and duration as a normal dash, including floor resistance.
+        const gap = a.pos.y - groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders);
+        const dashSpeed = def.tailFlip ? flipLaunch(a)
+          : (L * 9.5 + 7) * (def.id === 'waptia' ? 1.2 : 1) * punting(a, gap);
+        const dashLength = dashSpeed * (def.tailFlip ? 0.5 : 0.42);
+        a.pursuit = { target: input.pursueTarget, last: { ...a.pos }, traveled: 0, max: dashLength, spent: false };
+      } else if (!a.pursuit.spent) {
+        a.pursuit.traveled += dist(a.pos, a.pursuit.last);
+        a.pursuit.last = { ...a.pos };
+        if (a.pursuit.traveled >= a.pursuit.max) a.pursuit.spent = true;
+      }
+    } else a.pursuit = undefined;
+    const chaseTarget = a.pursuit?.spent ? undefined : input.pursueTarget;
+    if (a.pursuit?.spent && a.state === 'pounce' && a.lockTarget === a.pursuit.target) {
+      a.state = 'free'; a.stateT = 0; a.vel = v3();
+    }
     // The grip is only ever asked about below, inside the block a free body reaches. Say so first,
     // so a recording of a frame that never got there reads as the reason it did not rather than as
     // whatever the last frame that did happened to say.
@@ -1823,7 +1885,7 @@ export class Game implements AiWorld {
       // Aim (LT held): the camera owns the crosshair; whatever it reports is the target. Bots toggle lock.
       if (a.controller === 'player') {
         a.aiming = input.aim;
-        a.lockTarget = input.aim ? input.aimTarget : -1;
+        a.lockTarget = chaseTarget ?? (input.aim ? input.aimTarget : -1);
         if (input.aim) this.flag(a, 'lock');
       } else if (justLock) {
         if (a.lockTarget >= 0) a.lockTarget = -1;
@@ -1851,11 +1913,15 @@ export class Game implements AiWorld {
       // attack that sometimes stuck. Nothing in reach and the button does what it always did.
       // A grip that closed takes the button; one still closing does not, because the pounce is the
       // other way of arriving at the same hold — it lunges, and what it lands on it takes hold of.
-      const grasped = this.tryGrasp(a, def, L, input.heavy || input.ability) === 'took';
+      const grasped = !input.pursueDash && (this.tryGrasp(a, def, L, input.heavy || input.ability) === 'took');
       // Heavy (RT): the emergence strike, the creature's special, or the pounce — all of it in one
       // place, so a charge out of a sprint (below) or out of a dash reaches exactly the same move.
       // Sprinting makes it a charge: it aims along the line of travel and costs extra stamina.
       if (grasped) { /* the grip took the button */ }
+      else if (chaseTarget != null && a.controller === 'player') {
+        const target = this.idMap.get(chaseTarget);
+        if (target && isAlive(target) && !isHidden(target)) this.startPounce(a, target, L, sf, true);
+      }
       else if (justHeavy && this.heavyAction(a, def, L, sf, locked, bursting)) { /* the button was taken */ }
       // Holding the grip button at something too big to bite keeps swimming at it until it has
       // hold of it. A lunge is one press and lasts about a second, which on a body that size is
@@ -1903,13 +1969,25 @@ export class Game implements AiWorld {
     } else if (a.state === 'attack' && a.move) {
       const m = a.move;
       const total = m.windup + m.active + m.recovery;
-      if (a.stateT >= m.windup && a.stateT < m.windup + m.active) this.attackHits(a, m, L);
-      // cancel recovery into dodge, or chain lights
-      if (a.stateT > m.windup + m.active + m.recovery * 0.45 && (justDodge || (justDash && mag > 0.3)) && a.stamina >= 10) { a.dashUsed = true; this.startDodge(a, def, dir, mag, L, sf); }
-      else if (a.stateT >= total) { a.state = 'free'; a.stateT = 0; a.move = undefined; }
-      else if (a.moveKind === 'light' && justLight && a.stateT > m.windup + m.active + m.recovery * 0.35 && a.stamina >= 6) {
-        const nm = a.combo === 2 ? { ...def.light, damage: def.light.damage * 1.6, poise: def.light.poise * 1.8, knockback: def.light.knockback * 2, recovery: def.light.recovery + 0.12 } : def.light;
-        a.stateT = 0; a.move = nm; a.hitDone.clear(); a.stamina -= staminaCost(a, nm.stamina); a.combo = (a.combo + 1) % 3; a.comboT = 0.9;
+      // The first tap can already be winding up a bite. A creature double-tap commits to its
+      // target now, just as a water double-tap takes over immediately for the dash.
+      const chase = input.pursueDash && chaseTarget != null ? this.idMap.get(chaseTarget) : undefined;
+      if (chase && isAlive(chase) && !isHidden(chase)) {
+        a.move = undefined;
+        this.startPounce(a, chase, L, sf, true);
+      } else if (justDash && input.touchDash && !a.ashore && (a.stamina >= 10 || freeClimb) && (a.exhausted === 0 || freeClimb) && a.dashCd === 0) {
+        a.dashUsed = true;
+        a.move = undefined;
+        this.startDash(a, def, mag > 0.3 ? dir : vscale(heading(a.yaw), jets || def.tailFlip ? -1 : 1), L, sf, relief);
+      } else {
+        if (a.stateT >= m.windup && a.stateT < m.windup + m.active) this.attackHits(a, m, L);
+        // cancel recovery into dodge, or chain lights
+        if (a.stateT > m.windup + m.active + m.recovery * 0.45 && (justDodge || (justDash && mag > 0.3)) && a.stamina >= 10) { a.dashUsed = true; this.startDodge(a, def, dir, mag, L, sf); }
+        else if (a.stateT >= total) { a.state = 'free'; a.stateT = 0; a.move = undefined; }
+        else if (a.moveKind === 'light' && justLight && a.stateT > m.windup + m.active + m.recovery * 0.35 && a.stamina >= 6) {
+          const nm = a.combo === 2 ? { ...def.light, damage: def.light.damage * 1.6, poise: def.light.poise * 1.8, knockback: def.light.knockback * 2, recovery: def.light.recovery + 0.12 } : def.light;
+          a.stateT = 0; a.move = nm; a.hitDone.clear(); a.stamina -= staminaCost(a, nm.stamina); a.combo = (a.combo + 1) % 3; a.comboT = 0.9;
+        }
       }
     } else if (a.state === 'pounce') {
       const t = a.lockTarget >= 0 ? this.idMap.get(a.lockTarget) : undefined;
@@ -1919,12 +1997,15 @@ export class Game implements AiWorld {
       // turned as they close on it. While the button is down the lunge keeps its legs: it re-aims
       // at wherever the animal is now, every frame, until it arrives. Paid for once when it
       // started, because it is one act however long the swim to it takes.
+      if (t && isAlive(t) && chaseTarget === t.id) a.stateDur = a.stateT + 0.2;
       if (t && isAlive(t) && a.graspHold && !a.graspSpent && a.grabbing < 0 && a.rideHost < 0
         && (bandOf(a, t) === 'threat' || bandOf(a, t) === 'giant')) a.stateDur = a.stateT + 0.2;
       if (t && isAlive(t) && a.stateT < a.stateDur) {
         // home in hard on the target; impact when the mouth reaches it
         const to = sub(t.pos, a.pos); const d = len3(to);
-        const speed = Math.max(def.speed * sf * 3.2, 9 * Math.sqrt(sf));
+        const speed = chaseTarget === t.id && a.pursuit
+          ? Math.max(def.speed * sf * 3.2, a.pursuit.max / (def.tailFlip ? 0.5 : 0.42))
+          : Math.max(def.speed * sf * 3.2, 9 * Math.sqrt(sf));
         const dirTo = norm(to);
         a.vel = vscale(dirTo, speed);
         a.yaw = yawOf(dirTo); a.pitch = def.ground ? a.pitch : clamp(-Math.asin(clamp(dirTo.y, -1, 1)) * 0.8, -0.9, 0.9);
@@ -2096,7 +2177,7 @@ export class Game implements AiWorld {
       }
     } else if (a.state === 'eating') {
       const c = a.eatingTarget >= 0 ? this.idMap.get(a.eatingTarget) : undefined;
-      if (!c || c.state !== 'dead' || c.eaten >= 1 || dist(a.pos, c.pos) > L * 0.8 + lengthOf(c) * 0.6 || (a.controller === 'player' && !input.light && a.stateT > 0.3)) {
+      if (!c || c.state !== 'dead' || c.eaten >= 1 || !this.canEat(a, c) || dist(a.pos, c.pos) > L * 0.8 + lengthOf(c) * 0.6 || (a.controller === 'player' && !input.light && a.stateT > 0.3)) {
         a.state = 'free'; a.stateT = 0; a.eatingTarget = -1;
       } else {
         const ratio = lengthOf(c) / L;
@@ -2191,7 +2272,7 @@ export class Game implements AiWorld {
     // wiped the target on the first frame and left the animal stopped where it started.
     if (a.lockTarget >= 0) {
       const t = this.idMap.get(a.lockTarget);
-      const reaching = a.state === 'pounce' && a.graspHold && !!t
+      const reaching = (a.state === 'pounce' && chaseTarget === a.lockTarget) || a.state === 'pounce' && a.graspHold && !!t
         && (bandOf(a, t) === 'threat' || bandOf(a, t) === 'giant');
       if (!t || !isAlive(t) || isHidden(t) || (!a.aiming && !reaching && dist(a.pos, t.pos) > 16 + L * 8)) a.lockTarget = -1;
     }
@@ -2746,7 +2827,7 @@ export class Game implements AiWorld {
 
   private expansionContext() {
     return { hit: this.hitCtx, nearby: (pos: Vec3, radius: number) => this.nearby(pos, radius), silt: this.silt,
-      allies: (a: Actor, b: Actor) => this.mode === 'rise' && a.controller === 'player' && b.controller === 'player' };
+      allies: (a: Actor, b: Actor) => (this.mode === 'rise' || this.mode === 'survival') && a.controller === 'player' && b.controller === 'player' };
   }
 
   /** Internal animation state for native heavy specials; Y never calls this. */
@@ -2854,11 +2935,31 @@ export class Game implements AiWorld {
   }
 
   private startEating(a: Actor, c: Actor) {
+    if (!this.canEat(a, c)) return;
     a.state = 'eating'; a.stateT = 0; a.eatingTarget = c.id;
     a.lockTarget = -1;
     // The body's own bite count: whoever takes the first bite sizes it, and a carcass already
     // half eaten keeps the count it was opened with.
     if (c.eatBites < 1 || c.eaten <= 0) c.eatBites = bitesFor(a, c);
+  }
+
+  /**
+   * Whether a Survival body has room to eat. Any room at all: the meal tops the bar up to full and
+   * the rest is left. It used to ask whether the *whole* meal fitted, and a kill half again your
+   * own length is worth the full bar, so it could only be eaten at exactly zero hunger — which is
+   * starving — and a peer-sized kill waited until you were half empty.
+   */
+  private canEat(a: Actor, food: Actor): boolean {
+    void food;
+    return this.mode !== 'survival' || (a.controller !== 'player' && a.controller !== 'bot') || a.hunger < 100;
+  }
+
+  /** Survival growth: `fraction` of the whole ladder, in whichever units this game keeps it. */
+  private gainSurvivalXp(a: Actor, fraction: number) {
+    if (a.state === 'dead' || a.state === 'swallowed' || fraction <= 0) return;
+    if (RULES?.survivalGrow) RULES.survivalGrow(this, a, fraction);
+    else if (RULES) RULES.onNutrition(this, a, fraction * CAMBRIAN_LADDER, undefined);
+    else { a.nutrition += fraction * CAMBRIAN_LADDER; this.checkTierUp(a); }
   }
 
   private consumeSnacks(a: Actor, L: number, def: ReturnType<typeof creature>) {
@@ -2892,6 +2993,7 @@ export class Game implements AiWorld {
    * evaporating as you reached it rather than as being caught.
    */
   private takeWhole(a: Actor, o: Actor) {
+    if (!this.canEat(a, o)) { kill(this.hitCtx, o, a); return; }
     // A fish out of a school is a mouthful taken in passing, and a cloud of them is how a filter
     // feeder eats: no ceremony there either, or crossing a shoal would be a hundred performances.
     if (o.controller === 'swarm' || (a.controller !== 'player' && a.controller !== 'bot')) { this.consume(a, o); return; }
@@ -2904,6 +3006,7 @@ export class Game implements AiWorld {
   }
 
   private consume(a: Actor, o: Actor) {
+    if (!this.canEat(a, o)) { kill(this.hitCtx, o, a); return; }
     kill(this.hitCtx, o, a);
     o.eaten = 1;
     const val = this.nutritionValue(a, o);
@@ -2927,6 +3030,17 @@ export class Game implements AiWorld {
 
   private gainNutrition(a: Actor, food: Actor | undefined, amount: number) {
     if (a.controller !== 'player' && a.controller !== 'bot') { a.hp = Math.min(a.hpMax, a.hp + amount * 0.5); return; }
+    if (this.mode === 'survival') {
+      // Every way of feeding fills the stomach — a kill, a carcass, a bloom, a grazed mat, a
+      // giant's bones. Only the first two have a body to measure; the rest arrive as an amount
+      // already, and leaving them out starved every grazer and filter feeder whatever it did.
+      if (food) {
+        const whole = Math.max(this.nutritionValue(a, food), 1e-3);
+        const ratio = lengthOf(food) / Math.max(lengthOf(a), 1e-3);
+        a.hunger = Math.min(100, a.hunger + amount * hungerWorth(ratio, whole) / whole);
+      } else a.hunger = Math.min(100, a.hunger + amount);
+      return;
+    }
     if (this.mode === 'reef' && a.tier >= 4) return;
     a.nutrition += amount;
     // co-op share
@@ -3176,6 +3290,12 @@ export class Game implements AiWorld {
 
   private scoreHeader(): ScoreHeader {
     switch (this.mode) {
+      case 'survival': {
+        const chasing = this.players.filter((p) => !p.carriedTop);
+        if (this.endless || !chasing.length) return { title: SAY.board.survivalTitle, detail: SAY.board.reefWon };
+        const held = Math.max(0, ...this.players.map((p, i) => (p.carriedTop ? 0 : this.progress[i].apexT)));
+        return { title: SAY.board.survivalTitle, detail: held > 0 ? SAY.board.apexHeld(Math.floor(held), APEX_HOLD_SECONDS) : SAY.board.survivalGoal };
+      }
       case 'hunted': {
         const giant = this.hunterIndex >= 0 ? this.players[this.hunterIndex] : undefined;
         return {
@@ -3379,7 +3499,7 @@ export class Game implements AiWorld {
       // by `bankLadderTop`, when the run is actually finished.
       // A victory lap banks nothing. Somebody who came in on the top rung is revisiting a run they
       // already finished, not making progress, and their record already says so.
-      if (this.mode === 'rise' && !p.carriedTop) this.markLadder(p, rung >= LADDER_TOP ? MARK_NEAR_TOP : rung);
+      if ((this.mode === 'rise' || this.mode === 'survival') && !p.carriedTop) this.markLadder(p, rung >= LADDER_TOP ? MARK_NEAR_TOP : ladderMark(this, p));
     }
   }
 
@@ -3396,7 +3516,7 @@ export class Game implements AiWorld {
    * the shared code can see for itself.
    */
   bankLadderTop(p: Actor) {
-    if (this.mode !== 'rise') return;
+    if (this.mode !== 'rise' && this.mode !== 'survival') return;
     this.discovery.best.set(p.creature, LADDER_TOP);
   }
 
@@ -3450,6 +3570,9 @@ export class Game implements AiWorld {
   private updateModes(dt: number) {
     RULES?.updateModes(this, dt);
     switch (this.mode) {
+      // Survival's goal is Rise's: reach the top and hold it. The results screen and the choice to
+      // carry on follow from the state this sets, exactly as they do for Rise.
+      case 'survival':
       case 'rise': {
         this.players.forEach((p, i) => {
           const pr = this.progress[i];

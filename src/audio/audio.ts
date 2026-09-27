@@ -508,7 +508,7 @@ export class GameAudio {
     if (kind === 'hit' && s > 1.1) key = 'hit-heavy';
     if (kind === 'eat' && s > 0.5) key = 'crunch';
     const feeding = kind === 'eat' || kind === 'crunch-huge';   // same curve either size
-    const baseVol = kind.startsWith('ui') ? 0.42 : kind === 'noticed' ? 0.3 : feeding ? 0.45 + s * 0.3 : 0.6 + s * 0.35;
+    const baseVol = kind === 'ui-move' ? 0.2 : kind.startsWith('ui') ? 0.42 : kind === 'noticed' ? 0.3 : feeding ? 0.45 + s * 0.3 : 0.6 + s * 0.35;
     const vol = baseVol * atten;
 
     // Rate-limit spammy kinds so a reef full of grazers is not a machine gun. A louder (nearer)
@@ -517,7 +517,7 @@ export class GameAudio {
     const minGap = MIN_GAP[kind] ?? 0;
     if (minGap) {
       const now = performance.now(); const last = this.lastPlay.get(kind);
-      if (last && now - last.t < minGap && vol <= last.vol * 1.15) return;
+      if (last && now - last.t < minGap && (now - last.t < Math.min(100, minGap) || vol <= last.vol * 1.15)) return;
       this.lastPlay.set(kind, { t: now, vol });
     }
 
