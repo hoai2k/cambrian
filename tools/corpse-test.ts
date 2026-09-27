@@ -2,7 +2,7 @@ import { CORPSE_WINDOW, Game } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
 import { isAlive, lengthOf } from '../src/sim/actors';
 import { kill } from '../src/sim/combat';
-import { makeBrain } from '../src/sim/ai';
+import { makeBrain, HUNT_TELL } from '../src/sim/ai';
 let failed = 0;
 const check = (n: string, ok: boolean, d: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(48)} ${d}`); if (!ok) failed++; };
 const stepN = (g: Game, n: number, f: InputFrame = emptyInput(), onEvents?: (t: number) => void) => { const m = new Map([[0, f]]); for (let i = 0; i < n; i++) { g.step(1 / 60, m); onEvents?.((i + 1) / 60); g.events.length = 0; } };
@@ -44,6 +44,8 @@ const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
   const p = g.players[0]; p.pos = { x: 60, y: 6, z: -30 }; p.spawnProtect = 0; p.hp = 1;
   const giant = g.spawn('anomalocaris', 'giant', { x: 60, y: 6, z: -30 + 2 }, 3.5); giant.brain = makeBrain('giant', giant.pos, g.rng);
   let swallowAt = -1, sparkAt = -1, respawnAt = -1, sparkOther = -1;
+  // The hunt has already been told (`HUNT_TELL`): this is about what follows the swallow.
+  giant.brain!.goalT = HUNT_TELL;
   const m = new Map([[0, emptyInput()]]);
   for (let i = 0; i < 60 * (CORPSE_WINDOW + 4); i++) {
     if (swallowAt < 0) { giant.pos = { x: p.pos.x, y: p.pos.y, z: p.pos.z - lengthOf(giant) * 0.5 }; giant.yaw = 0; giant.brain!.goal = 'hunt'; giant.brain!.target = p.id; giant.brain!.detection.set(p.id, 3); giant.brain!.hunger = 999; giant.brain!.courage = 1; }

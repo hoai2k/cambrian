@@ -81,6 +81,39 @@ function pickWander(a: Actor, b: BrainState, rng: Rng, radius: number) {
  */
 export const peaceful = (p: Vec3) => nurseryFactor(p.x, p.z) > 0.35;
 
+/**
+ * Seconds a predator that has just picked a *player* spends stalking before it may strike.
+ *
+ * A player has to be able to see a hunt coming: the warning goes up the moment the hunt starts
+ * (`updateHunted` in game.ts), and this is the time it buys. Without it an animal that decided to
+ * hunt from close by went from "not interested" to jaws in about a second — a Triassic predator
+ * picking a player out from a body length away and eating it before the banner had drawn. Only a
+ * player is owed the tell; a bot or the sea's own animals are hunted as they always were.
+ */
+export const HUNT_TELL = 5;
+/** How much of its speed a stalker closes at while it tells. */
+export const STALK_PACE = 0.55;
+/** It holds off at this many times its striking reach while it tells, so it cannot land a blow. */
+export const STALK_OFF = 1.8;
+
+/** The tell a hunt on `t` is owed, in seconds (added to the hunt's give-up clock so it is not eaten). */
+export const tellFor = (t: Actor) => (t.controller === 'player' ? HUNT_TELL : 0);
+
+/**
+ * The stalk: while a hunt on a player is younger than its tell, close at `STALK_PACE`, hold off
+ * outside striking reach and do nothing else. Returns whether it wrote the frame.
+ */
+function stalking(b: BrainState, t: Actor, a: Actor, d: number, reach: number, out: InputFrame): boolean {
+  if (b.goalT >= tellFor(t)) return false;
+  const to = norm(sub(t.pos, a.pos));
+  const off = reach * STALK_OFF;
+  // Circle at the stand-off rather than parking: the head stays on the player, which is the tell.
+  if (d > off) out.worldMove = vscale(to, STALK_PACE);
+  else { const side = { x: -to.z, y: 0, z: to.x }; out.worldMove = add(vscale(side, 0.4), vscale(to, d < off * 0.8 ? -0.5 : 0)); }
+  out.burst = 0; out.light = false; out.heavy = false; out.ability = false; out.lock = true;
+  return true;
+}
+
 /** Detection score update for hunters (giants, predators). 10 Hz. */
 export function updateDetection(g: AiWorld, hunter: Actor, b: BrainState, dt: number) {
   const def = creature(hunter.creature);
@@ -437,8 +470,9 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     case 'hunt': {
       if (!t || !isAlive(t) || isHidden(t)) { b.goal = 'wander'; b.target = -1; break; }
       if ((peaceful(t.pos) && a.lastHitBy !== t.id) || (RULES?.sanctuary(a, t) && a.lastHitBy !== t.id)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 30); break; }
-      if (b.goalT > 9 || (t.cover > 0.45 && t.stillness > 0.8 && lengthOf(t) < L * 0.7)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; b.hunger = 0; pickWander(a, b, g.rng, 30); break; }
+      if (b.goalT > 9 + tellFor(t) || (t.cover > 0.45 && t.stillness > 0.8 && lengthOf(t) < L * 0.7)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; b.hunger = 0; pickWander(a, b, g.rng, 30); break; }
       const d = dist(a.pos, t.pos);
+      if (stalking(b, t, a, d, L * 0.9 + lengthOf(t) * 0.4, out)) break;
       const predicted = add(t.pos, vscale(t.vel, clamp(d / 8, 0, 0.6)));
       steerToward(a, predicted, out);
       out.burst = d > L * 2.5 && a.stamina > 20 ? 1 : 0;
@@ -669,13 +703,14 @@ export function thinkGiant(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       const d = dist(a.pos, cur.pos);
       // cannot get its head into dense cover: circles, then gives up
       if (cur.cover > 0.45 && d < L * 1.2) { b.goalT += dt * 2; const side = { x: -(cur.pos.z - a.pos.z), y: 0, z: cur.pos.x - a.pos.x }; out.worldMove = vscale(norm(side), 0.5); if (b.goalT > 14) { b.goal = 'search'; b.goalT = 0; b.target = -1; b.detection.set(cur.id, 0.3); } break; }
+      if (stalking(b, cur, a, d, L * 0.8 + lengthOf(cur) * 0.4, out)) break;
       const predicted = add(cur.pos, vscale(cur.vel, clamp(d / 10, 0, 0.6)));
       if (shadow) predicted.y = Math.max(predicted.y, LIGHT_WINDOW_Y - 1);
       steerToward(a, predicted, out);
       out.burst = d > L * 1.5 ? 1 : 0;
       // A giant's bite is the heavy: a visible wind-up you can dash out of.
       if (d < L * 0.8 + lengthOf(cur) * 0.4 && a.state === 'free') out.heavy = true;
-      if (b.goalT > 18) { b.goal = 'patrol'; b.target = -1; b.goalT = 0; b.hunger = 20; }
+      if (b.goalT > 18 + tellFor(cur)) { b.goal = 'patrol'; b.target = -1; b.goalT = 0; b.hunger = 20; }
       break;
     }
     case 'flee': {

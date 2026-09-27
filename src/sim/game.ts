@@ -3139,7 +3139,12 @@ export class Game implements AiWorld {
       const range = Math.min(creature(o.creature).sense * lengthOf(o) + 6, huge ? 70 : 40);
       // giants ramp with their detection score; smaller predators ramp with distance while actively chasing
       const noticing = o.brain.target === a.id && o.brain.goal === 'notice';
-      const score = clamp(huge ? Math.max(noticing ? 0.35 : 0, hunting ? Math.max(0.6, clamp(1.3 - d / range, 0.5, 1)) : Math.min(v / 4, 0.45)) : hunting ? clamp(1.1 - d / (range * 0.8), 0, 1) : 0, 0, 1);
+      // Anything bigger than you that has picked you out is a hunt on the banner from that moment,
+      // at any distance — the "hunting" line comes up at 0.5 and this starts at 0.6 — because the
+      // tell it then gives (`HUNT_TELL` in ai.ts) is only any use if the player has been told. A
+      // bigger predator that was not a giant used to ramp from nothing as it closed and reach the
+      // line a body length or two away, which is where it had already decided to bite.
+      const score = clamp(huge ? Math.max(noticing ? 0.35 : 0, hunting ? Math.max(0.6, clamp(1.3 - d / range, 0.5, 1)) : Math.min(v / 4, 0.45)) : hunting ? Math.max(0.6, clamp(1.1 - d / (range * 0.8), 0, 1)) : 0, 0, 1);
       if (score > best) { best = score; hunter = o.id; }
     }
     const wasHunted = a.hunted >= 0.98 || a.wasHunted;

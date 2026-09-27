@@ -2,7 +2,7 @@
 import { CORPSE_WINDOW, Game } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
 import { isAlive, lengthOf, bandOf } from '../src/sim/actors';
-import { makeBrain } from '../src/sim/ai';
+import { makeBrain, HUNT_TELL } from '../src/sim/ai';
 let failed = 0;
 const check = (n: string, ok: boolean, d: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(46)} ${d}`); if (!ok) failed++; };
 const run = (g: Game, f: InputFrame, steps: number, extra?: (i: number) => void) => { const m = new Map([[0, f]]); for (let i = 0; i < steps; i++) { extra?.(i); g.step(1 / 60, m); g.events.length = 0; } };
@@ -17,6 +17,9 @@ const fresh = (seed = 5) => { const g = new Game('reef', [{ creature: 'anomaloca
   const giant = g.spawn('anomalocaris', 'giant', { x: 60, y: 6, z: -27 }, 3.5); giant.brain = makeBrain('giant', giant.pos, g.rng);
   let bites = 0, frames = 0; const hp0 = p.hp;
   const m = new Map([[0, emptyInput()]]);
+  // The hunt has already been told (`HUNT_TELL`): what this measures is the kill, not the stalk
+  // that warns a player it is coming.
+  giant.brain!.goalT = HUNT_TELL;
   for (let i = 0; i < 60 * 30 && isAlive(p); i++) {
     giant.pos = { x: p.pos.x, y: p.pos.y, z: p.pos.z - lengthOf(giant) * 0.5 }; giant.yaw = 0; giant.brain!.goal = 'hunt'; giant.brain!.target = p.id; giant.brain!.detection.set(p.id, 3); giant.brain!.hunger = 999; giant.brain!.courage = 1;
     g.step(1 / 60, m); frames++;

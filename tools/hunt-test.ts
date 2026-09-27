@@ -195,6 +195,34 @@ for (const [creatureId, mode, scale] of [['waptia', 'rise', 0.25], ['anomalocari
     `band ${bandOf(q, peer)} hunted ${q.hunted.toFixed(2)}`);
 }
 
+// --- a hunt on a player is told before it strikes ---
+{
+  const { makeBrain, HUNT_TELL } = await import('../src/sim/ai');
+  // A predator half again your length that picks you out from a body length away. It used to go
+  // from "not interested" to jaws in about a second; now the banner goes up at once and it stalks
+  // for HUNT_TELL seconds before it may strike.
+  for (const scale of [1.6, 1.0]) {
+  const g = new Game('reef', [{ creature: 'opabinia', device: 'keyboard', ready: true }], 5);
+  const p = g.players[0]; p.scale = 1; applyScaleStats(p, false); p.pos = { ...OPEN }; p.spawnProtect = 0; p.hp = p.hpMax;
+  for (const o of [...g.actors]) if (o.controller !== 'player') g.remove(o);
+  const big = g.spawn('anomalocaris', 'ambient', { x: OPEN.x, y: OPEN.y, z: OPEN.z + 4 }, scale);
+  big.brain = makeBrain('needs', { ...big.pos }, g.rng, {});
+  big.brain.goal = 'hunt'; big.brain.target = p.id; big.brain.goalT = 0; big.brain.hunger = 999;
+  const band = bandOf(p, big);
+  const m = new Map([[0, { ...emptyInput() } as InputFrame]]);
+  let warnedAt = -1, struckAt = -1;
+  for (let i = 0; i < 60 * (HUNT_TELL + 6); i++) {
+    g.step(1 / 60, m); g.events.length = 0;
+    if (warnedAt < 0 && p.hunted >= 0.5) warnedAt = i / 60;
+    if (struckAt < 0 && (big.state === 'attack' || p.hp < p.hpMax)) struckAt = i / 60;
+    if (big.brain.goal !== 'hunt') { big.brain.goal = 'hunt'; big.brain.target = p.id; }   // hold it to the hunt under test
+  }
+  check('a bigger predator that picks you is on the banner at once', warnedAt >= 0 && warnedAt < 0.2, `band ${band}, warned at ${warnedAt.toFixed(2)} s`);
+  check(`...and does not strike for ${HUNT_TELL} s`, struckAt < 0 || struckAt >= HUNT_TELL - 0.05, `first strike at ${struckAt.toFixed(2)} s`);
+  check('...but does come for you after it', struckAt >= 0, `first strike at ${struckAt.toFixed(2)} s`);
+  }
+}
+
 // --- nothing in the sea swallows a player whole ---
 {
   // Taking a mouthful on contact is the player's own act and nobody else's: wildlife eats a swarm

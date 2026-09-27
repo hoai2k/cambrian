@@ -124,7 +124,16 @@ unless the user explicitly asks for a PR. Steps:
   it past the view cap: the cap is a frame-cost limit and must stay one, but what it cuts is the
   tail of the list, and a prey swarm is the tail — every member small on screen and most of them
   beside you. Weighting keeps a giant eighty units off ahead of the chaff and lifts what is within
-  reach above the small and far.
+  reach above the small and far. **And nothing on a threshold flickers** (`src/render/view-pick.ts`,
+  pure, `npm run views`): a body already drawn gets `SHOWN_SLACK` on the size floor and the far
+  limit and `SHOWN_RANK` in the queue, so a school at the edge of the floor or a giant at the edge
+  of the fog is no longer drawn and dropped on alternate frames; the far limit is **where the fog
+  has taken 95 % of a body** (`drawDistance`, `FOG_GONE / density`) rather than a flat 130 units,
+  because the fog thins as the animal you play grows and a seventeen-unit ichthyosaur at 135 was
+  still two thirds through the haze when it popped out; past the head-count cap bodies are drawn
+  at reduced detail up to `OVERFLOW` times the cap rather than not at all; and a change of detail
+  keeps the old view until the new copy is resident, where it used to dispose first and leave the
+  body missing until the download landed.
 - The renderer interpolates between fixed simulation steps using each actor's `prevT` snapshot,
   so anything that moves an actor by more than it could swim in one step (teleport, respawn)
   must read as a jump. `tools/motion-test.ts` guards this.
@@ -1487,6 +1496,16 @@ unless the user explicitly asks for a PR. Steps:
   cleared where death is actually handled, in `kill` and `startSwallow` in `src/sim/combat.ts`
   (a body in something's mouth has stopped being chased too), rather than by a guard in
   `updateHunted` that nothing would reach. `npm run hunt` holds both.
+- **A hunt on a player is told before it strikes** (`HUNT_TELL`, five seconds, `stalking` in
+  `src/sim/ai.ts`). A predator that picked a player out from close by went from not interested to
+  jaws in about a second, so the warning, however early, was never going to be read. Now anything
+  bigger than you that picks you is on the banner at once and at any distance (`updateHunted`
+  floors a hunt at 0.6 for the threat band as it already did for giants), and for its first
+  `HUNT_TELL` seconds it stalks: closes at `STALK_PACE`, circles at `STALK_OFF` times its striking
+  reach with its head on you, and neither sprints nor strikes. Needs brains and giants both, and
+  the tell is added to each one's give-up clock so it is not taken out of the chase. Only a player
+  is owed it; anything the player bites first is a fight, not a hunt, and gets no tell. `npm run
+  hunt` holds it at two sizes.
 - A warning is about intent, never about size. The colour of a band marker and of a radar contact is
   red only for a body that is actually coming for you (`comingFor` in `src/sim/actors.ts`: hunting,
   fighting or seeing you off its ground — and for a steered body, aiming at you); everything else is

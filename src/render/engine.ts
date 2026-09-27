@@ -1,6 +1,7 @@
 import { ACTIVE_ERA } from '../content';
 import { BURROWERS, hideLabel } from '../sim/concealment';
 import * as THREE from 'three';
+import { drawable, drawDistance, OVERFLOW, viewRank } from './view-pick';
 import { audio, SAMPLES } from '../audio/audio';
 import { distanceAtten, hugeLength } from '../audio/mix';
 import { applyMouse, emptyControls, gamepads, KeyboardInput, MousePlay, readGamepad, rumble, type RawControls } from '../input/input';
@@ -306,7 +307,6 @@ export function edgePitch(ndcY: number): number {
   return -Math.sign(ndcY) * k * k * EDGE_RATE;
 }
 /** How much a body inside the near field outranks one the same apparent size further off. */
-const NEAR_RANK = 3;
 /** 1 at a full-width view, falling off for a narrow one; never less than a third of the shift. */
 export const aimRoom = (aspect: number) => clamp(aspect / 1.6, 0.34, 1);
 export const PITCH_UP = -0.95;   // ~54° above the horizon
@@ -1384,18 +1384,29 @@ export class Engine {
      */
     const nearAlways = game.players.reduce(
       (m, p) => Math.max(m, magnificationDistance(p ? lengthOf(p) : 1) * 1.8 + 10), 22);
-    const candidates: { a: Actor; d: number; size: number }[] = [];
+    // How far a body can be drawn is how far the water lets you see, not a fixed number. The limit
+    // was 130 units (90 with three or four players), and the fog thins as the animal you play grows:
+    // playing a big Triassic reptile, a seventeen-unit ichthyosaur at 135 was still two thirds
+    // through the haze and large on screen, and it popped out of existence as it crossed the line. Past `FOG_GONE` the exponential fog
+    // has taken 95 % of it, which is where the eye has lost it anyway.
+    const fog = this.scene.fog as THREE.FogExp2 | null;
+    const seeTo = drawDistance(fog?.density ?? 0, players);
+    const candidates: { a: Actor; d: number; size: number; shown: boolean }[] = [];
     for (const a of game.actors) {
       const d = Math.max(0.5, nearDist(a));
       const size = lengthOf(a) / d;
-      if (a.controller === 'player' || d < nearAlways || (d < (players > 2 ? 90 : 130) && size > 0.011)) candidates.push({ a, d, size });
+      const shown = this.views.has(a.id);
+      if (drawable(d, size, seeTo, nearAlways, shown, a.controller === 'player')) candidates.push({ a, d, size, shown });
     }
     // Ranked by apparent size, with the near field weighted up rather than let past the cap: the
     // cap is a frame-cost limit and must stay one, but what it cuts is the *tail* of the list —
     // which is exactly a prey swarm, every member small on screen and most of them right beside
     // you. Weighting keeps a giant eighty units off (the thing that matters most at any moment)
     // ahead of the chaff while lifting what is within reach above the small and far.
-    candidates.sort((x, y) => y.size * (y.d < nearAlways ? NEAR_RANK : 1) - x.size * (x.d < nearAlways ? NEAR_RANK : 1));
+    // ...and a body already drawn ranks a little higher than a new one of the same size, so two
+    // near the cap do not trade places every frame.
+    const rank = (c: typeof candidates[number]) => viewRank(c.size, c.d, nearAlways, c.shown);
+    candidates.sort((x, y) => rank(y) - rank(x));
     const cap = Math.round((this.conserveMemory ? 32 : this.quality === 'high' ? 88 : 56) / (0.6 + 0.4 * players));
     // Full-detail bodies are the most expensive thing in the frame — they are skinned on the CPU
     // and drawn again into the shadow map, once per viewport — and how expensive depends entirely
@@ -1405,15 +1416,20 @@ export class Engine {
     // instead: biggest-on-screen first, everything past it takes the decimated copy.
     const budget = (this.quality === 'high' ? 700_000 : 320_000) / (0.6 + 0.4 * players);
     let spent = 0, count = 0;
+    // Past the cap a body is drawn at reduced detail rather than not drawn: the cap was cutting the
+    // tail of the list, which is a prey swarm right beside you. The decimated copy is what the far
+    // field is drawn with anyway, and the overflow is bounded so the frame cost still is.
+    const overflow = Math.round(cap * OVERFLOW);
     for (const { a, d } of candidates) {
-      if (count >= cap && a.controller !== 'player') break;
+      if (count >= overflow && a.controller !== 'player') break;
+      const pastCap = count >= cap && a.controller !== 'player';
       // Pick a detail level from apparent size, with hysteresis so it cannot flicker at the boundary.
       let v = this.views.get(a.id);
       const size = lengthOf(a) / d;
       let wantLod: Lod = a.controller === 'player' ? 0 : v ? (v.lod === 0 ? (size < 0.05 ? 1 : 0) : (size > 0.075 ? 0 : 1)) : (size < 0.06 ? 1 : 0);
       // On low-quality touch play in the large-model eras, keep full skinned bodies for players
       // only. The NPCs use decimated copies so a long match does not retain the whole roster.
-      if (this.conserveMemory && a.controller !== 'player') wantLod = 1;
+      if ((this.conserveMemory || pastCap) && a.controller !== 'player') wantLod = 1;
       // The budget only ever demotes: your own body, and anything already at full detail whose
       // share is still affordable, keep it.
       const full = loadedSync(a.creature, 0);
@@ -1429,6 +1445,13 @@ export class Engine {
       }
       // A view is built for one creature at one detail level. Both can change under it: the level
       // with distance, and the creature itself when a player changes body mid-match.
+      // A change of detail waits for the new copy to be resident. It used to throw the old view
+      // away first and build the new one only once it had loaded, so a body changing detail
+      // before its other copy had arrived simply vanished until the download landed.
+      if (v && v.creatureId === a.creature && v.lod !== wantLod && !loadedSync(a.creature, wantLod)) {
+        void ensureLoaded(a.creature, undefined, wantLod);
+        wantLod = v.lod;
+      }
       if (v && (v.lod !== wantLod || v.creatureId !== a.creature)) { v.dispose(); this.views.delete(a.id); v = undefined; }
       if (!v) {
         const loaded = loadedSync(a.creature, wantLod);
