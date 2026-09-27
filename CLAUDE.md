@@ -395,7 +395,7 @@ unless the user explicitly asks for a PR. Steps:
   their own. Two things about paper: a player's colour is mixed toward the ink (`--pc`) wherever it
   is drawn, because colours chosen to read on a dark sea do not read on parchment; and a portrait is
   `mix-blend-mode: multiply` with a little sepia, so a render prints *into* the page rather than
-  sitting on it. Each era keeps its own second ink (`[data-era]`). `?plate=0` still reaches the old
+  sitting on it. Each era keeps its own second ink (`[data-era]`), but a seat's own marks — its figure's frame and name, its seal or stamp — are in that seat's colour, so two players can tell their picks apart at a glance. `?plate=0` still reaches the old
   panel for comparison and nothing offers it. The face is IM Fell English, self-hosted beside the
   other two (OFL). A mode with no painting borrows one (`src/shared/mode-art.ts`: Survival wears the
   retired Hunted art), through one helper so the preloader fetches the picture the chip draws.
