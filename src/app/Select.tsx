@@ -14,6 +14,7 @@ import { btn, fillControls, key, type Scheme } from '../shared/controls';
 import { fillOf, ladderName, rungOf } from '../sim/ladder';
 import { gridColumns, rosterGrid, sameSlot, type ExtraId, type Slot } from './roster-grid';
 import { ERA_NAME, type EraId } from '../content/visitors';
+import { carouselView, gridFits, pickerSideBySide, rosterArea, type Box, type Layout } from '../shared/small-screen';
 import { TEXT } from '../shared/text';
 
 interface Props {
@@ -40,6 +41,12 @@ interface Props {
    * rather than into tiles too small to read.
    */
   maxCols: number;
+  /** How much room the window has: the carousel is only ever a compact window's answer. */
+  layout: Layout;
+  /** Step a seat's cursor through the roster in reading order — the carousel's arrows and swipes. */
+  onStep: (i: number, dir: 1 | -1) => void;
+  /** Tell the shell which view is on screen, so the arrow keys and the sticks walk it the same way. */
+  onView: (carousel: boolean) => void;
   /** How many animals this device has earned from the other games. */
   visitorCount: number;
   /**
@@ -205,14 +212,104 @@ export function SelectScreen(p: Props) {
   const grid = rosterGrid(CREATURES.map((c) => c.id), p.extras, p.maxCols);
   const cols = grid.cols;
   const compact = p.players.length >= 3;
+  /*
+   * Whether the grid fits, asked of the space it would actually be given. `.pick-layout` is sized by
+   * the screen's own grid rows rather than by what is inside it, so measuring it is the same answer
+   * in either view and switching cannot change the question that caused the switch.
+   */
+  const pickRef = useRef<HTMLDivElement>(null);
+  const [picker, setPicker] = useState<Box | null>(null);
+  useLayoutEffect(() => {
+    const el = pickRef.current; if (!el) return;
+    const read = () => { const r = el.getBoundingClientRect(); setPicker((was) => (was && was.w === r.width && was.h === r.height ? was : { w: r.width, h: r.height })); };
+    read();
+    const ro = new ResizeObserver(read); ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const fits = !picker || gridFits(grid.cells.length, rosterArea(picker, pickerSideBySide(window.innerWidth, window.innerHeight)), p.maxCols);
+  const carousel = carouselView(p.layout, p.players.length, fits);
+  const onView = p.onView;
+  useEffect(() => { onView(carousel); }, [carousel, onView]);
   // Controllers the game can see that have not joined yet, and joined players whose controller
   // has since gone away (an Xbox pad that went to sleep looks exactly like an unplugged one).
   const joined = new Set(p.players.map((pl) => pl.device));
   const waiting = p.padIndices.filter((i) => !joined.has(i));
   /** Nobody is on the keyboard yet, so it is still a way in. Only ever one player deep. */
   const keyboardFree = !p.players.some((pl) => typeof pl.device === 'string');
+  /** One seat's card. Drawn beside the grid, or as the carousel's whole stage. */
+  const renderCard = (pl: PlayerSetup, i: number, phantom = false) => {
+            const def = creature(pl.creature);
+            // The bars describe the fighter and must not move with the sizing option; the length
+            // beside the locality is what the sizing actually changes, so that is where it shows —
+            // and only while the roster is at those lengths.
+            const bars = authoredCreature(pl.creature);
+            const cm = naturalSizing() ? realCm(pl.creature) : undefined;
+            return (
+              <article key={i} className={`crew-card ${pl.ready ? 'ready' : ''}`} style={{ ['--player' as string]: PLAYER_COLORS[i] }}>
+                {pl.ready && <span key={'fx' + pl.creature} className="lock-fx" aria-hidden="true" />}
+                <div className="crew-top">
+                  <span className="player-chip">{TEXT.common.playerChip(i + 1)}</span>
+                  {/* Which thing this seat is steered by. The touch seat has to be named as itself:
+                      it used to fall through to the controller branch, which drew a pad icon, called
+                      it "Controller touch1" and — since `padIndices` never contains a string — marked
+                      it *disconnected*, on the one device that cannot be. */}
+                  <span className="device">{
+                    pl.device === 'keyboard' ? <><KeyboardIcon width={16} height={16} /> {C.keyboard1}</>
+                      : pl.device === 'keyboard2' ? <><KeyboardIcon width={16} height={16} /> {C.keyboard2}</>
+                      : pl.device === 'touch' ? <><TouchIcon width={16} height={16} /> {C.touch}</>
+                      : <><PadIcon width={16} height={16} /> {C.controller((pl.device as number) + 1)}{!p.padIndices.includes(pl.device as number) && <em className="gone">{C.disconnected}</em>}</>
+                  }</span>
+                  {!phantom && <button className="remove" aria-label={C.removePlayer(i + 1)} onClick={() => p.onRemove(i)}>×</button>}
+                </div>
+                <div className="hero">
+                  {/* A seat drawn in another palette because it is the second on this creature shows
+                      that palette here, so a player knows which animal in the water is theirs before
+                      the match starts. Falls back to the authored render where no portrait has been
+                      baked for the scheme, which is most of them. */}
+                  <CreaturePortrait key={`${def.id}:${pl.scheme ?? ''}`} creatureId={def.id} kind="select" schemeId={pl.scheme} assetBase={ASSETS} alt={C.portraitAlt(def.name)} draggable={false} />
+                </div>
+                <CopyBox>
+                  <span className="role">{def.ground ? TEXT.common.seafloor : TEXT.common.swimmer} · {def.role}</span>
+                  <h2>{def.name}</h2>
+                  <small className="provenance">{def.kind && <b className="kind">{def.kind}</b>}{def.species} · {def.provenance ?? def.locality ?? C.defaultLocality}{cm != null && <> · <b className="real-size">{C.realSize(cm)}</b></>}</small>
+                  <p className="tagline">{def.tagline}</p>
+                  {/* A visitor is not this game's animal and does not carry this game's record, so
+                      the growth badge has nothing to say about it. What it says instead is where the
+                      animal is from and how to look through the others you have earned. */}
+                  {pl.visitorScale
+                    ? <p className="visitor-note">{C.visitorNote(p.visitorOrigin?.(pl.creature) ?? ERA_NAME.devonian)}</p>
+                    : <BestRun mark={p.best[def.id]} carrying={!!p.carry[i]} rise={p.mode === 'rise' || p.mode === 'survival'} scheme={s} onToggle={() => p.onCarry(i)} />}
+                  {!compact && (
+                    <>
+                      <div className="stats">
+                        <Stat label={C.statSpeed} v={stat(bars.speed * bars.burst, 14.6)} />
+                        <Stat label={C.statPower} v={stat(bars.heavy.damage, 26)} />
+                        <Stat label={C.statArmor} v={stat(bars.hp * (1 + bars.defense), 233)} />
+                        <Stat label={C.statAgility} v={stat(bars.agility + bars.turnRate, 8.6)} />
+                      </div>
+                      {def.kindNote && <p className="kind-note">{def.kindNote}</p>}
+                      <dl className="kit">
+                        <div><dt>{key('heavy', s)}</dt><dd>{HEAVY_SPECIALS.has(def.ability) ? def.abilityName : def.heavy.name}</dd></div>
+                        <div><dt>{key('guard', s)}</dt><dd>{DEFENSIVE_SPECIALS.has(def.ability) ? def.abilityName : def.canGuard ? C.blockParry : C.evade}</dd></div>
+                        <div><dt>{key('ability', s)}</dt><dd><b>{RULES?.ySpecial(def.id)?.name ?? hideLabel(def.id)}.</b> {fillControls(RULES?.ySpecial(def.id)?.desc ?? hideDescription(def.id), s)}</dd></div>
+                        <div><dt>{C.passiveMark}</dt><dd>{def.passive}</dd></div>
+                        <div><dt>{C.weaknessMark}</dt><dd>{def.weakness}</dd></div>
+                      </dl>
+                    </>
+                  )}
+                </CopyBox>
+                {/* A phantom card is the carousel's, shown before anybody has a seat (arriving from
+                    another game's picker): locking it in is the gesture that takes the seat, on the
+                    animal on the card, exactly as a tap on a grid tile would. */}
+                <button className="ready-button" aria-pressed={pl.ready} onClick={() => { if (phantom) p.onPick(i, pl.creature); p.onReady(i); }}>
+                  {pl.ready ? <><CheckIcon width={18} height={18} /> {C.lockedIn(key('confirm', s).toUpperCase())}</> : C.lockIn(key('confirm', s).toUpperCase())}
+                </button>
+              </article>
+            );
+  };
+
   return (
-    <section className="select" aria-label={T.screenLabel}>
+    <section className={`select ${carousel ? 'select-carousel' : ''}`} aria-label={T.screenLabel}>
       <header className="select-header">
         <BrandHeader onBack={p.onBack} />
         <div className="mode-picker" role="tablist" aria-label={T.modePickerLabel}>
@@ -226,7 +323,8 @@ export function SelectScreen(p: Props) {
         <p className="mode-blurb">{p.modeInfo[p.mode].blurb} <span className="dim">{T.modeSwitchHint(btn('modePrev', s), btn('modeNext', s))}</span></p>
       </header>
 
-      <div className="pick-layout">
+      <div className="pick-layout" ref={pickRef}>
+        {carousel ? <RosterCarousel p={p} grid={grid} renderCard={renderCard} /> : <>
         {/* ---- roster grid ---- */}
         <div className={`roster-grid ${cols >= 6 ? 'dense' : ''}`} role="listbox" aria-label={T.rosterLabel} style={{ ['--cols' as string]: cols }}>
           {CREATURES.map((c) => {
@@ -284,73 +382,7 @@ export function SelectScreen(p: Props) {
 
         {/* ---- player cards ---- */}
         <div className={`crew crew-${p.players.length} ${compact ? 'compact' : ''}`}>
-          {p.players.map((pl, i) => {
-            const def = creature(pl.creature);
-            // The bars describe the fighter and must not move with the sizing option; the length
-            // beside the locality is what the sizing actually changes, so that is where it shows —
-            // and only while the roster is at those lengths.
-            const bars = authoredCreature(pl.creature);
-            const cm = naturalSizing() ? realCm(pl.creature) : undefined;
-            return (
-              <article key={i} className={`crew-card ${pl.ready ? 'ready' : ''}`} style={{ ['--player' as string]: PLAYER_COLORS[i] }}>
-                {pl.ready && <span key={'fx' + pl.creature} className="lock-fx" aria-hidden="true" />}
-                <div className="crew-top">
-                  <span className="player-chip">{TEXT.common.playerChip(i + 1)}</span>
-                  {/* Which thing this seat is steered by. The touch seat has to be named as itself:
-                      it used to fall through to the controller branch, which drew a pad icon, called
-                      it "Controller touch1" and — since `padIndices` never contains a string — marked
-                      it *disconnected*, on the one device that cannot be. */}
-                  <span className="device">{
-                    pl.device === 'keyboard' ? <><KeyboardIcon width={16} height={16} /> {C.keyboard1}</>
-                      : pl.device === 'keyboard2' ? <><KeyboardIcon width={16} height={16} /> {C.keyboard2}</>
-                      : pl.device === 'touch' ? <><TouchIcon width={16} height={16} /> {C.touch}</>
-                      : <><PadIcon width={16} height={16} /> {C.controller((pl.device as number) + 1)}{!p.padIndices.includes(pl.device as number) && <em className="gone">{C.disconnected}</em>}</>
-                  }</span>
-                  <button className="remove" aria-label={C.removePlayer(i + 1)} onClick={() => p.onRemove(i)}>×</button>
-                </div>
-                <div className="hero">
-                  {/* A seat drawn in another palette because it is the second on this creature shows
-                      that palette here, so a player knows which animal in the water is theirs before
-                      the match starts. Falls back to the authored render where no portrait has been
-                      baked for the scheme, which is most of them. */}
-                  <CreaturePortrait key={`${def.id}:${pl.scheme ?? ''}`} creatureId={def.id} kind="select" schemeId={pl.scheme} assetBase={ASSETS} alt={C.portraitAlt(def.name)} draggable={false} />
-                </div>
-                <CopyBox>
-                  <span className="role">{def.ground ? TEXT.common.seafloor : TEXT.common.swimmer} · {def.role}</span>
-                  <h2>{def.name}</h2>
-                  <small className="provenance">{def.kind && <b className="kind">{def.kind}</b>}{def.species} · {def.provenance ?? def.locality ?? C.defaultLocality}{cm != null && <> · <b className="real-size">{C.realSize(cm)}</b></>}</small>
-                  <p className="tagline">{def.tagline}</p>
-                  {/* A visitor is not this game's animal and does not carry this game's record, so
-                      the growth badge has nothing to say about it. What it says instead is where the
-                      animal is from and how to look through the others you have earned. */}
-                  {pl.visitorScale
-                    ? <p className="visitor-note">{C.visitorNote(p.visitorOrigin?.(pl.creature) ?? ERA_NAME.devonian)}</p>
-                    : <BestRun mark={p.best[def.id]} carrying={!!p.carry[i]} rise={p.mode === 'rise' || p.mode === 'survival'} scheme={s} onToggle={() => p.onCarry(i)} />}
-                  {!compact && (
-                    <>
-                      <div className="stats">
-                        <Stat label={C.statSpeed} v={stat(bars.speed * bars.burst, 14.6)} />
-                        <Stat label={C.statPower} v={stat(bars.heavy.damage, 26)} />
-                        <Stat label={C.statArmor} v={stat(bars.hp * (1 + bars.defense), 233)} />
-                        <Stat label={C.statAgility} v={stat(bars.agility + bars.turnRate, 8.6)} />
-                      </div>
-                      {def.kindNote && <p className="kind-note">{def.kindNote}</p>}
-                      <dl className="kit">
-                        <div><dt>{key('heavy', s)}</dt><dd>{HEAVY_SPECIALS.has(def.ability) ? def.abilityName : def.heavy.name}</dd></div>
-                        <div><dt>{key('guard', s)}</dt><dd>{DEFENSIVE_SPECIALS.has(def.ability) ? def.abilityName : def.canGuard ? C.blockParry : C.evade}</dd></div>
-                        <div><dt>{key('ability', s)}</dt><dd><b>{RULES?.ySpecial(def.id)?.name ?? hideLabel(def.id)}.</b> {fillControls(RULES?.ySpecial(def.id)?.desc ?? hideDescription(def.id), s)}</dd></div>
-                        <div><dt>{C.passiveMark}</dt><dd>{def.passive}</dd></div>
-                        <div><dt>{C.weaknessMark}</dt><dd>{def.weakness}</dd></div>
-                      </dl>
-                    </>
-                  )}
-                </CopyBox>
-                <button className="ready-button" aria-pressed={pl.ready} onClick={() => p.onReady(i)}>
-                  {pl.ready ? <><CheckIcon width={18} height={18} /> {C.lockedIn(key('confirm', s).toUpperCase())}</> : C.lockIn(key('confirm', s).toUpperCase())}
-                </button>
-              </article>
-            );
-          })}
+          {p.players.map((pl, i) => renderCard(pl, i))}
           {p.players.length < 4 && (
             /*
              * One line, and only the line that is true. There is never more than one keyboard
@@ -363,6 +395,7 @@ export function SelectScreen(p: Props) {
             </div>
           )}
         </div>
+        </>}
       </div>
 
       <footer className="select-footer">
@@ -412,5 +445,92 @@ const MODE_NAME = ACTIVE_ERA.modes.find((m) => m.id === 'rise')?.name ?? TEXT.si
 function Stat({ label, v }: { label: string; v: number }) {
   return (
     <span className="stat"><small>{label}</small><i>{Array.from({ length: 5 }, (_, k) => <b key={k} className={k < v ? 'on' : ''} />)}</i></span>
+  );
+}
+
+/**
+ * The roster one hero card at a time, for a screen too small to hold the grid.
+ *
+ * It is the grid laid end to end, not a second roster: the order is the grid model's own reading
+ * order (`grid.cells`, creatures and then the Random and Visitors buttons where they stand), the
+ * card on stage is wherever the seat's cursor already is, and every step goes through the same
+ * `moveCursor` the grid's arrow keys use — so a pad, the arrow keys, the arrows on screen and a swipe
+ * all walk one list and cannot disagree about what comes next. The card is the crew card the grid
+ * draws beside itself, portrait, copy, Lock In and all, because on a phone the grid's tiles and the
+ * card beside them were two views of one choice and there is room for exactly one.
+ *
+ * One seat: a phone is played by one person, and `carouselView` hands the screen back to the grid
+ * the moment a second player joins.
+ */
+function RosterCarousel({ p, grid, renderCard }: {
+  p: Props;
+  grid: ReturnType<typeof rosterGrid>;
+  renderCard: (pl: PlayerSetup, i: number, phantom?: boolean) => ReactNode;
+}) {
+  const K = T.carousel;
+  const seat = p.players[0];
+  const order = grid.cells.map((c) => c.slot);
+  // Where the card is: the seat's cursor, or — with nobody seated yet — the era's default animal.
+  const here: Slot = seat?.cursor ? { kind: 'extra', id: seat.cursor } : { kind: 'creature', id: seat?.creature ?? ACTIVE_ERA.defaults.player };
+  const at = Math.max(0, order.findIndex((s) => sameSlot(s, here)));
+  const slot = order[at] ?? here;
+  const step = (dir: 1 | -1) => {
+    if (seat) { p.onStep(0, dir); return; }
+    // Nobody seated: walking the roster is how the seat is taken, on the animal walked to. The
+    // buttons need a seat to press them for, so they are stepped over until there is one.
+    for (let k = 1; k <= order.length; k++) {
+      const next = order[(at + dir * k + order.length * k) % order.length];
+      if (next.kind === 'creature') { p.onPick(0, next.id as CreatureId); return; }
+    }
+  };
+  /*
+   * A swipe is a horizontal travel past `SWIPE` that is mostly horizontal, so the card's copy can
+   * still be scrolled up and down with the same thumb (`touch-action: pan-y` on the stage). It fires
+   * on the lift and swallows the click that would otherwise follow on whatever button the finger
+   * happened to start on — a swipe that began over Lock In is a swipe, not a lock-in.
+   */
+  const SWIPE = 44;
+  const press = useRef<{ x: number; y: number } | null>(null);
+  const swiped = useRef(false);
+  // A locked visitor is an animal on stage whatever the cursor says: its arrows walk the visitors.
+  const showCard = slot.kind === 'creature' || (seat?.cursor === 'visitors' && seat.ready);
+  const cardPl: PlayerSetup = seat ?? { creature: (slot.kind === 'creature' ? slot.id : ACTIVE_ERA.defaults.player) as CreatureId, device: 'touch', ready: false };
+  return (
+    <div className="carousel" role="group" aria-roledescription="carousel" aria-label={K.label}>
+      <button className="carousel-step prev" aria-label={K.prev} onClick={() => step(-1)}><span aria-hidden="true">‹</span></button>
+      <div
+        className="carousel-stage"
+        onPointerDown={(e) => { press.current = { x: e.clientX, y: e.clientY }; swiped.current = false; }}
+        onPointerUp={(e) => {
+          const d = press.current; press.current = null; if (!d) return;
+          const dx = e.clientX - d.x, dy = e.clientY - d.y;
+          if (Math.abs(dx) > SWIPE && Math.abs(dx) > Math.abs(dy) * 1.4) { swiped.current = true; step(dx < 0 ? 1 : -1); }
+        }}
+        onPointerCancel={() => { press.current = null; }}
+        onClickCapture={(e) => { if (swiped.current) { e.stopPropagation(); e.preventDefault(); swiped.current = false; } }}
+      >
+        {showCard
+          ? <div className="carousel-card" key={seat?.creature ?? cardPl.creature}>{renderCard(cardPl, 0, !seat)}</div>
+          : <ExtraCard id={slot.id as ExtraId} count={p.visitorCount} onTake={() => p.onExtra(0, slot.id as ExtraId)} />}
+      </div>
+      <button className="carousel-step next" aria-label={K.next} onClick={() => step(1)}><span aria-hidden="true">›</span></button>
+      <div className="carousel-foot" aria-live="polite">
+        <span className="carousel-dots" aria-hidden="true">{order.map((o, k) => <i key={k} className={`${k === at ? 'on' : ''} ${o.kind === 'extra' ? 'extra' : ''}`} />)}</span>
+        <span className="carousel-count">{K.count(at + 1, order.length)}</span>
+      </div>
+    </div>
+  );
+}
+
+/** Random or Visitors, as a whole card: there is no animal on it, so its one action is to take it. */
+function ExtraCard({ id, count, onTake }: { id: ExtraId; count: number; onTake: () => void }) {
+  const label = EXTRA_LABEL[id];
+  return (
+    <article className={`carousel-extra extra-${id}`}>
+      <span className="extra-glyph" aria-hidden="true">{label.glyph}</span>
+      <h2>{label.name}{id === 'visitors' && count > 0 && <span className="extra-count">{count}</span>}</h2>
+      <p>{label.title}</p>
+      <button className="ready-button" onClick={onTake}>{T.carousel.take}</button>
+    </article>
   );
 }

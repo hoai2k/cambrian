@@ -374,6 +374,16 @@ unless the user explicitly asks for a PR. Steps:
   threaded through the pure model rather than done in CSS because **three places have to agree about
   the number** — the screen that draws the grid, the cursor that walks it and the loader that guesses
   which portraits are wanted next — which is the whole reason `roster-grid.ts` is a model.
+- **A choice screen the grid will not fit shows one hero card at a time** (`carouselView` in
+  `src/shared/small-screen.ts`, `RosterCarousel` in `Select.tsx`). Whether it fits is *measured*:
+  `gridFits` lays the grid out as the stylesheet does inside `rosterArea` of the measured
+  `.pick-layout` — which is sized by the screen's grid rows and not its contents, so the answer is the
+  same in either view and cannot flip itself — rather than naming a breakpoint, so the same phone
+  holds a short roster and not a long one. Compact windows only, and **one seat only**: a second
+  player hands the grid back. It is the grid laid end to end, never a second roster — the grid
+  model's reading order, the seat's own cursor, the same `moveCursor` (up and down become left and
+  right) — and its card is the crew card, lifted into `renderCard` so both views draw one card.
+  `npm run touch` holds the decision, `node tools/carousel-browser.mjs` the three games at phone size.
 - **A narrow window is where you finally see the bugs a wide one hides.** Two of the worst things the
   compact layout turned up were not about touch at all. **Every centred HUD panel was off-centre**:
   `.hint`, `.grip-panel`, `.notice`, `.threat-alert` and `.death-note` are `left: 50%` plus

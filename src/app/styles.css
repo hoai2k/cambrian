@@ -1247,3 +1247,77 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .hunger-note.starving { color: var(--ember); font-weight: 600; }
 @keyframes hunger-flash { 50% { opacity: .45; } }
 @media (prefers-reduced-motion: reduce) { .bar.hunger.low i, .bar.hunger.starving { animation: none; } }
+
+/* ---------- The carousel: one hero card at a time ---------- */
+/*
+ * What a screen too small for the grid shows instead (`carouselView`). It is keyed on its own class
+ * rather than on a media query because the decision is not a size: it is whether *this roster* fits
+ * *this picker*, which only the screen that measured it knows.
+ *
+ * The picker stops being a two-part layout — there is one thing in it now — and the rules the
+ * compact layout wrote for a stacked roster and a sticky card are all undone here, because they
+ * were about sharing the screen between two blocks and there is only one.
+ */
+.select-carousel .pick-layout { display: block; overflow: hidden; padding: 4px 0; }
+.carousel {
+  height: 100%; min-height: 0;
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: minmax(0, 1fr) auto;
+  align-items: center; gap: 6px 8px;
+}
+.carousel-stage { grid-row: 1; grid-column: 2; height: 100%; min-height: 0; touch-action: pan-y; }
+.carousel-card { height: 100%; animation: carousel-in .22s ease-out both; }
+@keyframes carousel-in { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .carousel-card { animation: none; } }
+.carousel .crew-card { height: 100%; max-height: none; min-height: 0; }
+/* The arrows are thumb-sized and sit either side of the card, so a player who does not know the
+   card can be swiped still sees at once that there is more roster to either side. */
+.carousel-step {
+  grid-row: 1; width: 40px; height: 64px; border-radius: 14px;
+  border: 1px solid rgba(238,250,246,.2); background: rgba(6,22,28,.55); backdrop-filter: blur(8px);
+  color: var(--foam); font: 400 30px/1 var(--font-display); display: grid; place-items: center;
+}
+.carousel-step.prev { grid-column: 1; }
+.carousel-step.next { grid-column: 3; }
+.carousel-step:active { transform: scale(.94); }
+.carousel-foot { grid-row: 2; grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 16px; }
+.carousel-dots { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; max-width: 72%; }
+.carousel-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(238,250,246,.25); transition: background .15s, transform .15s; }
+.carousel-dots i.extra { border-radius: 1px; }
+.carousel-dots i.on { background: var(--player, var(--lagoon)); transform: scale(1.35); }
+.carousel-count { font: 700 11px var(--font-display); letter-spacing: .12em; color: var(--dim); white-space: nowrap; }
+
+/* An extra's card: Random or Visitors, as big as an animal's so it reads as a stop in the roster. */
+.carousel-extra {
+  /* A flex column, not a grid: the extras' glyph and name carry grid placement from the tile they
+     are drawn in on the grid, which laid this card out in two columns. */
+  height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 18px; text-align: center;
+  border-radius: var(--radius); border: 1px dashed rgba(238,250,246,.3); background: rgba(6,22,28,.62); backdrop-filter: blur(16px);
+  animation: carousel-in .22s ease-out both;
+}
+.carousel-extra .extra-glyph { position: static; grid-area: auto; font-size: 64px; line-height: 1; color: var(--ember); }
+.carousel-extra h2 { font-size: 22px; display: flex; gap: 8px; align-items: center; }
+.carousel-extra p { margin: 0; color: var(--mist); max-width: 26em; font-size: 13px; }
+.carousel-extra .ready-button { max-width: none; }
+
+/* Held upright there is a whole screen of height for one card, so the kit and the tagline the compact
+   layout hid to share the screen with a grid come back: this is the only place the animal is told. */
+@media (orientation: portrait) {
+  .select-carousel .creature-copy .kit, .select-carousel .creature-copy .tagline { display: grid; }
+  .select-carousel .creature-copy .tagline { display: block; }
+  .select-carousel .creature-copy .stats { display: grid; }
+  .select-carousel .crew-card { grid-template-rows: auto minmax(120px, 34%) minmax(0, 1fr); }
+}
+/* On its side the card lies down too: picture, copy and Lock In in one row under the seat line,
+   because 360 pixels cannot hold them stacked. */
+@media (orientation: landscape) and (max-height: 539px) {
+  .select-carousel .crew-card {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr) auto;
+    grid-template-areas: 'top top top' 'hero copy btn';
+    grid-template-rows: auto minmax(0, 1fr);
+    align-items: center;
+  }
+  .select-carousel .crew-card .hero { height: 100%; min-height: 0; }
+  .select-carousel .crew-card .creature-copy { align-self: stretch; }
+  .select-carousel .creature-copy .tagline { display: block; }
+  .carousel-step { height: 52px; width: 36px; }
+}

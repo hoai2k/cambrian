@@ -223,6 +223,39 @@ no amount of scrolling makes a stacked roster and a stacked crew card fit, so th
 over the roster. Keyed on the **aspect ratio** rather than a width, because it is the shape that
 decides: 780×360 and 1400×420 want the same thing and no single width tells them apart from 820×1180.
 
+### One card at a time
+
+When the roster grid will not fit the space the picker gives it, the choice screen stops drawing a
+grid at all and shows **one hero card at a time**: arrows either side, a swipe across the card, the
+arrow keys and a pad's stick all step through the roster, with a row of dots and a count under it.
+It is `carouselView` in `src/shared/small-screen.ts` and it asks three things: the window is
+compact, at most one seat is taken, and the grid **would not fit**.
+
+That last is measured rather than read off a breakpoint. `gridFits` lays the grid out the way the
+stylesheet does — as many columns as fit at `MIN_TILE`, never more than `gridColumns` gives, never
+fewer than three — inside `rosterArea`, the part of the measured `.pick-layout` the roster would get
+(side by side it has `ROSTER_SHARE` of the width; stacked it loses the sticky crew card's
+`CREW_RESERVE` of the height), and it fits when every row does. So the same phone holds a short
+roster and not a long one, and a desktop window dragged down to a sliver gets the carousel for the
+same reason a phone does. `.pick-layout` is sized by the screen's own grid rows rather than by what
+is in it, so measuring it gives the same answer in either view and switching cannot change the
+question that caused the switch.
+
+It is the grid **laid end to end**, not a second roster. Its order is the grid model's own reading
+order, creatures then the Random and Visitors buttons, the card on stage is wherever the seat's
+cursor already is, and every step goes through the same `moveCursor` the grid's arrow keys use —
+with up and down turned into left and right, because a list with one card showing has no rows. The
+card is the crew card itself, lifted into a function the grid and the carousel share; held upright
+it gets the kit and the tagline back, since it is now the only place the animal is described, and
+on its side it lies down into one row. An extra is a whole card of its own with one button on it.
+
+One seat, because a phone is played by one person: a second player joining — which a pad still can
+— hands the screen back to the grid, where everybody's cursor can be seen at once. With nobody
+seated yet (arriving from another game's picker), walking the carousel is how the seat is taken, on
+the animal walked to, exactly as a tap on a tile would. `node tools/carousel-browser.mjs` drives all
+three games at 390×844 and 780×360, swipes, arrows and keys, checks the card and both buttons are
+on screen, dives in, and checks a roomy window keeps the grid.
+
 ### Portrait
 
 The game runs in portrait and is not stopped from doing so — a screen that refused to draw until it
