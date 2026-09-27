@@ -7,24 +7,24 @@
   "maximumEnvelopeDifferenceFractionOfBodyLength": 0.012091362476348877,
   "surfaceDistanceMax": 0.07419749349355698,
   "surfaceDistanceMaxFractionOfBodyLength": 0.014839498698711396,
-  "surfaceDistanceP95": 0.026268914341926575,
-  "surfaceDistanceP95FractionOfBodyLength": 0.005253782868385315,
+  "surfaceDistanceP95": 0.026083408296108244,
+  "surfaceDistanceP95FractionOfBodyLength": 0.0052166816592216485,
   "anchorTolerance": 0.1,
   "anchorSurfaceDistances": {
     "anchor_mouth": {
-      "nearestSurfaceRaw": 0.00327,
-      "nearestSurfaceUnits": 0.01378,
-      "fractionOfBodyLength": 0.00276
+      "nearestSurfaceRaw": 0.00127,
+      "nearestSurfaceUnits": 0.00536,
+      "fractionOfBodyLength": 0.00107
     },
     "anchor_mouth_inside": {
-      "nearestSurfaceRaw": 0.0028,
-      "nearestSurfaceUnits": 0.01183,
-      "fractionOfBodyLength": 0.00237
+      "nearestSurfaceRaw": 0.01029,
+      "nearestSurfaceUnits": 0.04344,
+      "fractionOfBodyLength": 0.00869
     },
     "anchor_attack_primary": {
-      "nearestSurfaceRaw": 0.00408,
-      "nearestSurfaceUnits": 0.0172,
-      "fractionOfBodyLength": 0.00344
+      "nearestSurfaceRaw": 0.00361,
+      "nearestSurfaceUnits": 0.01521,
+      "fractionOfBodyLength": 0.00304
     }
   },
   "appendageRootSeating": {
@@ -32,10 +32,10 @@
     "pec_upper_L": 0.0257,
     "pelvic_R": 0.0195,
     "pelvic_L": 0.0289,
-    "jaw": 0.0261,
     "skull": 0.0598,
     "chest": 0.0968,
-    "body": 0.0638
+    "body": 0.0638,
+    "jaw": 0.0217
   },
   "stations": [
     {
@@ -100,7 +100,7 @@
         "min": [
           -0.536742091178894,
           -1.9839999675750732,
-          -0.22302453219890594
+          -0.22302451729774475
         ],
         "max": [
           0.33511775732040405,
@@ -112,7 +112,7 @@
         "min": [
           -0.5459749698638916,
           -1.9839999675750732,
-          -0.22900742292404175
+          -0.22900743782520294
         ],
         "max": [
           0.3343498110771179,
@@ -535,7 +535,7 @@
           -0.3108072280883789
         ],
         "max": [
-          0.1126713678240776,
+          0.1126713752746582,
           1.7360000610351562,
           0.08846356719732285
         ]
@@ -614,7 +614,7 @@
       },
       "twin": {
         "min": [
-          -0.05030336230993271,
+          -0.0503033883869648,
           2.4800000190734863,
           -0.051617998629808426
         ],
