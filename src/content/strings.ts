@@ -83,6 +83,11 @@ export interface GameStrings {
   readonly select: {
     readonly screenLabel: string;
     readonly rosterLabel: string;
+    /** The engraved plate's captions: each figure in the index, and the chosen animal's plate. */
+    readonly plate: {
+      readonly fig: (n: number) => string;
+      readonly plate: (numeral: string) => string;
+    };
     /**
      * The one-card-at-a-time roster a small screen shows instead of the grid. The arrows are named
      * for what they do and the counter says where in the roster the card is, because with one card
@@ -676,6 +681,12 @@ export const SHARED_STRINGS: GameStrings = {
   select: {
     screenLabel: 'Choose your creature',
     rosterLabel: 'Creatures',
+    plate: {
+      /** The small caption over each figure in the index, as a field guide numbers them. */
+      fig: (n: number) => `Fig. ${n}`,
+      /** The heading of the chosen animal's card, its figure number as a plate. */
+      plate: (numeral: string) => `Plate ${numeral}.`,
+    },
     carousel: {
       label: 'Choose a creature',
       prev: 'Previous creature',

@@ -16,6 +16,7 @@ import { gridColumns, rosterGrid, sameSlot, type ExtraId, type Slot } from './ro
 import { ERA_NAME, type EraId } from '../content/visitors';
 import { carouselView, gridFits, pickerSideBySide, rosterArea, type Box, type Layout } from '../shared/small-screen';
 import { TEXT } from '../shared/text';
+import './plate.css';
 
 interface Props {
   players: PlayerSetup[]; mode: Mode; modes: Mode[]; modeInfo: Record<Mode, { name: string; blurb: string; players: string }>;
@@ -207,6 +208,20 @@ const EXTRA_LABEL: Record<ExtraId, { name: string; glyph: string; title: string 
   visitors: { name: T.visitorsName, glyph: '★', title: T.visitorsTitle },
 };
 
+/**
+ * The engraved plate: the choice screen drawn in the title's own style, parchment and ink, with each
+ * animal a numbered figure and the chosen one a plate. `?plate=0` still reaches the old dark panel so
+ * the two can be compared; nothing on the page offers it.
+ */
+const PLATE = typeof location === 'undefined' || !/[?&]plate=0(?:&|$)/.test(location.search);
+const ROMAN: [number, string][] = [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
+/** A plate number the way a folio numbers its plates. */
+export function roman(n: number): string {
+  let out = '';
+  for (const [v, r] of ROMAN) while (n >= v) { out += r; n -= v; }
+  return out;
+}
+
 export function SelectScreen(p: Props) {
   const s = p.scheme;
   const grid = rosterGrid(CREATURES.map((c) => c.id), p.extras, p.maxCols);
@@ -248,6 +263,7 @@ export function SelectScreen(p: Props) {
               <article key={i} className={`crew-card ${pl.ready ? 'ready' : ''}`} style={{ ['--player' as string]: PLAYER_COLORS[i] }}>
                 {pl.ready && <span key={'fx' + pl.creature} className="lock-fx" aria-hidden="true" />}
                 <div className="crew-top">
+                  <span className="plate-no" aria-hidden="true">{T.plate.plate(roman(CREATURES.findIndex((c) => c.id === pl.creature) + 1 || 1))}</span>
                   <span className="player-chip">{TEXT.common.playerChip(i + 1)}</span>
                   {/* Which thing this seat is steered by. The touch seat has to be named as itself:
                       it used to fall through to the controller branch, which drew a pad icon, called
@@ -309,13 +325,13 @@ export function SelectScreen(p: Props) {
   };
 
   return (
-    <section className={`select ${carousel ? 'select-carousel' : ''}`} aria-label={T.screenLabel}>
+    <section className={`select ${carousel ? 'select-carousel' : ''} ${PLATE ? 'plate' : ''}`} data-era={ACTIVE_ERA.id} aria-label={T.screenLabel}>
       <header className="select-header">
         <BrandHeader onBack={p.onBack} />
         <div className="mode-picker" role="tablist" aria-label={T.modePickerLabel}>
           {p.modes.map((m, i) => (
             <button key={m} role="tab" aria-selected={p.mode === m} className={`mode-chip ${p.mode === m ? 'active' : ''}${i === p.modeFocus ? ' pad-focus' : ''}`} onClick={() => p.onMode(m)}>
-              <img className="mode-art" src={`${ASSETS}${assetPaths.ui(`mode-${m}.webp`)}`} alt="" />
+              <img className="mode-art" src={`${ASSETS}${assetPaths.ui(`mode-${m}.webp`)}`} alt="" onError={(e) => { e.currentTarget.dataset.missing = ''; }} />
               <span>{p.modeInfo[m].name}</span><small>{p.modeInfo[m].players}</small>
             </button>
           ))}
@@ -327,7 +343,7 @@ export function SelectScreen(p: Props) {
         {carousel ? <RosterCarousel p={p} grid={grid} renderCard={renderCard} /> : <>
         {/* ---- roster grid ---- */}
         <div className={`roster-grid ${cols >= 6 ? 'dense' : ''}`} role="listbox" aria-label={T.rosterLabel} style={{ ['--cols' as string]: cols }}>
-          {CREATURES.map((c) => {
+          {CREATURES.map((c, n) => {
             const hovering = p.players.map((pl, i) => ({ pl, i })).filter(({ pl }) => !pl.cursor && pl.creature === c.id);
             const lockedBy = hovering.filter(({ pl }) => pl.ready);
             const cls = ['cell', hovering.length ? 'hover' : '', lockedBy.length ? 'locked' : ''].join(' ');
@@ -346,6 +362,7 @@ export function SelectScreen(p: Props) {
                 }}
                 title={`${c.name}${c.kind ? ` · ${c.kind}` : ''} · ${c.role}`} aria-label={c.kind ? `${c.name}, ${c.kind}` : c.name}>
                 <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={ASSETS} alt="" draggable={false} loading="eager" />
+                <span className="cell-fig" aria-hidden="true">{T.plate.fig(n + 1)}</span>
                 <FitName name={c.name} />
                 {c.kind && <span className="cell-kind">{c.kind}</span>}
                 <span className="cell-rings">
