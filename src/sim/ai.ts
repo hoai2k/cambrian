@@ -81,6 +81,39 @@ function pickWander(a: Actor, b: BrainState, rng: Rng, radius: number) {
  */
 export const peaceful = (p: Vec3) => nurseryFactor(p.x, p.z) > 0.35;
 
+/**
+ * Seconds a predator that has just picked a *player* spends stalking before it may strike.
+ *
+ * A player has to be able to see a hunt coming: the warning goes up the moment the hunt starts
+ * (`updateHunted` in game.ts), and this is the time it buys. Without it an animal that decided to
+ * hunt from close by went from "not interested" to jaws in about a second — a Triassic predator
+ * picking a player out from a body length away and eating it before the banner had drawn. Only a
+ * player is owed the tell; a bot or the sea's own animals are hunted as they always were.
+ */
+export const HUNT_TELL = 5;
+/** How much of its speed a stalker closes at while it tells. */
+export const STALK_PACE = 0.55;
+/** It holds off at this many times its striking reach while it tells, so it cannot land a blow. */
+export const STALK_OFF = 1.8;
+
+/** The tell a hunt on `t` is owed, in seconds (added to the hunt's give-up clock so it is not eaten). */
+export const tellFor = (t: Actor) => (t.controller === 'player' ? HUNT_TELL : 0);
+
+/**
+ * The stalk: while a hunt on a player is younger than its tell, close at `STALK_PACE`, hold off
+ * outside striking reach and do nothing else. Returns whether it wrote the frame.
+ */
+function stalking(b: BrainState, t: Actor, a: Actor, d: number, reach: number, out: InputFrame): boolean {
+  if (b.goalT >= tellFor(t)) return false;
+  const to = norm(sub(t.pos, a.pos));
+  const off = reach * STALK_OFF;
+  // Circle at the stand-off rather than parking: the head stays on the player, which is the tell.
+  if (d > off) out.worldMove = vscale(to, STALK_PACE);
+  else { const side = { x: -to.z, y: 0, z: to.x }; out.worldMove = add(vscale(side, 0.4), vscale(to, d < off * 0.8 ? -0.5 : 0)); }
+  out.burst = 0; out.light = false; out.heavy = false; out.ability = false; out.lock = true;
+  return true;
+}
+
 /** Detection score update for hunters (giants, predators). 10 Hz. */
 export function updateDetection(g: AiWorld, hunter: Actor, b: BrainState, dt: number) {
   const def = creature(hunter.creature);
@@ -129,14 +162,63 @@ function bestDetected(b: BrainState, threshold: number, g: AiWorld): Actor | und
   return best;
 }
 
+/** Something this many times a schooling fish's length is run from by all of it, whatever its temper. */
+export const SCHOOL_OUTMATCHED = 1.8;
+/** How long a school goes on answering a bite: long enough to be seen to, short enough to reform. */
+export const SCHOOL_ALARM = 3;
+/** The temper a social fish needs to join a mob on a schoolmate's behalf: most of the school. */
+export const MOB_JOIN = 0.25;
+
+/** Whether a school of this animal stands together (see `social` on the creature card). */
+export function socialSchool(a: Actor): boolean {
+  const def = creature(a.creature);
+  if (def.social !== undefined) return def.social;
+  return !!(def.shoals || def.pod || (!def.diet && !def.noBite));
+}
+
+/** Whether this species turns on things bigger than itself (see `fierce` on the creature card). */
+export function fierceSpecies(a: Actor): boolean {
+  const def = creature(a.creature);
+  return !!def.fierce;
+}
+
+/**
+ * The temper a schooling fish needs to turn on what is attacking it, or `Infinity` where nothing
+ * would. `ratio` is the attacker's length over the fish's. Against something its own size or
+ * smaller most fish will: the bitten one unless it is timid, and a social school mobs. Against
+ * something bigger, only a fierce species stands, and even then it takes a bold one; everything
+ * else runs. Nothing faces a body twice its length.
+ */
+export function boldness(ratio: number, social: boolean, fierce: boolean, bitten: boolean): number {
+  if (ratio >= SCHOOL_OUTMATCHED) return Infinity;
+  if (ratio > 1.05) return fierce ? (bitten ? 0.45 : social ? 0.6 : Infinity) : Infinity;
+  if (bitten) return social ? 0.15 : 0.35;
+  return social ? MOB_JOIN : Infinity;
+}
+
+/**
+ * The attack a schooling fish is answering, if any: a bite on itself, or on a schoolmate within
+ * reach of it, in the last `SCHOOL_ALARM` seconds. `me` says which, because the bitten fish decides
+ * on its own temper and its schoolmates on the school's.
+ */
+function schoolAttack(g: AiWorld, a: Actor, b: BrainState, mateBitBy: number): { by: Actor; me: boolean } | undefined {
+  const outsider = (id: number) => { const by = id >= 0 ? g.byId(id) : undefined; return by && isAlive(by) && by.brain?.schoolId !== b.schoolId ? by : undefined; };
+  const mine = a.sinceHit < SCHOOL_ALARM ? outsider(a.lastHitBy) : undefined;
+  if (mine) return { by: mine, me: true };
+  const theirs = outsider(mateBitBy);
+  return theirs ? { by: theirs, me: false } : undefined;
+}
+
 export function thinkSwarm(g: AiWorld, a: Actor, b: BrainState, dt: number): InputFrame {
   const out = emptyInput();
   const L = lengthOf(a);
   const cohesion = v3(), align = v3(), sep = v3(), flee = v3();
-  let n = 0, threat = 0;
+  let n = 0, threat = 0, mateBitBy = -1;
   for (const o of g.nearby(a.pos, 6 + L * 8)) {
     if (o.id === a.id || !isAlive(o)) continue;
     if (o.brain?.schoolId === b.schoolId) {
+      // A schoolmate bitten a moment ago: the school answers the thing that bit it (below).
+      if (mateBitBy < 0 && o.sinceHit < SCHOOL_ALARM && o.lastHitBy >= 0) mateBitBy = o.lastHitBy;
       const d = dist(a.pos, o.pos);
       cohesion.x += o.pos.x; cohesion.y += o.pos.y; cohesion.z += o.pos.z;
       align.x += o.vel.x; align.y += o.vel.y; align.z += o.vel.z; n++;
@@ -151,15 +233,29 @@ export function thinkSwarm(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       }
     }
   }
-  // Something has just bitten it. A school does not fight back, but it does not carry on schooling
-  // either: whatever the size of the thing, being bitten scatters the fish away from it at once.
-  // The alarm above only sees bodies nearly twice their length, so a predator their own size — a
-  // hatchling player, most often — could eat through a school without any of it reacting.
-  const biter = a.sinceHit < 1.5 && a.lastHitBy >= 0 ? g.byId(a.lastHitBy) : undefined;
-  if (biter && isAlive(biter)) {
-    const d = Math.max(dist(a.pos, biter.pos), 1e-3);
+  // Something bit this fish, or a fish beside it. The alarm above only sees bodies nearly twice
+  // their length, so a predator their own size — a hatchling player, most often — could eat
+  // through a school without any of it reacting. What a school does about an attacker its own size
+  // or bigger is the animal's temperament and its species' way of living: a bold fish breaks ranks
+  // and fights, a timid one runs, and its schoolmates either mob the attacker (a social species)
+  // or scatter (one that is not). Something twice their size is only ever run from.
+  const attack = schoolAttack(g, a, b, mateBitBy);
+  if (attack) {
+    const { by, me } = attack;
+    const ratio = lengthOf(by) / Math.max(L, 1e-3);
+    const social = socialSchool(a);
+    const fights = b.aggression >= boldness(ratio, social, fierceSpecies(a), me);
+    if (fights) {
+      // Out of the school and into the fight: from here it is an animal with a grudge, and the
+      // ordinary brain already knows how to answer a biter, when to give up and when it is cornered.
+      b.kind = 'needs'; b.goal = 'fight'; b.target = by.id; b.goalT = 0; b.cached = undefined;
+      // A fish joining the mob carries the same grudge the bitten one does, for as long.
+      if (!me) { a.lastHitBy = by.id; a.sinceHit = 0; }
+      return thinkNeeds(g, a, b, dt);
+    }
+    const d = Math.max(dist(a.pos, by.pos), 1e-3);
     const k = 6 / d;
-    flee.x += (a.pos.x - biter.pos.x) * k; flee.y += (a.pos.y - biter.pos.y) * k * 0.5; flee.z += (a.pos.z - biter.pos.z) * k;
+    flee.x += (a.pos.x - by.pos.x) * k; flee.y += (a.pos.y - by.pos.y) * k * 0.5; flee.z += (a.pos.z - by.pos.z) * k;
     threat = 1;
   }
   const move = v3();
@@ -374,8 +470,9 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     case 'hunt': {
       if (!t || !isAlive(t) || isHidden(t)) { b.goal = 'wander'; b.target = -1; break; }
       if ((peaceful(t.pos) && a.lastHitBy !== t.id) || (RULES?.sanctuary(a, t) && a.lastHitBy !== t.id)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 30); break; }
-      if (b.goalT > 9 || (t.cover > 0.45 && t.stillness > 0.8 && lengthOf(t) < L * 0.7)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; b.hunger = 0; pickWander(a, b, g.rng, 30); break; }
+      if (b.goalT > 9 + tellFor(t) || (t.cover > 0.45 && t.stillness > 0.8 && lengthOf(t) < L * 0.7)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; b.hunger = 0; pickWander(a, b, g.rng, 30); break; }
       const d = dist(a.pos, t.pos);
+      if (stalking(b, t, a, d, L * 0.9 + lengthOf(t) * 0.4, out)) break;
       const predicted = add(t.pos, vscale(t.vel, clamp(d / 8, 0, 0.6)));
       steerToward(a, predicted, out);
       out.burst = d > L * 2.5 && a.stamina > 20 ? 1 : 0;
@@ -606,13 +703,14 @@ export function thinkGiant(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       const d = dist(a.pos, cur.pos);
       // cannot get its head into dense cover: circles, then gives up
       if (cur.cover > 0.45 && d < L * 1.2) { b.goalT += dt * 2; const side = { x: -(cur.pos.z - a.pos.z), y: 0, z: cur.pos.x - a.pos.x }; out.worldMove = vscale(norm(side), 0.5); if (b.goalT > 14) { b.goal = 'search'; b.goalT = 0; b.target = -1; b.detection.set(cur.id, 0.3); } break; }
+      if (stalking(b, cur, a, d, L * 0.8 + lengthOf(cur) * 0.4, out)) break;
       const predicted = add(cur.pos, vscale(cur.vel, clamp(d / 10, 0, 0.6)));
       if (shadow) predicted.y = Math.max(predicted.y, LIGHT_WINDOW_Y - 1);
       steerToward(a, predicted, out);
       out.burst = d > L * 1.5 ? 1 : 0;
       // A giant's bite is the heavy: a visible wind-up you can dash out of.
       if (d < L * 0.8 + lengthOf(cur) * 0.4 && a.state === 'free') out.heavy = true;
-      if (b.goalT > 18) { b.goal = 'patrol'; b.target = -1; b.goalT = 0; b.hunger = 20; }
+      if (b.goalT > 18 + tellFor(cur)) { b.goal = 'patrol'; b.target = -1; b.goalT = 0; b.hunger = 20; }
       break;
     }
     case 'flee': {

@@ -27,7 +27,7 @@ const nibble = (name: string): MoveDef => ({ name, windup: 0.2, active: 0.15, re
 export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
   // ---------------------------------------------------------------- Rung IV · Giants
   {
-    id: 'dunkleosteus', name: 'Dunkleosteus', species: 'D. terrelli',
+    id: 'dunkleosteus', name: 'Dunkleosteus', fierce: true, species: 'D. terrelli',
     kind: 'Placoderm', kindNote: 'Placoderms were armoured jawed fish, head and shoulders sheathed in bony plates; the arthrodires had a hinge between head and trunk armour.',
     locality: 'Late Devonian · Cleveland Shale',
     tagline: 'The jaws that cut through armour. Everything else is waiting to be eaten.',
@@ -61,7 +61,7 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
   },
   // ---------------------------------------------------------------- Rung III · Hunters
   {
-    id: 'cladoselache', name: 'Cladoselache', species: 'C. fyleri',
+    id: 'cladoselache', name: 'Cladoselache', fierce: true, species: 'C. fyleri',
     kind: 'Early shark', kindNote: 'A cartilaginous fish, shark-shaped and usually called an early shark, though the cladoselachids sit with the symmoriiforms on the chimaera side of the family tree rather than with modern sharks.',
     locality: 'Late Devonian · Cleveland Shale',
     tagline: 'The first shark shape, and still the fastest straight line in the water.',
@@ -78,7 +78,7 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: false,
   },
   {
-    id: 'stethacanthus', name: 'Stethacanthus', species: 'S. altonensis (Devonian material)',
+    id: 'stethacanthus', name: 'Stethacanthus', fierce: true, species: 'S. altonensis (Devonian material)',
     kind: 'Early shark', kindNote: 'A symmoriiform cartilaginous fish — the same shark-like grade as Cladoselache, carrying the anvil-shaped brush of enlarged denticles over its back.',
     locality: 'Late Devonian representative',
     tagline: 'The brush on its back is a bluff. Most things fall for it.',
@@ -95,7 +95,7 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'onychodus', name: 'Onychodus', species: 'O. jandemarrai',
+    id: 'onychodus', name: 'Onychodus', fierce: true, species: 'O. jandemarrai',
     kind: 'Lobe-finned fish', kindNote: 'A sarcopterygian: the fleshy-finned lineage that also holds coelacanths, lungfish and, eventually, us. Onychodonts hinged whorls of tusks inside the lower jaw.',
     locality: 'Late Devonian · Gogo',
     tagline: 'Two tusks and the patience to use them on something armoured.',
@@ -146,7 +146,7 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'jaekelopterus', name: 'Jaekelopterus', species: 'J. rhenaniae',
+    id: 'jaekelopterus', name: 'Jaekelopterus', fierce: true, species: 'J. rhenaniae',
     grasp: true,
     kind: 'Sea scorpion', kindNote: 'A eurypterid — the aquatic arthropod group nicknamed sea scorpions, and this is the largest one known.',
     locality: 'Early Devonian · Rhineland',
@@ -232,7 +232,7 @@ export const DEVONIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'coccosteus', name: 'Coccosteus', species: 'C. cuspidatus',
+    id: 'coccosteus', name: 'Coccosteus', fierce: true, species: 'C. cuspidatus',
     kind: 'Placoderm', kindNote: 'An arthrodire placoderm: Dunkleosteus\' own group at a tenth of the length, with the same hinged head and shearing jaw plates.',
     locality: 'Middle Devonian · Orcadian Basin',
     tagline: 'The small one with the big idea: armour at the front, teeth behind it.',

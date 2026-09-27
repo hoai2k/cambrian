@@ -1093,4 +1093,16 @@ const { TIER_SCALE } = await import('../src/sim/types');
   setEquivalentSizing(false);
 }
 
+// --- schools: who stands and fights something bigger, and no shoals of the player's own kind ---
+{
+  const { fierceSpecies } = await import('../src/sim/ai');
+  for (const id of ['dunkleosteus', 'cladoselache', 'stethacanthus', 'onychodus', 'jaekelopterus', 'coccosteus']) ok(fierceSpecies({ creature: id } as never), `${id} is fierce: its school turns on something bigger`);
+  for (const id of ['tiktaalik', 'acanthostega']) ok(!fierceSpecies({ creature: id } as never), `${id} is not: it runs from something bigger`);
+  const g = new Game('rise', [{ creature: 'acanthostega', device: 'keyboard', ready: true }], 12);
+  g.skipHatch();
+  for (let i = 0; i < 60 * 10; i++) { g.step(1 / 60, new Map()); g.events.length = 0; }
+  const own = g.actors.filter((a) => a.controller === 'swarm' && a.creature === 'acanthostega').length;
+  ok(own === 0, `no school of acanthostega in a sea a acanthostega is playing in (${own})`);
+}
+
 console.log(`PASS: ${passes} Devonian checks`);

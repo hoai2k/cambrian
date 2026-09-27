@@ -125,6 +125,20 @@ export interface CreatureDef {
   moults?: boolean;
   /** Rung II fish that gains standing from conspecifics following it. */
   shoals?: boolean;
+  /**
+   * Whether a school of this animal stands together. Bite one and a social school turns on the
+   * biter as a mob; an unsocial one scatters. Left out, it is read off the animal: a predator, a
+   * shoaler or a pod animal mobs, and a grazer, filter feeder or scavenger scatters (`socialSchool`
+   * in src/sim/ai.ts).
+   */
+  social?: boolean;
+  /**
+   * A species that turns on things bigger than itself. Most animals run from an attacker larger
+   * than they are, whatever their temper; a fierce one stands and fights, and its school mobs.
+   * Chosen per animal in every era rather than read off a rule: a rung-4 giant is not
+   * necessarily a fighter (Shonisaurus), and the Cambrian has no rungs at all.
+   */
+  fierce?: boolean;
   /** Cannot bite anything above snack size (Titanichthys, Doryaspis). */
   noBite?: boolean;
   /** Locality label for the selection card (the roster mixes places and times, and says so). */

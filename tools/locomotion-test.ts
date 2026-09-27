@@ -277,5 +277,31 @@ const flat = (v: { x: number; z: number }) => Math.hypot(v.x, v.z);
   check('...but a dash is never nothing', tap.moved > 3, `${tap.moved.toFixed(1)} units`);
 }
 
+// --- a dash costs a player twice what it did; a wild animal gets one escape and it takes everything ---
+{
+  const { DASH_STAMINA_MULT } = await import('../src/sim/effort');
+  const { p, step } = solo('anomalocaris');
+  for (let i = 0; i < 20; i++) step();
+  p.stamina = p.staminaMax;
+  for (let i = 0; i < 60; i++) step({ my: 1, dash: true });
+  const spent = p.staminaMax - p.stamina;
+  // Held right through, a dash bills its whole price; stamina comes back while it runs, so this
+  // is a floor rather than the figure.
+  check('a held dash costs a player double its old twelve', DASH_STAMINA_MULT === 2 && spent > 12 * 1.4, `${spent.toFixed(1)} stamina`);
+
+  const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 5);
+  for (const o of [...g.actors]) if (o.controller !== 'player') g.remove(o);
+  const pl = g.players[0];
+  const wild = g.spawn('canadia', 'ambient', { x: pl.pos.x + 20, y: pl.pos.y, z: pl.pos.z }, 1);
+  wild.brain = undefined;
+  const sim = g as unknown as { startDodge(a: typeof wild, def: ReturnType<typeof creature>, dir: { x: number; y: number; z: number }, mag: number, L: number, sf: number): void };
+  const dodge = () => { wild.state = 'free'; sim.startDodge(wild, creature('canadia'), { x: 1, y: 0, z: 0 }, 1, lengthOf(wild), 1); return wild.state === 'dodge'; };
+  wild.stamina = wild.staminaMax;
+  check('a wild animal on a full bar has its escape', dodge());
+  check('...and it takes everything it has', wild.stamina === 0, `${wild.stamina.toFixed(1)} left`);
+  wild.stamina = wild.staminaMax * 0.6;
+  check('...and it gets no second one until its bar is full again', !dodge(), `at ${(wild.stamina / wild.staminaMax * 100).toFixed(0)}%`);
+}
+
 console.log(failed ? `\n${failed} FAILED` : '\nall locomotion tests passed');
 process.exit(failed ? 1 : 0);
