@@ -5,10 +5,11 @@ by hand on the **built** Triassic model each one names. They are hand-offs: a bu
 hinge and the plane straight off the file instead of measuring, or read the numbers as a review —
 *the hinge belongs this far back, the line rises this much*. Nothing in the game reads them, and
 until 22 September 2026 no build did either — **Cartorhynchus' builder was the first that does**,
-and Birgeria's and Aphaneramma's followed it (T3D-38, 27 September 2026).
+and Birgeria's and Aphaneramma's followed it (T3D-38, 27 September 2026), and Hybodus' (T3D-39, the
+same day).
 
-These are accepted by the consumer against the body each names — **except the three a builder has
-since read**, Cartorhynchus, Birgeria and Aphaneramma:
+These are accepted by the consumer against the body each names — **except the four a builder has
+since read**, Cartorhynchus, Birgeria, Aphaneramma and Hybodus:
 
 ```
 npm run triassic:mouth -- docs/triassic/mouths/<id>-mouth.json
@@ -22,10 +23,11 @@ the opposite**. `tools/triassic/creatures/cartorhynchus/build.py` reads its file
 rebuilding the body is what *consuming* the cut looks like, and the hash the file carries is of the
 body it was aimed on rather than of the body it made. The builder asserts the frame instead, against
 the bounding box the document measured on that file: worst disagreement 6e-08 units on
-Cartorhynchus' body three units long, 1.2e-07 on Birgeria's and 1.5e-08 on Aphaneramma's, five units
-long. The rows keep the numbers each was aimed with and say where the cut went; the consumer now
+Cartorhynchus' body three units long, 1.2e-07 on Birgeria's, 1.5e-08 on Aphaneramma's and 5.3e-08 on
+Hybodus', five units long. The rows keep the numbers each was aimed with and say where the cut went; the consumer now
 refuses Birgeria's (body `070441275bbb…`) and Aphaneramma's (`ff9138761391…`) on the hash, as it does
-Cartorhynchus', and that refusal is the record of the cut having been taken.
+Cartorhynchus', and now Hybodus' (body `d00d0baa5039…`), and that refusal is the record of the cut
+having been taken.
 
 | Body | Hinge depth | Back from the nose | Pitch | Yaw | Roll | Mandible | Aimed on sha256 | State |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -33,6 +35,7 @@ Cartorhynchus', and that refusal is the record of the cut having been taken.
 | Atopodentatus | 0.6932 | 13.9% | −6.2° | 0° | 0° | 3,102 of 14,865 (20.9%) | `eacc9ccda3f5…` | accepted |
 | Birgeria | 0.4974 | 9.9% | +32.1° | +2.8° | −11.1° | 731 of 13,287 (5.5%) | `134d7f01fd21…` | **built on** |
 | Cartorhynchus | 0.2647 | 8.8% | +15.4° | −1.0° | −1.0° | 220 of 12,188 (1.8%) | `da116683099b…` | **built on** |
+| Hybodus | 0.5504 | 11.0% | +19.3° | −0.5° | −2.0° | 314 of 13,223 (2.4%) | `ba434d91d347…` | **built on** |
 | Mixosaurus | 0.7575 | 18.9% | +6.8° | 0° | 0° | 722 of 11,917 (6.1%) | `c2cade2c239b…` | accepted |
 | Odontochelys | 0.4237 | 8.5% | +19.8° | +1.7° | 0° | 419 of 13,050 (3.2%) | `c455d132ba32…` | accepted |
 | Shonisaurus | 1.0927 | 18.2% | +10.5° | 0° | 0° | 1,830 of 61,731 (3.0%) | `c3ce5d29967c…` | accepted |
@@ -79,8 +82,19 @@ retired with the cut they were fitted to. Two things about them are worth knowin
   offset as a gape — so the pivot is the reviewer's and the axis is the era's, and the difference is
   recorded in each `validation.json`.
 
+**Hybodus** is the fourth, and the first whose builder also re-weights the whole head round the
+cut (T3D-39): the owner asked that the geometry not break at the jaw, so the jaw's weight is one
+function of position in this document's own frame (`T.jaw_field_aimed`), continuous everywhere but
+across the plane ahead of the hinge wall — the cut — where the caps close it. Two things about the
+file: the plane runs *under* the generation's modelled slit the whole way (0.0035 raw at the snout,
+0.0141 at the back), and the hinge handle stands 0.0206 raw to one side of the head's measured
+centre, which the file's own `head.lateralMid` agrees with to 0.001 raw — this head sits 0.02 raw
+off the trunk's line after the builder's unbend — so the joint is on the aimed hinge line at the
+head's centre. The plane crosses two of the generation's teeth near the front of the mouth; the
+rim is one closed loop per half plus those two small loops, and does not pinch.
+
 `tools/triassic/lag.mjs` reads the hinge wall of any file a builder has consumed: a yawed or pitched
-wall is not "at or behind the hinge's own station", so on these three bodies the cut is the pairs on
+wall is not "at or behind the hinge's own station", so on these four bodies the cut is the pairs on
 the document's own wall plane.
 
 The mandible count is the editor's own, over every vertex of every mesh in the file. It is what

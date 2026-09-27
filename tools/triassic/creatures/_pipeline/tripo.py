@@ -2110,6 +2110,134 @@ def jaw_junction(body, shell, body_weights, hinge, rear, upper_jaw, axis, down=(
     return body_out, shell_out, report
 
 
+def jaw_field_aimed(body, shell, body_weights, point, normal, forward, width, back, corner=None,
+                    centre=.5, tol=1e-5):
+    """One jaw share over both halves of a head cut on an **aimed plane**, continuous everywhere
+    except across the cut itself.
+
+    `jaw_junction` makes the two copies of each hinge-wall vertex agree, and that is all it makes
+    agree: the mandible ramps from whatever the throat said at the rim to full jaw over `band` (a
+    hundredth and a half of a body), so the shell's rear corner is a crease where the weight climbs
+    the whole way in a ring or two, and the skin behind it is on a second rule (`back`, `dz`) with
+    its own crease under the hinge. Nothing parts, but the jaw *breaks* rather than bends there --
+    which is what the owner saw on Hybodus and asked to be rid of: the geometry should interpolate
+    smoothly everywhere and part **only** along the cut, where the caps close it.
+
+    So the share is one function of position, written in the document's own coordinates about its
+    hinge -- `u` ahead of the hinge wall along `forward`, `v` above the mouth plane along `normal`:
+
+        B(v) = smooth(centre - v / width)       across the mouth plane: 1 below, 0 above
+        C(u) = 1 - smooth(u / corner)           the commissure: 1 at the wall, 0 `corner` ahead
+        A(u) = 1 - smooth(-u / back)            the throat: 1 at the wall, 0 `back` behind
+
+        body (skull half):    J = B(v) . A(u) . C(u)
+        shell (the mandible): J = 1 - (1 - B(v)) . C(u)
+
+    On the hinge wall (u = 0) both read B(v), so the two copies of every wall vertex agree whatever
+    their depth -- asserted, to the last influence, exactly as `jaw_junction` asserts it. Behind the
+    wall the skin is one surface and the share is one smooth function across it: the throat under
+    the hinge follows the jaw, the cheek beside the corner takes part of it, and both fade over
+    `back`. The one place the two halves disagree is across the plane *ahead* of the wall, which is
+    the cut: there the skull's lip reads B(0).C(u) and the mandible's 1 - (1 - B(0)).C(u), a step of
+    1 - C(u) that is **nought at the corner of the mouth** and full `corner` ahead of it -- a mouth
+    that opens from its commissure rather than hinging open along its whole length at once. The
+    corner is the one point where a field that is 0 above a cut and 1 below it has to be *some*
+    value; this makes it `centre` from every side instead of a singularity.
+
+    `width` is the ramp's one number with a cost each way. Narrow, the whole swing is carried by a
+    band of skin a ring or two wide and the jump across an edge there is most of the share. Wide, the
+    tooth row near the hinge takes only part of the jaw's rotation -- B is below 1 within width/2 of
+    the plane -- and the jaw bows, which is what 0.05 of a body did to Mixosaurus. `corner` defaults
+    to it. The mandible's front is untouched whatever `width` is: past `corner` ahead and width/2
+    below the plane the shell is exactly 1.
+
+    **A limb is never throat**, for `jaw_junction`'s reason, and scaled out the same way: by whatever
+    of the body's own relaxed field at the point is not a limb's (the shell reads its nearest body
+    vertex, which on the wall is its own twin, so the scaling agrees there too).
+
+    Both objects must still be in raw coordinates, and `body_weights` is the body's relaxed field.
+    Returns (body field, shell field, share(p, on_shell), report).
+    """
+    import re
+    from mathutils.kdtree import KDTree
+    LIMB = re.compile(r'fore|hind|pec|pelvic|paddle|foot|hand|fin_|flipper', re.I)
+    P = Vector(point)
+    N = Vector(normal).normalized()
+    F = Vector(forward).normalized()
+    corner = width if corner is None else corner
+
+    def uv(p):
+        d = Vector(p) - P
+        return d.dot(F), d.dot(N)
+
+    def B(v):
+        return smooth(centre - v / width)
+
+    def C(u):
+        return 1. - smooth(u / corner)
+
+    def A(u):
+        return 1. - smooth(-u / back)
+
+    def share(p, on_shell, limbless=1.):
+        u, v = uv(p)
+        b = B(v) * limbless
+        return 1. - (1. - b) * C(u) if on_shell else b * A(u) * C(u)
+
+    def axial(w):
+        return max(0., 1. - sum(x for n, x in w.items() if LIMB.search(n)))
+
+    def trim(w):
+        items = sorted(((n, x) for n, x in w.items() if x > 1e-6), key=lambda kv: -kv[1])[:4]
+        total = sum(x for _, x in items) or 1.
+        return {n: x / total for n, x in items}
+
+    def mix(w, j):
+        out = {n: x * (1. - j) for n, x in w.items()}
+        out['jaw'] = out.get('jaw', 0.) + j
+        return trim(out)
+
+    bco = [v.co.copy() for v in body.data.vertices]
+    sco = [v.co.copy() for v in shell.data.vertices]
+    kd = KDTree(len(bco))
+    for i, c in enumerate(bco):
+        kd.insert(c, i)
+    kd.balance()
+    twin = [kd.find(c) for c in sco]
+    body_out, body_share = [], []
+    for i, c in enumerate(bco):
+        j = share(c, False, axial(body_weights[i]))
+        body_share.append(j)
+        body_out.append(mix(body_weights[i], j) if j > 0 else trim(body_weights[i]))
+    shell_out, shell_share = [], []
+    for i, c in enumerate(sco):
+        w = body_weights[twin[i][1]]
+        j = share(c, True, axial(w))
+        shell_share.append(j)
+        shell_out.append(mix(w, j))
+    # Which shared points are the wall (and must agree) and which are the lip (and part by design).
+    wall, lip = [], []
+    for i, (_, k, d) in enumerate(twin):
+        if d >= 1e-6:
+            continue
+        u, v = uv(sco[i])
+        (wall if abs(u) <= tol and v <= tol else lip).append((i, k))
+    assert len(wall) >= 3, ('the mandible shares no hinge wall with the body', len(wall), len(lip))
+    for i, k in wall:
+        a, b = shell_out[i], body_out[k]
+        assert a.keys() == b.keys() and all(abs(a[n] - b[n]) < 1e-9 for n in a), (i, a, b)
+    lip_step = max((abs(shell_share[i] - body_share[k]) for i, k in lip), default=0.)
+    report = {'construction': 'one share over both halves (T.jaw_field_aimed), continuous except '
+                              'across the aimed cut',
+              'width': float(width), 'corner': float(corner), 'back': float(back),
+              'centre': float(centre), 'wallPairs': len(wall), 'lipPairs': len(lip),
+              'wallPairsAgreeExactly': True, 'lipStepMax': float(lip_step),
+              'bodyVerticesWithAnyJaw': sum(1 for j in body_share if j > .01),
+              'shellVerticesFullJaw': sum(1 for j in shell_share if j > .99),
+              'shellVertices': len(sco), 'shellShareMin': float(min(shell_share, default=1.))}
+    return body_out, shell_out, share, report
+
+
 def jaw_field_uncut(body, body_weights, hinge, below, axis, band, behind, throat=1.,
                     reach=None, reach_margin=.5, spread=0, spread_hold=.45):
     """Give an **uncut** head a jaw, by weighting the mouth the generation already modelled.

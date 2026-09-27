@@ -365,6 +365,88 @@ for (const suffix of ['', '.puppet']) {
   report.worstSkinEdgeStretch = skin;
 }
 
+// ------------------------------------------------------------------- the jaw bends, not breaks ---
+// T3D-39: the owner asked that the geometry not break at the jaw -- that it interpolate smoothly
+// everywhere and part only along the cut, where the caps close it. So "does not break" is a number
+// read off the *packaged* file, not only the builder's own claim: over every edge of every skinned
+// primitive, the largest jump in `jaw` weight between its two ends; and over every pair of
+// rest-coincident vertices (a UV seam inside one primitive, or the cut between the head and the
+// mandible), the same jump split by whether the pair lies on the cut -- the aimed mouth plane ahead
+// of its hinge wall, read off the document this body was cut on. Off the cut it must be nought.
+{
+  const val = JSON.parse(fs.readFileSync(`${here}/validation.json`, 'utf8'));
+  const doc = JSON.parse(fs.readFileSync(val.mouth.aimedCut.file, 'utf8'));
+  const P = new THREE.Vector3(...doc.plane.point);
+  const Nn = new THREE.Vector3(...doc.plane.normal).normalize();
+  const Ff = new THREE.Vector3(...doc.plane.forward).normalize();
+  const steepBound = val.jawField.maxSteepnessPerRampWidthAssertedUnder;
+  const width = val.jawField.rampWidthUnits;
+  report.jawWeightSteps = {};
+  for (const suffix of ['', '.puppet']) {
+    const bytes = fs.readFileSync(base + suffix + '.glb');
+    const g = await loader.parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
+    const skinned = [];
+    g.scene.traverse(o => { if (o.isSkinnedMesh) skinned.push(o); });
+    g.scene.updateMatrixWorld(true);
+    const pos = [], jaw = [], mesh = [];
+    const vv = new THREE.Vector3();
+    let off = 0, worst = 0, worstAt = null, steepest = 0;
+    const edgeJumps = [];
+    skinned.forEach((m, mi) => {
+      m.skeleton.update();
+      const sk = m.geometry.attributes.skinIndex, sw = m.geometry.attributes.skinWeight;
+      const jawIndex = m.skeleton.bones.findIndex(b => b.name === 'jaw');
+      const n = m.geometry.attributes.position.count;
+      for (let i = 0; i < n; i++) {
+        m.getVertexPosition(i, vv);
+        vv.applyMatrix4(m.matrixWorld);
+        pos.push(vv.clone());
+        let w = 0;
+        for (let k = 0; k < 4; k++) if (sk.getComponent(i, k) === jawIndex) w += sw.getComponent(i, k);
+        jaw.push(w);
+        mesh.push(mi);
+      }
+      const ix = m.geometry.index;
+      for (let t = 0; t < ix.count; t += 3) {
+        const tri = [ix.getX(t), ix.getX(t + 1), ix.getX(t + 2)].map(x => x + off);
+        for (const [a, b] of [[tri[0], tri[1]], [tri[1], tri[2]], [tri[2], tri[0]]]) {
+          const d = Math.abs(jaw[a] - jaw[b]);
+          edgeJumps.push(d);
+          const len = pos[a].distanceTo(pos[b]);
+          if (len > 1e-7) steepest = Math.max(steepest, d * width / len);
+          if (d > worst) { worst = d; worstAt = { mesh: m.name, at: pos[a].clone().add(pos[b]).multiplyScalar(0.5).toArray().map(x => +x.toFixed(4)), jaw: [+jaw[a].toFixed(4), +jaw[b].toFixed(4)] }; }
+        }
+      }
+      off += n;
+    });
+    // rest-coincident pairs, by a coarse spatial hash
+    const key = p => `${Math.round(p.x * 2e4)},${Math.round(p.y * 2e4)},${Math.round(p.z * 2e4)}`;
+    const cells = new Map();
+    pos.forEach((p, i) => { const k = key(p); if (!cells.has(k)) cells.set(k, []); cells.get(k).push(i); });
+    let onCut = 0, offCut = 0, onCutMax = 0, offCutMax = 0;
+    const tol = 5e-5 * 5;
+    for (const list of cells.values()) {
+      for (let x = 0; x < list.length; x++) for (let y = x + 1; y < list.length; y++) {
+        const a = list[x], b = list[y];
+        if (pos[a].distanceTo(pos[b]) > 1e-5) continue;
+        const d = Math.abs(jaw[a] - jaw[b]);
+        const r = pos[a].clone().sub(P);
+        const cut = mesh[a] !== mesh[b] && Math.abs(r.dot(Nn)) < tol && r.dot(Ff) > tol;
+        if (cut) { onCut++; onCutMax = Math.max(onCutMax, d); } else { offCut++; offCutMax = Math.max(offCutMax, d); }
+      }
+    }
+    edgeJumps.sort((a, b) => a - b);
+    report.jawWeightSteps[suffix || 'authored'] = {
+      edges: edgeJumps.length, maxJumpAlongAnEdge: +worst.toFixed(4),
+      maxSteepnessPerRampWidth: +steepest.toFixed(3), steepnessAssertedUnder: steepBound,
+      p99JumpAlongAnEdge: +edgeJumps[Math.floor(edgeJumps.length * 0.99)].toFixed(4),
+      worstEdge: worstAt,
+      coincidentPairsOffTheCut: offCut, maxJumpOffTheCut: +offCutMax.toFixed(6),
+      coincidentPairsOnTheCut: onCut, maxJumpOnTheCut: +onCutMax.toFixed(4),
+    };
+  }
+}
+
 report.exactRigParity = true;
 report.exactAnimationParity = true;
 report.exactAnchorParity = true;
@@ -425,11 +507,18 @@ const grab = report.playback[0].results.find(r => r.clip === 'Grab');
 need(grab.duration >= 0.9 && grab.duration <= 1.2, `Grab must be a 0.9-1.2 s held loop (${grab.duration})`);
 need(report.worstSkinEdgeStretch < 8,
   `the skin must not tear: worst edge stretch ${report.worstSkinEdgeStretch.toFixed(2)}x, against Nothosaurus' 2.98x reference and the 12.4x the sweep called broken`);
+for (const [name, st] of Object.entries(report.jawWeightSteps)) {
+  need(st.maxJumpOffTheCut < 1e-4, `${name}: the jaw weight steps between two coincident points off the cut (${st.maxJumpOffTheCut})`);
+  // Every edge, the fill included: a long cap edge may carry a large jump and still be smooth, so
+  // the packaged file is held to the resolution-free figure; the raw skin-only jump is the build's.
+  need(st.maxSteepnessPerRampWidth <= st.steepnessAssertedUnder + 1e-3, `${name}: the jaw weight is steeper than its own ramp along an edge (${st.maxSteepnessPerRampWidth} per ramp width)`);
+}
 assert.equal(problems.join(' | '), '', 'measured performance checks');
 console.log(JSON.stringify({
   models: report.models, clips: report.clips, twinTriangleFraction: report.twinTriangleFraction,
   gait: report.gait, lunge: report.lunge, shake: report.shake,
   jaw: report.jaw.filter(j => ['Bite', 'Attack', 'Heavy', 'Idle'].includes(j.clip)),
   skinTearsPerSurface: report.skinTearsPerSurface,
+  jawWeightSteps: report.jawWeightSteps,
   exactRigParity: true, exactAnimationParity: true, playbackSamples: 61,
 }, null, 2));
