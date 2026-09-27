@@ -427,6 +427,11 @@ for (const file of targets) {
   // corner of the mouth, one vertex on both the lip and the cut, opening by the gape times its
   // short radius (Cartorhynchus 4 of 77 after repair, Coelophysis 2 of 237, Saurichthys 1 of 151).
   if (seam.cutWorst > CUT_FAIL && seam.cutOpen > CUT_OPEN_SHARE * seam.cutPairs) flags.push(`the jaw cut opens ${(seam.cutWorst * 100).toFixed(2)} % of a body at ${seam.cutClip}@${seam.cutPhase.toFixed(2)} (${seam.cutOpen} of ${seam.cutPairs} rim points past ${CUT_OPEN * 100} %)`);
+  // A wall read off an aimed file is a claim about where this body was cut, and a claim that
+  // catches nothing passes the test above vacuously: no cut pairs, nothing open. The three bodies
+  // built on one put 23-60 % of their seam on the wall (Aphaneramma 79 of 340, Cartorhynchus 52 of
+  // 152, Birgeria 130 of 215), so a tenth is well under any real wall and well over a stale one.
+  if (seam.cutFrom !== 'the hinge station' && seam.cutFrom !== '-' && seam.cutPairs < 0.1 * seam.pairs) flags.push(`the cut was read off ${seam.cutFrom} and only ${seam.cutPairs} of ${seam.pairs} seam pairs lie on it: that wall does not describe this body`);
   if (flags.length) failed++;
 
   console.log(`\n${file}   ${N} skin vertices · ${bones.length} joints · ${gltf.animations.length} clips · body ${L.toFixed(3)}`);
