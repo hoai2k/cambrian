@@ -125,3 +125,70 @@ export const rosterCap = (w: number, h: number, layout: Layout): number => {
   const room = w * (w > h ? ROSTER_SHARE : 1) - 24;
   return Math.max(3, Math.floor(room / MIN_TILE));
 };
+
+/** A width and a height, in CSS pixels. */
+export interface Box { w: number; h: number }
+
+/**
+ * A roster tile's height over its width: the 4:3 picture, the name band and the tile's own padding.
+ * Measured off the drawn tile rather than guessed — `.cell img` is `aspect-ratio: 4 / 3` at the
+ * tile's width, and the name and padding add about a third of that again.
+ */
+export const TILE_TALL = 1.05;
+/** The gap `.roster-grid` puts between tiles, both ways. */
+export const GRID_GAP = 10;
+/**
+ * How much of a *stacked* picker the crew card keeps for itself. It is sticky at the bottom of the
+ * scroll in portrait with `max-height: 38vh`, so that is the share of the height the roster cannot
+ * have.
+ */
+export const CREW_RESERVE = 0.38;
+
+/**
+ * Whether the pick screen puts the roster *beside* the crew card or stacks the two.
+ *
+ * The stylesheet's own answer, restated so the arithmetic below asks about the same layout that is
+ * drawn: side by side on anything wider than the 1000 where the picker has always gone to one
+ * column, and on a short wide window — a phone on its side — where the aspect-ratio rule puts it
+ * back into two columns because 360 pixels of height cannot hold a stack.
+ */
+export const pickerSideBySide = (w: number, h: number): boolean =>
+  w > 1000 || (h < COMPACT_H && w >= h);
+
+/** The part of the picker the roster grid would be given. */
+export const rosterArea = (picker: Box, sideBySide: boolean): Box => sideBySide
+  ? { w: picker.w * ROSTER_SHARE, h: picker.h }
+  : { w: picker.w, h: picker.h * (1 - CREW_RESERVE) };
+
+/**
+ * Whether a roster of `count` tiles fits the area it would be given without being cut off.
+ *
+ * This is the question the choice screen actually has, and it is asked of the space rather than of
+ * a breakpoint: the same phone holds the Cambrian's eighteen and would not hold a roster of forty,
+ * and a desktop window dragged down to a sliver runs out of room at a size no breakpoint names. The
+ * grid is laid out the way the stylesheet lays it out — as many columns as fit at `MIN_TILE`, never
+ * more than `gridColumns` would give, never fewer than three — and it fits when every row of it
+ * does. Anything that does not is a grid a player would have to scroll to *find* an animal in,
+ * which is the job the carousel does better.
+ */
+export function gridFits(count: number, area: Box, cap = Infinity): boolean {
+  if (count <= 0) return true;
+  const byWidth = Math.floor((area.w + GRID_GAP) / (MIN_TILE + GRID_GAP));
+  const cols = Math.min(Math.max(4, Math.ceil(count / 3)), cap, byWidth);
+  if (cols < 3) return false;
+  const tile = (area.w - GRID_GAP * (cols - 1)) / cols;
+  const rows = Math.ceil(count / cols);
+  return rows * tile * TILE_TALL + GRID_GAP * (rows - 1) <= area.h;
+}
+
+/**
+ * Whether the choice screen shows one hero card at a time instead of the grid.
+ *
+ * Three facts. The window is **compact** — a roomy window with a grid that does not fit is a bug in
+ * the grid, not a reason to change the screen. At most **one seat** is taken: a phone is played by
+ * one person (a pad on a phone is rare and a split view on one is worse), and a carousel shows one
+ * choice, so a second player joining — which a pad still can — hands the screen back to the grid
+ * where everybody's cursor can be seen at once. And the grid **would not fit**.
+ */
+export const carouselView = (layout: Layout, seats: number, fits: boolean): boolean =>
+  layout === 'compact' && seats <= 1 && !fits;

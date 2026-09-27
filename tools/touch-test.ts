@@ -12,7 +12,7 @@ import {
   AIM_HOLD, DOUBLE, DRAG, PINCH_MIN, SECONDARY, SWAP, TAP_TIME,
   clear, down, freshTouch, meterEdge, move, read, secondaryOf, stepSlot, toNdc, up,
 } from '../src/shared/touch-play';
-import { COMPACT_H, COMPACT_W, MIN_TILE, layoutFor, rosterCap, rotateHint, splitAxis, touchFirst } from '../src/shared/small-screen';
+import { COMPACT_H, COMPACT_W, MIN_TILE, layoutFor, rosterCap, rotateHint, splitAxis, touchFirst, carouselView, gridFits, pickerSideBySide, rosterArea } from '../src/shared/small-screen';
 import { applyTouch } from '../src/input/touch';
 import { emptyControls, type RawControls } from '../src/input/input';
 import { btn, key, menuScheme, schemeForDevice, type Action } from '../src/shared/controls';
@@ -457,6 +457,31 @@ check('...which is fewer than the width alone would allow', rosterCap(780, 360, 
 check('nothing ever falls below three columns', rosterCap(200, 200, 'compact') >= 3);
 check('every capped tile is at least MIN_TILE across', [[390, 844], [430, 932], [780, 360], [820, 500]]
   .every(([w, h]) => (w * (w > h ? 0.62 : 1) - 24) / rosterCap(w, h, 'compact') >= MIN_TILE - 1));
+
+// ---------------------------------------------------------------- grid or carousel
+
+// Whether the roster fits is asked of the space it would be given, not of a breakpoint: the same
+// picker holds a short roster and not a long one.
+{
+  const phoneUp = rosterArea({ w: 366, h: 618 }, pickerSideBySide(390, 844));
+  const phoneSide = rosterArea({ w: 756, h: 222 }, pickerSideBySide(780, 360));
+  const laptop = rosterArea({ w: 1236, h: 560 }, pickerSideBySide(1280, 800));
+  check('a phone held up stacks the picker', pickerSideBySide(390, 844) === false);
+  check('a phone on its side puts it side by side', pickerSideBySide(780, 360) === true);
+  check('a tablet upright stacks it', pickerSideBySide(820, 1180) === false);
+  check('a stacked roster loses the crew card\'s share of the height', Math.abs(phoneUp.h - 618 * 0.62) < 1e-9 && phoneUp.w === 366);
+  check('eighteen animals and a button do not fit a phone held up', !gridFits(19, phoneUp));
+  check('...nor a phone on its side', !gridFits(19, phoneSide));
+  check('...and do fit a laptop', gridFits(19, laptop));
+  check('a short roster fits where a long one does not', gridFits(6, phoneUp) && !gridFits(40, phoneUp));
+  check('an area too narrow for three tiles never fits', !gridFits(3, { w: 200, h: 2000 }));
+  check('an empty roster always fits', gridFits(0, { w: 1, h: 1 }));
+  check('more height is never a worse fit', [300, 500, 700, 900].every((h, i, a) => i === 0 || !gridFits(19, { w: 366, h: a[i - 1] }) || gridFits(19, { w: 366, h })));
+}
+check('the carousel is a compact window\'s answer only', carouselView('full', 1, false) === false);
+check('...for one seat', carouselView('compact', 1, false) === true && carouselView('compact', 0, false) === true);
+check('...and a second player hands the grid back', carouselView('compact', 2, false) === false);
+check('...and never when the grid fits', carouselView('compact', 1, true) === false);
 
 check('two players on a wide screen are cut side by side', splitAxis(1440, 900) === 'across');
 check('two on a tall one are cut top and bottom', splitAxis(820, 1180) === 'down');

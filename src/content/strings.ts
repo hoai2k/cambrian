@@ -83,6 +83,19 @@ export interface GameStrings {
   readonly select: {
     readonly screenLabel: string;
     readonly rosterLabel: string;
+    /**
+     * The one-card-at-a-time roster a small screen shows instead of the grid. The arrows are named
+     * for what they do and the counter says where in the roster the card is, because with one card
+     * on screen there is nothing else to say how many there are.
+     */
+    readonly carousel: {
+      readonly label: string;
+      readonly prev: string;
+      readonly next: string;
+      readonly count: (at: number, of: number) => string;
+      /** What an extra's card says under its name, since there is no animal on it to lock in. */
+      readonly take: string;
+    };
     readonly modePickerLabel: string;
     /** After the mode's blurb: how to get to the other modes. */
     readonly modeSwitchHint: (prev: string, next: string) => string;
@@ -663,6 +676,13 @@ export const SHARED_STRINGS: GameStrings = {
   select: {
     screenLabel: 'Choose your creature',
     rosterLabel: 'Creatures',
+    carousel: {
+      label: 'Choose a creature',
+      prev: 'Previous creature',
+      next: 'Next creature',
+      count: (at, of) => `${at} / ${of}`,
+      take: 'Tap to choose',
+    },
     modePickerLabel: 'Game mode',
     modeSwitchHint: (prev, next) => `${prev} / ${next} switch modes.`,
     backToTitle: (gameTitle) => `Back to the ${gameTitle} title screen`,

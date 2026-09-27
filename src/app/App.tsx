@@ -198,6 +198,9 @@ export function App() {
    */
   const cols = rosterCap(small.width, small.height, small.layout);
   const colsRef = useRef(cols);
+  /** Whether the choice screen is showing one card at a time (`carouselView`), as the screen reports it. */
+  const carouselRef = useRef(false);
+  const onView = useCallback((on: boolean) => { carouselRef.current = on; }, []);
   useEffect(() => { colsRef.current = cols; }, [cols]);
   /** The secondary pad, mirrored into state so the pad's label re-renders when a swipe lands. */
   const [secondary, setSecondary] = useState<Secondary>('aim');
@@ -592,6 +595,10 @@ export function App() {
   const moveCursor = useCallback((index: number, dx: number, dy: number) => {
     const ps = [...playersRef.current];
     const p = ps[index]; if (!p) return;
+    // The carousel is the grid laid end to end, so up and down have no row to move to: they walk it
+    // the same way left and right do, which is what a player on a pad or the arrow keys expects of a
+    // list with one card on screen.
+    if (carouselRef.current && dy && !dx) { dx = dy; dy = 0; }
     // A seat that has taken the Visitors button is locked in on purpose, and left and right walk
     // the animals it has earned rather than the grid behind them. This is the one place a locked
     // seat still answers the stick.
@@ -1049,6 +1056,7 @@ export function App() {
           scheme={scheme}
           best={best} carry={carry} modeFocus={focus.group === 'modes' ? focus.index : -1}
           extras={extras} onExtra={pressExtra} maxCols={cols}
+          layout={small.layout} onStep={(i, dir) => moveCursor(i, dir, 0)} onView={onView}
           visitorCount={visitors.length} visitorOrigin={(id) => visitors.find((v) => v.id === id)?.origin}
           onPick={setCreature} onReady={toggleReady} onRemove={removePlayer}
           onMode={changeMode} onStart={startMatch} onBack={backToTitle} onCarry={toggleCarry}
