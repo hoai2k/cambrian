@@ -65,12 +65,12 @@
     "meanJointGapRaw": 0.0,
     "meanJointGapOverBodyLength": 0.0,
     "maxJointGapOverBodyLength": 0.0,
-    "finVerticesMeasured": 2860,
-    "meanMirroredSurfaceGapOverBodyLength": 0.01043,
-    "p95MirroredSurfaceGapOverBodyLength": 0.04238
+    "finVerticesMeasured": 2845,
+    "meanMirroredSurfaceGapOverBodyLength": 0.01048,
+    "p95MirroredSurfaceGapOverBodyLength": 0.04241
   },
   "mouth": {
-    "method": "geometric: every head vertex casts its own outward normal back into the mesh",
+    "method": "aimed by hand in the viewer's mouth editor (docs/triassic/mouths/hybodus-mouth.json); the modelled slit -- found by casting every head vertex's own normal back into the mesh -- is measured beside it and no longer cuts",
     "cavityVertices": 190,
     "cavityStations": 7,
     "cavityExtentY": [
@@ -135,9 +135,9 @@
       "note": "how far the measured lip line departs from a straight line. A fish mouth is often genuinely straight and this is the easy case -- but the cut follows the measured curve either way, so the number below is what the cut costs and this one is only how much work the curve was doing."
     },
     "cutDeviationFromTheMeasuredLipLine": {
-      "maxRaw": 0.0,
-      "asFractionOfBodyLength": 0.0,
-      "note": "zero by construction. The head is sheared vertically by -seam(y), which carries the measured curve exactly onto the plane z = 0; the cut is taken there and the shear undone, so every vertex the cut adds lands on the measured line itself and every vertex that was already there returns to where it was."
+      "maxRaw": 0.01412,
+      "asFractionOfBodyLength": 0.01191,
+      "note": "the cut is the aimed plane now, read on the mouth's measured centre; this is how far that plane stands from the mid height of the slit the generation modelled, over the stations the slit was measured at (aimedCut.perStation has every one)."
     },
     "generationsOwnDentition": {
       "oralZoneVertices": 515,
@@ -146,205 +146,978 @@
       "maxProtrusionOverMouthHalfDepth": 0.705,
       "authoredReplacement": false,
       "note": "kept as generated and weighted to the jaw they grow from; nothing is authored here",
-      "verticesCarriedOntoTheMandible": 504
+      "verticesCarriedOntoTheMandible": 89
+    },
+    "teethOnTheCut": {
+      "patches": 19,
+      "wholeOnTheMandible": 1,
+      "wholeOnTheSkull": 17,
+      "crossedByThePlane": 1,
+      "crossed": [
+        {
+          "vertices": 60,
+          "proudMaxRaw": 0.00695,
+          "y": [
+            -0.543,
+            -0.5
+          ],
+          "onJaw": 45,
+          "onSkull": 15
+        }
+      ],
+      "note": "patches of oral surface standing proud of their own neighbourhood by more than the dentition threshold, and which side of the aimed cut each vertex of them is on. A patch on both is a tooth the plane crosses: its tip rides one bone and its root the other, and the caps close each piece."
+    },
+    "closure": "the cut's own rim: T.cap_cut over the hinge wall on each half, then T.cap_mouth along the mouth line on each half, domed into it (dome 0.30, ceiling 0.55 of the head's own room either side of the mouth line). No lining, no hinge plug, no rim fold and no seam seal.",
+    "aimedHingeAxisAgainstTheFramesXDegrees": 2.2241358437724084,
+    "aimedCut": {
+      "file": "docs/triassic/mouths/hybodus-mouth.json",
+      "appliesTo": "built",
+      "sha256": "ba434d91d3475ad833c4211071765677aa34b84df027bcdd4591f88e307f1d1e",
+      "consumed": true,
+      "note": "Cut on. The file hash-matched the shipped body it was aimed on; rebuilding on it is what consuming it looks like, so npm run triassic:mouth now refuses it on the hash, and the frame is asserted against the bounding box the document measured instead.",
+      "frameCheckUnits": 5.2624080648655536e-08,
+      "pitchDegrees": 19.325,
+      "yawDegrees": -0.489,
+      "rollDegrees": -2.014,
+      "hingeHeadFraction": 0.1101,
+      "mandibleVerticesTheEditorCounted": 314,
+      "hingeCentreRaw": [
+        -0.00079,
+        -0.46198,
+        -0.0215
+      ],
+      "mouthPlaneNormalRaw": [
+        0.03797,
+        0.3304,
+        0.94308
+      ],
+      "mouthLineForwardRaw": [
+        -0.00805,
+        -0.94362,
+        0.33092
+      ],
+      "hingeAxisRaw": [
+        0.99925,
+        -0.02016,
+        -0.03316
+      ],
+      "jawJointRaw": [
+        -0.02138,
+        -0.46157,
+        -0.02082
+      ],
+      "jawJointHullClearanceRaw": 0.03568,
+      "jawJointInsideByRayParity": true,
+      "aimedHingeOffTheMeasuredCentreRaw": 0.02059,
+      "aimedHingeOffTheHeadsOwnMedianRaw": 0.01665,
+      "hingeBehindTheSlitRaw": 0.0133,
+      "mandibleTipRaw": -0.543,
+      "belowTheSlitMaxRaw": 0.01412,
+      "aboveTheSlitMaxRaw": -0.00347,
+      "worstOverLocalMouthHalfDepth": 2.406,
+      "perStation": [
+        [
+          -0.5464,
+          0.00347
+        ],
+        [
+          -0.5345,
+          0.00447
+        ],
+        [
+          -0.5227,
+          0.00587
+        ],
+        [
+          -0.5108,
+          0.00755
+        ],
+        [
+          -0.499,
+          0.0092
+        ],
+        [
+          -0.4871,
+          0.01057
+        ],
+        [
+          -0.4753,
+          0.01412
+        ]
+      ]
     }
   },
-  "mouthSideLabelling": {
-    "method": "the height of the surface each vertex grows out of, against the measured mouth line",
-    "jawSideVertices": 578,
-    "skullSideVertices": 9117,
-    "note": "a height test on the vertex itself splits interlocking teeth down the middle and a graded one stretches each half between two bones -- which is how this fish's upper tooth row first came out as a comb of needles two head-depths long. Taking the height of the smoothed surface instead, which is the tooth's own base, puts every tooth whole on the jaw it grows from. Flood-filling labels from the skin was tried first and is worse on a needle rostrum: the seeds are sparse on a tube that thin and the label boundary wanders through it, which tore the snout into ribbons."
-  },
-  "hingePlug": {
-    "plug": "none",
-    "why": "the plug this builder shipped was fitted against an np.interp clearance test that clamps rather than refusing, so it passed while standing 1.29 units clear of the snout with 126 of its 207 vertices outside the animal; it is the spike and the white shoulder in the delivered renders.",
-    "seenThroughTheBodyAtAttack043": {
-      "giantPlugOutsideTheAnimal": 1,
-      "containedPlugAt0.6x": 666,
-      "containedPlugAt1.8x": 44,
-      "roofOnlyPlug": 625,
-      "noPlug": 667
+  "jawField": {
+    "construction": "T.jaw_field_aimed: one jaw share over both halves of the head, a function of position in the aimed document's frame, continuous everywhere except across the cut plane ahead of the hinge wall",
+    "rampWidthRaw": 0.04147,
+    "rampWidthOfBody": 0.035,
+    "backFadeRaw": 0.08294,
+    "backFadeOfBody": 0.07,
+    "perBody": {
+      "Hybodus authored body": {
+        "construction": "one share over both halves (T.jaw_field_aimed), continuous except across the aimed cut",
+        "width": 0.04146787166595459,
+        "corner": 0.04146787166595459,
+        "back": 0.08293574333190919,
+        "centre": 0.5,
+        "wallPairs": 44,
+        "lipPairs": 147,
+        "wallPairsAgreeExactly": true,
+        "lipStepMax": 1.0,
+        "bodyVerticesWithAnyJaw": 533,
+        "shellVerticesFullJaw": 721,
+        "shellVertices": 944,
+        "shellShareMin": 0.49999988630220216
+      },
+      "Hybodus procedural volume twin": {
+        "construction": "one share over both halves (T.jaw_field_aimed), continuous except across the aimed cut",
+        "width": 0.04146787166595459,
+        "corner": 0.04146787166595459,
+        "back": 0.08293574333190919,
+        "centre": 0.5,
+        "wallPairs": 30,
+        "lipPairs": 45,
+        "wallPairsAgreeExactly": true,
+        "lipStepMax": 1.0,
+        "bodyVerticesWithAnyJaw": 144,
+        "shellVerticesFullJaw": 258,
+        "shellVertices": 321,
+        "shellShareMin": 0.5000000473743759
+      }
     },
-    "whatClosesItInstead": {
-      "hingeCapFaces": {
-        "Hybodus authored body": 17,
-        "Hybodus procedural volume twin": 28
-      },
-      "rimFoldVertices": {
-        "Hybodus authored body": 88,
-        "Hybodus procedural volume twin": 47
-      },
-      "rimFoldRaw": 0.00415,
-      "headSeamsSealed": {
-        "Hybodus authored body": {
-          "faces": 8,
-          "refusedTooWide": 1
+    "weightSteps": {
+      "Hybodus authored body": {
+        "maxJumpAlongAnEdge": 0.3452,
+        "skin": {
+          "edges": 29821,
+          "maxJumpAlongAnEdge": 0.3452,
+          "maxSteepnessPerRampWidth": 1.225,
+          "p99JumpAlongAnEdge": 0.094,
+          "edgesJumpingMoreThanATenth": 282,
+          "edgesJumpingMoreThanAQuarter": 26,
+          "worstEdge": {
+            "part": "head",
+            "aheadOfTheHingeWallRaw": -0.0542,
+            "aboveTheMouthPlaneRaw": -0.01857,
+            "edgeLengthRaw": 0.02267,
+            "jaw": [
+              0.118,
+              0.4632
+            ]
+          }
         },
-        "Hybodus procedural volume twin": {
-          "faces": 0,
-          "refusedTooWide": 0
+        "mouthCaps": {
+          "edges": 3634,
+          "maxJumpAlongAnEdge": 0.4921,
+          "maxSteepnessPerRampWidth": 0.904,
+          "p99JumpAlongAnEdge": 0.2446,
+          "edgesJumpingMoreThanATenth": 170,
+          "edgesJumpingMoreThanAQuarter": 34,
+          "worstEdge": {
+            "part": "mandible",
+            "aheadOfTheHingeWallRaw": 0.00098,
+            "aboveTheMouthPlaneRaw": -0.00928,
+            "edgeLengthRaw": 0.09505,
+            "jaw": [
+              0.9921,
+              0.5
+            ]
+          }
+        },
+        "hingeWallCaps": {
+          "edges": 88,
+          "maxJumpAlongAnEdge": 0.4997,
+          "maxSteepnessPerRampWidth": 0.224,
+          "p99JumpAlongAnEdge": 0.4997,
+          "edgesJumpingMoreThanATenth": 20,
+          "edgesJumpingMoreThanAQuarter": 16,
+          "worstEdge": {
+            "part": "mandible",
+            "aheadOfTheHingeWallRaw": 0.0,
+            "aboveTheMouthPlaneRaw": -0.01017,
+            "edgeLengthRaw": 0.0924,
+            "jaw": [
+              0.5,
+              0.9997
+            ]
+          }
+        },
+        "sharedPointsOffTheCut": 44,
+        "maxJumpOffTheCut": 0.0,
+        "sharedPointsOnTheCut": 147,
+        "maxJumpOnTheCut": 1.0
+      },
+      "Hybodus procedural volume twin": {
+        "maxJumpAlongAnEdge": 0.6516,
+        "skin": {
+          "edges": 9682,
+          "maxJumpAlongAnEdge": 0.6516,
+          "maxSteepnessPerRampWidth": 1.225,
+          "p99JumpAlongAnEdge": 0.1369,
+          "edgesJumpingMoreThanATenth": 144,
+          "edgesJumpingMoreThanAQuarter": 37,
+          "worstEdge": {
+            "part": "head",
+            "aheadOfTheHingeWallRaw": -0.04695,
+            "aboveTheMouthPlaneRaw": -0.03102,
+            "edgeLengthRaw": 0.0407,
+            "jaw": [
+              0.7499,
+              0.0983
+            ]
+          }
+        },
+        "mouthCaps": {
+          "edges": 1168,
+          "maxJumpAlongAnEdge": 0.4986,
+          "maxSteepnessPerRampWidth": 0.877,
+          "p99JumpAlongAnEdge": 0.4967,
+          "edgesJumpingMoreThanATenth": 148,
+          "edgesJumpingMoreThanAQuarter": 64,
+          "worstEdge": {
+            "part": "head",
+            "aheadOfTheHingeWallRaw": 0.00236,
+            "aboveTheMouthPlaneRaw": 0.0099,
+            "edgeLengthRaw": 0.09397,
+            "jaw": [
+              0.0014,
+              0.5
+            ]
+          }
+        },
+        "hingeWallCaps": {
+          "edges": 60,
+          "maxJumpAlongAnEdge": 0.5,
+          "maxSteepnessPerRampWidth": 0.22,
+          "p99JumpAlongAnEdge": 0.5,
+          "edgesJumpingMoreThanATenth": 16,
+          "edgesJumpingMoreThanAQuarter": 14,
+          "worstEdge": {
+            "part": "head",
+            "aheadOfTheHingeWallRaw": 0.0,
+            "aboveTheMouthPlaneRaw": -0.01037,
+            "edgeLengthRaw": 0.0943,
+            "jaw": [
+              1.0,
+              0.5
+            ]
+          }
+        },
+        "sharedPointsOffTheCut": 30,
+        "maxJumpOffTheCut": 0.0,
+        "sharedPointsOnTheCut": 45,
+        "maxJumpOnTheCut": 1.0
+      }
+    },
+    "maxJumpAlongAnEdgeAssertedUnder": {
+      "authored": 0.36,
+      "twin": 0.66
+    },
+    "maxSteepnessPerRampWidthAssertedUnder": 1.5,
+    "rampWidthUnits": 0.175,
+    "sweep": {
+      "note": "T.jaw_field_aimed swept over its ramp width (fraction of the body; the fade behind the hinge is twice it). Each row is a full rebuild on 04ee6af plus this builder, measured on the build's own GLB: the builder's jaw-weight steps (\"does not break\": the largest jump in jaw weight along an edge of the skin the body arrived with, and the same over the two kinds of fill), skin-tears.mjs, lag.mjs, and mandible-travel.mjs --profile (the mandible mesh only, in fifths from the hinge to the front of the mouth, at each clip's peak). Ships at 0.035: the widest ramp -- so the smallest step -- at which every fifth of the tooth row still travels at least 0.95 of its bone at Bite, the widest gape; 0.05 bows the rear of the jaw to 0.91 at Bite and 0.75 at Eat, 0.07 to 0.84 and 0.64 and takes the front with it. Skin and the jaw cut are the same at every width.",
+      "ships": 0.035,
+      "rows": [
+        {
+          "rampWidthOfBody": 0.02,
+          "worstSkin": 5.93,
+          "mouthSkin": "jaw 1.30x in TurnRight (0.061->0.079) \u00b7 skull 5.93x in Shake (0.017->0.099)",
+          "jawWeightJumpAlongASkinEdge": {
+            "authored": 0.5992,
+            "twin": 0.7699
+          },
+          "jawWeightJumpP99Authored": 0.0451,
+          "jawWeightJumpAlongAFillEdge": {
+            "mouthCaps": 0.5,
+            "hingeWallCaps": 0.5
+          },
+          "jawWeightJumpOffTheCut": 0.0,
+          "lagFollows": "Bite 0.99 \u00b7 Attack 0.99 \u00b7 Heavy 0.99 \u00b7 Eat 0.97",
+          "lagSeam": "480 rest-coincident cross-mesh pairs; cut plane 72, 0 open past 0.2 %, worst 0.00 % of a body at @0.00; lip 408, gape 5.6 % at Heavy (cut read off the hinge wall of docs/triassic/mouths/hybodus-mouth.json)",
+          "toothRowTravelOverRigidByFifthFromHinge": {
+            "Bite": [
+              1.002,
+              0.998,
+              1,
+              1,
+              1
+            ],
+            "Attack": [
+              1.003,
+              1,
+              1,
+              1,
+              1
+            ],
+            "Heavy": [
+              1.002,
+              1,
+              1,
+              1,
+              1
+            ],
+            "Eat": [
+              0.955,
+              0.994,
+              1,
+              1,
+              1
+            ],
+            "Shake": [
+              0.999,
+              1,
+              1,
+              1,
+              1
+            ],
+            "Grab": [
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          "mandibleFrontFifthTravelOverRigid": {
+            "Bite": 1,
+            "Attack": 1,
+            "Heavy": 1,
+            "Eat": 1,
+            "Shake": 1,
+            "Grab": 1
+          }
+        },
+        {
+          "rampWidthOfBody": 0.027,
+          "worstSkin": 5.93,
+          "mouthSkin": "jaw 1.28x in TurnRight (0.059->0.075) \u00b7 skull 5.93x in Shake (0.017->0.099)",
+          "jawWeightJumpAlongASkinEdge": {
+            "authored": 0.4106,
+            "twin": 0.6145
+          },
+          "jawWeightJumpP99Authored": 0.0796,
+          "jawWeightJumpAlongAFillEdge": {
+            "mouthCaps": 0.5,
+            "hingeWallCaps": 0.5
+          },
+          "jawWeightJumpOffTheCut": 0.0,
+          "lagFollows": "Bite 0.99 \u00b7 Attack 1.00 \u00b7 Heavy 1.00 \u00b7 Eat 0.98",
+          "lagSeam": "480 rest-coincident cross-mesh pairs; cut plane 72, 0 open past 0.2 %, worst 0.00 % of a body at @0.00; lip 408, gape 5.6 % at Heavy (cut read off the hinge wall of docs/triassic/mouths/hybodus-mouth.json)",
+          "toothRowTravelOverRigidByFifthFromHinge": {
+            "Bite": [
+              1,
+              0.988,
+              1,
+              1,
+              1
+            ],
+            "Attack": [
+              1.004,
+              1.002,
+              1,
+              1,
+              1
+            ],
+            "Heavy": [
+              1.004,
+              1.002,
+              1,
+              1,
+              1
+            ],
+            "Eat": [
+              0.92,
+              0.961,
+              1,
+              1,
+              1
+            ],
+            "Shake": [
+              1.001,
+              0.999,
+              1,
+              1,
+              1
+            ],
+            "Grab": [
+              1,
+              0.999,
+              1,
+              1,
+              1
+            ]
+          },
+          "mandibleFrontFifthTravelOverRigid": {
+            "Bite": 1,
+            "Attack": 1,
+            "Heavy": 1,
+            "Eat": 1,
+            "Shake": 1,
+            "Grab": 1
+          }
+        },
+        {
+          "rampWidthOfBody": 0.035,
+          "worstSkin": 5.93,
+          "mouthSkin": "jaw 1.22x in TurnRight (0.065->0.079) \u00b7 skull 5.93x in Shake (0.017->0.099)",
+          "jawWeightJumpAlongASkinEdge": {
+            "authored": 0.3452,
+            "twin": 0.6516
+          },
+          "jawWeightJumpP99Authored": 0.094,
+          "jawWeightJumpAlongAFillEdge": {
+            "mouthCaps": 0.4921,
+            "hingeWallCaps": 0.4997
+          },
+          "jawWeightJumpOffTheCut": 0.0,
+          "lagFollows": "Bite 0.99 \u00b7 Attack 1.00 \u00b7 Heavy 1.00 \u00b7 Eat 0.99",
+          "lagSeam": "480 rest-coincident cross-mesh pairs; cut plane 72, 0 open past 0.2 %, worst 0.00 % of a body at @0.00; lip 408, gape 5.6 % at Heavy (cut read off the hinge wall of docs/triassic/mouths/hybodus-mouth.json)",
+          "toothRowTravelOverRigidByFifthFromHinge": {
+            "Bite": [
+              1.004,
+              0.956,
+              0.996,
+              1,
+              1
+            ],
+            "Attack": [
+              1.006,
+              1.005,
+              1,
+              1,
+              1
+            ],
+            "Heavy": [
+              1.005,
+              1.004,
+              1,
+              1,
+              1
+            ],
+            "Eat": [
+              0.89,
+              0.882,
+              0.995,
+              1,
+              1
+            ],
+            "Shake": [
+              1.002,
+              0.999,
+              0.999,
+              1,
+              1
+            ],
+            "Grab": [
+              1.002,
+              0.995,
+              0.999,
+              1,
+              1
+            ]
+          },
+          "mandibleFrontFifthTravelOverRigid": {
+            "Bite": 1,
+            "Attack": 1,
+            "Heavy": 1,
+            "Eat": 1,
+            "Shake": 1,
+            "Grab": 1
+          }
+        },
+        {
+          "rampWidthOfBody": 0.05,
+          "worstSkin": 5.93,
+          "mouthSkin": "jaw 1.14x in TurnRight (0.066->0.075) \u00b7 skull 5.93x in Shake (0.017->0.099)",
+          "jawWeightJumpAlongASkinEdge": {
+            "authored": 0.2726,
+            "twin": 0.4635
+          },
+          "jawWeightJumpP99Authored": 0.095,
+          "jawWeightJumpAlongAFillEdge": {
+            "mouthCaps": 0.4087,
+            "hingeWallCaps": 0.434
+          },
+          "jawWeightJumpOffTheCut": 0.0,
+          "lagFollows": "Bite 0.99 \u00b7 Attack 1.00 \u00b7 Heavy 1.00 \u00b7 Eat 0.98",
+          "lagSeam": "480 rest-coincident cross-mesh pairs; cut plane 72, 0 open past 0.2 %, worst 0.00 % of a body at @0.00; lip 408, gape 5.6 % at Heavy (cut read off the hinge wall of docs/triassic/mouths/hybodus-mouth.json)",
+          "toothRowTravelOverRigidByFifthFromHinge": {
+            "Bite": [
+              1.022,
+              0.909,
+              0.935,
+              0.999,
+              1
+            ],
+            "Attack": [
+              1.009,
+              1.01,
+              1.002,
+              1,
+              1
+            ],
+            "Heavy": [
+              1.009,
+              1.009,
+              1.002,
+              1,
+              1
+            ],
+            "Eat": [
+              0.841,
+              0.75,
+              0.907,
+              0.999,
+              1
+            ],
+            "Shake": [
+              1.004,
+              0.999,
+              0.995,
+              1,
+              1
+            ],
+            "Grab": [
+              1.005,
+              0.991,
+              0.989,
+              1,
+              1
+            ]
+          },
+          "mandibleFrontFifthTravelOverRigid": {
+            "Bite": 0.983,
+            "Attack": 1.001,
+            "Heavy": 1.002,
+            "Eat": 0.972,
+            "Shake": 1.003,
+            "Grab": 0.996
+          }
+        },
+        {
+          "rampWidthOfBody": 0.07,
+          "worstSkin": 5.93,
+          "mouthSkin": "jaw 1.17x in TurnLeft (0.069->0.080) \u00b7 skull 5.93x in Shake (0.017->0.099)",
+          "jawWeightJumpAlongASkinEdge": {
+            "authored": 0.2293,
+            "twin": 0.2989
+          },
+          "jawWeightJumpP99Authored": 0.0967,
+          "jawWeightJumpAlongAFillEdge": {
+            "mouthCaps": 0.3135,
+            "hingeWallCaps": 0.3383
+          },
+          "jawWeightJumpOffTheCut": 0.0,
+          "lagFollows": "Bite 0.98 \u00b7 Attack 0.99 \u00b7 Heavy 0.99 \u00b7 Eat 0.95",
+          "lagSeam": "480 rest-coincident cross-mesh pairs; cut plane 72, 0 open past 0.2 %, worst 0.00 % of a body at @0.00; lip 408, gape 5.5 % at Heavy (cut read off the hinge wall of docs/triassic/mouths/hybodus-mouth.json)",
+          "toothRowTravelOverRigidByFifthFromHinge": {
+            "Bite": [
+              1.046,
+              0.88,
+              0.841,
+              0.93,
+              0.984
+            ],
+            "Attack": [
+              1.016,
+              1.016,
+              1.007,
+              0.998,
+              0.998
+            ],
+            "Heavy": [
+              1.014,
+              1.015,
+              1.008,
+              0.999,
+              0.999
+            ],
+            "Eat": [
+              0.772,
+              0.644,
+              0.765,
+              0.919,
+              0.982
+            ],
+            "Shake": [
+              1.006,
+              1.001,
+              0.996,
+              1.003,
+              0.998
+            ],
+            "Grab": [
+              1.013,
+              0.991,
+              0.978,
+              0.985,
+              0.995
+            ]
+          },
+          "mandibleFrontFifthTravelOverRigid": {
+            "Bite": 0.732,
+            "Attack": 1.007,
+            "Heavy": 1.011,
+            "Eat": 0.581,
+            "Shake": 1.038,
+            "Grab": 0.938
+          }
+        }
+      ]
+    },
+    "note": "weightSteps is the \"does not break\" figure: over every edge of both halves the largest jump in jaw weight between its ends, and over every point the cut duplicated the jump off the cut (nought, asserted) and on it (the mouth line, which parts by design and is closed by the caps)."
+  },
+  "cut": {
+    "rim": {
+      "Hybodus authored body": {
+        "skull": {
+          "boundaryEdgesInRegion": 189,
+          "boundaryEdgesElsewhere": 20,
+          "loops": [
+            {
+              "vertices": 163,
+              "closed": true,
+              "box": [
+                [
+                  -0.11709,
+                  0.06916
+                ],
+                [
+                  -0.53443,
+                  -0.45964
+                ],
+                [
+                  -0.0519,
+                  0.00493
+                ]
+              ],
+              "reach": 0.07479,
+              "verticesOnTheSeam": 0
+            },
+            {
+              "vertices": 18,
+              "closed": true,
+              "box": [
+                [
+                  -0.03004,
+                  -0.01046
+                ],
+                [
+                  -0.53618,
+                  -0.53273
+                ],
+                [
+                  0.00382,
+                  0.00525
+                ]
+              ],
+              "reach": 0.00345,
+              "verticesOnTheSeam": 0
+            },
+            {
+              "vertices": 6,
+              "closed": true,
+              "box": [
+                [
+                  -0.03652,
+                  -0.03292
+                ],
+                [
+                  -0.53348,
+                  -0.53215
+                ],
+                [
+                  0.00449,
+                  0.00491
+                ]
+              ],
+              "reach": 0.00133,
+              "verticesOnTheSeam": 0
+            },
+            {
+              "vertices": 3,
+              "closed": false,
+              "box": [
+                [
+                  -0.10294,
+                  -0.10245
+                ],
+                [
+                  -0.51155,
+                  -0.51087
+                ],
+                [
+                  0.00861,
+                  0.01035
+                ]
+              ],
+              "reach": 0.00068,
+              "verticesOnTheSeam": 0
+            }
+          ]
+        },
+        "jaw": {
+          "boundaryEdgesInRegion": 187,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 163,
+              "closed": true,
+              "box": [
+                [
+                  -0.11709,
+                  0.06916
+                ],
+                [
+                  -0.53443,
+                  -0.45964
+                ],
+                [
+                  -0.0519,
+                  0.00493
+                ]
+              ],
+              "reach": 0.07479,
+              "verticesOnTheSeam": 0
+            },
+            {
+              "vertices": 18,
+              "closed": true,
+              "box": [
+                [
+                  -0.03004,
+                  -0.01046
+                ],
+                [
+                  -0.53618,
+                  -0.53273
+                ],
+                [
+                  0.00382,
+                  0.00525
+                ]
+              ],
+              "reach": 0.00345,
+              "verticesOnTheSeam": 0
+            },
+            {
+              "vertices": 6,
+              "closed": true,
+              "box": [
+                [
+                  -0.03652,
+                  -0.03292
+                ],
+                [
+                  -0.53348,
+                  -0.53215
+                ],
+                [
+                  0.00449,
+                  0.00491
+                ]
+              ],
+              "reach": 0.00133,
+              "verticesOnTheSeam": 0
+            }
+          ]
         }
       },
-      "boundaryEdgesLeftOpen": {
-        "Hybodus authored body": {
-          "onSeam": 112,
-          "otherOnHead": 178,
-          "behindHead": 12
+      "Hybodus procedural volume twin": {
+        "skull": {
+          "boundaryEdgesInRegion": 74,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 74,
+              "closed": true,
+              "box": [
+                [
+                  -0.1166,
+                  0.06871
+                ],
+                [
+                  -0.55581,
+                  -0.45965
+                ],
+                [
+                  -0.05362,
+                  0.0127
+                ]
+              ],
+              "reach": 0.09617,
+              "verticesOnTheSeam": 0
+            }
+          ]
         },
-        "Hybodus procedural volume twin": {
-          "onSeam": 49,
-          "otherOnHead": 7,
-          "behindHead": 0
+        "jaw": {
+          "boundaryEdgesInRegion": 74,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 74,
+              "closed": true,
+              "box": [
+                [
+                  -0.1166,
+                  0.06871
+                ],
+                [
+                  -0.55581,
+                  -0.45965
+                ],
+                [
+                  -0.05362,
+                  0.0127
+                ]
+              ],
+              "reach": 0.09617,
+              "verticesOnTheSeam": 0
+            }
+          ]
+        }
+      }
+    },
+    "caps": {
+      "Hybodus authored body": {
+        "skullAtHinge": 43,
+        "jawAtHinge": 43,
+        "palate": {
+          "rimEdges": 146,
+          "capped": true,
+          "faces": 1260,
+          "domedVertices": 560,
+          "deepestRaw": 0.018557,
+          "dome": 0.3,
+          "rounds": 2,
+          "firstNewVertex": 9769,
+          "rimVertices": 146,
+          "cycles": [
+            122,
+            6,
+            18
+          ]
+        },
+        "floor": {
+          "rimEdges": 146,
+          "capped": true,
+          "faces": 1260,
+          "domedVertices": 560,
+          "deepestRaw": 0.018557,
+          "dome": 0.3,
+          "rounds": 2,
+          "firstNewVertex": 384,
+          "rimVertices": 146,
+          "cycles": [
+            122,
+            6,
+            18
+          ]
         }
       },
-      "note": "the hinge cross-section is fanned shut with its own cut vertices (T.cap_cut) and the seam rim is folded in towards the mouth axis (T.rim_flange), running out before the snout where the two rims meet; the palate then closes the throat behind both. The shipped body material is double-sided, so none of it is drawn at runtime."
-    }
-  },
-  "oralShells": {
-    "contract": "a palate rigid on skull and a floor rigid on jaw, each a closed shell (T.oral_shells), overlapping behind the hinge, no wall between them",
-    "palateVertices": 168,
-    "floorVertices": 168,
-    "rings": 24,
-    "ring": 14,
-    "backY": -0.43499,
-    "frontY": -0.544,
-    "floorFrontY": -0.54127,
-    "mandibleTipY": -0.55311,
-    "lateralAxisAtStations": [
-      [
-        -0.435,
-        -0.0039
-      ],
-      [
-        -0.4532,
-        -0.0103
-      ],
-      [
-        -0.4713,
-        -0.0274
-      ],
-      [
-        -0.4895,
-        -0.0147
-      ],
-      [
-        -0.5077,
-        -0.005
-      ],
-      [
-        -0.5258,
-        -0.0204
-      ],
-      [
-        -0.544,
-        -0.0146
-      ]
-    ],
-    "palateAndFloorLinesAtStations": [
-      [
-        -0.435,
-        -0.0017,
-        0.0036,
-        -0.0069
-      ],
-      [
-        -0.4532,
-        -0.0017,
-        0.0036,
-        -0.0069
-      ],
-      [
-        -0.4713,
-        -0.0017,
-        0.0036,
-        -0.0069
-      ],
-      [
-        -0.4895,
-        -0.001,
-        0.0099,
-        -0.0083
-      ],
-      [
-        -0.5077,
-        0.0027,
-        0.0152,
-        -0.0076
-      ],
-      [
-        -0.5258,
-        0.0072,
-        0.0183,
-        -0.0016
-      ],
-      [
-        -0.544,
-        0.0115,
-        0.0237,
-        -0.0008
-      ]
-    ],
-    "builtAboutEachJawsOwnEdgeOfTheLumen": true,
-    "throatFraction": 0.5,
-    "mandibleNormalVoteAgainstTheIntakeSurface": {
-      "Hybodus authored body lower jaw": -1292,
-      "Hybodus procedural volume twin lower jaw": 212
+      "Hybodus procedural volume twin": {
+        "skullAtHinge": 29,
+        "jawAtHinge": 29,
+        "palate": {
+          "rimEdges": 47,
+          "capped": true,
+          "faces": 405,
+          "domedVertices": 180,
+          "deepestRaw": 0.019809,
+          "dome": 0.3,
+          "rounds": 2,
+          "firstNewVertex": 3305,
+          "rimVertices": 47,
+          "cycles": [
+            47
+          ]
+        },
+        "floor": {
+          "rimEdges": 47,
+          "capped": true,
+          "faces": 405,
+          "domedVertices": 180,
+          "deepestRaw": 0.019809,
+          "dome": 0.3,
+          "rounds": 2,
+          "firstNewVertex": 141,
+          "rimVertices": 47,
+          "cycles": [
+            47
+          ]
+        }
+      }
     },
-    "measuredRoomAtStations": [
-      [
-        -0.435,
-        0.0934,
-        0.1103,
-        0.0621
-      ],
-      [
-        -0.4532,
-        0.0945,
-        0.1064,
-        0.0571
-      ],
-      [
-        -0.4713,
-        0.0919,
-        0.1015,
-        0.0504
-      ],
-      [
-        -0.4895,
-        0.0793,
-        0.098,
-        0.0435
-      ],
-      [
-        -0.5077,
-        0.0553,
-        0.089,
-        0.0364
-      ],
-      [
-        -0.5258,
-        0.0616,
-        0.0797,
-        0.0308
-      ],
-      [
-        -0.544,
-        0.0215,
-        0.0705,
-        0.0
-      ]
-    ],
-    "vertexDirectionsOpenToTheOutside": 0,
-    "verticesSeatedInsideTheSilhouette": {
-      "vertices": 125,
-      "maxPullRaw": 0.0688120939516066
-    }
+    "capSeating": {
+      "Hybodus authored body": {
+        "capVertices": 1120,
+        "worstHullClearanceRaw": -0.00031769384994771445,
+        "outsideTheSectionHull": 1,
+        "outsideByRayParity": 239,
+        "seenFromOutsideAlong26Directions": 0,
+        "seenFromOutsideAt": [],
+        "standingOutOfTheSkin": 0
+      },
+      "Hybodus procedural volume twin": {
+        "capVertices": 360,
+        "worstHullClearanceRaw": -0.0027987055319099053,
+        "outsideTheSectionHull": 7,
+        "outsideByRayParity": 50,
+        "seenFromOutsideAlong26Directions": 4,
+        "seenFromOutsideAt": [
+          [
+            -0.0361,
+            -0.5456,
+            0.007,
+            0.00121
+          ],
+          [
+            0.044,
+            -0.5061,
+            -0.0108,
+            0.0014
+          ],
+          [
+            -0.0359,
+            -0.5449,
+            0.0065,
+            0.00145
+          ],
+          [
+            -0.0571,
+            -0.5441,
+            0.0074,
+            0.00158
+          ]
+        ],
+        "standingOutOfTheSkin": 0
+      }
+    },
+    "intakeBoundaryEdgesBeforeTheCut": {
+      "authored": 22,
+      "twin": 0,
+      "authoredHead": 6,
+      "twinHead": 0
+    },
+    "dome": 0.3,
+    "ceilingOfTheHeadsRoom": 0.55,
+    "seamToleranceRaw": 0.00296,
+    "onSkinRaw": 0.00118,
+    "onSkinBoundRaw": 0.00296,
+    "retired": [
+      "the shear onto the measured seam and the per-tooth labels",
+      "holes_fill over the mandible's boundary and the normal vote it needed",
+      "T.rim_flange on the lip rim",
+      "T.seal_seams after the cut",
+      "the two rigid T.oral_shells (palate on skull, floor on jaw)",
+      "the hinge report that justified having no plug"
+    ]
   },
-  "liningClearanceInsideSkinRaw": 0.00379,
   "scale": 4.22013,
   "bodyLength": 5.0,
-  "authoredTriangles": 22161,
-  "twinTriangles": 7984,
+  "authoredTriangles": 22546,
+  "twinTriangles": 7604,
   "twinRemeshTriangles": 63140,
   "twinDecimateRatio": 0.10294583439826965,
   "twinVerticesHeldBackFromRelaxation": 11372,
@@ -517,7 +1290,7 @@
       ],
       [
         1.293092966079712,
-        2.515584945678711,
+        2.5155856609344482,
         1.1012121438980103
       ]
     ],
@@ -529,7 +1302,7 @@
       ],
       [
         1.3211524486541748,
-        2.5382211208343506,
+        2.5382237434387207,
         1.0599169731140137
       ]
     ],
@@ -553,7 +1326,7 @@
       ],
       [
         1.3718035221099854,
-        2.5592081546783447,
+        2.5592153072357178,
         1.0481345653533936
       ]
     ],
@@ -565,7 +1338,7 @@
       ],
       [
         1.2991951704025269,
-        2.6125540733337402,
+        2.6126132011413574,
         1.0436943769454956
       ]
     ],
@@ -637,7 +1410,7 @@
       ],
       [
         1.291979432106018,
-        2.607111692428589,
+        2.60714054107666,
         1.0436943769454956
       ]
     ],
@@ -649,7 +1422,7 @@
       ],
       [
         1.2926791906356812,
-        2.51556134223938,
+        2.5155606269836426,
         1.1134276390075684
       ]
     ],
@@ -673,7 +1446,7 @@
       ],
       [
         1.2941257953643799,
-        2.5154669284820557,
+        2.5154662132263184,
         1.1179367303848267
       ]
     ],
@@ -685,7 +1458,7 @@
       ],
       [
         1.3496891260147095,
-        2.5153963565826416,
+        2.5153958797454834,
         1.0608258247375488
       ]
     ],
@@ -717,121 +1490,247 @@
   "weights": {
     "Hybodus authored body": {
       "maxInfluences": 4,
-      "vertices": 10893,
+      "vertices": 11273,
       "verticesPerBone": {
         "dorsal_1": 994,
-        "body": 4158,
-        "chest": 5600,
-        "tail_00": 2664,
-        "skull": 4667,
-        "pec_mid_L": 650,
-        "pec_upper_L": 704,
-        "dorsal_2": 530,
-        "tail_01": 1949,
-        "jaw": 514,
-        "tail_02": 1359,
-        "pec_mid_R": 825,
-        "pec_upper_R": 796,
-        "tail_03": 1295,
-        "tail_04": 1176,
+        "body": 3986,
+        "chest": 5552,
+        "tail_00": 2543,
+        "skull": 5261,
+        "jaw": 656,
+        "pec_mid_L": 711,
+        "pec_upper_L": 695,
+        "dorsal_2": 529,
+        "tail_01": 1834,
+        "tail_02": 1249,
+        "pec_mid_R": 916,
+        "pec_upper_R": 795,
+        "tail_03": 1185,
+        "tail_04": 1080,
         "pelvic_R": 485,
-        "tail_05": 908,
+        "tail_05": 810,
         "pelvic_L": 546,
-        "tail_06": 619,
-        "caudal_upper": 241,
-        "caudal_lower": 284,
+        "tail_06": 536,
+        "caudal_upper": 194,
+        "caudal_lower": 238,
         "pec_tip_R": 538,
         "pec_tip_L": 393
       },
-      "jawJunction": {
-        "cutRimPairs": 81,
-        "lipPairs": 163,
-        "rimReach": 0.13483949961039995,
-        "rimDepth": 0.0638849288225174,
-        "dz": 0.021294976274172466,
-        "band": 0.017771944999694825,
-        "back": 0.0710877799987793,
-        "throat": 1.0,
-        "shellVertices": 849,
-        "shellFullJaw": 708,
-        "bodyThroatVertices": 424
+      "jawField": {
+        "construction": "one share over both halves (T.jaw_field_aimed), continuous except across the aimed cut",
+        "width": 0.04146787166595459,
+        "corner": 0.04146787166595459,
+        "back": 0.08293574333190919,
+        "centre": 0.5,
+        "wallPairs": 44,
+        "lipPairs": 147,
+        "wallPairsAgreeExactly": true,
+        "lipStepMax": 1.0,
+        "bodyVerticesWithAnyJaw": 533,
+        "shellVerticesFullJaw": 721,
+        "shellVertices": 944,
+        "shellShareMin": 0.49999988630220216
+      },
+      "jawWeightSteps": {
+        "maxJumpAlongAnEdge": 0.3452,
+        "skin": {
+          "edges": 29821,
+          "maxJumpAlongAnEdge": 0.3452,
+          "maxSteepnessPerRampWidth": 1.225,
+          "p99JumpAlongAnEdge": 0.094,
+          "edgesJumpingMoreThanATenth": 282,
+          "edgesJumpingMoreThanAQuarter": 26,
+          "worstEdge": {
+            "part": "head",
+            "aheadOfTheHingeWallRaw": -0.0542,
+            "aboveTheMouthPlaneRaw": -0.01857,
+            "edgeLengthRaw": 0.02267,
+            "jaw": [
+              0.118,
+              0.4632
+            ]
+          }
+        },
+        "mouthCaps": {
+          "edges": 3634,
+          "maxJumpAlongAnEdge": 0.4921,
+          "maxSteepnessPerRampWidth": 0.904,
+          "p99JumpAlongAnEdge": 0.2446,
+          "edgesJumpingMoreThanATenth": 170,
+          "edgesJumpingMoreThanAQuarter": 34,
+          "worstEdge": {
+            "part": "mandible",
+            "aheadOfTheHingeWallRaw": 0.00098,
+            "aboveTheMouthPlaneRaw": -0.00928,
+            "edgeLengthRaw": 0.09505,
+            "jaw": [
+              0.9921,
+              0.5
+            ]
+          }
+        },
+        "hingeWallCaps": {
+          "edges": 88,
+          "maxJumpAlongAnEdge": 0.4997,
+          "maxSteepnessPerRampWidth": 0.224,
+          "p99JumpAlongAnEdge": 0.4997,
+          "edgesJumpingMoreThanATenth": 20,
+          "edgesJumpingMoreThanAQuarter": 16,
+          "worstEdge": {
+            "part": "mandible",
+            "aheadOfTheHingeWallRaw": 0.0,
+            "aboveTheMouthPlaneRaw": -0.01017,
+            "edgeLengthRaw": 0.0924,
+            "jaw": [
+              0.5,
+              0.9997
+            ]
+          }
+        },
+        "sharedPointsOffTheCut": 44,
+        "maxJumpOffTheCut": 0.0,
+        "sharedPointsOnTheCut": 147,
+        "maxJumpOnTheCut": 1.0
       }
     },
     "Hybodus procedural volume twin": {
       "maxInfluences": 4,
-      "vertices": 3691,
+      "vertices": 3806,
       "verticesPerBone": {
-        "tail_05": 356,
-        "tail_06": 240,
-        "tail_04": 431,
-        "tail_03": 449,
-        "caudal_lower": 123,
-        "caudal_upper": 97,
-        "tail_02": 494,
-        "tail_01": 878,
-        "tail_00": 1130,
-        "body": 1564,
-        "dorsal_2": 235,
-        "chest": 2021,
-        "pelvic_L": 253,
-        "pelvic_R": 230,
-        "dorsal_1": 414,
-        "skull": 1691,
-        "pec_upper_R": 437,
-        "pec_upper_L": 369,
-        "pec_mid_L": 388,
+        "tail_05": 308,
+        "tail_06": 203,
+        "tail_04": 382,
+        "tail_03": 406,
+        "caudal_lower": 104,
+        "caudal_upper": 77,
+        "tail_02": 446,
+        "tail_01": 817,
+        "tail_00": 1070,
+        "body": 1495,
+        "dorsal_2": 231,
+        "chest": 1994,
+        "pelvic_L": 252,
+        "pelvic_R": 227,
+        "dorsal_1": 404,
+        "skull": 1772,
+        "pec_upper_R": 417,
+        "pec_upper_L": 356,
+        "pec_mid_L": 381,
         "pec_tip_L": 210,
-        "jaw": 84,
-        "pec_mid_R": 404,
+        "jaw": 182,
+        "pec_mid_R": 394,
         "pec_tip_R": 227
       },
-      "jawJunction": {
-        "cutRimPairs": 28,
-        "lipPairs": 50,
-        "rimReach": 0.1270104257457621,
-        "rimDepth": 0.046013303101062775,
-        "dz": 0.015337767700354258,
-        "band": 0.017771944999694825,
-        "back": 0.0710877799987793,
-        "throat": 1.0,
-        "shellVertices": 175,
-        "shellFullJaw": 149,
-        "bodyThroatVertices": 71
+      "jawField": {
+        "construction": "one share over both halves (T.jaw_field_aimed), continuous except across the aimed cut",
+        "width": 0.04146787166595459,
+        "corner": 0.04146787166595459,
+        "back": 0.08293574333190919,
+        "centre": 0.5,
+        "wallPairs": 30,
+        "lipPairs": 45,
+        "wallPairsAgreeExactly": true,
+        "lipStepMax": 1.0,
+        "bodyVerticesWithAnyJaw": 144,
+        "shellVerticesFullJaw": 258,
+        "shellVertices": 321,
+        "shellShareMin": 0.5000000473743759
+      },
+      "jawWeightSteps": {
+        "maxJumpAlongAnEdge": 0.6516,
+        "skin": {
+          "edges": 9682,
+          "maxJumpAlongAnEdge": 0.6516,
+          "maxSteepnessPerRampWidth": 1.225,
+          "p99JumpAlongAnEdge": 0.1369,
+          "edgesJumpingMoreThanATenth": 144,
+          "edgesJumpingMoreThanAQuarter": 37,
+          "worstEdge": {
+            "part": "head",
+            "aheadOfTheHingeWallRaw": -0.04695,
+            "aboveTheMouthPlaneRaw": -0.03102,
+            "edgeLengthRaw": 0.0407,
+            "jaw": [
+              0.7499,
+              0.0983
+            ]
+          }
+        },
+        "mouthCaps": {
+          "edges": 1168,
+          "maxJumpAlongAnEdge": 0.4986,
+          "maxSteepnessPerRampWidth": 0.877,
+          "p99JumpAlongAnEdge": 0.4967,
+          "edgesJumpingMoreThanATenth": 148,
+          "edgesJumpingMoreThanAQuarter": 64,
+          "worstEdge": {
+            "part": "head",
+            "aheadOfTheHingeWallRaw": 0.00236,
+            "aboveTheMouthPlaneRaw": 0.0099,
+            "edgeLengthRaw": 0.09397,
+            "jaw": [
+              0.0014,
+              0.5
+            ]
+          }
+        },
+        "hingeWallCaps": {
+          "edges": 60,
+          "maxJumpAlongAnEdge": 0.5,
+          "maxSteepnessPerRampWidth": 0.22,
+          "p99JumpAlongAnEdge": 0.5,
+          "edgesJumpingMoreThanATenth": 16,
+          "edgesJumpingMoreThanAQuarter": 14,
+          "worstEdge": {
+            "part": "head",
+            "aheadOfTheHingeWallRaw": 0.0,
+            "aboveTheMouthPlaneRaw": -0.01037,
+            "edgeLengthRaw": 0.0943,
+            "jaw": [
+              1.0,
+              0.5
+            ]
+          }
+        },
+        "sharedPointsOffTheCut": 30,
+        "maxJumpOffTheCut": 0.0,
+        "sharedPointsOnTheCut": 45,
+        "maxJumpOnTheCut": 1.0
       }
     }
   },
   "finBladeSpansMeasuredOffTheGeneration": {
     "caudal": [
-      0.00266,
-      0.01508
+      0.00389,
+      0.01954
     ]
   },
   "bladeVerticesByStation": [
     {
       "fromBodyFraction": 0.0,
       "above": 14,
-      "below": 142,
+      "below": 179,
       "maxOutAbove": 0.0173,
-      "maxOutBelow": 0.0301
+      "maxOutBelow": 0.0323
     },
     {
       "fromBodyFraction": 0.05,
       "above": 61,
-      "below": 195,
+      "below": 738,
       "maxOutAbove": 0.0259,
-      "maxOutBelow": 0.03
+      "maxOutBelow": 0.0403
     },
     {
       "fromBodyFraction": 0.1,
       "above": 0,
-      "below": 40,
+      "below": 46,
       "maxOutAbove": 0.0,
-      "maxOutBelow": 0.0282
+      "maxOutBelow": 0.0562
     },
     {
       "fromBodyFraction": 0.15,
-      "above": 25,
-      "below": 521,
+      "above": 26,
+      "below": 509,
       "maxOutAbove": 0.0162,
       "maxOutBelow": 0.18
     },
@@ -929,21 +1828,21 @@
     {
       "fromBodyFraction": 0.85,
       "above": 46,
-      "below": 138,
+      "below": 127,
       "maxOutAbove": 0.0172,
       "maxOutBelow": 0.0571
     },
     {
       "fromBodyFraction": 0.9,
       "above": 52,
-      "below": 115,
+      "below": 94,
       "maxOutAbove": 0.0177,
       "maxOutBelow": 0.0515
     },
     {
       "fromBodyFraction": 0.95,
       "above": 39,
-      "below": 83,
+      "below": 56,
       "maxOutAbove": 0.016,
       "maxOutBelow": 0.0367
     }
@@ -957,24 +1856,24 @@
     "maximumEnvelopeDifference": 0.060456812381744385,
     "maximumEnvelopeDifferenceFractionOfBodyLength": 0.012091362476348877,
     "surfaceDistanceMax": 0.07419749349355698,
-    "surfaceDistanceP95": 0.026268914341926575,
+    "surfaceDistanceP95": 0.026083408296108244,
     "envelopeTolerance": 0.2
   },
   "anchors": {
     "anchor_mouth": {
-      "nearestSurfaceRaw": 0.00327,
-      "nearestSurfaceUnits": 0.01378,
-      "fractionOfBodyLength": 0.00276
+      "nearestSurfaceRaw": 0.00127,
+      "nearestSurfaceUnits": 0.00536,
+      "fractionOfBodyLength": 0.00107
     },
     "anchor_mouth_inside": {
-      "nearestSurfaceRaw": 0.0028,
-      "nearestSurfaceUnits": 0.01183,
-      "fractionOfBodyLength": 0.00237
+      "nearestSurfaceRaw": 0.01029,
+      "nearestSurfaceUnits": 0.04344,
+      "fractionOfBodyLength": 0.00869
     },
     "anchor_attack_primary": {
-      "nearestSurfaceRaw": 0.00408,
-      "nearestSurfaceUnits": 0.0172,
-      "fractionOfBodyLength": 0.00344
+      "nearestSurfaceRaw": 0.00361,
+      "nearestSurfaceUnits": 0.01521,
+      "fractionOfBodyLength": 0.00304
     }
   },
   "appendageRootSeating": {
@@ -982,18 +1881,18 @@
     "pec_upper_L": 0.0257,
     "pelvic_R": 0.0195,
     "pelvic_L": 0.0289,
-    "jaw": 0.0261,
     "skull": 0.0598,
     "chest": 0.0968,
-    "body": 0.0638
+    "body": 0.0638,
+    "jaw": 0.0217
   },
   "jawShutFromTheGenerationsPartedPose": {
     "closingRotationDegrees": 18.72,
-    "mandibleVerticesMeasured": 849,
-    "verticesInsideTheSkullSurface": 584,
-    "maxPenetrationUnits": 0.1996,
-    "maxPenetrationOverBodyLength": 0.03992,
-    "meanPenetrationOverBodyLength": 0.007619,
+    "mandibleVerticesMeasured": 944,
+    "verticesInsideTheSkullSurface": 713,
+    "maxPenetrationUnits": 0.07958,
+    "maxPenetrationOverBodyLength": 0.01592,
+    "meanPenetrationOverBodyLength": 0.003793,
     "note": "the mandible posed at the measured closing rotation, against the skull's own surface in the same pose. Anything above zero is the generation's two tooth rows, modelled apart, meeting for the first time."
   },
   "authoredVerticesFarthestFromTheTwin": [
@@ -1022,23 +1921,7 @@
       ]
     ],
     [
-      0.0644,
-      [
-        -0.214,
-        -2.121,
-        0.073
-      ]
-    ],
-    [
-      0.0634,
-      [
-        -0.17,
-        -2.166,
-        0.083
-      ]
-    ],
-    [
-      0.0616,
+      0.0625,
       [
         -0.026,
         -2.138,
@@ -1059,6 +1942,22 @@
         0.075,
         -0.671,
         0.371
+      ]
+    ],
+    [
+      0.0593,
+      [
+        -0.048,
+        -2.174,
+        0.079
+      ]
+    ],
+    [
+      0.0591,
+      [
+        -0.17,
+        -2.166,
+        0.083
       ]
     ]
   ],
@@ -1083,233 +1982,14 @@
       1,
       1
     ],
-    "note": "Measured 22 September 2026 on the reverted (cut, flanged, sealed, capped and lined) body, over every clip whose jaw leaves the shut pose: the eight that open past neutral at their own peak gape, the seven that only stir it, and the three legacy phases T3D-32A recorded its before-numbers at (Heavy@0.4, Bite@0.133, Attack@0.333). --as-drawn is the verdict; the plain run is what the file contains.",
-    "asDrawn": {
-      "worst": {
-        "seenThroughTheBody": 1346,
-        "holesOpenedByCulling": 2833
-      },
-      "shots": [
-        {
-          "clip": "Heavy",
-          "t": 0.5,
-          "pixels": 378000,
-          "differingPixels": 2214,
-          "holesOpenedByCulling": 0,
-          "seenThroughTheBody": 0,
-          "backdropInBothPasses": 0,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Heavy-0.5-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Heavy-0.5-culled.png"
-        },
-        {
-          "clip": "Bite",
-          "t": 0.1667,
-          "pixels": 378000,
-          "differingPixels": 10306,
-          "holesOpenedByCulling": 2328,
-          "seenThroughTheBody": 1073,
-          "backdropInBothPasses": 25,
-          "markedImage": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Bite-0.1667-opened.png",
-          "solid": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Bite-0.1667-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Bite-0.1667-culled.png"
-        },
-        {
-          "clip": "Attack",
-          "t": 0.4333,
-          "pixels": 378000,
-          "differingPixels": 2073,
-          "holesOpenedByCulling": 0,
-          "seenThroughTheBody": 0,
-          "backdropInBothPasses": 4,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Attack-0.4333-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Attack-0.4333-culled.png"
-        },
-        {
-          "clip": "Eat",
-          "t": 1.2,
-          "pixels": 378000,
-          "differingPixels": 995,
-          "holesOpenedByCulling": 0,
-          "seenThroughTheBody": 0,
-          "backdropInBothPasses": 0,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Eat-1.2-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Eat-1.2-culled.png"
-        },
-        {
-          "clip": "Shake",
-          "t": 0.6,
-          "pixels": 378000,
-          "differingPixels": 6629,
-          "holesOpenedByCulling": 497,
-          "seenThroughTheBody": 142,
-          "backdropInBothPasses": 49,
-          "markedImage": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Shake-0.6-opened.png",
-          "solid": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Shake-0.6-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Shake-0.6-culled.png"
-        },
-        {
-          "clip": "Grab",
-          "t": 0.1,
-          "pixels": 378000,
-          "differingPixels": 6929,
-          "holesOpenedByCulling": 518,
-          "seenThroughTheBody": 158,
-          "backdropInBothPasses": 22,
-          "markedImage": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Grab-0.1-opened.png",
-          "solid": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Grab-0.1-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Grab-0.1-culled.png"
-        },
-        {
-          "clip": "Flop",
-          "t": 0.1333,
-          "pixels": 378000,
-          "differingPixels": 3439,
-          "holesOpenedByCulling": 44,
-          "seenThroughTheBody": 0,
-          "backdropInBothPasses": 57,
-          "markedImage": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Flop-0.1333-opened.png",
-          "solid": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Flop-0.1333-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Flop-0.1333-culled.png"
-        },
-        {
-          "clip": "Ability",
-          "t": 0.5,
-          "pixels": 378000,
-          "differingPixels": 2368,
-          "holesOpenedByCulling": 0,
-          "seenThroughTheBody": 0,
-          "backdropInBothPasses": 22,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Ability-0.5-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Ability-0.5-culled.png"
-        },
-        {
-          "clip": "Breath",
-          "t": 1.2,
-          "pixels": 378000,
-          "differingPixels": 2000,
-          "holesOpenedByCulling": 0,
-          "seenThroughTheBody": 0,
-          "backdropInBothPasses": 0,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Breath-1.2-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Breath-1.2-culled.png"
-        },
-        {
-          "clip": "Death",
-          "t": 1.8,
-          "pixels": 378000,
-          "differingPixels": 975,
-          "holesOpenedByCulling": 0,
-          "seenThroughTheBody": 0,
-          "backdropInBothPasses": 0,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Death-1.8-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Death-1.8-culled.png"
-        },
-        {
-          "clip": "SpineBrace",
-          "t": 0.6,
-          "pixels": 378000,
-          "differingPixels": 1580,
-          "holesOpenedByCulling": 0,
-          "seenThroughTheBody": 0,
-          "backdropInBothPasses": 0,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid-as-drawn/SpineBrace-0.6-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid-as-drawn/SpineBrace-0.6-culled.png"
-        },
-        {
-          "clip": "Guard",
-          "t": 0.6,
-          "pixels": 378000,
-          "differingPixels": 2201,
-          "holesOpenedByCulling": 0,
-          "seenThroughTheBody": 0,
-          "backdropInBothPasses": 0,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Guard-0.6-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Guard-0.6-culled.png"
-        },
-        {
-          "clip": "Idle",
-          "t": 1.3,
-          "pixels": 378000,
-          "differingPixels": 2103,
-          "holesOpenedByCulling": 0,
-          "seenThroughTheBody": 0,
-          "backdropInBothPasses": 0,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Idle-1.3-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Idle-1.3-culled.png"
-        },
-        {
-          "clip": "Swim",
-          "t": 0.9,
-          "pixels": 378000,
-          "differingPixels": 2092,
-          "holesOpenedByCulling": 0,
-          "seenThroughTheBody": 0,
-          "backdropInBothPasses": 0,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Swim-0.9-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Swim-0.9-culled.png"
-        },
-        {
-          "clip": "Sprint",
-          "t": 0.5333,
-          "pixels": 378000,
-          "differingPixels": 2098,
-          "holesOpenedByCulling": 0,
-          "seenThroughTheBody": 0,
-          "backdropInBothPasses": 0,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Sprint-0.5333-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Sprint-0.5333-culled.png"
-        },
-        {
-          "clip": "Heavy",
-          "t": 0.4,
-          "pixels": 378000,
-          "differingPixels": 11375,
-          "holesOpenedByCulling": 2833,
-          "seenThroughTheBody": 1346,
-          "backdropInBothPasses": 25,
-          "markedImage": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Heavy-0.4-opened.png",
-          "solid": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Heavy-0.4-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Heavy-0.4-culled.png"
-        },
-        {
-          "clip": "Bite",
-          "t": 0.133,
-          "pixels": 378000,
-          "differingPixels": 11020,
-          "holesOpenedByCulling": 2670,
-          "seenThroughTheBody": 1261,
-          "backdropInBothPasses": 28,
-          "markedImage": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Bite-0.133-opened.png",
-          "solid": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Bite-0.133-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Bite-0.133-culled.png"
-        },
-        {
-          "clip": "Attack",
-          "t": 0.333,
-          "pixels": 378000,
-          "differingPixels": 9799,
-          "holesOpenedByCulling": 1985,
-          "seenThroughTheBody": 875,
-          "backdropInBothPasses": 25,
-          "markedImage": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Attack-0.333-opened.png",
-          "solid": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Attack-0.333-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid-as-drawn/Attack-0.333-culled.png"
-        }
-      ]
-    },
+    "note": "Measured 27 September 2026 (T3D-39) on the body cut on docs/triassic/mouths/hybodus-mouth.json and closed by its own rim, over every clip whose jaw leaves the shut pose: the eight that open past neutral at their own peak gape, the seven that only stir it, and the three legacy phases T3D-32A recorded its before-numbers at (Heavy@0.4, Bite@0.133, Attack@0.333). The body carries no oral mesh, so plain, --as-drawn and --as-drawn --show lining|hinge render the same geometry and agree shot for shot. \"before\" is the T3D-36 body (the labelled cut, rim fold, seam seal and two rigid shells) re-measured on 04ee6af.",
+    "backdropTest": "r > .90, g < .20, b > .90",
     "plain": {
       "worst": {
+        "seenThroughTheBody": 0,
+        "holesOpenedByCulling": 0
+      },
+      "worstBefore": {
         "seenThroughTheBody": 52,
         "holesOpenedByCulling": 1046
       },
@@ -1317,243 +1997,645 @@
         {
           "clip": "Heavy",
           "t": 0.5,
-          "pixels": 378000,
-          "differingPixels": 1795,
-          "holesOpenedByCulling": 0,
           "seenThroughTheBody": 0,
-          "backdropInBothPasses": 0,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid/Heavy-0.5-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid/Heavy-0.5-culled.png"
+          "holesOpenedByCulling": 0,
+          "differingPixels": 210,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
         },
         {
           "clip": "Bite",
           "t": 0.1667,
-          "pixels": 378000,
-          "differingPixels": 5501,
-          "holesOpenedByCulling": 963,
-          "seenThroughTheBody": 1,
-          "backdropInBothPasses": 25,
-          "markedImage": "local/triassic-authoring/hybodus/gape-solid/Bite-0.1667-opened.png",
-          "solid": "local/triassic-authoring/hybodus/gape-solid/Bite-0.1667-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid/Bite-0.1667-culled.png"
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 771,
+          "before": {
+            "seenThroughTheBody": 1,
+            "holesOpenedByCulling": 963
+          }
         },
         {
           "clip": "Attack",
           "t": 0.4333,
-          "pixels": 378000,
-          "differingPixels": 1609,
-          "holesOpenedByCulling": 0,
           "seenThroughTheBody": 0,
-          "backdropInBothPasses": 4,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid/Attack-0.4333-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid/Attack-0.4333-culled.png"
+          "holesOpenedByCulling": 0,
+          "differingPixels": 196,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
         },
         {
           "clip": "Eat",
           "t": 1.2,
-          "pixels": 378000,
-          "differingPixels": 889,
-          "holesOpenedByCulling": 0,
           "seenThroughTheBody": 0,
-          "backdropInBothPasses": 0,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid/Eat-1.2-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid/Eat-1.2-culled.png"
+          "holesOpenedByCulling": 0,
+          "differingPixels": 239,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
         },
         {
           "clip": "Shake",
           "t": 0.6,
-          "pixels": 378000,
-          "differingPixels": 3151,
-          "holesOpenedByCulling": 409,
-          "seenThroughTheBody": 52,
-          "backdropInBothPasses": 48,
-          "markedImage": "local/triassic-authoring/hybodus/gape-solid/Shake-0.6-opened.png",
-          "solid": "local/triassic-authoring/hybodus/gape-solid/Shake-0.6-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid/Shake-0.6-culled.png"
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 356,
+          "before": {
+            "seenThroughTheBody": 52,
+            "holesOpenedByCulling": 409
+          }
         },
         {
           "clip": "Grab",
           "t": 0.1,
-          "pixels": 378000,
-          "differingPixels": 3766,
-          "holesOpenedByCulling": 405,
-          "seenThroughTheBody": 46,
-          "backdropInBothPasses": 22,
-          "markedImage": "local/triassic-authoring/hybodus/gape-solid/Grab-0.1-opened.png",
-          "solid": "local/triassic-authoring/hybodus/gape-solid/Grab-0.1-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid/Grab-0.1-culled.png"
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 590,
+          "before": {
+            "seenThroughTheBody": 46,
+            "holesOpenedByCulling": 405
+          }
         },
         {
           "clip": "Flop",
           "t": 0.1333,
-          "pixels": 378000,
-          "differingPixels": 2118,
-          "holesOpenedByCulling": 44,
           "seenThroughTheBody": 0,
-          "backdropInBothPasses": 57,
-          "markedImage": "local/triassic-authoring/hybodus/gape-solid/Flop-0.1333-opened.png",
-          "solid": "local/triassic-authoring/hybodus/gape-solid/Flop-0.1333-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid/Flop-0.1333-culled.png"
+          "holesOpenedByCulling": 0,
+          "differingPixels": 258,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 44
+          }
         },
         {
           "clip": "Ability",
           "t": 0.5,
-          "pixels": 378000,
-          "differingPixels": 1690,
-          "holesOpenedByCulling": 0,
           "seenThroughTheBody": 0,
-          "backdropInBothPasses": 22,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid/Ability-0.5-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid/Ability-0.5-culled.png"
+          "holesOpenedByCulling": 0,
+          "differingPixels": 371,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
         },
         {
           "clip": "Breath",
           "t": 1.2,
-          "pixels": 378000,
-          "differingPixels": 1744,
-          "holesOpenedByCulling": 0,
           "seenThroughTheBody": 0,
-          "backdropInBothPasses": 0,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid/Breath-1.2-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid/Breath-1.2-culled.png"
+          "holesOpenedByCulling": 0,
+          "differingPixels": 202,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
         },
         {
           "clip": "Death",
           "t": 1.8,
-          "pixels": 378000,
-          "differingPixels": 845,
-          "holesOpenedByCulling": 0,
           "seenThroughTheBody": 0,
-          "backdropInBothPasses": 0,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid/Death-1.8-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid/Death-1.8-culled.png"
+          "holesOpenedByCulling": 0,
+          "differingPixels": 143,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
         },
         {
           "clip": "SpineBrace",
           "t": 0.6,
-          "pixels": 378000,
-          "differingPixels": 1385,
-          "holesOpenedByCulling": 0,
           "seenThroughTheBody": 0,
-          "backdropInBothPasses": 0,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid/SpineBrace-0.6-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid/SpineBrace-0.6-culled.png"
+          "holesOpenedByCulling": 0,
+          "differingPixels": 44,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
         },
         {
           "clip": "Guard",
           "t": 0.6,
-          "pixels": 378000,
-          "differingPixels": 1558,
-          "holesOpenedByCulling": 0,
           "seenThroughTheBody": 0,
-          "backdropInBothPasses": 0,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid/Guard-0.6-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid/Guard-0.6-culled.png"
+          "holesOpenedByCulling": 0,
+          "differingPixels": 199,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
         },
         {
           "clip": "Idle",
           "t": 1.3,
-          "pixels": 378000,
-          "differingPixels": 1647,
-          "holesOpenedByCulling": 0,
           "seenThroughTheBody": 0,
-          "backdropInBothPasses": 0,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid/Idle-1.3-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid/Idle-1.3-culled.png"
+          "holesOpenedByCulling": 0,
+          "differingPixels": 202,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
         },
         {
           "clip": "Swim",
           "t": 0.9,
-          "pixels": 378000,
-          "differingPixels": 1530,
-          "holesOpenedByCulling": 0,
           "seenThroughTheBody": 0,
-          "backdropInBothPasses": 0,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid/Swim-0.9-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid/Swim-0.9-culled.png"
+          "holesOpenedByCulling": 0,
+          "differingPixels": 213,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
         },
         {
           "clip": "Sprint",
           "t": 0.5333,
-          "pixels": 378000,
-          "differingPixels": 1504,
-          "holesOpenedByCulling": 0,
           "seenThroughTheBody": 0,
-          "backdropInBothPasses": 0,
-          "markedImage": null,
-          "solid": "local/triassic-authoring/hybodus/gape-solid/Sprint-0.5333-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid/Sprint-0.5333-culled.png"
+          "holesOpenedByCulling": 0,
+          "differingPixels": 202,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
         },
         {
           "clip": "Heavy",
           "t": 0.4,
-          "pixels": 378000,
-          "differingPixels": 6479,
-          "holesOpenedByCulling": 1046,
           "seenThroughTheBody": 0,
-          "backdropInBothPasses": 46,
-          "markedImage": "local/triassic-authoring/hybodus/gape-solid/Heavy-0.4-opened.png",
-          "solid": "local/triassic-authoring/hybodus/gape-solid/Heavy-0.4-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid/Heavy-0.4-culled.png"
+          "holesOpenedByCulling": 0,
+          "differingPixels": 950,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 1046
+          }
         },
         {
           "clip": "Bite",
           "t": 0.133,
-          "pixels": 378000,
-          "differingPixels": 6033,
-          "holesOpenedByCulling": 1028,
-          "seenThroughTheBody": 2,
-          "backdropInBothPasses": 29,
-          "markedImage": "local/triassic-authoring/hybodus/gape-solid/Bite-0.133-opened.png",
-          "solid": "local/triassic-authoring/hybodus/gape-solid/Bite-0.133-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid/Bite-0.133-culled.png"
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 836,
+          "before": {
+            "seenThroughTheBody": 2,
+            "holesOpenedByCulling": 1028
+          }
         },
         {
           "clip": "Attack",
           "t": 0.333,
-          "pixels": 378000,
-          "differingPixels": 5195,
-          "holesOpenedByCulling": 901,
-          "seenThroughTheBody": 2,
-          "backdropInBothPasses": 25,
-          "markedImage": "local/triassic-authoring/hybodus/gape-solid/Attack-0.333-opened.png",
-          "solid": "local/triassic-authoring/hybodus/gape-solid/Attack-0.333-solid.png",
-          "culled": "local/triassic-authoring/hybodus/gape-solid/Attack-0.333-culled.png"
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 811,
+          "before": {
+            "seenThroughTheBody": 2,
+            "holesOpenedByCulling": 901
+          }
         }
       ]
     },
-    "uncutBodyForComparison": {
-      "note": "the T.jaw_field_uncut construction this revert took out, a6d184c, same three legacy shots, --as-drawn",
+    "asDrawn": {
+      "worst": {
+        "seenThroughTheBody": 0,
+        "holesOpenedByCulling": 0
+      },
+      "worstBefore": {
+        "seenThroughTheBody": 1346,
+        "holesOpenedByCulling": 2833
+      },
       "shots": [
+        {
+          "clip": "Heavy",
+          "t": 0.5,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 210,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "Bite",
+          "t": 0.1667,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 771,
+          "before": {
+            "seenThroughTheBody": 1073,
+            "holesOpenedByCulling": 2328
+          }
+        },
+        {
+          "clip": "Attack",
+          "t": 0.4333,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 196,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "Eat",
+          "t": 1.2,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 239,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "Shake",
+          "t": 0.6,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 356,
+          "before": {
+            "seenThroughTheBody": 142,
+            "holesOpenedByCulling": 497
+          }
+        },
+        {
+          "clip": "Grab",
+          "t": 0.1,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 590,
+          "before": {
+            "seenThroughTheBody": 158,
+            "holesOpenedByCulling": 518
+          }
+        },
+        {
+          "clip": "Flop",
+          "t": 0.1333,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 258,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 44
+          }
+        },
+        {
+          "clip": "Ability",
+          "t": 0.5,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 371,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "Breath",
+          "t": 1.2,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 202,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "Death",
+          "t": 1.8,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 143,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "SpineBrace",
+          "t": 0.6,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 44,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "Guard",
+          "t": 0.6,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 199,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "Idle",
+          "t": 1.3,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 202,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "Swim",
+          "t": 0.9,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 213,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "Sprint",
+          "t": 0.5333,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 202,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
         {
           "clip": "Heavy",
           "t": 0.4,
           "seenThroughTheBody": 0,
-          "holesOpenedByCulling": 0
+          "holesOpenedByCulling": 0,
+          "differingPixels": 950,
+          "before": {
+            "seenThroughTheBody": 1346,
+            "holesOpenedByCulling": 2833
+          }
         },
         {
           "clip": "Bite",
           "t": 0.133,
           "seenThroughTheBody": 0,
-          "holesOpenedByCulling": 0
+          "holesOpenedByCulling": 0,
+          "differingPixels": 836,
+          "before": {
+            "seenThroughTheBody": 1261,
+            "holesOpenedByCulling": 2670
+          }
         },
         {
           "clip": "Attack",
           "t": 0.333,
           "seenThroughTheBody": 0,
-          "holesOpenedByCulling": 0
+          "holesOpenedByCulling": 0,
+          "differingPixels": 811,
+          "before": {
+            "seenThroughTheBody": 875,
+            "holesOpenedByCulling": 1985
+          }
         }
       ]
+    },
+    "shown": {
+      "worst": {
+        "seenThroughTheBody": 0,
+        "holesOpenedByCulling": 0
+      },
+      "worstBefore": {
+        "seenThroughTheBody": 52,
+        "holesOpenedByCulling": 1046
+      },
+      "shots": [
+        {
+          "clip": "Heavy",
+          "t": 0.5,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 210,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "Bite",
+          "t": 0.1667,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 771,
+          "before": {
+            "seenThroughTheBody": 1,
+            "holesOpenedByCulling": 963
+          }
+        },
+        {
+          "clip": "Attack",
+          "t": 0.4333,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 196,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "Eat",
+          "t": 1.2,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 239,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "Shake",
+          "t": 0.6,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 356,
+          "before": {
+            "seenThroughTheBody": 52,
+            "holesOpenedByCulling": 409
+          }
+        },
+        {
+          "clip": "Grab",
+          "t": 0.1,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 590,
+          "before": {
+            "seenThroughTheBody": 46,
+            "holesOpenedByCulling": 405
+          }
+        },
+        {
+          "clip": "Flop",
+          "t": 0.1333,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 258,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 44
+          }
+        },
+        {
+          "clip": "Ability",
+          "t": 0.5,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 371,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "Breath",
+          "t": 1.2,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 202,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "Death",
+          "t": 1.8,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 143,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "SpineBrace",
+          "t": 0.6,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 44,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "Guard",
+          "t": 0.6,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 199,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "Idle",
+          "t": 1.3,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 202,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "Swim",
+          "t": 0.9,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 213,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "Sprint",
+          "t": 0.5333,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 202,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 0
+          }
+        },
+        {
+          "clip": "Heavy",
+          "t": 0.4,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 950,
+          "before": {
+            "seenThroughTheBody": 0,
+            "holesOpenedByCulling": 1046
+          }
+        },
+        {
+          "clip": "Bite",
+          "t": 0.133,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 836,
+          "before": {
+            "seenThroughTheBody": 2,
+            "holesOpenedByCulling": 1028
+          }
+        },
+        {
+          "clip": "Attack",
+          "t": 0.333,
+          "seenThroughTheBody": 0,
+          "holesOpenedByCulling": 0,
+          "differingPixels": 811,
+          "before": {
+            "seenThroughTheBody": 2,
+            "holesOpenedByCulling": 901
+          }
+        }
+      ]
+    },
+    "oralMeshOutsideTheShutHead": {
+      "method": "T3D-38's cheek check: every oral mesh painted an emissive marker, the body at Idle frame 0 (jaw shut), photographed from four units off both flanks and from above; marker pixels counted.",
+      "before": {
+        "oralMeshes": [
+          "Mouth lining"
+        ],
+        "views": {
+          "left": 1509,
+          "right": 630,
+          "top": 0
+        },
+        "markerPixels": 2139
+      },
+      "after": {
+        "oralMeshes": [],
+        "views": {
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "markerPixels": 0
+      }
     }
   }
 }

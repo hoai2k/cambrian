@@ -1,0 +1,134 @@
+{
+  "schema": "mouth-cut/1",
+  "id": "hybodus",
+  "model": "assets/triassic/creatures/hybodus.glb",
+  "sha256": "ba434d91d3475ad833c4211071765677aa34b84df027bcdd4591f88e307f1d1e",
+  "sha256Source": "measured",
+  "appliesTo": "built",
+  "authoredAt": "2026-09-27T15:35:07.847Z",
+  "note": "",
+  "creature": {
+    "key": "triassic:hybodus",
+    "id": "hybodus",
+    "collection": "triassic",
+    "vertices": 13223,
+    "rigged": true
+  },
+  "frame": {
+    "axis": "z",
+    "forward": 1,
+    "up": "y",
+    "source": "mouth",
+    "note": "Model root frame, unscaled: the file's own coordinates with the scene graph flattened. The body runs along z; the head is at the high end."
+  },
+  "seat": {
+    "source": "manual"
+  },
+  "hinge": {
+    "depth": 0.550378,
+    "headFraction": 0.1101,
+    "centre": [
+      -0.003341,
+      -0.090738,
+      1.949622
+    ],
+    "axis": [
+      0.999247,
+      -0.033164,
+      0.020156
+    ]
+  },
+  "plane": {
+    "point": [
+      -0.003341,
+      -0.090738,
+      1.949622
+    ],
+    "normal": [
+      0.037965,
+      0.943076,
+      -0.330403
+    ],
+    "forward": [
+      -0.008051,
+      0.33092,
+      0.943625
+    ],
+    "pitch": 0.33727790398829155,
+    "yaw": -0.008532021281906771,
+    "roll": -0.03515178557262833,
+    "pitchDegrees": 19.325,
+    "yawDegrees": -0.489,
+    "rollDegrees": -2.014
+  },
+  "sides": {
+    "mandible": 314,
+    "skull": 12909,
+    "total": 13223
+  },
+  "bounds": {
+    "length": 5,
+    "height": 1.9669749736785889,
+    "width": 2.601132392883301,
+    "axisMin": -2.5,
+    "axisMax": 2.5,
+    "lateralMid": -0.03117048740386963,
+    "upMid": 0.045082926750183105
+  },
+  "head": {
+    "height": 0.7667669653892517,
+    "width": 0.9565886855125427,
+    "upMid": 0.08964851498603821,
+    "lateralMid": -0.0862245261669159
+  },
+  "rule": "A vertex is on the mandible when (v − plane.point) · plane.normal < 0 and (v − plane.point) · plane.forward > 0: below the cut plane and ahead of the hinge. hinge.axis is the pivot the jaw swings about, through hinge.centre. See docs/viewer-mouth.md.",
+  "mouth": {
+    "version": 1,
+    "key": "triassic:hybodus",
+    "id": "hybodus",
+    "collection": "triassic",
+    "model": "assets/triassic/creatures/hybodus.glb",
+    "frame": {
+      "axis": "z",
+      "forward": 1,
+      "up": "y"
+    },
+    "frameSource": "mouth",
+    "vertices": 13223,
+    "rigged": true,
+    "box": {
+      "lo": [
+        -1.33173668384552,
+        -0.9384045600891113,
+        -2.5
+      ],
+      "hi": [
+        1.2693957090377808,
+        1.0285704135894775,
+        2.5
+      ]
+    },
+    "bounds": {
+      "length": 5,
+      "height": 1.9669749736785889,
+      "width": 2.601132392883301,
+      "axisMin": -2.5,
+      "axisMax": 2.5,
+      "lateralMid": -0.03117048740386963,
+      "upMid": 0.045082926750183105
+    },
+    "head": {
+      "height": 0.7667669653892517,
+      "width": 0.9565886855125427,
+      "upMid": 0.08964851498603821,
+      "lateralMid": -0.0862245261669159
+    },
+    "seatSource": "manual",
+    "depth": 0.5503778058144142,
+    "up": -0.09073838122541747,
+    "lateral": -0.0033412238912883824,
+    "pitch": 0.33727790398829155,
+    "yaw": -0.008532021281906771,
+    "roll": -0.03515178557262833
+  }
+}

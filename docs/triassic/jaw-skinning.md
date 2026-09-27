@@ -432,3 +432,36 @@ the station rule found 3, worst 0.02 %; its own commit had measured 51 against t
 The twins barely change size — `birgeria.lod1.glb` 632,068 → 620,572 bytes, `aphaneramma.lod1.glb`
 713,676 → 711,244 — because these two linings wore a dark flat interior material rather than a copy
 of the body's maps, so retiring them sheds geometry and nothing else, and the caps add their own.
+
+## T3D-39: Hybodus on its aimed cut, and a jaw that bends rather than breaks
+
+The owner aimed a new cut for Hybodus (`docs/triassic/mouths/hybodus-mouth.json`) and asked that the
+geometry not break at the jaw: interpolate smoothly everywhere, part only along the cut, and let
+the fill close that. The first half is T3D-38's construction — the document's two half-spaces cut
+as planes, `T.cap_cut` then `T.cap_mouth` on each half — and the rim does not pinch on a plane (one
+closed loop per half plus two small loops where the plane crosses two teeth). The second half is
+new: `T.jaw_junction`'s *agreement at the rim* is replaced by **one jaw share over both halves of the
+head**, a function of position in the document's frame (`T.jaw_field_aimed`), continuous everywhere
+except across the mouth plane ahead of the hinge wall. The mandible's rear corner, the cheek beside
+the corner of the mouth and the throat under and behind the hinge all ramp over one width `w`
+(twice it behind the hinge); across the cut the step is nought at the commissure and full `w` ahead
+of it. It is Birgeria's and Aphaneramma's construction with the crease taken out of it, and nothing
+about it is Hybodus-specific.
+
+"Does not break" is measured three ways and asserted: the largest jump in `jaw` weight along an
+edge of the skin the body arrived with (0.345 on the authored body at the shipped width), the jump
+between the two copies of every point the cut made **off the cut** (nought, on both bodies), and the
+jump over an edge's own length in ramp widths on every edge, fill included (at most 1.225; a
+smoothstep's own ceiling is 1.5). Swept at `w` 0.020 / 0.027 / 0.035 / 0.050 / 0.070 of a body, the
+edge jump runs 0.60 / 0.41 / 0.35 / 0.27 / 0.23 and the tooth row's worst fifth at `Bite` 1.00 /
+0.99 / 0.96 / 0.91 / 0.84 (`mandible-travel.mjs --profile`, now binned over the mandible mesh
+alone); it ships at 0.035, the widest before the jaw bows. Measured on the packaged files, before
+(the shipped T3D-36 body `ba434d91…`) and after:
+
+| Body | cut opens (`lag.mjs`), before → after | jaw follows in `Bite` | skin worst | `jaw` skin | `skull` skin | clips past 2× |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| hybodus | 0.00 % (99 station pairs) → 0.00 % (72 on the aimed wall) | 1.00 → 0.99 | 5.93x → 5.93x | 2.55x → **1.22x** | 5.93x → 5.93x | 23 → **10** of 24 |
+
+The `skull` figure is the opercular crack in `Shake` both times, not the mouth. The per-body record,
+the sweep table and the gape tables are `tools/triassic/creatures/hybodus/README.md` (T3D-39),
+`jaw-sweep.json` and `gape-solid.json` beside it.

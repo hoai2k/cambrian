@@ -5,14 +5,17 @@
 `src/content/triassic/creatures.ts`, which keeps it out of the roster and in the specimen viewer.
 This directory is the body and the evidence for it.
 
-**The head is cut again.** T3D-32A took the cut out entirely and ran the mouth as a bone turning
-inside one closed surface, which measured **0 px through and 0 opened as drawn on every clip**;
-on 22 September 2026 the owner asked for that change to be reverted, and it has been. What ships
-is the construction that stood before it — the labelled jaw cut, the hinge cap, the rim fold, the
-post-cut seal and the two rigid oral shells — and it leaks. The numbers are in
-[T3D-36](#t3d-36--the-cut-put-back-at-the-owners-request) at the foot of this file; read that
-section beside [T3D-32A](#t3d-32a--the-head-is-not-cut-at-all), which is now the record of a
-construction this body no longer carries.
+**The head is cut where a reviewer aimed it, closed by its own rim, and bends rather than breaks
+(T3D-39).** The owner aimed a cut plane and hinge on this body in the viewer's mouth editor
+(`docs/triassic/mouths/hybodus-mouth.json`) and asked that the geometry not break at the jaw but
+interpolate smoothly, parting only along the cut where the fill closes it. What ships: the
+document's own two half-spaces cut as planes, `T.cap_cut` over the hinge wall and `T.cap_mouth`
+along the mouth line on each half, and **one jaw weight over both halves of the head**
+(`T.jaw_field_aimed`) that is continuous everywhere except across the cut. The labelled cut, the
+rim fold, the seam seal and the two rigid oral shells T3D-36 restored are retired; the body carries
+no oral mesh. **0 through / 0 opened on every clip, plain and as drawn.** The record is
+[T3D-39](#t3d-39--the-aimed-cut-closed-by-its-own-rim-and-a-jaw-that-bends) at the foot of this
+file; T3D-36 and T3D-32A above it are the history.
 
 The delivered pair keeps the generation's fusiform trunk, its two spined dorsal fins, its broad
 pectorals, its pelvics and anal fin and its heterocercal tail, on one 24-joint skeleton with the
@@ -21,15 +24,15 @@ also the runtime LOD.
 
 | Delivery | Triangles | Vertices | Packaged bytes |
 | --- | ---: | ---: | ---: |
-| `hybodus.glb` — worked Tripo body | 22,161 | 13,223 | 1,852,840 |
-| `hybodus.puppet.glb` — procedural twin | 7,984 | 4,027 | 1,325,848 |
-| `hybodus.lod1.glb` — byte-identical twin alias | 7,984 | 4,027 | 1,325,848 |
+| `hybodus.glb` — worked Tripo body | 22,546 | 13,211 | 1,856,484 |
+| `hybodus.puppet.glb` — procedural twin | 7,604 | 3,808 | 712,652 |
+| `hybodus.lod1.glb` — byte-identical twin alias | 7,604 | 3,808 | 712,652 |
 
 Twenty-three of those clips are the builder's; the twenty-fourth is the shore `Flop`, applied to
 all three files by `tools/creatures/motion/apply.mjs`, which also keeps `hybodus.json`'s `clips`
 and `looping` arrays in step. The byte counts are the packaged files after that gait lands.
 
-The reduced model is **36.0 %** of the authored triangles, inside the contract's 40 %. The model is
+The reduced model is **33.7 %** of the authored triangles, inside the contract's 40 %. The model is
 5.000 engine authoring units long, faces +Z in glTF and uses +Y up; the research registry
 (`docs/research/triassic-swimming.json`) gives the animal 2 m.
 
@@ -382,9 +385,17 @@ owns geometry, so each of those numbers is about a fin rather than about a bone.
 
 ```sh
 /opt/blender/blender --background --factory-startup --python tools/triassic/creatures/hybodus/build.py
-node tools/triassic/creatures/hybodus/audit.mjs --package --decode
-/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- hybodus Heavy@0.50 Attack@0.43 Bite@0.17
+node tools/triassic/creatures/hybodus/audit.mjs --package
+node tools/creatures/motion/apply.mjs hybodus          # the shore Flop, onto all three files and the manifest
+node tools/triassic/creatures/hybodus/audit.mjs --decode
+/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- hybodus \
+    Heavy@0.5 Bite@0.1667 Attack@0.4333 Eat@1.2 Shake@0.6 Grab@0.1 Flop@0.1333 Ability@0.5 \
+    Breath@1.2 Death@1.8 SpineBrace@0.6 Guard@0.6 Idle@1.3 Swim@0.9 Sprint@0.5333 \
+    Heavy@0.4 Bite@0.133 Attack@0.333 [--as-drawn]
 node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/hybodus.glb
+node --max-old-space-size=3000 tools/triassic/lag.mjs public/assets/triassic/creatures/hybodus.glb
+node tools/triassic/mandible-travel.mjs public/assets/triassic/creatures/hybodus.glb Bite 0.1667 --profile
+HYBODUS_JAW_RAMP=0.05 /opt/blender/blender -b --factory-startup --python .../build.py   # one sweep point
 /opt/blender/blender --background --factory-startup --python tools/triassic/creatures/hybodus/render.py -- --decoded
 /opt/blender/blender --background --factory-startup --python tools/triassic/creatures/hybodus/render.py -- --decoded --twin   # the twin's portrait only
 python3 tools/triassic/creatures/hybodus/contact-sheets.py
@@ -467,16 +478,18 @@ Honest limitations, worst first:
 
    | surface | worst | clip | grew from → to | edges over 2× |
    | --- | ---: | --- | ---: | ---: |
-   | `Hybodus_authored_body` (the skin) | **5.93×** | Shake | 0.017 → 0.099 | 336 |
-   | `Mouth_lining` (built to stretch) | 5.19× | Heavy | 0.023 → 0.118 | 48 |
-   | `Seated_jaw_hinge_tissue` | 1.00× | — | — | 0 |
-   | `Hybodus_authored_body_lower_jaw` | 1.00× | — | — | 0 |
+   | `Hybodus_authored_body` (the skin) | **5.93×** | Shake | 0.017 → 0.099 | 1,073 |
+   | `Hybodus_authored_body_lower_jaw` | 1.04× | Heavy | 0.102 → 0.106 | 0 |
+
+   (T3D-39: there is no lining any more, and the per-surface count of edges past 2× over the audit's
+   61 phases fell from 4,299 to 1,073 on the head with the continuous jaw field; `skin-tears.mjs`
+   reads 10 of 24 clips past 2× where it read 23 of 24.)
 
    What is left is `skull` against `pec_tip` at the pectoral root under Shake's roll, where the two
    bones genuinely go opposite ways and a tenth of a unit of weight difference across a 0.017 edge
    is enough. Full per-clip table in [`skin-tears.txt`](skin-tears.txt).
-2. **The generation's jaws were modelled apart** and closing them costs 638 of 849 mandible vertices
-   inside the skull surface, to 4.7 % of body length. Interior and not visible in any sheet, but it
+2. **The generation's jaws were modelled apart** and closing them costs 713 of 944 mandible vertices
+   (T3D-39's aimed mandible, caps included) inside the skull surface, to 1.6 % of body length. Interior and not visible in any sheet, but it
    is the reason this animal **wants a mouth-closed regeneration**.
 3. **The unbend is a real departure from the generated pose.** It is bounded, measured and comes out
    of one constant, but it moves a vertex as much as 0.33 raw units and makes the animal 18 % longer
@@ -488,9 +501,10 @@ Honest limitations, worst first:
 5. **No eye globes.** The generated head has sculpted eyes in its surface and albedo and this build
    does not cut and seat separate globes, as Nothosaurus, Placodus and Dinocephalosaurus do not. The
    pipeline contract asks for them; it is outstanding on all of them.
-6. **The lining takes its UVs from the skin it is sewn into**, which means its pigment is that skin's
-   pigment stretched across the inside of the mouth. It reads as flesh at swimming distance and as a
-   smear in a close-up.
+6. **The caps take their UVs from the rim they close** (inverse distance over the rim), which means
+   the palate and the floor wear the lip's pigment spread across the inside of the mouth. It reads as
+   the inside of a mouth at swimming distance and as streaks of the flank's mottling in a close-up
+   (`docs/triassic/verification/hybodus-mouth-space.png`).
 7. **The male's cephalic claspers are not modelled**, because the generation does not carry them. The
    research lists them as a headline hybodont feature; they are absent from the pose as well, so that
    is a redraw question rather than a mesh one.
@@ -643,7 +657,7 @@ ported it to `T.oral_shells` — what it actually carries is a palate rigid on t
 rigid on the jaw, which is what `oral-shell-audit.mjs` reports. It is left as the revert produced
 it rather than corrected, because correcting it means editing the builder and rebuilding, and this
 row's whole contract is that `build.py` is `a6d184c^` and nothing else. Fix it in whichever
-direction the mouth goes next.
+direction the mouth goes next. *(Fixed at its source in T3D-39: the rebuilt `hybodus.json` says what the body carries.)*
 
 **Not re-engineered, deliberately.** The leak above is the construction the owner asked for, and
 the routes out of it are the ones T3D-32A wrote down: span the rim (`T.cap_mouth` refuses this one
@@ -651,3 +665,162 @@ the routes out of it are the ones T3D-32A wrote down: span the rim (`T.cap_mouth
 runs of the rim to a point), or take the cut out again. Which of those to do, or whether to do
 neither, is a decision about the animal rather than about the pipeline, and it belongs to whoever
 looked at the mouth and said it was not working.
+
+## T3D-39 — the aimed cut, closed by its own rim, and a jaw that bends
+
+The owner aimed a new mouth cut on the shipped body in the viewer's mouth editor
+(`docs/triassic/mouths/hybodus-mouth.json`: sha256 `ba434d91…` of the T3D-36 body, 314 of 13,223
+vertices on the mandible, hinge 0.5504 deep — 11.0 % back from the nose — pitch +19.3°, yaw −0.5°,
+roll −2.0°) and asked that the geometry *not break at the jaw but interpolate smoothly*: the only
+place it may part is the cut, and the fill closes that. Both halves of that are done, and both are
+numbers in `validation.json`.
+
+### The cut
+
+`build.py` now consumes the document the way Birgeria's and Aphaneramma's builders do (T3D-38):
+schema, id and `appliesTo: built` asserted; the frame asserted against the bounding box the
+document measured on the shipped file (worst disagreement **5.3e-08 units** — the intake, unbend
+and recentring reproduce the body the reviewer aimed on); the plane, its normal and forward and the
+hinge axis read straight off the file; the mouth line read on the mouth's own measured centre `cx`;
+the cut taken as the document's two half-spaces, hinge wall first and then the mouth plane, over the
+head's faces only. The labelled cut is retired with everything that propped it up.
+
+- **Where the reviewer put it, against what the generation modelled** (`mouth.aimedCut`): the plane
+  runs **under** the modelled slit's mid-height the whole way, by 0.0035 raw at the snout and 0.0141
+  at the back (`perStation`), and the hinge wall stands 0.0133 raw behind where the slit peters out.
+  The reviewer's hinge handle is 0.0206 raw to one side of `cx`; `cx` agrees with the document's
+  *own* measured head middle to 0.001 raw — this head sits 0.02 raw to its left of the trunk after
+  the unbend — so the joint is seated on the aimed hinge line at `cx`, which is the reviewer's pivot
+  on the head's own middle.
+- **The jaw keeps the era's axis**, as T3D-38 recorded: the aimed hinge axis is 2.2° off the frame's
+  x (the roll), the joint turns about x like every jaw in the era, and the pivot is the reviewer's.
+- **`T.cut_rim` on the new cut, and it does not pinch.** On the authored body each half is left with
+  one closed loop of 163 vertices (the lip run and the hinge wall), and two small closed loops of 18
+  and 6 vertices at y −0.536…−0.532 — two of the generation's teeth near the front of the mouth,
+  which the plane crosses. Every vertex carries two boundary edges: the sixteen four-edge vertices
+  the labelled rim had round the interlocking tooth roots do not arise on a plane cut. One open
+  3-vertex arc on the skull at the cheek (x −0.10) is the generation's own, not the cut's, and is
+  left alone (the intake has 22 boundary edges in all, 6 on the head; the twin none). The twin's
+  halves are one 74-vertex loop each.
+- **The fill** is `T.cap_cut` over the hinge wall on each half (43 faces, facing out of that half)
+  and then `T.cap_mouth` along the mouth line on each half, over all three loops at once — cycles
+  [122, 6, 18] — domed into its own half (0.30 of each cap vertex's distance from the rim, never
+  further than 0.55 of the head's own room either side of the mouth line; 0.0186 raw at the
+  deepest). Every one of the 1,120 cap vertices is held to the closed intake surface as T3D-38 does:
+  the section hull clears all but one (−0.0003 raw, on a waisted station), none stands out of the
+  skin by more than 0.003 raw, and **none is seen from outside along any of the 26 directions**. The
+  239 that read "outside" by ray parity are all within a touch of the skin: the modelled slit is a
+  pocket of exterior space to a parity test. The twin's 360 cap vertices are held to the twin's own
+  surface; four escape along one of the 26, within 0.0016 raw of it.
+- **Teeth.** Of 19 patches of oral surface standing proud of their neighbourhood, 17 are whole on
+  the skull, one is whole on the mandible and one (60 vertices, 45 on the jaw) is crossed by the
+  plane; the caps close each piece. By eye, at `Bite`'s peak the upper row rides the skull and the
+  lower row stays on the mandible's lip (`docs/triassic/verification/hybodus-mouth-space.png`).
+- **Retired**: the shear onto the measured seam and the per-tooth labels; the `holes_fill` over the
+  mandible's boundary and the normal vote it needed (the split keeps the intake's outward winding
+  face by face); `T.rim_flange`; the post-cut `T.seal_seams`; the two rigid `T.oral_shells` and the
+  copy of the body pigmentation material they wore; the hinge report. **The body carries no oral
+  mesh** — nothing is hidden in play, so the viewer offers no *Mouth geometry* switch — and the
+  twin/LOD1 drops from 1,325,848 to **712,652 bytes**, T3D-32A's finding again.
+
+### The jaw bends: one field, continuous except across the cut
+
+`T.jaw_junction` made the two copies of every hinge-wall vertex agree and nothing more: the
+mandible ramped from the rim's value to full jaw over 0.015 of a body, so its rear corner was a
+crease where the weight climbed the whole way in a ring or two, and the throat behind it was on a
+second rule with its own crease. Nothing parted, but the jaw broke rather than bent. The field is now
+**one function of position** in the document's own frame (`T.jaw_field_aimed` in
+`_pipeline/tripo.py`), `u` ahead of the hinge wall and `v` above the mouth plane:
+
+    B(v) = smooth(½ − v/w)      C(u) = 1 − smooth(u/w)      A(u) = 1 − smooth(−u/2w)
+    head half:  J = B·A·C            mandible:  J = 1 − (1 − B)·C
+
+On the hinge wall both read `B(v)`, so the two copies of every wall vertex agree exactly (asserted to
+the last influence); behind the wall the head is one surface and one smooth function; the only place
+the two halves disagree is across the plane *ahead* of the wall — the cut — where the step is
+`1 − C(u)`: **nought at the corner of the mouth** and full `w` ahead of it, so the mouth opens from
+its commissure and the corner stretches rather than tears. The throat under the hinge follows the jaw
+and fades over `2w` behind it; a fin is never throat (the limb term, as in `jaw_junction`).
+
+**"Does not break", as a number.** Measured on the final trimmed field in the builder and again on
+the packaged file by `audit.mjs`: (a) the largest jump in `jaw` weight along an edge of the skin
+the body arrived with, and over the two kinds of fill; the jump between every pair of points the cut
+duplicated **off the cut** (asserted nought — it is 0 on both bodies, 44 and 30 wall pairs); and the
+resolution-free form of (a), the jump over an edge's own length in ramp widths, which a smoothstep
+keeps under 1.5. The build asserts (a) ≤ 0.36 on the authored skin (0.66 on the twin, whose edges
+are three times longer) and the steepness ≤ 1.5 on every edge, fill included; the audit asserts
+the steepness and the off-cut nought on the packaged files.
+
+**The sweep** (`jaw-sweep.json`, one full rebuild each; the tooth row is `mandible-travel.mjs
+--profile` over the mandible mesh in fifths from the hinge to the front, at `Bite@0.1667`, the widest
+gape, and `Eat@1.2`):
+
+| ramp `w` (of body) | (a) skin, authored | (a) p99 | (a) twin | fill: mouth caps / hinge wall | worst skin | mouth region (`jaw`) | `lag.mjs` follows B/A/H/E | tooth row at `Bite`, hinge → front | at `Eat` |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- |
+| 0.020 | 0.599 | 0.045 | 0.770 | 0.500 / 0.500 | 5.93× | 1.30× | 0.99 / 0.99 / 0.99 / 0.97 | 1.00 1.00 1.00 1.00 1.00 | 0.96 0.99 1.00 1.00 1.00 |
+| 0.027 | 0.411 | 0.080 | 0.615 | 0.500 / 0.500 | 5.93× | 1.28× | 0.99 / 1.00 / 1.00 / 0.98 | 1.00 0.99 1.00 1.00 1.00 | 0.92 0.96 1.00 1.00 1.00 |
+| **0.035** | **0.345** | 0.094 | 0.652 | 0.492 / 0.500 | **5.93×** | **1.22×** | 0.99 / 1.00 / 1.00 / 0.99 | 1.00 **0.96** 1.00 1.00 1.00 | 0.89 0.88 1.00 1.00 1.00 |
+| 0.050 | 0.273 | 0.095 | 0.464 | 0.409 / 0.434 | 5.93× | 1.14× | 0.99 / 1.00 / 1.00 / 0.98 | 1.02 **0.91** 0.94 1.00 1.00 | 0.84 0.75 0.91 1.00 1.00 |
+| 0.070 | 0.229 | 0.097 | 0.299 | 0.314 / 0.338 | 5.93× | 1.17× | 0.98 / 0.99 / 0.99 / 0.95 | 1.05 0.88 0.84 0.93 0.98 | 0.77 0.64 0.77 0.92 0.98 |
+
+**It ships at 0.035**, the widest ramp — so the smallest step — at which every fifth of the tooth
+row still travels at least 0.95 of its bone at `Bite`. What the sweep turns on is the bow, as
+CLAUDE.md warns from Mixosaurus: at 0.05 the rear of the jaw takes 0.91 of its bone at `Bite` and
+0.75 at `Eat`, and at 0.07 the bow reaches the front of the mouth. `Eat`'s rear bins are low at every
+width because its gape is small, and so is the rigid travel near the pivot that the ratio divides by.
+Skin is 5.93× at every width (the opercular crack in `Shake`, on `skull`, not the mouth), and the cut
+never opens (`lag.mjs`: 72 pairs on the aimed wall, 0 past 0.2 %). Two of the (a) columns are not
+the skin: the fill's worst edges are long ones — the hinge wall's fan to its hub and the mouth caps'
+chords across the mouth, 0.09 raw — whose steepness is 0.22 and 0.90 per ramp width; the steepest
+edge anywhere, fill included, is **1.225** per ramp width on both bodies. One tooling note:
+`mandible-travel.mjs`' *front fifth* is a fifth of the jaw-weighted reach, and once the throat
+carries jaw weight well behind the hinge that fifth slides back into the mouth — it read 0.73 at
+`Bite` for `w` 0.07 while the mandible's own front fifth read 0.98 — so `--profile` bins the mandible
+mesh alone, from the hinge.
+
+### Before → after
+
+`gape-solid.py` over every clip that moves the jaw, at each clip's own peak, plus T3D-32A's three
+phases; *through / opened*, backdrop `r > .90, g < .20, b > .90`. The body has no oral mesh, so
+plain, `--as-drawn` and `--as-drawn --show 'lining|hinge'` render the same geometry and agree shot
+for shot (`gape-solid.json`):
+
+| Shot | plain, before → after | as drawn, before → after | shown, before → after |
+| --- | ---: | ---: | ---: |
+| `Bite@0.1667` (peak) | 1 / 963 → 0 / 0 | **1,073 / 2,328** → 0 / 0 | 1 / 963 → 0 / 0 |
+| `Grab@0.1` | 46 / 405 → 0 / 0 | 158 / 518 → 0 / 0 | 46 / 405 → 0 / 0 |
+| `Shake@0.6` | 52 / 409 → 0 / 0 | 142 / 497 → 0 / 0 | 52 / 409 → 0 / 0 |
+| `Flop@0.1333` | 0 / 44 → 0 / 0 | 0 / 44 → 0 / 0 | 0 / 44 → 0 / 0 |
+| `Heavy@0.5`, `Attack@0.4333`, `Eat@1.2`, `Ability@0.5` | 0 / 0 → 0 / 0 | 0 / 0 → 0 / 0 | 0 / 0 → 0 / 0 |
+| the seven that only stir the jaw | 0 / 0 → 0 / 0 | 0 / 0 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Heavy@0.4` | 0 / 1,046 → 0 / 0 | **1,346 / 2,833** → 0 / 0 | 0 / 1,046 → 0 / 0 |
+| `Bite@0.133` | 2 / 1,028 → 0 / 0 | 1,261 / 2,670 → 0 / 0 | 2 / 1,028 → 0 / 0 |
+| `Attack@0.333` | 2 / 901 → 0 / 0 | 875 / 1,985 → 0 / 0 | 2 / 901 → 0 / 0 |
+
+| Measure | T3D-36 body | T3D-39 body |
+| --- | --- | --- |
+| oral mesh standing out of the shut head (marker pixels, both flanks and above, `Idle@0`) | **2,139** (1,509 left, 630 right): the palate/floor shells through the cheek | **0**: no oral mesh |
+| worst skin (`skin-tears.mjs`) | 5.93× `Shake` `skull` | 5.93× `Shake` `skull` (unchanged) |
+| clips past 2× | 23 of 24 | **10 of 24** |
+| mouth region | `jaw` 2.55× `Heavy`, `skull` 5.93× | `jaw` **1.22×** `TurnRight`, `skull` 5.93× (the same crack) |
+| jaw-weight jump along an edge, whole packaged file | 1.00 (on the mandible), steepness 3.12 per 0.175 units | 0.50 (fill), 0.35 on the skin; steepness 1.22 |
+| `lag.mjs` cut | 99 station pairs, 0 open | 72 pairs on the aimed wall, 0 open past 0.2 %, worst 0.00 % |
+| jaw follows its bone B/A/H/E | 1.00 / 1.00 / 1.00 / 1.00 | 0.99 / 1.00 / 1.00 / 0.99 |
+| twin / LOD1 bytes | 1,325,848 | 712,652 |
+
+Everything else: `idle-bones` every joint owns skin; `oral-shell-audit` no lining on any variant;
+`hidden-parts --check` and `clip-contract --check` clean; `audit.mjs` exact rig, clip and anchor
+parity with the LOD1 byte-identical to the twin, and `Flop` re-applied by `apply.mjs` (it opens the
+jaw 0.11–0.20 rad, the same direction as `Bite`); the rebuild after `gape-solid.json` was written is
+byte-identical to the body it measured; portraits re-rendered and published; the anchors move onto
+the aimed mouth line at `cx` (the mouth socket 0.006 of a body behind the mandible's own tip).
+Pictures: `docs/triassic/verification/hybodus-mouth-space.png` (before: `-before.png`,
+`-before-shown.png`), `hybodus-jaw-views-{Idle,Bite}.png` and their `-before-` pairs — the rest pose
+from under the throat is where the old rim's jagged crease and holes were, and the new throat is one
+surface — and `hybodus-oral-outside-before-left.png`, the shells through the cheek.
+
+**Judged by eye rather than measured:** that the mouth reads as a mouth (the three-view sheet); that
+the lower tooth row stays on the mandible; that the caps' pigment — the lip's, spread by inverse
+distance — reads as the inside of a mouth at swimming distance and as streaks close up; and that the
+curved edge under the shut head is the generation's own gular fold rather than a crease the field
+made (it is in the T3D-36 render too).

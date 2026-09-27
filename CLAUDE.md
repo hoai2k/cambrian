@@ -906,6 +906,22 @@ unless the user explicitly asks for a PR. Steps:
   hinge" runs to the shoulder on that flank and the mandible is bounded to the head as well as off
   the limbs. The **twin is held to its own surface**, not the intake's: a voxel resurfacing a few
   thousandths fuller than the generation reads "outside the intake" wherever it is fuller.
+- **A jaw that agrees at its rim can still break; weight an aimed cut as one field.** `T.jaw_junction`
+  makes the two copies of each hinge-wall vertex agree and nothing more — the shell climbs to full jaw
+  within 0.015 of a body of the rim and the throat is on a second rule — so nothing parts but the jaw
+  creases at the hinge. `T.jaw_field_aimed` (Hybodus, T3D-39) is one share of *position* in the
+  aimed document's own frame for both halves: `B(v)·A(u)·C(u)` on the head and `1 − (1 − B)·C` on
+  the mandible, which agree on the wall by construction and differ only across the plane ahead of
+  it, by a step that is nought at the commissure — the corner of the mouth stretches instead of
+  being a singularity where a field that is 0 above a cut and 1 below it must take some value. Its
+  width is a sweep like every jaw band: past 0.035 of a body Hybodus' rear tooth row bowed (0.91 at
+  `Bite` at 0.05). **"Does not break" is a steepness, not a jump**: a cap's fan and chords are
+  edges a tenth of a body long, so a large weight jump along them is smooth, and the resolution-free
+  figure — jump over the edge's own length, in ramp widths, under the smoothstep's 1.5 — is what
+  holds on skin and fill alike; the raw jump is asserted on the skin the body arrived with. And
+  `mandible-travel.mjs`' front fifth is a fifth of the *jaw-weighted reach*, which slides back into
+  the mouth once the throat carries jaw weight (0.73 at `Bite` where the mandible's own front read
+  0.98): `--profile` bins the mandible mesh from the hinge and is the tooth-row figure.
 - **A generation that arrived gaping is not cut** (`T.jaw_field_uncut`). Mosasaurus' cut left one
   closed loop of 156 vertices per half spanning 0.057 of a body behind the hinge, on a gape 0.176
   of a body long: the *back third* of the mouth and nothing else, because forward of that the jaws
@@ -1043,7 +1059,7 @@ unless the user explicitly asks for a PR. Steps:
   Rhaeticosaurus 2.81x, Nothosaurus 2.99x, Tanystropheus 3.00x, Macrocnemus 3.41x, Birgeria 3.46x,
   Hupehsuchus 3.47x, Saurichthys 3.61x, Mixosaurus 3.62x, Cartorhynchus 3.72x, Archelon 3.86x,
   Atopodentatus 3.90x, Helicoprion 4.21x, Aphaneramma 4.43x, Mystriosuchus 4.48x, Henodus 4.81x,
-  Askeptosaurus 1.36x (the promoted posed generation; the straight regeneration it replaced reads 1.31x as the backup), Odontochelys 5.12x, Hybodus 5.93x (its opercular crack), Dinocephalosaurus 7.00x, Coelophysis 7.74x
+  Askeptosaurus 1.36x (the promoted posed generation; the straight regeneration it replaced reads 1.31x as the backup), Odontochelys 5.12x, Hybodus 5.93x (its opercular crack; mouth region 1.22x since T3D-39), Dinocephalosaurus 7.00x, Coelophysis 7.74x
   (SnapRight, skull/neck), Ceratites 7.73x, Placodus 12.36x. Placodus is the outstanding repair work:
   Coelophysis came down from 25.25x, Macrocnemus from 23.31x, Helicoprion from 14.33x, Tanystropheus
   from 6.09x and Cartorhynchus from 5.17x. `docs/triassic/jaw-skinning.md` is the per-body record of

@@ -1,0 +1,351 @@
+{
+ "note": "T.jaw_field_aimed swept over its ramp width (fraction of the body; the fade behind the hinge is twice it). Each row is a full rebuild on 04ee6af plus this builder, measured on the build's own GLB: the builder's jaw-weight steps (\"does not break\": the largest jump in jaw weight along an edge of the skin the body arrived with, and the same over the two kinds of fill), skin-tears.mjs, lag.mjs, and mandible-travel.mjs --profile (the mandible mesh only, in fifths from the hinge to the front of the mouth, at each clip's peak). Ships at 0.035: the widest ramp -- so the smallest step -- at which every fifth of the tooth row still travels at least 0.95 of its bone at Bite, the widest gape; 0.05 bows the rear of the jaw to 0.91 at Bite and 0.75 at Eat, 0.07 to 0.84 and 0.64 and takes the front with it. Skin and the jaw cut are the same at every width.",
+ "ships": 0.035,
+ "rows": [
+  {
+   "rampWidthOfBody": 0.02,
+   "worstSkin": 5.93,
+   "mouthSkin": "jaw 1.30x in TurnRight (0.061->0.079) \u00b7 skull 5.93x in Shake (0.017->0.099)",
+   "jawWeightJumpAlongASkinEdge": {
+    "authored": 0.5992,
+    "twin": 0.7699
+   },
+   "jawWeightJumpP99Authored": 0.0451,
+   "jawWeightJumpAlongAFillEdge": {
+    "mouthCaps": 0.5,
+    "hingeWallCaps": 0.5
+   },
+   "jawWeightJumpOffTheCut": 0.0,
+   "lagFollows": "Bite 0.99 \u00b7 Attack 0.99 \u00b7 Heavy 0.99 \u00b7 Eat 0.97",
+   "lagSeam": "480 rest-coincident cross-mesh pairs; cut plane 72, 0 open past 0.2 %, worst 0.00 % of a body at @0.00; lip 408, gape 5.6 % at Heavy (cut read off the hinge wall of docs/triassic/mouths/hybodus-mouth.json)",
+   "toothRowTravelOverRigidByFifthFromHinge": {
+    "Bite": [
+     1.002,
+     0.998,
+     1,
+     1,
+     1
+    ],
+    "Attack": [
+     1.003,
+     1,
+     1,
+     1,
+     1
+    ],
+    "Heavy": [
+     1.002,
+     1,
+     1,
+     1,
+     1
+    ],
+    "Eat": [
+     0.955,
+     0.994,
+     1,
+     1,
+     1
+    ],
+    "Shake": [
+     0.999,
+     1,
+     1,
+     1,
+     1
+    ],
+    "Grab": [
+     1,
+     1,
+     1,
+     1,
+     1
+    ]
+   },
+   "mandibleFrontFifthTravelOverRigid": {
+    "Bite": 1,
+    "Attack": 1,
+    "Heavy": 1,
+    "Eat": 1,
+    "Shake": 1,
+    "Grab": 1
+   }
+  },
+  {
+   "rampWidthOfBody": 0.027,
+   "worstSkin": 5.93,
+   "mouthSkin": "jaw 1.28x in TurnRight (0.059->0.075) \u00b7 skull 5.93x in Shake (0.017->0.099)",
+   "jawWeightJumpAlongASkinEdge": {
+    "authored": 0.4106,
+    "twin": 0.6145
+   },
+   "jawWeightJumpP99Authored": 0.0796,
+   "jawWeightJumpAlongAFillEdge": {
+    "mouthCaps": 0.5,
+    "hingeWallCaps": 0.5
+   },
+   "jawWeightJumpOffTheCut": 0.0,
+   "lagFollows": "Bite 0.99 \u00b7 Attack 1.00 \u00b7 Heavy 1.00 \u00b7 Eat 0.98",
+   "lagSeam": "480 rest-coincident cross-mesh pairs; cut plane 72, 0 open past 0.2 %, worst 0.00 % of a body at @0.00; lip 408, gape 5.6 % at Heavy (cut read off the hinge wall of docs/triassic/mouths/hybodus-mouth.json)",
+   "toothRowTravelOverRigidByFifthFromHinge": {
+    "Bite": [
+     1,
+     0.988,
+     1,
+     1,
+     1
+    ],
+    "Attack": [
+     1.004,
+     1.002,
+     1,
+     1,
+     1
+    ],
+    "Heavy": [
+     1.004,
+     1.002,
+     1,
+     1,
+     1
+    ],
+    "Eat": [
+     0.92,
+     0.961,
+     1,
+     1,
+     1
+    ],
+    "Shake": [
+     1.001,
+     0.999,
+     1,
+     1,
+     1
+    ],
+    "Grab": [
+     1,
+     0.999,
+     1,
+     1,
+     1
+    ]
+   },
+   "mandibleFrontFifthTravelOverRigid": {
+    "Bite": 1,
+    "Attack": 1,
+    "Heavy": 1,
+    "Eat": 1,
+    "Shake": 1,
+    "Grab": 1
+   }
+  },
+  {
+   "rampWidthOfBody": 0.035,
+   "worstSkin": 5.93,
+   "mouthSkin": "jaw 1.22x in TurnRight (0.065->0.079) \u00b7 skull 5.93x in Shake (0.017->0.099)",
+   "jawWeightJumpAlongASkinEdge": {
+    "authored": 0.3452,
+    "twin": 0.6516
+   },
+   "jawWeightJumpP99Authored": 0.094,
+   "jawWeightJumpAlongAFillEdge": {
+    "mouthCaps": 0.4921,
+    "hingeWallCaps": 0.4997
+   },
+   "jawWeightJumpOffTheCut": 0.0,
+   "lagFollows": "Bite 0.99 \u00b7 Attack 1.00 \u00b7 Heavy 1.00 \u00b7 Eat 0.99",
+   "lagSeam": "480 rest-coincident cross-mesh pairs; cut plane 72, 0 open past 0.2 %, worst 0.00 % of a body at @0.00; lip 408, gape 5.6 % at Heavy (cut read off the hinge wall of docs/triassic/mouths/hybodus-mouth.json)",
+   "toothRowTravelOverRigidByFifthFromHinge": {
+    "Bite": [
+     1.004,
+     0.956,
+     0.996,
+     1,
+     1
+    ],
+    "Attack": [
+     1.006,
+     1.005,
+     1,
+     1,
+     1
+    ],
+    "Heavy": [
+     1.005,
+     1.004,
+     1,
+     1,
+     1
+    ],
+    "Eat": [
+     0.89,
+     0.882,
+     0.995,
+     1,
+     1
+    ],
+    "Shake": [
+     1.002,
+     0.999,
+     0.999,
+     1,
+     1
+    ],
+    "Grab": [
+     1.002,
+     0.995,
+     0.999,
+     1,
+     1
+    ]
+   },
+   "mandibleFrontFifthTravelOverRigid": {
+    "Bite": 1,
+    "Attack": 1,
+    "Heavy": 1,
+    "Eat": 1,
+    "Shake": 1,
+    "Grab": 1
+   }
+  },
+  {
+   "rampWidthOfBody": 0.05,
+   "worstSkin": 5.93,
+   "mouthSkin": "jaw 1.14x in TurnRight (0.066->0.075) \u00b7 skull 5.93x in Shake (0.017->0.099)",
+   "jawWeightJumpAlongASkinEdge": {
+    "authored": 0.2726,
+    "twin": 0.4635
+   },
+   "jawWeightJumpP99Authored": 0.095,
+   "jawWeightJumpAlongAFillEdge": {
+    "mouthCaps": 0.4087,
+    "hingeWallCaps": 0.434
+   },
+   "jawWeightJumpOffTheCut": 0.0,
+   "lagFollows": "Bite 0.99 \u00b7 Attack 1.00 \u00b7 Heavy 1.00 \u00b7 Eat 0.98",
+   "lagSeam": "480 rest-coincident cross-mesh pairs; cut plane 72, 0 open past 0.2 %, worst 0.00 % of a body at @0.00; lip 408, gape 5.6 % at Heavy (cut read off the hinge wall of docs/triassic/mouths/hybodus-mouth.json)",
+   "toothRowTravelOverRigidByFifthFromHinge": {
+    "Bite": [
+     1.022,
+     0.909,
+     0.935,
+     0.999,
+     1
+    ],
+    "Attack": [
+     1.009,
+     1.01,
+     1.002,
+     1,
+     1
+    ],
+    "Heavy": [
+     1.009,
+     1.009,
+     1.002,
+     1,
+     1
+    ],
+    "Eat": [
+     0.841,
+     0.75,
+     0.907,
+     0.999,
+     1
+    ],
+    "Shake": [
+     1.004,
+     0.999,
+     0.995,
+     1,
+     1
+    ],
+    "Grab": [
+     1.005,
+     0.991,
+     0.989,
+     1,
+     1
+    ]
+   },
+   "mandibleFrontFifthTravelOverRigid": {
+    "Bite": 0.983,
+    "Attack": 1.001,
+    "Heavy": 1.002,
+    "Eat": 0.972,
+    "Shake": 1.003,
+    "Grab": 0.996
+   }
+  },
+  {
+   "rampWidthOfBody": 0.07,
+   "worstSkin": 5.93,
+   "mouthSkin": "jaw 1.17x in TurnLeft (0.069->0.080) \u00b7 skull 5.93x in Shake (0.017->0.099)",
+   "jawWeightJumpAlongASkinEdge": {
+    "authored": 0.2293,
+    "twin": 0.2989
+   },
+   "jawWeightJumpP99Authored": 0.0967,
+   "jawWeightJumpAlongAFillEdge": {
+    "mouthCaps": 0.3135,
+    "hingeWallCaps": 0.3383
+   },
+   "jawWeightJumpOffTheCut": 0.0,
+   "lagFollows": "Bite 0.98 \u00b7 Attack 0.99 \u00b7 Heavy 0.99 \u00b7 Eat 0.95",
+   "lagSeam": "480 rest-coincident cross-mesh pairs; cut plane 72, 0 open past 0.2 %, worst 0.00 % of a body at @0.00; lip 408, gape 5.5 % at Heavy (cut read off the hinge wall of docs/triassic/mouths/hybodus-mouth.json)",
+   "toothRowTravelOverRigidByFifthFromHinge": {
+    "Bite": [
+     1.046,
+     0.88,
+     0.841,
+     0.93,
+     0.984
+    ],
+    "Attack": [
+     1.016,
+     1.016,
+     1.007,
+     0.998,
+     0.998
+    ],
+    "Heavy": [
+     1.014,
+     1.015,
+     1.008,
+     0.999,
+     0.999
+    ],
+    "Eat": [
+     0.772,
+     0.644,
+     0.765,
+     0.919,
+     0.982
+    ],
+    "Shake": [
+     1.006,
+     1.001,
+     0.996,
+     1.003,
+     0.998
+    ],
+    "Grab": [
+     1.013,
+     0.991,
+     0.978,
+     0.985,
+     0.995
+    ]
+   },
+   "mandibleFrontFifthTravelOverRigid": {
+    "Bite": 0.732,
+    "Attack": 1.007,
+    "Heavy": 1.011,
+    "Eat": 0.581,
+    "Shake": 1.038,
+    "Grab": 0.938
+   }
+  }
+ ]
+}

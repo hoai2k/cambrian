@@ -64,7 +64,7 @@ clip the audit says opens the jaw.
 | Cymbospondylus | 4 | 933 | |
 | Archelon | 1 | 1,262 | |
 | **Macrocnemus** | **0** | **0** | ported in T3D-32B: arrived shut, capped with its own rim on a *fitted* cut (was 934 / 2,594 over **all twelve** opening clips) |
-| Hybodus | **1,346** | **2,833** | **reverted in T3D-36 at the owner's request.** T3D-32A took the cut out and read 0 / 0; the mouth was reported as not working well and `build.py` is restored verbatim to `a6d184c^` — the labelled cut, `T.cap_cut`, `T.rim_flange`, the pre-cut `T.seal_seams` and the two rigid `T.oral_shells`. Measured over **all fifteen** clips whose jaw leaves the shut pose rather than the three this table samples: the worst is `Heavy@0.4` 1,346 / 2,833, then `Bite@0.133` 1,261 / 2,670, `Bite@0.167` (its own peak) 1,073 / 2,328, `Attack@0.333` 875 / 1,985, `Grab@0.1` 158 / 518 and `Shake@0.6` 142 / 497; everything else 0 / 0, `Heavy` and `Attack` included at their own peaks. Plain run 52 / 1,046 — the rigid shells *are* what stands in the gap and the runtime hides them, which is the `--as-drawn` lesson on the body it was written about. Not re-engineered: the routes out are in [the README](../../../tools/triassic/creatures/hybodus/README.md#t3d-36--the-cut-put-back-at-the-owners-request) and the decision is the owner's |
+| **Hybodus** | **0** | **0** | ported in T3D-39 on the owner's aimed cut (`mouths/hybodus-mouth.json`): the two half-spaces cut as planes, capped with the cut's own rim, and the jaw weighted as **one field over both halves of the head** (`T.jaw_field_aimed`), continuous everywhere but across the cut. The rim does not pinch on a plane. Was 1,346 / 2,833 as drawn under T3D-36's labelled cut, rim fold, seam seal and two rigid shells (all retired); now 0 / 0 plain, as drawn and shown over **all eighteen** shots — every clip that moves the jaw at its own peak plus T3D-32A's three phases. No oral mesh; [the README](../../../tools/triassic/creatures/hybodus/README.md#t3d-39--the-aimed-cut-closed-by-its-own-rim-and-a-jaw-that-bends) |
 | Mixosaurus | 0 | 3,697 | |
 | **Atopodentatus** | **0** | **0** | ported in T3D-32A: capped with its own rim (was 3,738 / 4,494) |
 | Keichousaurus | 2 | 4,375 | |
@@ -101,6 +101,7 @@ surface on the line whether the lining is really the first.
 | --- | ---: | --- | --- |
 | Birgeria | **14,868** (7,101 / 4,590 / 3,177) | 11 of 12 meet the lining first, 0.002–0.019 in front of the skin | seated by `depth()` beside the modelled slit, which reads the lumen's wall |
 | Aphaneramma | **9,714** (5,007 / 3,194 / 1,513) | 11 of 12 meet the lining first; on 2 there is no skin on the line at all | a twelve-step shrink that returned the vertex at 0.615 of the way out when twelve steps were not enough |
+| Hybodus (T3D-36 body, checked in T3D-39) | **2,139** (1,509 / 630 / 0) | not cast; the picture (`verification/hybodus-oral-outside-before-left.png`) shows the palate/floor shells in front of the cheek below the eye and along the lip | the rigid shells' rooms, seated about each jaw's edge of a gaping lumen; retired with the labelled cut, and 0 marker pixels after, because there is no oral mesh |
 
 Ray parity over the shipped meshes (nine oblique rays, majority) found only 35 of 816 and 2 of 720
 lining vertices outside the solid — the lining lies a hair proud over large areas, which a
