@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ACTIVE_ERA } from '../content';
 import { assetPaths } from '../content/asset-paths';
 import { hideLabel, hideDescription, HEAVY_SPECIALS, DEFENSIVE_SPECIALS } from '../sim/concealment';
@@ -16,6 +16,12 @@ import { gridColumns, rosterGrid, sameSlot, type ExtraId, type Slot } from './ro
 import { ERA_NAME, type EraId } from '../content/visitors';
 import { carouselView, gridFits, pickerSideBySide, rosterArea, type Box, type Layout } from '../shared/small-screen';
 import { TEXT } from '../shared/text';
+import { modeArtFile } from '../shared/mode-art';
+import { depthLayout, habitatBand, type DepthItem, type DepthLayout } from './depth-layout';
+import './plate.css';
+
+export type RosterView = 'list' | 'size';
+const VIEWS: RosterView[] = ['list', 'size'];
 
 interface Props {
   players: PlayerSetup[]; mode: Mode; modes: Mode[]; modeInfo: Record<Mode, { name: string; blurb: string; players: string }>;
@@ -28,6 +34,13 @@ interface Props {
   carry: boolean[];
   /** Which mode chip the pad is pointing at, or -1 when the shoulder ring is elsewhere. */
   modeFocus?: number;
+  /** Which of the List and Size tabs the pad is pointing at, or -1. */
+  viewFocus?: number;
+  /** How the roster is drawn on a desktop: the list, or the animals at size where they live. */
+  rosterView: RosterView;
+  onRosterView: (v: RosterView) => void;
+  /** The Size view's layout while it is drawn (null otherwise), so the cursor walks what is on screen. */
+  onDepth: (layout: DepthLayout | null) => void;
   onPick: (i: number, c: CreatureId) => void; onReady: (i: number) => void; onRemove: (i: number) => void;
   onMode: (m: Mode) => void; onStart: () => void; onBack: () => void;
   onCarry: (i: number) => void;
@@ -207,6 +220,20 @@ const EXTRA_LABEL: Record<ExtraId, { name: string; glyph: string; title: string 
   visitors: { name: T.visitorsName, glyph: '★', title: T.visitorsTitle },
 };
 
+/**
+ * The engraved plate: the choice screen drawn in the title's own style, parchment and ink, with each
+ * animal a numbered figure and the chosen one a plate. `?plate=0` still reaches the old dark panel so
+ * the two can be compared; nothing on the page offers it.
+ */
+const PLATE = typeof location === 'undefined' || !/[?&]plate=0(?:&|$)/.test(location.search);
+const ROMAN: [number, string][] = [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
+/** A plate number the way a folio numbers its plates. */
+export function roman(n: number): string {
+  let out = '';
+  for (const [v, r] of ROMAN) while (n >= v) { out += r; n -= v; }
+  return out;
+}
+
 export function SelectScreen(p: Props) {
   const s = p.scheme;
   const grid = rosterGrid(CREATURES.map((c) => c.id), p.extras, p.maxCols);
@@ -230,6 +257,32 @@ export function SelectScreen(p: Props) {
   const carousel = carouselView(p.layout, p.players.length, fits);
   const onView = p.onView;
   useEffect(() => { onView(carousel); }, [carousel, onView]);
+  /*
+   * The List and Size tabs are a desktop's: a compact window has no room for a sea of animals drawn
+   * to scale (the smallest would be smaller than a fingertip), and on a phone the carousel is the
+   * whole roster anyway. There the list is simply what is drawn.
+   */
+  const tabs = !carousel && p.layout !== 'compact';
+  const view: RosterView = tabs ? p.rosterView : 'list';
+  const onDepth = p.onDepth;
+  useEffect(() => { if (view !== 'size') onDepth(null); }, [view, onDepth]);
+  /** Which seats are on an animal, and which of those have locked it in. */
+  const seatsOn = (id: string) => {
+    const hovering = p.players.map((pl, i) => ({ pl, i })).filter(({ pl }) => !pl.cursor && pl.creature === id);
+    return { hovering, lockedBy: hovering.filter(({ pl }) => pl.ready) };
+  };
+  /** A click on an animal, from the list or the Size view alike. */
+  const clickCreature = (id: CreatureId) => {
+    // A click on the animal you are already on is the second half of choosing it:
+    // once to move here, again to lock in, again to change your mind. The seat that
+    // answers is the one *on this tile* when there is one — otherwise a locked-in
+    // player could never be unlocked, because the search below skips ready seats.
+    const here = p.players.findIndex((pl) => !pl.cursor && pl.creature === id && typeof pl.device === 'string');
+    if (here >= 0) { p.onReady(here); return; }
+    const i = p.players.findIndex((pl) => !pl.ready && typeof pl.device === 'string');
+    p.onPick(i >= 0 ? i : 0, id);
+  };
+  const clickExtra = (id: ExtraId) => { const i = p.players.findIndex((pl) => !pl.ready && typeof pl.device === 'string'); p.onExtra(i >= 0 ? i : 0, id); };
   // Controllers the game can see that have not joined yet, and joined players whose controller
   // has since gone away (an Xbox pad that went to sleep looks exactly like an unplugged one).
   const joined = new Set(p.players.map((pl) => pl.device));
@@ -248,6 +301,7 @@ export function SelectScreen(p: Props) {
               <article key={i} className={`crew-card ${pl.ready ? 'ready' : ''}`} style={{ ['--player' as string]: PLAYER_COLORS[i] }}>
                 {pl.ready && <span key={'fx' + pl.creature} className="lock-fx" aria-hidden="true" />}
                 <div className="crew-top">
+                  <span className="plate-no" aria-hidden="true">{T.plate.plate(roman(CREATURES.findIndex((c) => c.id === pl.creature) + 1 || 1))}</span>
                   <span className="player-chip">{TEXT.common.playerChip(i + 1)}</span>
                   {/* Which thing this seat is steered by. The touch seat has to be named as itself:
                       it used to fall through to the controller branch, which drew a pad icon, called
@@ -308,44 +362,18 @@ export function SelectScreen(p: Props) {
             );
   };
 
-  return (
-    <section className={`select ${carousel ? 'select-carousel' : ''}`} aria-label={T.screenLabel}>
-      <header className="select-header">
-        <BrandHeader onBack={p.onBack} />
-        <div className="mode-picker" role="tablist" aria-label={T.modePickerLabel}>
-          {p.modes.map((m, i) => (
-            <button key={m} role="tab" aria-selected={p.mode === m} className={`mode-chip ${p.mode === m ? 'active' : ''}${i === p.modeFocus ? ' pad-focus' : ''}`} onClick={() => p.onMode(m)}>
-              <img className="mode-art" src={`${ASSETS}${assetPaths.ui(`mode-${m}.webp`)}`} alt="" />
-              <span>{p.modeInfo[m].name}</span><small>{p.modeInfo[m].players}</small>
-            </button>
-          ))}
-        </div>
-        <p className="mode-blurb">{p.modeInfo[p.mode].blurb} <span className="dim">{T.modeSwitchHint(btn('modePrev', s), btn('modeNext', s))}</span></p>
-      </header>
-
-      <div className="pick-layout" ref={pickRef}>
-        {carousel ? <RosterCarousel p={p} grid={grid} renderCard={renderCard} /> : <>
-        {/* ---- roster grid ---- */}
-        <div className={`roster-grid ${cols >= 6 ? 'dense' : ''}`} role="listbox" aria-label={T.rosterLabel} style={{ ['--cols' as string]: cols }}>
-          {CREATURES.map((c) => {
-            const hovering = p.players.map((pl, i) => ({ pl, i })).filter(({ pl }) => !pl.cursor && pl.creature === c.id);
-            const lockedBy = hovering.filter(({ pl }) => pl.ready);
+  const rosterList = (
+<div className={`roster-grid ${cols >= 6 ? 'dense' : ''}`} role="listbox" aria-label={T.rosterLabel} style={{ ['--cols' as string]: cols }}>
+          {CREATURES.map((c, n) => {
+            const { hovering, lockedBy } = seatsOn(c.id);
             const cls = ['cell', hovering.length ? 'hover' : '', lockedBy.length ? 'locked' : ''].join(' ');
             return (
               <button key={c.id} role="option" aria-selected={hovering.length > 0} className={cls}
                 style={{ ['--c' as string]: hovering.length ? PLAYER_COLORS[hovering[0].i] : c.color }}
-                onClick={() => {
-                  // A click on the animal you are already on is the second half of choosing it:
-                  // once to move here, again to lock in, again to change your mind. The seat that
-                  // answers is the one *on this tile* when there is one — otherwise a locked-in
-                  // player could never be unlocked, because the search below skips ready seats.
-                  const here = p.players.findIndex((pl) => !pl.cursor && pl.creature === c.id && typeof pl.device === 'string');
-                  if (here >= 0) { p.onReady(here); return; }
-                  const i = p.players.findIndex((pl) => !pl.ready && typeof pl.device === 'string');
-                  p.onPick(i >= 0 ? i : 0, c.id);
-                }}
+                onClick={() => clickCreature(c.id)}
                 title={`${c.name}${c.kind ? ` · ${c.kind}` : ''} · ${c.role}`} aria-label={c.kind ? `${c.name}, ${c.kind}` : c.name}>
                 <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={ASSETS} alt="" draggable={false} loading="eager" />
+                <span className="cell-fig" aria-hidden="true">{T.plate.fig(n + 1)}</span>
                 <FitName name={c.name} />
                 {c.kind && <span className="cell-kind">{c.kind}</span>}
                 <span className="cell-rings">
@@ -367,7 +395,7 @@ export function SelectScreen(p: Props) {
               <button key={id} role="option" aria-selected={on.length > 0}
                 className={`cell extra extra-${id} ${on.length ? 'hover' : ''}`}
                 style={{ gridColumn: col + 1, gridRow: `span 3`, ['--c' as string]: on.length ? PLAYER_COLORS[on[0].i] : 'var(--foam)', ['--extra-row' as string]: row }}
-                onClick={() => { const i = p.players.findIndex((pl) => !pl.ready && typeof pl.device === 'string'); p.onExtra(i >= 0 ? i : 0, id); }}
+                onClick={() => clickExtra(id)}
                 title={label.title} aria-label={label.title}>
                 <span className="extra-glyph" aria-hidden="true">{label.glyph}</span>
                 <span className="extra-name">{label.name}</span>
@@ -379,6 +407,35 @@ export function SelectScreen(p: Props) {
             );
           })}
         </div>
+  );
+
+  return (
+    <section className={`select ${carousel ? 'select-carousel' : ''} ${PLATE ? 'plate' : ''}`} data-era={ACTIVE_ERA.id} aria-label={T.screenLabel}>
+      <header className="select-header">
+        <BrandHeader onBack={p.onBack} />
+        <div className="mode-picker" role="tablist" aria-label={T.modePickerLabel}>
+          {p.modes.map((m, i) => (
+            <button key={m} role="tab" aria-selected={p.mode === m} className={`mode-chip ${p.mode === m ? 'active' : ''}${i === p.modeFocus ? ' pad-focus' : ''}`} onClick={() => p.onMode(m)}>
+              <img className="mode-art" src={`${ASSETS}${assetPaths.ui(modeArtFile(m))}`} alt="" onError={(e) => { e.currentTarget.dataset.missing = ''; }} />
+              <span>{p.modeInfo[m].name}</span><small>{p.modeInfo[m].players}</small>
+            </button>
+          ))}
+        </div>
+        <p className="mode-blurb">{p.modeInfo[p.mode].blurb} <span className="dim">{T.modeSwitchHint(btn('modePrev', s), btn('modeNext', s))}</span></p>
+      </header>
+
+      <div className="pick-layout" ref={pickRef}>
+        {carousel ? <RosterCarousel p={p} grid={grid} renderCard={renderCard} /> : <>
+        {/* ---- the roster: the list, or on a desktop the Size view, under their tabs ---- */}
+        {tabs && <div className="roster-pane">
+          <div className="roster-tabs" role="tablist" aria-label={T.views.label}>
+            {VIEWS.map((v, k) => (
+              <button key={v} role="tab" aria-selected={view === v} className={`roster-tab${view === v ? ' active' : ''}${p.viewFocus === k ? ' pad-focus' : ''}`} onClick={() => p.onRosterView(v)}>{T.views[v]}</button>
+            ))}
+          </div>
+          {view === 'size' ? <DepthView p={p} seatsOn={seatsOn} onCreature={clickCreature} onExtra={clickExtra} onLayout={onDepth} /> : rosterList}
+        </div>}
+        {!tabs && rosterList}
 
         {/* ---- player cards ---- */}
         <div className={`crew crew-${p.players.length} ${compact ? 'compact' : ''}`}>
@@ -498,6 +555,10 @@ function RosterCarousel({ p, grid, renderCard }: {
   return (
     <div className="carousel" role="group" aria-roledescription="carousel" aria-label={K.label}>
       <button className="carousel-step prev" aria-label={K.prev} onClick={() => step(-1)}><span aria-hidden="true">‹</span></button>
+      {/* Held upright the arrows give way to the neighbouring cards themselves, peeking in at either
+          edge: the edge of the next card says "swipe" without a word, and tapping it steps there. */}
+      <Peek slot={order[(at - 1 + order.length) % order.length]} side="prev" label={K.prev} onStep={() => step(-1)} />
+      <Peek slot={order[(at + 1) % order.length]} side="next" label={K.next} onStep={() => step(1)} />
       <div
         className="carousel-stage"
         onPointerDown={(e) => { press.current = { x: e.clientX, y: e.clientY }; swiped.current = false; }}
@@ -519,6 +580,98 @@ function RosterCarousel({ p, grid, renderCard }: {
         <span className="carousel-count">{K.count(at + 1, order.length)}</span>
       </div>
     </div>
+  );
+}
+
+/**
+ * The Size view: the roster as a slice of sea, each animal at its size where it lives
+ * (`depth-layout.ts`). It measures its own box, lays the roster out in it and tells the shell the
+ * layout it drew, so the stick walks the same rectangles the eye sees. Everything else about the
+ * screen — the crew cards, Lock In, the seats' rings — is the list's, unchanged.
+ */
+function DepthView({ p, seatsOn, onCreature, onExtra, onLayout }: {
+  p: Props;
+  seatsOn: (id: string) => { hovering: { pl: PlayerSetup; i: number }[]; lockedBy: { pl: PlayerSetup; i: number }[] };
+  onCreature: (id: CreatureId) => void;
+  onExtra: (id: ExtraId) => void;
+  onLayout: (layout: DepthLayout | null) => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [box, setBox] = useState<Box | null>(null);
+  useLayoutEffect(() => {
+    const el = ref.current; if (!el) return;
+    const read = () => setBox((was) => (was && was.w === el.clientWidth && was.h === el.clientHeight ? was : { w: el.clientWidth, h: el.clientHeight }));
+    read();
+    const ro = new ResizeObserver(read); ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  // Real length where the era records one (the Cambrian's `realCm`), the adult length otherwise:
+  // this view is about how big the animals *are*, whatever the Equivalent sizing option says.
+  const items = useMemo<DepthItem[]>(() => CREATURES.map((c) => ({ id: c.id, band: habitatBand(c), length: realCm(c.id) ?? creature(c.id).adultLength })), []);
+  const extrasKey = p.extras.join(',');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const layout = useMemo(() => (box && box.w > 0 && box.h > 0 ? depthLayout(items, p.extras, box) : null), [box, items, extrasKey]);
+  useEffect(() => { onLayout(layout); }, [layout, onLayout]);
+  useEffect(() => () => onLayout(null), [onLayout]);
+  const V = T.views;
+  return (
+    <div className="depth-view" ref={ref} role="listbox" aria-label={T.rosterLabel}>
+      {layout && <>
+        {layout.bands.map((b) => (
+          <div key={b.band} className={`depth-band depth-band-${b.band}`} style={{ top: b.top, height: b.bottom - b.top }}>
+            <span className="depth-label">{V.bands[b.band]}</span>
+          </div>
+        ))}
+        <div className="depth-surface" style={{ top: layout.surfaceY }} aria-hidden="true" />
+        <div className="depth-floor" style={{ top: layout.floorY }} aria-hidden="true" />
+        {layout.spots.map(({ slot, x, y, w, h }) => {
+          const place = { left: x, top: y, width: w, height: h };
+          if (slot.kind === 'extra') {
+            const id = slot.id as ExtraId;
+            const on = p.players.map((pl, i) => ({ pl, i })).filter(({ pl }) => pl.cursor === id);
+            const label = EXTRA_LABEL[id];
+            return (
+              <button key={'x' + id} role="option" aria-selected={on.length > 0} className={`depth-spot extra extra-${id} ${on.length ? 'hover' : ''}`}
+                style={{ ...place, ['--c' as string]: on.length ? PLAYER_COLORS[on[0].i] : 'var(--foam)' }}
+                onClick={() => onExtra(id)} title={label.title} aria-label={label.title}>
+                <span className="extra-glyph" aria-hidden="true">{label.glyph}</span>
+                <span className="depth-name">{label.name}</span>
+                <span className="cell-rings">{on.map(({ i }) => <i key={i} style={{ ['--c' as string]: PLAYER_COLORS[i], ['--k' as string]: i }} className="ring" />)}</span>
+              </button>
+            );
+          }
+          const c = creature(slot.id as CreatureId);
+          const { hovering, lockedBy } = seatsOn(c.id);
+          return (
+            <button key={c.id} role="option" aria-selected={hovering.length > 0}
+              className={`depth-spot ${hovering.length ? 'hover' : ''} ${lockedBy.length ? 'locked' : ''}`}
+              style={{ ...place, ['--c' as string]: hovering.length ? PLAYER_COLORS[hovering[0].i] : c.color }}
+              onClick={() => onCreature(c.id)} title={`${c.name}${c.kind ? ` · ${c.kind}` : ''} · ${c.role}`} aria-label={c.kind ? `${c.name}, ${c.kind}` : c.name}>
+              <CreaturePortrait creatureId={c.id} kind="thumb" assetBase={ASSETS} alt="" draggable={false} loading="eager" />
+              <span className="depth-name">{c.name}</span>
+              <span className="cell-rings">
+                {hovering.map(({ i, pl }) => <i key={i} style={{ ['--c' as string]: PLAYER_COLORS[i], ['--k' as string]: i }} className={pl.ready ? 'ring locked' : 'ring'} />)}
+              </span>
+              {lockedBy.map(({ i }) => <span key={'b' + i} className="lock-badge" style={{ background: PLAYER_COLORS[i] }}>{TEXT.common.playerChip(i + 1)}</span>)}
+            </button>
+          );
+        })}
+      </>}
+    </div>
+  );
+}
+
+/** The edge of the card either side of the one on stage, for the carousel held upright. */
+function Peek({ slot, side, label, onStep }: { slot: Slot | undefined; side: 'prev' | 'next'; label: string; onStep: () => void }) {
+  if (!slot) return null;
+  return (
+    <button className={`carousel-peek ${side}`} aria-label={label} onClick={onStep} tabIndex={-1}>
+      <span className="peek-card" aria-hidden="true">
+        {slot.kind === 'creature'
+          ? <CreaturePortrait creatureId={slot.id as CreatureId} kind="thumb" assetBase={ASSETS} alt="" draggable={false} />
+          : <span className="extra-glyph">{EXTRA_LABEL[slot.id as ExtraId].glyph}</span>}
+      </span>
+    </button>
   );
 }
 

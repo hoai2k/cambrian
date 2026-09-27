@@ -1,0 +1,245 @@
+/*
+ * The engraved plate: the choice screen in the title's own style.
+ *
+ * Every game's title is a naturalist's plate — parchment, sepia ink, engraved animals — and the pick
+ * screen that follows it used to be a dark teal app panel, so pressing start felt like arriving in a
+ * different game. This is the same screen, the same layout and the same markup, drawn in ink on paper:
+ * the roster an index of numbered figures, the chosen animal a plate, Lock In a wax seal.
+ *
+ * It is a layer, not a rewrite. Everything is scoped under `.select.plate` (the class `Select.tsx` sets
+ * unless the page was opened with `?plate=0`), and it restyles colour, type, borders and ornament
+ * while leaving the layout rules in styles.css alone — so the compact layout, the carousel and the
+ * split-screen crew all keep working exactly as they did and simply come out on paper.
+ *
+ * Player colours are bright on purpose, for a dark sea; on paper they are mixed toward the ink
+ * (`--pc`), so a cursor ring or a ready card still says whose it is and can still be read.
+ */
+.select.plate {
+  --paper: #ecdfbf;
+  --paper-2: #e2d0a6;
+  --paper-edge: #a88a57;
+  --ink-1: #34261a;
+  --ink-2: #5c4631;
+  --ink-3: #85694a;
+  --rule: rgba(52, 38, 26, .55);
+  --accent: #9a2e1c; /* red ink: the seal, the chosen figure, the underline of the chosen mode */
+  --serif: 'IM Fell English', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --serif-sc: 'IM Fell English SC', 'IM Fell English', Georgia, serif;
+  color: var(--ink-1);
+  font-family: var(--serif);
+  /* A faint grain under the paper, then the paper, then the scorched edge every title plate has. */
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .2 0 0 0 0 .14 0 0 0 0 .08 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 50% 42%, var(--paper) 0%, var(--paper-2) 58%, var(--paper-edge) 100%);
+  box-shadow: inset 0 0 160px rgba(58, 34, 12, .6), inset 0 0 36px rgba(58, 34, 12, .35);
+}
+/* Each game keeps its own second ink, taken from its title painting. */
+.select.plate[data-era='devonian'] { --accent: #7a3322; --paper: #eadcbb; }
+.select.plate[data-era='triassic'] { --accent: #8a2c1f; --paper: #ecdfbd; --paper-2: #e0cda0; }
+
+.select.plate .dim { color: var(--ink-3); }
+.select.plate h2 { font-family: var(--serif); font-weight: 400; }
+
+/* ---- the header: wordmark, modes as engraved vignettes, the mode's line in italic ---- */
+.select.plate .brand-home:hover, .select.plate .brand-home:focus-visible,
+.select.plate .brand-title:enabled:hover, .select.plate .brand-title:focus-visible { background: rgba(52, 38, 26, .08); }
+.select.plate .brand-title svg { color: var(--accent); }
+.select.plate .header-logo { filter: drop-shadow(0 1px 0 rgba(255, 244, 220, .5)) drop-shadow(0 2px 3px rgba(52, 38, 26, .35)); }
+.select.plate .brand-home img { filter: sepia(.35) drop-shadow(0 2px 3px rgba(52, 38, 26, .3)); }
+.select.plate .era-menu { background: var(--paper); border: 1px solid var(--rule); box-shadow: 0 12px 30px rgba(52, 38, 26, .35); }
+
+.select.plate .mode-chip { border-radius: 4px; border: 1px solid var(--ink-2); outline: 1px solid var(--ink-2); outline-offset: -5px; background: var(--paper-2); color: var(--paper); }
+.select.plate .mode-chip .mode-art { filter: sepia(.75) saturate(.55) contrast(.95) brightness(.95); }
+.select.plate .mode-chip::after { background: linear-gradient(transparent 30%, rgba(40, 26, 14, .88)); }
+.select.plate .mode-chip span { font: 400 17px var(--serif-sc); letter-spacing: .06em; }
+.select.plate .mode-chip small { font: italic 12px var(--serif); color: rgba(246, 234, 206, .85); }
+.select.plate .mode-chip.active { background: var(--paper-2); border-color: var(--accent); outline-color: var(--accent); box-shadow: 0 0 0 2px var(--paper), 0 0 0 3px var(--accent), 0 6px 14px rgba(52, 38, 26, .3); }
+.select.plate .mode-chip.active .mode-art { filter: none; }
+.select.plate .mode-chip:hover { transform: translateY(-1px); }
+/* A mode whose picture has not been delivered shows its caption on the paper, not a broken image. */
+.select.plate .mode-chip .mode-art:not([src]), .select.plate .mode-chip .mode-art[data-missing] { visibility: hidden; }
+.select.plate .mode-blurb { font: italic 17px/1.35 var(--serif); color: var(--ink-2); }
+.select.plate .mode-blurb .dim { font-style: normal; font-size: 14px; }
+
+/* ---- the index: each animal a numbered figure in an oval frame ---- */
+.select.plate .cell {
+  --pc: color-mix(in oklch, var(--c), var(--ink-1) 45%);
+  border: 0; border-radius: 6px; background: none; overflow: visible;
+  padding: 16px 4px 2px;
+}
+.select.plate .cell img {
+  width: 100%; margin: 0; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255, 249, 230, .7), rgba(255, 246, 222, .25) 70%);
+  border: 3px double var(--ink-2);
+  mix-blend-mode: multiply; filter: sepia(.4) saturate(.8) contrast(1.05);
+}
+.select.plate .cell-fig { position: absolute; top: 0; left: 0; right: 0; text-align: center; font: 400 12px/1 var(--serif-sc); letter-spacing: .06em; color: var(--ink-3); pointer-events: none; }
+.select.plate .cell-name { font: italic calc(clamp(12px, calc(10cqw / var(--cols)), 17px) * var(--fit, 1))/1.1 var(--serif); letter-spacing: 0; color: var(--ink-1); }
+.select.plate .cell-kind { font: 400 clamp(9px, calc(6.6cqw / var(--cols)), 11px)/1.2 var(--serif-sc); letter-spacing: .05em; text-transform: none; color: var(--ink-3); }
+.select.plate .cell:hover { transform: translateY(-2px); }
+.select.plate .cell:hover img { border-color: var(--ink-1); }
+.select.plate .cell.hover { background: none; }
+.select.plate .cell.hover img { border-color: var(--accent); filter: sepia(.1) saturate(.95); transform: scale(1.04); box-shadow: 0 0 0 3px rgba(154, 46, 28, .16); }
+.select.plate .cell.hover .cell-name { color: var(--accent); }
+.select.plate .cell.hover .cell-kind { color: var(--ink-2); }
+.select.plate .cell-rings .ring { inset: calc(-4px - var(--k) * 4px); border-radius: 10px; border: 1.5px solid var(--pc, var(--c)); box-shadow: none; }
+.select.plate .cell-rings .ring { border-color: color-mix(in oklch, var(--c), var(--ink-1) 45%); }
+.select.plate .cell-rings .ring.locked { border-width: 2.5px; border-style: double; border-width: 4px; }
+.select.plate .lock-badge { top: 12px; right: -2px; font: 400 12px var(--serif-sc); letter-spacing: .04em; padding: 1px 7px 2px; border-radius: 2px; color: #f3e5c6; background: var(--ink-1) !important; /* the seat's own colour is on the ring; on paper the tag is ink */ transform: rotate(4deg); }
+.select.plate .cell.extra { background: none; border: 1px dashed var(--ink-3); border-radius: 50%; aspect-ratio: 4 / 3; padding: 0; align-self: center; }
+.select.plate .cell.extra .extra-glyph { font: 400 2em var(--serif); color: var(--ink-2); }
+.select.plate .cell.extra .extra-name { font: 400 .95em var(--serif-sc); letter-spacing: .06em; text-transform: none; color: var(--ink-2); }
+.select.plate .cell.extra.hover { border-style: solid; border-color: var(--accent); }
+.select.plate .cell.extra.hover .extra-glyph, .select.plate .cell.extra.hover .extra-name { color: var(--accent); }
+.select.plate .cell.extra .extra-count { color: var(--ink-2); }
+
+/* ---- the plate: the chosen animal, framed in a double rule, headed with its figure number ---- */
+.select.plate .crew-card {
+  --pc: color-mix(in oklch, var(--player), var(--ink-1) 42%);
+  border-radius: 2px; background: rgba(255, 248, 226, .28); backdrop-filter: none;
+  border: 1px solid var(--ink-2); outline: 1px solid var(--ink-2); outline-offset: -7px;
+  box-shadow: 0 1px 0 rgba(255, 250, 235, .6) inset, 0 10px 30px rgba(52, 38, 26, .18);
+}
+.select.plate .crew-card::before { inset: 10px 10px auto 10px; height: 3px; background: var(--pc); opacity: .85; }
+.select.plate .crew-card.ready { border-color: var(--pc); outline-color: var(--pc); box-shadow: 0 0 0 1px var(--pc), 0 10px 30px rgba(52, 38, 26, .22); }
+.select.plate .crew-top { color: var(--ink-2); font: 400 14px var(--serif); padding-top: 4px; }
+.select.plate .plate-no { font: 400 16px var(--serif-sc); letter-spacing: .08em; color: var(--ink-1); order: 2; margin: 0 auto; }
+.select.plate .crew-top .player-chip { order: 1; }
+.select.plate .crew-top .device { order: 3; }
+.select.plate .crew-top .remove { order: 4; margin-left: 0; }
+.select.plate .player-chip { font: 400 13px var(--serif-sc); letter-spacing: .06em; background: var(--pc); color: var(--paper); border-radius: 2px; padding: 2px 8px 3px; }
+.select.plate .remove { border-radius: 50%; border-color: var(--rule); color: var(--ink-2); }
+.select.plate .remove:hover { color: var(--accent); border-color: var(--accent); }
+.select.plate .hero::before { background: radial-gradient(circle, rgba(255, 248, 226, .75), transparent 70%); filter: blur(6px); }
+.select.plate .hero img { filter: sepia(.2) saturate(.9) drop-shadow(0 10px 12px rgba(52, 38, 26, .28)); mix-blend-mode: multiply; animation-name: hero-in; }
+.select.plate .creature-copy { scrollbar-color: var(--ink-3) rgba(52, 38, 26, .1); }
+.select.plate .creature-copy .role { font: 400 14px var(--serif-sc); letter-spacing: .06em; color: var(--accent); }
+.select.plate .creature-copy h2 { font-family: var(--serif); font-weight: 400; letter-spacing: -.005em; line-height: 1.02; font-size: clamp(24px, 3vw, 46px); }
+.select.plate .provenance { font: italic 13px/1.35 var(--serif); color: var(--ink-2); }
+.select.plate .kind { background: none; border: 1px solid var(--ink-2); border-radius: 2px; color: var(--ink-1); font: 400 .95em var(--serif-sc); letter-spacing: .03em; }
+.select.plate .real-size { color: var(--accent); font-style: normal; }
+.select.plate .tagline { font: italic 19px/1.3 var(--serif); color: var(--ink-1); }
+.select.plate .tagline::before { content: '\201C'; }
+.select.plate .tagline::after { content: '\201D'; }
+.select.plate .kind-note, .select.plate .visitor-note { color: var(--ink-2); font-family: var(--serif); }
+.select.plate .best-badge { background: none; border: 1px solid var(--ink-3); color: var(--ink-1); font: 400 13px/1.3 var(--serif); letter-spacing: 0; border-radius: 2px; }
+.select.plate .best-badge b { font: 400 11px var(--serif-sc); opacity: 1; color: var(--accent); }
+.select.plate .carry-toggle { border-color: var(--ink-3); color: var(--ink-2); font: italic 13px/1.3 var(--serif); border-radius: 2px; }
+.select.plate .carry-toggle:hover { color: var(--ink-1); border-color: var(--ink-1); }
+.select.plate .best-run.carrying .carry-toggle { border-color: var(--pc); color: var(--pc); background: none; }
+.select.plate .stat small { font: 400 13px var(--serif-sc); letter-spacing: .04em; color: var(--ink-2); }
+/* A bar is a row of hatched blocks, filled where it counts — ink, not light. */
+.select.plate .stat b { height: 7px; border-radius: 0; background: rgba(52, 38, 26, .1); border: 1px solid rgba(52, 38, 26, .25); }
+.select.plate .stat b.on { background: repeating-linear-gradient(135deg, var(--ink-1) 0 1.5px, var(--ink-2) 1.5px 3px); border-color: var(--ink-1); box-shadow: none; }
+.select.plate .kit { color: var(--ink-1); font: 400 14px/1.35 var(--serif); }
+.select.plate .kit b { color: var(--ink-1); font-weight: 400; font-style: italic; }
+.select.plate .kit dt { font: 400 12px/19px var(--serif-sc); background: var(--ink-1); color: var(--paper); border-radius: 2px; letter-spacing: .03em; }
+
+/* Lock In is a wax seal: round beside the portrait while there is room for one, a pressed stamp in
+   the split-screen and compact cards, where it has a row of its own. */
+.select.plate .ready-button {
+  border-radius: 50%; aspect-ratio: 1; width: clamp(92px, 26cqw, 124px); max-width: none; padding: 10px; justify-self: end;
+  border: 0; color: #f7e3c4; font: 400 15px/1.08 var(--serif-sc); letter-spacing: .04em;
+  background: radial-gradient(circle at 36% 32%, color-mix(in oklch, var(--accent), #fff 18%), var(--accent) 62%, color-mix(in oklch, var(--accent), #000 35%));
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--accent), transparent 78%), 0 3px 0 color-mix(in oklch, var(--accent), #000 45%), 0 8px 18px rgba(52, 26, 10, .35);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, .35);
+}
+.select.plate .ready-button:hover { transform: rotate(-4deg) scale(1.03); }
+.select.plate .ready-button[aria-pressed='true'] { background: radial-gradient(circle at 36% 32%, color-mix(in oklch, var(--pc), #fff 12%), var(--pc) 62%, color-mix(in oklch, var(--pc), #000 35%)); color: #f7ecd6; transform: rotate(-8deg); box-shadow: 0 0 0 4px color-mix(in oklch, var(--pc), transparent 75%), 0 2px 0 color-mix(in oklch, var(--pc), #000 45%), 0 5px 10px rgba(52, 26, 10, .3); }
+.select.plate .crew-2 .ready-button, .select.plate .crew.compact .ready-button {
+  aspect-ratio: auto; width: auto; justify-self: stretch; border-radius: 3px; padding: 8px 12px; font-size: 15px;
+}
+.select.plate .crew-2 .ready-button:hover, .select.plate .crew.compact .ready-button:hover { transform: translateY(-1px); }
+.select.plate .crew-2 .ready-button[aria-pressed='true'], .select.plate .crew.compact .ready-button[aria-pressed='true'] { transform: none; }
+.select.plate .lock-fx { border-radius: 2px; }
+
+.select.plate .join-card { border: 1px dashed var(--ink-3); border-radius: 2px; color: var(--ink-2); font: italic 16px var(--serif); background: rgba(255, 248, 226, .2); }
+.select.plate .join-card.waiting { border-color: var(--accent); box-shadow: none; color: var(--ink-1); }
+.select.plate .join-card small, .select.plate .join-card small.dim { color: var(--ink-3); }
+
+/* ---- the footer: Dive In as a printed ribbon ---- */
+.select.plate .start-button {
+  border-radius: 0; background: var(--ink-1); color: #f3e5c6; font: 400 21px var(--serif-sc); letter-spacing: .14em;
+  padding: 12px 40px 13px; box-shadow: 0 6px 16px rgba(52, 38, 26, .35);
+  clip-path: polygon(0 0, 100% 0, 95% 50%, 100% 100%, 0 100%, 5% 50%);
+}
+.select.plate .start-button:hover:not(:disabled) { filter: none; background: var(--accent); }
+.select.plate .start-button:disabled { opacity: .38; }
+.select.plate .start-button.focused { outline: none; animation: plate-ready 1.6s ease-in-out infinite; }
+@keyframes plate-ready { 50% { background: var(--accent); } }
+.select.plate .feedback-button { border-radius: 2px; border-color: var(--ink-3); background: none; backdrop-filter: none; color: var(--ink-2); font: italic 15px var(--serif); }
+.select.plate .feedback-button:hover, .select.plate .feedback-button:focus-visible { color: var(--accent); border-color: var(--accent); }
+.select.plate button:focus-visible { outline-color: var(--accent); }
+
+/* The icon toolbar belongs to the shell, not to this section, so it is reached from the screen. */
+.screen-select:has(.select.plate) .toolbar .icon-button { border-radius: 50%; background: rgba(255, 248, 226, .35); border-color: var(--rule, rgba(52, 38, 26, .55)); color: #34261a; backdrop-filter: none; }
+.screen-select:has(.select.plate) .toolbar .icon-button:hover { background: rgba(255, 248, 226, .7); }
+.screen-select:has(.select.plate) .toolbar .icon-button.off { color: #85694a; }
+
+/* ---- the carousel, where the grid will not fit ---- */
+.select.plate .carousel-step { border-radius: 50%; border: 1px solid var(--ink-2); background: rgba(255, 248, 226, .35); color: var(--ink-1); font-family: var(--serif); }
+.select.plate .carousel-dots i { background: rgba(52, 38, 26, .22); }
+.select.plate .carousel-dots i.on { background: var(--accent); }
+.select.plate .carousel-count { font: 400 13px var(--serif-sc); color: var(--ink-2); letter-spacing: .06em; }
+.select.plate .carousel-extra { background: rgba(255, 248, 226, .28); border: 1px solid var(--ink-2); outline: 1px solid var(--ink-2); outline-offset: -7px; border-radius: 2px; color: var(--ink-1); }
+.select.plate .carousel-extra .extra-glyph { color: var(--accent); font-family: var(--serif); }
+.select.plate .carousel-extra p { color: var(--ink-2); font: italic 15px var(--serif); }
+.select.plate .carousel .crew-card { background: rgba(255, 248, 226, .3); }
+/* On a phone every card is the whole screen's subject, so the seal keeps its round shape there. */
+.select.plate.select-carousel .ready-button { width: clamp(84px, 24cqw, 112px); font-size: 14px; }
+/* A stamp across the card's width is flat ink; the seal's highlight only reads on a round one. */
+.select.plate .crew-2 .ready-button, .select.plate .crew.compact .ready-button { background: var(--accent); box-shadow: 0 2px 0 color-mix(in oklch, var(--accent), #000 45%); }
+.select.plate .crew-2 .ready-button[aria-pressed='true'], .select.plate .crew.compact .ready-button[aria-pressed='true'] { background: var(--pc); box-shadow: 0 2px 0 color-mix(in oklch, var(--pc), #000 45%); }
+.select.plate .start-button { white-space: nowrap; }
+@media (max-width: 759px), (max-height: 539px) {
+  .select.plate .start-button { font-size: 16px; letter-spacing: .1em; padding: 10px 26px 11px; }
+}
+
+/* ---- the carousel's peeking neighbours, on paper ---- */
+.select.plate .peek-card { border-radius: 2px; border: 1px solid var(--ink-2); outline: 1px solid var(--ink-2); outline-offset: -5px; background: rgba(255, 248, 226, .3); }
+.select.plate .peek-card img { mix-blend-mode: multiply; filter: sepia(.35); opacity: .9; }
+.select.plate .peek-card .extra-glyph { color: var(--accent); font-family: var(--serif); }
+
+/* ---- the folder tabs over the roster ---- */
+.select.plate .roster-tab {
+  border: 1px solid var(--ink-2); border-bottom: 0; border-radius: 9px 9px 0 0; padding: 5px 26px 4px;
+  background: linear-gradient(#d9c496, #cdb682); color: var(--ink-2); font: 400 17px var(--serif-sc); letter-spacing: .06em;
+  box-shadow: inset 0 1px 0 rgba(255, 248, 226, .5);
+}
+.select.plate .roster-tab:hover { color: var(--ink-1); }
+.select.plate .roster-tab.active { background: var(--paper); color: var(--ink-1); padding-bottom: 5px; box-shadow: inset 0 2px 0 var(--accent); }
+.select.plate .roster-tab.pad-focus { outline-color: var(--accent); }
+.select.plate .roster-pane > .roster-grid { border-top: 1px solid var(--ink-2); padding-top: 12px; }
+
+/* ---- the Size view: an engraved section through the sea ---- */
+.select.plate .depth-view {
+  border: 1px solid var(--ink-2); outline: 1px solid var(--ink-2); outline-offset: -6px;
+  background: linear-gradient(rgba(150, 190, 186, .18), rgba(96, 146, 146, .3) 55%, rgba(58, 104, 108, .42));
+}
+.select.plate .depth-band + .depth-band { border-top: 1px dashed rgba(52, 38, 26, .22); }
+.select.plate .depth-label { left: 14px; top: 6px; font: italic 14px var(--serif); letter-spacing: 0; text-transform: none; color: var(--ink-2); }
+.select.plate .depth-surface {
+  height: 8px; margin-top: -4px; background:
+    radial-gradient(ellipse 10px 4px at 10px 0, transparent 8px, var(--ink-2) 8.5px, var(--ink-2) 9.5px, transparent 10px) 0 0 / 20px 8px repeat-x;
+  opacity: .8;
+}
+.select.plate .depth-floor {
+  background:
+    radial-gradient(rgba(52, 38, 26, .28) 0.8px, transparent 1.2px) 0 0 / 7px 6px,
+    linear-gradient(#d8c290, #c5ab74);
+  border-top: 1px solid var(--ink-2);
+}
+.select.plate .depth-spot { color: var(--ink-1); --pc: color-mix(in oklch, var(--c), var(--ink-1) 45%); }
+.select.plate .depth-spot img { filter: sepia(.25) saturate(.9) drop-shadow(0 4px 5px rgba(40, 30, 18, .3)); }
+.select.plate .depth-name { font: italic 15px/20px var(--serif); }
+.select.plate .depth-spot.hover .depth-name { color: var(--accent); }
+.select.plate .depth-spot.hover img { filter: sepia(.05) drop-shadow(0 0 1px var(--accent)) drop-shadow(0 6px 8px rgba(40, 30, 18, .35)); }
+.select.plate .depth-spot .cell-rings .ring { inset: calc(-4px - var(--k) * 4px); border-radius: 50%; border: 1.5px solid color-mix(in oklch, var(--c), var(--ink-1) 45%); box-shadow: none; }
+.select.plate .depth-spot .cell-rings .ring.locked { border-style: double; border-width: 4px; }
+.select.plate .depth-spot .lock-badge { top: 4px; right: 4px; }
+.select.plate .depth-spot.extra { border: 1px dashed var(--ink-3); background: rgba(255, 248, 226, .25); }
+.select.plate .depth-spot.extra .extra-glyph { font: 400 2em var(--serif); color: var(--ink-2); }
+.select.plate .depth-spot.extra .depth-name { font: 400 14px var(--serif-sc); font-style: normal; }
+.select.plate .depth-spot.extra.hover { border-style: solid; border-color: var(--accent); }
+/* A small animal's name is wider than its picture; it hangs out either side rather than being cut. */
+.select.plate .depth-name, .depth-name { overflow: visible; text-overflow: clip; justify-self: center; width: max-content; max-width: 150px; }

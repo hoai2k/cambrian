@@ -256,6 +256,15 @@ the animal walked to, exactly as a tap on a tile would. `node tools/carousel-bro
 three games at 390×844 and 780×360, swipes, arrows and keys, checks the card and both buttons are
 on screen, dives in, and checks a roomy window keeps the grid.
 
+### Peeking neighbours
+
+Held upright there are no arrows: the card either side of the one on stage peeks in at the edge
+(`Peek` in `Select.tsx`), which says "swipe" without a word, and tapping it steps there. The card takes
+the width the arrows used to. On its side the arrows stay, because there the width is the room the
+picture and the copy share. The margin that makes room for the peeks is the compact portrait
+layout's and not the carousel's, because the carousel is chosen by measuring the picker and must not
+change the box it measured (see CLAUDE.md).
+
 ### Portrait
 
 The game runs in portrait and is not stopped from doing so — a screen that refused to draw until it

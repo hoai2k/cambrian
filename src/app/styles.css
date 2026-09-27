@@ -1321,3 +1321,57 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
   .select-carousel .creature-copy .tagline { display: block; }
   .carousel-step { height: 52px; width: 36px; }
 }
+
+/* Held upright, the neighbouring cards peek in at either edge instead of the arrows: the edge of the
+   next card says there is more roster that way without a word, and tapping it steps there. The card
+   on stage takes the width the arrows used to. */
+.carousel-peek { display: none; }
+/* The narrower margin is the compact portrait layout's, not the carousel's: the carousel is chosen by
+   measuring the picker, so anything the carousel does to the picker's own box changes the answer that
+   chose it — a margin that came with the carousel made the grid fit, which took the margin away,
+   which made it not fit, for ever. */
+@media (orientation: portrait) and (max-width: 759px) { .select { padding-left: 6px; padding-right: 6px; } }
+@media (orientation: portrait) {
+  .select-carousel .carousel { grid-template-columns: 26px minmax(0, 1fr) 26px; column-gap: 6px; }
+  .select-carousel .carousel-step { display: none; }
+  .carousel-peek {
+    display: block; position: relative; grid-row: 1; align-self: center; height: 82%; width: 26px; padding: 0; border: 0;
+    background: none; overflow: hidden; cursor: pointer;
+  }
+  .carousel-peek.prev { grid-column: 1; }
+  .carousel-peek.next { grid-column: 3; }
+  .peek-card { position: absolute; top: 0; bottom: 0; width: 150px; border-radius: 14px; border: 1px solid rgba(238,250,246,.18); background: rgba(6,22,28,.55); }
+  .carousel-peek.prev .peek-card { right: 0; }
+  .carousel-peek.next .peek-card { left: 0; }
+  .peek-card img, .peek-card .extra-glyph { position: absolute; top: 18%; width: 96px; height: auto; opacity: .85; }
+  .carousel-peek.prev .peek-card img, .carousel-peek.prev .peek-card .extra-glyph { right: -58px; }
+  .carousel-peek.next .peek-card img, .carousel-peek.next .peek-card .extra-glyph { left: -58px; }
+  .peek-card .extra-glyph { font-size: 40px; color: var(--ember); }
+  .carousel-peek.prev .peek-card .extra-glyph { text-align: left; }
+  .carousel-peek.next .peek-card .extra-glyph { text-align: right; }
+  /* Four bars do not fit across a phone's card; two rows of two do. */
+  .select-carousel .creature-copy .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 14px; }
+}
+
+/* The roster's two views on a desktop, under folder tabs: the list, or every animal at its size. */
+.roster-pane { display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; min-width: 0; }
+.roster-tabs { display: flex; gap: 4px; padding-left: 14px; position: relative; z-index: 1; margin-bottom: -1px; }
+.roster-tab { padding: 6px 18px 5px; border: 1px solid rgba(238,250,246,.2); border-bottom: 0; border-radius: 10px 10px 0 0; background: rgba(6,22,28,.4); color: var(--dim); font: 700 12px var(--font-display); letter-spacing: .1em; }
+.roster-tab.active { background: rgba(6,22,28,.8); color: var(--foam); }
+.roster-tab.pad-focus { outline: 2px solid var(--ember); outline-offset: 2px; }
+.roster-pane > .roster-grid { border-top: 1px solid rgba(238,250,246,.2); padding-top: 12px; }
+.depth-view { position: relative; min-height: 0; overflow: hidden; border: 1px solid rgba(238,250,246,.2); background: linear-gradient(#1f4a4c, #0b2224 80%); }
+.depth-band { position: absolute; left: 0; right: 0; pointer-events: none; }
+.depth-band + .depth-band { border-top: 1px dashed rgba(238,250,246,.1); }
+.depth-label { position: absolute; left: 10px; top: 4px; font: 700 10px var(--font-display); letter-spacing: .16em; text-transform: uppercase; color: var(--dim); }
+.depth-surface { position: absolute; left: 0; right: 0; height: 2px; background: rgba(238,250,246,.5); pointer-events: none; }
+.depth-floor { position: absolute; left: 0; right: 0; bottom: 0; background: linear-gradient(#5c4f38, #3e3526); pointer-events: none; }
+.depth-spot { position: absolute; display: grid; grid-template-rows: minmax(0, 1fr) auto; padding: 0; border: 0; background: none; color: var(--foam); cursor: pointer; transition: transform .15s; }
+.depth-spot img { width: 100%; height: 100%; object-fit: contain; min-height: 0; filter: drop-shadow(0 6px 8px rgba(0,0,0,.45)); transition: transform .2s; }
+.depth-spot:hover { transform: translateY(-2px); }
+.depth-spot.hover img { transform: scale(1.08); }
+.depth-name { font: 700 11px/1.2 var(--font-display); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: 20px; line-height: 20px; }
+.depth-spot.extra { place-items: center; border: 1px dashed rgba(238,250,246,.35); border-radius: 50%; }
+.depth-spot.extra .extra-glyph { font: 700 1.6em var(--font-display); }
+/* A peek is a pointer target only (tabindex -1): the keys and the sticks already walk the roster. */
+.carousel-peek:focus { outline: none; }

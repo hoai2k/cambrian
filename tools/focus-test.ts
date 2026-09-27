@@ -21,6 +21,9 @@ eq(groupsFor('playing', false, ALL), ['main', 'icons'], 'in play there are only 
 eq(groupsFor('playing', true, ALL), ['main', 'icons'], 'a pause menu owns the pad: its choices and the icons');
 eq(groupsFor('results', true, ALL), ['main', 'icons'], 'and so does the results screen');
 eq(groupsFor('select', false, { link: true, icons: false }), ['main', 'modes'], 'hidden icons are not in the ring');
+eq(groupsFor('select', false, { ...ALL, views: true }), ['main', 'modes', 'views', 'icons'], 'a desktop choice screen reaches the List and Size tabs after the modes');
+eq(groupsFor('title', false, { ...ALL, views: true }), ['era', 'main', 'icons'], 'the tabs are the choice screen\'s alone');
+eq(groupsFor('select', true, { ...ALL, views: true }), ['main', 'icons'], 'a menu over the choice screen takes the tabs out of the ring');
 
 // ---- main is always reachable, on every screen and configuration ----
 for (const screen of ['title', 'select', 'playing', 'results'] as const) {

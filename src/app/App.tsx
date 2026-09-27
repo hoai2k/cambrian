@@ -21,6 +21,8 @@ import { atMain, cycle, groupsFor, stops, type Focus, type FocusGroup } from './
 import { rectsOf, step as spatialStep, type Dir } from './spatial-nav';
 import { gridColumns, SelectScreen } from './Select';
 import { gridStep, rosterGrid, sameSlot, type ExtraId, type Slot } from './roster-grid';
+import { depthStep, type DepthLayout } from './depth-layout';
+import type { RosterView } from './Select';
 import { visitorsInBrowser, type EraId, type Visitor } from '../content/visitors';
 import { registerVisitorAssets } from '../content/asset-paths';
 import { admitVisitors } from '../sim/creatures';
@@ -57,6 +59,8 @@ export interface Settings {
    * swipe back to it every time they hatch.
    */
   secondary: Secondary;
+  /** How the pick screen's roster is drawn on a desktop: the list, or the Size view (`depth-layout.ts`). */
+  rosterView: RosterView;
 }
 
 /** The active era's modes, in its order; the first is the default selection. */
@@ -76,12 +80,12 @@ const MODES: Mode[] = ACTIVE_ERA.modes.map((m) => m.id);
 const SETTINGS_KEY = ACTIVE_ERA.copy.settingsKey;
 const defaultSettings = (): Settings => {
   // Re-evaluate old automatic defaults against this device; an explicit Settings choice wins.
-  const defaults: Settings = { quality: qualityForDevice(undefined), lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false, shoreAnimals: false, secondary: 'aim' };
+  const defaults: Settings = { quality: qualityForDevice(undefined), lookSpeed: 1, invertY: false, volume: 0.8, muted: false, music: true, equivalentSizing: false, shoreAnimals: false, secondary: 'aim', rosterView: 'list' };
   try {
     const s = localStorage.getItem(SETTINGS_KEY);
     if (s) {
       const saved = JSON.parse(s) as Partial<Settings>;
-      return { ...defaults, ...saved, secondary: SECONDARY.includes(saved.secondary as Secondary) ? saved.secondary! : 'aim', quality: qualityForDevice(saved) };
+      return { ...defaults, ...saved, secondary: SECONDARY.includes(saved.secondary as Secondary) ? saved.secondary! : 'aim', rosterView: saved.rosterView === 'size' ? 'size' : 'list', quality: qualityForDevice(saved) };
     }
   } catch { /* ignore */ }
   return defaults;
@@ -201,6 +205,13 @@ export function App() {
   /** Whether the choice screen is showing one card at a time (`carouselView`), as the screen reports it. */
   const carouselRef = useRef(false);
   const onView = useCallback((on: boolean) => { carouselRef.current = on; }, []);
+  /**
+   * The Size view's layout while it is on screen, as the screen drew it — null in the list. The
+   * cursor walks these rectangles, so it goes where the eye does rather than down a list order the
+   * picture does not show.
+   */
+  const depthRef = useRef<DepthLayout | null>(null);
+  const onDepth = useCallback((layout: DepthLayout | null) => { depthRef.current = layout; }, []);
   useEffect(() => { colsRef.current = cols; }, [cols]);
   /** The secondary pad, mirrored into state so the pad's label re-renders when a swipe lands. */
   const [secondary, setSecondary] = useState<Secondary>('aim');
@@ -518,6 +529,7 @@ export function App() {
   const groupEls = useCallback((group: FocusGroup): HTMLElement[] => {
     const sel = group === 'icons' ? '.toolbar .icon-button'
       : group === 'modes' ? '.mode-picker .mode-chip'
+      : group === 'views' ? '.roster-tabs [role=tab]'
       : group === 'era' ? '.era-switch'
       : '.menu-choices button';
     return [...document.querySelectorAll<HTMLElement>(sel)];
@@ -612,9 +624,11 @@ export function App() {
       return;
     }
     if (p.ready) return;
-    const model = rosterGrid(CREATURE_IDS, extrasRef.current, colsRef.current);
     const from: Slot = p.cursor ? { kind: 'extra', id: p.cursor } : { kind: 'creature', id: p.creature };
-    const to = gridStep(model, from, dx, dy);
+    const depth = depthRef.current;
+    const to = depth
+      ? depthStep(depth, from, dx, dy) as Slot
+      : gridStep(rosterGrid(CREATURE_IDS, extrasRef.current, colsRef.current), from, dx, dy);
     if (sameSlot(to, from)) return;
     ps[index] = to.kind === 'extra'
       ? { ...p, cursor: to.id }
@@ -727,15 +741,17 @@ export function App() {
    */
   const cycleFocus = useCallback((dir: number, owner: number | 'keyboard') => {
     const ring = groupsFor(screenRef.current, pausedRef.current || screenRef.current === 'results', {
-      link: !!ACTIVE_ERA.copy.trilogy, icons: toolbarRef.current !== 'hidden',
+      link: !!ACTIVE_ERA.copy.trilogy, icons: toolbarRef.current !== 'hidden', views: groupEls('views').length > 0,
     });
-    const all = stops(ring, { era: groupEls('era').length, modes: groupEls('modes').length, icons: groupEls('icons').length });
+    const all = stops(ring, { era: groupEls('era').length, modes: groupEls('modes').length, views: groupEls('views').length, icons: groupEls('icons').length });
     const f = focusRef.current;
     const from = f.owner === null || f.owner === owner ? f : { group: 'main' as FocusGroup, index: 0 };
     const to = cycle(all, from, dir);
     setFocusBoth({ ...to, owner: to.group === 'main' ? null : owner });
     // A mode chip is a tab: landing on it picks it, which is what the shoulders always did here.
     if (to.group === 'modes') { const m = MODES[to.index]; if (m && m !== modeRef.current) changeMode(m); }
+    // So are the roster's List and Size tabs.
+    if (to.group === 'views') groupEls('views')[to.index]?.click();
     audio.play('ui-move');
   }, [changeMode, groupEls, setFocusBoth]);
 
@@ -1054,7 +1070,8 @@ export function App() {
         <SelectScreen
           players={players} mode={mode} modes={MODES} modeInfo={modeInfo} allReady={allReady} padIndices={padIndices}
           scheme={scheme}
-          best={best} carry={carry} modeFocus={focus.group === 'modes' ? focus.index : -1}
+          best={best} carry={carry} modeFocus={focus.group === 'modes' ? focus.index : -1} viewFocus={focus.group === 'views' ? focus.index : -1}
+          rosterView={settings.rosterView} onRosterView={(v) => setSettings((x) => ({ ...x, rosterView: v }))} onDepth={onDepth}
           extras={extras} onExtra={pressExtra} maxCols={cols}
           layout={small.layout} onStep={(i, dir) => moveCursor(i, dir, 0)} onView={onView}
           visitorCount={visitors.length} visitorOrigin={(id) => visitors.find((v) => v.id === id)?.origin}
