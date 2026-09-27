@@ -889,37 +889,38 @@ unless the user explicitly asks for a PR. Steps:
   at 0.20 / 0.30 / 0.38 / 0.50 of the head's half depth at the hinge, with the mandible still
   travelling 0.96–1.00 of its own joint at every one; it ships at 0.50, where the worst edge is no
   longer in the mouth at all and the figure is exactly the 2.54x the cut body shipped.
-- **A generation that arrived *partially* open is filled at the seam and nowhere else**
-  (`T.seam_rim`, `T.seam_web`). That is `cut_rim`'s case 2 and neither of the other two
-  constructions fits it: the cut runs *deeper than the modelled mouth does*, so there is nothing to
-  fill at the front — where `cap_mouth` over the whole boundary would seal the generation's own
-  lumen shut — and there is a hole at the back, where the cut drew a rim through solid head.
-  Cymbospondylus' mouth is 0.14 of a body long and its cut left a rim over only the back **0.042**;
-  Shonisaurus' is 0.196 and 0.078. `jaw_junction` holds the two copies of that rim together **only
-  at the hinge cross-section** (55 pairs of 125, 40 of 164); everywhere else they part by design,
-  which on a body cut at its own lip is the mouth opening and on these two is the mouth opening
-  *plus* a hole into the head. The fill is therefore not a cap over an aperture but the **ruled
-  surface between the two copies of the rim**, and it closes by construction for a reason that
-  needs no render: every boundary vertex is a rim vertex's own rest position and own weight
-  dictionary, and linear blend skinning is a function of those two alone, so the web's boundary
-  *is* the halves' rims in every pose — worst difference 0.0 on both counts, asserted in
-  `seam_web_parity` rather than rendered. It also answers "fill only where the cut went through"
-  **by construction rather than by a bound**, because the web's extent is the rim's extent and a
-  rim exists only where the cut passed through surface. Three things it paid for. The albedo comes
-  from the **lumen's own wall** (`cavity_vertices`/`cavity_pigment` — every vertex whose outward
-  normal, cast back into the mesh, meets the wall opposite, which is what makes it interior), not
-  from the rim: more than half of Cymbospondylus' rim is outer cheek, and `cap_mouth`'s rim
-  sampling — right where the whole rim is a cut — would drag the flank into the inside of a mouth.
-  The fold that keeps the mesh from being degenerate at a shut mouth is **smoothed along the rim**,
-  because its depth follows the parting and its direction the rim's normal and both jump between
-  neighbours: unsmoothed it came out corrugated and read as a grille rather than as tissue.
-  And **ray parity cannot judge that fold** — a modelled mouth is an invagination and a parted rim
-  is a slot, so both read as outside the solid — so the parity count is recorded and what is
-  asserted is the head's own measured section. `gape-solid.py --show` is how a hidden fill is
-  measured *as the viewer's switch draws it*, beside the as-drawn run that measures the game.
-  Retired with it: Cymbospondylus' one-sac `Oral cavity lining` and its `Seated jaw hinge tissue`,
-  the second because since `jaw_junction` there is no square at the back of the mandible to cover
-  and it read as a black blister on the cheek the moment the switch went on. Record and both gape
+  **Where the lips nearly touch, a height band cannot be right, and the band becomes a distance
+  along the skin** (`spread`). Cymbospondylus' and Shonisaurus' lumens are open along the whole
+  front — forward of the commissure no edge crosses the mouth line — but their lips sit 0.0006–0.004
+  raw off it, so every height band wide enough to spare the corner gave the lower lip a partial share
+  and tore the jaw's own skin along its length (5.2x–9.9x on Cymbospondylus, whose worst edges were
+  all on the lip and none at the corner), and the bands wide enough to spread that took the tooth
+  row off its bone (0.45 of the rotation at 0.90). `lag.mjs`' *follows* read 1.00 through all of it,
+  because it is taken round the hinge: measure the front of the mandible's own travel as well. With
+  `spread` the share is a step on the line diffused that many passes over the edge graph, and
+  diffusion cannot move a sheet no edge connects across it — the lower jaw stays exactly 1, the
+  palate 0, and only the corner and the back of the lumen blend. Cymbospondylus ships at 2, the
+  widest inside the 0.96–1.00 follow bar, at 2.48x — its old figure, with the worst edge off the
+  mouth. **Where a builder also shuts a baked-open generation in bind geometry through the share,
+  the spread is how far the closing is spread too, and the bind pose decides it**: Shonisaurus at 2
+  shut its corner over two rings of skin that folded out over the lip as a pale flap in `Idle`, gone
+  only at 24, which ships (1.44x, follow 0.95/0.90 at `Bite`/`Eat`); closing through one field and
+  skinning through another tore the corner instead (6.9x–8.1x). Look at the rest pose's corner.
+  A twin whose voxels bridge the slit has no topology to use and keeps a height band — Cymbospondylus'
+  pays 12.63x for a jaw that opens with the authored body's.
+- **A generation that arrived *partially* open was once filled at the seam, and is now simply not
+  cut.** Cymbospondylus (mouth 0.1375 of a body, cut rim over the back **0.042**) and Shonisaurus
+  (0.196, **0.078**) are `cut_rim`'s case 2: the cut ran through surface only behind the modelled
+  lumen, and T3D-34 closed that run with a seam web — the ruled surface between the two copies of
+  the rim, closed by construction because each boundary vertex was a rim vertex's own rest position
+  and weights. It was hidden in play (neither body is greenlit), so as drawn both heads still opened
+  onto their insides: 744 and 1,863 px `opened` at `Heavy`. T3D-37 took the cut out at the owner's
+  request and both are now the uncut construction above, 0 px at every clip that moves the jaw; the
+  web's helpers (`seam_rim`, `seam_web`, `seam_web_parity`, `cavity_pigment`) are retired from
+  `_pipeline/tripo.py` and live in git at `8161d0c`. What stays is `cavity_vertices` — the lumen's
+  wall, every vertex whose own outward normal cast back into the mesh meets the wall opposite — which
+  is how both builders still find the mouth line. **A partly open generation is worth trying uncut
+  first**; a web is the answer only where the lumen does not separate the jaws. Record and both gape
   tables: `docs/triassic/throat-repairs/oral-verdicts.md`.
 - **`gape-solid.py` was proving a body the game does not draw, and `--as-drawn` is the fix.** The
   runtime hides everything `src/shared/oral-geometry.ts` matches — every lining, every hinge plug —

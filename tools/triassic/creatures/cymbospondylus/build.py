@@ -332,7 +332,8 @@ puppet, puppet_thickness, twin_report, bvh_src = T.build_twin(
 # inside a closed head; it is the 7,986-triangle stand-in the game draws at LOD range and the
 # paired-volume witness, and CLAUDE.md's rule is that authored geometry inside a mouth has to earn
 # itself on a gape a player can see. It does not earn itself here, so the twin goes uncut with the
-# body it is a twin of, and the two carry one weight field.
+# body it is a twin of. The two carry the same construction but not the same band: the authored
+# body separates its jaws by topology and the twin, having none, by height (`TWIN_JAW_BAND`).
 TWIN_CAVITY = {'authored': len(CAV), 'authoredLumenWall': len(CAV_WALL),
                'twinAtTheSameGap': len(T.mouth_cavity(puppet, front_fraction=.34, gap=MOUTH_GAP)),
                'twinAtTwiceTheGap': len(T.mouth_cavity(puppet, front_fraction=.34, gap=.060))}
@@ -360,53 +361,71 @@ def is_jaw(c):
     return JAW_FRONT_Y - .004 < c.y < HINGE_Y and c.z < seam(c.y) - 1e-7
 
 
-# How far a point is **below the mouth line**, and the answer is in units of the head's own section
-# at that station rather than in raw units. `np.interp` holds `seam`'s end value behind the hinge
-# and in front of the first open station, which is what the band wants.
-#
-# **The section is why this is a ratio and not a distance, and it took a metric to see it.**
-# Mosasaurus' band is a constant fraction of the head's half depth *at the hinge*, and its own
-# comment admits what that means further forward -- "about a sixth of the gape at the snout". This
-# rostrum is 0.027 raw half deep at the hinge and about a third of that at the tip, so no constant
-# band is right at both ends: wide enough not to pinch the corner of the mouth is wider than the
-# whole mandible at the snout, where it leaves the lower tooth row taking a *fraction* of the jaw's
-# rotation. A ratio narrows with the rostrum and keeps the tooth row rigid where the mandible is
-# thin. It is CLAUDE.md's limb-blend lesson in another place: a blend is a fraction of what it is
-# blending across, never a number.
+# How far a point is **below the mouth line**, in units of the head's own half depth at that
+# station. On the authored body only its *sign* is used (see below); on the twin it is the band.
 def below_mouth_line(c):
     return (seam(c[1]) - c[2]) / max(head_half_depth(c[1]), 1e-4)
 
 
-# The band the commissure stretches over, as a fraction of the head's own half depth at each
-# station. It is the one number with a cost either way -- too wide and the front of the mandible
-# takes only part of the jaw's rotation; too narrow and the whole swing is carried by a strip of
-# skin where the two lips meet, which is where linear blend skinning pinches.
+# **The band is a distance along the skin from the corner of the mouth, not a height.** That is the
+# whole of what this body taught, and it took two measurements to see.
 #
-# **And `lag.mjs`' own `follows` cannot see the first of those, which is the reason this sweep is
-# recorded against a second measurement.** That figure is accumulated over the ball of vertices
-# round the *joint*, and it reads 1.00 at every band from 0.20 to 1.20 while the tooth row at the
-# snout goes from taking all of the jaw's rotation to taking **45 %** of it. What the sweep is
-# measured against instead is the front fifth of the mandible's own reach: how far that skin
-# actually travels between the rest pose and the clip's widest gape, over how far a rigid rotation
-# of the `jaw` bone would have carried it. A count that does not move under a correction is a count
-# about something else.
+# A height band -- Mosasaurus' construction, a fraction of the head's half depth -- cannot tell the
+# lower lip from the commissure here. This generation's slit is open for the whole front of the
+# mouth (forward of y -0.355 no edge of the mesh crosses the mouth line at all: the jaws are two
+# sheets), but its lips come within **0.0006-0.004 raw** of that line, against a head 0.018-0.022
+# half deep. So any band wide enough not to pinch the corner hands the lower lip a *partial* jaw
+# share, and the jaw's own skin tears along its whole length between lip vertices on different
+# shares -- every worst edge at `Heavy` was on the lower lip, from the hinge to the snout, never at
+# the corner. And the band that stops that is so wide the tooth row stops opening. Swept, with
+# `skin-tears.mjs` ranked on skin, `lag.mjs`' jaw follows at Bite/Attack/Heavy/Eat and the front
+# fifth of the mandible's travel over a rigid carry by its own bone at `Bite` (lag's figure is taken
+# over the ball round the hinge and cannot see the tooth row -- it reads 0.98-1.00 while the tip
+# takes 45 % of the jaw's rotation):
 #
-# Swept both ways, against `skin-tears.mjs` (ranked on skin) and that travel at `Bite@0.1667`:
+#     height band (x half depth at the hinge)       skin    follows              tooth row
+#     0.20                                          9.85x   0.98 1.00 1.00 0.96  0.980
+#     0.38                                          9.58x   1.00 1.00 1.00 0.99  0.825
+#     0.50                                          7.43x   1.00 1.00 1.00 0.99  0.713
+#     0.90                                          5.22x   1.00 1.00 1.00 0.97  0.446
+#     0.30 x the local half depth                   8.88x   0.98 1.00 1.00 0.95  0.965
 #
-#     constant band (x the half depth at the hinge)      as a fraction of the local half depth
-#     0.08  11.26x  1.000        0.38   9.58x  0.825     0.20  11.60x  0.999
-#     0.12  11.26x  1.000        0.50   7.43x  0.713     0.25  10.19x  0.987
-#     0.18  10.76x  0.991        0.70   6.77x  0.562     0.30   8.88x  0.965   <-- ships
-#     0.25  10.26x  0.942        0.90   5.22x  0.446     0.35   9.82x  0.936
-#     0.30  10.05x  0.900        1.20   3.15x  ~0.3      0.50  10.50x  0.841
+# What separates the jaws is **topology**, so the field is built on it: the share is a step on the
+# sign of `below` (a band of 0.01 of the local half depth, ~0.0002 raw) and that step is diffused
+# `JAW_SPREAD` passes over the mesh's own edge graph (`T.jaw_field_uncut`'s `spread`). A sheet no
+# edge connects across the line is uniform and diffusion cannot move it, so the whole lower jaw stays
+# at exactly 1 and the palate at exactly 0; the step softens only where edges cross -- the corner of
+# the mouth and the back of the lumen -- which is where the stretch belongs:
 #
-# The constant band's skin figure falls all the way to 3.15x and **every bit of that is the mouth
-# not opening**: at 0.90 the shipped-looking 5.22x is a jaw whose tooth row takes 45 % of its own
-# bone. The ratio at 0.30 is the best pair on the table -- the tooth row keeps 0.965 of its travel,
-# inside Mosasaurus' own 0.96--1.00 bar, at 8.88x.
-JAW_BAND_FRACTION = float(os.environ.get('CYMBO_JAW_BAND', '0.30'))
-JAW_BAND = JAW_BAND_FRACTION
+#     spread   skin    mouth jaw / skull   follows              tooth row
+#     0        7.92x   5.25x / 7.92x       1.00 1.00 1.00 1.00  1.000
+#     1        2.74x   2.74x / 2.55x       0.99 1.00 1.00 0.98  1.000
+#     2        2.48x   1.61x / 1.58x       0.99 1.00 1.00 0.96  1.000   <-- ships
+#     3        2.48x   1.31x / 1.46x       0.99 1.00 1.00 0.95  1.000
+#     6        2.48x   1.22x / 1.30x       0.97 1.00 1.00 0.92  1.000
+#     12       2.48x   1.16x / 1.19x       0.96 1.00 1.00 0.88  1.000
+#     24       2.48x   1.14x / 1.15x       0.96 1.00 1.00 0.88  1.000
+#     48       2.48x   1.12x / 1.15x       0.97 1.00 1.00 0.86  1.000
+#
+# From 2 upwards the body's worst edge is no longer in the mouth at all: 2.48x is the right
+# forelimb in `Death`, the figure this animal shipped with. Widening further only takes the
+# commissure's corner off its own bone -- `Eat`'s follow falls below Mosasaurus' 0.96-1.00 at 3 --
+# so 2 is the widest spread inside that bar, and it ships.
+JAW_BAND = float(os.environ.get('CYMBO_JAW_BAND', '0.01'))
+JAW_SPREAD = int(os.environ.get('CYMBO_JAW_SPREAD', '2'))
 JAW_BEHIND = .030
+
+# **The twin has no lumen, so it has no topology to use**, and it gets the height band instead. It
+# is a voxel resurfacing whose occupancy field bridges the slit (`TWIN_CAVITY` above), so an edge
+# crosses the mouth line along the whole mouth and a step there would be a crease. What it can
+# offer is a closed head whose lower half swings, and the band is the price of that swing: its
+# own skin at `Heavy` reads 12.63x at 0.30 of the local half depth, 7.65x at 1.00, and 5.82x /
+# 3.52x at 0.90 / 1.50 of the half depth at the hinge -- where its tooth row takes 0.86, 0.61,
+# 0.50 and 0.34 of the jaw's rotation at `Bite`. The cut twin this replaces read 2.47x and 0.89,
+# with a seam web the runtime hides, so in play it showed a hole into its own head. 0.30 local
+# keeps the LOD's jaw opening with the authored body's, so the model does not change its gape
+# when the renderer swaps it, and it ships.
+TWIN_JAW_BAND = float(os.environ.get('CYMBO_TWIN_BAND', '0.30'))
 
 # Every measured tooth patch must belong whole to one jaw or the other. Placodus' first delivery
 # cut its chisels in half with a straight ramp; the measurement is what stops that happening here.
@@ -453,11 +472,13 @@ for o, thin in ((auth, thickness), (puppet, puppet_thickness)):
     # The mandible is not a shell and there is no junction to close: one field over one surface,
     # full jaw below the mouth line and forward of the hinge, blending through the commissure
     # (`T.jaw_field_uncut`). The relaxation still runs first, because every gate in `weights()` is
-    # still a per-vertex decision; the jaw share is added after it because it is a smooth function
-    # of position and needs no smoothing.
+    # still a per-vertex decision; the jaw share is added after it and carries its own smoothing --
+    # on the authored body a step diffused over the edge graph, on the twin a height band (see
+    # `JAW_SPREAD` and `TWIN_JAW_BAND` above for why they differ).
     body_w, JUNCTION[o.name] = T.jaw_field_uncut(
         o, relaxed, B['jaw'][0], below_mouth_line, axis=(0., -1., 0.),
-        band=JAW_BAND, behind=JAW_BEHIND)
+        band=JAW_BAND if o is auth else TWIN_JAW_BAND, behind=JAW_BEHIND,
+        spread=JAW_SPREAD if o is auth else 0)
     counts, owners = [], {}
     for part, field in ((o, body_w),):
         for v in part.data.vertices:
@@ -945,8 +966,10 @@ report = {
         'lumenWallVertices': len(CAV_WALL),
         'twinCavity': TWIN_CAVITY,
         'boundaryAtTheMouth': UNCUT_RIM,
-        'jawBandFractionOfTheHeadsOwnHalfDepthAtEachStation': JAW_BAND_FRACTION,
-        'jawBandRaw': JAW_BAND, 'jawBehindRaw': JAW_BEHIND,
+        'jawField': {'authored': {'stepBandOfTheLocalHalfDepth': JAW_BAND,
+                                  'spreadPassesOverTheEdgeGraph': JAW_SPREAD},
+                     'twin': {'bandOfTheLocalHalfDepth': TWIN_JAW_BAND},
+                     'behindRaw': JAW_BEHIND},
         'gapeMeasuredFromTheClips': MAX_GAPE,
         'toothPatches': tooth_report,
         'toothPatchesStraddlingTheMouthLine': straddling, 'authoredToothRows': tooth_rows,
@@ -966,7 +989,7 @@ print('CYMBO_REPORT', json.dumps({k: report[k] for k in
 print('CYMBO_ENVELOPE', json.dumps(report['envelope']))
 print('CYMBO_MOUTH', json.dumps({k: report['mouth'][k] for k in
       ('method', 'cavityVertices', 'hingeY', 'jawFrontY', 'twinCavity',
-       'jawBandFractionOfTheHeadsOwnHalfDepthAtEachStation', 'jawBandRaw', 'gapeMeasuredFromTheClips',
+       'jawField', 'gapeMeasuredFromTheClips',
        'toothPatchesStraddlingTheMouthLine')}))
 print('CYMBO_JAWFIELD', json.dumps(JUNCTION))
 print('CYMBO_POSE', json.dumps({'spine': {k: v for k, v in POSE_DEVIATION['spine'].items() if k != 'perStation'},

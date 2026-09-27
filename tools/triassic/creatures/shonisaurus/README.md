@@ -4,8 +4,8 @@ The delivered Tripo body and the procedural volume puppet use one armature and o
 
 ## Delivered files
 
-- `public/assets/triassic/creatures/shonisaurus.glb`: 117,442 triangles, 7,381,764 bytes, detailed source UV albedo and restrained source normal detail.
-- `shonisaurus.puppet.glb`: 10,874 triangles, 572,216 bytes, measured procedural body, rostrum branches, four flipper lofts and crescent caudal loft.
+- `public/assets/triassic/creatures/shonisaurus.glb`: 116,064 triangles, 7,385,420 bytes, detailed source UV albedo and restrained source normal detail.
+- `shonisaurus.puppet.glb`: 9,496 triangles, 561,776 bytes, measured procedural body, rostrum branches, four flipper lofts and crescent caudal loft.
 - `shonisaurus.lod1.glb`: byte-identical to the procedural puppet.
 - `shonisaurus.json`: physical scale, clip and socket metadata.
 - Studio, select, card, thumbnail and puppet portraits are rendered from the final meshes.
@@ -119,6 +119,8 @@ Skin: 1.44x before and after (`skin-tears.mjs`, 0 of 21 clips past 2x); every jo
 
 ## The cut's own seam, filled — 22 September 2026 (T3D-34)
 
+*Superseded by T3D-37 below: the mandible is no longer split off, so there is no rim and no web.*
+
 The verdict above stands: this body carries **no lining**, no palate, no floor and no throat tube,
 and the pixels the gape proof reports are the generation's own open rostrum and the slivers along
 its own tooth row. What it gained is one optional, hidden fill for a different fault, reported as
@@ -181,6 +183,52 @@ modelled mouth. Skin 1.44x unchanged, 0 of 21 clips past 2x; `lag.mjs` cut 0 ope
 
 Sheets: `docs/triassic/verification/shonisaurus-mouth-space.png` (shipped) and
 `-mouth-space-seam-web.png` (with the switch on).
+
+## The mandible is not split off at all — T3D-37
+
+The owner asked for the modelled mouth to move as a normal skinned deformation rather than being cut
+and filled. The authored body is **one surface** again: the face-label split is gone, so are the rim
+and the seam web, and the mouth opening is the `jaw` bone turning inside skin (`T.jaw_field_uncut`).
+`package-audit.mjs` now asserts one uncut authored skin and nothing the oral classifier matches;
+`oral-shell-audit.mjs` reports all three variants clean; `lag.mjs` finds no seam (67 pairs before).
+
+**The mouth line is measured** (`cavity_vertices` → `cavity_profile`, the lumen's own mid height,
+carried back behind the commissure on the old typed lip line and offset to meet it), and the share
+is a **step** on it diffused 24 passes over the mesh's own edge graph (`JAW_SPREAD`), not a height
+band. Forward of the commissure no edge crosses the line — the rostra are two sheets — so diffusion
+leaves the whole lower jaw at exactly 1 and the palate at 0, and only the corner and the back of the
+lumen blend. A height band cannot do that here: every one from 0.06 to 0.24 of the head's half depth
+put its worst edge on the lower lip (1.80x-3.80x), and 0.75 is so wide that `close_rest`, which shuts
+this baked-open generation *through the same share*, never closes the lip and ships the mouth ajar
+(3,596 of 14,400 lateral rays through). The sweep of thirteen settings is in `build.py` beside
+`JAW_SPREAD` and in `docs/triassic/throat-repairs/oral-verdicts.md`.
+
+| | before (split + web) | after |
+| --- | --- | --- |
+| skin | 1.44x | **1.44x** |
+| mouth-region skin, `jaw` / `skull` | 1.00x / 1.00x (no edge crossed the split) | 1.16x / 1.00x |
+| jaw follows `Bite`/`Attack`/`Heavy`/`Eat` | 0.98 / 0.99 / 0.99 / 0.95 | 0.95 / 0.98 / 0.99 / 0.90 |
+| front fifth of the mandible, travel over a rigid carry at `Bite` | 1.000 | 1.000 |
+| mouth shut at rest (`mouth-closure-audit.py`) | yes | yes, 0 of 14,400 rays |
+| faces opposing their neighbours, bind / worst (`lip-audit.py`) | 8 / 8 | 28 / 28 |
+| `gape-solid.py --as-drawn`, `opened` at Heavy/Attack/Bite/Eat | 1,863 / 1,478 / 381 / 13 | **0 / 0 / 0 / 0**, plain alike |
+
+**Why 24 and not Cymbospondylus' 2.** The same share shuts the bind pose, so the spread is also how
+far the *closing* is spread, and at 2 the corner is shut over two rings of skin that fold out over
+the upper lip — a pale flap beside the eye in `Idle`, which the split body never had. It is a trace
+at 12 and 16 and gone at 24 (judged by eye on `review.py --mouth-only`'s `Idle` shot at each). What
+pays is the follow at the hinge, 0.95 at `Bite` and 0.90 at `Eat`, while the mandible's front still
+takes all of its bone; closing through a wider field than the skinning one instead tears the corner
+open at the gape (6.9x-8.1x). 28 faces oppose their neighbours at the bind pose (the intake's own
+floor, uncut with nothing closed, is 11): 0.025 % of the mouth's 113,904 triangles, under
+`lip-audit.py`'s 0.05 % bar, and nothing shows in the gape proof. `lip-audit.py` itself was repaired on the way: its old
+mean-weight transported normal is exact only on a rigid shell and flagged hundreds of faces across a
+blend that agree with every neighbour they have; the verdict is now the neighbour test, with the old
+figure kept beside it as a strain reading.
+
+The twin is unchanged: its rostrum was always two separate closed lofts with the gap between them.
+Portraits, the review stills and every sheet in this folder were re-rendered from this build.
+Sheet: `docs/triassic/verification/shonisaurus-mouth-space.png`.
 
 ## Reproduction
 

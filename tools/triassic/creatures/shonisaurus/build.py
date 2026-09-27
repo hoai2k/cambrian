@@ -219,39 +219,69 @@ MOUTH_LINE_DEVIATION={'measuredVersusTheTypedLipLineMaxRaw':float(max(abs(seam(y
                       'restSlitMaxHalfDepthRaw':float(np.max(TALL)),
                       'restSlitMaxHalfDepthOverHeadDepth':float(np.max(TALL)/max(np.interp(.40,_HY,_HD),1e-6))}
 def below_mouth_line(c):
- """How far a point is below the mouth line, positive under it. `np.interp` holds `seam`'s end
- value behind the hinge and in front of the last open station, which is what the band wants."""
+ """How far a point is below the mouth line, positive under it. Only its sign is used on the
+ authored body (see `JAW_SPREAD`); `np.interp` holds `seam`'s end values past both ends."""
  return seam(c[1])-c[2]
-# The band the commissure stretches over, in units of the head's own half depth at the hinge, which
-# is Mosasaurus' measure. Too wide and the front of the mandible takes only part of the jaw's
-# rotation, so the lower tooth row lags the bone it is drawn on; too narrow and the whole swing is
-# carried by a strip of skin where the two lips meet.
+# **The band is a distance along the skin from the corner of the mouth, not a height**, which is
+# Cymbospondylus' finding and holds here for the same reason. This generation's lumen is open along
+# the front of the mouth -- forward of the commissure no edge crosses the mouth line, the two jaws
+# are separate sheets -- so what separates them is topology, and a height band can only get it
+# wrong: wide enough not to pinch the corner, it hands the lower lip a partial jaw share and tears
+# the lip along its length (every height band from 0.06 to 0.24 has its worst edge on the lower
+# lip, 1.80x-3.80x). So the share is a step on the sign of `below_mouth_line` (a band of 0.01 of
+# the head's half depth at the hinge, 0.0005 raw) diffused `JAW_SPREAD` passes over the mesh's own
+# edge graph (`T.jaw_field_uncut`'s `spread`): a sheet no edge connects across the line cannot be
+# moved by diffusion, so the lower jaw is exactly 1 and the palate exactly 0, and only the corner
+# and the back of the lumen blend.
 #
-# **And on this body the band has a third cost, which is the one that decides it.** `close_rest`
-# shuts the generation's baked-open mouth in bind geometry through this same field, so a vertex only
-# closes by its own jaw share -- and the mandible's dorsal margin sits one lumen half depth (0.012
-# raw at its widest) below the mouth line. A band much wider than that never reaches 1 there, the
-# lip never meets the palate, and the animal ships with its mouth ajar: `mouth-closure-audit.py`
-# read **3,596 of 14,400 lateral rays passing clean through the rostrum**, a 0.098-unit aperture, at
-# a band of 0.75. That bounds the band from above at about 0.24 whatever else is true.
+# **This body has a third cost, and it bounds any height band from above.** `close_rest` shuts the
+# generation's baked-open mouth in bind geometry through this same field, so a vertex only closes by
+# its own jaw share, and the mandible's dorsal margin sits one lumen half depth (0.012 raw at its
+# widest) below the mouth line: a height band of 0.75 never reaches 1 there and the animal ships
+# with its mouth ajar (`mouth-closure-audit.py`: 3,596 of 14,400 lateral rays clean through the
+# rostrum, a 0.098 aperture). A step has no such bound, because the whole lower sheet is at 1.
 #
-# Swept inside that bound, against the closure, `skin-tears.mjs`, `lag.mjs` and the repaired
-# `lip-audit.py` (see its own docstring -- the old mean-weight test cannot read a blend band and
-# reports hundreds of faces that agree with every neighbour they have):
+# Swept against `skin-tears.mjs` (ranked on skin), `lag.mjs`' jaw follows at Bite/Attack/Heavy/Eat,
+# the front fifth of the mandible's travel over a rigid carry by its own bone at `Bite` (lag's
+# figure is taken round the hinge and cannot see the tooth row), `mouth-closure-audit.py`, and
+# `lip-audit.py`'s neighbour test (faces opposing their neighbours, rest / worst posed; the split
+# body this replaces reads 8 / 8 and the intake's own floor, uncut with the mouth left ajar, 11):
 #
-#     band   skin    jaw follows Bite/Attack/Heavy/Eat   mouth shut   inverted rest / worst posed
-#     0.06   1.81x   0.98 0.99 0.99 0.95                 yes          29 / 29
-#     0.10   1.80x   0.96 0.99 0.99 0.93                 yes          14 / 18
-#     0.15   1.44x   0.96 0.98 0.99 0.91                 yes          31 / 31
-#     0.20   3.80x   0.96 0.98 0.99 0.91                 yes          49 / 49
-#     0.24   3.64x   0.96 0.99 0.99 0.92                 yes          40 / 40
-#     0.75   1.44x   0.94 0.98 0.99 0.87                 NO           0 / 0
+#     height band (x half depth at hinge)  skin   follows              tooth row  shut  inverted
+#     0.06                                 1.81x  0.98 0.99 0.99 0.95  1.000      yes   29 / 29
+#     0.10                                 1.80x  0.96 0.99 0.99 0.93  1.000      yes   14 / 18
+#     0.15                                 1.44x  0.96 0.98 0.99 0.91  0.999      yes   31 / 31
+#     0.20                                 3.80x  0.96 0.98 0.99 0.91  0.980      yes   49 / 49
+#     0.24                                 3.64x  0.96 0.99 0.99 0.92  0.930      yes   40 / 40
+#     0.75                                 1.44x  0.94 0.98 0.99 0.87  0.199      NO    11 / 11
+#     0.30 x the local half depth          1.44x  0.96 0.98 0.99 0.92  1.000      yes   24 / 27
 #
-# The shipped split body reads 1.44x, 0.98/0.99/0.99/0.95, shut, and a constant **8** inverted faces
-# at every frame including its own bind pose -- that floor is the intake mesh's own and no weighting
-# moves it. 0.10 is the value with the fewest inversions of any that shuts the mouth, and its follow
-# is within 0.02 of the split body's at every clip.
-JAW_BAND_FRACTION=float(os.environ.get('SHONI_JAW_BAND','0.10'))
+#     step, spread                         skin   follows              tooth row  shut  inverted
+#     0                                    1.47x  0.99 1.00 1.00 0.97  1.000      yes   77 / 78
+#     1                                    1.44x  0.98 0.99 1.00 0.96  1.000      yes   48 / 48
+#     2                                    1.44x  0.98 0.99 0.99 0.96  1.000      yes   43 / 43
+#     3                                    1.44x  0.98 0.99 0.99 0.95  1.000      yes   38 / 38
+#     6                                    1.44x  0.97 0.99 0.99 0.94  1.000      yes   40 / 40
+#     12                                   1.44x  0.96 0.99 0.99 0.93  1.000      yes   34 / 34
+#     16                                   1.44x  0.96 0.98 0.99 0.92  1.000      yes   30 / 30
+#     24                                   1.44x  0.95 0.98 0.99 0.90  1.000      yes   28 / 28   <-- ships
+#
+# From a spread of 1 the body's worst edge is not in the mouth at all (1.44x, the figure this animal
+# shipped with), the tooth row takes the whole of the jaw's rotation and the mouth shuts -- so on the
+# numbers Cymbospondylus' rule (the widest spread whose follow stays inside Mosasaurus' 0.96-1.00)
+# would pick 2. **The bind pose overrules it, and it is a picture rather than a number.** This body
+# is shut in bind geometry by the same share, and a narrow spread shuts the corner of the mouth over
+# two rings of skin: the skin that spanned the open corner has nowhere to go and folds out over the
+# upper lip, a pale flap beside the eye in `Idle` -- the pose the animal spends its life in, and one
+# the split body never had. It shrinks as the spread widens (clear at 2 and 6, a trace at 12 and 16)
+# and is gone at 24, which is what ships: the corner closes over enough skin to take it, and what is
+# left at rest is the lip line running dark into the corner. What it costs is `lag.mjs`' follow at
+# the hinge -- 0.95 at `Bite`, 0.90 at `Eat`, the corner's own skin blending over a wider run -- while
+# the mandible's front still travels all of its bone. The neighbour count falls with it: 28 at every
+# frame against the split body's 8 and the intake's own 11 (the height-0.75 row, nothing closed).
+# Judged on `review.py --mouth-only`'s `Idle` shot of the corner, spreads 2, 6, 12, 16 and 24.
+JAW_BAND_FRACTION=float(os.environ.get('SHONI_JAW_BAND','0.01'))
+JAW_SPREAD=int(os.environ.get('SHONI_JAW_SPREAD','24'))
 JAW_BAND=JAW_BAND_FRACTION*head_half_depth(.326)
 JAW_BEHIND=.030
 source['region']='authored';authored=[source]
@@ -381,8 +411,12 @@ for o in allmesh:
   # One field over one surface: full jaw below the measured mouth line and forward of the hinge,
   # full skull above it, and a band at the commissure that stretches. This runs while the mesh is
   # still in raw coordinates, which is the frame `HINGE_RAW` and `seam()` are in.
+  # The same field shuts the baked-open generation in bind geometry (`close_rest` below), and it
+  # has to: a bind pose closed through one share and skinned through another compresses the corner
+  # at rest and tears it open again at the gape (7.9x at `Heavy` with a height band closing and the
+  # step skinning, 6.9x-8.1x with the step closing at a wider spread than it skins).
   field,JAW_FIELD[o.name]=T.jaw_field_uncut(o,field,HINGE_RAW,below_mouth_line,axis=(0.,1.,0.),
-                                            band=JAW_BAND,behind=JAW_BEHIND)
+                                            band=JAW_BAND,behind=JAW_BEHIND,spread=JAW_SPREAD)
  for v in o.data.vertices:
   w=field[v.index];w=dict(sorted(w.items(),key=lambda t:-t[1])[:4]);total=sum(w.values());assert total>0
   for n,q in w.items():o.vertex_groups[n].add([v.index],q/total,'REPLACE')
@@ -440,8 +474,8 @@ ORAL_GEOMETRY={'construction':'uncut (T.jaw_field_uncut): the generation modelle
                               'it, and a band at the commissure that stretches.',
                'authoredParts':[], 'lumenWallVertices':len(CAV_WALL),
                'mouthLine':MOUTH_LINE_DEVIATION, 'boundaryAtTheMouth':UNCUT_RIM,
-               'jawBandFractionOfHeadHalfDepthAtTheHinge':JAW_BAND_FRACTION,
-               'jawBandRaw':JAW_BAND,'jawBehindRaw':JAW_BEHIND,
+               'jawStepBandFractionOfHeadHalfDepthAtTheHinge':JAW_BAND_FRACTION,
+               'jawStepBandRaw':JAW_BAND,'jawSpreadPassesOverTheEdgeGraph':JAW_SPREAD,'jawBehindRaw':JAW_BEHIND,
                'gapeMeasuredFromTheClips':JAW_GAPE,'field':JAW_FIELD}
 print('SHONI_ORAL',json.dumps({k:v for k,v in ORAL_GEOMETRY.items() if k!='construction'}),flush=True)
 
@@ -476,4 +510,4 @@ meta={'id':'shonisaurus','name':'Shonisaurus','species':'Shonisaurus popularis',
 existing=json.loads((OUT/'shonisaurus.json').read_text())if(OUT/'shonisaurus.json').exists()else{}
 meta={**existing,**meta}
 (OUT/'shonisaurus.json').write_text(json.dumps(meta,indent=2)+'\n')
-(HERE/'build-report.json').write_text(json.dumps({'materialCorrection':{'authoredAlbedo':'original UV texture; white COLOR_0','normalStrength':.15,'roughness':.7,'puppetMaterialUnchanged':True},'mandible':{'construction':'uncut: one continuous surface, one weight field (T.jaw_field_uncut)','bandFractionOfHeadHalfDepthAtTheHinge':JAW_BAND_FRACTION,'bandRaw':JAW_BAND,'behindRaw':JAW_BEHIND},'rawSHA256':hashlib.sha256(RAW.read_bytes()).hexdigest(),'closedRestJawAngleRadians':CLOSED_REST_ANGLE,'puppetLipContactFit':{'vertices':puppet_lip_seated,'maximumModelDisplacement':puppet_lip_max},'chinSurgery':{'adjustedVertices':chin_count,'maximumRawLengthDisplacement':chin_max},'oralGeometry':ORAL_GEOMETRY,'eyes':eye_report,'closedSurfaceWinding':winding_report,'rawVertices':len(points),'rawTriangles':raw_triangles,'meshes':weight_report,'bones':len(B),'clips':list(CLIPS),'profileSections':len(profile)},indent=2)+'\n')
+(HERE/'build-report.json').write_text(json.dumps({'materialCorrection':{'authoredAlbedo':'original UV texture; white COLOR_0','normalStrength':.15,'roughness':.7,'puppetMaterialUnchanged':True},'mandible':{'construction':'uncut: one continuous surface, one weight field (T.jaw_field_uncut): a step on the mouth line diffused over the edge graph','stepBandFractionOfHeadHalfDepthAtTheHinge':JAW_BAND_FRACTION,'stepBandRaw':JAW_BAND,'spreadPasses':JAW_SPREAD,'behindRaw':JAW_BEHIND},'rawSHA256':hashlib.sha256(RAW.read_bytes()).hexdigest(),'closedRestJawAngleRadians':CLOSED_REST_ANGLE,'puppetLipContactFit':{'vertices':puppet_lip_seated,'maximumModelDisplacement':puppet_lip_max},'chinSurgery':{'adjustedVertices':chin_count,'maximumRawLengthDisplacement':chin_max},'oralGeometry':ORAL_GEOMETRY,'eyes':eye_report,'closedSurfaceWinding':winding_report,'rawVertices':len(points),'rawTriangles':raw_triangles,'meshes':weight_report,'bones':len(B),'clips':list(CLIPS),'profileSections':len(profile)},indent=2)+'\n')

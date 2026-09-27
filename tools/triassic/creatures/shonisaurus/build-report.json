@@ -6,9 +6,10 @@
     "puppetMaterialUnchanged": true
   },
   "mandible": {
-    "construction": "uncut: one continuous surface, one weight field (T.jaw_field_uncut)",
-    "bandFractionOfHeadHalfDepthAtTheHinge": 0.1,
-    "bandRaw": 0.005070183459593324,
+    "construction": "uncut: one continuous surface, one weight field (T.jaw_field_uncut): a step on the mouth line diffused over the edge graph",
+    "stepBandFractionOfHeadHalfDepthAtTheHinge": 0.01,
+    "stepBandRaw": 0.0005070183459593324,
+    "spreadPasses": 24,
     "behindRaw": 0.03
   },
   "rawSHA256": "576114e5d8e4b3eabfd97148a515cc8f9f4567788478791a4441eb85606b6330",
@@ -67,20 +68,28 @@
         }
       ]
     },
-    "jawBandFractionOfHeadHalfDepthAtTheHinge": 0.1,
-    "jawBandRaw": 0.005070183459593324,
+    "jawStepBandFractionOfHeadHalfDepthAtTheHinge": 0.01,
+    "jawStepBandRaw": 0.0005070183459593324,
+    "jawSpreadPassesOverTheEdgeGraph": 24,
     "jawBehindRaw": 0.03,
     "gapeMeasuredFromTheClips": 0.45,
     "field": {
       "Shonisaurus authored skin": {
         "vertices": 56954,
-        "fullJaw": 2171,
-        "blended": 924,
-        "band": 0.005070183459593324,
+        "fullJaw": 1946,
+        "blended": 1925,
+        "band": 0.0005070183459593324,
         "behind": 0.03,
         "throat": 1.0,
         "reach": null,
-        "uncut": true
+        "uncut": true,
+        "spread": 24,
+        "spreadHold": 0.45,
+        "edgesAcrossTheStep": 216,
+        "stepCrossedAheadOfTheHinge": [
+          -0.01699894666671753,
+          0.06446576118469238
+        ]
       }
     }
   },

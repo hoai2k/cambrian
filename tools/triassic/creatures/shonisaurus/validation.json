@@ -58,20 +58,28 @@
         }
       ]
     },
-    "jawBandFractionOfHeadHalfDepthAtTheHinge": 0.1,
-    "jawBandRaw": 0.005070183459593324,
+    "jawStepBandFractionOfHeadHalfDepthAtTheHinge": 0.01,
+    "jawStepBandRaw": 0.0005070183459593324,
+    "jawSpreadPassesOverTheEdgeGraph": 24,
     "jawBehindRaw": 0.03,
     "gapeMeasuredFromTheClips": 0.45,
     "field": {
       "Shonisaurus authored skin": {
         "vertices": 56954,
-        "fullJaw": 2171,
-        "blended": 924,
-        "band": 0.005070183459593324,
+        "fullJaw": 1946,
+        "blended": 1925,
+        "band": 0.0005070183459593324,
         "behind": 0.03,
         "throat": 1,
         "reach": null,
-        "uncut": true
+        "uncut": true,
+        "spread": 24,
+        "spreadHold": 0.45,
+        "edgesAcrossTheStep": 216,
+        "stepCrossedAheadOfTheHinge": [
+          -0.01699894666671753,
+          0.06446576118469238
+        ]
       }
     }
   },
@@ -351,8 +359,8 @@
         }
       }
     ],
-    "bytes": 7386000,
-    "sha256": "d1b23382f980ab9726da29ba96c2384ee59f8a0c88e7775894a264afc308dc3f"
+    "bytes": 7403936,
+    "sha256": "76b394d6c4add4802994246d293735e55d52588da32e9401524ab99a0daaaad3"
   },
   "puppet": {
     "closedSurfaceWinding": [
@@ -578,7 +586,7 @@
         }
       }
     ],
-    "bytes": 561748,
-    "sha256": "3c335d6564517b0795cfcc53c6f03d87b91cf5aec07783b2c252172bb5dcf421"
+    "bytes": 561764,
+    "sha256": "7dddae73e9a068ca82f8c98ed64d9e0223ac4d90efb0a6b185e417e2db18d5fe"
   }
 }

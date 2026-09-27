@@ -5,21 +5,21 @@
   "models": [
     {
       "variant": "authored",
-      "sha256": "3793e794be2a834c0fc22f9e978b116201233ca5bf911d5dadc8f4a074b9b04a",
+      "sha256": "02a8ea07c4cba25764019727fa67cef3e65e1ef6cfb0df6a16b11fa4023d1eda",
       "meshes": [],
       "otherOralMeshes": [],
       "oralShells": "none"
     },
     {
       "variant": ".puppet",
-      "sha256": "e67ba20f229e3c2d025eed06a0ee23d3dbca0ff56d114f9ad891a6c49467b215",
+      "sha256": "3b93badbfc8c4d938a12b0092796e1dc0fe6770b4e26691d50aaa38aede306f6",
       "meshes": [],
       "otherOralMeshes": [],
       "oralShells": "none"
     },
     {
       "variant": ".lod1",
-      "sha256": "e67ba20f229e3c2d025eed06a0ee23d3dbca0ff56d114f9ad891a6c49467b215",
+      "sha256": "3b93badbfc8c4d938a12b0092796e1dc0fe6770b4e26691d50aaa38aede306f6",
       "meshes": [],
       "otherOralMeshes": [],
       "oralShells": "none"

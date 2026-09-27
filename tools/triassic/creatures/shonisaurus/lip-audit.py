@@ -63,7 +63,9 @@ r={'file':str(file),'triangles':sum(len(d[2])for d in data),
 
 # **The bar is a share of the mesh, because the floor is not zero and never was.** The intake's own
 # geometry carries a handful of faces that oppose their neighbours in the bind pose itself -- 8 on
-# the split body this replaces, at every frame of every clip, and 14 on the uncut one -- so
+# the split body this replaces, at every frame of every clip, and 11 on the uncut body left with its
+# mouth ajar (nothing closed in bind geometry, so nothing folded); the shipped uncut body, whose
+# corner is closed through a blended jaw share, reads 28 -- so
 # "inverts nothing" is not a thing any weighting can deliver and an assertion that said so would be
 # measuring the generation. What it has to catch is the 2026-09-13 regression, which was 259 faces
 # of 113,904 at `Heavy` 0.35 s: 0.23 % of the mesh, against a good build's 1. A twentieth of a

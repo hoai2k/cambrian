@@ -14,11 +14,12 @@ and the wave runs down every station in order.
 
 | Delivery | Triangles | Vertices | Packaged bytes |
 | --- | ---: | ---: | ---: |
-| `cymbospondylus.glb` — authored Tripo body | 20,604 | 12,057 | 1,901,512 |
-| `cymbospondylus.puppet.glb` — procedural twin | 7,986 | 4,152 | 827,140 |
-| `cymbospondylus.lod1.glb` — identical puppet alias | 7,986 | 4,152 | 827,140 |
+| `cymbospondylus.glb` — authored Tripo body | 19,166 | 11,152 | 1,942,204 |
+| `cymbospondylus.puppet.glb` — procedural twin | 6,600 | 3,302 | 823,400 |
+| `cymbospondylus.lod1.glb` — identical puppet alias | 6,600 | 3,302 | 823,400 |
 
-The reduced model is **38.76 %** of the authored triangles, inside the contract's 40 %. Files are in
+The reduced model is **34.44 %** of the authored triangles, inside the contract's 40 % (T3D-37: the
+jaw is no longer cut off, so the bisect's extra edges and the seam web are gone from both bodies). Files are in
 `public/assets/triassic/creatures/`, with metadata; meshopt packaging preserves mesh attributes and
 animation sample values exactly and textures are embedded. The model is **6.0 engine authoring
 units** long, faces +Z in glTF and uses +Y up; the runtime normalises by the bounding box and
@@ -101,7 +102,47 @@ being remodelled by hand. What it costs is recorded here and in `validation.json
 `mouth.hingeY` and `mouth.jawFrontY` are the measurement, and the skull is a quarter too long for
 the animal in the books.
 
-## The mouth: a measured cut, and the cut's own seam filled
+## The mouth: not cut at all (T3D-37)
+
+The owner asked for the modelled mouth to move as a normal skinned deformation rather than being cut
+off and filled. So the body is **one surface** again and the jaw is a bone turning inside skin: full
+`jaw` below the measured mouth line and forward of the hinge, full `skull` above it, and a commissure
+that stretches (`T.jaw_field_uncut`). There is no rim, no junction, no seam web and no oral geometry
+of any kind; `oral-shell-audit.mjs` reports authored, twin and LOD1 clean and agreeing, and
+`lag.mjs` finds no seam to measure (146 rest-coincident pairs before).
+
+**The share is a step diffused over the mesh, not a height band.** Forward of y −0.355 no edge of this
+generation crosses the mouth line — the jaws are two sheets — but the lips come within 0.0006-0.004
+raw of it, against a head 0.02 half deep. Mosasaurus' height band cannot be both wide enough to spare
+the corner and narrow enough to miss the lip: every width tried tore the lower lip along its whole
+length (5.2x-9.9x) or, wide enough to spread that, left the tooth row travelling 45-71 % of its own
+bone. So the share is a step on the mouth line, diffused `JAW_SPREAD = 2` passes over the edge graph
+(`spread` on the helper): a sheet that no edge connects across the line cannot be moved by diffusion,
+so the lower jaw is exactly 1 and the palate exactly 0, and only the corner and the back of the lumen
+blend. Swept over nine settings against skin, `lag.mjs`' follow and the front fifth of the mandible's
+own travel — the table is in `build.py` beside `JAW_SPREAD` and in
+`docs/triassic/throat-repairs/oral-verdicts.md` under T3D-37.
+
+| | before (cut + web) | after |
+| --- | --- | --- |
+| skin | 2.48x (`fore_mid_L`, `Death`) | **2.48x**, the same edge |
+| mouth-region skin, `jaw` / `skull` | 1.15x / 1.15x (no edge crossed the cut) | 1.61x / 1.58x |
+| jaw follows `Bite`/`Attack`/`Heavy`/`Eat` | 1.00 / 1.00 / 1.00 / 1.00 | 0.99 / 1.00 / 1.00 / 0.96 |
+| front fifth of the mandible, travel over a rigid carry at `Bite` | 1.000 | 1.000 |
+| `gape-solid.py --as-drawn`, worst `opened` over 16 clips | 750 (`Eat`) | **0** at every clip, plain and as drawn alike |
+
+**The twin keeps a height band** (0.30 of the local half depth), because a voxel resurfacing bridges
+the slit — `T.mouth_cavity` finds 0 lumen vertices on it where the authored body finds 280 — so an
+edge crosses the mouth line along the whole mouth and there is no topology to separate the jaws by.
+It opens its jaw with the authored body (tooth row 0.86 of its bone at `Bite`, the cut twin's 0.89)
+and pays in stretch: 12.63x at `Heavy`, a pale membrane between the jaws, against 3.52x at a band so
+wide its jaw barely drops (0.34). Sheets: `docs/triassic/verification/cymbospondylus-mouth-space.png`
+and `cymbospondylus-twin-mouth-space.png`.
+
+### Before T3D-37: the measured cut and its seam web
+
+What follows is the record of the construction this replaced. The measurement at its head is still
+the mouth line the jaw field steps on; the cut, the lining, the hinge envelope and the web are gone.
 
 **Method: the geometric one.** Placodus' measurement — every head vertex casts its own outward
 normal back into the mesh over 0.030 raw units, and a vertex that hits is looking across the slit
@@ -446,8 +487,9 @@ each strike's travel falls inside a third of its clip.
 
 The Blender build additionally checks every vertex of both bodies at 13 phases of all 23 clips,
 asserts the countershading signal is strong enough to read a roll from, refuses any appendage root
-it cannot seat inside the trunk, refuses a lining narrower than the measured mouth, and refuses a
-measured tooth on the wrong side of the cut.
+it cannot seat inside the trunk, refuses a measured tooth straddling the mouth line, and (T3D-37)
+refuses any boundary loop over the head that sits on the mouth line or runs along it — the two
+properties a cut rim has and the generation's own 3-vertex pinhole does not.
 
 Sheets, rendered from the **decoded packaged** file — the authored body alone. The twin's own pose
 set is not rendered: the pairing is verified by the audit, which checks *parity* and cannot see

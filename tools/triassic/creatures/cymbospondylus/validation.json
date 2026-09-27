@@ -1335,17 +1335,17 @@
         "tail_02": 2232,
         "fore_mid_R": 546,
         "fore_tip_R": 256,
-        "chest": 3972,
+        "chest": 3977,
         "body": 4364,
         "tail_04": 636,
         "tail_03": 1757,
         "tail_05": 478,
         "hind_upper_R": 733,
-        "neck": 1244,
-        "skull": 972,
+        "neck": 1260,
+        "skull": 888,
+        "jaw": 665,
         "fore_mid_L": 616,
         "fore_upper_L": 922,
-        "jaw": 527,
         "fore_tip_L": 287,
         "fore_upper_R": 871,
         "hind_mid_R": 472,
@@ -1361,13 +1361,20 @@
       },
       "jawJunction": {
         "vertices": 9585,
-        "fullJaw": 244,
-        "blended": 270,
-        "band": 0.3,
+        "fullJaw": 362,
+        "blended": 253,
+        "band": 0.01,
         "behind": 0.03,
         "throat": 1.0,
         "reach": null,
-        "uncut": true
+        "uncut": true,
+        "spread": 2,
+        "spreadHold": 0.45,
+        "edgesAcrossTheStep": 130,
+        "stepCrossedAheadOfTheHinge": [
+          -0.02078878879547119,
+          0.04946437478065491
+        ]
       }
     },
     "Cymbospondylus procedural volume twin": {
@@ -1416,7 +1423,7 @@
     }
   },
   "maxInfluences": 4,
-  "meanInfluences": 3.0523783657949872,
+  "meanInfluences": 3.0581981842166526,
   "mouth": {
     "method": "modelled cavity",
     "note": "Placodus' geometric method: every head vertex casts its own outward normal back into the mesh over 0.030 raw units, and a vertex that hits is looking across the slit at the lip opposite. The albedo fallback Dinocephalosaurus needed was not used, because this generation models a real mouth.",
@@ -2144,9 +2151,16 @@
         "loops": []
       }
     },
-    "jawBandFractionOfTheHeadsOwnHalfDepthAtEachStation": 0.3,
-    "jawBandRaw": 0.3,
-    "jawBehindRaw": 0.03,
+    "jawField": {
+      "authored": {
+        "stepBandOfTheLocalHalfDepth": 0.01,
+        "spreadPassesOverTheEdgeGraph": 2
+      },
+      "twin": {
+        "bandOfTheLocalHalfDepth": 0.3
+      },
+      "behindRaw": 0.03
+    },
     "gapeMeasuredFromTheClips": 0.6,
     "toothPatches": [
       {

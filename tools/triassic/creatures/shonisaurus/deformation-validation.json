@@ -27,7 +27,7 @@
       "full": [
         0.16764074966893996,
         -0.01789957748538502,
-        0.12690848287769024
+        0.12690845308659074
       ],
       "puppet": [
         0.1674999019805513,
@@ -37,7 +37,7 @@
       "absoluteError": [
         0.00014084768838865114,
         0.00043148253981633786,
-        0.010566933022238392
+        0.010566903231138888
       ]
     },
     {
@@ -45,7 +45,7 @@
       "full": [
         0.2149122856201256,
         -0.10573497918281217,
-        0.19803403819909285
+        0.19752749869663874
       ],
       "puppet": [
         0.21192081057484125,
@@ -55,14 +55,14 @@
       "absoluteError": [
         0.002991475045284353,
         0.000873908168526602,
-        0.005346361335174354
+        0.004839821832720248
       ]
     },
     {
       "station": -2.004736842105263,
       "full": [
         0.296726986912493,
-        -0.29337949680081843,
+        -0.29250998646714244,
         0.34570106862925576
       ],
       "puppet": [
@@ -72,7 +72,7 @@
       ],
       "absoluteError": [
         0.00019111474855776356,
-        0.010156669486465375,
+        0.009287159152789382,
         0.007378361157013902
       ]
     },
@@ -80,8 +80,8 @@
       "station": -1.6963157894736842,
       "full": [
         0.4372718379716601,
-        -0.41883586577209136,
-        0.40441197842990545
+        -0.418864159145245,
+        0.4044120068195374
       ],
       "puppet": [
         0.43692565233813146,
@@ -90,8 +90,8 @@
       ],
       "absoluteError": [
         0.0003461856335286173,
-        0.0006143763329841678,
-        0.0005256465518824749
+        0.0006426697061377995,
+        0.000525674941514398
       ]
     },
     {
@@ -367,18 +367,18 @@
   ],
   "surfaceDistances": {
     "fullToPuppet": {
-      "p50": 0.004332339158281684,
+      "p50": 0.004374934360384941,
       "p95": 0.03822030238807201,
       "max": 0.11313711851835251
     },
     "puppetToFull": {
-      "p50": 8.429369557916289e-08,
+      "p50": 1.6993873686033112e-07,
       "p95": 0.04011568948626517,
-      "max": 0.20055240392684937
+      "max": 0.2004551887512207
     }
   },
   "signedVolume": {
-    "full": 3.299871607538851,
+    "full": 3.300195072865401,
     "puppet": 3.244314687627783
   },
   "finRootSeating": {
@@ -921,9 +921,9 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.4025727298462334,
-        "stretch99": 1.027885413536389,
-        "stretchMax": 3.2386812616883898,
-        "edgesOver5x": 0
+        "stretch99": 1.0345432574733855,
+        "stretchMax": 7.909192512404013,
+        "edgesOver5x": 1
       },
       {
         "object": "Puppet measured trunk",
@@ -993,9 +993,9 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.3672639068630361,
-        "stretch99": 1.0323123946246975,
-        "stretchMax": 3.197713927728476,
-        "edgesOver5x": 0
+        "stretch99": 1.037305367993115,
+        "stretchMax": 7.782921843802043,
+        "edgesOver5x": 1
       },
       {
         "object": "Puppet measured trunk",
@@ -1065,7 +1065,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.1573585032691466,
-        "stretch99": 1.0112535877731255,
+        "stretch99": 1.011264433468179,
         "stretchMax": 1.4315153474821563,
         "edgesOver5x": 0
       },
@@ -1355,9 +1355,9 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.31133670013783155,
-        "stretch99": 1.014303356782695,
-        "stretchMax": 2.868676811005596,
-        "edgesOver5x": 0
+        "stretch99": 1.022220182993807,
+        "stretchMax": 6.7675496753376425,
+        "edgesOver5x": 1
       },
       {
         "object": "Puppet measured trunk",
@@ -1427,9 +1427,9 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.2834766590095977,
-        "stretch99": 1.0170742208385197,
-        "stretchMax": 2.744248030826909,
-        "edgesOver5x": 0
+        "stretch99": 1.0206319334481806,
+        "stretchMax": 6.3830737519954575,
+        "edgesOver5x": 1
       },
       {
         "object": "Puppet measured trunk",
@@ -1499,7 +1499,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.15105992141139674,
-        "stretch99": 1.0114029313064339,
+        "stretch99": 1.011410934773802,
         "stretchMax": 1.3560126188745159,
         "edgesOver5x": 0
       },
@@ -3525,8 +3525,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.2133326785251721,
-        "stretch99": 1.0049776740843648,
-        "stretchMax": 2.219459286804202,
+        "stretch99": 1.0099041951957914,
+        "stretchMax": 4.75642035563446,
         "edgesOver5x": 0
       },
       {
@@ -3597,8 +3597,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.1376352237801089,
-        "stretch99": 1.0137749343770368,
-        "stretchMax": 1.9131659899383593,
+        "stretch99": 1.0161290587084748,
+        "stretchMax": 3.801140637023223,
         "edgesOver5x": 0
       },
       {
@@ -3741,8 +3741,8 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.21333500303244887,
-        "stretch99": 1.005183817145082,
-        "stretchMax": 2.2194568762859777,
+        "stretch99": 1.0096981517253587,
+        "stretchMax": 4.756395617108841,
         "edgesOver5x": 0
       },
       {
@@ -4899,7 +4899,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.1552869226412537,
-        "stretch99": 1.0200770551674545,
+        "stretch99": 1.0200874913095155,
         "stretchMax": 1.9907160186776076,
         "edgesOver5x": 0
       },
@@ -5261,9 +5261,9 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.2,
         "maxTravel": 0.46942566296857363,
-        "stretch99": 1.0399314500219732,
-        "stretchMax": 3.563173801343242,
-        "edgesOver5x": 0
+        "stretch99": 1.045518124563445,
+        "stretchMax": 8.79535252529997,
+        "edgesOver5x": 1
       },
       {
         "object": "Puppet measured trunk",
@@ -5333,9 +5333,9 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.35,
         "maxTravel": 0.6417477283795857,
-        "stretch99": 1.0525910543197294,
-        "stretchMax": 3.2745035033961436,
-        "edgesOver5x": 0
+        "stretch99": 1.0559664839452736,
+        "stretchMax": 8.019534994964248,
+        "edgesOver5x": 1
       },
       {
         "object": "Puppet measured trunk",
@@ -5405,7 +5405,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.1650865905227195,
-        "stretch99": 1.011168847010128,
+        "stretch99": 1.0111746346843544,
         "stretchMax": 1.4826724100670068,
         "edgesOver5x": 0
       },
@@ -5839,7 +5839,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.15938632786235976,
-        "stretch99": 1.023026888622669,
+        "stretch99": 1.0230281715369771,
         "stretchMax": 1.3253718180853085,
         "edgesOver5x": 0
       },
@@ -5911,7 +5911,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.03985954428331536,
-        "stretch99": 1.0147991185365997,
+        "stretch99": 1.0148073553031889,
         "stretchMax": 1.053966366193096,
         "edgesOver5x": 0
       },
@@ -6707,7 +6707,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.5,
         "maxTravel": 0.15232814558846305,
-        "stretch99": 1.0306849371924198,
+        "stretch99": 1.0306639072326036,
         "stretchMax": 3.270248341134784,
         "edgesOver5x": 0
       },
@@ -6779,7 +6779,7 @@
         "object": "Shonisaurus authored skin",
         "phase": 0.7,
         "maxTravel": 0.07092303039875054,
-        "stretch99": 1.0150775120514746,
+        "stretch99": 1.0151119378297455,
         "stretchMax": 2.296919313824461,
         "edgesOver5x": 0
       },

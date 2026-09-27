@@ -180,6 +180,9 @@ so the change moved exactly these four bodies' parts and nothing else (`hidden-p
 
 ## T3D-34: the seam web — a fill for a generation that arrived *partially* open
 
+*Superseded on both bodies by T3D-37 below, which takes the cut out instead; the helpers are gone
+from `_pipeline/tripo.py` (in git at `8161d0c`). Kept as the record of what was shipped and why.*
+
 Two bodies were reported as showing "holes in the geometry near the back of the mouth ... for
 creatures that have a mouth rendered already partially open". They are `cut_rim`'s **case 2** and
 neither of T3D-31's two constructions fits them, which is why this is a third one.
@@ -330,192 +333,233 @@ should be re-aimed at the body that ships. The comparison is on the record so th
 is arguing with numbers.
 
 
-## T3D-36: Shonisaurus and Cymbospondylus go uncut — the mouth is a joint, not a seam
+## T3D-37: Shonisaurus and Cymbospondylus go uncut — the jaws are separated by topology, not height
 
 The owner's request: *"for Shonisaurus and Cymbospondylus can we move their interior mouth geometry
 as a normal skinned deformation instead of cutting it or putting in 'mouth geometry' — I think a
 basic deformation as a skinned bone movement for the jaw should probably work best, since the mouth
 interior is modelled."*
 
-That is CLAUDE.md's **case 3** and `T.jaw_field_uncut` is the construction. It supersedes T3D-34's
-seam web on exactly these two bodies, and the web is retired with the cut that made it necessary —
-on Cymbospondylus' twin as well. Both bodies now carry **no oral geometry of any kind**:
-`oral-shell-audit.mjs` reports each of the three variants clean with no hidden oral parts at all,
-where before it listed a `Mouth interior seam web` on each.
+That is CLAUDE.md's case-3 construction (`T.jaw_field_uncut`, Mosasaurus the worked example). It
+supersedes T3D-34's seam web on exactly these two bodies. Both now carry **no oral geometry of any
+kind** — no web, no lining, no plug — and one continuous skin; `oral-shell-audit.mjs` reports each
+of authored, twin and LOD1 clean with no hidden oral parts, all three agreeing.
 
-### What the cut was buying, measured before anything changed
+### What the cut was buying
 
-`T.cut_rim` on the shipped bodies, over the head, with the mouth line given so it can say how much
-of each loop was *on the cut* rather than pre-existing rim:
+`T.cut_rim` on the bodies this replaces (Cymbospondylus: its own builder's record in `validation.json`
+at `cea726e`; Shonisaurus: the shipped web's boundary, which is the rim by construction, measured off
+the packaged GLB):
 
-| | mouth length | loop | reach | on the seam |
+| | mouth | cut rim | reach | on the seam |
 |---|---:|---:|---:|---:|
-| Cymbospondylus, authored | 0.1375 | 112 (+13) | **0.042** (+0.019) | 59 (+11) |
-| Cymbospondylus, twin | 0.1375 | 101 (+9) | **0.139** (+0.000) | 64 (+0) |
-| Shonisaurus, authored (upper) | 0.196 | 164 | **0.0779** | — |
-| Shonisaurus, authored (mandible) | 0.196 | 168 | 0.0779 | — |
+| Cymbospondylus, authored | 0.1375 | 112-vertex loop (+13) | **0.042** (y −0.3525 to −0.3106) | 59 (+11) |
+| Cymbospondylus, twin | 0.1375 | 101-vertex loop | **0.139** — the whole mouth | 64 |
+| Shonisaurus, authored | 0.196 | 164-vertex loop | **0.078** (0.100–0.178 of a body from the snout) | — |
 
-So on both authored bodies the cut ran through real surface over only the back third and bought
-nothing at the front, where the two jaws are already separate sheets and the seam passes between
-them. Mosasaurus' own figure for comparison is 0.057 of 0.176, which is the same proportion — these
-two are not a harder case than the worked example by that measure.
+Case 2 on both authored bodies, as T3D-34 said: the cut runs through surface over the back third
+and passes between two separate sheets at the front. The twin is not: Cymbospondylus' twin is a
+voxel resurfacing whose occupancy field bridges the slit (`T.mouth_cavity` finds 0 lumen vertices
+on it at 0.030 and 0.060 where the authored body finds 280), so its cut made the *whole* aperture.
 
-**The twin is the exception and it is measured rather than assumed.** Cymbospondylus' twin is a
-voxel resurfacing of the authored body, and at 0.0045 raw the occupancy field bridges the gape:
-`T.mouth_cavity` finds **zero** interior vertices on it at a 0.030 gap and zero at 0.060, where the
-authored body answers with 280. Its cut therefore ran through solid head over the *whole* mouth —
-0.139 against the authored body's 0.042 — so the cut made its only aperture and the web was closing
-the hole behind it. It goes uncut with the body it is a twin of; what it now has is a mouth line
-that creases rather than an aperture, which is what a 6,600-triangle LOD stand-in can honestly
-offer, and `docs/triassic/verification/cymbospondylus-twin-mouth-space.png` is that judgement put in
-front of a human. (Shonisaurus' twin needed nothing either way: its rostrum is two separate closed
-lofts with the modelled gap between them.)
+### Why Mosasaurus' band does not work here, located rather than guessed
 
-### `JAW_BAND`, swept
+The first uncut build used Mosasaurus' height band and tore: 8.88x at a band of 0.30 of the local
+half depth, 5.22x at 0.90 of the half depth at the hinge. `skin-tears.mjs`' worst edges at `Heavy`
+were **not at the corner of the mouth**. They ran the whole length of the lower lip, from the hinge
+to the snout, between vertices on jaw shares of 0.5-0.9 and 1.0.
 
-The band is a fraction of the head's own half depth at the hinge, which is Mosasaurus' measure.
-Skin is `skin-tears.mjs` ranked on skin, and the four figures after it are `lag.mjs`' *jaw follows
-its bone* at `Bite`/`Attack`/`Heavy`/`Eat` — Mosasaurus held 0.96–1.00.
+Measured on the intake (a one-off dump of the authored Cymbospondylus' head from its builder, raw units):
 
-**Cymbospondylus** (0.02743 raw at the hinge; shipped **0.90**):
+- **forward of y −0.355 no edge of the mesh crosses the mouth line at all** — 85 crossing edges, every
+  one of them between y −0.355 and the hinge and behind it. The jaws are separate sheets there;
+- but the **lips come within 0.0006-0.004 raw of the mouth line** along that open run, against a
+  head 0.018-0.022 half deep and a modelled lumen 0.007 half deep.
 
-| band | raw | skin | jaw follows |
-|---:|---:|---:|---|
-| 0.20 | 0.0055 | 9.85x | 0.98 / 1.00 / 1.00 / 0.96 |
-| 0.30 | 0.0082 | 10.05x | 0.98 / 1.00 / 1.00 / 0.93 |
-| 0.38 | 0.0104 | 9.58x | 1.00 / 1.00 / 1.00 / 0.99 |
-| 0.50 | 0.0137 | 7.43x | 1.00 / 1.00 / 1.00 / 0.99 |
-| 0.70 | 0.0192 | 6.77x | 1.00 / 1.00 / 1.00 / 0.99 |
-| **0.90** | **0.0247** | **5.22x** | **1.00 / 1.00 / 1.00 / 0.97** |
-| 1.00 | 0.0274 | 4.50x | 1.00 / 1.00 / 1.00 / 0.93 |
-| 1.10 | 0.0302 | 3.65x | 1.01 / 1.01 / 1.01 / 0.89 |
-| 1.20 | 0.0329 | 3.15x | 1.01 / 1.01 / 1.01 / 0.85 |
+Shonisaurus is the same shape with a longer corner: `jaw_field_uncut` reports the step crossed by an
+edge up to 0.064 raw ahead of its hinge (raw y 0.39) on a mouth that runs to 0.498, so its lips are
+joined skin over the back third and two sheets over the front two.
 
-Skin falls monotonically from 0.30 upwards and the mandible's follow falls with it; 0.90 is the
-widest value that keeps the follow inside Mosasaurus' range, and it ships there.
+So a height band cannot be both wide enough to spare the corner and narrow enough to miss the lip.
+Every band wider than the lip's clearance gives the lower lip a partial share and tears the jaw's own
+skin; the bands wide enough to spread that tear out take the tooth row off its bone instead. And
+`lag.mjs`' *jaw follows its bone* cannot see the second half: it is taken over the ball round the
+hinge, and reads 1.00 at a band where the front fifth of the mandible travels 45 % of what the jaw
+bone would carry it. The tooth row is measured separately below (`tools/triassic/mandible-travel.mjs`:
+skin travel between rest and the clip's widest gape over a rigid carry by the `jaw` bone, over every
+jaw-weighted vertex in the front fifth of the jaw's reach).
 
-**What widening is actually buying, located rather than guessed.** Every value up to 0.5 put the
-body's worst edge at z 2.64–2.70 of the exported frame — the last 0.04 of a 6-unit body, the
-**snout tip** — and not at the hinge at z 1.86. This generation's lumen is a *slit*: 0.249 of the
-head's own depth at its widest, which is what `restSlitMaxHalfDepthOverHeadDepth` in its
-`validation.json` says. So the upper and lower lips are joined round the front of it by a narrow run
-of continuous skin, and uncut that run carries the whole travel of the mandible's tip. A wide band
-spreads that travel over more geometry. A band scaled by the head's *local* half depth was swept too
-(0.50 → 10.50x, 0.90 → 7.38x, 1.30 → 5.90x, 1.80 → 4.01x) and is worse at matched follow, because
-narrowing it at the snout is exactly what concentrates the lip run.
+### The construction: a step on the mouth line, diffused over the edge graph
 
-**Shonisaurus** (0.0507 raw at the hinge; shipped **0.10**):
+`T.jaw_field_uncut` gains `spread`. The jaw share is made a **step** on the sign of the builder's
+`below` (a band of 0.01 of the head's half depth, ~0.0002-0.0005 raw) and that scalar is then diffused
+`spread` passes over the mesh's own edge graph, coupled by 1/length like `relax_weights`. A sheet no
+edge connects across the line is uniform, and diffusion cannot move a uniform field: **the lower jaw
+stays at exactly 1 and the palate at exactly 0**, and the step only softens where edges cross — the
+corner of the mouth and the back of the lumen, which is where CLAUDE.md says the stretch belongs.
+The band is then a distance along the skin from the commissure, not a height. `spread=0` (the
+default) is the old code path exactly, so Mosasaurus is untouched.
 
-| band | skin | jaw follows | mouth shut | inverted, rest / worst posed |
-|---:|---:|---|---|---:|
-| 0.06 | 1.81x | 0.98 / 0.99 / 0.99 / 0.95 | yes | 29 / 29 |
-| **0.10** | **1.80x** | **0.96 / 0.99 / 0.99 / 0.93** | **yes** | **14 / 18** |
-| 0.15 | 1.44x | 0.96 / 0.98 / 0.99 / 0.91 | yes | 31 / 31 |
-| 0.20 | 3.80x | 0.96 / 0.98 / 0.99 / 0.91 | yes | 49 / 49 |
-| 0.24 | 3.64x | 0.96 / 0.99 / 0.99 / 0.92 | yes | 40 / 40 |
-| 0.75 | 1.44x | 0.94 / 0.98 / 0.99 / 0.87 | **NO** | 0 / 0 |
-| 1.00 | 1.44x | 0.86 / 0.95 / 0.97 / 0.72 | **NO** | 0 / 0 |
+### The sweeps
 
-**This body's band is bounded from above by its own bind pose, and that is the finding.** Its
-generation was authored gaping and `close_rest` shuts it in bind geometry *through this same field*,
-so a vertex only closes by its own jaw share — and the mandible's dorsal margin sits one lumen half
-depth (0.012 raw at its widest) below the mouth line. A band much wider than 0.24 never reaches 1
-there, the lip never meets the palate, and the animal ships with its mouth ajar:
-`mouth-closure-audit.py` read **3,596 of 14,400 lateral rays passing clean through the rostrum**, a
-0.098-unit aperture, at a band of 0.75. The shipped split body reads 1.44x, 0.98/0.99/0.99/0.95 and
-shut; 0.10 is the value inside that bound with the fewest inverted faces, and its follow is within
-0.02 of the split body's at every clip.
+Skin is `skin-tears.mjs` ranked on skin (oral surfaces separately — there are none now), *mouth* its
+mouth-region `jaw` / `skull` figures, *follows* `lag.mjs` at `Bite`/`Attack`/`Heavy`/`Eat`, *tooth
+row* the front fifth's travel over a rigid carry at `Bite`. Every row is a full rebuild and repackage.
 
-### `lip-audit.py` was asking a question only a rigid shell can answer
+**Cymbospondylus** (was 2.48x — its right forelimb in `Death` — with the mouth reading 1.15x):
 
-That audit compared each deformed face normal with its rest normal transported by the **mean of its
-three vertices' weights**. That is exact where the three share one transform, which is what the
-mandible shell gave it — and it is only an approximation across a blend band. The moment the
-commissure became a band it reported **415 inverted faces** at `Heavy`, of which, checked against
-their own neighbours, **none is inverted**: the worst agreement with its neighbours over all of them
-is +0.62. `gape-solid.py` says the same thing independently and in pixels — the culled and the solid
-passes at `Heavy` differ by **0 pixels of 378,000**, so nothing renders backfacing anywhere in that
-frame. An assertion whose message says something it does not test is the `np.interp` lesson in
-another costume.
+| construction | skin | mouth jaw / skull | follows | tooth row |
+|---|---:|---:|---|---:|
+| height 0.20 × half depth at the hinge | 9.85x | 9.85x / 9.29x | 0.98 1.00 1.00 0.96 | 0.980 |
+| height 0.38 | 9.58x | 9.58x / 8.36x | 1.00 1.00 1.00 0.99 | 0.825 |
+| height 0.50 | 7.43x | 7.43x / 6.84x | 1.00 1.00 1.00 0.99 | 0.713 |
+| height 0.90 | 5.22x | 4.86x / 5.22x | 1.00 1.00 1.00 0.97 | 0.446 |
+| height 0.30 × *local* half depth | 8.88x | 8.47x / 8.88x | 0.98 1.00 1.00 0.95 | 0.965 |
+| step, spread 0 | 7.92x | 5.25x / 7.92x | 1.00 1.00 1.00 1.00 | 1.000 |
+| step, spread 1 | 2.74x | 2.74x / 2.55x | 0.99 1.00 1.00 0.98 | 1.000 |
+| **step, spread 2** | **2.48x** | **1.61x / 1.58x** | **0.99 1.00 1.00 0.96** | **1.000** |
+| step, spread 3 | 2.48x | 1.31x / 1.46x | 0.99 1.00 1.00 0.95 | 1.000 |
+| step, spread 6 | 2.48x | 1.22x / 1.30x | 0.97 1.00 1.00 0.92 | 1.000 |
+| step, spread 12 | 2.48x | 1.16x / 1.19x | 0.96 1.00 1.00 0.88 | 1.000 |
+| step, spread 24 | 2.48x | 1.14x / 1.15x | 0.96 1.00 1.00 0.88 | 1.000 |
+| step, spread 48 | 2.48x | 1.12x / 1.15x | 0.97 1.00 1.00 0.86 | 1.000 |
 
-The verdict is now the **neighbour test**, which uses no weights at all: a face that has really
-turned inside out points the opposite way to the faces it shares edges with. The mean-weight figure
-stays beside it, because it is what every earlier verdict on this animal measured and because it is
-a fair reading of *strain* across the band.
+The height rows reproduce the previous attempt's figures exactly (it preferred the local-section
+band at 0.30: 8.88x, tooth row 0.965). **Spread 2 ships**: it is the widest spread whose follow stays
+inside Mosasaurus' 0.96-1.00, the whole lower jaw takes the whole of its bone's rotation, and the
+body's worst edge is no longer in the mouth — 2.48x is the right forelimb in `Death`, the figure it
+shipped with.
 
-And the floor is not zero and never was. Under the repaired test the **shipped split body carries 8
-inverted faces at every frame of every clip, including its own bind pose** — the intake mesh's own,
-which no weighting moves. The uncut body at 0.10 carries 14 at rest and 18 at worst. So the
-assertion is a share of the mesh (a twentieth of a percent), which is an order of magnitude under
-the 2026-09-13 regression this audit exists to catch (259 faces of 113,904, 0.23 %) and an order of
-magnitude over the floor.
+**Shonisaurus** (was 1.44x, mouth 1.00x; a band here also closes the baked-open generation in bind
+geometry through `close_rest`, so *shut* is `mouth-closure-audit.py` and *inverted* is
+`lip-audit.py`'s neighbour test, rest / worst posed):
 
-### The gape, before and after
+| construction | skin | follows | tooth row | shut | inverted |
+|---|---:|---|---:|---|---:|
+| height 0.06 × half depth at the hinge | 1.81x | 0.98 0.99 0.99 0.95 | 1.000 | yes | 29 / 29 |
+| height 0.10 | 1.80x | 0.96 0.99 0.99 0.93 | 1.000 | yes | 14 / 18 |
+| height 0.15 | 1.44x | 0.96 0.98 0.99 0.91 | 0.999 | yes | 31 / 31 |
+| height 0.20 | 3.80x | 0.96 0.98 0.99 0.91 | 0.980 | yes | 49 / 49 |
+| height 0.24 | 3.64x | 0.96 0.99 0.99 0.92 | 0.930 | yes | 40 / 40 |
+| height 0.75 | 1.44x | 0.94 0.98 0.99 0.87 | 0.199 | **no** — 3,596 of 14,400 rays through | 11 / 11 |
+| height 0.30 × local half depth | 1.44x | 0.96 0.98 0.99 0.92 | 1.000 | yes | 24 / 27 |
+| step, spread 0 | 1.47x | 0.99 1.00 1.00 0.97 | 1.000 | yes | 77 / 78 |
+| step, spread 1 | 1.44x | 0.98 0.99 1.00 0.96 | 1.000 | yes | 48 / 48 |
+| step, spread 2 | 1.44x | 0.98 0.99 0.99 0.96 | 1.000 | yes | 43 / 43 |
+| step, spread 3 | 1.44x | 0.98 0.99 0.99 0.95 | 1.000 | yes | 38 / 38 |
+| step, spread 6 | 1.44x | 0.97 0.99 0.99 0.94 | 1.000 | yes | 40 / 40 |
+| step, spread 12 | 1.44x | 0.96 0.99 0.99 0.93 | 1.000 | yes | 34 / 34 |
+| step, spread 16 | 1.44x | 0.96 0.98 0.99 0.92 | 1.000 | yes | 30 / 30 |
+| **step, spread 24** | **1.44x** | **0.95 0.98 0.99 0.90** | **1.000** | **yes** | **28 / 28** |
+| *closing:* height 0.10, *skinning:* spread 2 | 7.94x | 0.98 0.99 0.99 0.95 | 1.000 | yes | 14 / 32 |
+| *closing:* spread 12, *skinning:* spread 2 | 6.94x | 0.98 0.99 0.99 0.95 | 1.000 | yes | 34 / 34 |
+| *closing:* spread 24, *skinning:* spread 2 | 8.11x | 0.98 0.99 0.99 0.95 | 1.000 | yes | 28 / 28 |
 
-`gape-solid.py` at the measured peak of **every** clip that opens the jaw, not the roster sweep's
-three-clip sample. Read `opened`: it is every pixel whose only surface is a back face, and on a
-mouth held wide from the side it is the larger and the more honest of the two. Both bodies now carry
-nothing the runtime hides, so the plain and the `--as-drawn` runs are **identical** — the same
-counts, shot for shot, which is the thing to check on a body that used to have a hidden fill.
+**On the numbers Cymbospondylus' rule would pick 2, and the bind pose overrules it.** This body is
+shut in bind geometry by the same share (`close_rest`), and a narrow spread shuts the corner of the
+mouth over two rings of skin: the skin that spanned the generation's open corner has nowhere to go
+and folds out over the upper lip, a **pale flap beside the eye in `Idle`** — the pose the animal
+spends its life in, and one the split body never had. The previous attempt's height band 0.10 did
+not show it, and neither did `cea726e` (both rendered at the same shot for comparison). It shrinks as
+the spread widens — clearly there at 2 and 6, a trace at 12 and 16 — and is gone at 24, which is what
+ships: skin still exactly the 1.44x this animal shipped with (the mouth region 1.16x at `Heavy`), the
+tooth row taking all of the jaw's rotation, the mouth shut, and what is left at rest is the lip line
+running dark into the corner. The three *closing/skinning* rows are the obvious alternative — shut
+the bind pose through a wider or a height field and skin through the narrow one — and are worse in
+the other direction: a corner closed through one share and skinned through another is compressed at
+rest and torn open again at the gape, 6.9x-8.1x on the corner edge. So one field does both.
 
-| Cymbospondylus | shipped `opened` (as drawn, web hidden) | uncut `opened` |
-| --- | ---: | ---: |
-| `Heavy@0.6` | 744 | **0** |
-| `Lunge@0.7333` | 719 | **0** |
-| `Eat@0.4333` | 750 | **0** |
-| `Bite@0.1667` | 647 | **0** |
-| `Ability@0.3667` | 308 | **0** |
-| `Attack@0.4667` | 286 | **0** |
-| `Hit@0.3` | 301 | **0** |
-| `Stagger@0.6` | 319 | **0** |
-| `Death@2.0` | 244 | **0** |
-| `Grab@0.1` | (not shot) | **0** |
-| `Breathe@1.6` | 19 | **0** |
-| `Breath@1.3` | 0 | **0** |
+What 24 costs is `lag.mjs`' follow at the hinge, **0.95 at `Bite` and 0.90 at `Eat`** against the
+split body's 0.98 and 0.95: the corner's own skin blends over a wider run, while the front of the
+mandible still travels all of its bone. The neighbour count falls with it, to **28** at every frame,
+against **8** on the split body this replaces (re-measured by rebuilding `cea726e` in a scratch
+worktree, whose rebuild is byte-identical to what shipped) and **11** on the uncut body with nothing
+closed (the height-0.75 row). 28 is 0.025 % of the mouth's 113,904 triangles, under `lip-audit.py`'s
+0.05 % bar, and none of it shows in `gape-solid.py`. The flap was judged by eye, on
+`review.py --mouth-only`'s `Idle` shot of the corner at every spread named above.
 
-| Shonisaurus | shipped `opened` | uncut `opened` |
-| --- | ---: | ---: |
-| `Heavy@0.3333` | 1,863 | **0** |
-| `Attack@0.2333` | 1,478 | **0** |
-| `Bite@0.1667` | 381 | **0** |
-| `Eat@0.6` | 13 | **0** |
+### The twin keeps a height band, and pays for it in stretch
 
-`through` is 0 everywhere, before and after. The 1,671 px T3D-34 attributed to "the generation's own
-modelled lumen seen from outside with every back face culled" was not that: it was the *cut* leaving
-the lumen's walls bounding an open surface. One continuous solid puts them inside it, and they stop
-being back faces that the culled pass can see past.
+Cymbospondylus' twin has no lumen, so it has no topology to separate its jaws by: an edge crosses the
+mouth line along the whole mouth, and a step there would be a crease. It carries the height band
+instead, and its own `skin-tears.mjs` figure at `Heavy` is the price of a closed head whose lower half
+swings:
 
-`tools/triassic/creatures/cymbospondylus/mouth-views.py` agrees from its own angles: 0–5 hole pixels
-of 92,000–288,000 aperture pixels at seven clips and three views, and `pixelsChangedByTheCull` is
-exactly 0.0 on all fourteen proof pairs.
+| twin band | twin skin | twin tooth row at `Bite` |
+|---|---:|---:|
+| **0.30 × local half depth** | **12.63x** | **0.86** |
+| 1.00 × local half depth | 7.65x | 0.61 |
+| 0.90 × half depth at the hinge | 5.82x | 0.50 |
+| 1.50 × half depth at the hinge | 3.52x | 0.34 |
+| the cut twin this replaces (seam web hidden in play) | 2.47x | 0.89 |
+
+0.30 local ships, so the LOD opens its jaw with the authored body and the gape does not change when the
+renderer swaps models; the stretch is a pale membrane between the jaws, which is what a
+6,600-triangle closed head can honestly offer and is judged by eye in
+`docs/triassic/verification/cymbospondylus-twin-mouth-space.png`. The cut twin's 2.47x was not free
+either: its web is hidden in play, so as drawn it opened a hole into its own head. Shonisaurus' twin
+needs nothing: its rostrum is two separate closed lofts with the gap between them, unchanged.
+
+### The gape, before and after, over every clip that moves the jaw
+
+`gape-solid.py` at each clip's own widest jaw rotation, `opened / through` (and pixels differing
+between the culled and solid passes). *Before* is the shipped `cea726e` bodies, decoded in a scratch
+worktree; *after* is this delivery. The backdrop test is `r > .90, g < .20, b > .90`.
+
+| Cymbospondylus | before, plain | before, as drawn | after, plain | after, as drawn |
+|---|---:|---:|---:|---:|
+| `Heavy@0.6` | 155 / 155 (2,044) | 744 / 1 (2,396) | **0 / 0** (0) | **0 / 0** (0) |
+| `Lunge@0.7333` | 143 / 143 (2,050) | 719 / 3 (2,267) | **0 / 0** (0) | **0 / 0** (0) |
+| `Bite@0.1667` | 116 / 116 (2,080) | 647 / 0 (2,089) | **0 / 0** (0) | **0 / 0** (0) |
+| `Ability@0.3667` | 68 / 68 (1,614) | 308 / 113 (1,694) | **0 / 0** (1) | **0 / 0** (1) |
+| `Attack@0.4667` | 61 / 61 (1,540) | 286 / 106 (1,530) | **0 / 0** (2) | **0 / 0** (2) |
+| `Eat@0.4333` | 146 / 146 (2,036) | 750 / 0 (2,187) | **0 / 0** (0) | **0 / 0** (0) |
+| `Hit@0.3` | 64 / 64 (1,593) | 301 / 113 (1,550) | **0 / 0** (3) | **0 / 0** (3) |
+| `Stagger@0.6` | 76 / 76 (1,663) | 319 / 122 (1,568) | **0 / 0** (6) | **0 / 0** (6) |
+| `Death@2` | 55 / 55 (991) | 244 / 99 (1,217) | **0 / 0** (2) | **0 / 0** (2) |
+| `Grab@0.1` | 34 / 34 (1,069) | 63 / 49 (946) | **0 / 0** (5) | **0 / 0** (5) |
+| `Breath@1.3` | 0 / 0 (321) | 0 / 0 (215) | **0 / 0** (7) | **0 / 0** (7) |
+| `Breathe@1.6` | 16 / 16 (729) | 19 / 19 (627) | **0 / 0** (4) | **0 / 0** (4) |
+| `Guard@0.6` | 9 / 9 (519) | 9 / 9 (391) | **0 / 0** (11) | **0 / 0** (11) |
+| `Idle@1.5` | 0 / 0 (377) | 0 / 0 (256) | **0 / 0** (11) | **0 / 0** (11) |
+| `Sprint@0.7` | 0 / 0 (375) | 0 / 0 (280) | **0 / 0** (7) | **0 / 0** (7) |
+| `Swim@1.1` | 3 / 3 (370) | 3 / 3 (253) | **0 / 0** (12) | **0 / 0** (12) |
+
+| Shonisaurus | before, plain | before, as drawn | after, plain | after, as drawn |
+|---|---:|---:|---:|---:|
+| `Heavy@0.3333` | 1,671 / 1,671 (6,358) | 1,863 / 6 (3,035) | **0 / 0** (0) | **0 / 0** (0) |
+| `Attack@0.2333` | 1,305 / 1,305 (5,224) | 1,478 / 5 (2,579) | **0 / 0** (2) | **0 / 0** (2) |
+| `Bite@0.1667` | 248 / 248 (1,618) | 381 / 306 (1,163) | **0 / 0** (0) | **0 / 0** (0) |
+| `Eat@0.6` | 5 / 2 (287) | 13 / 9 (292) | **0 / 0** (0) | **0 / 0** (0) |
+
+**Plain and as drawn now agree count for count on every shot**, which is what they must do on a body
+the runtime hides nothing on. The residual *differing* pixels after (up to 12, on clips that barely
+move the jaw) are never backdrop in either pass — no pixel is opened — and are the two passes'
+sampling rather than a surface. The as-drawn *before* column reproduces the previous attempt's
+figures exactly (744/719/750/647/308/286/301/319/244/19 and 1,863/1,478/381/13), and adds `Grab`
+(63), which it had not shot.
 
 ### What else moved
 
 | | Cymbospondylus | Shonisaurus |
-| --- | --- | --- |
-| skin (`skin-tears.mjs`) | 2.48x → **5.22x** | 1.44x → **1.80x** |
-| mouth-region skin, `jaw` / `skull` | 1.15x / 1.15x → 4.86x / 5.22x | 1.00x / 1.00x → 1.80x / 1.65x |
-| `lag.mjs` seam | 146 rest-coincident pairs → **none, nothing is cut** | 67 → **none** |
-| jaw follows its bone | 1.00 / 1.00 / 1.00 / 1.00 → 1.00 / 1.00 / 1.00 / 0.97 | 0.98 / 0.99 / 0.99 / 0.95 → 0.96 / 0.99 / 0.99 / 0.93 |
-| authored triangles | 20,604 → 19,166 (the generation's own; the bisect's added edges are gone) | 116,392 → 116,064 (the web's 328) |
-| twin triangles | 7,986 → 6,600; fraction 38.76 % → 34.44 % | 9,496, unchanged |
-| oral meshes | 2 (web, authored + twin) → **0** | 1 (web) → **0** |
+|---|---|---|
+| skin (`skin-tears.mjs`, ranked on skin) | 2.48x → **2.48x** (same forelimb in `Death`) | 1.44x → **1.44x** |
+| mouth-region skin, `jaw` / `skull` | 1.15x / 1.15x → 1.61x / 1.58x | 1.00x / 1.00x → 1.16x / 1.00x |
+| jaw follows its bone, `Bite`/`Attack`/`Heavy`/`Eat` | 1.00 1.00 1.00 1.00 → 0.99 1.00 1.00 0.96 | 0.98 0.99 0.99 0.95 → 0.95 0.98 0.99 0.90 |
+| tooth row at `Bite` (front fifth over a rigid carry) | 1.000 → 1.000 | 1.000 → 1.000 |
+| `lag.mjs` seam | 146 rest-coincident pairs → **none: nothing is cut** | 67 → **none** |
+| twin skin | 2.47x (web hidden in play) → 12.63x (see above) | unchanged |
+| bind-pose skin moved | 0 (every vertex within 3e-8 of a body of the shipped one; only the bisect's extra vertices are gone) | at the corner, where `close_rest` now shuts it through a blended share (the sweep above) |
+| faces opposing their neighbours (`lip-audit.py`), bind / worst | — | 8 / 8 → 28 / 28 |
+| oral meshes | web on authored + twin → **none** | web → **none** |
 
-**The skin figures are not comparable to their own past, and that is the point.** Neither body's old
-number measured its mouth at all: Cymbospondylus' mouth was a cut and Shonisaurus' mandible was a
-separate mesh, so *no edge crossed the commissure* and the tool's own mouth-region readings were
-1.15x and 1.00x — a measurement about something else. Uncut, the commissure is skin and is measured
-for the first time, and on Cymbospondylus it is the worst edge on the animal. The 2.48x that figure
-replaces was a forelimb in `Death`, and that forelimb is untouched and still reads 2.48x.
+The mouth-region figures went *up* and that is the point: under a cut no edge crossed the commissure,
+so the 1.15x and 1.00x were measurements of nothing. Uncut the commissure is skin and is measured.
 
-### Does this overturn "neither"?
+### Judged by eye, not measured
 
-No, and it strengthens it. Both bodies' verdicts were that they need no lining, and they now need no
-*anything*: no palate, no floor, no sac, no hinge plug, no web. What closes these mouths is the
-mouths themselves. Shonisaurus' entry above stands exactly as written, and Cymbospondylus' correction
-in T3D-34 — that it had been believed to carry no lining while carrying a one-sac lining and a hinge
-ellipsoid — is now simply true of it.
-
-Sheets: `docs/triassic/verification/cymbospondylus-mouth-space.png`,
-`shonisaurus-mouth-space.png` (the shipped state, and there is no switched-on state any more) and
-`cymbospondylus-twin-mouth-space.png`.
+`docs/triassic/verification/{cymbospondylus,shonisaurus}-mouth-space.png` (at `Heavy`'s peak) and
+`cymbospondylus-twin-mouth-space.png`. Both authored mouths read as mouths — a pink modelled palate
+and floor with the tooth rows along them on Cymbospondylus, a dark cavity between the rostra on
+Shonisaurus — with no seam, plug or membrane in either. The twin reads as a closed head whose lower
+half has swung down under a stretched pale membrane: an honest LOD stand-in, not a mouth.
