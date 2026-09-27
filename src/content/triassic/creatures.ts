@@ -41,7 +41,7 @@ export const TRIASSIC_CREATURES: readonly CreatureDef[] = [
   },
   // ---------------------------------------------------------------- Rung IV · Giants
   {
-    id: 'cymbospondylus', name: 'Cymbospondylus', species: 'C. youngorum',
+    id: 'cymbospondylus', name: 'Cymbospondylus', fierce: true, species: 'C. youngorum',
     kind: 'Ichthyosaur', kindNote: 'The fish-shaped marine reptiles; this early one is long and eel-bodied, with a low tail fin rather than a crescent and a full row of conical teeth.',
     locality: 'Middle Triassic · Fossil Hill, Nevada',
     tagline: 'The first giant. Eight million years after the first ichthyosaur, and nothing alive was bigger.',
@@ -76,7 +76,7 @@ export const TRIASSIC_CREATURES: readonly CreatureDef[] = [
   },
   // ---------------------------------------------------------------- Rung III · Hunters
   {
-    id: 'nothosaurus', name: 'Nothosaurus', species: 'N. giganteus',
+    id: 'nothosaurus', name: 'Nothosaurus', fierce: true, species: 'N. giganteus',
     kind: 'Nothosaur', kindNote: 'A sauropterygian — the paddle-limbed reptile line that led to the plesiosaurs — with a long flat skull and interlocking fangs at the front, a fish trap.',
     locality: 'Middle Triassic · Muschelkalk and Monte San Giorgio',
     tagline: 'Rows along the sand until something moves. Then the other gear.',
@@ -93,7 +93,7 @@ export const TRIASSIC_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'helicoprion', name: 'Helicoprion', species: 'H. davisii (Permian relict)',
+    id: 'helicoprion', name: 'Helicoprion', fierce: true, species: 'H. davisii (Permian relict)',
     kind: 'Whorl-tooth fish', kindNote: 'A eugeneodont, a cartilaginous relative of the chimaeras with a spiral of teeth coiled inside the lower jaw. Permian, in truth — twenty million years before this sea, and here by licence.',
     locality: 'Early Permian · Phosphoria, Idaho — a relict',
     tagline: 'The last of something. The saw still turns.',
@@ -179,7 +179,7 @@ export const TRIASSIC_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'hybodus', name: 'Hybodus', species: 'Hybodus sp.',
+    id: 'hybodus', name: 'Hybodus', fierce: true, species: 'Hybodus sp.',
     kind: 'Hybodont shark', kindNote: 'A shark of the old line, with a stout ridged spine in front of each dorsal fin and, in the males, hooked spines behind the eyes.',
     locality: 'Middle Triassic · Muschelkalk',
     tagline: 'Bite it and see what the spines think of that.',
@@ -196,7 +196,7 @@ export const TRIASSIC_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'birgeria', name: 'Birgeria', species: 'B. stensioei',
+    id: 'birgeria', name: 'Birgeria', fierce: true, species: 'B. stensioei',
     kind: 'Ray-finned fish', kindNote: 'A big naked-bodied predatory fish with a very wide gape and fangs in three sizes: the tuna of the Triassic actinopterygians.',
     locality: 'Middle Triassic · Monte San Giorgio',
     tagline: 'Wide open. Whatever it was is inside now.',

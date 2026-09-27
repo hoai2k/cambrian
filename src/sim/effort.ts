@@ -19,3 +19,19 @@ export const PLANT_HEAL = 2;
 
 export const healRate = (a: Actor, mode: Mode) =>
   (a.controller === 'player' || a.controller === 'bot' ? HEAL_PLAYER : HEAL_WILD) * (mode === 'survival' ? SURVIVAL_HEAL : 1);
+
+/**
+ * A steered body's dash (a player's or a bot's) costs this many times its base price: doubled, so
+ * the dash is a decision rather than a way of getting about, and its invulnerability is paid for.
+ */
+export const DASH_STAMINA_MULT = 2;
+
+/**
+ * The sea's own animals get **one** escape, and it takes everything. A wild body may only dodge or
+ * dash on a bar at least this full, and doing it empties the bar — so it cannot chain escapes, and
+ * after the one it has it is spent and cannot sprint either until it has got its breath back.
+ */
+export const WILD_ESCAPE_READY = 0.95;
+export const steered = (a: Actor) => a.controller === 'player' || a.controller === 'bot';
+/** Whether a wild body has the escape in it right now. Steered bodies are priced per dash instead. */
+export const escapeReady = (a: Actor) => steered(a) || a.stamina >= a.staminaMax * WILD_ESCAPE_READY;

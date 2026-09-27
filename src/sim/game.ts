@@ -19,7 +19,7 @@ import { columnHolds, columnY, DIP_CHANCE, DRIFT_CURRENT, driftRise, flipLaunch,
 import { amphibious, ASHORE_WADE, ashoreInput, breathesAir, landSpeed, onFoot, stepBeach, wadeAt, WALL_EASE, WALL_WADE, type BeachContext } from './beach';
 import { TEXT } from '../shared/text';
 import { CAMBRIAN_LADDER, hitSeconds, HUNGER_DRAIN, hungerWorth, STARVE_TIME, SURVIVAL_DEATH_COST, SURVIVAL_TOP_SECONDS } from './survival';
-import { healRate, PLANT_HEAL } from './effort';
+import { DASH_STAMINA_MULT, escapeReady, healRate, PLANT_HEAL, steered } from './effort';
 
 /** Everything the simulation says out loud; the words are in `src/content/strings.ts`. */
 const SAY = TEXT.sim;
@@ -725,9 +725,14 @@ export class Game implements AiWorld {
     const L = lengthOf(p);
     const def = creature(p.creature);
     const crawlers = WILD_IDS.filter((id) => creature(id).ground);
-    const pool = def.ground
+    // Never a school of an animal somebody is playing. Nothing hunts its own kind as its staple, and
+    // the pool is a handful of species, so a player met shoals of themselves about one time in
+    // three. A kind is only held back while there is something else to draw.
+    const played = this.playedKinds();
+    const others = (ids: CreatureId[]) => { const o = ids.filter((id) => !played.has(id)); return o.length ? o : ids; };
+    const pool = others(def.ground
       ? (this.rng() < 0.8 && crawlers.length ? crawlers : WILD_IDS.slice())
-      : WILD_IDS.filter((id) => !creature(id).ground);
+      : WILD_IDS.filter((id) => !creature(id).ground));
     const c = pool[Math.floor(this.rng() * pool.length)];
     const cd = creature(c);
     const ratio = 0.28 + this.rng() * 0.32;            // snack to small prey relative to the player
@@ -754,7 +759,20 @@ export class Game implements AiWorld {
     return p;
   }
 
+  /** The kinds the players are, so the sea does not fill their water with shoals of themselves. */
+  private playedKinds(): Set<CreatureId> {
+    return new Set(this.players.map((p) => p.creature));
+  }
+
   private spawnSchool(c: CreatureId, s: number, count: number, i: number) {
+    // The era's snack schools cover most of its roster, and the first eight are laid round the
+    // nurseries a player hatches in — so a hatchling came out of its egg into a shoal of its own
+    // species about half the time. A school of a played kind gives its place to one that is not.
+    const played = this.playedKinds();
+    if (played.has(c)) {
+      const alt = SNACK_SCHOOLS.filter((o) => !played.has(o.creature));
+      if (alt.length) { const o = alt[i % alt.length]; c = o.creature; s = o.scale; count = o.count; }
+    }
     const def = creature(c);
     const anchor = this.randomAnchor();
     let home: Vec3;
@@ -1936,7 +1954,7 @@ export class Game implements AiWorld {
       // left of it after the relief, and an empty bar does not refuse it — the body just goes up
       // rather than along (see `startDash`). There is always a way back to the surface.
       // Not on the sand: a stranded body's dash is its flop, and a walker has no water to dash through.
-      else if (justDash && !a.ashore && (a.stamina >= 10 || freeClimb) && (a.exhausted === 0 || freeClimb) && a.dashCd === 0 && !a.dashUsed) {
+      else if (justDash && !a.ashore && (a.stamina >= 10 || freeClimb) && (a.exhausted === 0 || freeClimb) && a.dashCd === 0 && !a.dashUsed && escapeReady(a)) {
         a.dashUsed = true;
         this.startDash(a, def, mag > 0.3 ? dir : vscale(heading(a.yaw), jets || def.tailFlip ? -1 : 1), L, sf, relief);
       }
@@ -2364,6 +2382,8 @@ export class Game implements AiWorld {
   }
 
   private startDodge(a: Actor, def: ReturnType<typeof creature>, dir: Vec3, mag: number, L: number, sf: number) {
+    // A wild animal has one escape in it, and only on a near-full bar (`WILD_ESCAPE_READY`).
+    if (!escapeReady(a)) return;
     // An animal that escapes by flipping its tail has only that one evasion, whichever button asked.
     if (def.tailFlip) { this.startDash(a, def, mag > 0.2 ? dir : vscale(heading(a.yaw), -1), L, sf); return; }
     const retreat = a.dodgeTapT > 0;
@@ -2373,6 +2393,7 @@ export class Game implements AiWorld {
     a.state = 'dodge'; a.stateT = 0; a.stateDur = retreat ? 0.5 : 0.32;
     a.iframes = retreat ? 0 : 0.28;
     a.stamina -= retreat ? 14 : 10;
+    if (!steered(a)) a.stamina = 0;   // the one escape a wild animal gets takes everything it has
     const power = (retreat ? 9 : 7.5) * Math.sqrt(sf) * (def.id === 'waptia' ? 1.25 : 1);
     a.vel.x = d.x * power; a.vel.y = def.ground ? a.vel.y : d.y * power * 0.7; a.vel.z = d.z * power;
     a.dodgeDir = d; a.dodgeTapT = retreat ? 0 : 0.35;
@@ -2751,7 +2772,7 @@ export class Game implements AiWorld {
     // A body dashing on nothing but free climb gets the climb and not the ground: the horizontal
     // half of the burst is what the stamina was for, and it has none. A flip is the exception —
     // the reflex fires whatever is left, it just fires weakly (`flipLaunch`).
-    const cost = (flip ? FLIP_STAMINA : 12) * (1 - relief);
+    const cost = (flip ? FLIP_STAMINA : 12) * (1 - relief) * (steered(a) ? DASH_STAMINA_MULT : 1);
     const empty = a.stamina < cost;
     // Priced by how far it is actually taken: the tap's share now, the rest billed per second for
     // as long as the button is held (`stepActions`). A flip is not a held move — the reflex fires
@@ -2759,6 +2780,8 @@ export class Game implements AiWorld {
     a.dashCost = flip ? 0 : cost;
     const upFront = flip ? cost : cost * (DASH_TAP / (flip ? 0.5 : 0.42));
     a.iframes = flip ? 0.5 : 0.42; a.stamina = Math.max(0, a.stamina - upFront); a.dashCd = flip ? 0.7 : 0.55;
+    // A wild animal's one escape takes everything it has (`WILD_ESCAPE_READY`).
+    if (!steered(a)) { a.stamina = 0; a.dashCost = 0; }
     // A punt needs the floor under it; out in the water there is nothing to push off.
     const gap = a.pos.y - groundHeight(this.world, a.pos.x, a.pos.z, []);   // own scratch: called mid-update
     const power = flip ? flipLaunch(a) : (L * 9.5 + 7) * (def.id === 'waptia' ? 1.2 : 1) * punting(a, gap);

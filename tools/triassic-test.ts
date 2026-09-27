@@ -932,5 +932,17 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
   ok(worst <= 1.001, `every ambient body fits the water it was put in (worst ${worst.toFixed(2)}: ${worstId})`);
 }
 
+// --- schools: who stands and fights something bigger, and no shoals of the player's own kind ---
+{
+  const { fierceSpecies } = await import('../src/sim/ai');
+  for (const id of ['cymbospondylus', 'helicoprion', 'hybodus', 'birgeria', 'nothosaurus']) ok(fierceSpecies({ creature: id } as never), `${id} is fierce: its school turns on something bigger`);
+  for (const id of ['shonisaurus', 'dinocephalosaurus', 'keichousaurus']) ok(!fierceSpecies({ creature: id } as never), `${id} is not: it runs from something bigger`);
+  const g = new Game('rise', [{ creature: 'keichousaurus', device: 'keyboard', ready: true }], 12);
+  g.skipHatch();
+  for (let i = 0; i < 60 * 10; i++) { g.step(1 / 60, new Map()); g.events.length = 0; }
+  const own = g.actors.filter((a) => a.controller === 'swarm' && a.creature === 'keichousaurus').length;
+  ok(own === 0, `no school of keichousaurus in a sea a keichousaurus is playing in (${own})`);
+}
+
 console.log(`\nall ${passes} Triassic checks passed`);
 void CREATURES; void biomeAt; void nurseryAt;

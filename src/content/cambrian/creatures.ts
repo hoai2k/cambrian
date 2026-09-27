@@ -18,7 +18,7 @@ const heavy = (name: string, o: Partial<MoveDef> = {}): MoveDef => ({
 export const CAMBRIAN_CREATURES: readonly CreatureDef[] = [
   {
     // No kind: "radiodont" is the group, and far fewer people have met the word than the animal.
-    id: 'anomalocaris', name: 'Anomalocaris', species: 'A. canadensis',
+    id: 'anomalocaris', name: 'Anomalocaris', fierce: true, species: 'A. canadensis',
     grasp: true,
     tagline: 'The reef’s original nightmare. Grab it. Crush it. Keep swimming.',
     role: 'Pursuit predator', ground: false, adultLength: 3.9,
@@ -132,7 +132,7 @@ export const CAMBRIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'olenoides', name: 'Olenoides', species: 'O. serratus',
+    id: 'olenoides', name: 'Olenoides', fierce: true, species: 'O. serratus',
     kind: 'Trilobite', kindNote: 'The three-lobed armoured arthropods that crawled the sea floor for 270 million years and are the classic fossil of the Palaeozoic.',
     tagline: 'Armor, momentum, and a very bad attitude.',
     role: 'Bruiser', weedWalk: true, ground: true, adultLength: 3.0,

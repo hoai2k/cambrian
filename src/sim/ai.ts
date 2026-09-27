@@ -129,14 +129,63 @@ function bestDetected(b: BrainState, threshold: number, g: AiWorld): Actor | und
   return best;
 }
 
+/** Something this many times a schooling fish's length is run from by all of it, whatever its temper. */
+export const SCHOOL_OUTMATCHED = 1.8;
+/** How long a school goes on answering a bite: long enough to be seen to, short enough to reform. */
+export const SCHOOL_ALARM = 3;
+/** The temper a social fish needs to join a mob on a schoolmate's behalf: most of the school. */
+export const MOB_JOIN = 0.25;
+
+/** Whether a school of this animal stands together (see `social` on the creature card). */
+export function socialSchool(a: Actor): boolean {
+  const def = creature(a.creature);
+  if (def.social !== undefined) return def.social;
+  return !!(def.shoals || def.pod || (!def.diet && !def.noBite));
+}
+
+/** Whether this species turns on things bigger than itself (see `fierce` on the creature card). */
+export function fierceSpecies(a: Actor): boolean {
+  const def = creature(a.creature);
+  return !!def.fierce;
+}
+
+/**
+ * The temper a schooling fish needs to turn on what is attacking it, or `Infinity` where nothing
+ * would. `ratio` is the attacker's length over the fish's. Against something its own size or
+ * smaller most fish will: the bitten one unless it is timid, and a social school mobs. Against
+ * something bigger, only a fierce species stands, and even then it takes a bold one; everything
+ * else runs. Nothing faces a body twice its length.
+ */
+export function boldness(ratio: number, social: boolean, fierce: boolean, bitten: boolean): number {
+  if (ratio >= SCHOOL_OUTMATCHED) return Infinity;
+  if (ratio > 1.05) return fierce ? (bitten ? 0.45 : social ? 0.6 : Infinity) : Infinity;
+  if (bitten) return social ? 0.15 : 0.35;
+  return social ? MOB_JOIN : Infinity;
+}
+
+/**
+ * The attack a schooling fish is answering, if any: a bite on itself, or on a schoolmate within
+ * reach of it, in the last `SCHOOL_ALARM` seconds. `me` says which, because the bitten fish decides
+ * on its own temper and its schoolmates on the school's.
+ */
+function schoolAttack(g: AiWorld, a: Actor, b: BrainState, mateBitBy: number): { by: Actor; me: boolean } | undefined {
+  const outsider = (id: number) => { const by = id >= 0 ? g.byId(id) : undefined; return by && isAlive(by) && by.brain?.schoolId !== b.schoolId ? by : undefined; };
+  const mine = a.sinceHit < SCHOOL_ALARM ? outsider(a.lastHitBy) : undefined;
+  if (mine) return { by: mine, me: true };
+  const theirs = outsider(mateBitBy);
+  return theirs ? { by: theirs, me: false } : undefined;
+}
+
 export function thinkSwarm(g: AiWorld, a: Actor, b: BrainState, dt: number): InputFrame {
   const out = emptyInput();
   const L = lengthOf(a);
   const cohesion = v3(), align = v3(), sep = v3(), flee = v3();
-  let n = 0, threat = 0;
+  let n = 0, threat = 0, mateBitBy = -1;
   for (const o of g.nearby(a.pos, 6 + L * 8)) {
     if (o.id === a.id || !isAlive(o)) continue;
     if (o.brain?.schoolId === b.schoolId) {
+      // A schoolmate bitten a moment ago: the school answers the thing that bit it (below).
+      if (mateBitBy < 0 && o.sinceHit < SCHOOL_ALARM && o.lastHitBy >= 0) mateBitBy = o.lastHitBy;
       const d = dist(a.pos, o.pos);
       cohesion.x += o.pos.x; cohesion.y += o.pos.y; cohesion.z += o.pos.z;
       align.x += o.vel.x; align.y += o.vel.y; align.z += o.vel.z; n++;
@@ -151,15 +200,29 @@ export function thinkSwarm(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       }
     }
   }
-  // Something has just bitten it. A school does not fight back, but it does not carry on schooling
-  // either: whatever the size of the thing, being bitten scatters the fish away from it at once.
-  // The alarm above only sees bodies nearly twice their length, so a predator their own size — a
-  // hatchling player, most often — could eat through a school without any of it reacting.
-  const biter = a.sinceHit < 1.5 && a.lastHitBy >= 0 ? g.byId(a.lastHitBy) : undefined;
-  if (biter && isAlive(biter)) {
-    const d = Math.max(dist(a.pos, biter.pos), 1e-3);
+  // Something bit this fish, or a fish beside it. The alarm above only sees bodies nearly twice
+  // their length, so a predator their own size — a hatchling player, most often — could eat
+  // through a school without any of it reacting. What a school does about an attacker its own size
+  // or bigger is the animal's temperament and its species' way of living: a bold fish breaks ranks
+  // and fights, a timid one runs, and its schoolmates either mob the attacker (a social species)
+  // or scatter (one that is not). Something twice their size is only ever run from.
+  const attack = schoolAttack(g, a, b, mateBitBy);
+  if (attack) {
+    const { by, me } = attack;
+    const ratio = lengthOf(by) / Math.max(L, 1e-3);
+    const social = socialSchool(a);
+    const fights = b.aggression >= boldness(ratio, social, fierceSpecies(a), me);
+    if (fights) {
+      // Out of the school and into the fight: from here it is an animal with a grudge, and the
+      // ordinary brain already knows how to answer a biter, when to give up and when it is cornered.
+      b.kind = 'needs'; b.goal = 'fight'; b.target = by.id; b.goalT = 0; b.cached = undefined;
+      // A fish joining the mob carries the same grudge the bitten one does, for as long.
+      if (!me) { a.lastHitBy = by.id; a.sinceHit = 0; }
+      return thinkNeeds(g, a, b, dt);
+    }
+    const d = Math.max(dist(a.pos, by.pos), 1e-3);
     const k = 6 / d;
-    flee.x += (a.pos.x - biter.pos.x) * k; flee.y += (a.pos.y - biter.pos.y) * k * 0.5; flee.z += (a.pos.z - biter.pos.z) * k;
+    flee.x += (a.pos.x - by.pos.x) * k; flee.y += (a.pos.y - by.pos.y) * k * 0.5; flee.z += (a.pos.z - by.pos.z) * k;
     threat = 1;
   }
   const move = v3();

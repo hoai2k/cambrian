@@ -1506,6 +1506,35 @@ unless the user explicitly asks for a PR. Steps:
   fifths of its *length* (`mouthReach` in `actors.ts`): the old sphere was a head on a shark and
   half a neck on a plesiosaur, so a long-necked swimmer bit things a body width from its jaws and
   a big animal bit a whole shoal at once.
+- **A school answers an attack by who made it, and nobody shoals with their own kind.** The era's
+  snack schools cover most of its roster and the first eight are laid round the nurseries a player
+  hatches in, and `spawnPreyFor` drew from every wild species — so a hatchling came out of its egg
+  into a school of its *own* species 22 starts in 54. `spawnSchool` and `spawnPreyFor` both skip a
+  kind a player is playing (`playedKinds`), falling back only when nothing else is left; individual
+  animals of your kind still turn up in the sea as rivals, which is what they are.
+  A school used to answer only things **1.8× its length** (`SCHOOL_OUTMATCHED`), so a hatchling its
+  own size could eat through one untouched and the bitten fish slipped back into the school a moment
+  later. Now a bite on a fish or a schoolmate within reach raises `SCHOOL_ALARM` seconds of answer,
+  decided by `boldness` in `src/sim/ai.ts` against the brain's rolled `aggression`: against
+  something its **own size or smaller** the bitten fish fights unless timid, and a **social** school
+  (`social` on the card; default: predators, shoalers and pod animals mob, grazers, filter feeders
+  and scavengers scatter) mobs the biter; against something **bigger** only a **fierce** species
+  stands (`fierce`, set by hand on the card in every era rather than read off a rule, because a
+  rung-4 giant is not necessarily a fighter: the Cambrian's Anomalocaris, Olenoides, Sidneyia and
+  Isoxys; the Devonian's Dunkleosteus, Cladoselache, Stethacanthus, Onychodus, Jaekelopterus and
+  Coccosteus; the Triassic's Cymbospondylus, Helicoprion, Hybodus, Birgeria and Nothosaurus);
+  nothing faces twice its length. A fish that
+  fights breaks ranks for good — its brain becomes an ordinary `needs` brain with the biter as its
+  target, which already knows when to give up and when it is cornered — and a schoolmate that joins
+  carries the same four-second grudge the bitten one does. The schoolmate check rides in the loop
+  the boids already walk, because a second `nearby` query per fish per think is two hundred of
+  them twelve times a second. `npm run reactions` holds all of it.
+- **A dash is priced for players and rationed for wildlife** (`src/sim/effort.ts`). A steered
+  body's dash costs `DASH_STAMINA_MULT` (2) times its base. A wild animal gets **one** escape — its
+  dodge, or a tail-flip — only on a bar at least `WILD_ESCAPE_READY` full, and it empties the bar,
+  so it cannot chain escapes and cannot sprint away afterwards until it has its breath back. The
+  gate is inside `startDodge` rather than at its callers, because four paths reach it.
+  `npm run locomotion` holds both.
 - What lives where is the place's own business, not the player's: `src/sim/population.ts` gives every
   210-unit area a size profile and a density from a hash bent by the biome (hatcheries inshore, grown
   animals in the deep), pure in the place and the world seed so an area is the same when you return.
