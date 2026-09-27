@@ -22,7 +22,7 @@
   --ink-2: #5c4631;
   --ink-3: #85694a;
   --rule: rgba(52, 38, 26, .55);
-  --accent: #9a2e1c; /* red ink: the seal, the chosen figure, the underline of the chosen mode */
+  --accent: #9a2e1c; /* red ink: the chosen mode, the role line, the ribbon. A seat's own things — its figure's frame and its seal — are in its colour (--pc). */
   --serif: 'IM Fell English', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
   --serif-sc: 'IM Fell English SC', 'IM Fell English', Georgia, serif;
   color: var(--ink-1);
@@ -63,7 +63,7 @@
 
 /* ---- the index: each animal a numbered figure in an oval frame ---- */
 .select.plate .cell {
-  --pc: color-mix(in oklch, var(--c), var(--ink-1) 45%);
+  --pc: color-mix(in oklch, var(--c), var(--ink-1) 32%);
   border: 0; border-radius: 6px; background: none; overflow: visible;
   padding: 16px 4px 2px;
 }
@@ -79,23 +79,23 @@
 .select.plate .cell:hover { transform: translateY(-2px); }
 .select.plate .cell:hover img { border-color: var(--ink-1); }
 .select.plate .cell.hover { background: none; }
-.select.plate .cell.hover img { border-color: var(--accent); filter: sepia(.1) saturate(.95); transform: scale(1.04); box-shadow: 0 0 0 3px rgba(154, 46, 28, .16); }
-.select.plate .cell.hover .cell-name { color: var(--accent); }
+.select.plate .cell.hover img { border: 4px double var(--pc); filter: sepia(.1) saturate(.95); transform: scale(1.04); box-shadow: 0 0 0 3px color-mix(in oklch, var(--pc), transparent 72%); }
+.select.plate .cell.hover .cell-name { color: color-mix(in oklch, var(--pc), var(--ink-1) 38%); }
 .select.plate .cell.hover .cell-kind { color: var(--ink-2); }
 .select.plate .cell-rings .ring { inset: calc(-4px - var(--k) * 4px); border-radius: 10px; border: 1.5px solid var(--pc, var(--c)); box-shadow: none; }
-.select.plate .cell-rings .ring { border-color: color-mix(in oklch, var(--c), var(--ink-1) 45%); }
+.select.plate .cell-rings .ring { border-color: color-mix(in oklch, var(--c), var(--ink-1) 32%); }
 .select.plate .cell-rings .ring.locked { border-width: 2.5px; border-style: double; border-width: 4px; }
 .select.plate .lock-badge { top: 12px; right: -2px; font: 400 12px var(--serif-sc); letter-spacing: .04em; padding: 1px 7px 2px; border-radius: 2px; color: #f3e5c6; background: var(--ink-1) !important; /* the seat's own colour is on the ring; on paper the tag is ink */ transform: rotate(4deg); }
 .select.plate .cell.extra { background: none; border: 1px dashed var(--ink-3); border-radius: 50%; aspect-ratio: 4 / 3; padding: 0; align-self: center; }
 .select.plate .cell.extra .extra-glyph { font: 400 2em var(--serif); color: var(--ink-2); }
 .select.plate .cell.extra .extra-name { font: 400 .95em var(--serif-sc); letter-spacing: .06em; text-transform: none; color: var(--ink-2); }
-.select.plate .cell.extra.hover { border-style: solid; border-color: var(--accent); }
-.select.plate .cell.extra.hover .extra-glyph, .select.plate .cell.extra.hover .extra-name { color: var(--accent); }
+.select.plate .cell.extra.hover { border-style: solid; border-color: var(--pc); border-width: 2px; }
+.select.plate .cell.extra.hover .extra-glyph, .select.plate .cell.extra.hover .extra-name { color: var(--pc); }
 .select.plate .cell.extra .extra-count { color: var(--ink-2); }
 
 /* ---- the plate: the chosen animal, framed in a double rule, headed with its figure number ---- */
 .select.plate .crew-card {
-  --pc: color-mix(in oklch, var(--player), var(--ink-1) 42%);
+  --pc: color-mix(in oklch, var(--player), var(--ink-1) 32%);
   border-radius: 2px; background: rgba(255, 248, 226, .28); backdrop-filter: none;
   border: 1px solid var(--ink-2); outline: 1px solid var(--ink-2); outline-offset: -7px;
   box-shadow: 0 1px 0 rgba(255, 250, 235, .6) inset, 0 10px 30px rgba(52, 38, 26, .18);
@@ -140,12 +140,13 @@
 .select.plate .ready-button {
   border-radius: 50%; aspect-ratio: 1; width: clamp(92px, 26cqw, 124px); max-width: none; padding: 10px; justify-self: end;
   border: 0; color: #f7e3c4; font: 400 15px/1.08 var(--serif-sc); letter-spacing: .04em;
-  background: radial-gradient(circle at 36% 32%, color-mix(in oklch, var(--accent), #fff 18%), var(--accent) 62%, color-mix(in oklch, var(--accent), #000 35%));
-  box-shadow: 0 0 0 4px color-mix(in oklch, var(--accent), transparent 78%), 0 3px 0 color-mix(in oklch, var(--accent), #000 45%), 0 8px 18px rgba(52, 26, 10, .35);
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, .35);
+  background: radial-gradient(circle at 36% 32%, color-mix(in oklch, var(--pc), #fff 18%), var(--pc) 62%, color-mix(in oklch, var(--pc), #000 35%));
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--pc), transparent 78%), 0 3px 0 color-mix(in oklch, var(--pc), #000 45%), 0 8px 18px rgba(52, 26, 10, .35);
+  text-shadow: 0 1px 2px rgba(20, 12, 4, .55), 0 0 1px rgba(20, 12, 4, .6); /* pale player colours still carry the lettering */
 }
 .select.plate .ready-button:hover { transform: rotate(-4deg) scale(1.03); }
-.select.plate .ready-button[aria-pressed='true'] { background: radial-gradient(circle at 36% 32%, color-mix(in oklch, var(--pc), #fff 12%), var(--pc) 62%, color-mix(in oklch, var(--pc), #000 35%)); color: #f7ecd6; transform: rotate(-8deg); box-shadow: 0 0 0 4px color-mix(in oklch, var(--pc), transparent 75%), 0 2px 0 color-mix(in oklch, var(--pc), #000 45%), 0 5px 10px rgba(52, 26, 10, .3); }
+/* Pressed, the seal is the same seat's colour set deeper and struck at an angle: locked reads as done, and still says whose. */
+.select.plate .ready-button[aria-pressed='true'] { --pd: color-mix(in oklch, var(--pc), #000 24%); background: radial-gradient(circle at 36% 32%, color-mix(in oklch, var(--pd), #fff 10%), var(--pd) 62%, color-mix(in oklch, var(--pd), #000 35%)); color: #f7ecd6; transform: rotate(-8deg); box-shadow: 0 0 0 4px color-mix(in oklch, var(--pc), transparent 60%), 0 2px 0 color-mix(in oklch, var(--pd), #000 45%), 0 5px 10px rgba(52, 26, 10, .3); }
 .select.plate .crew-2 .ready-button, .select.plate .crew.compact .ready-button {
   aspect-ratio: auto; width: auto; justify-self: stretch; border-radius: 3px; padding: 8px 12px; font-size: 15px;
 }
@@ -188,8 +189,8 @@
 /* On a phone every card is the whole screen's subject, so the seal keeps its round shape there. */
 .select.plate.select-carousel .ready-button { width: clamp(84px, 24cqw, 112px); font-size: 14px; }
 /* A stamp across the card's width is flat ink; the seal's highlight only reads on a round one. */
-.select.plate .crew-2 .ready-button, .select.plate .crew.compact .ready-button { background: var(--accent); box-shadow: 0 2px 0 color-mix(in oklch, var(--accent), #000 45%); }
-.select.plate .crew-2 .ready-button[aria-pressed='true'], .select.plate .crew.compact .ready-button[aria-pressed='true'] { background: var(--pc); box-shadow: 0 2px 0 color-mix(in oklch, var(--pc), #000 45%); }
+.select.plate .crew-2 .ready-button, .select.plate .crew.compact .ready-button { background: var(--pc); box-shadow: 0 2px 0 color-mix(in oklch, var(--pc), #000 45%); }
+.select.plate .crew-2 .ready-button[aria-pressed='true'], .select.plate .crew.compact .ready-button[aria-pressed='true'] { background: color-mix(in oklch, var(--pc), #000 24%); box-shadow: 0 0 0 3px color-mix(in oklch, var(--pc), transparent 60%), 0 2px 0 color-mix(in oklch, var(--pc), #000 50%); }
 .select.plate .start-button { white-space: nowrap; }
 @media (max-width: 759px), (max-height: 539px) {
   .select.plate .start-button { font-size: 16px; letter-spacing: .1em; padding: 10px 26px 11px; }
@@ -229,17 +230,19 @@
     linear-gradient(#d8c290, #c5ab74);
   border-top: 1px solid var(--ink-2);
 }
-.select.plate .depth-spot { color: var(--ink-1); --pc: color-mix(in oklch, var(--c), var(--ink-1) 45%); }
+.select.plate .depth-spot { color: var(--ink-1); --pc: color-mix(in oklch, var(--c), var(--ink-1) 32%); }
 .select.plate .depth-spot img { filter: sepia(.25) saturate(.9) drop-shadow(0 4px 5px rgba(40, 30, 18, .3)); }
 .select.plate .depth-name { font: italic 15px/20px var(--serif); }
-.select.plate .depth-spot.hover .depth-name { color: var(--accent); }
-.select.plate .depth-spot.hover img { filter: sepia(.05) drop-shadow(0 0 1px var(--accent)) drop-shadow(0 6px 8px rgba(40, 30, 18, .35)); }
-.select.plate .depth-spot .cell-rings .ring { inset: calc(-4px - var(--k) * 4px); border-radius: 50%; border: 1.5px solid color-mix(in oklch, var(--c), var(--ink-1) 45%); box-shadow: none; }
+.select.plate .depth-spot.hover .depth-name { color: color-mix(in oklch, var(--pc), var(--ink-1) 38%); }
+.select.plate .depth-spot.hover img { filter: sepia(.05) drop-shadow(0 0 2px var(--pc)) drop-shadow(0 6px 8px rgba(40, 30, 18, .35)); }
+.select.plate .depth-spot .cell-rings .ring { inset: calc(-4px - var(--k) * 4px); border-radius: 50%; border: 1.5px solid color-mix(in oklch, var(--c), var(--ink-1) 32%); box-shadow: none; }
 .select.plate .depth-spot .cell-rings .ring.locked { border-style: double; border-width: 4px; }
 .select.plate .depth-spot .lock-badge { top: 4px; right: 4px; }
 .select.plate .depth-spot.extra { border: 1px dashed var(--ink-3); background: rgba(255, 248, 226, .25); }
 .select.plate .depth-spot.extra .extra-glyph { font: 400 2em var(--serif); color: var(--ink-2); }
 .select.plate .depth-spot.extra .depth-name { font: 400 14px var(--serif-sc); font-style: normal; }
-.select.plate .depth-spot.extra.hover { border-style: solid; border-color: var(--accent); }
+.select.plate .depth-spot.extra.hover { border-style: solid; border-color: var(--pc); border-width: 2px; }
 /* A small animal's name is wider than its picture; it hangs out either side rather than being cut. */
 .select.plate .depth-name, .depth-name { overflow: visible; text-overflow: clip; justify-self: center; width: max-content; max-width: 150px; }
+/* The same shade under the lettering of a stamp, which is flat and has no highlight to lean on. */
+.select.plate .crew-2 .ready-button, .select.plate .crew.compact .ready-button { text-shadow: 0 1px 2px rgba(20, 12, 4, .55); }
