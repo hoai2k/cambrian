@@ -104,6 +104,12 @@ export class GameAudio {
   private tension = 0;
   private started = false;
   private ambientStarted = false;
+  /**
+   * Whether the water should be heard. The title and the choice screen are paper now, not the sea,
+   * so the reef bed waits for a match: it loads with everything else, and only starts (or comes back
+   * up) once `setWater(true)` says the player is in the water.
+   */
+  private waterOn = false;
   private lastPlay = new Map<string, { t: number; vol: number }>();
   volume = 0.8;
   muted = false;
@@ -374,11 +380,21 @@ export class GameAudio {
     src.connect(dest); src.start(0, 0.05);
   }
   private startAmbient() {
-    if (this.ambientStarted || !this.ctx || !this.ambGain) return;
+    if (this.ambientStarted || !this.waterOn || !this.ctx || !this.ambGain) return;
     this.ambientStarted = true;
     this.startLoop(loops().ambient, this.ambGain);
     const t = this.ctx.currentTime;
     this.ambGain.gain.linearRampToValueAtTime(0.55, t + 2.5);
+  }
+  /** In the water or out of it: starts the reef bed on the first match and fades it on the menus. */
+  setWater(on: boolean) {
+    this.waterOn = on;
+    if (!this.ctx || !this.ambGain || !this.ambience) return;
+    if (on && !this.ambientStarted) { if (this.buffers.has(loops().ambient)) this.startAmbient(); return; }
+    const t = this.ctx.currentTime;
+    this.ambGain.gain.cancelScheduledValues(t);
+    this.ambGain.gain.setValueAtTime(this.ambGain.gain.value, t);
+    this.ambGain.gain.linearRampToValueAtTime(on ? 0.55 : 0, t + (on ? 2.5 : 0.8));
   }
   private startDrone() { if (this.tensionGain) this.startLoop(loops().drone, this.tensionGain); }
 
