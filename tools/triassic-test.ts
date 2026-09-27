@@ -47,7 +47,7 @@ const SHORE = TRIASSIC.creatures.filter((c) => c.shore);
 const SHELVED = TRIASSIC.creatures.filter((c) => c.shelved);
 const NPCS = TRIASSIC.creatures.filter((c) => c.npc && !c.shore && !c.shelved);
 ok(TRIASSIC.creatures.length === 25, 'the roster entry is kept for every subject, offered or not');
-ok(SHORE.length === 4 && SHELVED.length === 2 && NPCS.length === 1, `four on the beach, ${SHELVED.length} shelved, ${NPCS.length} in the water and off the menu`);
+ok(SHORE.length === 4 && SHELVED.length === 1 && NPCS.length === 2, `four on the beach, ${SHELVED.length} shelved, ${NPCS.length} in the water and off the menu`);
 ok(PLAYABLE.length === TRIASSIC.creatures.length - SHORE.length - SHELVED.length - NPCS.length,
   `exactly the ${PLAYABLE.length} offered swimmers are pickable`);
 ok(PLAYABLE.every((c) => !c.shore && !c.npc && !c.shelved), 'and none of the three kept-back kinds is');

@@ -105,7 +105,7 @@ try {
   assert.deepEqual(errors, [], 'no page errors');
   if (offsite.length) console.log(`note: ${offsite.length} off-site request(s) failed (no route out of the container): ${offsite.join(', ')}`);
   console.log('PASS: viewer roster sections in a browser — Visitors/NPCs/Unfinished appear in order in the Triassic list, '
-    + 'no heading is focusable or clickable, Mosasaurus/Archelon/Cartorhynchus/the shore animals/the shelved pair all sit '
+    + 'no heading is focusable or clickable, Mosasaurus/Archelon/Cartorhynchus/the shore animals/the shelved body all sit '
     + 'under the right one, a creature filed under a heading still opens on a click, and a props collection carries none. '
     + `Screenshot in ${out}`);
 } finally { await browser.close(); }
