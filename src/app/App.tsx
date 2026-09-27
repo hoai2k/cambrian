@@ -183,6 +183,9 @@ export function App() {
   const padCount = padIndices.length;
   /** How much room this window has, and whether a finger is what is working it. */
   const small = useSmallScreen(padCount);
+  // The reef bed is the sea's sound, and only a match shows the sea: the title and the choice
+  // screen are paper, so the water is heard from the dive in and fades when the menus return.
+  useEffect(() => { audio.setWater(screen === 'playing' || screen === 'results'); }, [screen]);
   const orientationBlocked = small.rotate && screen === 'playing' && !paused && dialog === null;
   /**
    * Which device the one local seat joins on.
