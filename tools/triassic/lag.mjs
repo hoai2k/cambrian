@@ -40,6 +40,18 @@
  * and nothing else in the toolset reports it. The corner of the mouth is one vertex on both, so a
  * point or two parting there is the lip; a cut that opens opens along its length.
  *
+ * **Where a builder cut on a reviewer's aimed plane, the cut is that plane's hinge wall.** A mouth
+ * file from the viewer's mouth editor (`docs/triassic/mouths/`) is two half-spaces, and a builder
+ * that consumed one (its `validation.json` names the file under `mouth.aimedCut` and does not say
+ * `consumed: false`) cut its hinge wall exactly on the document's plane through the hinge, square
+ * to the document's `forward` -- in the file's own frame, which is the frame this tool measures in.
+ * The station rule above cannot read such a wall once it is yawed or pitched: Cartorhynchus' wall,
+ * pitched 15.4 deg, slants forward as it goes down and the rule took 3 of its 51 wall pairs for the
+ * cut; Aphaneramma's, yawed 17.5 deg, leans back across one cheek and the rule took the corner of
+ * the lip on that flank for the cut and failed a closed junction on the gape. So there the cut is
+ * the pairs *on that wall* -- within the same hair of tolerance, and on the mandible's side of the
+ * mouth plane -- which is the builder's own word for which points are the junction (`rear`).
+ *
  * The oral lining, tooth rows, eyes and hinge tissue are left out of all of it (matched by the
  * pattern `src/shared/oral-geometry.ts` uses, plus eyes and teeth): they are rigid shells hidden
  * in play, and a floor that rides the jaw next to a palate that rides the skull is not a lag.
@@ -52,6 +64,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'meshoptimizer';
 import fs from 'node:fs';
+import path from 'node:path';
 
 await MeshoptDecoder.ready;
 globalThis.self = globalThis;
@@ -88,6 +101,20 @@ const DIR = 'public/assets/triassic/creatures';
 const targets = ALL
   ? JSON.parse(fs.readFileSync('tools/triassic/shipped.json', 'utf8')).creatures.map((id) => `${DIR}/${id}.glb`)
   : files;
+
+/** The hinge wall a builder cut on, where it consumed an aimed mouth file; else null. */
+function aimedWall(file) {
+  const id = path.basename(file).replace(/(\.puppet|\.lod1)?\.glb$/, '');
+  const record = `tools/triassic/creatures/${id}/validation.json`;
+  if (!fs.existsSync(record)) return null;
+  const aimed = JSON.parse(fs.readFileSync(record, 'utf8'))?.mouth?.aimedCut;
+  if (!aimed?.file || aimed.consumed === false || !fs.existsSync(aimed.file)) return null;
+  const doc = JSON.parse(fs.readFileSync(aimed.file, 'utf8'));
+  if (doc.id !== id || !doc.plane?.point || !doc.plane?.forward || !doc.plane?.normal) return null;
+  return { file: aimed.file, point: new THREE.Vector3(...doc.plane.point),
+           forward: new THREE.Vector3(...doc.plane.forward).normalize(),
+           normal: new THREE.Vector3(...doc.plane.normal).normalize() };
+}
 
 const report = [];
 let failed = 0;
@@ -247,7 +274,7 @@ for (const file of targets) {
     }
     return dirs;
   });
-  let cut = [], lip = pairs;
+  let cut = [], lip = pairs, cutFrom = '-';
   if (jawK >= 0 && pairs.length) {
     // The cut is the rim that runs *round* the head at the hinge; the lip runs *along* it. So a
     // shared vertex whose boundary edges on the mandible run transverse to the body, in the rear
@@ -279,7 +306,14 @@ for (const file of targets) {
     // Macrocnemus, Tanystropheus), so the station is the hinge's or the rim's own rearmost point,
     // whichever is further forward.
     const hingeStation = Math.max(head[jawK].dot(axis), Math.min(...stations)) + L * 0.0005;
-    const isCut = (n) => stations[n] <= hingeStation;
+    const wall = aimedWall(file);
+    const tol = L * 0.0005;
+    const onWall = (i) => {
+      const d = at(i).clone().sub(wall.point);
+      return Math.abs(d.dot(wall.forward)) <= tol && d.dot(wall.normal) <= tol;
+    };
+    const isCut = wall ? (n) => onWall(shellSide[n]) : (n) => stations[n] <= hingeStation;
+    cutFrom = wall ? `the hinge wall of ${wall.file}` : 'the hinge station';
     void transverse; void rearEnd;
     cut = pairs.filter((pr, n) => isCut(n));
     lip = pairs.filter((pr, n) => !isCut(n));
@@ -380,7 +414,7 @@ for (const file of targets) {
   const jaw = rows.find((r) => r.bone === 'jaw');
   const jawMouth = Object.fromEntries(['Bite', 'Attack', 'Heavy', 'Eat'].filter((c) => c in jawFollow).map((c) => [c, jawFollow[c]]));
   const seam = {
-    pairs: pairs.length, cutPairs: cut.length, cutOpen: cutOpen.size, cutWorst: cutWorst.gap / L, cutClip: cutWorst.clip, cutPhase: cutWorst.phase,
+    pairs: pairs.length, cutFrom, cutPairs: cut.length, cutOpen: cutOpen.size, cutWorst: cutWorst.gap / L, cutClip: cutWorst.clip, cutPhase: cutWorst.phase,
     lipPairs: lip.length, lipWorst: lipWorst.gap / L, lipClip: lipWorst.clip,
   };
   const flags = [];
@@ -405,7 +439,8 @@ for (const file of targets) {
   }
   if (jaw) console.log(`  jaw follows its bone: ${Object.entries(jawMouth).map(([c, l]) => `${c} ${l.toFixed(2)}`).join(' · ') || '(no mouth clip moves it)'}`);
   console.log(`  seam: ${seam.pairs} rest-coincident cross-mesh pairs; cut plane ${seam.cutPairs}, ${seam.cutOpen} open past ${CUT_OPEN * 100} %, worst ${(seam.cutWorst * 100).toFixed(2)} % of a body` +
-    (seam.cutPairs ? ` at ${seam.cutClip}@${seam.cutPhase.toFixed(2)}` : '') + `; lip ${seam.lipPairs}, gape ${(seam.lipWorst * 100).toFixed(1)} %${seam.lipPairs ? ` at ${seam.lipClip}` : ''}`);
+    (seam.cutPairs ? ` at ${seam.cutClip}@${seam.cutPhase.toFixed(2)}` : '') + `; lip ${seam.lipPairs}, gape ${(seam.lipWorst * 100).toFixed(1)} %${seam.lipPairs ? ` at ${seam.lipClip}` : ''}` +
+    (seam.cutFrom !== 'the hinge station' ? ` (cut read off ${seam.cutFrom})` : ''));
   if (VERBOSE && cutWorst.pair) {
     const w = (i) => [...weightOf[i]].map(([b, x]) => `${bones[b].name} ${x.toFixed(3)}`).join(' ');
     const show = (i, j, label) => console.log(`  ${label} at rest (${[0, 1, 2].map((k) => rest[i * 3 + k].toFixed(3)).join(', ')}): ${skinned[meshOf[i]].name} {${w(i)}} against ${skinned[meshOf[j]].name} {${w(j)}}`);

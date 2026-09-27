@@ -136,7 +136,7 @@ edge dominated by `jaw` and by `skull`.
 | archelon | yes | 0.24 % → 0.00 % | 1.01 (1.00) → 1.01 (1.00) | 3.86x → 3.86x | 1.19x → 1.44x | 1.26x → 1.26x |
 | askeptosaurus | no | 0.00 % → 0.00 % | 1.00 (1.02) → 1.00 (1.02) | 1.10x → 1.10x | 1.00x → 1.00x | 1.01x → 1.01x |
 | atopodentatus | yes | 0.26 % → 0.00 % | 1.12 (1.00) → 1.12 (1.00) | 3.90x → 3.90x | 3.90x → 3.90x | 1.62x → 1.62x |
-| birgeria | yes | 0.07 % → 0.00 % | 1.00 (0.99) → 1.00 (0.99) | 3.46x → 3.46x | 1.45x → 1.50x | 1.31x → 1.31x |   <!-- T3D-36 re-seated the oral shells; the cut and the junction are untouched and the mouth-region jaw edge came back from 1.80x to 1.50x -->
+| birgeria | yes | 0.07 % → 0.00 % | 1.00 (0.99) → 1.00 (0.99) | 3.46x → 3.46x | 1.45x → 1.80x | 1.31x → 1.31x |
 | cartorhynchus | yes | 2.02 % → 0.00 % | 1.04 (1.00) → 1.04 (1.00) | 3.72x → 3.72x | 1.00x → 1.46x | 1.27x → 1.29x |
 | ceratites | no | no shell → no shell | 1.03 (nan) → 1.03 (nan) | 7.73x → 7.73x | 1.36x → 1.36x | 1.61x → 1.61x |
 | coelophysis | no | 0.01 % → 0.01 % | 0.99 (0.99) → 0.99 (0.99) | 7.74x → 7.74x | 3.56x → 3.56x | 7.74x → 7.74x |
@@ -364,3 +364,27 @@ the body pigmentation material*, which is the right rule for an authored patch a
 body whose twin needs no texture at all. Atopodentatus' parts wore a flat colour and a vertex-colour
 material, so there was nothing to lose there: its twin goes 875,528 → 891,384 bytes, up by the caps'
 own geometry.
+
+## T3D-38: Birgeria and Aphaneramma on their aimed cuts
+
+Both bodies now cut on a reviewer's aimed plane (`docs/triassic/mouths/`) and close it with its own
+rim, so the junction is a different wall from the one the table above measured. Measured on the
+packaged files, before (the shipped `134d7f01…` / `ad7ebb00…`) and after:
+
+| Body | cut opens (`lag.mjs`), before → after | jaw follows in `Bite` | skin worst | `jaw` skin | `skull` skin |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| birgeria | 0.00 % (147 station pairs) → 0.01 % (130 on the aimed wall) | 0.99 → 1.01 | 3.46x → 3.46x | 1.50x → 1.57x | 1.31x → 1.95x |
+| aphaneramma | 0.00 % (77 station pairs) → 0.01 % (79 on the aimed wall) | 0.99 → 1.00 | 4.43x → 4.43x | 4.02x → 2.82x | 2.02x → 2.50x |
+
+**`lag.mjs` reads an aimed wall now.** Its cut was "at or behind the hinge's own station", which is
+a plane square to the head's axis; a wall a reviewer pitched or yawed is not. On Aphaneramma, yawed
+17.5°, the station rule took the lip's corner on the flank where the wall leans back for the cut —
+6 of 34 pairs "open", 1.34 % of a body at `Ability`, a failure — while the pairs actually on the
+wall part 0.01 %. Where a builder has consumed a mouth file (`mouth.aimedCut` in its
+`validation.json`, not `consumed: false`) the cut is the pairs on that document's hinge wall in the
+file's own frame, on the mandible's side of the mouth plane. On Cartorhynchus that is 52 pairs where
+the station rule found 3, worst 0.02 %; its own commit had measured 51 against the same plane.
+
+The twins barely change size — `birgeria.lod1.glb` 632,068 → 620,572 bytes, `aphaneramma.lod1.glb`
+713,676 → 711,244 — because these two linings wore a dark flat interior material rather than a copy
+of the body's maps, so retiring them sheds geometry and nothing else, and the caps add their own.

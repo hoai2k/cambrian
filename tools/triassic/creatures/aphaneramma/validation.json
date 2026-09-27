@@ -1266,9 +1266,9 @@
     "margin": 0.042,
     "rootFade": 0.34
   },
-  "authoredTriangles": 22473,
-  "twinTriangles": 7762,
-  "twinTriangleFraction": 0.3453922484759489,
+  "authoredTriangles": 23315,
+  "twinTriangles": 7174,
+  "twinTriangleFraction": 0.3076989062835085,
   "twinRemeshTriangles": 103988,
   "twinDecimateRatio": 0.05385236814618111,
   "twinVerticesHeldBackFromRelaxation": 12728,
@@ -1437,13 +1437,13 @@
   "attackReach": {
     "Attack": {
       "axis": "the rig's own forward (-Y here, +Z in the packaged file), in bodies",
-      "anchorForwardOverL": 0.1243,
+      "anchorForwardOverL": 0.1257,
       "forwardAtPhase": 0.2963,
-      "anchorRearBackOverL": -0.0032,
+      "anchorRearBackOverL": -0.0035,
       "rearBackAtPhase": 0.0741,
       "anchorLateralOverL": 0.0031,
       "bodyLungeOverL": 0.12,
-      "anchorMinThroughTheSweepOverL": 0.1236,
+      "anchorMinThroughTheSweepOverL": 0.1249,
       "trace": [
         [
           0.0,
@@ -1463,35 +1463,35 @@
         ],
         [
           0.2963,
-          0.124
+          0.126
         ],
         [
           0.3704,
-          0.124
+          0.126
         ],
         [
           0.4444,
-          0.124
+          0.125
         ],
         [
           0.5185,
-          0.124
+          0.125
         ],
         [
           0.5926,
-          0.124
+          0.125
         ],
         [
           0.6667,
-          0.124
+          0.125
         ],
         [
           0.7407,
-          0.124
+          0.125
         ],
         [
           0.8148,
-          0.106
+          0.107
         ],
         [
           0.8889,
@@ -1505,13 +1505,13 @@
     },
     "Heavy": {
       "axis": "the rig's own forward (-Y here, +Z in the packaged file), in bodies",
-      "anchorForwardOverL": 0.1692,
+      "anchorForwardOverL": 0.1711,
       "forwardAtPhase": 0.4545,
-      "anchorRearBackOverL": -0.0514,
+      "anchorRearBackOverL": -0.0519,
       "rearBackAtPhase": 0.1212,
-      "anchorLateralOverL": 0.1761,
+      "anchorLateralOverL": 0.1765,
       "bodyLungeOverL": 0.162,
-      "anchorMinThroughTheSweepOverL": 0.1684,
+      "anchorMinThroughTheSweepOverL": 0.1705,
       "trace": [
         [
           0.0,
@@ -1523,55 +1523,55 @@
         ],
         [
           0.1212,
-          -0.051
+          -0.052
         ],
         [
           0.1818,
-          0.036
+          0.037
         ],
         [
           0.2424,
-          0.119
+          0.12
         ],
         [
           0.303,
-          0.162
+          0.164
         ],
         [
           0.3636,
-          0.166
-        ],
-        [
-          0.4242,
-          0.169
-        ],
-        [
-          0.4848,
-          0.169
-        ],
-        [
-          0.5455,
-          0.169
-        ],
-        [
-          0.6061,
-          0.169
-        ],
-        [
-          0.6667,
-          0.169
-        ],
-        [
-          0.7273,
           0.168
         ],
         [
+          0.4242,
+          0.171
+        ],
+        [
+          0.4848,
+          0.171
+        ],
+        [
+          0.5455,
+          0.171
+        ],
+        [
+          0.6061,
+          0.171
+        ],
+        [
+          0.6667,
+          0.171
+        ],
+        [
+          0.7273,
+          0.171
+        ],
+        [
           0.7879,
-          0.167
+          0.169
         ],
         [
           0.8485,
-          0.092
+          0.093
         ],
         [
           0.9091,
@@ -1585,13 +1585,13 @@
     },
     "Ability": {
       "axis": "the rig's own forward (-Y here, +Z in the packaged file), in bodies",
-      "anchorForwardOverL": 0.1695,
+      "anchorForwardOverL": 0.1711,
       "forwardAtPhase": 0.75,
-      "anchorRearBackOverL": -0.0482,
+      "anchorRearBackOverL": -0.0486,
       "rearBackAtPhase": 0.125,
-      "anchorLateralOverL": 0.1758,
+      "anchorLateralOverL": 0.1759,
       "bodyLungeOverL": 0.162,
-      "anchorMinThroughTheSweepOverL": 0.1679,
+      "anchorMinThroughTheSweepOverL": 0.1694,
       "trace": [
         [
           0.0,
@@ -1599,7 +1599,7 @@
         ],
         [
           0.0833,
-          -0.035
+          -0.036
         ],
         [
           0.1667,
@@ -1607,35 +1607,35 @@
         ],
         [
           0.25,
-          0.128
+          0.129
         ],
         [
           0.3333,
-          0.166
+          0.168
         ],
         [
           0.4167,
-          0.169
+          0.171
         ],
         [
           0.5,
-          0.168
-        ],
-        [
-          0.5833,
-          0.168
-        ],
-        [
-          0.6667,
-          0.168
-        ],
-        [
-          0.75,
           0.169
         ],
         [
+          0.5833,
+          0.169
+        ],
+        [
+          0.6667,
+          0.17
+        ],
+        [
+          0.75,
+          0.171
+        ],
+        [
           0.8333,
-          0.118
+          0.119
         ],
         [
           0.9167,
@@ -1674,7 +1674,9 @@
     "Crawl": 0.0
   },
   "mouthCutDeviation": {
-    "cutFromMeasuredLineRaw": 0.0010120378034599448,
+    "note": "The cut is the aimed plane now. cutFromMeasuredLineRaw is how far that plane stands from the painted line on the body's centreline at worst, over the painted read; the straight-ramp figures are what the painted line itself would have cost cut as a line, and paintedLineSmoothingRaw what smoothing it moved.",
+    "paintedLineSmoothingRaw": 0.0010120378034599448,
+    "cutFromMeasuredLineRaw": 0.010497944735081005,
     "aStraightCutWouldHaveDeviatedRaw": 0.0027791337751765927,
     "aStraightCutWouldHaveDeviatedOverLocalRadius": 0.0905039656625066
   },
@@ -1742,7 +1744,7 @@
     "Idle": [
       [
         -1.146868348121643,
-        -2.6636836528778076,
+        -2.667829990386963,
         -0.893305778503418
       ],
       [
@@ -1754,8 +1756,8 @@
     "Swim": [
       [
         -1.289657473564148,
-        -2.6722288131713867,
-        -0.9289982914924622
+        -2.678229331970215,
+        -0.9289982318878174
       ],
       [
         1.1116745471954346,
@@ -1766,7 +1768,7 @@
     "Sprint": [
       [
         -1.3433594703674316,
-        -2.6751976013183594,
+        -2.6812753677368164,
         -0.9369019269943237
       ],
       [
@@ -1791,7 +1793,7 @@
       [
         -1.4960497617721558,
         -2.7360877990722656,
-        -0.899100661277771
+        -0.8991007804870605
       ],
       [
         0.8782874345779419,
@@ -1803,7 +1805,7 @@
       [
         -1.1898852586746216,
         -2.6677701473236084,
-        -0.8987974524497986
+        -0.8987975120544434
       ],
       [
         1.0440020561218262,
@@ -1826,19 +1828,19 @@
     "Attack": [
       [
         -1.1832811832427979,
-        -3.289885997772217,
+        -3.292449474334717,
         -0.9325911998748779
       ],
       [
         1.0707143545150757,
         2.361794948577881,
-        0.6039143800735474
+        0.6024363040924072
       ]
     ],
     "Bite": [
       [
         -1.1773511171340942,
-        -2.8276526927948,
+        -2.8701529502868652,
         -0.8773354887962341
       ],
       [
@@ -1849,21 +1851,21 @@
     ],
     "Heavy": [
       [
-        -1.4261441230773926,
+        -1.4390772581100464,
         -3.5160861015319824,
         -0.9311172366142273
       ],
       [
         0.9141879677772522,
         2.3704681396484375,
-        0.6009400486946106
+        0.5999158620834351
       ]
     ],
     "Hit": [
       [
         -1.4412918090820312,
-        -2.682771921157837,
-        -0.8815457820892334
+        -2.6962199211120605,
+        -0.8815457224845886
       ],
       [
         1.0836708545684814,
@@ -1874,8 +1876,8 @@
     "Death": [
       [
         -1.193023681640625,
-        -2.7064757347106934,
-        -0.9120673537254333
+        -2.7281060218811035,
+        -0.912067711353302
       ],
       [
         1.1156222820281982,
@@ -1886,8 +1888,8 @@
     "Guard": [
       [
         -1.1466493606567383,
-        -2.6841542720794678,
-        -0.9757511019706726
+        -2.698193073272705,
+        -0.9757522344589233
       ],
       [
         0.9290691018104553,
@@ -1922,7 +1924,7 @@
     "Eat": [
       [
         -1.1647260189056396,
-        -2.7292802333831787,
+        -2.7538466453552246,
         -0.8774617910385132
       ],
       [
@@ -1934,7 +1936,7 @@
     "Stagger": [
       [
         -1.464359998703003,
-        -2.676168441772461,
+        -2.6945457458496094,
         -0.8818444013595581
       ],
       [
@@ -1945,20 +1947,20 @@
     ],
     "Ability": [
       [
-        -1.449615716934204,
+        -1.4681371450424194,
         -3.517369508743286,
         -0.9189689755439758
       ],
       [
         0.9128935933113098,
         2.381976366043091,
-        0.6020314693450928
+        0.6009718775749207
       ]
     ],
     "Grab": [
       [
         -1.1602137088775635,
-        -2.851606845855713,
+        -2.8700883388519287,
         -0.9180629253387451
       ],
       [
@@ -1994,7 +1996,7 @@
     "Breathe": [
       [
         -1.1570563316345215,
-        -2.6684117317199707,
+        -2.681396245956421,
         -0.8347939848899841
       ],
       [
@@ -2019,23 +2021,23 @@
   "weights": {
     "Aphaneramma authored body": {
       "maxInfluences": 4,
-      "vertices": 10551,
+      "vertices": 11662,
       "verticesPerBone": {
-        "body": 3031,
-        "chest": 3517,
+        "body": 3077,
+        "chest": 3608,
         "hind_upper_L": 983,
         "tail_00": 2171,
         "tail_01": 1868,
         "tail_02": 1391,
-        "fore_lower_L": 449,
+        "fore_lower_L": 448,
         "fore_foot_L": 314,
-        "fore_upper_L": 919,
+        "fore_upper_L": 937,
         "hind_lower_L": 627,
-        "skull": 1342,
+        "skull": 2051,
         "tail_07": 1428,
-        "fore_foot_R": 508,
-        "fore_lower_R": 647,
-        "neck_00": 2079,
+        "fore_foot_R": 428,
+        "fore_lower_R": 567,
+        "neck_00": 2383,
         "hind_upper_R": 848,
         "hind_lower_R": 529,
         "hind_foot_L": 412,
@@ -2043,27 +2045,27 @@
         "tail_05": 1103,
         "tail_06": 1257,
         "tail_04": 956,
-        "jaw": 945,
         "tail_03": 1046,
-        "fore_upper_R": 788
+        "fore_upper_R": 949,
+        "jaw": 809
       },
       "jawJunction": {
-        "cutRimPairs": 74,
-        "lipPairs": 116,
-        "rimReach": 0.07411100667105978,
-        "rimDepth": 0.055714648216962814,
-        "dz": 0.01857154940565427,
+        "cutRimPairs": 69,
+        "lipPairs": 140,
+        "rimReach": 0.07300895590266945,
+        "rimDepth": 0.035373009741306305,
+        "dz": 0.035373007878661156,
         "band": 0.015,
         "back": 0.06,
         "throat": 1.0,
-        "shellVertices": 901,
-        "shellFullJaw": 789,
-        "bodyThroatVertices": 323
+        "shellVertices": 1410,
+        "shellFullJaw": 1255,
+        "bodyThroatVertices": 297
       }
     },
     "Aphaneramma procedural volume twin": {
       "maxInfluences": 4,
-      "vertices": 3106,
+      "vertices": 3591,
       "verticesPerBone": {
         "tail_06": 420,
         "tail_07": 426,
@@ -2075,45 +2077,45 @@
         "hind_upper_R": 322,
         "tail_02": 390,
         "tail_01": 590,
-        "tail_00": 680,
-        "body": 724,
+        "tail_00": 683,
+        "body": 739,
         "hind_upper_L": 386,
-        "chest": 1038,
+        "chest": 1086,
         "hind_foot_L": 170,
         "hind_lower_L": 216,
-        "neck_00": 716,
-        "jaw": 387,
-        "fore_upper_R": 309,
-        "fore_upper_L": 337,
-        "skull": 423,
-        "fore_lower_R": 270,
-        "fore_foot_R": 233,
+        "neck_00": 860,
+        "fore_upper_R": 352,
+        "jaw": 382,
+        "fore_upper_L": 339,
+        "skull": 744,
+        "fore_lower_R": 219,
+        "fore_foot_R": 186,
         "fore_lower_L": 203,
         "fore_foot_L": 159
       },
       "jawJunction": {
-        "cutRimPairs": 41,
-        "lipPairs": 60,
-        "rimReach": 0.07386473287752578,
-        "rimDepth": 0.0556795671582222,
-        "dz": 0.0185598557194074,
+        "cutRimPairs": 33,
+        "lipPairs": 65,
+        "rimReach": 0.07254164700074668,
+        "rimDepth": 0.035475198179483414,
+        "dz": 0.03547519724816084,
         "band": 0.015,
         "back": 0.06,
         "throat": 1.0,
-        "shellVertices": 250,
-        "shellFullJaw": 205,
-        "bodyThroatVertices": 93
+        "shellVertices": 486,
+        "shellFullJaw": 421,
+        "bodyThroatVertices": 86
       }
     }
   },
   "maxInfluences": 4,
-  "meanInfluences": 3.005125576627371,
+  "meanInfluences": 2.8484232609978366,
   "mouth": {
-    "method": "painted line, read as a continuous curve under a raised jump penalty (the geometric method found no slit)",
+    "method": "aimed by hand in the viewer's mouth editor (docs/triassic/mouths/aphaneramma-mouth.json); the painted line -- read as a continuous curve under a raised jump penalty, the geometric method having found no slit -- is measured beside it and no longer cuts",
     "cavityVertices": 34,
     "cavityZSpread": 0.13310988247394562,
-    "hingeY": -0.27197994422912597,
-    "jawFrontY": -0.531979944229126,
+    "hingeY": -0.2810822129249573,
+    "typedHingeY": -0.27197994422912597,
     "readBackY": -0.304979944229126,
     "paintedLineJumpPenalty": 3.0,
     "paintedLine": [
@@ -2315,373 +2317,407 @@
     "paintedLineFlankDisagreementMaxOverRadius": 0.19999999999999996,
     "seamExtrapolatedFrom": -0.304979944229126,
     "seamExtrapolationSlope": -0.1549502717952473,
-    "liningCoverage": [
-      [
-        -0.5061,
-        0.969,
-        0.364
-      ],
-      [
-        -0.4992,
-        0.972,
-        0.412
-      ],
-      [
-        -0.4922,
-        0.974,
-        0.401
-      ],
-      [
-        -0.4853,
-        0.976,
-        0.358
-      ],
-      [
-        -0.4784,
-        0.977,
-        0.359
-      ],
-      [
-        -0.4714,
-        0.979,
-        0.39
-      ],
-      [
-        -0.4645,
-        0.979,
-        0.395
-      ],
-      [
-        -0.4576,
-        0.98,
-        0.385
-      ],
-      [
-        -0.4506,
-        0.981,
-        0.414
-      ],
-      [
-        -0.4437,
-        0.981,
-        0.412
-      ],
-      [
-        -0.4368,
-        0.982,
-        0.416
-      ],
-      [
-        -0.4298,
-        0.983,
-        0.407
-      ],
-      [
-        -0.4229,
-        0.984,
-        0.417
-      ],
-      [
-        -0.4159,
-        0.984,
-        0.424
-      ],
-      [
-        -0.409,
-        0.985,
-        0.447
-      ],
-      [
-        -0.4021,
-        0.986,
-        0.452
-      ],
-      [
-        -0.3951,
-        0.986,
-        0.471
-      ],
-      [
-        -0.3882,
-        0.987,
-        0.458
-      ],
-      [
-        -0.3813,
-        0.987,
-        0.45
-      ],
-      [
-        -0.3743,
-        0.988,
-        0.443
-      ],
-      [
-        -0.3674,
-        0.989,
-        0.446
-      ],
-      [
-        -0.3605,
-        0.99,
-        0.475
-      ],
-      [
-        -0.3535,
-        0.99,
-        0.49
-      ],
-      [
-        -0.3466,
-        0.991,
-        0.494
-      ],
-      [
-        -0.3397,
-        0.992,
-        0.491
-      ],
-      [
-        -0.3327,
-        0.992,
-        0.487
-      ],
-      [
-        -0.3258,
-        0.993,
-        0.497
-      ],
-      [
-        -0.3189,
-        0.993,
-        0.5
-      ],
-      [
-        -0.3119,
-        0.993,
-        0.5
-      ],
-      [
-        -0.305,
-        0.993,
-        0.5
-      ]
+    "seamInsideTheHeadMinRaw": 0.012332089502632995,
+    "toothPatches": [
+      {
+        "vertices": 46,
+        "proudMax": 0.0059521812945604324,
+        "y": [
+          -0.529979944229126,
+          -0.5019312500953674
+        ],
+        "onJaw": 29,
+        "onSkull": 17
+      },
+      {
+        "vertices": 42,
+        "proudMax": 0.004401677753776312,
+        "y": [
+          -0.28257593512535095,
+          -0.24574801325798035
+        ],
+        "onJaw": 0,
+        "onSkull": 42
+      },
+      {
+        "vertices": 21,
+        "proudMax": 0.0072730970568954945,
+        "y": [
+          -0.3134983479976654,
+          -0.299005389213562
+        ],
+        "onJaw": 0,
+        "onSkull": 21
+      },
+      {
+        "vertices": 19,
+        "proudMax": 0.0072617498226463795,
+        "y": [
+          -0.32263898849487305,
+          -0.30449292063713074
+        ],
+        "onJaw": 0,
+        "onSkull": 19
+      },
+      {
+        "vertices": 16,
+        "proudMax": 0.0034229971934109926,
+        "y": [
+          -0.31701013445854187,
+          -0.2947717308998108
+        ],
+        "onJaw": 0,
+        "onSkull": 16
+      },
+      {
+        "vertices": 15,
+        "proudMax": 0.005747643299400806,
+        "y": [
+          -0.30911198258399963,
+          -0.2957756519317627
+        ],
+        "onJaw": 0,
+        "onSkull": 15
+      },
+      {
+        "vertices": 14,
+        "proudMax": 0.004326250869780779,
+        "y": [
+          -0.34488755464553833,
+          -0.3307611048221588
+        ],
+        "onJaw": 0,
+        "onSkull": 14
+      },
+      {
+        "vertices": 14,
+        "proudMax": 0.005342327523976564,
+        "y": [
+          -0.274972528219223,
+          -0.2657320499420166
+        ],
+        "onJaw": 0,
+        "onSkull": 14
+      },
+      {
+        "vertices": 10,
+        "proudMax": 0.005096413195133209,
+        "y": [
+          -0.2948710322380066,
+          -0.2855296730995178
+        ],
+        "onJaw": 0,
+        "onSkull": 10
+      },
+      {
+        "vertices": 8,
+        "proudMax": 0.003017356852069497,
+        "y": [
+          -0.3336610496044159,
+          -0.3112533688545227
+        ],
+        "onJaw": 0,
+        "onSkull": 8
+      },
+      {
+        "vertices": 7,
+        "proudMax": 0.0035219741985201836,
+        "y": [
+          -0.28966060280799866,
+          -0.2624402642250061
+        ],
+        "onJaw": 5,
+        "onSkull": 2
+      },
+      {
+        "vertices": 7,
+        "proudMax": 0.0027177301235497,
+        "y": [
+          -0.30583900213241577,
+          -0.27775177359580994
+        ],
+        "onJaw": 0,
+        "onSkull": 7
+      },
+      {
+        "vertices": 6,
+        "proudMax": 0.00239330786280334,
+        "y": [
+          -0.29204365611076355,
+          -0.28307706117630005
+        ],
+        "onJaw": 0,
+        "onSkull": 6
+      },
+      {
+        "vertices": 6,
+        "proudMax": 0.0028641102835536003,
+        "y": [
+          -0.27797624468803406,
+          -0.2569892406463623
+        ],
+        "onJaw": 0,
+        "onSkull": 6
+      }
     ],
-    "liningFitFactors": {
-      "-0.25598": [
-        0.05399,
-        0.02374
+    "toothPatchesStraddlingTheCut": [
+      {
+        "vertices": 46,
+        "proudMax": 0.0059521812945604324,
+        "y": [
+          -0.529979944229126,
+          -0.5019312500953674
+        ],
+        "onJaw": 29,
+        "onSkull": 17
+      }
+    ],
+    "authoredToothRows": [],
+    "oralParts": [],
+    "closure": "the cut's own rim: T.cap_cut at the hinge cross-section, then T.cap_mouth along the mouth line, each half domed into itself (dome 0.30, ceiling 0.55 of the head's own room either side of the mouth line). No lining and no hinge envelope: both were retired with the cut they were fitted to.",
+    "cutRim": {
+      "Aphaneramma authored body": {
+        "skull": {
+          "boundaryEdgesInRegion": 208,
+          "boundaryEdgesElsewhere": 14,
+          "loops": [
+            {
+              "vertices": 208,
+              "closed": true,
+              "box": [
+                [
+                  -0.11433,
+                  0.03839
+                ],
+                [
+                  -0.52964,
+                  -0.2591
+                ],
+                [
+                  -0.01308,
+                  0.09943
+                ]
+              ],
+              "reach": 0.27055,
+              "verticesOnTheSeam": 0
+            }
+          ]
+        },
+        "jaw": {
+          "boundaryEdgesInRegion": 208,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 208,
+              "closed": true,
+              "box": [
+                [
+                  -0.11433,
+                  0.03839
+                ],
+                [
+                  -0.52964,
+                  -0.2591
+                ],
+                [
+                  -0.01308,
+                  0.09943
+                ]
+              ],
+              "reach": 0.27055,
+              "verticesOnTheSeam": 0
+            }
+          ]
+        }
+      },
+      "Aphaneramma procedural volume twin": {
+        "skull": {
+          "boundaryEdgesInRegion": 97,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 97,
+              "closed": true,
+              "box": [
+                [
+                  -0.11703,
+                  0.03761
+                ],
+                [
+                  -0.53209,
+                  -0.25918
+                ],
+                [
+                  -0.01319,
+                  0.10036
+                ]
+              ],
+              "reach": 0.27291,
+              "verticesOnTheSeam": 0
+            }
+          ]
+        },
+        "jaw": {
+          "boundaryEdgesInRegion": 97,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 97,
+              "closed": true,
+              "box": [
+                [
+                  -0.11703,
+                  0.03761
+                ],
+                [
+                  -0.53209,
+                  -0.25918
+                ],
+                [
+                  -0.01319,
+                  0.10036
+                ]
+              ],
+              "reach": 0.27291,
+              "verticesOnTheSeam": 0
+            }
+          ]
+        }
+      }
+    },
+    "caps": {
+      "Aphaneramma authored body": {
+        "skullAtHinge": 68,
+        "jawAtHinge": 68,
+        "palate": {
+          "rimEdges": 142,
+          "capped": true,
+          "faces": 1260,
+          "domedVertices": 560,
+          "deepestRaw": 0.019753,
+          "dome": 0.3,
+          "rounds": 2,
+          "firstNewVertex": 9692,
+          "rimVertices": 142,
+          "cycles": [
+            142
+          ]
+        },
+        "floor": {
+          "rimEdges": 142,
+          "capped": true,
+          "faces": 1260,
+          "domedVertices": 560,
+          "deepestRaw": 0.019753,
+          "dome": 0.3,
+          "rounds": 2,
+          "firstNewVertex": 850,
+          "rimVertices": 142,
+          "cycles": [
+            142
+          ]
+        }
+      },
+      "Aphaneramma procedural volume twin": {
+        "skullAtHinge": 32,
+        "jawAtHinge": 32,
+        "palate": {
+          "rimEdges": 67,
+          "capped": true,
+          "faces": 585,
+          "domedVertices": 260,
+          "deepestRaw": 0.019831,
+          "dome": 0.3,
+          "rounds": 2,
+          "firstNewVertex": 2845,
+          "rimVertices": 67,
+          "cycles": [
+            67
+          ]
+        },
+        "floor": {
+          "rimEdges": 67,
+          "capped": true,
+          "faces": 585,
+          "domedVertices": 260,
+          "deepestRaw": 0.019831,
+          "dome": 0.3,
+          "rounds": 2,
+          "firstNewVertex": 226,
+          "rimVertices": 67,
+          "cycles": [
+            67
+          ]
+        }
+      }
+    },
+    "capSeating": {
+      "Aphaneramma authored body": {
+        "capVertices": 1120,
+        "worstHullClearanceRaw": -0.0005301671938567865,
+        "outsideTheSectionHull": 10,
+        "outsideByRayParity": 58,
+        "seenFromOutsideAlong26Directions": 0,
+        "seenFromOutsideAt": [],
+        "standingOutOfTheSkin": 0
+      },
+      "Aphaneramma procedural volume twin": {
+        "capVertices": 520,
+        "worstHullClearanceRaw": -0.0021813039029029073,
+        "outsideTheSectionHull": 37,
+        "outsideByRayParity": 16,
+        "seenFromOutsideAlong26Directions": 0,
+        "seenFromOutsideAt": [],
+        "standingOutOfTheSkin": 0
+      }
+    },
+    "mandibleBox": {
+      "Aphaneramma authored body": [
+        [
+          -0.11554,
+          -0.52998,
+          -0.01308
+        ],
+        [
+          0.03839,
+          -0.2591,
+          0.09943
+        ]
       ],
-      "-0.27469": [
-        0.05893,
-        0.02983
-      ],
-      "-0.29341": [
-        0.05831,
-        0.02822
-      ],
-      "-0.31212": [
-        0.05635,
-        0.02493
-      ],
-      "-0.33084": [
-        0.05333,
-        0.02153
-      ],
-      "-0.34955": [
-        0.04325,
-        0.01903
-      ],
-      "-0.36827": [
-        0.03491,
-        0.01568
-      ],
-      "-0.38698": [
-        0.02958,
-        0.01388
-      ],
-      "-0.40569": [
-        0.02671,
-        0.01209
-      ],
-      "-0.42441": [
-        0.02371,
-        0.00982
-      ],
-      "-0.44312": [
-        0.02111,
-        0.0089
-      ],
-      "-0.46184": [
-        0.0193,
-        0.00782
-      ],
-      "-0.48055": [
-        0.01682,
-        0.00702
-      ],
-      "-0.49927": [
-        0.0138,
-        0.00651
-      ],
-      "-0.51798": [
-        0.00852,
-        0.00335
-      ],
-      "-0.50611": [
-        0.01246,
-        0.00612
-      ],
-      "-0.49917": [
-        0.01382,
-        0.00652
-      ],
-      "-0.49224": [
-        0.01488,
-        0.00681
-      ],
-      "-0.4853": [
-        0.01607,
-        0.00692
-      ],
-      "-0.47837": [
-        0.01721,
-        0.00709
-      ],
-      "-0.47143": [
-        0.01827,
-        0.00734
-      ],
-      "-0.4645": [
-        0.01907,
-        0.00766
-      ],
-      "-0.45756": [
-        0.01967,
-        0.00808
-      ],
-      "-0.45063": [
-        0.02032,
-        0.00845
-      ],
-      "-0.44369": [
-        0.02105,
-        0.00886
-      ],
-      "-0.43675": [
-        0.02214,
-        0.00928
-      ],
-      "-0.42982": [
-        0.0232,
-        0.00955
-      ],
-      "-0.42288": [
-        0.02394,
-        0.00994
-      ],
-      "-0.41595": [
-        0.02522,
-        0.01064
-      ],
-      "-0.40901": [
-        0.02629,
-        0.01161
-      ],
-      "-0.40208": [
-        0.02725,
-        0.01253
-      ],
-      "-0.39514": [
-        0.02843,
-        0.01319
-      ],
-      "-0.38821": [
-        0.02944,
-        0.01377
-      ],
-      "-0.38127": [
-        0.03034,
-        0.01437
-      ],
-      "-0.37433": [
-        0.03207,
-        0.01496
-      ],
-      "-0.3674": [
-        0.03539,
-        0.01581
-      ],
-      "-0.36046": [
-        0.03914,
-        0.01717
-      ],
-      "-0.35353": [
-        0.04169,
-        0.01851
-      ],
-      "-0.34659": [
-        0.04461,
-        0.01944
-      ],
-      "-0.33966": [
-        0.048,
-        0.02034
-      ],
-      "-0.33272": [
-        0.05226,
-        0.02123
-      ],
-      "-0.32579": [
-        0.05488,
-        0.02256
-      ],
-      "-0.31885": [
-        0.05572,
-        0.02382
-      ],
-      "-0.31192": [
-        0.05638,
-        0.02498
-      ],
-      "-0.30498": [
-        0.05717,
-        0.02644
+      "Aphaneramma procedural volume twin": [
+        [
+          -0.11775,
+          -0.53209,
+          -0.01319
+        ],
+        [
+          0.03761,
+          -0.25918,
+          0.10036
+        ]
       ]
     },
-    "oralShellSeating": {
-      "vertices": 720,
-      "pulled": 112,
-      "unseated": 0,
-      "maxPullRaw": 0.00879796438492367,
-      "shellVertices": 720
-    },
-    "oralShellSeatingMethod": "every shell vertex asked of the closed intake surface along the cube's 26 directions -- a point inside meets skin along every one -- with a touch of 0.0010 of a body allowed within 0.45 of the local half height of the mouth line, where the shell's width has to reach the skin, and 0.0030 of clearance outside that band. Asserted over the vertices the helper wrote and again over the exported mesh.",
-    "hingeEnvelope": {
-      "fit": 0.7916666666666666,
-      "radii": [
-        0.06301029467716218,
-        0.048,
-        0.06192739117022456
-      ],
-      "centreRaw": [
-        -0.017181162223815917,
-        -0.26797994422912597,
-        0.03157563439801335
-      ],
-      "seatedBy": "the 26 directions and the depth probe, both"
-    },
+    "jawReachBehindTheHingeStationRaw": 0.04869158870599579,
+    "jawJunctionDzShare": 1.0,
+    "rimSelectorTolerance": 0.0025,
+    "jawAxisIsTheFramesX": true,
+    "aimedHingeAxisAgainstTheFramesXDegrees": 22.63812241906283,
     "aimedCut": {
       "file": "docs/triassic/mouths/aphaneramma-mouth.json",
       "appliesTo": "built",
       "sha256": "ad7ebb007e3cbf2e5d26fbb0093a8d68408f980887591f637f108d23a6c83e92",
-      "consumed": false,
-      "note": "Read as a review. Cut on, this body's gape opens 4,229 px of opened-by-culling against 0 on the painted line's own cut; what closes an aimed cut is the cut's own rim (T.cap_cut/T.cap_mouth), which this body has not been ported to. T3D-32's rollout.",
-      "frameFitWorstRaw": 1.4901161193847656e-08,
+      "consumed": true,
+      "note": "Cut on. The file hash-matched the shipped body it was aimed on; rebuilding on it is what consuming it looks like, so npm run triassic:mouth now refuses it on the hash by design. The frame is asserted against the bounding box the document measured instead. The limb guard stays on top of the document's rule, which is the editor's own stated limit: a limb tucked under the snout falls inside the two half-spaces.",
+      "frameFitWorstUnits": 1.4901161193847656e-08,
       "hingeCentreRaw": [
         -0.028074000030755997,
         -0.2810822129249573,
         0.023799199610948563
+      ],
+      "jawJointRaw": [
+        -0.020075619220733643,
+        -0.2840560972690582,
+        0.022288374602794647
       ],
       "planeNormalRaw": [
         0.2552700638771057,
@@ -2704,6 +2740,7 @@
       "mandibleVerticesInTheDocument": 1240,
       "hingeAheadOfTheTypedStationRaw": 0.009102268695831306,
       "belowThePaintedLineMaxRaw": 0.010497944735081005,
+      "aboveThePaintedLineMaxRaw": 0.005955745986845909,
       "worstOverLocalHeadHalfDepth": 0.421478882405002,
       "perStation": [
         [
@@ -2835,202 +2872,39 @@
           0.0105
         ]
       ]
-    },
-    "toothPatches": [
-      {
-        "vertices": 46,
-        "proudMax": 0.0059521812945604324,
-        "y": [
-          -0.529979944229126,
-          -0.5019312500953674
-        ],
-        "onJaw": 11,
-        "onSkull": 35
-      },
-      {
-        "vertices": 42,
-        "proudMax": 0.004401677753776312,
-        "y": [
-          -0.28257593512535095,
-          -0.24574801325798035
-        ],
-        "onJaw": 0,
-        "onSkull": 42
-      },
-      {
-        "vertices": 21,
-        "proudMax": 0.0072730970568954945,
-        "y": [
-          -0.3134983479976654,
-          -0.299005389213562
-        ],
-        "onJaw": 0,
-        "onSkull": 21
-      },
-      {
-        "vertices": 19,
-        "proudMax": 0.0072617498226463795,
-        "y": [
-          -0.32263898849487305,
-          -0.30449292063713074
-        ],
-        "onJaw": 0,
-        "onSkull": 19
-      },
-      {
-        "vertices": 16,
-        "proudMax": 0.0034229971934109926,
-        "y": [
-          -0.31701013445854187,
-          -0.2947717308998108
-        ],
-        "onJaw": 0,
-        "onSkull": 16
-      },
-      {
-        "vertices": 15,
-        "proudMax": 0.005747643299400806,
-        "y": [
-          -0.30911198258399963,
-          -0.2957756519317627
-        ],
-        "onJaw": 0,
-        "onSkull": 15
-      },
-      {
-        "vertices": 14,
-        "proudMax": 0.004326250869780779,
-        "y": [
-          -0.34488755464553833,
-          -0.3307611048221588
-        ],
-        "onJaw": 0,
-        "onSkull": 14
-      },
-      {
-        "vertices": 14,
-        "proudMax": 0.005342327523976564,
-        "y": [
-          -0.274972528219223,
-          -0.2657320499420166
-        ],
-        "onJaw": 0,
-        "onSkull": 14
-      },
-      {
-        "vertices": 10,
-        "proudMax": 0.005096413195133209,
-        "y": [
-          -0.2948710322380066,
-          -0.2855296730995178
-        ],
-        "onJaw": 0,
-        "onSkull": 10
-      },
-      {
-        "vertices": 8,
-        "proudMax": 0.003017356852069497,
-        "y": [
-          -0.3336610496044159,
-          -0.3112533688545227
-        ],
-        "onJaw": 0,
-        "onSkull": 8
-      },
-      {
-        "vertices": 7,
-        "proudMax": 0.0035219741985201836,
-        "y": [
-          -0.28966060280799866,
-          -0.2624402642250061
-        ],
-        "onJaw": 3,
-        "onSkull": 4
-      },
-      {
-        "vertices": 7,
-        "proudMax": 0.0027177301235497,
-        "y": [
-          -0.30583900213241577,
-          -0.27775177359580994
-        ],
-        "onJaw": 7,
-        "onSkull": 0
-      },
-      {
-        "vertices": 6,
-        "proudMax": 0.00239330786280334,
-        "y": [
-          -0.29204365611076355,
-          -0.28307706117630005
-        ],
-        "onJaw": 0,
-        "onSkull": 6
-      },
-      {
-        "vertices": 6,
-        "proudMax": 0.0028641102835536003,
-        "y": [
-          -0.27797624468803406,
-          -0.2569892406463623
-        ],
-        "onJaw": 0,
-        "onSkull": 6
-      }
-    ],
-    "toothPatchesStraddlingTheCut": [
-      {
-        "vertices": 46,
-        "proudMax": 0.0059521812945604324,
-        "y": [
-          -0.529979944229126,
-          -0.5019312500953674
-        ],
-        "onJaw": 11,
-        "onSkull": 35
-      }
-    ],
-    "authoredToothRows": [],
-    "oralPartSeating": [
-      {
-        "part": "Oral cavity lining",
-        "worstDepthRaw": -0.00021363979612942785,
-        "vertices": 720,
-        "verticesVisibleFromOutside": 0
-      },
-      {
-        "part": "Seated jaw hinge tissue",
-        "worstDepthRaw": 0.003928657155483961,
-        "vertices": 164,
-        "verticesVisibleFromOutside": 0
-      }
-    ]
+    }
   },
   "envelope": {
     "maximumEnvelopeDifference": 0.049594998359680176,
     "maximumEnvelopeDifferenceFractionOfBodyLength": 0.009918999671936036,
     "surfaceDistanceMax": 0.03272062912583351,
-    "surfaceDistanceP95": 0.01586780697107315,
+    "surfaceDistanceP95": 0.015576266311109062,
     "envelopeTolerance": 0.2
   },
   "anchors": {
     "anchor_mouth": {
-      "nearestSurfaceRaw": 0.00280706281773746,
-      "nearestSurfaceUnits": 0.0140353140886873,
-      "fractionOfBodyLength": 0.00280706281773746,
-      "depthInsideSkinRaw": 0.00280706281773746
+      "nearestSurfaceRaw": 0.00672747939825058,
+      "nearestSurfaceUnits": 0.0336373969912529,
+      "fractionOfBodyLength": 0.00672747939825058,
+      "depthInsideSkinRaw": 0.00672747939825058,
+      "insideByRayParity": true,
+      "sectionHullClearanceRaw": 0.009936166850868974
     },
     "anchor_mouth_inside": {
-      "nearestSurfaceRaw": 0.03813949599862099,
-      "nearestSurfaceUnits": 0.19069747999310493,
-      "fractionOfBodyLength": 0.03813949599862099,
-      "depthInsideSkinRaw": 0.03813949599862099
+      "nearestSurfaceRaw": 0.028334172442555428,
+      "nearestSurfaceUnits": 0.14167086221277714,
+      "fractionOfBodyLength": 0.028334172442555428,
+      "depthInsideSkinRaw": 0.028334172442555428,
+      "insideByRayParity": true,
+      "sectionHullClearanceRaw": 0.033479860621247276
     },
     "anchor_attack_primary": {
-      "nearestSurfaceRaw": 0.003955262713134289,
-      "nearestSurfaceUnits": 0.019776313565671444,
-      "fractionOfBodyLength": 0.003955262713134289,
-      "depthInsideSkinRaw": 0.003955262713134289
+      "nearestSurfaceRaw": 0.0023386855609714985,
+      "nearestSurfaceUnits": 0.011693427804857492,
+      "fractionOfBodyLength": 0.0023386855609714985,
+      "depthInsideSkinRaw": 0.0023386855609714985,
+      "insideByRayParity": true,
+      "sectionHullClearanceRaw": 0.004372717725711018
     }
   },
   "normalizedWeights": true,

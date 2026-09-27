@@ -1,70 +1,28 @@
 {
   "id": "birgeria",
-  "verdict": "separate closed rigid palate/floor",
+  "verdict": "no oral lining: nothing to be mixed",
   "method": "Actual packaged GLBs: one unit bone weight per vertex; every triangle belongs wholly to skull or jaw; every indexed edge is shared by two faces; both closed halves present. A body with no lining mesh is reported as such, with the hidden oral parts it does carry listed, and all three variants must agree.",
   "models": [
     {
       "variant": "authored",
-      "sha256": "9b600ae946d5289cb225c27d12a6c7b503982de9e77a6bd5e812130623ca2d89",
-      "meshes": [
-        {
-          "name": "Oral cavity lining",
-          "vertices": 816,
-          "triangles": {
-            "skull": 812,
-            "jaw": 812
-          },
-          "boundaryEdges": 0,
-          "mixedVertices": 0,
-          "bridgingTriangles": 0
-        }
-      ],
-      "otherOralMeshes": [
-        "Seated jaw hinge tissue"
-      ],
-      "oralShells": "separate palate and floor"
+      "sha256": "070441275bbb372dcff0f1a523870ac4085bc4d26833bee02415c8317e3d7d01",
+      "meshes": [],
+      "otherOralMeshes": [],
+      "oralShells": "none"
     },
     {
       "variant": ".puppet",
-      "sha256": "413b924e79989e7b1983d7d8c793220ed97393244d094ce7fd56e5c0f9a3cd47",
-      "meshes": [
-        {
-          "name": "Oral cavity lining",
-          "vertices": 816,
-          "triangles": {
-            "skull": 812,
-            "jaw": 812
-          },
-          "boundaryEdges": 0,
-          "mixedVertices": 0,
-          "bridgingTriangles": 0
-        }
-      ],
-      "otherOralMeshes": [
-        "Seated jaw hinge tissue"
-      ],
-      "oralShells": "separate palate and floor"
+      "sha256": "bf31a68d6c9091149695bd4f2553937752297dbf2c1c969d67ace531d1e5af5b",
+      "meshes": [],
+      "otherOralMeshes": [],
+      "oralShells": "none"
     },
     {
       "variant": ".lod1",
-      "sha256": "413b924e79989e7b1983d7d8c793220ed97393244d094ce7fd56e5c0f9a3cd47",
-      "meshes": [
-        {
-          "name": "Oral cavity lining",
-          "vertices": 816,
-          "triangles": {
-            "skull": 812,
-            "jaw": 812
-          },
-          "boundaryEdges": 0,
-          "mixedVertices": 0,
-          "bridgingTriangles": 0
-        }
-      ],
-      "otherOralMeshes": [
-        "Seated jaw hinge tissue"
-      ],
-      "oralShells": "separate palate and floor"
+      "sha256": "bf31a68d6c9091149695bd4f2553937752297dbf2c1c969d67ace531d1e5af5b",
+      "meshes": [],
+      "otherOralMeshes": [],
+      "oralShells": "none"
     }
   ]
 }
