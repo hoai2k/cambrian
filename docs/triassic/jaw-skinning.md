@@ -365,6 +365,50 @@ body whose twin needs no texture at all. Atopodentatus' parts wore a flat colour
 material, so there was nothing to lose there: its twin goes 875,528 → 891,384 bytes, up by the caps'
 own geometry.
 
+
+## Shonisaurus and Cymbospondylus: no jaw cut at all (T3D-37)
+
+Both bodies stopped cutting the mandible off. There is no rim, no junction and no seam — `lag.mjs`
+finds no rest-coincident pairs to measure on either (146 and 67 before) — so the row that matters
+here is the **commissure**: where the jaw share passes from 0 to 1, which now carries the gape.
+
+**The share is a step on the mouth line diffused over the mesh's edge graph, not a height band**
+(`T.jaw_field_uncut`'s `spread`). On both generations the lumen is open along the front — no edge
+crosses the mouth line forward of the commissure — while the lips sit within 0.0006-0.004 raw of
+that line, so any height band wide enough to spare the corner hands the lower lip a partial share
+and tears the jaw's own skin along its length (Cymbospondylus 5.2x-9.9x across every height band
+tried, Shonisaurus 1.8x-3.8x). Diffusion cannot move a sheet that no edge connects across the line,
+so the lower jaw stays at exactly 1 and the palate at 0, and only the corner and the back of the
+lumen blend.
+
+| | construction | full jaw / blended vertices | skin | mouth-region skin, `jaw` / `skull` | jaw follows `Bite`/`Attack`/`Heavy`/`Eat` | tooth row at `Bite` |
+| --- | --- | ---: | ---: | --- | --- | ---: |
+| Cymbospondylus, authored | step, spread 2 | 362 / 253 of 9,585 | 2.48x | 1.61x / 1.58x | 0.99 / 1.00 / 1.00 / 0.96 | 1.000 |
+| Cymbospondylus, twin | height 0.30 × local half depth (no lumen to separate by) | 99 / 76 of 3,302 | 12.63x | 11.86x / 12.63x | — | 0.86 |
+| Shonisaurus, authored | step, spread 24 | 1,946 / 1,925 of 56,954 | 1.44x | 1.16x / 1.00x | 0.95 / 0.98 / 0.99 / 0.90 | 1.000 |
+
+The full sweeps (nine height and step settings on each body, and four twin bands), the gape table
+over every clip that moves the jaw, and why each value ships are in
+`docs/triassic/throat-repairs/oral-verdicts.md` under T3D-37. Two things from them are about the
+band rather than about these two animals:
+
+**`lag.mjs`' follow cannot see the tooth row.** It is taken over the ball round the hinge, and read
+1.00 on Cymbospondylus at a height band under which the front fifth of the mandible travelled 45 %
+of what its own bone would carry it. The sweep is recorded against that travel as well
+(`tools/triassic/mandible-travel.mjs`; a jaw-weighted vertex's travel between rest and the clip's
+widest gape over a rigid carry by the `jaw` bone).
+
+**On a body that closes a baked-open mouth in bind geometry, the band bounds the closure too.**
+Shonisaurus' `close_rest` shuts its generation through the same share, so a height band wider than
+the lumen never reaches 1 at the mandible's lip and ships the mouth ajar (0.75: 3,596 of 14,400
+lateral rays through the rostrum). A step has no such bound, because the whole lower sheet is at 1 —
+but the spread is then also how far the *closing* is spread, and a narrow one shuts the corner over
+two rings of skin that fold out over the upper lip as a pale flap at rest. That is why Shonisaurus
+ships at 24 where Cymbospondylus (no bind closure) ships at 2: the flap is gone there, the follow at
+the hinge is what pays (0.95 at `Bite`, 0.90 at `Eat`), and closing through one field while skinning
+through another is worse (6.9x-8.1x at the corner). 28 faces oppose their neighbours at the bind
+pose, against the split body's 8 (`lip-audit.py`).
+
 ## T3D-38: Birgeria and Aphaneramma on their aimed cuts
 
 Both bodies now cut on a reviewer's aimed plane (`docs/triassic/mouths/`) and close it with its own
