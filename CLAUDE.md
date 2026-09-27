@@ -884,6 +884,28 @@ unless the user explicitly asks for a PR. Steps:
   construction — the distance from a point on the midline to the rim *is* the half-width there — with
   an optional ceiling off the head's own measured section so a palate cannot reach the scalp.
   Rhaeticosaurus is the worked example.
+- **No gape count sees a mouth standing out of a cheek, and an aimed cut is closed by its own rim.**
+  `gape-solid.py` counts backdrop the cull *opens*; a lining that pokes through the skin draws
+  lining over skin, which is not backdrop, so Birgeria and Aphaneramma passed every proof while a
+  reviewer watched their *Mouth geometry* come out of their cheeks. The instrument is a picture and
+  a ray: paint every oral mesh an emissive marker, photograph the shut head from both flanks and
+  above, and cast the camera's own ray through a marker pixel to ask every surface on the line. It
+  read 14,868 and 9,714 marker pixels on the two shut heads, the lining the first surface on the
+  line in front of skin; Birgeria's shells had been seated by `depth()` beside its modelled slit,
+  and Aphaneramma's by a twelve-step shrink that *returned the vertex at 0.615 of the way out*
+  wherever twelve steps were not enough. When both were re-aimed in the mouth editor the answer was
+  not to re-seat the shells but to take the cut the reviewer aimed and close it the way this file
+  already says (T3D-38): Cartorhynchus' builder is the pattern, the lining and hinge plug retire, and
+  each cap vertex is held to its own body's closed surface — inside by parity *or* within a touch of
+  the skin, and seen along none of the cube's twenty-six directions from further out than that. Two
+  things the port costs. The **jaw keeps the era's axis**: every rig's jaw has the skull's rest
+  orientation and the audits read the gape as the jaw's own local rotation about x, so a jaw bone
+  rolled onto the document's hinge axis reads its own rest offset as a gape on every clip; the pivot
+  is seated on the aimed hinge line and the axis difference (9.9° and 22.6° here) is recorded. And
+  a **yawed hinge wall reaches back across one cheek**, so the document's half-space "ahead of the
+  hinge" runs to the shoulder on that flank and the mandible is bounded to the head as well as off
+  the limbs. The **twin is held to its own surface**, not the intake's: a voxel resurfacing a few
+  thousandths fuller than the generation reads "outside the intake" wherever it is fuller.
 - **A generation that arrived gaping is not cut** (`T.jaw_field_uncut`). Mosasaurus' cut left one
   closed loop of 156 vertices per half spanning 0.057 of a body behind the hinge, on a gape 0.176
   of a body long: the *back third* of the mouth and nothing else, because forward of that the jaws
@@ -1128,7 +1150,12 @@ unless the user explicitly asks for a PR. Steps:
   0.04 of a body *behind* the hinge, so a window ahead of the hinge found 30 of 109 rim points with
   a negative depth and closed nothing. The corner of the mouth is one vertex on both the lip and
   the cut, so a point or two parting there by the gape times its short radius is the lip; a cut
-  that opens opens along its length, which is what the tool fails on. And the throat share is
+  that opens opens along its length, which is what the tool fails on. Where a builder has consumed
+  an aimed mouth file, the tool reads the cut off that document's own hinge wall rather than the
+  hinge's station, because a pitched or yawed wall is not "at or behind" any one station:
+  Aphaneramma's wall, yawed 17.5°, leans back across one cheek and the station rule took the lip's
+  corner on that flank for the cut (6 of 34 "open", 1.34 % of a body) where the 79 pairs actually
+  on the wall part 0.01 %. And the throat share is
   scaled by what a vertex is *not* a limb's, and is a builder parameter: Aphaneramma's tucked
   forelimb took half of itself from the jaw at 4.6x until the limb term, and Atopodentatus'
   `Heavy` pulls the neck back a third of a body while the jaw opens, so a full share tore the

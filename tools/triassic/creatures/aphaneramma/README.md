@@ -13,7 +13,9 @@ number this build produced, not an impression.
 node tools/triassic/creatures/aphaneramma/audit.mjs --package --decode
 /opt/blender/blender -b --factory-startup --python tools/triassic/creatures/aphaneramma/render.py -- --decoded
 python3 tools/triassic/creatures/aphaneramma/contact-sheets.py
-/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- aphaneramma Bite@0.12 Heavy@0.55 Ability@0.45 Attack@0.45 Eat@0.4
+/opt/blender/blender -b --factory-startup --python tools/triassic/gape-solid.py -- aphaneramma Bite@0.1 Heavy@0.5667 Ability@0.3333 Attack@0.4 Eat@0.3667 Hit@0.3 Stagger@0.5333 Death@1.8 Breath@1.1 Grab@0.1 Breathe@1.5 Guard@0.6 Idle@1.5 Swim@0.9333 Sprint@0.5333 --as-drawn
+/opt/blender/blender -b --factory-startup --python tools/triassic/mouth-space.py -- aphaneramma Heavy@0.5667 docs/triassic/verification/aphaneramma-mouth-space.png
+node --max-old-space-size=3000 tools/triassic/lag.mjs public/assets/triassic/creatures/aphaneramma.glb
 node tools/triassic/skin-tears.mjs public/assets/triassic/creatures/aphaneramma.glb
 node tools/triassic/idle-bones.mjs public/assets/triassic/creatures/aphaneramma.glb
 ```
@@ -98,6 +100,10 @@ at rest.
 
 ### The mouth line
 
+**No longer the cut.** Since T3D-38 the jaw is cut on the plane a reviewer aimed in the viewer's
+mouth editor and the mouth is closed by the cut's own rim (*The aimed cut*, below). The painted
+line is still read, recorded, and measured against the aimed plane; what follows is how.
+
 Placodus' geometric method — cast every head vertex's own normal back into the mesh and keep the
 hits — returns **34 vertices** over the whole front third, at every gap from 0.02 to 0.05, and they
 are spread over **0.133 of z**, which is the entire depth of the head. That is the gular folds and
@@ -164,9 +170,9 @@ measured against an axis that was in the wrong place. Era context: Rhaeticosauru
 2.81x is the cleanest, Nothosaurus 2.98x is the reference, Henodus 4.81x, Cartorhynchus 5.17x,
 Hupehsuchus 5.79x, Hybodus 5.93x. **Every one of the 26 joints owns skin** (`idle-bones.mjs`).
 
-### The mouth is solid
+### The mouth is solid (superseded by T3D-38)
 
-`gape-solid.py`, at full gape on five clips against a saturated backdrop, with and without a
+What follows is the lining this body shipped with until T3D-38 retired it. `gape-solid.py`, at full gape on five clips against a saturated backdrop, with and without a
 backface-cull shim: **0 pixels of backdrop seen through the body**, against a tolerance of 12 of
 378,000. One closed skinned lining — roof on the skull, floor on the jaw, wall stretching between
 them, wound inwards, superellipse power 2.8 because a temnospondyl's skull is very flat and very
@@ -174,6 +180,96 @@ wide and an ellipse at that aspect ratio narrows to nothing exactly where the ma
 at full gape. The skin is double-sided behind it as a backstop, and the lining is not culled either:
 a sac buried inside a head is never seen from outside whatever its winding, and culling it takes
 away the floor exactly when something is looking up into an open mouth.
+
+### The aimed cut, closed by its own rim (T3D-38)
+
+A reviewer re-aimed this mouth in the viewer's mouth editor on the body then shipping
+(`docs/triassic/mouths/aphaneramma-mouth.json`, sha256 `ad7ebb00…`, which it matched): the hinge
+24.9 % of the body back where this builder typed 25.8 %, the line at +16.2° of pitch with
+**−17.5° of yaw and −10.5° of roll**. The yaw is the point of it: this snout is long and turned,
+and the old cut was a curve of y (`T.bisect_on_curve` shears the head by −seam(y)), which cannot
+carry a term in x at all. The reviewer was also looking at something no gape proof could see: with
+*Mouth geometry* on in the viewer, the lining **came out through the cheeks**.
+
+**What was poking out, measured before anything moved.** Painted an emissive marker and
+photographed shut from four units off both flanks and from above, the shipped head showed **9,714
+marker pixels** (5,007 left, 3,194 right, 1,513 top) in patches under and behind the eye, above the
+real mouth line. Of twelve camera rays cast through marker pixels on the left flank, eleven met the
+lining first, and on two of them there was no skin on the line at all — lining standing out past
+the snout's own silhouette. Ray parity over the shipped mesh (nine oblique rays, majority vote)
+put 2 of the 720 lining vertices outside the solid; the marker and the rays are what showed the
+rest. The cause: the lining was fitted by a shrink towards the mouth's axis in twelve steps of
+3.5 % against `depth()`, and where twelve were not enough it **returned the vertex at 0.615 of the
+way out regardless** — a shrink with a floor under it, and the floor is where the geometry came out.
+
+**What moved, and why it is not a re-seat.** A tube fitted about one mouth line does not close an
+aperture cut on another, and a cut mouth is closed by its own rim, so the builder now cuts on the
+document exactly as Cartorhynchus' does: schema and id asserted; frame asserted against the
+document's bounding box (worst 1.5e-08 units); plane and hinge read straight off the file; the mouth
+line read on the body's own centreline `cx`; `T.cap_cut` over the hinge wall, then `T.cap_mouth`
+along the mouth line, each half domed into itself (dome 0.30, ceiling 0.55 of the head's own room,
+limbs excluded from the head's section); `T.jaw_junction` with `rear` = the document's hinge wall and
+`dz` over the mandible's whole depth. The lining and the hinge envelope are retired — the body
+carries no oral mesh at all now, so the viewer offers no *Mouth geometry* switch for it and nothing
+is hidden in play. Every bone but `jaw` is where it was (the skull still hangs off the typed
+station); the jaw joint sits on the aimed hinge line at the centreline and turns about the frame's x
+like every jaw in the era — the audits read the gape as the jaw's local rotation, so a bone rolled
+onto the document's axis (22.6° off x) reads its own rest offset as a gape on every clip, which is
+what the first build on this cut did.
+
+**The forelimb guard stays, and a second bound joins it.** The document's rule is two half-spaces,
+and the editor says outright that a limb tucked under the snout falls inside them — this is the
+animal it was written about. So the mandible is the document's rule *and* not nearer a limb's own
+polyline than the axial one (the guard from the 0.45 repair) *and* in the head: a hinge wall yawed
+17.5° leans back across one cheek, and "ahead of the hinge" on that flank runs to the shoulder, so
+nothing more than 0.049 of a body behind the hinge's own station (the wall's reach across the head's
+measured section, plus 0.01) is jaw. The mandible's box is asserted against the head (0.112 deep).
+**The right forefoot's skin travel over its own joint**, `lag.mjs`' figure: in `Swim` 1.10 → **1.12**
+(the other feet 1.03, 1.04 and 1.08 before and after); on the clip that carries each joint furthest,
+1.01 → 1.01, every limb joint 0.88–1.03.
+
+`cut_rim`: one closed loop per half (208 vertices authored, 97 twin). Every cap vertex is held to
+its own body's closed surface — the twin to the twin's — and asserted: none stands out of the skin
+by more than 0.0025 raw, none is seen along any of the cube's 26 directions, and the intake's own
+section hull (limbs excluded) clears every authored cap vertex to within 0.0005 raw.
+
+**The gape, over every clip that opens the jaw**, at each clip's own peak (`gape-solid.py`, backdrop
+test `r > .90, g < .20, b > .90`; *through / opened*). *Plain* is what the file contains, *as drawn*
+is what the game draws (oral parts hidden), *shown* is what the viewer's *Mouth geometry* switch drew:
+
+| Shot | plain, before → after | as drawn, before → after | shown, before → after |
+| --- | ---: | ---: | ---: |
+| `Bite@0.1` | 0 / 0 → 0 / 0 | 0 / 10,730 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Heavy@0.5667` | 0 / 0 → 0 / 0 | 2 / 6,360 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Ability@0.3333` | 0 / 0 → 0 / 0 | 1 / 10,156 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Attack@0.4` | 0 / 0 → 0 / 0 | 1 / 7,604 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Eat@0.3667` | 0 / 0 → 0 / 0 | 1 / 8,764 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Hit@0.3` | 0 / 0 → 0 / 0 | 1 / 6,623 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Stagger@0.5333` | 0 / 0 → 0 / 0 | 3 / 6,782 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Death@1.8` | 0 / 0 → 0 / 0 | 9 / 6,779 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Breath@1.1` | 0 / 0 → 0 / 0 | 8 / 3,914 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Grab@0.1` | 0 / 0 → 0 / 0 | 4 / 5,800 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Breathe@1.5` | 0 / 0 → 0 / 0 | 3 / 5,338 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Guard@0.6` | 0 / 0 → 0 / 0 | 11 / 3,406 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Idle@1.5` | 0 / 0 → 0 / 0 | 67 / 1,527 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Swim@0.9333` | 0 / 0 → 0 / 0 | 76 / 1,588 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Sprint@0.5333` | 0 / 0 → 0 / 0 | 77 / 1,630 → 0 / 0 | 0 / 0 → 0 / 0 |
+| worst | **0 / 0 → 0 / 0** | **77 / 10,730 → 0 / 0** | **0 / 0 → 0 / 0** |
+
+As drawn, the shipped mouth opened 10,730 px at `Bite` and leaked through the head with the mouth
+all but shut — 67–77 px at `Idle`, `Swim` and `Sprint`. Every one is 0 now.
+
+**What it cost, measured on the packaged files.** Skin `4.43x` unchanged; the mouth region `jaw`
+4.02x → 2.82x and `skull` 2.02x → 2.50x, both at `Ability`. `lag.mjs`: 79 pairs on the document's
+hinge wall, worst 0.01 % of a body; the jaw follows its bone 1.00 in `Bite`/`Attack`/`Heavy` and 0.98
+in `Eat`. (Read off the hinge's *station*, as `lag.mjs` did before it learned aimed walls, the yawed
+wall's lip corner on one flank counted as the cut and failed at 1.34 % — the mouth opening, not a
+slot.) `idle-bones`: every joint owns skin. Twin 30.8 % of the authored triangles; envelope 0.99 %
+of a body. Anchors: mouth 0.67 %, attack 0.23 % of a body from the surface, swallow inside by parity
+and by the head's own section. One tooth patch straddles the cut at the snout tip (29 of 46 on the
+jaw), the same patch the painted cut straddled (11 of 46). `oral-shell-audit`: no oral lining on any
+variant. The reviewer's `npm run triassic:mouth` file now refuses on the hash (the body is
+`ff9138761391…`), which is what consuming it looks like.
 
 ## The performance
 
@@ -260,9 +356,9 @@ skin, packaging parity exact and the LOD1 byte-identical to the twin.
 | Section envelope, authored against twin, 21 stations | 0.0496 (0.99 % of body length) | 4 % |
 | Authored surface to twin surface, max | 0.0327 | 0.20 |
 | Authored surface to twin surface, p95 | 0.0159 | — |
-| `anchor_mouth` to the nearest surface | 0.0028 of body length | 2 % |
-| `anchor_attack_primary` to the nearest surface | 0.0040 of body length | 2 % |
-| `anchor_mouth_inside`, inside the head | yes, 0.041 of body length from the surface | 5 % |
+| `anchor_mouth` to the nearest surface | 0.0067 of body length | 2 % |
+| `anchor_attack_primary` to the nearest surface | 0.0023 of body length | 2 % |
+| `anchor_mouth_inside`, inside the head | yes by parity and section, 0.028 of body length from the surface | 5 % |
 | Limb roots seated inside the trunk | all four | > 0.010 raw |
 | Skin influences | 4 max, 3.18 mean | 4 |
 | Loop seams | 0.0 on all 8 looping clips | 1e-6 |

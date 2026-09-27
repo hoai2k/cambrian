@@ -3,24 +3,24 @@
   "models": [
     {
       "suffix": "",
-      "bytes": 1890296,
-      "sha256": "134d7f01fd21e04cd01b62a36b30d537c49455e9bab335437e902c5df5f7da7d",
-      "triangles": 22410,
-      "vertices": 13287
+      "bytes": 1881108,
+      "sha256": "070441275bbb372dcff0f1a523870ac4085bc4d26833bee02415c8317e3d7d01",
+      "triangles": 21630,
+      "vertices": 12659
     },
     {
       "suffix": ".puppet",
-      "bytes": 632068,
-      "sha256": "ff712025260394314b12c165c62ab6e49e46bc36e940b76d11440ccd25de0396",
-      "triangles": 7476,
-      "vertices": 3894
+      "bytes": 620572,
+      "sha256": "bf31a68d6c9091149695bd4f2553937752297dbf2c1c969d67ace531d1e5af5b",
+      "triangles": 6482,
+      "vertices": 3249
     },
     {
       "suffix": ".lod1",
-      "bytes": 632068,
-      "sha256": "ff712025260394314b12c165c62ab6e49e46bc36e940b76d11440ccd25de0396",
-      "triangles": 7476,
-      "vertices": 3894
+      "bytes": 620572,
+      "sha256": "bf31a68d6c9091149695bd4f2553937752297dbf2c1c969d67ace531d1e5af5b",
+      "triangles": 6482,
+      "vertices": 3249
     }
   ],
   "clips": 24,
@@ -33,7 +33,7 @@
       "t": [
         0.025898244231939316,
         -0.33000028133392334,
-        0.08260340243577957
+        0.09612616151571274
       ],
       "r": [
         0,
@@ -53,9 +53,9 @@
       "name": "anchor_mouth",
       "parent": "jaw",
       "t": [
-        0.05681004747748375,
-        -0.41000044345855713,
-        0.11859872192144394
+        0.06231163814663887,
+        -0.4472217559814453,
+        0.2428835779428482
       ],
       "r": [
         0,
@@ -75,9 +75,9 @@
       "name": "anchor_mouth_inside",
       "parent": "skull",
       "t": [
-        0.039135973900556564,
-        -0.10000026226043701,
-        -0.06558332592248917
+        0.02507494017481804,
+        -0.06262814998626709,
+        -0.09154031425714493
       ],
       "r": [
         0,
@@ -97,102 +97,102 @@
   "clipSignatures": [
     {
       "name": "Ability",
-      "sha256": "2472b23daf9f2bfd85078efcc7e0ed3068c91574760c80473e29028c360d2e0a"
+      "sha256": "41a4a5d36951b726e5ce6b6423fe968c99570baa338c0918ab69e86c86b73758"
     },
     {
       "name": "Attack",
-      "sha256": "e3db17d848e37de22a32288a59f495cdacc42b0e3aba5d76d69f514370b9ce6c"
+      "sha256": "8f39a9d696105b39c79b863a98984a3d101fa6bf28bcbe0f6181741b452119fc"
     },
     {
       "name": "Bite",
-      "sha256": "07181fd9d93754715573ccdfc757deb2530cf063046c1496328d253eb24ebcaf"
+      "sha256": "968a498906fcddcfe138653b74f3278ad339f7dd4421e6adf7e24ac88d9f6cd8"
     },
     {
       "name": "Breath",
-      "sha256": "655e877416d0b1bc19d567c2fa75f212878c8b066ce18393caeca3b618804a1c"
+      "sha256": "c990a4a466024883a99427bee6cf757009b35c064e06d0b496e3891b3cc2be54"
     },
     {
       "name": "Death",
-      "sha256": "79d5bacfc9049cc19305fa5812dec2d26d980b361b976e6f78627606146099b7"
+      "sha256": "77c3a04a2996590bc5acfff4cfed19d36d04d137665c03e3eacc5ae70f7b035f"
     },
     {
       "name": "Dive",
-      "sha256": "fc29729b025ad8feef342edeb90102fa9b88ec0d324737a70a3294c770ed9a9d"
+      "sha256": "7954ad8eb360b1a6fd1c81460bd93c482d768289f8e7f7f2cd477ea1e594d794"
     },
     {
       "name": "Dodge",
-      "sha256": "b18eed4175367966c06a71353d776df90862ba899f045f2d543a98ecf5a5c1dc"
+      "sha256": "3f737ddab7714d58204836de45085f530f1799ec653ab93a55367b24202a071b"
     },
     {
       "name": "Eat",
-      "sha256": "7fae8444aa800900b4d37da7045dc4d351318ee7728a28f17ef949e1e5a3679f"
+      "sha256": "2b0396faf0c414624f2d0e8bcf3fb2063084e6ce880854aee3272abd703bca3a"
     },
     {
       "name": "FastStart",
-      "sha256": "fbc99c034ec7b8e6cf74dca2d83672a02efb66e196bed4559067782f55986c49"
+      "sha256": "e889efe589047b4ac9c57530821e39d14ca2db05544c9ba67fb04c540b83c93a"
     },
     {
       "name": "Flop",
-      "sha256": "b84204f322d40e3356413f873ca4e76b581764a70bed0becb03c58d44e247a48"
+      "sha256": "3bb704b6901372971691d36bff6481cc40817f2fb20a926d8933ef4022d31810"
     },
     {
       "name": "Gape",
-      "sha256": "7f25319798c4c58ab26dbc3c4e206d800535100807014248bb216bacd5781b1e"
+      "sha256": "0326f95cf130e05c4f8784fb407bfd7dee68b7f7cc673794942a7586a5a68142"
     },
     {
       "name": "Grab",
-      "sha256": "ab1e4652522d8e839311f7b3ee16b78aa06c22e026906a6028e702e51ec5d724"
+      "sha256": "45820f961121b0f90a2882ec4ee8871f26b556ae472c665ab2cc96678c3852e3"
     },
     {
       "name": "Growth",
-      "sha256": "e31112288a60d18c92e31933a358c50e15b0e9ca92f01bdf8b43ab4d721700ea"
+      "sha256": "ae4f9c12e59121fd976e9230dd04225fdd224aa2d4d05f3b1fe981fcd2d6e4e6"
     },
     {
       "name": "Guard",
-      "sha256": "3d0c2d85ada3999b22f9a7a7ff3707a14d4ccc3eab5ce75569c14c4365c97c1e"
+      "sha256": "50ab96abcaec57c2eb7195850587d8aea7b1d207503eeb0c117d23c020f6475a"
     },
     {
       "name": "Heavy",
-      "sha256": "1d503a1e2c4d5273354d1eeb2138544656e714376ca0ee45ba7c062ae3ff79d8"
+      "sha256": "62f49c56ff9e27026c1dd57dc30e3c10c32049797dd1dabb97cc18f0dc20ac88"
     },
     {
       "name": "Hit",
-      "sha256": "b490f9c055bd43ee092178363e57c186fb24452e59b30f48af3c6067f3f51d5b"
+      "sha256": "008d49e939cd57ad1a848977d62c4dd24534fc794e4f67f8d58959cbadd35595"
     },
     {
       "name": "Idle",
-      "sha256": "be69c06f495c55cb75549fac9ac0ca8dde2096d4acd08baf6437025d35621c6c"
+      "sha256": "9b1d1894ce0ddcee7d2a899a67704a1d541ccf24e0f56087e03fdb793571969f"
     },
     {
       "name": "Parry",
-      "sha256": "1356ac595a3c7957f6e0f1093501d2994679e14e6ac0820df911e10a1bd5923a"
+      "sha256": "c44c368f8904b7625ac2a16249e76c51cfefdbadfd6faa42f82a57d11953b2ed"
     },
     {
       "name": "Rise",
-      "sha256": "9a7676e6a6d703c4fc9ea484a771b46830232cefafd3ae26a3cec4a0868948cd"
+      "sha256": "07b4234d29327193e51e0a78de78710787ced623366d116c612afcc3ae2269ee"
     },
     {
       "name": "Sprint",
-      "sha256": "70ae08f5ab728b76de3e746edfd0a6f07f52a8d50a1b14f5e0429865aa46e457"
+      "sha256": "1e838e41d27fac26298a83e860fb708766b48b4f8e24c7f0895404a29502f076"
     },
     {
       "name": "Stagger",
-      "sha256": "4b760b3786088b2fb69c82c8f4ef5eb453400be4d03757f24960a0d42cc6f2bd"
+      "sha256": "768a31729a00c4f542d860b134d9f2d0166e3f9fa9c28ee9ceabb17fe900e9d5"
     },
     {
       "name": "Swim",
-      "sha256": "f8c2f94bee314c4580675228f61cb84815c15b436a48710812c40e89fe04f14e"
+      "sha256": "05a30f83721d2a3dfded04b07065976e5d3f5cde3ba0adeb2eb0610031f924ae"
     },
     {
       "name": "TurnLeft",
-      "sha256": "8fb3790bc6524cf868d0e4bfd294aec10987c9312099bbf5195328bc4f5e7cbf"
+      "sha256": "35cb41de9c425ca84e371f68cad5108614ce623532355eeeaa30cde39fd17aae"
     },
     {
       "name": "TurnRight",
-      "sha256": "7c9ff01680d30c99c1ff165e70bddefcc1e11d445f47fdb6382d93a9841b0faa"
+      "sha256": "3c8438a3bc4cd3ac017c700893e37f03bbde91ca28c27f34da966cd356d46fd1"
     }
   ],
-  "twinTriangleFraction": 0.33360107095046854,
+  "twinTriangleFraction": 0.29967637540453074,
   "playback": [
     {
       "suffix": "",
@@ -201,145 +201,145 @@
           "clip": "Ability",
           "duration": 1,
           "samples": 61,
-          "maxVertexTravel": 1.6270258590991458
+          "maxVertexTravel": 1.6359904476316427
         },
         {
           "clip": "Attack",
           "duration": 0.8999999761581421,
           "samples": 61,
-          "maxVertexTravel": 1.0588897108537532
+          "maxVertexTravel": 1.0695039859176132
         },
         {
           "clip": "Bite",
           "duration": 0.46666666865348816,
           "samples": 61,
-          "maxVertexTravel": 0.6629075212913083
+          "maxVertexTravel": 0.664210538603876
         },
         {
           "clip": "Breath",
           "duration": 2.4000000953674316,
           "samples": 61,
-          "maxVertexTravel": 0.6175144592305434
+          "maxVertexTravel": 0.6205192492684984
         },
         {
           "clip": "Death",
           "duration": 1.7999999523162842,
           "samples": 61,
-          "maxVertexTravel": 2.943180276622311
+          "maxVertexTravel": 2.980063826840214
         },
         {
           "clip": "Dive",
           "duration": 1.2999999523162842,
           "samples": 61,
-          "maxVertexTravel": 0.5346348166900843
+          "maxVertexTravel": 0.5544597795502219
         },
         {
           "clip": "Dodge",
           "duration": 0.46666666865348816,
           "samples": 61,
-          "maxVertexTravel": 1.161133880828601
+          "maxVertexTravel": 1.1336910334780785
         },
         {
           "clip": "Eat",
           "duration": 1.5,
           "samples": 61,
-          "maxVertexTravel": 0.43229691338365395
+          "maxVertexTravel": 0.4341920878104241
         },
         {
           "clip": "FastStart",
           "duration": 0.699999988079071,
           "samples": 61,
-          "maxVertexTravel": 3.940933604096062
+          "maxVertexTravel": 3.9476659139665364
         },
         {
           "clip": "Gape",
           "duration": 1.2999999523162842,
           "samples": 61,
-          "maxVertexTravel": 0.500159514965379
+          "maxVertexTravel": 0.4708834551989839
         },
         {
           "clip": "Grab",
           "duration": 1.100000023841858,
           "samples": 61,
-          "maxVertexTravel": 0.5274491027503385
+          "maxVertexTravel": 0.5094976675796881
         },
         {
           "clip": "Growth",
           "duration": 1.5,
           "samples": 61,
-          "maxVertexTravel": 0.5169842261402762
+          "maxVertexTravel": 0.5190870502684704
         },
         {
           "clip": "Guard",
           "duration": 1.2000000476837158,
           "samples": 61,
-          "maxVertexTravel": 0.34167649411730044
+          "maxVertexTravel": 0.3424810581385422
         },
         {
           "clip": "Heavy",
           "duration": 1.100000023841858,
           "samples": 61,
-          "maxVertexTravel": 1.0599781473829766
+          "maxVertexTravel": 1.0705984596221223
         },
         {
           "clip": "Hit",
           "duration": 0.5333333611488342,
           "samples": 61,
-          "maxVertexTravel": 0.7133697345748339
+          "maxVertexTravel": 0.6196092192407093
         },
         {
           "clip": "Idle",
           "duration": 2.5999999046325684,
           "samples": 61,
-          "maxVertexTravel": 0.3181349407373217
+          "maxVertexTravel": 0.31953125603322813
         },
         {
           "clip": "Parry",
           "duration": 0.3333333432674408,
           "samples": 61,
-          "maxVertexTravel": 1.0744950404206963
+          "maxVertexTravel": 1.0773733314501786
         },
         {
           "clip": "Rise",
           "duration": 1.2999999523162842,
           "samples": 61,
-          "maxVertexTravel": 0.4234293111914605
+          "maxVertexTravel": 0.4371880703662779
         },
         {
           "clip": "Sprint",
           "duration": 0.9333333373069763,
           "samples": 61,
-          "maxVertexTravel": 1.9161267312897938
+          "maxVertexTravel": 1.9240379366929163
         },
         {
           "clip": "Stagger",
           "duration": 1.2000000476837158,
           "samples": 61,
-          "maxVertexTravel": 0.8974402030332996
+          "maxVertexTravel": 0.775509469139121
         },
         {
           "clip": "Swim",
           "duration": 1.5,
           "samples": 61,
-          "maxVertexTravel": 1.3667584503357177
+          "maxVertexTravel": 1.372603128144985
         },
         {
           "clip": "TurnLeft",
           "duration": 1.399999976158142,
           "samples": 61,
-          "maxVertexTravel": 1.0256246333212156
+          "maxVertexTravel": 0.9458172165095236
         },
         {
           "clip": "TurnRight",
           "duration": 1.399999976158142,
           "samples": 61,
-          "maxVertexTravel": 1.612734057453797
+          "maxVertexTravel": 1.5680047522864422
         },
         {
           "clip": "Flop",
           "duration": 0.800000011920929,
           "samples": 61,
-          "maxVertexTravel": 3.412278256912564
+          "maxVertexTravel": 3.4217405960754657
         }
       ]
     },
@@ -350,13 +350,13 @@
           "clip": "Ability",
           "duration": 1,
           "samples": 61,
-          "maxVertexTravel": 1.6402433380915389
+          "maxVertexTravel": 1.6402433375210528
         },
         {
           "clip": "Attack",
           "duration": 0.8999999761581421,
           "samples": 61,
-          "maxVertexTravel": 1.0746433985011226
+          "maxVertexTravel": 1.0746433981294357
         },
         {
           "clip": "Bite",
@@ -374,13 +374,13 @@
           "clip": "Death",
           "duration": 1.7999999523162842,
           "samples": 61,
-          "maxVertexTravel": 2.998674084125274
+          "maxVertexTravel": 2.998674083075553
         },
         {
           "clip": "Dive",
           "duration": 1.2999999523162842,
           "samples": 61,
-          "maxVertexTravel": 0.5633416089378547
+          "maxVertexTravel": 0.5633416087517991
         },
         {
           "clip": "Dodge",
@@ -428,7 +428,7 @@
           "clip": "Heavy",
           "duration": 1.100000023841858,
           "samples": 61,
-          "maxVertexTravel": 1.0757415013975327
+          "maxVertexTravel": 1.075741501025467
         },
         {
           "clip": "Hit",
@@ -452,7 +452,7 @@
           "clip": "Rise",
           "duration": 1.2999999523162842,
           "samples": 61,
-          "maxVertexTravel": 0.44339201214887775
+          "maxVertexTravel": 0.44339201199776423
         },
         {
           "clip": "Sprint",
@@ -611,346 +611,346 @@
       "maxOpenRadians": 0.03000000228632211,
       "minRadians": 8.881784197001252e-15,
       "peakPhase": 0.5,
-      "mouthSocketTravelInSkullFrame": 0.012803794265878568
+      "mouthSocketTravelInSkullFrame": 0.015267033500562707
     },
     {
       "clip": "Swim",
       "maxOpenRadians": 0.02996346539818456,
       "minRadians": -3.410605131648481e-13,
       "peakPhase": 0.5,
-      "mouthSocketTravelInSkullFrame": 0.012788201761281157
+      "mouthSocketTravelInSkullFrame": 0.015248441250982804
     },
     {
       "clip": "Sprint",
       "maxOpenRadians": 0.03000000228632211,
       "minRadians": 2.2737367544323206e-13,
       "peakPhase": 0.5,
-      "mouthSocketTravelInSkullFrame": 0.01280379424369482
+      "mouthSocketTravelInSkullFrame": 0.015267033478239085
     },
     {
       "clip": "TurnLeft",
       "maxOpenRadians": 0,
       "minRadians": 0,
       "peakPhase": 0,
-      "mouthSocketTravelInSkullFrame": 8.908848018021073e-16
+      "mouthSocketTravelInSkullFrame": 8.961656023355713e-16
     },
     {
       "clip": "TurnRight",
       "maxOpenRadians": 0,
       "minRadians": 0,
       "peakPhase": 0,
-      "mouthSocketTravelInSkullFrame": 1.1106186879145144e-15
+      "mouthSocketTravelInSkullFrame": 1.1102230246251565e-15
     },
     {
       "clip": "Dive",
       "maxOpenRadians": 0,
       "minRadians": 0,
       "peakPhase": 0,
-      "mouthSocketTravelInSkullFrame": 8.905875023529544e-16
+      "mouthSocketTravelInSkullFrame": 8.888557877610145e-16
     },
     {
       "clip": "Rise",
       "maxOpenRadians": 0,
       "minRadians": 0,
       "peakPhase": 0,
-      "mouthSocketTravelInSkullFrame": 8.901548895386232e-16
+      "mouthSocketTravelInSkullFrame": 8.900196549101993e-16
     },
     {
       "clip": "Attack",
       "maxOpenRadians": 0.5599985782520791,
       "minRadians": -3.261012396247759e-9,
       "peakPhase": 0.4583333333333333,
-      "mouthSocketTravelInSkullFrame": 0.23590163628518396
+      "mouthSocketTravelInSkullFrame": 0.2812852275817418
     },
     {
       "clip": "Bite",
       "maxOpenRadians": 0.6193876025030605,
       "minRadians": -7.105427357601002e-14,
       "peakPhase": 0.2708333333333333,
-      "mouthSocketTravelInSkullFrame": 0.2601546830094591
+      "mouthSocketTravelInSkullFrame": 0.31020416124001937
     },
     {
       "clip": "Heavy",
       "maxOpenRadians": 0.699595654122129,
       "minRadians": -3.49586812541463e-12,
       "peakPhase": 0.4791666666666667,
-      "mouthSocketTravelInSkullFrame": 0.2925416977840658
+      "mouthSocketTravelInSkullFrame": 0.3488219044870531
     },
     {
       "clip": "Hit",
       "maxOpenRadians": 0.3000000489350671,
       "minRadians": 0,
       "peakPhase": 0.5,
-      "mouthSocketTravelInSkullFrame": 0.12756313498980393
+      "mouthSocketTravelInSkullFrame": 0.15210418208392587
     },
     {
       "clip": "Death",
       "maxOpenRadians": 0.2600000587723491,
       "minRadians": 0,
       "peakPhase": 1,
-      "mouthSocketTravelInSkullFrame": 0.11065808240818084
+      "mouthSocketTravelInSkullFrame": 0.13194688372928123
     },
     {
       "clip": "Guard",
       "maxOpenRadians": 0.06000002322373293,
       "minRadians": 0,
       "peakPhase": 0.5,
-      "mouthSocketTravelInSkullFrame": 0.025604715686516826
+      "mouthSocketTravelInSkullFrame": 0.03053064146819195
     },
     {
       "clip": "Parry",
       "maxOpenRadians": 0,
       "minRadians": 0,
       "peakPhase": 0,
-      "mouthSocketTravelInSkullFrame": 9.472860953274757e-16
+      "mouthSocketTravelInSkullFrame": 9.470001470981493e-16
     },
     {
       "clip": "Dodge",
       "maxOpenRadians": 0,
       "minRadians": 0,
       "peakPhase": 0,
-      "mouthSocketTravelInSkullFrame": 8.921809491438631e-16
+      "mouthSocketTravelInSkullFrame": 8.900196549101993e-16
     },
     {
       "clip": "Eat",
       "maxOpenRadians": 0.49854212745676346,
       "minRadians": 0.10000000584277584,
       "peakPhase": 0.75,
-      "mouthSocketTravelInSkullFrame": 0.16897788499975402
+      "mouthSocketTravelInSkullFrame": 0.2014864482684619
     },
     {
       "clip": "Stagger",
       "maxOpenRadians": 0.3000000489350671,
       "minRadians": 0,
       "peakPhase": 0.5,
-      "mouthSocketTravelInSkullFrame": 0.1275631349898039
+      "mouthSocketTravelInSkullFrame": 0.15210418208392582
     },
     {
       "clip": "Ability",
       "maxOpenRadians": 0.7399999446454848,
       "minRadians": -6.986179189975188e-9,
       "peakPhase": 0.4791666666666667,
-      "mouthSocketTravelInSkullFrame": 0.3086815027959969
+      "mouthSocketTravelInSkullFrame": 0.3680667422758661
     },
     {
       "clip": "Grab",
       "maxOpenRadians": 0.16708339832966157,
       "minRadians": 0.11999999038149944,
       "peakPhase": 0.75,
-      "mouthSocketTravelInSkullFrame": 0.020093765365366036
+      "mouthSocketTravelInSkullFrame": 0.023959475064379718
     },
     {
       "clip": "Breath",
       "maxOpenRadians": 0.11999999735386131,
       "minRadians": -1.8627510506222408e-9,
       "peakPhase": 0.5,
-      "mouthSocketTravelInSkullFrame": 0.05118636790932225
+      "mouthSocketTravelInSkullFrame": 0.061033782443788015
     },
     {
       "clip": "Growth",
       "maxOpenRadians": 0,
       "minRadians": 0,
       "peakPhase": 0,
-      "mouthSocketTravelInSkullFrame": 6.690187733356916e-16
+      "mouthSocketTravelInSkullFrame": 8.900805130356702e-16
     },
     {
       "clip": "FastStart",
       "maxOpenRadians": 0.3000000489350671,
       "minRadians": 0,
       "peakPhase": 0.4791666666666667,
-      "mouthSocketTravelInSkullFrame": 0.1275631347917674
+      "mouthSocketTravelInSkullFrame": 0.15210418192623246
     },
     {
       "clip": "Gape",
       "maxOpenRadians": 0.9200001457478642,
       "minRadians": 0,
       "peakPhase": 0.375,
-      "mouthSocketTravelInSkullFrame": 0.3789622528628729
+      "mouthSocketTravelInSkullFrame": 0.45186835166320377
     },
     {
       "clip": "Flop",
-      "maxOpenRadians": 0.21023415093383793,
-      "minRadians": 0.11465944134867648,
+      "maxOpenRadians": 0.21266995298454414,
+      "minRadians": 0.11599492277840473,
       "peakPhase": 0.16666666666666666,
-      "mouthSocketTravelInSkullFrame": 0.022128735168490305
+      "mouthSocketTravelInSkullFrame": 0.026522641581272516
     }
   ],
   "strike": [
     {
       "clip": "Attack",
-      "snoutPathLength": 1.5331698932175657,
-      "snoutReach": 0.5246614498483887,
+      "snoutPathLength": 1.536352782981016,
+      "snoutReach": 0.5250801734477032,
       "halfTravelInFractionOfClip": 0.3020833333333333
     },
     {
       "clip": "Heavy",
-      "snoutPathLength": 1.5349261710751476,
-      "snoutReach": 0.5247545056487555,
+      "snoutPathLength": 1.5377079637255204,
+      "snoutReach": 0.5249465976522137,
       "halfTravelInFractionOfClip": 0.2916666666666667
     },
     {
       "clip": "Ability",
-      "snoutPathLength": 1.9973073656398146,
-      "snoutReach": 1.1988648748033879,
+      "snoutPathLength": 2.0030558902643807,
+      "snoutReach": 1.2005423925507068,
       "halfTravelInFractionOfClip": 0.25
     },
     {
       "clip": "FastStart",
-      "snoutPathLength": 4.180405634539444,
-      "snoutReach": 1.2103045274755884,
+      "snoutPathLength": 4.179925462755431,
+      "snoutReach": 1.2104577434172674,
       "halfTravelInFractionOfClip": 0.25
     },
     {
       "clip": "Bite",
-      "snoutPathLength": 0.3868237197365048,
-      "snoutReach": 0.1801231483700029,
+      "snoutPathLength": 0.38633975500296974,
+      "snoutReach": 0.1801236661505096,
       "halfTravelInFractionOfClip": 0.3333333333333333
     }
   ],
   "anchorTravel": [
     {
       "clip": "Idle",
-      "anchor_mouth": 0.010988169489957464,
-      "anchor_mouth_inside": 0.0042521201144787345,
-      "anchor_attack_primary": 0.005569364511839003
+      "anchor_mouth": 0.013415607173238527,
+      "anchor_mouth_inside": 0.00420297245504325,
+      "anchor_attack_primary": 0.005645889699805104
     },
     {
       "clip": "Swim",
-      "anchor_mouth": 0.021896006781452197,
-      "anchor_mouth_inside": 0.018601795834176413,
-      "anchor_attack_primary": 0.023312969886730563
+      "anchor_mouth": 0.023557801630544703,
+      "anchor_mouth_inside": 0.01860072592171118,
+      "anchor_attack_primary": 0.02369307104097741
     },
     {
       "clip": "Sprint",
-      "anchor_mouth": 0.029484914254870265,
-      "anchor_mouth_inside": 0.027645914013046093,
-      "anchor_attack_primary": 0.03444232386375582
+      "anchor_mouth": 0.029910592221206362,
+      "anchor_mouth_inside": 0.027692437747162863,
+      "anchor_attack_primary": 0.03501384334875135
     },
     {
       "clip": "TurnLeft",
-      "anchor_mouth": 0.4153963997151558,
-      "anchor_mouth_inside": 0.36608888841033177,
-      "anchor_attack_primary": 0.4331999585678631
+      "anchor_mouth": 0.41883344646307913,
+      "anchor_mouth_inside": 0.3549115147973922,
+      "anchor_attack_primary": 0.43663697954048253
     },
     {
       "clip": "TurnRight",
-      "anchor_mouth": 0.42958768802558867,
-      "anchor_mouth_inside": 0.37849445429056355,
-      "anchor_attack_primary": 0.44736013938231106
+      "anchor_mouth": 0.4329863153749729,
+      "anchor_mouth_inside": 0.36800947495293407,
+      "anchor_attack_primary": 0.4507702556994434
     },
     {
       "clip": "Dive",
-      "anchor_mouth": 0.003787479949091246,
-      "anchor_mouth_inside": 0.003269936063899014,
-      "anchor_attack_primary": 0.004172316997611462
+      "anchor_mouth": 0.0038715638003243213,
+      "anchor_mouth_inside": 0.003286899222244872,
+      "anchor_attack_primary": 0.0042652961873855255
     },
     {
       "clip": "Rise",
-      "anchor_mouth": 0.005053305231866204,
-      "anchor_mouth_inside": 0.004465785572935217,
-      "anchor_attack_primary": 0.0053612308756182964
+      "anchor_mouth": 0.005116291925994178,
+      "anchor_mouth_inside": 0.0044863284964531125,
+      "anchor_attack_primary": 0.005433723973130823
     },
     {
       "clip": "Attack",
-      "anchor_mouth": 0.5186125578253579,
-      "anchor_mouth_inside": 0.5217052770813824,
-      "anchor_attack_primary": 0.5246344113588612
+      "anchor_mouth": 0.5809905271244467,
+      "anchor_mouth_inside": 0.5211105874376402,
+      "anchor_attack_primary": 0.5250661931834265
     },
     {
       "clip": "Bite",
-      "anchor_mouth": 0.297741414918491,
-      "anchor_mouth_inside": 0.1845877356856791,
-      "anchor_attack_primary": 0.1801231483700029
+      "anchor_mouth": 0.3712482319406783,
+      "anchor_mouth_inside": 0.18624874657173623,
+      "anchor_attack_primary": 0.1801236661505096
     },
     {
       "clip": "Heavy",
-      "anchor_mouth": 0.5177861445390939,
-      "anchor_mouth_inside": 0.5233408461271488,
-      "anchor_attack_primary": 0.5247305432634662
+      "anchor_mouth": 0.5971360990262381,
+      "anchor_mouth_inside": 0.5230178402579619,
+      "anchor_attack_primary": 0.5249246329713194
     },
     {
       "clip": "Hit",
-      "anchor_mouth": 0.24690052558137057,
-      "anchor_mouth_inside": 0.24207100741926482,
-      "anchor_attack_primary": 0.25341985637474423
+      "anchor_mouth": 0.23856841575297708,
+      "anchor_mouth_inside": 0.24624273385203216,
+      "anchor_attack_primary": 0.2561071141659825
     },
     {
       "clip": "Death",
-      "anchor_mouth": 0.1592857793910466,
-      "anchor_mouth_inside": 0.17893123806090042,
-      "anchor_attack_primary": 0.26069149371053846
+      "anchor_mouth": 0.15419878110560073,
+      "anchor_mouth_inside": 0.22333275307955447,
+      "anchor_attack_primary": 0.27885101057557543
     },
     {
       "clip": "Guard",
-      "anchor_mouth": 0.15593764397955653,
-      "anchor_mouth_inside": 0.11758076624644895,
-      "anchor_attack_primary": 0.13214484434687893
+      "anchor_mouth": 0.15925390802275877,
+      "anchor_mouth_inside": 0.11533880518422349,
+      "anchor_attack_primary": 0.13218901919302734
     },
     {
       "clip": "Parry",
-      "anchor_mouth": 0.29971925206868133,
-      "anchor_mouth_inside": 0.3152722163115686,
-      "anchor_attack_primary": 0.2841826331570077
+      "anchor_mouth": 0.29602707860143207,
+      "anchor_mouth_inside": 0.3224509523329846,
+      "anchor_attack_primary": 0.2805381952980556
     },
     {
       "clip": "Dodge",
-      "anchor_mouth": 0.10160561884370962,
-      "anchor_mouth_inside": 0.12608942826969122,
-      "anchor_attack_primary": 0.09225352420339694
+      "anchor_mouth": 0.09876761889322347,
+      "anchor_mouth_inside": 0.13696424162900342,
+      "anchor_attack_primary": 0.0912896448459703
     },
     {
       "clip": "Eat",
-      "anchor_mouth": 0.15662893837846112,
-      "anchor_mouth_inside": 0.013287870408708382,
-      "anchor_attack_primary": 0.0373624647442719
+      "anchor_mouth": 0.18893490931375584,
+      "anchor_mouth_inside": 0.009940402539108066,
+      "anchor_attack_primary": 0.03749549272684417
     },
     {
       "clip": "Stagger",
-      "anchor_mouth": 0.3265993277787185,
-      "anchor_mouth_inside": 0.31978916530737295,
-      "anchor_attack_primary": 0.33233134262672337
+      "anchor_mouth": 0.31834790167981797,
+      "anchor_mouth_inside": 0.3242442453015791,
+      "anchor_attack_primary": 0.33521931036816754
     },
     {
       "clip": "Ability",
-      "anchor_mouth": 1.191647922248811,
-      "anchor_mouth_inside": 1.1834371276873237,
-      "anchor_attack_primary": 1.1988648748033879
+      "anchor_mouth": 1.193325012460604,
+      "anchor_mouth_inside": 1.180749289303904,
+      "anchor_attack_primary": 1.2005423925507068
     },
     {
       "clip": "Grab",
-      "anchor_mouth": 0.07966909621385308,
-      "anchor_mouth_inside": 0.07457364471177216,
-      "anchor_attack_primary": 0.0827192990867333
+      "anchor_mouth": 0.08564321980264838,
+      "anchor_mouth_inside": 0.07602767520643297,
+      "anchor_attack_primary": 0.08322729925038473
     },
     {
       "clip": "Breath",
-      "anchor_mouth": 0.3800548743555675,
-      "anchor_mouth_inside": 0.3878740845567192,
-      "anchor_attack_primary": 0.43226292367757313
+      "anchor_mouth": 0.37693617141989466,
+      "anchor_mouth_inside": 0.38097938600997333,
+      "anchor_attack_primary": 0.43233313194157863
     },
     {
       "clip": "Growth",
-      "anchor_mouth": 0.13879829145763475,
-      "anchor_mouth_inside": 0.1307271862747967,
-      "anchor_attack_primary": 0.13954320083660693
+      "anchor_mouth": 0.13877904532658356,
+      "anchor_mouth_inside": 0.12940514146658808,
+      "anchor_attack_primary": 0.13953865524769893
     },
     {
       "clip": "FastStart",
-      "anchor_mouth": 1.205013214657618,
-      "anchor_mouth_inside": 1.1494439025746648,
-      "anchor_attack_primary": 1.2103045274755884
+      "anchor_mouth": 1.2060404669576394,
+      "anchor_mouth_inside": 1.1392344865653012,
+      "anchor_attack_primary": 1.2104577434172674
     },
     {
       "clip": "Gape",
-      "anchor_mouth": 0.17798948046457583,
-      "anchor_mouth_inside": 0.2096726610103932,
-      "anchor_attack_primary": 0.23774284577348287
+      "anchor_mouth": 0.2827939638919123,
+      "anchor_mouth_inside": 0.20658462792065072,
+      "anchor_attack_primary": 0.23671670563881603
     },
     {
       "clip": "Flop",
-      "anchor_mouth": 0.08886480316134578,
-      "anchor_mouth_inside": 0.02868195960226705,
-      "anchor_attack_primary": 0.10324226632179492
+      "anchor_mouth": 0.09550451852088673,
+      "anchor_mouth_inside": 0.019579251740146325,
+      "anchor_attack_primary": 0.10397727491034855
     }
   ]
 }

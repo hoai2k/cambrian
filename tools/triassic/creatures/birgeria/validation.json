@@ -802,9 +802,9 @@
       "radiusOuter": 0.06675387117389622
     }
   },
-  "authoredTriangles": 22410,
-  "twinTriangles": 7476,
-  "twinTriangleFraction": 0.33360107095046854,
+  "authoredTriangles": 21630,
+  "twinTriangles": 6482,
+  "twinTriangleFraction": 0.29967637540453074,
   "twinRemeshTriangles": 101812,
   "twinDecimateRatio": 0.05107453092932701,
   "twinVerticesHeldBackFromRelaxation": 13938,
@@ -941,7 +941,8 @@
     "Gape": 0.92
   },
   "mouthCutDeviation": {
-    "cutFromMeasuredLineRaw": 0.0,
+    "note": "The cut is the aimed plane now. cutFromMeasuredLineRaw is how far that plane stands from the generation's own modelled slit at worst, over the slit's stations; the straight-ramp figures are what the slit itself would have cost cut as a line.",
+    "cutFromMeasuredLineRaw": 0.025622728624362084,
     "aStraightCutWouldHaveDeviatedRaw": 0.01605754521989927,
     "aStraightCutWouldHaveDeviatedOverLocalRadius": 0.18696054379319674
   },
@@ -1007,7 +1008,7 @@
     "Idle": [
       [
         -1.3033838272094727,
-        -1.955920696258545,
+        -1.961855411529541,
         -1.2094857692718506
       ],
       [
@@ -1019,7 +1020,7 @@
     "Swim": [
       [
         -1.32049560546875,
-        -1.9564547538757324,
+        -1.961750864982605,
         -1.230472445487976
       ],
       [
@@ -1031,7 +1032,7 @@
     "Sprint": [
       [
         -1.328184962272644,
-        -1.956761360168457,
+        -1.9619752168655396,
         -1.2394835948944092
       ],
       [
@@ -1091,7 +1092,7 @@
     "Attack": [
       [
         -1.3124122619628906,
-        -2.4624452590942383,
+        -2.5353963375091553,
         -1.2179232835769653
       ],
       [
@@ -1103,7 +1104,7 @@
     "Bite": [
       [
         -1.2974625825881958,
-        -2.1361780166625977,
+        -2.2340147495269775,
         -1.2115806341171265
       ],
       [
@@ -1115,7 +1116,7 @@
     "Heavy": [
       [
         -1.3102513551712036,
-        -2.460547924041748,
+        -2.5350327491760254,
         -1.2179232835769653
       ],
       [
@@ -1139,7 +1140,7 @@
     "Death": [
       [
         -1.453927755355835,
-        -1.960843563079834,
+        -1.9962401390075684,
         -1.624049186706543
       ],
       [
@@ -1151,7 +1152,7 @@
     "Guard": [
       [
         -1.3049447536468506,
-        -1.9607232809066772,
+        -1.9723961353302002,
         -1.2280875444412231
       ],
       [
@@ -1187,7 +1188,7 @@
     "Eat": [
       [
         -1.3055849075317383,
-        -1.9658498764038086,
+        -2.0503358840942383,
         -1.2123329639434814
       ],
       [
@@ -1223,11 +1224,11 @@
     "Grab": [
       [
         -1.3226896524429321,
-        -2.122194290161133,
+        -2.1603832244873047,
         -1.234644889831543
       ],
       [
-        1.2795860767364502,
+        1.2795859575271606,
         2.9662880897521973,
         0.9518960118293762
       ]
@@ -1259,7 +1260,7 @@
     "FastStart": [
       [
         -1.8556767702102661,
-        -2.60836124420166,
+        -2.663928508758545,
         -1.2162376642227173
       ],
       [
@@ -1271,7 +1272,7 @@
     "Gape": [
       [
         -1.2974625825881958,
-        -2.0271620750427246,
+        -2.170516014099121,
         -1.2034000158309937
       ],
       [
@@ -1284,13 +1285,13 @@
   "weights": {
     "Birgeria authored body": {
       "maxInfluences": 4,
-      "vertices": 10418,
+      "vertices": 10819,
       "verticesPerBone": {
         "body": 4790,
         "tail_00": 1690,
-        "chest": 5441,
-        "skull": 2367,
-        "jaw": 992,
+        "chest": 5637,
+        "skull": 2671,
+        "jaw": 1017,
         "dorsal": 1141,
         "tail_01": 1298,
         "tail_02": 1092,
@@ -1300,7 +1301,7 @@
         "pec_mid_R": 380,
         "pec_tip_L": 255,
         "tail_06": 956,
-        "caudal_upper": 577,
+        "caudal_upper": 579,
         "caudal_lower": 516,
         "tail_03": 939,
         "tail_04": 776,
@@ -1309,22 +1310,22 @@
         "pec_tip_R": 166
       },
       "jawJunction": {
-        "cutRimPairs": 102,
-        "lipPairs": 83,
-        "rimReach": 0.09558802490348096,
-        "rimDepth": 0.0660240426659584,
-        "dz": 0.022008014221986134,
+        "cutRimPairs": 77,
+        "lipPairs": 69,
+        "rimReach": 0.09092415741616368,
+        "rimDepth": 0.03569643199443817,
+        "dz": 0.03569643013179302,
         "band": 0.015,
         "back": 0.06,
         "throat": 1.0,
-        "shellVertices": 523,
-        "shellFullJaw": 427,
-        "bodyThroatVertices": 327
+        "shellVertices": 700,
+        "shellFullJaw": 551,
+        "bodyThroatVertices": 257
       }
     },
     "Birgeria procedural volume twin": {
       "maxInfluences": 4,
-      "vertices": 2871,
+      "vertices": 3245,
       "verticesPerBone": {
         "caudal_lower": 233,
         "tail_06": 311,
@@ -1338,39 +1339,39 @@
         "dorsal": 306,
         "tail_00": 497,
         "body": 1348,
-        "chest": 1593,
-        "pec_upper_R": 279,
-        "skull": 786,
-        "pec_upper_L": 323,
+        "chest": 1743,
+        "pec_upper_R": 273,
+        "skull": 1000,
+        "pec_upper_L": 320,
         "pec_mid_R": 174,
         "pec_tip_R": 70,
         "pec_mid_L": 187,
         "pec_tip_L": 64,
-        "jaw": 411
+        "jaw": 436
       },
       "jawJunction": {
-        "cutRimPairs": 54,
-        "lipPairs": 51,
-        "rimReach": 0.0951282914786829,
-        "rimDepth": 0.06560225784778595,
-        "dz": 0.021867419282595318,
+        "cutRimPairs": 44,
+        "lipPairs": 52,
+        "rimReach": 0.09098726528554839,
+        "rimDepth": 0.035296618938446045,
+        "dz": 0.035296620801091194,
         "band": 0.015,
         "back": 0.06,
         "throat": 1.0,
-        "shellVertices": 215,
-        "shellFullJaw": 171,
-        "bodyThroatVertices": 116
+        "shellVertices": 405,
+        "shellFullJaw": 334,
+        "bodyThroatVertices": 107
       }
     }
   },
   "maxInfluences": 4,
-  "meanInfluences": 2.7696591165625706,
+  "meanInfluences": 2.7198521046643913,
   "mouth": {
-    "method": "modelled cavity (geometric), cross-checked against the painted line",
+    "method": "aimed by hand in the viewer's mouth editor (docs/triassic/mouths/birgeria-mouth.json); the modelled slit -- found by the geometric method and cross-checked against the painted line -- is measured beside it and no longer cuts",
     "note": "Placodus' geometric method reaches this animal: over the front 0.17 of the body it returns 79 vertices, all of them on the rostrum, and the cavity profile runs from y -0.3818 to -0.2968. The painted line was read independently as a cross-check -- a matched filter for a thin dark line between lighter skin, resolved as one continuous path -- and lands within 0.057 of the local radius of it on average, 0.276 at worst.",
     "cavityVertices": 79,
-    "hingeY": -0.2967968361377715,
-    "jawFrontY": -0.3907968361377716,
+    "hingeY": -0.2893224060535431,
+    "slitBackY": -0.2967968361377715,
     "cavityMidHeight": [
       [
         -0.3818,
@@ -1906,175 +1907,7 @@
     "paintedLineFlankDisagreementMaxOverRadius": 0.55,
     "paintedVersusModelledMaxOverLocalRadius": 0.2764935204041902,
     "paintedVersusModelledMeanOverLocalRadius": 0.05691064980941036,
-    "liningCoverage": [
-      [
-        -0.3668,
-        0.98,
-        1.198
-      ],
-      [
-        -0.3643,
-        0.981,
-        1.15
-      ],
-      [
-        -0.3618,
-        0.982,
-        1.15
-      ],
-      [
-        -0.3593,
-        0.982,
-        1.15
-      ],
-      [
-        -0.3493,
-        0.985,
-        1.15
-      ],
-      [
-        -0.3468,
-        0.985,
-        1.15
-      ],
-      [
-        -0.3443,
-        0.986,
-        1.15
-      ],
-      [
-        -0.3418,
-        0.986,
-        1.15
-      ],
-      [
-        -0.3393,
-        0.986,
-        1.15
-      ],
-      [
-        -0.3368,
-        0.987,
-        1.15
-      ],
-      [
-        -0.3343,
-        0.987,
-        1.15
-      ],
-      [
-        -0.3318,
-        0.988,
-        1.15
-      ],
-      [
-        -0.3293,
-        0.988,
-        1.15
-      ],
-      [
-        -0.3268,
-        0.988,
-        1.15
-      ],
-      [
-        -0.3243,
-        0.988,
-        1.15
-      ],
-      [
-        -0.3218,
-        0.988,
-        1.15
-      ],
-      [
-        -0.3193,
-        0.988,
-        1.15
-      ],
-      [
-        -0.3168,
-        0.988,
-        1.15
-      ],
-      [
-        -0.3143,
-        0.988,
-        1.15
-      ],
-      [
-        -0.3118,
-        0.988,
-        1.15
-      ],
-      [
-        -0.3093,
-        0.988,
-        1.15
-      ],
-      [
-        -0.3068,
-        0.988,
-        1.15
-      ],
-      [
-        -0.3043,
-        0.988,
-        1.07
-      ],
-      [
-        -0.3018,
-        0.989,
-        1.033
-      ],
-      [
-        -0.2993,
-        0.989,
-        1.074
-      ]
-    ],
-    "liningWorstDepthPerStation": {
-      "-0.2868": 0.00097,
-      "-0.2923": 0.00038,
-      "-0.2978": 2e-05,
-      "-0.3033": -0.00078,
-      "-0.3088": 0.00061,
-      "-0.3143": 0.00132,
-      "-0.3198": 0.00104,
-      "-0.3253": 0.00068,
-      "-0.3308": 0.00059,
-      "-0.3363": 0.00079,
-      "-0.3418": 0.00072,
-      "-0.3473": 0.00083,
-      "-0.3528": -0.017,
-      "-0.3583": 0.0003,
-      "-0.3638": 0.0006,
-      "-0.3693": -0.00083,
-      "-0.3748": -0.00134,
-      "-0.3668": -0.00026,
-      "-0.3643": 0.00061,
-      "-0.3618": 0.00061,
-      "-0.3593": 0.00042,
-      "-0.3493": -0.00996,
-      "-0.3468": 0.00083,
-      "-0.3443": 0.00074,
-      "-0.3393": 0.00062,
-      "-0.3368": 0.0008,
-      "-0.3343": 0.00064,
-      "-0.3318": 0.00064,
-      "-0.3293": 0.00077,
-      "-0.3268": 0.00111,
-      "-0.3243": 0.00067,
-      "-0.3218": 0.0009,
-      "-0.3193": 0.00107,
-      "-0.3168": 0.00121,
-      "-0.3118": 0.00126,
-      "-0.3093": 0.00094,
-      "-0.3068": -0.00082,
-      "-0.3043": 0.00155,
-      "-0.3018": -0.0018,
-      "-0.2993": 0.00045
-    },
+    "seamInsideTheHeadMinRaw": 0.0218469919438653,
     "toothPatches": [
       {
         "vertices": 63,
@@ -2083,8 +1916,8 @@
           -0.3877164423465729,
           -0.34359022974967957
         ],
-        "onJaw": 55,
-        "onSkull": 8
+        "onJaw": 63,
+        "onSkull": 0
       },
       {
         "vertices": 61,
@@ -2093,8 +1926,8 @@
           -0.3887968361377716,
           -0.29976826906204224
         ],
-        "onJaw": 2,
-        "onSkull": 59
+        "onJaw": 0,
+        "onSkull": 61
       },
       {
         "vertices": 23,
@@ -2219,42 +2052,461 @@
     ],
     "toothPatchesStraddlingTheCut": [],
     "authoredToothRows": [],
-    "oralPartSeating": [
-      {
-        "part": "Oral cavity lining",
-        "worstDepthRaw": -0.01168354693800211
+    "oralParts": [],
+    "closure": "the cut's own rim: T.cap_cut at the hinge cross-section, then T.cap_mouth along the mouth line, each half domed into itself (dome 0.30, ceiling 0.55 of the head's own room either side of the mouth line). No lining and no hinge envelope: both were retired with the cut they were fitted to.",
+    "cutRim": {
+      "Birgeria authored body": {
+        "skull": {
+          "boundaryEdgesInRegion": 145,
+          "boundaryEdgesElsewhere": 12,
+          "loops": [
+            {
+              "vertices": 145,
+              "closed": true,
+              "box": [
+                [
+                  -0.09336,
+                  0.06771
+                ],
+                [
+                  -0.37451,
+                  -0.28543
+                ],
+                [
+                  -0.0502,
+                  0.03912
+                ]
+              ],
+              "reach": 0.08908,
+              "verticesOnTheSeam": 0
+            }
+          ]
+        },
+        "jaw": {
+          "boundaryEdgesInRegion": 145,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 145,
+              "closed": true,
+              "box": [
+                [
+                  -0.09336,
+                  0.06771
+                ],
+                [
+                  -0.37451,
+                  -0.28543
+                ],
+                [
+                  -0.0502,
+                  0.03912
+                ]
+              ],
+              "reach": 0.08908,
+              "verticesOnTheSeam": 0
+            }
+          ]
+        }
       },
-      {
-        "part": "Seated jaw hinge tissue",
-        "worstDepthRaw": 0.010037008672952652
+      "Birgeria procedural volume twin": {
+        "skull": {
+          "boundaryEdgesInRegion": 95,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 95,
+              "closed": true,
+              "box": [
+                [
+                  -0.09323,
+                  0.06777
+                ],
+                [
+                  -0.39061,
+                  -0.28544
+                ],
+                [
+                  -0.0498,
+                  0.04879
+                ]
+              ],
+              "reach": 0.10517,
+              "verticesOnTheSeam": 0
+            }
+          ]
+        },
+        "jaw": {
+          "boundaryEdgesInRegion": 95,
+          "boundaryEdgesElsewhere": 0,
+          "loops": [
+            {
+              "vertices": 95,
+              "closed": true,
+              "box": [
+                [
+                  -0.09323,
+                  0.06777
+                ],
+                [
+                  -0.39061,
+                  -0.28544
+                ],
+                [
+                  -0.0498,
+                  0.04879
+                ]
+              ],
+              "reach": 0.10517,
+              "verticesOnTheSeam": 0
+            }
+          ]
+        }
       }
-    ]
+    },
+    "caps": {
+      "Birgeria authored body": {
+        "skullAtHinge": 76,
+        "jawAtHinge": 76,
+        "palate": {
+          "rimEdges": 71,
+          "capped": true,
+          "faces": 621,
+          "domedVertices": 276,
+          "deepestRaw": 0.021547,
+          "dome": 0.3,
+          "rounds": 2,
+          "firstNewVertex": 9843,
+          "rimVertices": 71,
+          "cycles": [
+            71
+          ]
+        },
+        "floor": {
+          "rimEdges": 71,
+          "capped": true,
+          "faces": 621,
+          "domedVertices": 276,
+          "deepestRaw": 0.021547,
+          "dome": 0.3,
+          "rounds": 2,
+          "firstNewVertex": 424,
+          "rimVertices": 71,
+          "cycles": [
+            71
+          ]
+        }
+      },
+      "Birgeria procedural volume twin": {
+        "skullAtHinge": 43,
+        "jawAtHinge": 43,
+        "palate": {
+          "rimEdges": 54,
+          "capped": true,
+          "faces": 468,
+          "domedVertices": 208,
+          "deepestRaw": 0.022652,
+          "dome": 0.3,
+          "rounds": 2,
+          "firstNewVertex": 2632,
+          "rimVertices": 54,
+          "cycles": [
+            54
+          ]
+        },
+        "floor": {
+          "rimEdges": 54,
+          "capped": true,
+          "faces": 468,
+          "domedVertices": 208,
+          "deepestRaw": 0.022652,
+          "dome": 0.3,
+          "rounds": 2,
+          "firstNewVertex": 197,
+          "rimVertices": 54,
+          "cycles": [
+            54
+          ]
+        }
+      }
+    },
+    "capSeating": {
+      "Birgeria authored body": {
+        "capVertices": 552,
+        "worstHullClearanceRaw": 0.002131252374062968,
+        "outsideTheSectionHull": 0,
+        "outsideByRayParity": 101,
+        "seenFromOutsideAlong26Directions": 1,
+        "seenFromOutsideAt": [
+          [
+            -0.074,
+            -0.3274,
+            0.0221,
+            0.00115
+          ]
+        ],
+        "standingOutOfTheSkin": 0
+      },
+      "Birgeria procedural volume twin": {
+        "capVertices": 416,
+        "worstHullClearanceRaw": 0.0006739440294435566,
+        "outsideTheSectionHull": 0,
+        "outsideByRayParity": 62,
+        "seenFromOutsideAlong26Directions": 7,
+        "seenFromOutsideAt": [
+          [
+            -0.0063,
+            -0.3896,
+            0.0445,
+            0.00112
+          ],
+          [
+            0.0488,
+            -0.3353,
+            -0.0013,
+            0.00133
+          ],
+          [
+            0.0552,
+            -0.3269,
+            -0.0082,
+            0.0016
+          ],
+          [
+            -0.0046,
+            -0.3896,
+            0.0436,
+            0.00176
+          ],
+          [
+            -0.0614,
+            -0.3621,
+            0.0376,
+            0.00123
+          ],
+          [
+            -0.0224,
+            -0.3887,
+            0.0459,
+            0.00172
+          ],
+          [
+            -0.0063,
+            -0.3894,
+            0.0444,
+            0.00103
+          ]
+        ],
+        "standingOutOfTheSkin": 0
+      }
+    },
+    "jawJunctionDzShare": 1.0,
+    "rimSelectorTolerance": 0.0025,
+    "jawAxisIsTheFramesX": true,
+    "aimedHingeAxisAgainstTheFramesXDegrees": 9.86021305753944,
+    "aimedCut": {
+      "file": "docs/triassic/mouths/birgeria-mouth.json",
+      "appliesTo": "built",
+      "sha256": "134d7f01fd21e04cd01b62a36b30d537c49455e9bab335437e902c5df5f7da7d",
+      "consumed": true,
+      "note": "Cut on. The file hash-matched the shipped body it was aimed on; rebuilding on it is what consuming it looks like, so npm run triassic:mouth now refuses it on the hash by design. The frame is asserted against the bounding box the document measured instead.",
+      "frameFitWorstUnits": 1.1920928955078125e-07,
+      "hingeCentreRaw": [
+        -0.02242339961230755,
+        -0.2893224060535431,
+        -0.014411799609661102
+      ],
+      "jawJointRaw": [
+        -0.02187334932386875,
+        -0.28935256600379944,
+        -0.014502523466944695
+      ],
+      "planeNormalRaw": [
+        0.1661950647830963,
+        0.5303951501846313,
+        0.8313003182411194
+      ],
+      "mouthLineForwardRaw": [
+        0.041283003985881805,
+        -0.846027135848999,
+        0.5315390825271606
+      ],
+      "hingeAxisRaw": [
+        0.9852284789085388,
+        -0.05402102693915367,
+        -0.16250108182430267
+      ],
+      "pitchDegrees": 32.109,
+      "yawDegrees": 2.794,
+      "rollDegrees": -11.061,
+      "mandibleVerticesInTheDocument": 731,
+      "hingeBehindTheSlitRaw": 0.007474430084228434,
+      "belowTheSlitMaxRaw": 0.025622728624362084,
+      "belowTheSlitAtTheSnoutRaw": -0.0039786973886669075,
+      "worstOverLocalHeadHalfDepth": 0.2983294900605171,
+      "perStation": [
+        [
+          -0.3818,
+          -0.00398
+        ],
+        [
+          -0.3793,
+          -0.00289
+        ],
+        [
+          -0.3768,
+          -0.00197
+        ],
+        [
+          -0.3743,
+          -0.00121
+        ],
+        [
+          -0.3718,
+          -0.00053
+        ],
+        [
+          -0.3693,
+          0.00012
+        ],
+        [
+          -0.3668,
+          0.0007
+        ],
+        [
+          -0.3643,
+          0.00097
+        ],
+        [
+          -0.3618,
+          0.00066
+        ],
+        [
+          -0.3593,
+          -0.00026
+        ],
+        [
+          -0.3493,
+          0.00333
+        ],
+        [
+          -0.3468,
+          0.00226
+        ],
+        [
+          -0.3443,
+          0.00166
+        ],
+        [
+          -0.3418,
+          0.00144
+        ],
+        [
+          -0.3393,
+          0.00131
+        ],
+        [
+          -0.3368,
+          0.00098
+        ],
+        [
+          -0.3343,
+          0.00056
+        ],
+        [
+          -0.3318,
+          0.00017
+        ],
+        [
+          -0.3293,
+          -0.00011
+        ],
+        [
+          -0.3268,
+          -0.00027
+        ],
+        [
+          -0.3243,
+          -0.00033
+        ],
+        [
+          -0.3218,
+          -0.00033
+        ],
+        [
+          -0.3193,
+          -0.00025
+        ],
+        [
+          -0.3168,
+          6e-05
+        ],
+        [
+          -0.3143,
+          0.00085
+        ],
+        [
+          -0.3118,
+          0.00248
+        ],
+        [
+          -0.3093,
+          0.0052
+        ],
+        [
+          -0.3068,
+          0.00894
+        ],
+        [
+          -0.3043,
+          0.01329
+        ],
+        [
+          -0.3018,
+          0.01773
+        ],
+        [
+          -0.2993,
+          0.02186
+        ],
+        [
+          -0.2968,
+          0.02562
+        ]
+      ]
+    }
   },
   "envelope": {
     "maximumEnvelopeDifference": 0.03846085071563721,
     "maximumEnvelopeDifferenceFractionOfBodyLength": 0.007692170143127441,
-    "surfaceDistanceMax": 0.0797542855143547,
-    "surfaceDistanceP95": 0.015809403453022237,
+    "surfaceDistanceMax": 0.04040456935763359,
+    "surfaceDistanceP95": 0.015642309188842775,
     "envelopeTolerance": 0.2
   },
   "anchors": {
     "anchor_mouth": {
-      "nearestSurfaceRaw": 0.004965210799127817,
-      "nearestSurfaceUnits": 0.024826053995639086,
-      "fractionOfBodyLength": 0.004965210799127817,
-      "depthInsideSkinRaw": 0.004965210799127817
+      "nearestSurfaceRaw": 0.0024216731544584036,
+      "nearestSurfaceUnits": 0.012108365772292018,
+      "fractionOfBodyLength": 0.0024216731544584036,
+      "depthInsideSkinRaw": 0.0024216731544584036,
+      "insideByRayParity": true,
+      "sectionHullClearanceRaw": 0.026232207866223472
     },
     "anchor_mouth_inside": {
-      "nearestSurfaceRaw": 0.029301773756742477,
-      "nearestSurfaceUnits": 0.1465088687837124,
-      "fractionOfBodyLength": 0.029301773756742477,
-      "depthInsideSkinRaw": 0.029301773756742477
+      "nearestSurfaceRaw": 0.030383022502064705,
+      "nearestSurfaceUnits": 0.15191511251032352,
+      "fractionOfBodyLength": 0.030383022502064705,
+      "depthInsideSkinRaw": 0.030383022502064705,
+      "insideByRayParity": true,
+      "sectionHullClearanceRaw": 0.04499365481556629
     },
     "anchor_attack_primary": {
-      "nearestSurfaceRaw": 0.0005832135793752968,
-      "nearestSurfaceUnits": 0.002916067896876484,
-      "fractionOfBodyLength": 0.0005832135793752968,
-      "depthInsideSkinRaw": -0.0005832135793752968
+      "nearestSurfaceRaw": 0.0017080629477277398,
+      "nearestSurfaceUnits": 0.008540314738638699,
+      "fractionOfBodyLength": 0.0017080629477277398,
+      "depthInsideSkinRaw": 0.0017080629477277398,
+      "insideByRayParity": true,
+      "sectionHullClearanceRaw": 0.019365982285089758
     }
   },
   "normalizedWeights": true,

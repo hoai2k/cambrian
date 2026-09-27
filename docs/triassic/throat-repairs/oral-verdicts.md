@@ -71,8 +71,8 @@ clip the audit says opens the jaw.
 | Hupehsuchus | 38 | 4,784 | |
 | Coelophysis | 3 | 7,276 | |
 | Mystriosuchus | 1 | 7,734 | |
-| Aphaneramma | 5 | 10,730 | |
-| Birgeria | 4 | **15,357** | measured at last in T3D-33 — the assertion that blocked it read a *constant* root channel as root motion. `Gape@0.467` 4/15,357, `Ability@0.467` 4/8,416, `Heavy@0.533` 2/7,239. The widest `opened` left on the roster, and the widest gape on it: nothing through the head, a mouth a single-sided runtime draws as a hole. Not re-cut here; it is the rollout's remaining work |
+| **Aphaneramma** | **0** | **0** | ported in T3D-38 on a human's re-aimed cut (`mouths/aphaneramma-mouth.json`): capped with its own rim, lining and hinge plug retired. Measured over **all fifteen** opening clips: the shipped body read **77 / 10,730** (the 77 at `Sprint`, a mouth all but shut); see [T3D-38](#t3d-38-two-linings-out-through-the-cheek-and-two-aimed-cuts-taken) |
+| **Birgeria** | **0** | **0** | ported in T3D-38 on a human's re-aimed cut (`mouths/birgeria-mouth.json`): capped with its own rim, lining and hinge plug retired. Measured over **all seventeen** opening clips: the shipped body read **203 / 15,357** — the widest `opened` on the roster at `Gape`, and 203 px through the head at `Swim` with the mouth all but shut; see [T3D-38](#t3d-38-two-linings-out-through-the-cheek-and-two-aimed-cuts-taken) |
 | **Henodus** | **0** | **0** | ported in T3D-32B: the cut makes the aperture, capped with its own rim fanned to a sunk hub (was 407 / 462). T3D-19's fringe pixels were **not** the fringe — a ray through every one of them meets one back face of the mandible and nothing else |
 | Dinocephalosaurus | **120** | 197 | its verdict was **neither**, and it is still right about the lining — but the `Seated jaw hinge tissue` that closes its hinge cross-section is hidden in play, so as drawn the head is open there |
 | Ceratites, Phragmoteuthis | — | — | no jaw and no mouth drawn; settled in T3D-02a and T3D-12B and unaffected by any of this |
@@ -84,6 +84,89 @@ measured it three ways and concluded correctly that the **sac** closed nothing t
 not already closing; what nobody asked was whether the hinge plug is drawn. It is not. So the
 verdict "neither" is right about a *lining* and wrong about the mouth: what that head needs is its
 hinge cross-section capped with its own vertices, which is `T.cap_cut`, and no lining at all.
+
+## T3D-38: two linings out through the cheek, and two aimed cuts taken
+
+**A body can pass every gape proof there is and still show its mouth on the outside of its face.**
+`gape-solid.py` counts backdrop the cull *opens*; a lining that stands proud of a cheek draws lining
+over skin, which is not backdrop. Birgeria and Aphaneramma were both doing it, and a reviewer saw it
+through the viewer's *Mouth geometry* switch before any instrument did.
+
+The instrument is a render and a ray. Painted an emissive marker the animal cannot produce, each
+shut head is photographed from four units off both flanks and from above; every marker pixel is
+mouth a camera outside the animal can see, and the camera's own ray cast through one asks every
+surface on the line whether the lining is really the first.
+
+| Body | marker pixels, shut head, shipped | the rays | the cause |
+| --- | ---: | --- | --- |
+| Birgeria | **14,868** (7,101 / 4,590 / 3,177) | 11 of 12 meet the lining first, 0.002–0.019 in front of the skin | seated by `depth()` beside the modelled slit, which reads the lumen's wall |
+| Aphaneramma | **9,714** (5,007 / 3,194 / 1,513) | 11 of 12 meet the lining first; on 2 there is no skin on the line at all | a twelve-step shrink that returned the vertex at 0.615 of the way out when twelve steps were not enough |
+
+Ray parity over the shipped meshes (nine oblique rays, majority) found only 35 of 816 and 2 of 720
+lining vertices outside the solid — the lining lies a hair proud over large areas, which a
+per-vertex vote barely registers and a picture shows at once.
+
+Both mouths had also been re-aimed in the viewer's mouth editor, and both files hash-matched the
+bodies they were aimed on. So the fix is not to re-seat the shells about the old line but to take
+the cut the reviewer aimed and close it the way this page's verdicts already close a cut: **with its
+own rim** (`T.cap_cut`, `T.cap_mouth`), following Cartorhynchus' builder. Neither body carries an
+oral mesh now, so there is nothing to hide in play and nothing for the switch to show; each cap
+vertex is asserted inside its own body's closed surface or within 0.0025 raw of its skin, and seen
+along none of the cube's 26 directions from further out than that. Neither body goes on
+`oral-greenlit.json`: that is a human's verdict, and there is no authored mouth geometry left on
+either for it to be about.
+
+`gape-solid.py` over every clip whose jaw leaves the shut pose, each at its own peak, before (the
+shipped `134d7f01…` and `ad7ebb00…`) and after; *through / opened*:
+
+#### Birgeria
+
+| Shot | plain, before → after | as drawn, before → after | shown, before → after |
+| --- | ---: | ---: | ---: |
+| `Gape@0.4667` | 0 / 423 → 0 / 0 | 4 / 15,357 → 0 / 0 | 0 / 423 → 0 / 0 |
+| `Ability@0.4667` | 0 / 122 → 0 / 0 | 4 / 8,416 → 0 / 0 | 0 / 122 → 0 / 0 |
+| `Heavy@0.5333` | 0 / 78 → 0 / 0 | 2 / 7,239 → 0 / 0 | 0 / 78 → 0 / 0 |
+| `Bite@0.1333` | 1 / 159 → 0 / 0 | 1 / 9,592 → 0 / 0 | 1 / 159 → 0 / 0 |
+| `Attack@0.4` | 0 / 85 → 0 / 0 | 1 / 7,487 → 0 / 0 | 0 / 85 → 0 / 0 |
+| `Eat@0.3667` | 0 / 107 → 0 / 0 | 1 / 8,067 → 0 / 0 | 0 / 107 → 0 / 0 |
+| `FastStart@0.3` | 0 / 32 → 0 / 0 | 4 / 5,539 → 0 / 0 | 0 / 32 → 0 / 0 |
+| `Hit@0.2667` | 0 / 21 → 0 / 0 | 1 / 4,724 → 0 / 0 | 0 / 21 → 0 / 0 |
+| `Stagger@0.6` | 0 / 17 → 0 / 0 | 4 / 4,656 → 0 / 0 | 0 / 17 → 0 / 0 |
+| `Death@1.8` | 0 / 17 → 0 / 0 | 0 / 4,842 → 0 / 0 | 0 / 17 → 0 / 0 |
+| `Flop@0.1333` | 0 / 78 → 0 / 0 | 3 / 7,446 → 0 / 0 | 0 / 78 → 0 / 0 |
+| `Grab@0.1` | 0 / 10 → 0 / 0 | 7 / 2,887 → 0 / 0 | 0 / 10 → 0 / 0 |
+| `Breath@1.2` | 0 / 5 → 0 / 0 | 44 / 616 → 0 / 0 | 0 / 5 → 0 / 0 |
+| `Guard@0.6` | 0 / 6 → 0 / 0 | 10 / 913 → 0 / 0 | 0 / 6 → 0 / 0 |
+| `Idle@1.3` | 0 / 4 → 0 / 0 | 81 / 378 → 0 / 0 | 0 / 4 → 0 / 0 |
+| `Sprint@0.4667` | 0 / 4 → 0 / 0 | 194 / 375 → 0 / 0 | 0 / 4 → 0 / 0 |
+| `Swim@0.7333` | 0 / 4 → 0 / 0 | 203 / 407 → 0 / 0 | 0 / 4 → 0 / 0 |
+| worst | **1 / 423 → 0 / 0** | **203 / 15,357 → 0 / 0** | **1 / 423 → 0 / 0** |
+
+#### Aphaneramma
+
+| Shot | plain, before → after | as drawn, before → after | shown, before → after |
+| --- | ---: | ---: | ---: |
+| `Bite@0.1` | 0 / 0 → 0 / 0 | 0 / 10,730 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Heavy@0.5667` | 0 / 0 → 0 / 0 | 2 / 6,360 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Ability@0.3333` | 0 / 0 → 0 / 0 | 1 / 10,156 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Attack@0.4` | 0 / 0 → 0 / 0 | 1 / 7,604 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Eat@0.3667` | 0 / 0 → 0 / 0 | 1 / 8,764 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Hit@0.3` | 0 / 0 → 0 / 0 | 1 / 6,623 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Stagger@0.5333` | 0 / 0 → 0 / 0 | 3 / 6,782 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Death@1.8` | 0 / 0 → 0 / 0 | 9 / 6,779 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Breath@1.1` | 0 / 0 → 0 / 0 | 8 / 3,914 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Grab@0.1` | 0 / 0 → 0 / 0 | 4 / 5,800 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Breathe@1.5` | 0 / 0 → 0 / 0 | 3 / 5,338 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Guard@0.6` | 0 / 0 → 0 / 0 | 11 / 3,406 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Idle@1.5` | 0 / 0 → 0 / 0 | 67 / 1,527 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Swim@0.9333` | 0 / 0 → 0 / 0 | 76 / 1,588 → 0 / 0 | 0 / 0 → 0 / 0 |
+| `Sprint@0.5333` | 0 / 0 → 0 / 0 | 77 / 1,630 → 0 / 0 | 0 / 0 → 0 / 0 |
+| worst | **0 / 0 → 0 / 0** | **77 / 10,730 → 0 / 0** | **0 / 0 → 0 / 0** |
+
+The *shown* column is the switch's view: before, the lining closed every gape it was drawn in (so
+the plain and shown runs agree) while standing out of the cheek at rest; after, there is nothing
+to switch. Pictures: `verification/birgeria-mouth-space.png` and `aphaneramma-mouth-space.png`, and
+the shipped linings as the switch drew them in `*-mouth-space-before-shown.png`.
 
 ## T3D-31: the three ported bodies
 
