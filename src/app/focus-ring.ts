@@ -12,13 +12,15 @@ import type { Screen } from './App';
  * They are listed in the order they sit on screen, left to right, so the ring matches what the eye
  * would do. `main` is always present and is what the screen is for; the rest come and go.
  */
-export type FocusGroup = 'era' | 'main' | 'modes' | 'icons';
+export type FocusGroup = 'era' | 'main' | 'modes' | 'views' | 'icons';
 
 export interface FocusOpts {
   /** The title screen offers the trilogy's page, bottom left — but only when the era names one. */
   link: boolean;
   /** The icon buttons hide themselves when a player has asked for a bare sea. */
   icons: boolean;
+  /** The pick screen's List and Size tabs, which a desktop draws and a phone does not. */
+  views?: boolean;
 }
 
 /** The ring for a screen, in screen order. Always contains `main`. */
@@ -27,6 +29,7 @@ export function groupsFor(screen: Screen, menuOpen: boolean, o: FocusOpts): Focu
   if (screen === 'title' && o.link) ring.push('era');
   ring.push('main');
   if (screen === 'select') ring.push('modes');
+  if (screen === 'select' && o.views) ring.push('views');
   if (o.icons) ring.push('icons');
   // A menu over the sea owns the pad while it is up: its own choices and the icons, nothing else.
   if (menuOpen) return ring.filter((g) => g === 'main' || g === 'icons');

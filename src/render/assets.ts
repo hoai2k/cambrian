@@ -17,6 +17,7 @@ import { creature, WILD_IDS, type CreatureId } from '../sim/creatures';
 import { ensureLoaded } from './creature';
 import { loops, SAMPLES, sfxUrl } from '../audio/audio';
 import { appBase } from '../shared/base';
+import { modeArtFile } from '../shared/mode-art';
 
 export type AssetKind = 'glb' | 'lod' | 'thumb' | 'select' | 'ui' | 'sfx';
 export interface AssetItem { key: string; kind: AssetKind; url: string; size: number; priority: number; status: 'queued' | 'loading' | 'done' | 'failed'; loaded: number; }
@@ -84,7 +85,7 @@ export class AssetQueue {
     });
     // The pick screen's other art: one painted panel per mode it offers.
     ACTIVE_ERA.modes.forEach((m, i) => this.items.set(`ui:mode-${m.id}`, {
-      key: `ui:mode-${m.id}`, kind: 'ui', url: `${B}${assetPaths.ui(`mode-${m.id}.webp`)}`, size: 40_000, priority: 260 + i, status: 'queued', loaded: 0,
+      key: `ui:mode-${m.id}`, kind: 'ui', url: `${B}${assetPaths.ui(modeArtFile(m.id))}`, size: 40_000, priority: 260 + i, status: 'queued', loaded: 0,
     }));
     // Sizes so the bar is honest before the first byte arrives: the beds are measured, everything
     // else is a one-shot of about twelve kilobytes.

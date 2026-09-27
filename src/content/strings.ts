@@ -83,6 +83,16 @@ export interface GameStrings {
   readonly select: {
     readonly screenLabel: string;
     readonly rosterLabel: string;
+    /**
+     * The tabs over the roster on a desktop — the list, or every animal at its size where it lives —
+     * and the Size view's names for the three depths it draws.
+     */
+    readonly views: {
+      readonly label: string;
+      readonly list: string;
+      readonly size: string;
+      readonly bands: { readonly surface: string; readonly water: string; readonly floor: string };
+    };
     /** The engraved plate's captions: each figure in the index, and the chosen animal's plate. */
     readonly plate: {
       readonly fig: (n: number) => string;
@@ -681,6 +691,12 @@ export const SHARED_STRINGS: GameStrings = {
   select: {
     screenLabel: 'Choose your creature',
     rosterLabel: 'Creatures',
+    views: {
+      label: 'How the roster is shown',
+      list: 'List',
+      size: 'Size',
+      bands: { surface: 'Drifters', water: 'Open water', floor: 'Sea floor' },
+    },
     plate: {
       /** The small caption over each figure in the index, as a field guide numbers them. */
       fig: (n: number) => `Fig. ${n}`,

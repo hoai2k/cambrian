@@ -194,3 +194,52 @@
 @media (max-width: 759px), (max-height: 539px) {
   .select.plate .start-button { font-size: 16px; letter-spacing: .1em; padding: 10px 26px 11px; }
 }
+
+/* ---- the carousel's peeking neighbours, on paper ---- */
+.select.plate .peek-card { border-radius: 2px; border: 1px solid var(--ink-2); outline: 1px solid var(--ink-2); outline-offset: -5px; background: rgba(255, 248, 226, .3); }
+.select.plate .peek-card img { mix-blend-mode: multiply; filter: sepia(.35); opacity: .9; }
+.select.plate .peek-card .extra-glyph { color: var(--accent); font-family: var(--serif); }
+
+/* ---- the folder tabs over the roster ---- */
+.select.plate .roster-tab {
+  border: 1px solid var(--ink-2); border-bottom: 0; border-radius: 9px 9px 0 0; padding: 5px 26px 4px;
+  background: linear-gradient(#d9c496, #cdb682); color: var(--ink-2); font: 400 17px var(--serif-sc); letter-spacing: .06em;
+  box-shadow: inset 0 1px 0 rgba(255, 248, 226, .5);
+}
+.select.plate .roster-tab:hover { color: var(--ink-1); }
+.select.plate .roster-tab.active { background: var(--paper); color: var(--ink-1); padding-bottom: 5px; box-shadow: inset 0 2px 0 var(--accent); }
+.select.plate .roster-tab.pad-focus { outline-color: var(--accent); }
+.select.plate .roster-pane > .roster-grid { border-top: 1px solid var(--ink-2); padding-top: 12px; }
+
+/* ---- the Size view: an engraved section through the sea ---- */
+.select.plate .depth-view {
+  border: 1px solid var(--ink-2); outline: 1px solid var(--ink-2); outline-offset: -6px;
+  background: linear-gradient(rgba(150, 190, 186, .18), rgba(96, 146, 146, .3) 55%, rgba(58, 104, 108, .42));
+}
+.select.plate .depth-band + .depth-band { border-top: 1px dashed rgba(52, 38, 26, .22); }
+.select.plate .depth-label { left: 14px; top: 6px; font: italic 14px var(--serif); letter-spacing: 0; text-transform: none; color: var(--ink-2); }
+.select.plate .depth-surface {
+  height: 8px; margin-top: -4px; background:
+    radial-gradient(ellipse 10px 4px at 10px 0, transparent 8px, var(--ink-2) 8.5px, var(--ink-2) 9.5px, transparent 10px) 0 0 / 20px 8px repeat-x;
+  opacity: .8;
+}
+.select.plate .depth-floor {
+  background:
+    radial-gradient(rgba(52, 38, 26, .28) 0.8px, transparent 1.2px) 0 0 / 7px 6px,
+    linear-gradient(#d8c290, #c5ab74);
+  border-top: 1px solid var(--ink-2);
+}
+.select.plate .depth-spot { color: var(--ink-1); --pc: color-mix(in oklch, var(--c), var(--ink-1) 45%); }
+.select.plate .depth-spot img { filter: sepia(.25) saturate(.9) drop-shadow(0 4px 5px rgba(40, 30, 18, .3)); }
+.select.plate .depth-name { font: italic 15px/20px var(--serif); }
+.select.plate .depth-spot.hover .depth-name { color: var(--accent); }
+.select.plate .depth-spot.hover img { filter: sepia(.05) drop-shadow(0 0 1px var(--accent)) drop-shadow(0 6px 8px rgba(40, 30, 18, .35)); }
+.select.plate .depth-spot .cell-rings .ring { inset: calc(-4px - var(--k) * 4px); border-radius: 50%; border: 1.5px solid color-mix(in oklch, var(--c), var(--ink-1) 45%); box-shadow: none; }
+.select.plate .depth-spot .cell-rings .ring.locked { border-style: double; border-width: 4px; }
+.select.plate .depth-spot .lock-badge { top: 4px; right: 4px; }
+.select.plate .depth-spot.extra { border: 1px dashed var(--ink-3); background: rgba(255, 248, 226, .25); }
+.select.plate .depth-spot.extra .extra-glyph { font: 400 2em var(--serif); color: var(--ink-2); }
+.select.plate .depth-spot.extra .depth-name { font: 400 14px var(--serif-sc); font-style: normal; }
+.select.plate .depth-spot.extra.hover { border-style: solid; border-color: var(--accent); }
+/* A small animal's name is wider than its picture; it hangs out either side rather than being cut. */
+.select.plate .depth-name, .depth-name { overflow: visible; text-overflow: clip; justify-self: center; width: max-content; max-width: 150px; }

@@ -16,6 +16,8 @@ const OUT = process.argv[2];
 const BASE = process.env.QA_BASE_URL || 'http://127.0.0.1:4181/';
 const browser = await chromium.launch({ executablePath: process.env.QA_CHROME || '/opt/pw-browsers/chromium', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--no-sandbox'] });
 const failures = [];
+// Held upright the arrows give way to the neighbouring cards peeking in; on its side the arrows stay.
+const stepper = async (page, side) => ((await page.locator(`.carousel-step.${side}`).isVisible()) ? page.locator(`.carousel-step.${side}`) : page.locator(`.carousel-peek.${side}`));
 const title = (page) => page.evaluate(() => document.querySelector('.carousel .crew-card h2')?.textContent ?? '');
 const until = (page, fn, arg) => page.waitForFunction(fn, arg, { timeout: 20000 });
 
@@ -34,13 +36,18 @@ async function drive(era, w, h, full) {
     await page.locator('.select').waitFor({ timeout: 60000 });
     await page.locator('.carousel').waitFor({ timeout: 20000 });
     assert.equal(await page.locator('.roster-grid').count(), 0, 'the grid must not be drawn under the carousel');
+    if (h > w) {
+      assert.ok(await page.locator('.carousel-peek.next').isVisible() && !(await page.locator('.carousel-step.next').isVisible()), 'upright, the neighbouring cards peek in where the arrows were');
+      const card = await page.locator('.carousel .crew-card').boundingBox();
+      assert.ok(card.width >= w * 0.78, `upright, the card takes most of the width (${Math.round(card.width)} of ${w})`);
+    }
     const name0 = await title(page);
 
     // The arrows walk it.
-    await page.locator('.carousel-step.next').click();
+    await (await stepper(page, 'next')).click();
     await until(page, (n) => document.querySelector('.carousel .crew-card h2')?.textContent !== n, name0);
     const name1 = await title(page);
-    await page.locator('.carousel-step.prev').click();
+    await (await stepper(page, 'prev')).click();
     await until(page, (n) => document.querySelector('.carousel .crew-card h2')?.textContent === n, name0);
 
     // A swipe walks it, leftward to the next card, off real touches.
@@ -71,10 +78,10 @@ async function drive(era, w, h, full) {
 
     // The Random/Visitors stops, at the far end of the roster: walk back from the first card.
     if (await page.locator('.carousel-dots i.extra').count()) {
-      for (let k = 0; k < 40 && !(await page.locator('.carousel-extra').count()); k++) await page.locator('.carousel-step.prev').click();
+      for (let k = 0; k < 40 && !(await page.locator('.carousel-extra').count()); k++) await (await stepper(page, 'prev')).click();
       assert.equal(await page.locator('.carousel-extra').count(), 1, 'an extra should show its own card');
       if (OUT) await page.screenshot({ path: `${OUT}/${name}-extra.png` });
-      for (let k = 0; k < 40 && (await page.locator('.carousel-extra').count()); k++) await page.locator('.carousel-step.next').click();
+      for (let k = 0; k < 40 && (await page.locator('.carousel-extra').count()); k++) await (await stepper(page, 'next')).click();
     }
 
     if (full) {

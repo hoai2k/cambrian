@@ -33,7 +33,12 @@ async function open(era, viewport, { pad = false, mobile = false } = {}) {
   await page.goto(`${BASE}${era}/`, { waitUntil: 'networkidle', timeout: 120000 });
   return { ctx, page };
 }
-const settle = (page) => page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(r, 400)))));
+// Two frames, and the screen's own entrance finished: under the software renderer a frame can take
+// seconds, and a shot taken mid fade-in is of a blank sea.
+const settle = async (page) => {
+  await page.waitForFunction(() => [...document.querySelectorAll('.select, .select *')].every((el) => el.getAnimations().every((a) => a.playState !== 'running' || a.effect?.getComputedTiming().iterations === Infinity)), null, { timeout: 90000 }).catch(() => {});
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(r, 400)))));
+};
 // Every portrait on screen has arrived, so a shot is not of half-loaded tiles.
 const imagesIn = (page) => page.waitForFunction(() => [...document.querySelectorAll('.select img')].every((i) => i.complete), null, { timeout: 60000 }).catch(() => {});
 
@@ -50,6 +55,14 @@ for (const era of ERAS) {
   await page.keyboard.press('ArrowRight'); await page.keyboard.press('ArrowRight'); await page.keyboard.press('Enter');
   await imagesIn(page); await settle(page);
   await page.screenshot({ path: `${OUT}/${era}-select-locked.png`, timeout: 180000 });
+  // The Size view: the same screen with the roster drawn at size where each animal lives. The
+  // seat is unlocked first and the stick walked a little, so the cursor is seen moving by position.
+  await page.locator('.crew-card .ready-button').first().click(); // unlock, or Enter would dive in
+  await page.locator('.roster-tab', { hasText: /size/i }).click();
+  await page.locator('.depth-view .depth-spot').first().waitFor({ timeout: 30000 });
+  await page.keyboard.press('ArrowDown'); await page.keyboard.press('ArrowRight');
+  await imagesIn(page); await settle(page);
+  await page.screenshot({ path: `${OUT}/${era}-size.png`, timeout: 180000 });
   console.log(`shot ${era}`);
   await ctx.close();
 }

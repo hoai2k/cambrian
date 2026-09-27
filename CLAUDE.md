@@ -384,6 +384,39 @@ unless the user explicitly asks for a PR. Steps:
   model's reading order, the seat's own cursor, the same `moveCursor` (up and down become left and
   right) — and its card is the crew card, lifted into `renderCard` so both views draw one card.
   `npm run touch` holds the decision, `node tools/carousel-browser.mjs` the three games at phone size.
+- **The choice screen is a naturalist's plate, because the title is one.** Every game's title is an
+  engraved plate on parchment, and the pick screen after it was a dark teal app panel, so pressing
+  start felt like arriving in a different game. `src/app/plate.css` draws the same screen in ink on
+  paper — the roster an index of numbered figures (`Fig. 3`) in oval frames, the chosen animal a
+  double-ruled plate headed with its figure number, Lock In a wax seal, Dive In a printed ribbon, the
+  modes as sepia vignettes. It is a **layer over the unchanged layout**, scoped under `.select.plate`,
+  restyling colour, type, borders and ornament and leaving the layout rules alone, which is why the
+  compact grid, the carousel and the split-screen crew all came across on paper without a line of
+  their own. Two things about paper: a player's colour is mixed toward the ink (`--pc`) wherever it
+  is drawn, because colours chosen to read on a dark sea do not read on parchment; and a portrait is
+  `mix-blend-mode: multiply` with a little sepia, so a render prints *into* the page rather than
+  sitting on it. Each era keeps its own second ink (`[data-era]`). `?plate=0` still reaches the old
+  panel for comparison and nothing offers it. The face is IM Fell English, self-hosted beside the
+  other two (OFL). A mode with no painting borrows one (`src/shared/mode-art.ts`: Survival wears the
+  retired Hunted art), through one helper so the preloader fetches the picture the chip draws.
+  On a desktop the roster has two views under folder tabs, **List** and **Size**, remembered in
+  `Settings.rosterView` and in the pad's focus ring after the modes. **Size** (`depth-layout.ts`,
+  `DepthView`) lays the roster out as a slice of sea: drifters under the surface, swimmers in open
+  water with the largest highest (where `columnY` keeps them in play), bottom-dwellers standing on the
+  floor — the band read off the traits the simulation already moves the animal by (`ground`, `drift`,
+  a pulse swim) — each drawn as wide as the **square root** of its real length, so the order of sizes
+  is exact and a two-centimetre animal is still something to point at. It is a model like the grid:
+  the screen reports the rectangles it drew and `moveCursor` walks *those* through `spatial-nav`, so
+  the stick goes where the eye does. A phone has no tabs — the smallest animal would be smaller than
+  a fingertip, and the carousel is the whole roster there. `npm run depth` checks the layout on all
+  three real rosters and `npm run select:shots` screenshots every era, two players and a phone.
+- **A choice the screen makes by measuring itself must not change what it measures.** Held upright,
+  the carousel shows the neighbouring cards peeking in at either edge instead of arrows, and its card
+  takes the width they left. The narrower margin that paid for it was first written under
+  `.select-carousel` — and `carouselView` is decided by measuring the picker, so the margin widened the
+  picker, the grid then fitted, the carousel went away and took the margin with it, and the screen
+  flipped between the two for as long as it was open. Anything that feeds `gridFits` belongs to the
+  window's layout (here, compact portrait), never to the view it chooses.
 - **A narrow window is where you finally see the bugs a wide one hides.** Two of the worst things the
   compact layout turned up were not about touch at all. **Every centred HUD panel was off-centre**:
   `.hint`, `.grip-panel`, `.notice`, `.threat-alert` and `.death-note` are `left: 50%` plus
