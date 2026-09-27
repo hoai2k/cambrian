@@ -851,9 +851,10 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
   ok(sections[0].title === undefined, 'the playable roster heads the list with no heading');
   const named = (title: string | undefined) => sections.find((s) => s.title === title)?.rows.map((r) => r.id).join(' ') ?? '';
   ok(named('Visitors') === 'archelon mosasaurus', `Visitors is the two standing guests, alphabetised (got: ${named('Visitors')})`);
-  ok(named('NPCs') === 'cartorhynchus coelophysis macrocnemus mystriosuchus tanystropheus',
-    `NPCs is Cartorhynchus and the four shore animals, alphabetised (got: ${named('NPCs')})`);
-  ok(named('Unfinished') === 'askeptosaurus hybodus', `Unfinished is the two shelved bodies, alphabetised (got: ${named('Unfinished')})`);
+  ok(named('NPCs') === 'cartorhynchus ceratites coelophysis macrocnemus mystriosuchus tanystropheus',
+    `NPCs is Cartorhynchus, Ceratites and the four shore animals, alphabetised (got: ${named('NPCs')})`);
+  ok(named('Unfinished') === 'askeptosaurus', `Unfinished is the one shelved body (got: ${named('Unfinished')})`);
+  ok(sections[0].rows.some((r) => r.id === 'hybodus'), 'Hybodus is on the pick screen, so it heads the list with the roster');
   for (const section of sections) {
     if (section.title === 'Visitors') for (const r of section.rows) ok(r.offRoster, `${r.id}: a Visitors row is a standing guest`);
     else if (section.title) for (const r of section.rows) ok(r.role.includes(r.notPlayable!), `${r.id} says which kind it is in its role line`);

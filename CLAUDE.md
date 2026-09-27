@@ -483,8 +483,8 @@ unless the user explicitly asks for a PR. Steps:
   which is what puts it in no sea (deleting the entry would take the animal's name, group, portrait
   and model paths with it). All three games now offer **eighteen**, which is `gridColumns`' three
   rows of six: the Cambrian keeps Odontogriphus, Ctenorhabdotus and Vetulicola in the water,
-  the Devonian Bothriolepis, Cheirolepis and Rhinodipterus, and the Triassic Cartorhynchus, with
-  Askeptosaurus and Hybodus shelved. `npm run eras` counts all three off the flags and checks that
+  the Devonian Bothriolepis, Cheirolepis and Rhinodipterus, and the Triassic Cartorhynchus and
+  Ceratites, with Askeptosaurus shelved. `npm run eras` counts all three off the flags and checks that
   nothing on a preload list is an animal the pick screen does not offer — the Devonian's `boot`
   named Bothriolepis the day it stopped being pickable, which is a full body and two portraits
   fetched ahead of time for a tile nobody sees. Three consequences worth knowing: the preload queue

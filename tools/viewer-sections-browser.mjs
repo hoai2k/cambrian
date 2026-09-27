@@ -10,7 +10,7 @@
  *   QA_BASE_URL=http://127.0.0.1:4173 node tools/viewer-sections-browser.mjs [out dir]
  *
  * The Triassic collection is the one with all four sections — the roster, *Visitors* (the standing
- * guests), *NPCs* (Cartorhynchus and the four shore animals) and *Unfinished* (the two shelved
+ * guests), *NPCs* (Cartorhynchus, Ceratites and the four shore animals) and *Unfinished* (the shelved
  * bodies) — which is the case CLAUDE.md spells out and the one worth watching in a screenshot.
  */
 import { chromium } from 'playwright-core';
@@ -72,23 +72,24 @@ try {
   assert.ok(nameAt('Mosasaurus') < headingAt('NPCs'), 'Mosasaurus sits before the NPCs heading');
   assert.ok(headingAt('Visitors') < nameAt('Archelon'), 'Visitors heads its section, before Archelon');
   assert.ok(headingAt('Visitors') < nameAt('Mosasaurus'), 'and before Mosasaurus too');
-  assert.ok(nameAt('Cartorhynchus') > headingAt('NPCs') && nameAt('Cartorhynchus') < headingAt('Unfinished'),
-    'Cartorhynchus sits under NPCs');
+  for (const npc of ['Cartorhynchus', 'Ceratites']) {
+    assert.ok(nameAt(npc) > headingAt('NPCs') && nameAt(npc) < headingAt('Unfinished'), `${npc} sits under NPCs`);
+  }
   for (const shore of ['Coelophysis', 'Macrocnemus', 'Mystriosuchus', 'Tanystropheus']) {
     assert.ok(nameAt(shore) > headingAt('NPCs') && nameAt(shore) < headingAt('Unfinished'), `${shore} sits under NPCs`);
   }
-  for (const shelved of ['Askeptosaurus', 'Hybodus']) {
+  for (const shelved of ['Askeptosaurus']) {
     assert.ok(nameAt(shelved) > headingAt('Unfinished'), `${shelved} sits under Unfinished`);
   }
   await page.screenshot({ path: path.join(out, 'sections-triassic.png') });
 
   // Picking a creature filed under a subtitle still opens it: the click reaches the button, not
   // the heading text sitting a few pixels above it in the same list.
-  await page.getByRole('button', { name: /^Hybodus/ }).first().click();
-  await loaded('triassic:hybodus');
-  assert.equal(new URL(page.url()).searchParams.get('specimen'), 'triassic:hybodus', 'the URL followed the click');
-  assert.equal(await page.locator('.info h2').textContent(), 'Hybodus');
-  assert.match(await page.locator('.info .role').textContent(), /SHELVED/, "Hybodus' role line says it is shelved");
+  await page.getByRole('button', { name: /^Askeptosaurus/ }).first().click();
+  await loaded('triassic:askeptosaurus');
+  assert.equal(new URL(page.url()).searchParams.get('specimen'), 'triassic:askeptosaurus', 'the URL followed the click');
+  assert.equal(await page.locator('.info h2').textContent(), 'Askeptosaurus');
+  assert.match(await page.locator('.info .role').textContent(), /SHELVED/, "Askeptosaurus' role line says it is shelved");
 
   await page.getByRole('button', { name: /^Archelon/ }).first().click();
   await loaded('triassic:archelon');
