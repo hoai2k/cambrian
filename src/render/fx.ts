@@ -316,7 +316,7 @@ export const TRACK_ROCK = 0.25;
  */
 export const TRACK_WET = 0.8;
 /** How far the deepest part of the deepest mark darkens the sand under it. Subtle on purpose. */
-export const TRACK_MAX = 0.3;
+const TRACK_MAX = 0.3;
 
 /** What a body leaves where it touches the sand. */
 export type TrackKind = 'foot' | 'drag' | 'slap';

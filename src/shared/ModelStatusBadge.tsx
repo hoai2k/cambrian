@@ -14,7 +14,7 @@ const NOTE_W = 340, NOTE_H = 150, EDGE = 8;
  * declares `container-type`, which makes it the containing block for fixed descendants. A portal
  * does.
  */
-export function RefinementNote({ note, heading, label, className, children }: {
+function RefinementNote({ note, heading, label, className, children }: {
   note: string; heading: string; label: string; className?: string; children: ReactNode;
 }) {
   const id = useId();

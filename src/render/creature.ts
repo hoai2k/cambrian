@@ -26,7 +26,7 @@ export type Lod = 0 | 1;
 const cache = new Map<string, Promise<Loaded>>();
 const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
 
-export const creatureUrl = (id: CreatureId, lod: Lod = 0) =>
+const creatureUrl = (id: CreatureId, lod: Lod = 0) =>
   `${appBase()}${assetPaths.model(id, lod)}`;
 
 export function loadCreature(id: CreatureId, onProgress?: (loaded: number, total: number) => void, lod: Lod = 0): Promise<Loaded> {

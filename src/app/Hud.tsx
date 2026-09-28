@@ -8,6 +8,7 @@ import { creature } from '../sim/creatures';
 import { BIOME_ART, biomeArtPath, radarGlyphPath } from '../shared/environment-assets';
 import { BAND_COLOR, CALM_MARK } from '../sim/types';
 import { CreaturePortrait } from './CreaturePortrait';
+import { roman } from './roman';
 import { appBase } from '../shared/base';
 import { fillControls, key, type Scheme } from '../shared/controls';
 import { TEXT } from '../shared/text';
@@ -122,7 +123,7 @@ function SensePanel({ p }: { p: PlayerHud }) {
             <circle cx="36" cy="36" r={R} className="ring-fg" strokeDasharray={`${C * p.progress} ${C}`} transform="rotate(-90 36 36)" />
           </svg>
           {p.era
-            ? <span className="tier-num rung-num" role="img" aria-label={COPY.rungAria(p.era.rung, p.era.rungName, p.era.stage, moultLabel(p.progress))}><small>{COPY.rungLabel}</small>{RUNG_NUMERALS[p.era.rung] ?? p.era.rung}</span>
+            ? <span className="tier-num rung-num" role="img" aria-label={COPY.rungAria(p.era.rung, p.era.rungName, p.era.stage, moultLabel(p.progress))}><small>{COPY.rungLabel}</small>{p.era.rung >= 0 && p.era.rung <= 4 ? roman(p.era.rung) : p.era.rung}</span>
             : <span className="tier-num" role="img" aria-label={COPY.tierAria(p.tier + 1, p.tierName, moultLabel(p.progress))}><i className="tier-glyph" style={{ maskImage: `url(${appBase()}${assetPaths.ui(`tier-${p.tier + 1}.svg`)})` }} /></span>}
         </div>
         <div className="bars">
@@ -531,7 +532,6 @@ function Radar({ radar, biome }: { radar: PlayerHud['radar']; biome: string }) {
   );
 }
 
-const RUNG_NUMERALS = ['', 'I', 'II', 'III', 'IV'];
 
 /** Every era's shore, said the same way: what the sand is doing to this body and the way off it. */
 function ShoreStatus({ stranded, low }: { stranded: boolean; low: boolean }) {

@@ -27,7 +27,7 @@ const SAND_CACHE = new Map<Biome, THREE.Color>();
  * The floor's own colour where a body is digging. A burrow in the shelf mosaic and one in the
  * black basin must not shower the same beige, and the biome under the animal is what decides.
  */
-export function sandColorAt(x: number, z: number): THREE.Color {
+function sandColorAt(x: number, z: number): THREE.Color {
   const b = biomeAt(x, z);
   let c = SAND_CACHE.get(b);
   if (!c) { c = new THREE.Color(SAND_COLORS[b]); SAND_CACHE.set(b, c); }

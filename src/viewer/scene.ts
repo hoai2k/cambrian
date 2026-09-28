@@ -38,14 +38,14 @@ const CLIP_ORDER = [
 import { isOralGeometryNamed } from '../shared/oral-geometry';
 
 /** Whether a loaded mesh is authored mouth geometry (see `src/shared/oral-geometry.ts`). */
-export const isOralGeometry = (o: THREE.Mesh) =>
+const isOralGeometry = (o: THREE.Mesh) =>
   isOralGeometryNamed(o.name, (Array.isArray(o.material) ? o.material : [o.material]).map((m) => m?.name));
 
-export const REPLACED_PREFIX = 'replaced/';
+const REPLACED_PREFIX = 'replaced/';
 export const isReplaced = (name: string) => name.startsWith(REPLACED_PREFIX);
 /** The name a replaced clip had, and that its replacement now carries. */
 export const replacedName = (name: string) => (isReplaced(name) ? name.slice(REPLACED_PREFIX.length) : name);
-export const orderClips = (names: string[]) =>
+const orderClips = (names: string[]) =>
   [...names].sort((a, b) => {
     const ia = CLIP_ORDER.indexOf(replacedName(a)), ib = CLIP_ORDER.indexOf(replacedName(b));
     if (ia !== ib) return (ia < 0 ? 1e3 : ia) - (ib < 0 ? 1e3 : ib);

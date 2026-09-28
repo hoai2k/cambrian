@@ -95,7 +95,7 @@ export const BREATH_PEEK = 1.1;
  * narrow view keeps the animal on screen; the camera also comes in a little further than it did,
  * which is what was asked for and helps at every width.
  */
-export const AIM_CLOSER = 0.42, AIM_SHOULDER = 0.75;
+const AIM_CLOSER = 0.42, AIM_SHOULDER = 0.75;
 /**
  * The follow camera, for mouse play: how fast it comes round behind the body, and how long it
  * stands aside after the player has moved it themselves.
@@ -131,7 +131,7 @@ export function edgePitch(ndcY: number): number {
   return -Math.sign(ndcY) * k * k * EDGE_RATE;
 }
 /** 1 at a full-width view, falling off for a narrow one; never less than a third of the shift. */
-export const aimRoom = (aspect: number) => clamp(aspect / 1.6, 0.34, 1);
+const aimRoom = (aspect: number) => clamp(aspect / 1.6, 0.34, 1);
 export const PITCH_UP = -0.95;   // ~54° above the horizon
 export const PITCH_DOWN = 1.32;  // ~76° below it, near enough straight down at the seabed
 /**

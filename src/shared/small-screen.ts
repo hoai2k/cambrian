@@ -103,7 +103,7 @@ export const MIN_TILE = 86;
  * `.pick-layout` is `1.45fr / 0.85fr` in a compact landscape window, so the roster has a little
  * under two thirds of it. Stacked — which is what a portrait window does — it has all of it.
  */
-export const ROSTER_SHARE = 0.62;
+const ROSTER_SHARE = 0.62;
 
 /**
  * The most columns the roster may use in this window, or `Infinity` where it should use as many as
@@ -134,15 +134,15 @@ export interface Box { w: number; h: number }
  * Measured off the drawn tile rather than guessed — `.cell img` is `aspect-ratio: 4 / 3` at the
  * tile's width, and the name and padding add about a third of that again.
  */
-export const TILE_TALL = 1.05;
+const TILE_TALL = 1.05;
 /** The gap `.roster-grid` puts between tiles, both ways. */
-export const GRID_GAP = 10;
+const GRID_GAP = 10;
 /**
  * How much of a *stacked* picker the crew card keeps for itself. It is sticky at the bottom of the
  * scroll in portrait with `max-height: 38vh`, so that is the share of the height the roster cannot
  * have.
  */
-export const CREW_RESERVE = 0.38;
+const CREW_RESERVE = 0.38;
 
 /**
  * The width at and below which the pick screen stacks its picker into one column (the stylesheet's

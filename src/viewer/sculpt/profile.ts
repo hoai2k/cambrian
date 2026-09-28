@@ -86,7 +86,7 @@ export interface MouthFeature {
   contour: number[];
 }
 
-export const CONTOUR_BINS = 48;
+const CONTOUR_BINS = 48;
 
 export interface SculptDoc {
   version: 1;
@@ -103,11 +103,11 @@ export interface SculptDoc {
   mouth?: MouthFeature;
 }
 
-export const EYE_REACH = 2.2;
-export const MOUTH_REACH = 1.0;
+const EYE_REACH = 2.2;
+const MOUTH_REACH = 1.0;
 
 /** Default number of stations: enough for five regions of four, few enough to grab by hand. */
-export const STATION_COUNT = 20;
+const STATION_COUNT = 20;
 
 const REGION_NAMES: readonly [string, number][] = [
   ['Head', .15], ['Fore body', .40], ['Mid body', .65], ['Hind body', .85], ['Tail', 1.01],
@@ -225,7 +225,7 @@ export function measure(input: MeasureInput, meta: { key: string; id: string; co
  * at `CONTOUR_BINS` even angles from the front (0) round to the back (π). Sampled from the body's
  * vertices within the jaw band; empty bins borrow their neighbours.
  */
-export function sampleContour(chunks: ArrayLike<number>[], frame: SculptFrame, lateralMid: number, mouth: FeaturePoint, jawDepth: number, band: number): number[] {
+function sampleContour(chunks: ArrayLike<number>[], frame: SculptFrame, lateralMid: number, mouth: FeaturePoint, jawDepth: number, band: number): number[] {
   const A = frame.axis === 'x' ? 0 : 2, L = frame.axis === 'x' ? 2 : 0;
   const hingeAxis = mouth.axis - frame.forward * jawDepth;
   const n = CONTOUR_BINS;
@@ -266,7 +266,7 @@ export function mouthCorner(doc: SculptDoc, gape: number): FeaturePoint {
 }
 
 /** The angular remap of the jaw: the mouth's half stretches to the new corner, the rest of the outline takes up the slack. */
-export function gapeRemap(theta: number, from: number, to: number): number {
+function gapeRemap(theta: number, from: number, to: number): number {
   const t = Math.abs(theta);
   const mapped = t <= from ? t * (to / Math.max(from, 1e-6)) : to + (t - from) * ((Math.PI - to) / Math.max(Math.PI - from, 1e-6));
   return theta < 0 ? -mapped : mapped;
@@ -350,7 +350,7 @@ function measureEyes(eyeChunks: ArrayLike<number>[], doc: SculptDoc, probe: Surf
 }
 
 /** Five bands from nose to tail, each a contiguous run of station indices. */
-export function defaultRegions(stations: readonly Station[]): Region[] {
+function defaultRegions(stations: readonly Station[]): Region[] {
   const order = [...stations.keys()].sort((i, j) => stations[i].headFraction - stations[j].headFraction);
   const regions: Region[] = [];
   let start = 0;
@@ -447,7 +447,7 @@ const smooth = (t: number) => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t));
  * moves and scales about its base centre, and the mouth region widens, deepens and moves about
  * the socket. Applied before the profile warp so features ride the body's own change.
  */
-export function featureWarp(doc: SculptDoc): WarpFn | null {
+function featureWarp(doc: SculptDoc): WarpFn | null {
   const A = doc.frame.axis === 'x' ? 0 : 2, L = doc.frame.axis === 'x' ? 2 : 0;
   const mid = doc.bounds.lateralMid;
   const ops: { c: number[]; d: number[]; r: number; sx: number; sy: number; sl: number; globe: boolean }[] = [];

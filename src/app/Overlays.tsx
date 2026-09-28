@@ -33,7 +33,7 @@ const LANDMARK_KINDS = ['arch', 'stack', 'bones'] as const;
  */
 export interface MenuItem { label: string; run: () => void; primary?: boolean }
 
-export function MenuButtons({ items, sel, shown, onHover }: { items: MenuItem[]; sel: number; shown: boolean; onHover: (i: number) => void }) {
+function MenuButtons({ items, sel, shown, onHover }: { items: MenuItem[]; sel: number; shown: boolean; onHover: (i: number) => void }) {
   return (
     <div className="menu-buttons">
       <div className="menu-choices" role="menu">

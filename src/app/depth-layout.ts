@@ -38,7 +38,7 @@ export function habitatBand(def: { ground: boolean; drift?: boolean; swimStyle?:
 
 /** A portrait is 4:3; the name sits under it. */
 export const PORTRAIT = 0.75;
-export const LABEL_H = 20;
+const LABEL_H = 20;
 export const GAP = 10;
 /** Room above the waterline for the band label, and sand below the floor line. */
 export const TOP = 30;
@@ -46,7 +46,7 @@ export const SAND = 26;
 export const SIDE = 18;
 /** Nothing is drawn narrower than this, however small the animal: it has to be something to point at. */
 export const MIN_W = 50;
-export const EXTRA_W = 76;
+const EXTRA_W = 76;
 /** A band with nothing in it still shows as water: the surface is always there. */
 const EMPTY_BAND = 34;
 

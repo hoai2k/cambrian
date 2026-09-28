@@ -174,8 +174,11 @@ ok(!/localStorage|sessionStorage|document\.cookie/.test(stats),
 // The page is built, and is not something a search engine should index.
 const page = read('stats/index.html');
 ok(/name="robots"[^>]*noindex/.test(page), '/stats/ is noindex');
-ok(/config-stats/.test(page), '/stats/ reads the same config as the counter');
-ok(/goatcounter\.com\/signup/.test(page), '/stats/ carries the setup steps for the off state');
+// Its logic is a module of its own (src/stats/main.ts), so the type check reaches it.
+ok(/src="\/src\/stats\/main\.ts"/.test(page), '/stats/ runs src/stats/main.ts');
+const statsMain = read('src/stats/main.ts');
+ok(/config-stats/.test(statsMain), '/stats/ reads the same config as the counter');
+ok(/goatcounter\.com\/signup/.test(statsMain), '/stats/ carries the setup steps for the off state');
 const vite = read('vite.config.ts');
 ok(/stats\/index\.html/.test(vite), '/stats/ is a page in the build');
 
