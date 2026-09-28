@@ -1223,4 +1223,3 @@ export class Engine {
     this.renderer.domElement.remove();
   }
 }
-
