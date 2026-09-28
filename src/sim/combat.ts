@@ -236,7 +236,7 @@ export const GRIP_STRAIN = 0.55;
 export function takeRide(ctx: HitContext, rider: Actor, host: Actor): boolean {
   // Only the animals somebody is steering hold on. The reef's own predators have no use for it —
   // a wild Anomalocaris clinging to a giant for nine seconds is a bug, not behaviour.
-  if (rider.controller !== 'player' && rider.controller !== 'bot') return false;
+  if (rider.controller !== 'player') return false;
   if (rider.rideHost >= 0 || host.riddenBy >= 0 || rider.riddenBy >= 0 || host.rideHost >= 0) return false;
   if (host.state === 'dead' || host.state === 'grabbed' || rider.state === 'grabbed') return false;
   const h = heading(host.yaw);

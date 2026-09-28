@@ -1461,8 +1461,8 @@ unless the user explicitly asks for a PR. Steps:
   `tools/flora-test.ts`'s step-cost check came to be failing on `main` for a day unnoticed, and how
   two dozen suites once ran nowhere at all. **A test that waits on a clock winds the clock rather
   than stepping the sea through it**: the hold at the top (`progress[i].apexT`, the era's
-  `primeT`), a Hunter & Hunted turn (`huntTurnT`), a stranding (`strandT`) and the shore's
-  occupancy schedule (`g.time`) are all plain state, and stepping two hundred seconds of full world
+  `primeT`), a stranding (`strandT`) and the shore's occupancy schedule (`g.time`) are all plain
+  state, and stepping two hundred seconds of full world
   to reach the end of one is what once made `modes` take ten minutes. Step the last second or two
   so the ending still happens the way it happens in play. The step-cost check is wall clock and so
   machine-dependent — the runner gives it the machine to itself before the parallel batch: the same
@@ -1481,7 +1481,7 @@ unless the user explicitly asks for a PR. Steps:
   about a third of a full crossing for about a quarter of the stamina. `DASH_TAP` is a
   *commitment* window — the dash cannot be ended inside it, which is what keeps its invulnerability
   worth having — not a delay before braking. `a.dashCost` is what is still owed, and it is zero on
-  a dash nobody is holding (a bot's, a tail-flip's reflex), which is how those stay untouched.
+  a dash nobody is holding (a wild animal's, a tail-flip's reflex), which is how those stay untouched.
   `npm run locomotion` measures the travel and the price at three hold lengths.
 - A giant hunts when it is hungry and not otherwise (`wantsToHunt` in `src/sim/ai.ts`): being seen
   used to be reason enough, so every giant that could see a player came down on them and there was
@@ -1510,7 +1510,7 @@ unless the user explicitly asks for a PR. Steps:
   `npm run hunt` holds the warning and `npm run triassic` the water.
 - **A mouthful taken on contact is the player's own act.** Wildlife swallows a swarm fish or a
   small ambient body whole, and nothing else: `consumeSnacks` and `attackHits` both require the
-  victim to be `swarm` or `ambient`, so a player or a bot is never taken whole however close it
+  victim to be `swarm` or `ambient`, so a player is never taken whole however close it
   swims to a mouth — it is bitten for, and a grip is a grip with a bar on it. `npm run hunt` swims
   a hatchling into a giant's jaws for two seconds to keep it that way.
 - **Being eaten is the end of the chase.** The hunt warning — the arrow, the eye, the line — is a
@@ -1541,7 +1541,7 @@ unless the user explicitly asks for a PR. Steps:
   has to bite or pounce. The reef's own predators, and anything out of a school, still go down in
   one gulp with no ceremony — but **one bite takes one mouthful**. `attackHits` called `takeWhole`
   for every snack inside the mouth, so a bite into a prey swarm made three or four animals vanish
-  at once and none of them was seen taken. A steered body (player or bot) takes the *nearest* one,
+  at once and none of them was seen taken. A player takes the *nearest* one,
   after the loop and through the swallow, and strikes whatever else is in the way; bulk feeding is
   untouched, because a filter feeder crossing a shoal has its own path and an unsteered reef
   predator eats the way it always did. And the mouth is sized on the body's **girth**, not on two
@@ -1631,8 +1631,7 @@ unless the user explicitly asks for a PR. Steps:
   and one player who grows a second animal up gets a second results screen for it. `continueMatch`
   clears only the winner's clock, and the era hook is handed the winning seat for the same reason
   (the Devonian and the Triassic count their own `primeT`). The `endless` latch stays for what it
-  was always about — the board's own "the reef is won" line — and for a bot, which has no seat to
-  remember with.
+  was always about — the board's own "the reef is won" line.
 - A death costs a rung, not the swim back. `respawnAt` in `src/sim/game.ts` returns a body to the
   distance from shore it died at — the same biome, the same depth — and away from any giant;
   inshore that is still the nursery, which is the hatchery and in the shore band anyway. Every
@@ -1692,7 +1691,7 @@ unless the user explicitly asks for a PR. Steps:
   It must **not** go through `loadCodex`, which filters ids against the *active* roster and would
   strip every foreign id. A visitor is admitted to `creature()` through its own map
   (`admitVisitors`/`isVisitor` in `src/sim/creatures.ts`) and deliberately never joins `CREATURES`
-  or `PLAYABLE` — the roster is what the grid draws, what bots are drawn from and what the sea is
+  or `PLAYABLE` — the roster is what the grid draws and what the sea is
   populated with, and a visitor is none of that. `PlayerSetup.visitorScale` overrides every other
   answer about starting size and skips the egg. The one rule they get is that they must fit:
   `deepEnoughFor` in `game.ts` walks out from shore until the column holds the body, because

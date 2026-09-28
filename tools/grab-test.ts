@@ -484,7 +484,9 @@ function inFront(p: Actor, o: Actor) {
   const { g, p, o, ctx } = pair('hallucigenia', 4.6);
   behind(p, o);
   takeRide(ctx, p, o);
-  const other = g.spawn('hallucigenia', 'bot', { x: o.pos.x, y: o.pos.y, z: o.pos.z - 1 }, 1);
+  // A second rider: only a player rides, so this one is a player in all but seat.
+  const other = g.spawn('hallucigenia', 'ambient', { x: o.pos.x, y: o.pos.y, z: o.pos.z - 1 }, 1);
+  other.controller = 'player';
   check('a host carries one rider', !takeRide(ctx, other, o) && other.rideHost === -1, 'the second grip finds no room');
   const wild = g.spawn('hallucigenia', 'ambient', { x: o.pos.x, y: o.pos.y, z: o.pos.z - 1 }, 1);
   const free = g.spawn('anomalocaris', 'ambient', { x: o.pos.x + 40, y: o.pos.y, z: o.pos.z }, 3.2);

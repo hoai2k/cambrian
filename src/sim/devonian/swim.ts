@@ -107,22 +107,20 @@ export function spawnInCover(g: Game, center: Vec3, id: CreatureId, scale: numbe
 const dist2D = (a: Vec3, b: Vec3) => Math.hypot(a.x - b.x, a.z - b.z);
 
 /**
- * Nurseries are sanctuaries for the young. Bots hatch in the next nurseries along the shore rather
- * than beside the players; a body that has not reached adult size cannot be hunted or fought
- * inside a nursery by an AI body unless it started the fight; and a hatchling keeps its spawn
+ * Nurseries are sanctuaries for the young: a body that has not reached adult size cannot be hunted
+ * or fought inside a nursery by an AI body unless it started the fight; and a hatchling keeps its spawn
  * protection for eight seconds, a juvenile five.
  */
-export function botNursery(index: number): Vec3 { return nurseryAt(1 + (index % 2)); }
 export function spawnProtect(a: Actor): number {
   const def = creature(a.creature);
   const stage = stageForScale(def.adultLength, a.scale);
   return stage === 0 ? 8 : stage === 1 ? 5 : 3.5;
 }
 export function sanctuary(hunter: Actor, target: Actor): boolean {
-  if (target.controller !== 'player' && target.controller !== 'bot') return false;
+  if (target.controller !== 'player') return false;
   if (nurseryFactor(target.pos.x, target.pos.z) < 0.05) return false;           // anywhere inside the nursery ring
   const def = creature(target.creature);
-  return stageForScale(def.adultLength, target.scale) < ADULT_STAGE || hunter.controller === 'bot';
+  return stageForScale(def.adultLength, target.scale) < ADULT_STAGE;
 }
 
 /** Where a swimmer hatches when there is no cover to hatch in: mid-column, with more water over it than under. */

@@ -23,7 +23,7 @@ selectEra(which === 'devonian' ? DEVONIAN : which === 'triassic' ? TRIASSIC : CA
 const { APEX_HOLD_SECONDS, Game } = await import('../src/sim/game');
 const { ladderName, ladderNames, ladderRung, ladderScale, clampMark, fillOf, rungOf, MARK_NEAR_TOP, LADDER_RUNGS, LADDER_TOP } = await import('../src/sim/ladder');
 const { PLAYABLE, creature } = await import('../src/sim/creatures');
-const { emptyInput, isCoop, MODE_IDS, TIER_NEED } = await import('../src/sim/types');
+const { emptyInput, MODE_IDS, TIER_NEED } = await import('../src/sim/types');
 type InputFrame = import('../src/sim/types').InputFrame;
 type Mode = import('../src/sim/types').Mode;
 type CreatureId = import('../src/sim/creatures').CreatureId;
@@ -235,7 +235,6 @@ const meterFill = (g: InstanceType<typeof Game>, a: import('../src/sim/types').A
 
 // ---- Rise can be carried on after it is finished ----
 {
-  ok(isCoop('rise'), 'Rise is co-op, so its result is a milestone rather than a verdict');
   const g = new Game('rise', setup(HERO, LADDER_TOP), 3);
   g.state = { status: 'won', winner: 0, message: 'grew up' };
   ok(g.continueMatch(), 'a finished Rise match offers to carry on');
@@ -246,10 +245,6 @@ const meterFill = (g: InstanceType<typeof Game>, a: import('../src/sim/types').A
   run(g, 2);
   ok(g.state.status === 'playing', 'and does not immediately win a second time');
   ok(!g.continueMatch(), 'a match already running has nothing to carry on');
-
-  const versus = new Game('hunted', setup(HERO), 3);
-  versus.state = { status: 'won', winner: 0, message: 'won' };
-  ok(!versus.continueMatch(), 'the versus mode refuses: its result is a verdict between players');
 }
 
 // ---- an egg is an egg: everything hatches at about the same size and grows from there ----

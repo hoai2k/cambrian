@@ -14,7 +14,7 @@ import { bandOf, comingFor, floorClearance, isAlive, isHidden, lengthOf } from '
 import { creature, type CreatureId } from '../sim/creatures';
 import { CORPSE_WINDOW, DEATH_FADE, Game, radarRange as radarReach, type GripHud, type ScoreHeader, type ScoreRow, type TeleportDest } from '../sim/game';
 import type { Phase } from '../sim/daynight';
-import { BAND_COLOR, CALM_MARK, emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
+import { BAND_COLOR, CALM_MARK, emptyInput, TIER_NAMES, TIER_NEED, type Actor, type Band, type InputFrame, type Mode, type PlayerSetup } from '../sim/types';
 import { recordStep, recordingPhase } from '../app/debug-record';
 import { BIOME_NAMES, biomeAt, coverAt, groundHeight, LAND_REACH, nurseryAt, sampleHeight, shoreDistance, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../sim/world';
 import { amphibious, breathesAir, STRAND_BREATH, STRAND_LOW } from '../sim/beach';
@@ -73,7 +73,7 @@ export interface PlayerHud {
   /** 0..1 of the rescue dwell, for the downed player and for whoever is standing over them. */
   reviveProgress: number;
   downedAllies: { index: number; name: string; color: string; seconds: number; distance: number; x: number; y: number; progress: number }[];
-  /** Versus: whose viewport this one is borrowing while dead. */
+  /** Survival: whose viewport this one is borrowing while dead. */
   spectating?: { index: number; name: string; color: string; creature: CreatureId };
   /**
    * What happened, while this player is dead: whether they were swallowed or simply killed, and
@@ -1193,8 +1193,8 @@ export class Engine {
   }
 
   /**
-   * Who a dead player's camera follows. Only in the versus modes, where there is a race to watch,
-   * and never when you are inside something — being eaten is its own shot. The leader is whoever
+   * Who a dead player's camera follows. Only in Survival, which has no revive to wait on (Rise
+   * does, and Reef has nothing to race), and never when you are inside something — being eaten is its own shot. The leader is whoever
    * is furthest along, so the viewport shows the thing you are about to respawn behind.
    */
   private spectatorTarget(game: Game, i: number): Actor | undefined {
@@ -1204,7 +1204,7 @@ export class Engine {
     let best: Actor | undefined, score = -Infinity;
     for (const a of game.actors) {
       if (a === p || a.player < 0 || !isAlive(a)) continue;
-      if (a.controller !== 'player' && a.controller !== 'bot') continue;
+      if (a.controller !== 'player') continue;
       const s = a.tier + a.nutrition / Math.max(1, TIER_NEED[a.tier]);
       if (s > score) { score = s; best = a; }
     }
@@ -2026,7 +2026,7 @@ export class Engine {
         const l = Math.max(1e-3, Math.hypot(f, r));
         downed.push({ index: j, name: creature(o.creature).name, color: PLAYER_COLORS[j % 4], seconds, distance: Math.hypot(dx, dz), x: r / l, y: -f / l, progress: game.reviveProgress(o) });
       }
-      // Versus: a dead player watches the leader rather than their own sinking body.
+      // Survival: a dead player watches the leader rather than their own sinking body.
       // Who killed this player, named the way the rest of the HUD names bodies: another player by
       // their seat, anything else by its species.
       const killerId = p.swallowedBy >= 0 ? p.swallowedBy : p.killer;
@@ -2082,7 +2082,7 @@ export class Engine {
     });
     return {
       players, rects, time: game.time, status: game.state.status, message: game.state.message, mode: game.mode, winner: game.state.winner, fps: this.fps,
-      canContinue: game.state.status !== 'playing' && isCoop(game.mode),
+      canContinue: game.state.status !== 'playing',
       discovery: { biomes: [...game.discovery.biomes], landmarks: [...game.discovery.landmarks], apex: [...game.discovery.apex], best: Object.fromEntries(game.discovery.best) },
       day: game.dayPhase(),
     };

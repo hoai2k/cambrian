@@ -27,7 +27,7 @@ export const BAND_COLOR: Record<Band, string> = {
   snack: '#7ef0a8', prey: '#5fd9d1', rival: '#ffc45c', threat: '#ff8a3d', giant: '#ff4b5c',
 };
 
-export type Controller = 'player' | 'bot' | 'ambient' | 'giant' | 'swarm' | 'shadow';
+export type Controller = 'player' | 'ambient' | 'giant' | 'swarm' | 'shadow';
 
 export type ActorState =
   | 'free' | 'attack' | 'dodge' | 'guard' | 'parry' | 'stagger'
@@ -317,16 +317,9 @@ export interface PlayerSetup {
   visitorScale?: number;
 }
 
-/** Selectable modes plus the legacy hunted identifier retained for old match data and tests. */
-export type Mode = 'rise' | 'survival' | 'reef' | 'hunted';
+/** The selectable modes. */
+export type Mode = 'rise' | 'survival' | 'reef';
 export const MODE_IDS: readonly Mode[] = ['rise', 'survival', 'reef'];
-/**
- * Modes that are not a contest between players. Their goal is a milestone rather than a win over
- * somebody, so meeting it need not take the sea away: these matches can carry on afterwards as a
- * free swim (`Game.continueMatch`). The versus mode — hunted — ends for good.
- */
-export const COOP_MODES: readonly Mode[] = ['rise', 'survival', 'reef'];
-export const isCoop = (m: Mode) => COOP_MODES.includes(m);
 
 export interface Prompt { text: string; t: number; }
 

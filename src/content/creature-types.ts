@@ -201,7 +201,7 @@ export interface CreatureDef {
   shore?: boolean;
   /**
    * An animal the sea keeps and the pick screen does not offer. It spawns, it is hunted, it hunts,
-   * bots wear it and the ecology counts it — everything except being somebody. A roster is a menu
+   * and the ecology counts it — everything except being somebody. A roster is a menu
    * rather than a census: an animal can be worth meeting without being worth *playing*, and three
    * or four of those on a pick screen cost every other animal a share of the player's attention.
    * `shore` says the same thing about a beach animal and says much more besides (where it stands,

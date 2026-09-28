@@ -125,7 +125,7 @@ export function applyScaleStats(a: Actor, keepFraction = true) {
 export const comingFor = (o: Actor, a: Actor): boolean => {
   if (o.id === a.id || !isAlive(o)) return false;
   // A body somebody is steering says so by aiming: it has no brain to read.
-  if (o.controller === 'player' || o.controller === 'bot') {
+  if (o.controller === 'player') {
     if (o.lockTarget === a.id && (o.aiming || o.state === 'attack' || o.state === 'pounce')) return true;
   }
   const b = o.brain;

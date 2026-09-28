@@ -326,14 +326,14 @@ const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, 
     check('a team-mate who bites the body eats it instead', ate && !isAlive(a), `eaten=${a.eaten.toFixed(2)} state=${a.state}`);
   }
 
-  // the versus mode never opens the window
+  // only Rise opens the window
   {
-    const g = new Game('hunted', [{ creature: 'waptia', device: 'keyboard', ready: true }, { creature: 'marrella', device: 'keyboard2', ready: true }], 7);
+    const g = new Game('survival', [{ creature: 'waptia', device: 'keyboard', ready: true }, { creature: 'marrella', device: 'keyboard2', ready: true }], 7);
     const [a, b] = g.players;
     a.hp = 0; a.state = 'dead'; a.deathY = a.pos.y; a.spawnProtect = 0;
     b.pos = { x: a.pos.x + 1.5, y: a.pos.y, z: a.pos.z }; b.spawnProtect = 99;
     run(g, emptyInput(), 6);
-    check('versus has no revive', g.reviveWindow(a) === 0, `mode=${g.mode}`);
+    check('survival has no revive', g.reviveWindow(a) === 0, `mode=${g.mode}`);
   }
 }
 

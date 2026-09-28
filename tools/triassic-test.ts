@@ -19,7 +19,6 @@ const { RULES } = await import('../src/sim/era-rules');
 const { devActor, stageScale, ADULT_STAGE, PRIME_STAGE, STAGE_AT } = await import('../src/sim/devonian/state');
 const { AIR_LOW, AIR_MAX, triActor } = await import('../src/sim/triassic/state');
 /** Mirrors AIR_BOT_SEEK in the rules: the breath at which a bot starts up. Kept here so the test says what it is testing. */
-const AIR_BOT_SEEK_T = 80;
 const { OCCUPANCY_WINDOW, setShoreAnimals, shoreAnimalsOn, shoreClip, shorePosts } = await import('../src/sim/triassic/shore');
 const { applyHit } = await import('../src/sim/combat');
 const { forceOccupancy } = await import('../src/sim/triassic/shore');
@@ -243,27 +242,6 @@ ok(opener && fs.existsSync(`public/${decodeURIComponent(paths.music(opener.name)
   run(g, 8);
   ok(!isAlive(p), `and it finishes the job (hp ${half.toFixed(0)} → ${p.hp.toFixed(0)})`);
 
-  // A bot is subject to the same rule and must not simply die of it: the shared brain steers for
-  // food and threats and knows nothing about breathing, so the era has to send it up itself.
-  {
-    const gb = new Game('hunted', [{ creature: 'nothosaurus', device: 'keyboard', ready: true }]);
-    gb.skipHatch();
-    const bot = gb.actors.find((a) => a.controller === 'bot' && creature(a.creature).breathing === 'air');
-    ok(!!bot, 'the match has a bot to watch');
-    if (bot) {
-      bot.pos.y = groundHeight(gb.world, bot.pos.x, bot.pos.z, []) + lengthOf(bot) * 0.6; bot.prevT.y = bot.pos.y;
-      triActor(gb, bot).air = AIR_BOT_SEEK_T;
-      const startY = bot.pos.y;
-      run(gb, 20);
-      ok(bot.pos.y > startY + 2, `a bot low on air climbs for the surface (${startY.toFixed(1)} → ${bot.pos.y.toFixed(1)})`);
-      // It started with AIR_BOT_SEEK_T seconds in its chest, so a bot that never took a breath would
-      // have run dry by now: watching for the blow that refills it is the whole question, and stops
-      // the moment it is answered rather than stepping four more minutes of sea.
-      let breathed = false;
-      for (let i = 0; i < 60 * AIR_BOT_SEEK_T && isAlive(bot) && !breathed; i++) { tick(gb); breathed = triActor(gb, bot).air > AIR_BOT_SEEK_T; }
-      ok(isAlive(bot) && breathed, `and does not quietly drown on the clock (air ${triActor(gb, bot).air.toFixed(0)}, hp ${bot.hp.toFixed(0)})`);
-    }
-  }
 
   // ...and the next life starts on a full chest. Respawning on the breath it drowned with would
   // put a body straight back into the drowning window the moment its bar went.
@@ -569,12 +547,14 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
     for (let i = 0; i < 60 * 8; i++) { park(far); tick(g); }
     ok(p.hp === p.hpMax && p.state === 'free' && boom.phase === 'watch', `twenty-two units out, it cannot reach (hp ${p.hp.toFixed(1)}/${p.hpMax}, state ${p.state}, boom ${boom.phase})`);
     // Something big holding still is ignored: the neck does not lower for what could bite it off.
-    const big = g.spawn('cymbospondylus', 'bot', { ...spot }, 1);
-    big.spawnProtect = 0;
+    // The player is grown for this, since only a player is ever watched: three times the neck's
+    // own length, holding still where a hatchling would have been taken.
+    const small = p.scale;
+    p.scale = (lengthOf(neck) * 3) / creature(p.creature).adultLength;
     let loweredForBig = false;
-    for (let i = 0; i < 60 * 8; i++) { big.pos = { ...spot }; big.vel = { x: 0, y: 0, z: 0 }; big.holdT = 1; park(far); tick(g); if (boom.target === big.id) loweredForBig = true; }
-    ok(!loweredForBig && isAlive(big) && big.hp === big.hpMax, 'a giant holding still under it is left alone');
-    (g as unknown as { despawn(a: typeof big): void }).despawn(big);
+    for (let i = 0; i < 60 * 8; i++) { park(spot); p.holdT = 1; tick(g); if (boom.target === p.id) loweredForBig = true; }
+    ok(!loweredForBig && isAlive(p) && p.hp === p.hpMax, 'a giant holding still under it is left alone');
+    p.scale = small;
     // One that stops for less than the wait and moves on is not struck.
     boom.phase = 'watch'; boom.t = 0; boom.target = -1; boom.still.clear();
     p.hp = p.hpMax; p.state = 'free'; p.hatching = false;

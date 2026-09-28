@@ -384,9 +384,8 @@ function DeathNote({ p }: { p: PlayerHud }) {
 }
 
 /**
- * The scoreboard, held open with the View button. Everyone in the running, sorted by whatever the
- * mode is actually about, with the viewer's own row marked. Bots are on it too: in a mode where
- * they fill the empty seats they are as much of a rival as anyone.
+ * The scoreboard, held open with the View button. Every player, sorted by how far up the ladder
+ * they are, with the viewer's own row marked.
  */
 export function Scoreboard({ board, me }: { board: NonNullable<PlayerHud['board']>; me: number }) {
   const { header, rows } = board;
@@ -394,20 +393,18 @@ export function Scoreboard({ board, me }: { board: NonNullable<PlayerHud['board'
     <div className="scoreboard">
       <div className="board-head">
         <p className="eyebrow">{header.title}</p>
-        {header.clock != null && <b className="board-clock">{fmtClock(header.clock)}</b>}
       </div>
       <p className="board-detail">{header.detail}</p>
       <ol>
         {rows.map((r, k) => (
-          <li key={k} className={`board-row ${r.player === me ? 'you' : ''} ${r.hunting ? 'hunting' : ''} ${r.alive ? '' : 'down'}`}
-            style={{ ['--player' as string]: r.player >= 0 ? PLAYER_COLORS[r.player % 4] : '#8fa3a8' }}>
-            <span className="board-who">{r.player >= 0 ? TEXT.common.playerChip(r.player + 1) : COPY.scoreboard.bot}</span>
+          <li key={k} className={`board-row ${r.player === me ? 'you' : ''} ${r.alive ? '' : 'down'}`}
+            style={{ ['--player' as string]: PLAYER_COLORS[r.player % 4] }}>
+            <span className="board-who">{TEXT.common.playerChip(r.player + 1)}</span>
             <span className="board-name">
               <b>{r.name}</b>
-              <small>{r.rank}{r.hunting ? COPY.scoreboard.hunting : ''}{r.alive ? '' : COPY.scoreboard.down}</small>
+              <small>{r.rank}{r.alive ? '' : COPY.scoreboard.down}</small>
               <i className="board-bar" style={{ transform: `scaleX(${r.progress})` }} />
             </span>
-            {r.score != null && <span className="board-score" title={COPY.scoreboard.caught}>{r.score}</span>}
             <span className="board-tally">
               <small>{COPY.scoreboard.tally(r.kills, r.eats)}</small>
               <small>{r.player === me ? r.biome : fmtDist(r.distance)}</small>
@@ -424,7 +421,6 @@ export function Scoreboard({ board, me }: { board: NonNullable<PlayerHud['board'
  * a tier in the Cambrian, a life stage in the Devonian — so it is spoken as one thing.
  */
 const moultLabel = (progress: number) => progress >= 1 ? COPY.fullyGrown : COPY.toNextMoult(Math.round(progress * 100));
-const fmtClock = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
 const fmtDist = (d: number) => (d < 1000 ? TEXT.common.metres(Math.round(d)) : TEXT.common.kilometres((d / 1000).toFixed(1)));
 

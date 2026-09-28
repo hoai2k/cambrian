@@ -12,7 +12,7 @@ import { creature, isVisitor, PLAYABLE_IDS, WILD_IDS, type CreatureId, type Move
 import { resolveFlora, stepFlora, type FloraContact } from './flora';
 import { SpatialHash } from './spatial';
 import { clampMark, deathMark, fillOf, ladderFill, ladderMark, ladderRung, ladderScale, LADDER_TOP, MARK_NEAR_TOP, placeOnLadder } from './ladder';
-import { emptyInput, isCoop, TIER_NAMES, TIER_NEED, type Actor, type Band, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
+import { emptyInput, TIER_NAMES, TIER_NEED, type Actor, type Band, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
 import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, RISE_RATE, sampleCurrent, sampleHeight, shoreDistance, shoreZ, type StaticContact, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 import { areaProfile, bandScale, drawBand, headroom, PASSER_BY, SMALLEST_BAND } from './population';
 import { columnHolds, columnY, DIP_CHANCE, DRIFT_CURRENT, driftRise, flipLaunch, FLIP_STAMINA, PULSE_CYCLE, pulseRefilling, pulseThrust, punting, rowWalkCurrent } from './locomotion';
@@ -67,11 +67,10 @@ export interface GameState {
 }
 
 /**
- * One line on the scoreboard (hold View). Everyone who is in the running — the local players and
- * the bots filling the empty seats — with what they have done and where they are.
+ * One line on the scoreboard (hold View). Every player, with what they have done and where they are.
  */
 export interface ScoreRow {
-  /** Player index, or -1 for a bot. */
+  /** Player index. */
   player: number;
   creature: CreatureId;
   name: string;
@@ -88,14 +87,10 @@ export interface ScoreRow {
   biome: string;
   /** Metres from this row's creature to the viewer, or 0 for the viewer's own row. */
   distance: number;
-  /** The mode's own number for this player: catch in Hunter & Hunted, otherwise absent. */
-  score?: number;
-  /** This row is the giant right now. */
-  hunting?: boolean;
 }
 
 /** The heading above the scoreboard: what this mode is asking of everyone. */
-export interface ScoreHeader { title: string; detail: string; clock?: number; }
+export interface ScoreHeader { title: string; detail: string; }
 
 /** Where a player may teleport: home nursery, or alongside another player. */
 export type TeleportDest = 'home' | number;
@@ -224,7 +219,7 @@ const STALL = 0.05;
 /**
  * Co-op revive. A downed player in Rise lies on the floor for this long instead of dissolving
  * after the usual three seconds, and any living team-mate who swims into them brings them back
- * where they fell with no tier lost. Solo, and in every versus mode, death is unchanged: the
+ * where they fell with no tier lost. Solo, and in every other mode, death is unchanged: the
  * window only opens when there is somebody who could actually reach you.
  */
 const DOWNED_WINDOW = 10;
@@ -356,15 +351,6 @@ const REVIVE_REACH = 90;
 const REVIVE_HOLD = 0.6;
 
 /**
- * Hunter & Hunted takes turns. Every human player gets one stint as the giant, of at most this
- * long, and is scored on the same job: how many of the small ones they caught. Playing prey is
- * how you set the others' score down, not a role you are stuck in for the match.
- */
-const HUNT_TURN = 100;
-/** The pause between turns, so the hand-over reads as a hand-over. */
-const HUNT_BREAK = 3.5;
-
-/**
  * What one pass over one actor has worked out about this frame, handed from each step of
  * `Game.updateActor` to the next.
  *
@@ -456,17 +442,6 @@ export class Game implements AiWorld {
    * check never fires again, so the sea stays open; nothing else about the match is touched.
    */
   endless = false;
-  /**
-   * Hunter & Hunted: whose turn it is to be the giant, which turn this is, and how many each
-   * player has caught on their own turn. `hunterIndex` is -1 during the hand-over pause, when
-   * nobody is the giant.
-   */
-  hunterIndex = 0;
-  huntTurn = 0;
-  huntTurns = 1;
-  huntScore: number[] = [];
-  huntTurnT = 0;
-  huntBreakT = 0;
   readonly discovery: Discovery = { biomes: new Set(), landmarks: new Set(), apex: new Set(), best: new Map() };
   private scratchActors: Actor[] = [];
   private scratchBoulders: Boulder[] = [];
@@ -502,9 +477,6 @@ export class Game implements AiWorld {
     this.world.loadAround(nursery);
     this.hitCtx = { events: this.events, byId: (id) => this.idMap.get(id), time: 0, rng: this.rng, armour: RULES ? (att, vic, dir) => RULES!.armour(att, vic, dir) : undefined, canEat: (pred, food) => this.canEat(pred, food) };
     this.beachCtx = { events: this.events, hitCtx: this.hitCtx };
-    // One turn as the giant each. A single human plays the mode exactly as it was before.
-    this.huntTurns = mode === 'hunted' ? Math.max(1, setups.length) : 1;
-    this.huntScore = setups.map(() => 0);
     const hatchers: Actor[] = [];
     setups.forEach((s, i) => {
       // Rise can start you part-grown, at the furthest rung you have taken this creature to before.
@@ -514,7 +486,7 @@ export class Game implements AiWorld {
       // A visitor arrives at the size it finishes its own game at, whatever this one's ladder or
       // mode would have said. That is the reward, and it is deliberately not balanced.
       const startScale = s.visitorScale ?? (carry > 0 ? ladderScale(s.creature, carry)
-        : RULES ? RULES.startScale(mode === 'survival' ? 'rise' : mode, this.eraRoleIndex(i), s.creature) : mode === 'rise' || mode === 'survival' ? tierScale(s.creature, 0) : mode === 'hunted' ? (this.isHunter(i) ? 3.0 : tierScale(s.creature, 1)) : mode === 'reef' ? tierScale(s.creature, 2) : tierScale(s.creature, 1));
+        : RULES ? RULES.startScale(mode === 'survival' ? 'rise' : mode, s.creature) : mode === 'reef' ? tierScale(s.creature, 2) : tierScale(s.creature, 0));
       const a = this.spawn(s.creature, 'player', this.spawnPoint(nursery, s.creature, startScale, i), startScale, i);
       // Arriving on the top rung means the goal is already behind you: no clock, just the sea.
       a.carriedTop = carry >= LADDER_TOP;
@@ -527,21 +499,6 @@ export class Game implements AiWorld {
       // So does a visitor, which did its growing up in another sea.
       if (carry === 0 && !s.visitorScale) hatchers.push(a);
     });
-    if (mode === 'hunted') {
-      // Fill to 4 with bots
-      for (let i = setups.length; i < 4; i++) {
-        const c = this.pickBot(setups.map((s) => s.creature), i);
-        // Bots are never the giant: the loop starts past the human seats, so `i` is never 0.
-        const botScale = RULES ? RULES.startScale(mode, i, c) : tierScale(c, 1);
-        // an era may hatch its bots in a different nursery, so the players' one is a quiet start
-        const botHome = RULES?.botNursery(i) ?? nursery;
-        // keep every hatching ground loaded: streaming around one point alone would drop the others
-        if (botHome !== nursery) this.world.stream([nursery, ...this.actors.filter((a) => a.controller === 'bot').map((b) => b.home), botHome], 1e6);
-        const bot = this.spawn(c, 'bot', this.spawnPoint(botHome, c, botScale, i), botScale);
-        bot.home = { ...botHome };
-        bot.brain = makeBrain('needs', botHome, this.rng, { aggression: 0.9, reaction: 0.2, parrySkill: 0.55 });
-      }
-    }
     this.populate();
     RULES?.init(this);
     // A run that starts on the bottom rung starts in an egg, the same as every hatch after it.
@@ -557,34 +514,15 @@ export class Game implements AiWorld {
     });
   }
 
-  /** Whether this player index is the giant right now. Only ever true in Hunter & Hunted. */
-  isHunter(index: number) { return this.mode === 'hunted' && index >= 0 && index === this.hunterIndex; }
-
-  /**
-   * Both eras write their Hunter & Hunted rule as "player index 0 is the giant". Turns move that
-   * role around, so the current giant is presented to the era as index 0 and everybody else as
-   * index 1; nothing in the era packs has to know that the role rotates.
-   */
-  private eraRoleIndex(index: number) { return this.mode === 'hunted' ? (this.isHunter(index) ? 0 : 1) : index; }
-
-  /** A bot's species: anything a player might pick. */
-  private pickBot(taken: CreatureId[], i: number): CreatureId {
-    // Bots pick from the same list the player chose from, so a rival is always an animal the
-    // player could have been (and always has its own model rather than a borrowed one).
-    const from = PLAYABLE_IDS;
-    void i;
-    return from[Math.floor(this.rng() * from.length)];
-  }
-
-  /** The points the world streams around and the ecosystem is kept alive near: every player and bot. */
+  /** The points the world streams around and the ecosystem is kept alive near: every player. */
   anchors(): Vec3[] {
     const out: Vec3[] = [];
-    for (const a of this.actors) if (a.controller === 'player' || a.controller === 'bot') out.push(a.pos);
+    for (const a of this.actors) if (a.controller === 'player') out.push(a.pos);
     if (!out.length) out.push(nurseryAt(0));
     return out;
   }
   private randomAnchor() { const an = this.anchors(); return an[Math.floor(this.rng() * an.length)]; }
-  /** Distance from the closest player or bot. */
+  /** Distance from the closest player. */
   private anchorDistance(p: Vec3) { let d = Infinity; for (const a of this.anchors()) d = Math.min(d, distXZ(a, p)); return d; }
 
   byId(id: number) { return this.idMap.get(id); }
@@ -899,13 +837,13 @@ export class Game implements AiWorld {
   }
 
   /**
-   * Carry a finished co-op match on instead of ending it. The goal has been met and recorded; this
-   * puts the sea back the way it was and stops the mode asking for it again, so the reef stays
-   * playable as a free swim. Versus modes refuse: their result is a verdict between players.
-   * Returns whether the match resumed.
+   * Carry a finished match on instead of ending it. Every mode is co-op, so its goal is a milestone
+   * rather than a verdict: it has been met and recorded, and this puts the sea back the way it was
+   * and stops the mode asking for it again, so the reef stays playable as a free swim. Returns
+   * whether the match resumed (it refuses one that is still playing).
    */
   continueMatch(): boolean {
-    if (this.state.status === 'playing' || !isCoop(this.mode)) return false;
+    if (this.state.status === 'playing') return false;
     const winner = this.state.winner;
     this.endless = true;
     this.state = { status: 'playing', winner: -1, message: '' };
@@ -940,7 +878,7 @@ export class Game implements AiWorld {
       this.updateActor(a, input, dt);
     }
     if (this.mode === 'survival') {
-      for (const a of this.actors) if ((a.controller === 'player' || a.controller === 'bot') && isAlive(a)) {
+      for (const a of this.actors) if ((a.controller === 'player') && isAlive(a)) {
         a.hunger = Math.max(0, a.hunger - dt * HUNGER_DRAIN);
         // An empty stomach eats the body rather than ending it on the frame the bar meets zero:
         // seconds of visibly going under, the way drowning is, and a meal in time stops it.
@@ -952,7 +890,7 @@ export class Game implements AiWorld {
       }
       for (const e of this.events.slice(eventStart)) if (e.kind === 'hit' && e.other != null) {
         const attacker = this.idMap.get(e.actor), victim = this.idMap.get(e.other);
-        if (!attacker || !victim || (attacker.controller !== 'player' && attacker.controller !== 'bot')) continue;
+        if (!attacker || !victim || (attacker.controller !== 'player')) continue;
         const ratio = lengthOf(victim) / Math.max(lengthOf(attacker), 1e-3);
         const secs = hitSeconds(e.strength ?? 0, ratio, attacker.controller === 'player' && victim.controller === 'player');
         this.gainSurvivalXp(attacker, secs / SURVIVAL_TOP_SECONDS);
@@ -967,8 +905,8 @@ export class Game implements AiWorld {
     this.updateDiscovery();
     RULES?.step(this, dt);
     this.updateModes(dt);
-    for (const a of this.actors) if (a.state === 'dead' && a.corpseT > 45 && a.controller !== 'player' && a.controller !== 'bot') this.remove(a);
-    for (const a of this.actors) if (a.state === 'dead' && a.eaten >= 1 && a.controller !== 'player' && a.controller !== 'bot') this.remove(a);
+    for (const a of this.actors) if (a.state === 'dead' && a.corpseT > 45 && a.controller !== 'player') this.remove(a);
+    for (const a of this.actors) if (a.state === 'dead' && a.eaten >= 1 && a.controller !== 'player') this.remove(a);
   }
 
   /** In a predator's mouth: slide in, shrink, and after the gulp become a consumed corpse. */
@@ -988,7 +926,7 @@ export class Game implements AiWorld {
       a.eaten = 1;                                        // nothing left to scavenge
       const val = this.nutritionValue(pred, a);
       if (this.canEat(pred, a)) { this.gainNutrition(pred, a, val); pred.eats++; pred.hp = Math.min(pred.hpMax, pred.hp + val * 0.5); }
-      if (a.controller === 'player' || a.controller === 'bot') a.respawnT = a.stateDur; else this.remove(a);
+      if (a.controller === 'player') a.respawnT = a.stateDur; else this.remove(a);
     }
   }
 
@@ -1027,7 +965,7 @@ export class Game implements AiWorld {
       void def;
     }
     a.hitFlash = Math.max(0, a.hitFlash - dt);
-    if (a.controller === 'player' || a.controller === 'bot') {
+    if (a.controller === 'player') {
       a.respawnT += dt;
       // three seconds of corpse (or of being digested), a puff of sparkles, then back in — or, for
       // a downed team-mate somebody could still reach, ten, and a revive ends it early.
@@ -1104,7 +1042,6 @@ export class Game implements AiWorld {
     if (this.mode === 'survival') placeOnLadder(this, a, clampMark(ladderMark(this, a) - SURVIVAL_DEATH_COST));
     else if (this.mode !== 'reef') placeOnLadder(this, a, deathMark(ladderMark(this, a)));
     else if (!RULES) a.nutrition *= 0.5;
-    if (this.mode === 'hunted' && this.isHunter(a.player) && !RULES) { a.scale = 3.0; a.tier = 3; }
     applyScaleStats(a, false);
     a.eaten = 0;
     a.stamina = a.staminaMax; a.poise = a.poiseMax;
@@ -2229,7 +2166,7 @@ export class Game implements AiWorld {
     } else if (a.state === 'moult') {
       const t = clamp(a.stateT / a.stateDur, 0, 1);
       const era = RULES?.moultScale(this, a);
-      const to = era ? era.to : this.mode === 'hunted' && this.isHunter(a.player) ? a.scale : tierScale(a.creature, a.tier);
+      const to = era ? era.to : tierScale(a.creature, a.tier);
       // In an egg the animal is already most of the size it will be when it comes out — an egg is
       // not a seed. A moult out of nothing (a respawn above the bottom rung) still swells from a
       // speck, which is what that second was always for.
@@ -2244,7 +2181,7 @@ export class Game implements AiWorld {
       // Coming out of an egg, the animal is the size of what was in the egg until the shell starts
       // to give: the growth is what opens it, over the last third of the hold.
       const k = inEgg ? clamp((t - 0.62) / 0.38, 0, 1) : t;
-      if (!(this.mode === 'hunted' && this.isHunter(a.player))) a.scale = lerp(from, to, k * k * (3 - 2 * k));
+      a.scale = lerp(from, to, k * k * (3 - 2 * k));
       // Held where it hatched, working at the shell: the wriggle is the animal, not the water. The
       // position is put back as well as the velocity — an egg does not drift down the current, and
       // a step's worth of drift each step adds up to the shell crawling off its own patch of sand.
@@ -2295,7 +2232,7 @@ export class Game implements AiWorld {
       if (!t || !isAlive(t) || isHidden(t) || (!a.aiming && !reaching && dist(a.pos, t.pos) > 16 + L * 8)) a.lockTarget = -1;
     }
     // Hunted meter (for players)
-    if (a.controller === 'player' || a.controller === 'bot') this.updateHunted(a);
+    if (a.controller === 'player') this.updateHunted(a);
 
     if (bursting && !a.prev.burst && a.controller === 'player') this.events.push({ kind: 'burst', pos: { ...a.pos }, actor: a.id, player: a.player });
     a.prev = { light: input.light, heavy: input.heavy, ability: input.ability, dodge: input.dodge, guard: input.guard, lock: input.lock, sense: input.sense, rise: input.rise, burst: bursting, dash: input.dash, aim: input.aim };
@@ -2918,7 +2855,7 @@ export class Game implements AiWorld {
      * predator that is not steered still eats the way it always did.
      */
     let mouthful: Actor | undefined, mouthfulD = Infinity;
-    const steered = a.controller === 'player' || a.controller === 'bot';
+    const steered = a.controller === 'player';
     for (const o of this.nearby(a.pos, L * 1.5 + 4)) {
       if (o.id === a.id || !isAlive(o) || a.hitDone.has(o.id) || isHidden(o)) continue;
       if (o.controller === 'swarm' && a.controller === 'swarm') continue;
@@ -2974,7 +2911,7 @@ export class Game implements AiWorld {
    */
   private canEat(a: Actor, food: Actor): boolean {
     void food;
-    return this.mode !== 'survival' || (a.controller !== 'player' && a.controller !== 'bot') || a.hunger < 100;
+    return this.mode !== 'survival' || (a.controller !== 'player') || a.hunger < 100;
   }
 
   /** Survival growth: `fraction` of the whole ladder, in whichever units this game keeps it. */
@@ -2991,14 +2928,14 @@ export class Game implements AiWorld {
     for (const o of this.nearby(a.pos, L * 0.6 + 1)) {
       if (o.id === a.id || !isAlive(o)) continue;
       if (bandOf(a, o) !== 'snack') continue;
-      // Only small wild things go down in one gulp. Players and bots always get a fight (three bites from a giant).
+      // Only small wild things go down in one gulp. Players always get a fight (three bites from a giant).
       if (o.controller !== 'swarm' && o.controller !== 'ambient') continue;
       if (o.controller === 'ambient' && lengthOf(o) > lengthOf(a) * 0.3) continue;
       // Swimming through a cloud of plankton feeds you; swimming *at* an animal does not. For a
       // player an animal is something to be caught — bitten, pounced on, taken in the mouth — and
       // having one vanish as you closed on it was the whole of what made hunting feel like nothing
       // happened. The reef's own predators still take a mouthful in passing.
-      if ((a.controller === 'player' || a.controller === 'bot') && o.controller !== 'swarm' && a.state !== 'attack' && a.state !== 'pounce') continue;
+      if ((a.controller === 'player') && o.controller !== 'swarm' && a.state !== 'attack' && a.state !== 'pounce') continue;
       // A nursery is a peace, and a mouthful taken in passing breaks it as surely as a hunt does.
       if (peaceful(o.pos) && a.lastHitBy !== o.id) continue;
       if (dist(a.pos, o.pos) < L * 0.4 + bodyRadius(o) && (moving || a.state === 'attack')) this.takeWhole(a, o);
@@ -3019,7 +2956,7 @@ export class Game implements AiWorld {
     if (!this.canEat(a, o)) { kill(this.hitCtx, o, a); return; }
     // A fish out of a school is a mouthful taken in passing, and a cloud of them is how a filter
     // feeder eats: no ceremony there either, or crossing a shoal would be a hundred performances.
-    if (o.controller === 'swarm' || (a.controller !== 'player' && a.controller !== 'bot')) { this.consume(a, o); return; }
+    if (o.controller === 'swarm' || (a.controller !== 'player')) { this.consume(a, o); return; }
     const ratio = clamp(lengthOf(o) / Math.max(lengthOf(a), 1e-3), 0.05, 1);
     startSwallow(this.hitCtx, a, o);
     // A mouthful is not a meal: the chew and the pause both follow how big the thing was.
@@ -3038,7 +2975,7 @@ export class Game implements AiWorld {
     a.hp = Math.min(a.hpMax, a.hp + val * 0.4);
     this.events.push({ kind: 'eat', pos: { ...o.pos }, actor: a.id, other: o.id, strength: lengthOf(o) / lengthOf(a), player: a.player });
     this.flag(a, 'ate');
-    if (o.controller === 'player' || o.controller === 'bot') { o.respawnT = 1.2; return; } // swallowed: corpse logic respawns them
+    if (o.controller === 'player') { o.respawnT = 1.2; return; } // swallowed: corpse logic respawns them
     this.remove(o);
   }
 
@@ -3052,7 +2989,7 @@ export class Game implements AiWorld {
   }
 
   private gainNutrition(a: Actor, food: Actor | undefined, amount: number) {
-    if (a.controller !== 'player' && a.controller !== 'bot') { a.hp = Math.min(a.hpMax, a.hp + amount * 0.5); return; }
+    if (a.controller !== 'player') { a.hp = Math.min(a.hpMax, a.hp + amount * 0.5); return; }
     if (this.mode === 'survival') {
       // Every way of feeding fills the stomach — a kill, a carcass, a bloom, a grazed mat, a
       // giant's bones. Only the first two have a body to measure; the rest arrive as an amount
@@ -3289,11 +3226,11 @@ export class Game implements AiWorld {
 
   /**
    * The scoreboard for one viewport (hold View). Sorted by the thing the mode is about, so the
-   * top line is whoever is winning it: catch in Hunter & Hunted, size everywhere else.
+   * top line is whoever is furthest up the ladder.
    */
   scoreboard(viewer: number): { header: ScoreHeader; rows: ScoreRow[] } {
     const me = this.players[viewer];
-    const contenders = this.actors.filter((a) => a.controller === 'player' || a.controller === 'bot');
+    const contenders = this.actors.filter((a) => a.controller === 'player');
     const rows: ScoreRow[] = contenders.map((a) => {
       const era = RULES?.scoreLine?.(this, a);
       return {
@@ -3305,14 +3242,9 @@ export class Game implements AiWorld {
         alive: isAlive(a),
         biome: BIOME_NAMES[biomeAt(a.pos.x, a.pos.z)],
         distance: me && a !== me ? distXZ(me.pos, a.pos) : 0,
-        score: this.mode === 'hunted' && a.player >= 0 ? (this.huntScore[a.player] ?? 0) : undefined,
-        hunting: this.isHunter(a.player) || undefined,
       };
     });
-    const by = this.mode === 'hunted'
-      ? (r: ScoreRow) => (r.score ?? -1)
-      : (r: ScoreRow) => r.tier + r.progress;
-    rows.sort((x, y) => by(y) - by(x));
+    rows.sort((x, y) => (y.tier + y.progress) - (x.tier + x.progress));
     return { header: this.scoreHeader(), rows };
   }
 
@@ -3323,14 +3255,6 @@ export class Game implements AiWorld {
         if (this.endless || !chasing.length) return { title: SAY.board.survivalTitle, detail: SAY.board.reefWon };
         const held = Math.max(0, ...this.players.map((p, i) => (p.carriedTop ? 0 : this.progress[i].apexT)));
         return { title: SAY.board.survivalTitle, detail: held > 0 ? SAY.board.apexHeld(Math.floor(held), APEX_HOLD_SECONDS) : SAY.board.survivalGoal };
-      }
-      case 'hunted': {
-        const giant = this.hunterIndex >= 0 ? this.players[this.hunterIndex] : undefined;
-        return {
-          title: SAY.board.huntTurn(Math.min(this.huntTurn + 1, this.huntTurns), this.huntTurns),
-          detail: giant ? SAY.board.huntingNow(this.hunterIndex + 1) : SAY.board.changingOver,
-          clock: this.huntBreakT > 0 ? this.huntBreakT : this.huntTurnLeft(),
-        };
       }
       case 'rise': {
         // Nobody left with a clock running — everyone here carried a finished run in — reads the
@@ -3559,7 +3483,7 @@ export class Game implements AiWorld {
     const cells = new Map<string, { dx: number; dy: number; dz: number; n: number; food: number; r: number }>();
     for (const a of this.nearby(p.pos, range)) {
       if (a.id === p.id || !isAlive(a) || isHidden(a)) continue;
-      if (a.controller === 'player' || a.controller === 'bot') continue;
+      if (a.controller === 'player') continue;
       const band = bandOf(p, a);
       if (band !== 'snack' && band !== 'prey') continue;
       const dx = a.pos.x - p.pos.x, dy = a.pos.y - p.pos.y, dz = a.pos.z - p.pos.z;
@@ -3618,103 +3542,7 @@ export class Game implements AiWorld {
         });
         break;
       }
-      case 'hunted': {
-        this.creditHunt();
-        // Between turns nobody is the giant: everyone drifts while the hand-over is announced.
-        if (this.huntBreakT > 0) {
-          this.huntBreakT -= dt;
-          if (this.huntBreakT <= 0) this.beginHuntTurn();
-          break;
-        }
-        this.huntTurnT += dt;
-        const smalls = this.actors.filter((a) => (a.controller === 'player' || a.controller === 'bot') && !this.isHunter(a.player));
-        // The turn ends when its time is up, or early when every small one has grown out of reach.
-        const grownUp = smalls.length > 0 && smalls.every((s) => s.tier >= 2);
-        if (grownUp || this.huntTurnT >= HUNT_TURN) this.endHuntTurn(grownUp);
-        break;
-      }
     }
-  }
-
-  /**
-   * Score the giant's catch as it happens. Every contender the giant kills on its turn is a
-   * point — including one it has already eaten once, because a small one that keeps getting
-   * caught is exactly what the score is measuring.
-   */
-  private creditHunt() {
-    if (this.hunterIndex < 0) return;
-    const giant = this.players[this.hunterIndex];
-    if (!giant) return;
-    for (const e of this.events) {
-      if (e.kind !== 'kill' || e.actor !== giant.id || e.other == null) continue;
-      const victim = this.idMap.get(e.other);
-      if (!victim || (victim.controller !== 'player' && victim.controller !== 'bot')) continue;
-      this.huntScore[this.hunterIndex] = (this.huntScore[this.hunterIndex] ?? 0) + 1;
-    }
-  }
-
-  /** Seconds left in the current giant's turn, for the HUD. */
-  huntTurnLeft() { return this.mode === 'hunted' ? Math.max(0, HUNT_TURN - this.huntTurnT) : 0; }
-
-  /**
-   * A turn is over. The giant's catch is already on the board (`huntScore`, credited as it
-   * happened), so this only has to hand the role on — or, on the last turn, decide the match.
-   */
-  private endHuntTurn(grownUp: boolean) {
-    const giant = this.players[this.hunterIndex];
-    const caught = this.huntScore[this.hunterIndex] ?? 0;
-    const name = giant ? creature(giant.creature).name : SAY.theGiant;
-    this.announce(grownUp ? SAY.match.grownUp(name, caught) : SAY.match.timeUp(name, caught));
-    if (this.huntTurn + 1 >= this.huntTurns) { this.finishHunt(); return; }
-    this.huntTurn++;
-    // Nobody is the giant during the pause. The old one keeps its body until the changeover —
-    // popping it down a tier mid-sentence reads as a glitch — but everyone is made invulnerable
-    // for the whole break, so nothing it does in those seconds can count.
-    this.hunterIndex = -1;
-    this.huntBreakT = HUNT_BREAK;
-    for (const p of this.players) if (isAlive(p)) { p.state = 'free'; p.stateT = 0; p.spawnProtect = HUNT_BREAK + 2; }
-  }
-
-  /** Put everyone back where they belong for the next turn and hand the giant's body over. */
-  private beginHuntTurn() {
-    this.hunterIndex = this.huntTurn % Math.max(1, this.players.length);
-    this.huntTurnT = 0;
-    const nursery = nurseryAt(0);
-    this.world.loadAround(nursery);
-    const giant = this.players[this.hunterIndex];
-    this.announce(SAY.match.turnAnnounce(this.huntTurn + 1, this.huntTurns, giant ? SAY.match.playerName(this.hunterIndex + 1) : SAY.match.nobody));
-    // Contenders are re-seated: the new giant at giant size, everybody else back to a juvenile in
-    // a nursery. Scores stay; only the bodies are reset.
-    for (const a of this.actors) {
-      if (a.controller !== 'player' && a.controller !== 'bot') continue;
-      const hunter = this.isHunter(a.player);
-      a.tier = hunter ? 3 : 1;
-      a.scale = RULES ? RULES.startScale('hunted', hunter ? 0 : 1, a.creature) : hunter ? 3.0 : tierScale(a.creature, 1);
-      a.nutrition = 0;
-      applyScaleStats(a, true);
-      a.hp = a.hpMax; a.stamina = a.staminaMax; a.poise = a.poiseMax;
-      a.pos = this.spawnPoint(nursery, a.creature, a.scale, Math.max(0, a.player) + (hunter ? 4 : 0));
-      if (hunter) a.pos.z -= 70;                       // the giant starts out to sea, not on top of the nursery
-      a.home = { ...nursery };
-      a.vel = v3(); a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0; a.reviveT = 0;
-      stopHiding(a); a.camoStrength = 0; a.hideCd = 0; a.emergenceHeavy = false; a.abilityActive = false; a.abilityCd = 0;
-      a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.swallowedBy = -1;
-      a.bank = 0; a.pitch = 0; a.yaw = Math.PI; a.spawnProtect = 3.5; a.hitFlash = 0;
-      this.events.push({ kind: 'moult', pos: { ...a.pos }, actor: a.id, player: a.player, strength: 0.6 });
-    }
-  }
-
-  /** Every turn played: the best hunter takes it. */
-  private finishHunt() {
-    let best = -1, bestScore = -1, tied = false;
-    this.huntScore.forEach((n, i) => {
-      if (n > bestScore) { bestScore = n; best = i; tied = false; }
-      else if (n === bestScore) tied = true;
-    });
-    const line = this.huntScore.map((n, i) => SAY.match.scoreLine(i + 1, n)).join(' · ');
-    if (bestScore <= 0) this.state = { status: 'lost', winner: -2, message: SAY.match.nobodyCaught(line) };
-    else if (tied) this.state = { status: 'won', winner: -2, message: SAY.match.tie(bestScore, line) };
-    else this.state = { status: 'won', winner: best, message: SAY.match.huntedBest(best + 1, bestScore, line) };
   }
 
   /** A short line in every player's viewport. */

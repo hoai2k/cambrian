@@ -88,7 +88,7 @@ export const peaceful = (p: Vec3) => nurseryFactor(p.x, p.z) > 0.35;
  * (`updateHunted` in game.ts), and this is the time it buys. Without it an animal that decided to
  * hunt from close by went from "not interested" to jaws in about a second — a Triassic predator
  * picking a player out from a body length away and eating it before the banner had drawn. Only a
- * player is owed the tell; a bot or the sea's own animals are hunted as they always were.
+ * player is owed the tell; the sea's own animals are hunted as they always were.
  */
 export const HUNT_TELL = 5;
 /** How much of its speed a stalker closes at while it tells. */
@@ -300,11 +300,11 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
   const L = lengthOf(a);
   b.goalT += dt; b.thinkT -= dt; b.reactT -= dt; b.hunger += dt;
   /**
-   * A brain standing in for a player — a versus bot, or the balance harness driving a creature
-   * through a match — is a competitor in a game, not an animal in an ecosystem. The hour governs
+   * A brain standing in for a player — the balance harness or a test driving a creature through
+   * a match — is a competitor in a game, not an animal in an ecosystem. The hour governs
    * what the wildlife does; it must not decide how hard a rival plays.
    */
-  const competitor = a.controller === 'bot' || a.controller === 'player';
+  const competitor = a.controller === 'player';
   if (a.eats !== b.lastEats) { b.lastEats = a.eats; b.hunger = competitor ? 2 : 0; }
 
   if (b.thinkT <= 0) {
@@ -343,12 +343,12 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       if (d > senseR) {
         // Out of sight: only its own territory is still its business.
         if (b.territory && b.territoryR > 0 && !intruder && distXZ(o.pos, b.territory) < b.territoryR
-          && (o.controller === 'player' || o.controller === 'bot' || o.controller === 'ambient')
+          && (o.controller === 'player' || o.controller === 'ambient')
           && lengthOf(o) > L * 0.5 && band !== 'giant' && band !== 'threat') intruder = o;
         continue;
       }
       if (band === 'giant' || band === 'threat') {
-        const hunting = o.brain ? (o.brain.detection.get(a.id) ?? 0) > 1 || o.brain.target === a.id : o.controller === 'player' || o.controller === 'bot';
+        const hunting = o.brain ? (o.brain.detection.get(a.id) ?? 0) > 1 || o.brain.target === a.id : o.controller === 'player';
         const r = band === 'giant' ? senseR : senseR * 0.6;
         if (d < r && (hunting || d < r * 0.5) && d < worstD) { worst = o; worstD = d; }
       } else if (band === 'snack' || band === 'prey') {
@@ -368,21 +368,21 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
         // neighbour at midday, unprovoked and not hungry, is exactly the restlessness that made
         // the old reef tiring, so the odds of it scale with the hour like everything else.
         const spoiling = b.aggression > 0.7 && d < senseR * 0.35 && g.rng() < 0.3 * appetiteAt(g.time, here);
-        const wants = competitor ? (o.controller === 'player' || o.controller === 'bot') : crowded || provoked || spoiling;
+        const wants = competitor ? (o.controller === 'player') : crowded || provoked || spoiling;
         if (wants && !peace && d < rivalD) { rival = o; rivalD = d; }
       }
       // Anything of consequence standing in the patch this animal holds, whatever size it is.
       if (b.territory && b.territoryR > 0 && !intruder) {
         const inside = distXZ(o.pos, b.territory) < b.territoryR;
-        const worthChasing = (o.controller === 'player' || o.controller === 'bot' || o.controller === 'ambient') && lengthOf(o) > L * 0.5;
+        const worthChasing = (o.controller === 'player' || o.controller === 'ambient') && lengthOf(o) > L * 0.5;
         if (inside && worthChasing && band !== 'giant' && band !== 'threat') intruder = o;
       }
     }
     // How long this animal will go after a meal before it looks for another. Short through the
     // twilight, when the whole reef is hunting at once; long through the middle of the day, when
     // a fed animal simply gets on with its life — and shorter or longer again for the water it is
-    // in, so the channel and the basin are hungry places and a flat of sunlit sand is not. Bots
-    // are competitors in a versus match rather than wildlife, so they are always hungry.
+    // in, so the channel and the basin are hungry places and a flat of sunlit sand is not. A brain
+    // standing in for a player is a competitor rather than wildlife, so it is always hungry.
     const hungry = competitor || b.hunger > huntInterval(g.time, here) * (g.mode === 'survival' ? 0.8 : 1) * (0.7 + b.appetite * 0.6) || a.hp < a.hpMax * 0.45;
     const predatory = !def.diet || (competitor && def.diet !== 'filter');
     const attacker = a.lastHitBy >= 0 ? g.byId(a.lastHitBy) : undefined;
@@ -402,18 +402,18 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     const cornered = struck && b.goal === 'flee' && b.target === attacker!.id && b.goalT > 2
       && dist(a.pos, attacker!.pos) < L * 1.6 + lengthOf(attacker!) * 0.6;
     if (cornered) { if (b.goal !== 'fight' || b.target !== attacker!.id) b.goalT = 0; b.goal = 'fight'; b.target = attacker!.id; }
-    else if (outmatched && a.controller !== 'bot') { if (b.goal !== 'flee' || b.target !== attacker!.id) b.goalT = 0; b.goal = 'flee'; b.target = attacker!.id; }
+    else if (outmatched) { if (b.goal !== 'flee' || b.target !== attacker!.id) b.goalT = 0; b.goal = 'flee'; b.target = attacker!.id; }
     else if (struck) { if (b.goal !== 'fight' || b.target !== attacker!.id) b.goalT = 0; b.goal = 'fight'; b.target = attacker!.id; }
     else if (worst) { if (b.goal !== 'flee') b.goalT = 0; b.goal = 'flee'; b.target = worst.id; }
     // Its own ground comes before a squabble with a neighbour and before feeding. Without this an
     // animal would wander off its patch to bicker and leave the intruder standing in it.
     else if (intruder) { if (b.goal !== 'defend' || b.target !== intruder.id) b.goalT = 0; b.goal = 'defend'; b.target = intruder.id; }
-    else if (rival && (a.hp > a.hpMax * 0.35 || a.controller === 'bot')) { if (b.goal !== 'fight') b.goalT = 0; b.goal = 'fight'; b.target = rival.id; }
+    else if (rival && a.hp > a.hpMax * 0.35) { if (b.goal !== 'fight') b.goalT = 0; b.goal = 'fight'; b.target = rival.id; }
     // A scavenger goes to the dead rather than making its own. It looks whenever it is hungry,
     // and falls through to wandering when there is nothing to find, which is most of the time.
     else if (def.diet === 'scavenger' && hungry && carrion) { if (b.goal !== 'scavenge') b.goalT = 0; b.goal = 'scavenge'; b.target = carrion.id; }
     // Everything without a diet of its own hunts, and so does anything standing in for a player:
-    // a bot picking Wiwaxia still has to compete, and a human in that shell can always bite. Only
+    // a brain driving Wiwaxia for a player still has to compete, and a human in that shell can always bite. Only
     // suspension feeders are left out — their whole living is the bloom, and chasing loses it.
     // Opportunists take a free meal first: a body on the floor is a better proposition than a
     // chase, and a trilobite is in no position to be proud.
@@ -429,7 +429,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       if (b.territory && b.territoryR > 0) {
         const ang = g.rng() * TAU, r = Math.sqrt(g.rng()) * b.territoryR * 0.75;
         b.wanderTo = { x: b.territory.x + Math.cos(ang) * r, y: a.pos.y, z: b.territory.z + Math.sin(ang) * r };
-      } else pickWander(a, b, g.rng, a.controller === 'bot' ? 60 : 32);
+      } else pickWander(a, b, g.rng, 32);
     }
   }
 
@@ -477,7 +477,6 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       steerToward(a, predicted, out);
       out.burst = d > L * 2.5 && a.stamina > 20 ? 1 : 0;
       if (d < L * 0.9 + lengthOf(t) * 0.4) { if (lengthOf(t) > L * 0.45 && a.state === 'free') out.heavy = true; else out.light = true; }
-      if (a.controller === 'bot' && d < L * 3 && def.ability === 'ambushSurge') out.burst = 1;
       break;
     }
     case 'defend': {
@@ -509,7 +508,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       } else out.worldMove = vscale(to, 0.3);
       if (t.state === 'attack' && d < reach * 1.6 && def.canGuard && g.rng() < 0.5) out.guard = true;
       // Losing badly on your own ground is still losing.
-      if (a.hp < a.hpMax * 0.3 && a.controller !== 'bot') { b.goal = 'flee'; b.goalT = 0; }
+      if (a.hp < a.hpMax * 0.3) { b.goal = 'flee'; b.goalT = 0; }
       break;
     }
     case 'fight': {
@@ -543,7 +542,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       // react to enemy wind-ups
       if (t.state === 'attack' && t.stateT < (t.move?.windup ?? 0.3) && d < reach * 1.6 && b.reactT <= 0) {
         const roll = g.rng();
-        const skill = a.controller === 'bot' ? 0.7 : 0.4;
+        const skill = 0.4;
         if (roll < skill * 0.3) out.dodge = true;
         else if (roll < skill * 0.8 && def.canGuard) out.guard = true;
         b.reactT = b.reaction * (1.2 + g.rng());
@@ -558,7 +557,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
         else if (a.abilityCd <= 0) out.heavy = true;
         b.reactT = b.reaction * 1.5;
       }
-      if (a.hp < a.hpMax * 0.3 && a.controller !== 'bot') { b.goal = 'flee'; b.goalT = 0; }
+      if (a.hp < a.hpMax * 0.3) { b.goal = 'flee'; b.goalT = 0; }
       break;
     }
     case 'scavenge': {

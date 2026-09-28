@@ -42,7 +42,7 @@ type InputFrame = import('../src/sim/types').InputFrame;
 type Mode = import('../src/sim/types').Mode;
 import { heading } from '../src/shared/math';
 import { wrapAngle } from '../src/shared/math';
-import { isCoop, MODE_IDS } from '../src/sim/types';
+import { MODE_IDS } from '../src/sim/types';
 type CreatureId = import('../src/sim/creatures').CreatureId;
 
 const DT = 1 / 60;
@@ -205,10 +205,6 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
   ok(Math.abs(stageScale(L, ADULT_STAGE) - 1) < 1e-9 && stageScale(L, PRIME_STAGE) > 1.3, 'adult is full size and Prime is bigger again');
   // every hatchling hatches inside plant cover, never in open water
   for (const p of dom.players) ok(coverAt(dom.world, p.pos, lengthOf(p), []) > 0.2, `${p.creature} hatches hidden in the plants (cover ${coverAt(dom.world, p.pos, lengthOf(p), []).toFixed(2)})`);
-  ok(dom.actors.every((a) => a.controller !== 'bot'), 'Rise is whoever turned up: no bots fill the seats');
-  const hunt = new Game('hunted', [{ creature: 'eldredgeops', device: 'keyboard', ready: true }]);
-  hunt.skipHatch();
-  ok(hunt.actors.filter((a) => a.controller === 'bot').length === 3, 'Hunter & Hunted still fills to four with bots');
   const reef = new Game('reef', [{ creature: 'tiktaalik', device: 'keyboard', ready: true }]);
   reef.skipHatch();
   ok(Math.abs(reef.players[0].scale - stageScale(creature('tiktaalik').adultLength, ADULT_STAGE)) < 1e-6 && devActor(reef, reef.players[0]).standing > STAGE_AT[ADULT_STAGE], 'Reef starts Adult');
@@ -672,8 +668,6 @@ ok(RULES !== undefined && !RULES.growthByNutrition, 'Devonian rules active: grow
     for (const kind of ['select', 'card', 'thumb'] as const) ok(fs.existsSync(`public/${paths.portrait(id, kind)}`), `${id} has a ${kind} portrait for the roster`);
   }
   for (const id of [DEVONIAN.defaults.player, ...DEVONIAN.defaults.boot, ...DEVONIAN.defaults.title]) ok(PLAYABLE_IDS.includes(id), `${id} is preloaded and pickable`);
-  const bots = new Game('hunted', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]).actors.filter((a) => a.controller === 'bot');
-  ok(bots.length > 0 && bots.every((b) => PLAYABLE_IDS.includes(b.creature)), 'bots are animals the player could have picked');
 }
 
 // ---- movement reads at the same speed as the Cambrian, whatever the body's size ----
@@ -751,13 +745,18 @@ const { TIER_SCALE } = await import('../src/sim/types');
   // the brush display bluffs an AI rival off
   // away from the other players, so the rival has only the stethacanthus to square up to
   steth.pos.x += 80; steth.prevT.x = steth.pos.x;
-  const bot = g.spawn('cladoselache', 'bot', { x: steth.pos.x + 6, y: steth.pos.y, z: steth.pos.z }, 1.0);
+  const bot = g.spawn('cladoselache', 'ambient', { x: steth.pos.x + 6, y: steth.pos.y, z: steth.pos.z }, 1.0);
   const { makeBrain } = await import('../src/sim/ai');
   bot.brain = makeBrain('needs', { ...steth.pos }, g.rng, { aggression: 1, reaction: 0.1, parrySkill: 0 });
   bot.brain.goal = 'hunt'; bot.brain.target = steth.id;
   const hold = new Map<number, InputFrame>(g.players.map((_, i) => [i, i === 2 ? { ...emptyInput(), guard: true } : emptyInput()]));
   let routed = false;
-  for (let i = 0; i < 30; i++) { g.step(DT, hold); if (g.events.some((e) => e.kind === 'routed' && e.actor === bot.id)) routed = true; g.events.length = 0; }
+  // Held on the hunt until the display answers it: the rival stands in the nursery, where an
+  // ordinary animal starts nothing, and what is under test is the rout rather than its appetite.
+  for (let i = 0; i < 30; i++) {
+    if (!routed) { bot.brain.goal = 'hunt'; bot.brain.target = steth.id; }
+    g.step(DT, hold); if (g.events.some((e) => e.kind === 'routed' && e.actor === bot.id)) routed = true; g.events.length = 0;
+  }
   ok(steth.state === 'guard' && bot.brain.goal === 'flee' && routed, `the brush display routs a hunting rival (${bot.brain.goal})`);
   ok(RULES!.camoDrain(g.spawn('furcaster', 'ambient', { x: 0, y: -10, z: 90 }, 1)) === 0.25 && RULES!.camoDrain(ony) === 1, 'camouflage is nearly free for the benthos');
 }
@@ -898,14 +897,13 @@ const { TIER_SCALE } = await import('../src/sim/types');
   const g = new Game('rise', [{ creature: 'coccosteus', device: 'keyboard', ready: true }]);
   g.skipHatch();
   const p = g.players[0];
-  const bots = g.actors.filter((a) => a.controller === 'bot');
-  ok(bots.every((b) => Math.hypot(b.pos.x - p.pos.x, b.pos.z - p.pos.z) > 120), `bots hatch in other nurseries (nearest ${Math.min(...bots.map((b) => Math.hypot(b.pos.x - p.pos.x, b.pos.z - p.pos.z))).toFixed(0)} away)`);
   ok(p.spawnProtect >= 8 - 1e-6, `a hatchling is protected for eight seconds (${p.spawnProtect})`);
-  // a shark bot put right beside the hatchling in the nursery will not take it
+  // a shark put right beside the hatchling in the nursery will not take it
   const { makeBrain } = await import('../src/sim/ai');
-  const shark = g.spawn('cladoselache', 'bot', { x: p.pos.x + 5, y: p.pos.y, z: p.pos.z }, 1.0);
+  const shark = g.spawn('cladoselache', 'ambient', { x: p.pos.x + 5, y: p.pos.y, z: p.pos.z }, 1.0);
   shark.brain = makeBrain('needs', { ...nurseryAt(0) }, g.rng, { aggression: 1, reaction: 0.1, parrySkill: 0 });
-  shark.brain.hunger = 10; shark.spawnProtect = 0; p.spawnProtect = 0;
+  // Starving, so the only thing keeping it off the hatchling is the nursery (appetite follows the hour).
+  shark.brain.hunger = 500; shark.spawnProtect = 0; p.spawnProtect = 0;
   let targeted = false;
   for (let i = 0; i < 60 * 8; i++) { g.step(DT, new Map([[0, emptyInput()]])); g.events.length = 0; if ((shark.brain.goal === 'hunt' || shark.brain.goal === 'fight') && shark.brain.target === p.id) targeted = true; }
   ok(!targeted && isAlive(p) && p.hp === p.hpMax, `an unprovoked shark leaves the hatchling alone in the nursery (goal ${shark.brain.goal}, hp ${p.hp}/${p.hpMax})`);
@@ -915,9 +913,9 @@ const { TIER_SCALE } = await import('../src/sim/types');
   const q = g2.players[0];
   q.pos.x = 120; q.pos.z -= 420; q.prevT.x = q.pos.x; q.prevT.z = q.pos.z; g2.world.loadAround(q.pos); q.spawnProtect = 0;
   for (let i = 0; i < 60; i++) { g2.step(DT, new Map([[0, emptyInput()]])); g2.events.length = 0; }
-  const shark2 = g2.spawn('cladoselache', 'bot', { x: q.pos.x + 6, y: q.pos.y, z: q.pos.z }, 1.0);
+  const shark2 = g2.spawn('cladoselache', 'ambient', { x: q.pos.x + 6, y: q.pos.y, z: q.pos.z }, 1.0);
   shark2.brain = makeBrain('needs', { ...q.pos }, g2.rng, { aggression: 1, reaction: 0.1, parrySkill: 0 });
-  shark2.brain.hunger = 10; shark2.spawnProtect = 0;
+  shark2.brain.hunger = 500; shark2.spawnProtect = 0;
   let hunted = false;
   for (let i = 0; i < 60 * 6; i++) { g2.step(DT, new Map([[0, emptyInput()]])); g2.events.length = 0; if (shark2.brain.target === q.id) hunted = true; }
   ok(hunted, `in open water the shark hunts it (goal ${shark2.brain.goal})`);
@@ -958,7 +956,7 @@ const { TIER_SCALE } = await import('../src/sim/types');
   d.standing = 100; d.stage = PRIME_STAGE; d.primeT = HOLD_TO_WIN - 0.01;
   tick(g, new Map([[0, emptyInput()]]));
   ok(g.state.status === 'won' && g.state.winner === 0, `holding Prime wins (${g.state.message})`);
-  const modes: Mode[] = ['rise', 'hunted', 'reef'];
+  const modes: Mode[] = ['rise', 'survival', 'reef'];
   for (const m of modes) { const gm = new Game(m, [{ creature: 'coccosteus', device: 'keyboard', ready: true }, { creature: 'cladoselache', device: 0, ready: true }]); gm.skipHatch(); for (let i = 0; i < 120; i++) tick(gm, new Map([[0, emptyInput()], [1, emptyInput()]])); ok(gm.state.status === 'playing', `${m} runs`); }
 
   // Rise is co-op, so its result is a milestone: the sea can be carried on into.
@@ -1010,14 +1008,6 @@ const { TIER_SCALE } = await import('../src/sim/types');
   ok(g.progress[0].apexDone.includes('dunkleosteus') && g.progress[1].apexDone.includes('cladoselache'),
     'each seat records the animal it took up');
   ok(!g.progress[0].apexDone.includes('cladoselache'), "and not the other seat's");
-}
-{
-  // Reef is co-op too; Hunter & Hunted is a contest between players and stays decided.
-  ok(isCoop('rise') && isCoop('reef') && !isCoop('hunted'), 'rise and reef are co-op, hunted is versus');
-  const hh = new Game('hunted', [{ creature: 'coccosteus', device: 'keyboard', ready: true }, { creature: 'cladoselache', device: 0, ready: true }]);
-  hh.skipHatch();
-  hh.state = { status: 'won', winner: 0, message: 'done' };
-  ok(!hh.continueMatch() && hh.state.status === 'won', 'a versus verdict is final');
 }
 
 // ---- rise ----

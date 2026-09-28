@@ -220,16 +220,16 @@ if (shared) {
 if (shared) {
   const { g, p } = fresh(swimmerId());
   const { makeBrain } = await import('../src/sim/ai');
-  const bot = g.spawn(swimmerId(), 'bot', { x: 20, y: SURFACE_Y + 4, z: shoreZ(20) + 6 }, p.scale);
+  const bot = g.spawn(swimmerId(), 'ambient', { x: 20, y: SURFACE_Y + 4, z: shoreZ(20) + 6 }, p.scale);
   bot.brain = makeBrain('needs', { ...bot.pos }, g.rng);
   bot.airborne = true; bot.spawnProtect = 0;
   place(g, p, 60);
   run(g, 3);
-  assert(bot.ashore, 'the bot came down on the sand');
+  assert(bot.ashore, 'the animal came down on the sand');
   let t = 0;
   while (bot.ashore && t < 55) { run(g, 1); t++; }
   assert(!bot.ashore && isAlive(bot), `and got itself back into the water in ${t} s`);
-  pass(`a bot ashore goes back to the sea (${t} s)`);
+  pass(`a brained animal ashore goes back to the sea (${t} s)`);
 }
 
 // ---- the era's own: air-breathers and walkers ----

@@ -12,7 +12,7 @@ export const CREATURE_IDS = CREATURES.map((c) => c.id);
  * shore.ts` places them, one per post, pinned and brainless). It is not a swimmer, so it has no
  * business in the ambient draw — and it was in it, because that draw took the whole roster: the
  * Triassic was spawning hatchling Tanystropheus out in open water with ordinary brains, walking
- * animals swimming around biting people. Ecology and bots take this rather than `CREATURES`.
+ * animals swimming around biting people. The ecology takes this rather than `CREATURES`.
  *
  * A `shelved: true` creature is dropped for a different reason: the game does not have that animal
  * any more. Its entry is kept so the specimen viewer can still show the body that was built for it,
@@ -93,7 +93,7 @@ export const realCm = (id: CreatureId) => ACTIVE_ERA.naturalSizes?.[id]?.realCm;
  * Animals from the other games, admitted as visitors (src/content/visitors.ts).
  *
  * They are kept in their own map rather than folded into the roster on purpose: the roster is what
- * the pick grid draws, what bots are drawn from and what the sea is populated with, and a visitor
+ * the pick grid draws and what the sea is populated with, and a visitor
  * belongs to none of that — it is one body a player brought with them. So `creature()` finds it and
  * nothing that walks `CREATURES` ever does.
  */

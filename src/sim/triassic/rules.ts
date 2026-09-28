@@ -11,7 +11,7 @@ import type { Actor, InputFrame } from '../types';
 import { biomeWeights, coverAt, groundHeight, nurseryAt, RISE_RATE, SURFACE_Y } from '../world';
 import { DEVONIAN_RULES } from '../devonian/rules';
 import { ADULT_STAGE, devActor, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageProgress, stageScale } from '../devonian/state';
-import { botNursery, canBreach as devCanBreach, sanctuary, spawnInCover, spawnProtect, spawnY, swim as devSwim, wanderY } from '../devonian/swim';
+import { canBreach as devCanBreach, sanctuary, spawnInCover, spawnProtect, spawnY, swim as devSwim, wanderY } from '../devonian/swim';
 import { camoDrain, installTriassicSpecials, stepAbility, useAbility, ySpecial } from './specials';
 import { setShoreAnimals, shoreClip, shoreRadar, stepShore } from './shore';
 import { AIR_LOW, AIR_MAX, triActor, triState } from './state';
@@ -49,7 +49,7 @@ const POD_SIZE = 2;
  */
 const AIR_CLIMB_FLOOR = 0.7;
 
-const isPlayerish = (a: Actor) => a.controller === 'player' || a.controller === 'bot';
+const isPlayerish = (a: Actor) => a.controller === 'player';
 /** The game whose step is running, for the hooks that are not handed it (armour). */
 let lastGame: Game | undefined;
 const players = (g: Game) => g.actors.filter(isPlayerish);
@@ -92,8 +92,6 @@ const DROWN_TIME = 8;
 const NECK_BREATH = 0.3;
 /** Seconds of held breath an exhaustion hold costs per second: half a lungful over a full grip. */
 const HELD_AIR_DRAIN = 10;
-/** The breath left at which a bot starts for the surface: long enough to climb from the deepest water. */
-const AIR_BOT_SEEK = 90;
 function updateAir(g: Game, a: Actor, dt: number) {
   const t = triActor(g, a);
   if (!breathesAir(a)) return;
@@ -108,14 +106,6 @@ function updateAir(g: Game, a: Actor, dt: number) {
   if (up) a.stamina = Math.max(a.stamina, a.staminaMax * 0.98);
   // the gauge: filled by a breath, spent by the second under water
   t.air = up ? AIR_MAX : Math.max(0, t.air - dt);
-  // A bot goes up for air. The shared brain has no notion of breathing at all — it steers for food,
-  // cover and threats and nothing else — so a gauge that can kill would kill every bot air-breather
-  // in the sea on a timer, which is not a rule the player is subject to so much as a bug with a
-  // clock on it. The assist is the same climb the player gets for free and it only ever lifts, so
-  // a bot that is eating or fleeing still does that; it simply does it on the way up.
-  if (a.controller === 'bot' && !up && isAlive(a) && a.grabbedBy < 0 && t.air < AIR_BOT_SEEK) {
-    a.vel.y = Math.max(a.vel.y, RISE_RATE * speedFactor(a.scale) * AIR_CLIMB_FLOOR);
-  }
   // drowning: out of air and out of effort together, for long enough to see it happen
   if (!up && t.air <= 0 && a.stamina <= 0 && isAlive(a)) {
     t.drownT += dt;
@@ -461,7 +451,7 @@ export const TRIASSIC_RULES: EraRules = {
     const at = spawnInCover(g, center, id, scale, index);
     return at ? clearTheView(g, at, id, scale) : at;
   },
-  botNursery, spawnProtect, sanctuary,
+  spawnProtect, sanctuary,
 
   moultScale: DEVONIAN_RULES.moultScale,
 

@@ -703,7 +703,7 @@ function applyBiomeProps(chunk: Chunk) {
 }
 
 /**
- * The streamed world. Chunks within `SIM_RADIUS` of every anchor (players, bots) are generated
+ * The streamed world. Chunks within `SIM_RADIUS` of every anchor (the players) are generated
  * and indexed; chunks further than that plus a margin are dropped. Flat arrays and hashes are
  * rebuilt whenever the loaded set changes, so the rest of the sim never sees chunks at all.
  */

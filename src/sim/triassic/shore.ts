@@ -261,7 +261,7 @@ function move(post: Post, a: Actor): boolean {
 }
 
 /**
- * The stillness detector. Every player or bot within reach — at the surface, or on the sand — has
+ * The stillness detector. Every player within reach — at the surface, or on the sand — has
  * its clock run while it is under `STILL_SPEED` of its own cruise and reset the moment it is not;
  * bodies out of reach are forgotten. Returns the one that has been still longest past the post's
  * threshold and is a band this kind goes for, or nothing.
@@ -271,7 +271,7 @@ function stillest(g: Game, post: Post, a: Actor, dt: number): Actor | undefined 
   const seen = new Set<number>();
   let best: Actor | undefined, bestT = 0;
   for (const o of g.nearby(post.pos, reach + 4)) {
-    if (o.id === a.id || (o.controller !== 'player' && o.controller !== 'bot') || !isAlive(o) || isInvulnerable(o) || o.state === 'swallowed') continue;
+    if (o.id === a.id || (o.controller !== 'player') || !isAlive(o) || isInvulnerable(o) || o.state === 'swallowed') continue;
     if (!inReach(post, a, o, reach)) continue;
     seen.add(o.id);
     const cruise = creature(o.creature).speed * speedFactor(o.scale);

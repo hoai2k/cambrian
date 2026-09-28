@@ -57,8 +57,8 @@ export interface EraRules {
   install(): void;
   /** The Y button's own special for this creature, when the era gives it one instead of the shared hide. */
   ySpecial(id: CreatureId): { name: string; desc: string } | undefined;
-  /** Starting body scale for the player or bot at `index` in `mode`, for creature `id`. */
-  startScale(mode: Mode, index: number, id: CreatureId): number;
+  /** Starting body scale for a player in `mode`, for creature `id`. */
+  startScale(mode: Mode, id: CreatureId): number;
   /**
    * The growth ladder, in this era's own terms (see src/sim/ladder.ts). Five rungs either way:
    * the Cambrian's tiers and the Devonian's life stages are the same ladder under two names, and
@@ -85,12 +85,10 @@ export interface EraRules {
    */
   onSwap?(g: Game, a: Actor): void;
   /**
-   * Where a player or bot hatches, given the nursery centre; undefined leaves the shared placement.
+   * Where a player hatches, given the nursery centre; undefined leaves the shared placement.
    * The Devonian puts every hatchling inside plant cover, on the floor or up a column.
    */
   spawnPoint(g: Game, center: Vec3, id: CreatureId, scale: number, index: number): Vec3 | undefined;
-  /** The nursery a bot hatches in; undefined puts it with the players. */
-  botNursery(index: number): Vec3 | undefined;
   /** Seconds of protection a body gets when it hatches or comes back. */
   spawnProtect(a: Actor): number;
   /**
@@ -107,7 +105,7 @@ export interface EraRules {
   init(g: Game): void;
   /** After every fixed step, before the events are drained by the renderer. */
   step(g: Game, dt: number): void;
-  /** Nutrition a player or bot just gained; `food` is the eaten actor when there is one. */
+  /** Nutrition a player just gained; `food` is the eaten actor when there is one. */
   onNutrition(g: Game, a: Actor, amount: number, food: Actor | undefined): void;
   /**
    * Survival's growth, which is not a meal: `fraction` of the whole ladder, hatchling to top. The

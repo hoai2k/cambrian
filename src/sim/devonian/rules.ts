@@ -9,7 +9,7 @@ import { BIOME_DANGER, biomeAt, groundHeight, RISE_RATE, sampleCurrent, shoreDis
 import { bodyRadius } from '../actors';
 import { ADULT_STAGE, devActor, GROWN, HOLD_TO_WIN, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageProgress, stageScale, stateFor, type DeadZone, type DevActor } from './state';
 import { camoDrain, installDevonianSpecials, stepAbility, stepGuardSpecial, useAbility, ySpecial } from './specials';
-import { botNursery, canBreach, sanctuary, spawnInCover, spawnProtect, spawnY, swim, wanderY } from './swim';
+import { canBreach, sanctuary, spawnInCover, spawnProtect, spawnY, swim, wanderY } from './swim';
 
 /**
  * The Devonian era rules (docs/redesign/08-devonian-domination.md).
@@ -87,7 +87,7 @@ function climbRelief(a: Actor, input: InputFrame, dir: Vec3, mag: number): numbe
 }
 
 const rungOf = (a: Actor) => creature(a.creature).rung ?? 2;
-const isPlayerish = (a: Actor) => a.controller === 'player' || a.controller === 'bot';
+const isPlayerish = (a: Actor) => a.controller === 'player';
 const players = (g: Game) => g.actors.filter(isPlayerish);
 
 /** Feeding is the only thing that grows an animal here, exactly as nutrition is in the Cambrian. */
@@ -235,9 +235,9 @@ function updateExuvia(g: Game, a: Actor, d: DevActor, dt: number) {
 // ---- the rules object ----
 export const DEVONIAN_RULES: EraRules = {
   growthByNutrition: false,
-  startScale(mode: Mode, index: number, id) {
+  startScale(mode: Mode, id) {
     const L = creature(id).adultLength;
-    return stageScale(L, mode === 'reef' ? ADULT_STAGE : mode === 'hunted' && index === 0 ? PRIME_STAGE : 0);
+    return stageScale(L, mode === 'reef' ? ADULT_STAGE : 0);
   },
   // The Devonian grows in five life stages, which is the shared ladder under its own names.
   ladderNames: STAGES,
@@ -318,7 +318,7 @@ export const DEVONIAN_RULES: EraRules = {
 
   useAbility, stepAbility, camoDrain,
   swim, rise: riseDrive, staminaRegen, climbRelief, canBreach, spawnY, wanderY,
-  spawnPoint: spawnInCover, botNursery, spawnProtect, sanctuary,
+  spawnPoint: spawnInCover, spawnProtect, sanctuary,
 
   moultScale(g, a) {
     const d = devActor(g, a);
@@ -344,8 +344,7 @@ export const DEVONIAN_RULES: EraRules = {
       // Somebody who came in on the top rung has already done this; the clock is not theirs to
       // run. Everyone else in the same sea keeps theirs and can still win it.
       if (a.carriedTop) { d.primeT = 0; continue; }
-      // Per seat and per animal, never per match: a bot has no seat to remember with, so the old
-      // whole-match latch is what holds one of those.
+      // Per seat and per animal, never per match.
       const pr = a.player >= 0 ? g.progress[a.player] : undefined;
       const already = pr ? pr.apexDone.includes(a.creature) : g.endless;
       if (d.stage >= PRIME_STAGE && isAlive(a)) {
@@ -372,7 +371,7 @@ export const DEVONIAN_RULES: EraRules = {
 
   /**
    * The Devonian ranks its animals by stage and standing rather than by tier, so the scoreboard
-   * shows those: "Adult · Apex predator" against the standing bar, for bots as well as players.
+   * shows those: "Adult · Apex predator" against the standing bar.
    */
   scoreLine(g, a) {
     const d = devActor(g, a);
