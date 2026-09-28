@@ -392,6 +392,13 @@ unless the user explicitly asks for a PR. Steps:
   player hands the grid back. It is the grid laid end to end, never a second roster — the grid
   model's reading order, the seat's own cursor, the same `moveCursor` (up and down become left and
   right) — and its card is the crew card, lifted into `renderCard` so both views draw one card.
+  **The cards follow the finger.** The stage is a track of three — the card on stage and its two
+  neighbours, which are also what peeks in at the edges held upright — moved with the finger once a
+  drag is claimed as sideways (an upward drag still scrolls the copy), and finished on the lift: past
+  a fifth of the card or flicked, the track slides on and the cursor steps; short of both it springs
+  back. The step happens *after* the slide and the track is re-seated with no motion, which is
+  invisible because the new card is already where the neighbour was. The slide is ended by a timer,
+  never by `transitionend`, which a slow renderer can deliver late or not at all.
   `npm run touch` holds the decision, `node tools/carousel-browser.mjs` the three games at phone size.
 - **The choice screen is a naturalist's plate, because the title is one.** Every game's title is an
   engraved plate on parchment, and the pick screen after it was a dark teal app panel, so pressing

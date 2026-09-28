@@ -196,11 +196,6 @@
   .select.plate .start-button { font-size: 16px; letter-spacing: .1em; padding: 10px 26px 11px; }
 }
 
-/* ---- the carousel's peeking neighbours, on paper ---- */
-.select.plate .peek-card { border-radius: 2px; border: 1px solid var(--ink-2); outline: 1px solid var(--ink-2); outline-offset: -5px; background: rgba(255, 248, 226, .3); }
-.select.plate .peek-card img { mix-blend-mode: multiply; filter: sepia(.35); opacity: .9; }
-.select.plate .peek-card .extra-glyph { color: var(--accent); font-family: var(--serif); }
-
 /* ---- the folder tabs over the roster ---- */
 .select.plate .roster-tab {
   border: 1px solid var(--ink-2); border-bottom: 0; border-radius: 9px 9px 0 0; padding: 5px 26px 4px;

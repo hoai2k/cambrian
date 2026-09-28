@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
 import { ACTIVE_ERA } from '../content';
 import { assetPaths } from '../content/asset-paths';
 import { hideLabel, hideDescription, HEAVY_SPECIALS, DEFENSIVE_SPECIALS } from '../sim/concealment';
@@ -519,6 +519,9 @@ function Stat({ label, v }: { label: string; v: number }) {
  * One seat: a phone is played by one person, and `carouselView` hands the screen back to the grid
  * the moment a second player joins.
  */
+/** The space between the card on stage and its neighbours, in the track and in the CSS (`--slide-gap`). */
+const SLIDE_GAP = 12;
+
 function RosterCarousel({ p, grid, renderCard }: {
   p: Props;
   grid: ReturnType<typeof rosterGrid>;
@@ -541,40 +544,87 @@ function RosterCarousel({ p, grid, renderCard }: {
     }
   };
   /*
-   * A swipe is a horizontal travel past `SWIPE` that is mostly horizontal, so the card's copy can
-   * still be scrolled up and down with the same thumb (`touch-action: pan-y` on the stage). It fires
-   * on the lift and swallows the click that would otherwise follow on whatever button the finger
-   * happened to start on — a swipe that began over Lock In is a swipe, not a lock-in.
+   * The cards follow the finger. Three are laid side by side — the one on stage and its neighbours
+   * either side, which are also what peeks in at the edges when the phone is upright — and the row
+   * moves with the finger as it travels. On the lift the motion completes: past `COMMIT` of the card's
+   * width, or flicked faster than `FLICK`, the row slides on to the neighbour and the cursor steps
+   * there; short of both it springs back. A drag is only claimed once it is going sideways
+   * (`touch-action: pan-y` leaves an upward drag to scroll the card's copy), and the click it would
+   * otherwise end in — on whatever button the finger started over — is swallowed, so a swipe that
+   * began on Lock In is a swipe, not a lock-in.
    */
-  const SWIPE = 44;
-  const press = useRef<{ x: number; y: number } | null>(null);
+  const COMMIT = 0.22, FLICK = 0.45, SLIDE_MS = 240;
+  const stageRef = useRef<HTMLDivElement>(null);
+  const press = useRef<{ x: number; y: number; t: number; axis: 'x' | 'y' | null; id: number } | null>(null);
   const swiped = useRef(false);
+  const [dx, setDx] = useState(0);
+  /** 'drag' follows the finger with no easing; 'slide' eases to a rest; 'jump' re-seats the row with none. */
+  const [motion, setMotion] = useState<'drag' | 'slide' | 'jump'>('jump');
+  const busy = useRef(false);
+  const width = () => stageRef.current?.clientWidth ?? 1;
+  /** Slide the row a whole card over, then step the cursor and re-seat the row under the new card. */
+  const go = (dir: 1 | -1) => {
+    if (busy.current) return;
+    busy.current = true;
+    setMotion('slide'); setDx(-dir * (width() + SLIDE_GAP));
+    // A timer rather than `transitionend`: under a slow renderer the event can arrive a frame late
+    // or not at all, and the carousel must never be left stuck mid-slide.
+    window.setTimeout(() => { step(dir); setMotion('jump'); setDx(0); busy.current = false; }, SLIDE_MS);
+  };
+  const release = (e: ReactPointerEvent) => {
+    const d = press.current; press.current = null;
+    if (!d || d.axis !== 'x') return;
+    const moved = e.clientX - d.x, speed = Math.abs(moved) / Math.max(1, e.timeStamp - d.t);
+    swiped.current = true;
+    if (Math.abs(moved) > width() * COMMIT || (speed > FLICK && Math.abs(moved) > 20)) go(moved < 0 ? 1 : -1);
+    else { setMotion('slide'); setDx(0); window.setTimeout(() => setMotion((m) => (m === 'slide' ? 'jump' : m)), SLIDE_MS); }
+  };
   // A locked visitor is an animal on stage whatever the cursor says: its arrows walk the visitors.
   const showCard = slot.kind === 'creature' || (seat?.cursor === 'visitors' && seat.ready);
   const cardPl: PlayerSetup = seat ?? { creature: (slot.kind === 'creature' ? slot.id : ACTIVE_ERA.defaults.player) as CreatureId, device: 'touch', ready: false };
+  /** A neighbour's card: the same card, drawn for an animal nobody is on yet. */
+  const neighbour = (o: Slot | undefined) => {
+    if (!o) return null;
+    if (o.kind === 'extra') return <ExtraCard id={o.id as ExtraId} count={p.visitorCount} onTake={() => {}} />;
+    return renderCard({ creature: o.id as CreatureId, device: seat?.device ?? 'touch', ready: false }, 0, true);
+  };
+  const prevSlot = order[(at - 1 + order.length) % order.length], nextSlot = order[(at + 1) % order.length];
   return (
     <div className="carousel" role="group" aria-roledescription="carousel" aria-label={K.label}>
-      <button className="carousel-step prev" aria-label={K.prev} onClick={() => step(-1)}><span aria-hidden="true">‹</span></button>
-      {/* Held upright the arrows give way to the neighbouring cards themselves, peeking in at either
-          edge: the edge of the next card says "swipe" without a word, and tapping it steps there. */}
-      <Peek slot={order[(at - 1 + order.length) % order.length]} side="prev" label={K.prev} onStep={() => step(-1)} />
-      <Peek slot={order[(at + 1) % order.length]} side="next" label={K.next} onStep={() => step(1)} />
+      <button className="carousel-step prev" aria-label={K.prev} onClick={() => go(-1)}><span aria-hidden="true">‹</span></button>
       <div
-        className="carousel-stage"
-        onPointerDown={(e) => { press.current = { x: e.clientX, y: e.clientY }; swiped.current = false; }}
-        onPointerUp={(e) => {
-          const d = press.current; press.current = null; if (!d) return;
-          const dx = e.clientX - d.x, dy = e.clientY - d.y;
-          if (Math.abs(dx) > SWIPE && Math.abs(dx) > Math.abs(dy) * 1.4) { swiped.current = true; step(dx < 0 ? 1 : -1); }
+        className="carousel-stage" ref={stageRef}
+        onPointerDown={(e) => {
+          // A new press is never the tail of the last swipe, even mid-slide: clear that first, or a
+          // swipe (which ends in no click at all) leaves the next real tap — Lock In — swallowed.
+          swiped.current = false;
+          if (busy.current) return;
+          press.current = { x: e.clientX, y: e.clientY, t: e.timeStamp, axis: null, id: e.pointerId };
         }}
-        onPointerCancel={() => { press.current = null; }}
+        onPointerMove={(e) => {
+          const d = press.current; if (!d) return;
+          const mx = e.clientX - d.x, my = e.clientY - d.y;
+          if (!d.axis && Math.hypot(mx, my) > 8) {
+            d.axis = Math.abs(mx) > Math.abs(my) ? 'x' : 'y';
+            if (d.axis === 'x') { try { (e.currentTarget as HTMLElement).setPointerCapture(d.id); } catch { /* */ } setMotion('drag'); }
+          }
+          if (d.axis === 'x') setDx(mx);
+        }}
+        onPointerUp={release}
+        onPointerCancel={() => { if (press.current?.axis === 'x') { setMotion('slide'); setDx(0); } press.current = null; }}
         onClickCapture={(e) => { if (swiped.current) { e.stopPropagation(); e.preventDefault(); swiped.current = false; } }}
       >
-        {showCard
-          ? <div className="carousel-card" key={seat?.creature ?? cardPl.creature}>{renderCard(cardPl, 0, !seat)}</div>
-          : <ExtraCard id={slot.id as ExtraId} count={p.visitorCount} onTake={() => p.onExtra(0, slot.id as ExtraId)} />}
+        <div className={`carousel-track ${motion}`} style={{ transform: `translateX(${dx}px)`, ['--slide-ms' as string]: `${SLIDE_MS}ms` }}>
+          <div className="carousel-slide prev" aria-hidden="true" onClickCapture={(e) => { e.stopPropagation(); e.preventDefault(); go(-1); }}>{neighbour(prevSlot)}</div>
+          <div className="carousel-slide current">
+            {showCard
+              ? renderCard(cardPl, 0, !seat)
+              : <ExtraCard id={slot.id as ExtraId} count={p.visitorCount} onTake={() => p.onExtra(0, slot.id as ExtraId)} />}
+          </div>
+          <div className="carousel-slide next" aria-hidden="true" onClickCapture={(e) => { e.stopPropagation(); e.preventDefault(); go(1); }}>{neighbour(nextSlot)}</div>
+        </div>
       </div>
-      <button className="carousel-step next" aria-label={K.next} onClick={() => step(1)}><span aria-hidden="true">›</span></button>
+      <button className="carousel-step next" aria-label={K.next} onClick={() => go(1)}><span aria-hidden="true">›</span></button>
       <div className="carousel-foot" aria-live="polite">
         <span className="carousel-dots" aria-hidden="true">{order.map((o, k) => <i key={k} className={`${k === at ? 'on' : ''} ${o.kind === 'extra' ? 'extra' : ''}`} />)}</span>
         <span className="carousel-count">{K.count(at + 1, order.length)}</span>
@@ -658,20 +708,6 @@ function DepthView({ p, seatsOn, onCreature, onExtra, onLayout }: {
         })}
       </>}
     </div>
-  );
-}
-
-/** The edge of the card either side of the one on stage, for the carousel held upright. */
-function Peek({ slot, side, label, onStep }: { slot: Slot | undefined; side: 'prev' | 'next'; label: string; onStep: () => void }) {
-  if (!slot) return null;
-  return (
-    <button className={`carousel-peek ${side}`} aria-label={label} onClick={onStep} tabIndex={-1}>
-      <span className="peek-card" aria-hidden="true">
-        {slot.kind === 'creature'
-          ? <CreaturePortrait creatureId={slot.id as CreatureId} kind="thumb" assetBase={ASSETS} alt="" draggable={false} />
-          : <span className="extra-glyph">{EXTRA_LABEL[slot.id as ExtraId].glyph}</span>}
-      </span>
-    </button>
   );
 }
 
