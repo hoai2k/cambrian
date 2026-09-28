@@ -6,9 +6,13 @@
 .crew-card .device .gone { font-style: normal; color: var(--coral); }
 
 /* Illustrated natural-history branding, with enough room for the complete supplied artwork. */
-.title-illustrated, .loading-illustrated { background: #090b09; }
+.title-illustrated { background: #100d08; }
+.loading-illustrated { background: #090b09; }
 .title-illustrated { overflow: hidden; align-items: end; }
 .title-illustration { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; z-index: -2; }
+@media (min-aspect-ratio: 3/1) {
+  .title-illustration { object-fit: contain; }
+}
 
 /* The tagline, PRESS START and the hint sit over the bottom of the painting, which is free to be
    pale there. The text carries its own contrast rather than a scrim dimming the artwork: the tight

@@ -7,7 +7,7 @@ import type { EraDefinition } from '../era';
  */
 export const TRIASSIC_BRAND = {
   logo: 'assets/triassic/brand/logo-header.webp',
-  illustration: 'assets/triassic/brand/title.webp',
+  illustration: 'assets/triassic/brand/title-wide.webp',
   emblem: 'assets/triassic/brand/emblem.webp',
 } as const satisfies Pick<EraDefinition['assets'], 'logo' | 'illustration' | 'emblem'>;
 

@@ -39,7 +39,7 @@ export const CAMBRIAN = defineEra({
     props: 'assets/props/', biomes: 'assets/biomes/', ui: 'assets/ui/', sfx: 'assets/sfx/', music: 'music/',
     // `npm run logos` derives the interface wordmark from the delivered engraved mark, so the
     // three games' marks carry the same lightness and weight at the size the pick screen uses.
-    logo: 'assets/brand/logo-header.webp', illustration: 'assets/brand/logo-illustrated.webp',
+    logo: 'assets/brand/logo-header.webp', illustration: 'assets/brand/logo-illustrated-wide.webp',
     emblem: 'assets/brand/emblem.webp', modelBytes, modelStatus: CAMBRIAN_MODEL_STATUS, modelNotes: CAMBRIAN_MODEL_NOTES, clipNotes: CAMBRIAN_CLIP_NOTES,
   },
   audio: { music: MUSIC, loops: { ambient: 'ambient-reef', drone: 'giant-drone' } },
