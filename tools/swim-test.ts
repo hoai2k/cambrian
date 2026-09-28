@@ -8,7 +8,7 @@ import { applyScaleStats, bodyRadius, clearanceOf, climbHeight, climbRise, floor
 import { boulderQ, boulderTop, groundHeight, resolveStatic, rockRadius, sampleHeight, type Boulder, type StaticContact, type WorldData } from '../src/sim/world';
 import { creature } from '../src/sim/creatures';
 import { floraSize } from '../src/sim/flora';
-import { BREATH_PEEK, climbAimHold, DASH_AIM_GRACE, edgePitch, fitCameraArm, FLOOR_CLOSE_HOLD, keepCreatureInFrame, PITCH_DOWN, PITCH_UP, seafloorCloseHold, swimPitch } from '../src/render/engine';
+import { BREATH_PEEK, climbAimHold, DASH_AIM_GRACE, edgePitch, fitCameraArm, FLOOR_CLOSE_HOLD, keepCreatureInFrame, PITCH_DOWN, PITCH_UP, seafloorCloseHold, swimPitch } from '../src/render/camera';
 import { damp } from '../src/shared/math';
 
 let failed = 0;

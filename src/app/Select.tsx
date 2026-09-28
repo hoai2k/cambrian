@@ -5,7 +5,7 @@ import { hideLabel, hideDescription, HEAVY_SPECIALS, DEFENSIVE_SPECIALS } from '
 import { RULES } from '../sim/era-rules';
 import { CreaturePortrait } from './CreaturePortrait';
 import { FeedbackButton } from './Feedback';
-import { PLAYER_COLORS } from '../render/engine';
+import { PLAYER_COLORS } from '../shared/hud-types';
 import { PLAYABLE as CREATURES, authoredCreature, creature, naturalSizing, realCm, type CreatureId } from '../sim/creatures';
 import type { Mode, PlayerSetup } from '../sim/types';
 import { CheckIcon, ChevronDown, Emblem, KeyboardIcon, PadIcon, TouchIcon } from './icons';

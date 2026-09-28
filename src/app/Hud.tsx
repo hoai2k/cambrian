@@ -1,8 +1,8 @@
 import { assetPaths } from '../content/asset-paths';
 import { hideDescription } from '../sim/concealment';
 import { useEffect, useId, useRef, useState } from 'react';
-import type { HudSnapshot, PlayerHud, RadarBlipHud } from '../render/engine';
-import { PLAYER_COLORS } from '../render/engine';
+import type { HudSnapshot, PlayerHud, RadarBlipHud } from '../shared/hud-types';
+import { PLAYER_COLORS } from '../shared/hud-types';
 import type { EraHud } from '../sim/era-rules';
 import { creature } from '../sim/creatures';
 import { BIOME_ART, biomeArtPath, radarGlyphPath } from '../shared/environment-assets';

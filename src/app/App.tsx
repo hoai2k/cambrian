@@ -3,7 +3,8 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { audio } from '../audio/audio';
 import { gamepads, readGamepad, type RawControls } from '../input/input';
 import type { AssetProgress } from '../render/assets';
-import { Engine, type HudSnapshot } from '../render/engine';
+import { Engine } from '../render/engine';
+import type { HudSnapshot } from '../shared/hud-types';
 import type { Quality } from '../render/sea';
 import { PLAYABLE_IDS as CREATURE_IDS, PLAYABLE as CREATURES, creature, setEquivalentSizing, type CreatureId } from '../sim/creatures';
 import { MODE_IDS, type Mode, type PlayerSetup } from '../sim/types';
@@ -16,7 +17,7 @@ import { Dialogs, PauseMenu, Results, type MenuItem } from './Overlays';
 import { TEXT } from '../shared/text';
 import { debugGame } from '../shared/debug';
 import { enterFullscreen, rememberFullscreen, restoreFullscreenOnGesture } from '../shared/fullscreen';
-import { exportRecording, recordingPhase, resetRecording, startRecording, stopRecording } from './debug-record';
+import { exportRecording, recordingPhase, resetRecording, startRecording, stopRecording } from '../shared/debug-record';
 import { atMain, cycle, groupsFor, stops, type Focus, type FocusGroup } from './focus-ring';
 import { rectsOf, step as spatialStep, type Dir } from './spatial-nav';
 import { gridColumns, SelectScreen } from './Select';

@@ -103,7 +103,7 @@ check('crawler: stick right -> screen right', c.onRight > 0.5 && c.onRight > Mat
 // one only; looking up is always deliberate and is taken at close to its face value. At the end of
 // the camera's own travel, either way, the body swims at exactly the angle being looked along.
 {
-  const { swimPitch, PITCH_UP, PITCH_DOWN } = await import('../src/render/engine');
+  const { swimPitch, PITCH_UP, PITCH_DOWN } = await import('../src/render/camera');
   const deg = (d: number) => (d * Math.PI) / 180;
   for (const d of [0, 11, 20, 25]) check(`camera ${d}° down: forward stays level`, swimPitch(deg(d)) === 0, `pitch=${swimPitch(deg(d)).toFixed(3)}`);
   check('camera 40° down: forward tilts, but less than the camera', swimPitch(deg(40)) > 0 && swimPitch(deg(40)) < deg(40), `pitch=${swimPitch(deg(40)).toFixed(3)}`);
@@ -124,7 +124,7 @@ check('crawler: stick right -> screen right', c.onRight > 0.5 && c.onRight > Mat
 // degrees flatter than it was aimed and made lining one up on prey above or below harder than
 // lining it up on prey alongside.
 {
-  const { swimPitch } = await import('../src/render/engine');
+  const { swimPitch } = await import('../src/render/camera');
   const deg = (r: number) => (r * 180) / Math.PI;
   for (const camPitch of [-0.95, -0.6, -0.3, 0]) {
     const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 21);

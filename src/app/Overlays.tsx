@@ -2,7 +2,7 @@ import { hasEquivalentSizing, PLAYABLE } from '../sim/creatures';
 import { RULES } from '../sim/era-rules';
 import { ACTIVE_ERA } from '../content';
 import { useEffect, useRef } from 'react';
-import type { HudSnapshot } from '../render/engine';
+import type { HudSnapshot } from '../shared/hud-types';
 import { Scoreboard } from './Hud';
 import { creature } from '../sim/creatures';
 import type { PlayerSetup } from '../sim/types';

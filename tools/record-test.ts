@@ -16,7 +16,7 @@ import { Game } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
 import {
   exportRecording, recordStep, recordingPhase, resetRecording, startRecording, stopRecording,
-} from '../src/app/debug-record';
+} from '../src/shared/debug-record';
 
 let passes = 0;
 const ok = (cond: unknown, msg: string) => { assert.ok(cond, msg); passes++; console.log(`PASS  ${msg}`); };

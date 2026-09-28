@@ -5,7 +5,7 @@
  *
  * Usage: npm run immersive
  */
-import { layoutRects } from '../src/render/engine';
+import { layoutRects } from '../src/render/camera';
 import { toolbarPlace, type ToolbarView } from '../src/app/toolbar-place';
 
 let failed = 0;
