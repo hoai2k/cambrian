@@ -1265,9 +1265,7 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
   align-items: center; gap: 6px 8px;
 }
 .carousel-stage { grid-row: 1; grid-column: 2; height: 100%; min-height: 0; touch-action: pan-y; }
-.carousel-card { height: 100%; animation: carousel-in .22s ease-out both; }
 @keyframes carousel-in { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .carousel-card { animation: none; } }
 .carousel .crew-card { height: 100%; max-height: none; min-height: 0; }
 /* The arrows are thumb-sized and sit either side of the card, so a player who does not know the
    card can be swiped still sees at once that there is more roster to either side. */
@@ -1323,9 +1321,9 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 }
 
 /* Held upright, the neighbouring cards peek in at either edge instead of the arrows: the edge of the
-   next card says there is more roster that way without a word, and tapping it steps there. The card
-   on stage takes the width the arrows used to. */
-.carousel-peek { display: none; }
+   next card says there is more roster that way without a word, and tapping it steps there. The card on
+   stage takes the width the arrows used to. The peeks are the track's own neighbour slides, shown
+   past the stage's edges, so dragging brings the one you see into the middle. */
 /* The narrower margin is the compact portrait layout's, not the carousel's: the carousel is chosen by
    measuring the picker, so anything the carousel does to the picker's own box changes the answer that
    chose it — a margin that came with the carousel made the grid fit, which took the margin away,
@@ -1334,24 +1332,26 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 @media (orientation: portrait) {
   .select-carousel .carousel { grid-template-columns: 26px minmax(0, 1fr) 26px; column-gap: 6px; }
   .select-carousel .carousel-step { display: none; }
-  .carousel-peek {
-    display: block; position: relative; grid-row: 1; align-self: center; height: 82%; width: 26px; padding: 0; border: 0;
-    background: none; overflow: hidden; cursor: pointer;
-  }
-  .carousel-peek.prev { grid-column: 1; }
-  .carousel-peek.next { grid-column: 3; }
-  .peek-card { position: absolute; top: 0; bottom: 0; width: 150px; border-radius: 14px; border: 1px solid rgba(238,250,246,.18); background: rgba(6,22,28,.55); }
-  .carousel-peek.prev .peek-card { right: 0; }
-  .carousel-peek.next .peek-card { left: 0; }
-  .peek-card img, .peek-card .extra-glyph { position: absolute; top: 18%; width: 96px; height: auto; opacity: .85; }
-  .carousel-peek.prev .peek-card img, .carousel-peek.prev .peek-card .extra-glyph { right: -58px; }
-  .carousel-peek.next .peek-card img, .carousel-peek.next .peek-card .extra-glyph { left: -58px; }
-  .peek-card .extra-glyph { font-size: 40px; color: var(--ember); }
-  .carousel-peek.prev .peek-card .extra-glyph { text-align: left; }
-  .carousel-peek.next .peek-card .extra-glyph { text-align: right; }
+  .select-carousel .carousel-stage { overflow: visible; }
   /* Four bars do not fit across a phone's card; two rows of two do. */
   .select-carousel .creature-copy .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 14px; }
 }
+/* The track: the card on stage and its two neighbours side by side, moved by the finger (`drag`, no
+   easing), eased to a rest (`slide`) and re-seated under the new card with no motion at all (`jump`),
+   which is invisible because the new card is already where the old neighbour was. */
+.carousel-stage { position: relative; overflow: hidden; }
+/* `touch-action` stops at a scrolling box, so the card's scrolling copy has to say pan-y for itself:
+   left to the default, a sideways drag that starts on the copy is taken by the browser as a pan and
+   the drag is cancelled after its first move. */
+.carousel-stage .creature-copy { touch-action: pan-y; }
+.carousel-track { position: relative; height: 100%; will-change: transform; }
+.carousel-track.slide { transition: transform var(--slide-ms, 240ms) cubic-bezier(.2, .8, .25, 1); }
+.carousel-slide { position: absolute; top: 0; bottom: 0; left: 0; width: 100%; }
+.carousel-slide.prev { left: calc(-100% - 12px); }
+.carousel-slide.next { left: calc(100% + 12px); }
+.carousel-slide.prev, .carousel-slide.next { cursor: pointer; opacity: .8; }
+.carousel-slide .carousel-extra { animation: none; }
+@media (prefers-reduced-motion: reduce) { .carousel-track.slide { transition-duration: 90ms; } }
 
 /* The roster's two views on a desktop, under folder tabs: the list, or every animal at its size. */
 .roster-pane { display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; min-width: 0; }
@@ -1373,5 +1373,3 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
 .depth-name { font: 700 11px/1.2 var(--font-display); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: 20px; line-height: 20px; }
 .depth-spot.extra { place-items: center; border: 1px dashed rgba(238,250,246,.35); border-radius: 50%; }
 .depth-spot.extra .extra-glyph { font: 700 1.6em var(--font-display); }
-/* A peek is a pointer target only (tabindex -1): the keys and the sticks already walk the roster. */
-.carousel-peek:focus { outline: none; }

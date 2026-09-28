@@ -17,9 +17,14 @@ const BASE = process.env.QA_BASE_URL || 'http://127.0.0.1:4181/';
 const browser = await chromium.launch({ executablePath: process.env.QA_CHROME || '/opt/pw-browsers/chromium', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--no-sandbox'] });
 const failures = [];
 // Held upright the arrows give way to the neighbouring cards peeking in; on its side the arrows stay.
-const stepper = async (page, side) => ((await page.locator(`.carousel-step.${side}`).isVisible()) ? page.locator(`.carousel-step.${side}`) : page.locator(`.carousel-peek.${side}`));
-const title = (page) => page.evaluate(() => document.querySelector('.carousel .crew-card h2')?.textContent ?? '');
-const until = (page, fn, arg) => page.waitForFunction(fn, arg, { timeout: 20000 });
+const stepper = async (page, side) => ((await page.locator(`.carousel-step.${side}`).isVisible()) ? page.locator(`.carousel-step.${side}`) : page.locator(`.carousel-slide.${side}`));
+// The track at rest: no slide under way. A press during a slide is ignored by design (the slide
+// finishes first), so a walk that presses again before it lands would press nothing.
+const rest = (page) => page.waitForFunction(() => document.querySelector('.carousel-track')?.classList.contains('jump'), null, { timeout: 20000 });
+const title = (page) => page.evaluate(() => document.querySelector('.carousel-slide.current .crew-card h2')?.textContent ?? '');
+// Every wait says which step it was, so a timeout names the part of the journey that stopped.
+let stepName = '';
+const until = (page, fn, arg) => page.waitForFunction(fn, arg, { timeout: 20000 }).catch((e) => { throw new Error(`${stepName}: ${e.message.split('\n')[0]}`); });
 
 async function drive(era, w, h, full) {
   const page = await browser.newPage({ viewport: { width: w, height: h }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
@@ -37,19 +42,37 @@ async function drive(era, w, h, full) {
     await page.locator('.carousel').waitFor({ timeout: 20000 });
     assert.equal(await page.locator('.roster-grid').count(), 0, 'the grid must not be drawn under the carousel');
     if (h > w) {
-      assert.ok(await page.locator('.carousel-peek.next').isVisible() && !(await page.locator('.carousel-step.next').isVisible()), 'upright, the neighbouring cards peek in where the arrows were');
-      const card = await page.locator('.carousel .crew-card').boundingBox();
+      assert.ok(await page.locator('.carousel-slide.next').isVisible() && !(await page.locator('.carousel-step.next').isVisible()), 'upright, the neighbouring cards peek in where the arrows were');
+      const card = await page.locator('.carousel-slide.current .crew-card').boundingBox();
       assert.ok(card.width >= w * 0.78, `upright, the card takes most of the width (${Math.round(card.width)} of ${w})`);
     }
     const name0 = await title(page);
 
+    stepName = 'arrows';
     // The arrows walk it.
     await (await stepper(page, 'next')).click();
-    await until(page, (n) => document.querySelector('.carousel .crew-card h2')?.textContent !== n, name0);
+    await until(page, (n) => document.querySelector('.carousel-slide.current .crew-card h2')?.textContent !== n, name0);
     const name1 = await title(page);
     await (await stepper(page, 'prev')).click();
-    await until(page, (n) => document.querySelector('.carousel .crew-card h2')?.textContent === n, name0);
+    await until(page, (n) => document.querySelector('.carousel-slide.current .crew-card h2')?.textContent === n, name0);
 
+    stepName = 'drag';
+    // The card follows the finger: part-way through a drag the track has moved with it, and a drag
+    // too short to commit springs back to the card it started on.
+    {
+      const box = await page.locator('.carousel-stage').boundingBox();
+      const y0 = box.y + box.height * 0.3, x0 = box.x + box.width * 0.7;
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: x0, y: y0, id: 5 }] });
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x0 - 20, y: y0, id: 5 }] });
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x0 - 40, y: y0, id: 5 }] });
+      await until(page, () => { const m = getComputedStyle(document.querySelector('.carousel-track')).transform; return m !== 'none' && new DOMMatrix(m).m41 < -15; });
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x0 - 30, y: y0, id: 5 }] });
+      await page.waitForTimeout(400); // slow enough that it is not a flick
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      await until(page, () => new DOMMatrix(getComputedStyle(document.querySelector('.carousel-track')).transform).m41 === 0);
+      assert.equal(await title(page), name0, 'a short drag springs back to the same card');
+    }
+    stepName = 'swipe';
     // A swipe walks it, leftward to the next card, off real touches.
     const stage = await page.locator('.carousel-stage').boundingBox();
     const y = stage.y + stage.height * 0.3;
@@ -59,35 +82,39 @@ async function drive(era, w, h, full) {
       ['touchMove', [{ x: stage.x + stage.width * 0.2, y, id: 2 }]],
       ['touchEnd', []],
     );
-    await until(page, (n) => document.querySelector('.carousel .crew-card h2')?.textContent === n, name1);
+    await until(page, (n) => document.querySelector('.carousel-slide.current .crew-card h2')?.textContent === n, name1);
 
+    stepName = 'keys';
     // The arrow keys walk it too — down included, since a list of one card has no rows.
     await page.keyboard.press('ArrowDown');
-    await until(page, (n) => document.querySelector('.carousel .crew-card h2')?.textContent !== n, name1);
+    await until(page, (n) => document.querySelector('.carousel-slide.current .crew-card h2')?.textContent !== n, name1);
     await page.keyboard.press('ArrowUp');
-    await until(page, (n) => document.querySelector('.carousel .crew-card h2')?.textContent === n, name1);
+    await until(page, (n) => document.querySelector('.carousel-slide.current .crew-card h2')?.textContent === n, name1);
 
     // Everything it takes to choose is on screen.
     const vis = await page.evaluate(() => {
       const r = (s) => document.querySelector(s)?.getBoundingClientRect();
-      const b = r('.carousel .ready-button'), c = r('.carousel .crew-card'), d = r('.start-button');
+      const b = r('.carousel-slide.current .ready-button'), c = r('.carousel-slide.current .crew-card'), d = r('.start-button');
       return { btn: !!b && b.bottom <= innerHeight && b.top >= 0, card: !!c && c.bottom <= innerHeight + 1, dive: !!d && d.bottom <= innerHeight };
     });
     assert.ok(vis.btn && vis.card && vis.dive, `the card, its Lock In and Dive In must all be on screen (${JSON.stringify(vis)})`);
     if (OUT) await page.screenshot({ path: `${OUT}/${name}.png` });
 
+    stepName = 'extras';
     // The Random/Visitors stops, at the far end of the roster: walk back from the first card.
     if (await page.locator('.carousel-dots i.extra').count()) {
-      for (let k = 0; k < 40 && !(await page.locator('.carousel-extra').count()); k++) await (await stepper(page, 'prev')).click();
-      assert.equal(await page.locator('.carousel-extra').count(), 1, 'an extra should show its own card');
+      for (let k = 0; k < 40 && !(await page.locator('.carousel-slide.current .carousel-extra').count()); k++) { await (await stepper(page, 'prev')).click(); await rest(page); }
+      assert.equal(await page.locator('.carousel-slide.current .carousel-extra').count(), 1, 'an extra should show its own card');
       if (OUT) await page.screenshot({ path: `${OUT}/${name}-extra.png` });
-      for (let k = 0; k < 40 && (await page.locator('.carousel-extra').count()); k++) await (await stepper(page, 'next')).click();
+      for (let k = 0; k < 40 && (await page.locator('.carousel-slide.current .carousel-extra').count()); k++) { await (await stepper(page, 'next')).click(); await rest(page); }
     }
 
+    stepName = 'dive';
     if (full) {
       // Lock In and Dive In still reach the sea.
-      await page.locator('.carousel .ready-button').click();
-      await until(page, () => document.querySelector('.carousel .ready-button')?.getAttribute('aria-pressed') === 'true');
+      await rest(page);
+      await page.locator('.carousel-slide.current .ready-button').click();
+      await until(page, () => document.querySelector('.carousel-slide.current .ready-button')?.getAttribute('aria-pressed') === 'true');
       await page.locator('.start-button').click();
       await page.locator('.hud').first().waitFor({ timeout: 90000 });
     }
@@ -114,7 +141,9 @@ async function keepsGrid(era, w, h) {
   await page.close();
 }
 
+const ONLY = process.env.ONLY;
 for (const era of ['cambrian', 'devonian', 'triassic']) {
+  if (ONLY && ONLY !== era) continue;
   // The dive is driven on its side: a match held upright is asked to turn round rather than drawn,
   // so a HUD never arrives in portrait and waiting for one there measures the rotate screen.
   await drive(era, 390, 844, false);
