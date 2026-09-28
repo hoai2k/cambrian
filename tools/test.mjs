@@ -85,6 +85,8 @@ const SUITES = {
   touch: { file: 'touch-test.ts' },
   bindings: { file: 'menu-bindings-test.ts' },
   audio: { file: 'audio-mix-test.ts' },
+  // Not a test: prints the simulation's fingerprint, to compare before and after a refactor.
+  'replay-hash': { file: 'replay-hash.ts', runs: ERAS },
   // ---- per era: the ladder, the record, and what crosses between the games ----
   progress: { file: 'progress-test.ts', runs: ERAS },
   codex: { file: 'codex-test.ts', runs: ERAS },
@@ -165,7 +167,7 @@ const GROUPS = {
   gate: GATE,
   fast: FAST,
   ci: [...GATE, ...FAST, 'triassic'],
-  all: Object.keys(SUITES),
+  all: Object.keys(SUITES).filter((n) => n !== 'replay-hash'),
 };
 
 // ---- arguments ----
