@@ -281,12 +281,6 @@ export interface BendDoc {
 }
 
 /**
- * The most the *straightening* can ever be: the turn is `straighten` times the angle between two
- * unit vectors, and that angle cannot exceed a half turn. Kept because the panel's fields still
- * need a range to offer.
- */
-export const MAX_TURN = Math.PI;
-/**
  * How far the slider goes either way.
  *
  * Past 1 is an overshoot — the run carried beyond straight, which is how a reviewer finds out
@@ -517,9 +511,6 @@ export const isIdentity = (doc: BendShape): boolean => Math.abs(bendRotation(doc
  * anywhere that can kink the body where the span begins.
  */
 export const turnAt = (doc: BendShape, s: number): number => bendRotation(doc).angle * s;
-
-/** How fast it is turning there — constant across the span, and what pinches the inside of the bend. */
-export const turnRateAt = (doc: BendShape, _s?: number): number => bendRotation(doc).angle;
 
 // ---------------------------------------------------------------------------------------------
 // The warp

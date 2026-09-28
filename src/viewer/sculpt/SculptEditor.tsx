@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { ViewerSpecimen } from '../catalogue';
-import { rootFramePositions, type OrthoView, type Rect, type ViewerScene } from '../scene';
+import { rootFramePositions, type OrthoView, type PaneRect, type ViewerScene } from '../scene';
 import { History } from './history';
+import { UndoRedo, downloadJson, useEditorHistory, useUndoKeys } from '../editor-kit';
 import {
   CURVES, autoSlope, contourAt, evaluate, exportDoc, eyesChanged, gapeToward, isIdentity, makeProbe, measure, mouthChanged, mouthCorner,
   moveEyesOnCrown, moveEyesOnFlank, resetFeatures, resetStations, setEyeReach, setEyeScale, setJawDepth, setMouth, setShift, setTangent,
@@ -60,7 +61,6 @@ export function SculptEditor({ scene, specimen, onExit }: Props) {
   const stageRef = useRef<HTMLDivElement>(null);
   const cellRefs = { side: useRef<HTMLDivElement>(null), top: useRef<HTMLDivElement>(null), main: useRef<HTMLDivElement>(null) };
   const [doc, setDocState] = useState<SculptDoc | null>(null);
-  const historyRef = useRef<History<SculptDoc> | null>(null);
   const probeRef = useRef<SurfaceProbe | null>(null);
   const bodyRef = useRef<Float32Array[]>([]);
   const [region, setRegion] = useState(0);
@@ -71,8 +71,7 @@ export function SculptEditor({ scene, specimen, onExit }: Props) {
   const previewRef = useRef(false);
   previewRef.current = previewOriginal;
   const [cams, setCams] = useState<Record<ViewName, Camera2D> | null>(null);
-  const [rects, setRects] = useState<Record<ViewName | 'main', Rect> | null>(null);
-  const [historyTick, setHistoryTick] = useState(0);
+  const [rects, setRects] = useState<Record<ViewName | 'main', PaneRect> | null>(null);
   const dragRef = useRef<Drag | null>(null);
   const [error, setError] = useState('');
 
@@ -105,15 +104,8 @@ export function SculptEditor({ scene, specimen, onExit }: Props) {
     if (!previewRef.current) scene.applySculpt(isIdentity(next) ? null : warp(next), finalize);
   }, [scene]);
 
-  const step = useCallback((next: SculptDoc) => { historyRef.current?.push(next); commitDoc(next, true); setHistoryTick((t) => t + 1); }, [commitDoc]);
+  const { historyRef, step, endGesture: endDrag, undo, redo } = useEditorHistory<SculptDoc>((d) => commitDoc(d, true));
   const drag = useCallback((next: SculptDoc) => { historyRef.current?.replace(next); commitDoc(next, false); }, [commitDoc]);
-  const endDrag = useCallback(() => {
-    const h = historyRef.current;
-    if (!h) return;
-    if (h.inGesture) { h.commit(); commitDoc(h.present, true); setHistoryTick((t) => t + 1); }
-  }, [commitDoc]);
-  const undo = useCallback(() => { const h = historyRef.current; if (!h?.canUndo) return; commitDoc(h.undo(), true); setHistoryTick((t) => t + 1); }, [commitDoc]);
-  const redo = useCallback(() => { const h = historyRef.current; if (!h?.canRedo) return; commitDoc(h.redo(), true); setHistoryTick((t) => t + 1); }, [commitDoc]);
 
   // The preview toggle: the shipped body, or the edit. The drawings keep showing both.
   const setPreview = useCallback((original: boolean) => {
@@ -124,26 +116,15 @@ export function SculptEditor({ scene, specimen, onExit }: Props) {
     scene.applySculpt(original || isIdentity(d) ? null : warp(d), true);
   }, [scene]);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      const t = e.target as HTMLElement | null;
-      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) return;
-      const mod = e.metaKey || e.ctrlKey;
-      if (!mod && (e.key === 'o' || e.key === 'O')) { e.preventDefault(); setPreview(!previewRef.current); return; }
-      if (!mod) return;
-      if (e.key === 'z' || e.key === 'Z') { e.preventDefault(); if (e.shiftKey) redo(); else undo(); }
-      else if (e.key === 'y' || e.key === 'Y') { e.preventDefault(); redo(); }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [undo, redo, setPreview]);
+  // O toggles the preview against the body as it ships.
+  useUndoKeys(undo, redo, (e) => { if (e.key === 'o' || e.key === 'O') { e.preventDefault(); setPreview(!previewRef.current); } });
 
   // ---- layout: where the three cells sit on the canvas ----
   const measureCells = useCallback(() => {
     const stage = stageRef.current;
     if (!stage) return;
     const s = stage.getBoundingClientRect();
-    const rel = (el: HTMLDivElement | null): Rect => {
+    const rel = (el: HTMLDivElement | null): PaneRect => {
       const r = el?.getBoundingClientRect();
       return r ? { x: r.left - s.left, y: r.top - s.top, width: r.width, height: r.height } : { x: 0, y: 0, width: 0, height: 0 };
     };
@@ -163,7 +144,7 @@ export function SculptEditor({ scene, specimen, onExit }: Props) {
     const pad = 1.25;
     const mid = latMid(doc);
     const half = doc.bounds.width / 2;
-    const fitView = (r: Rect, spanA: number, spanV: number, centre: [number, number]): Camera2D => ({
+    const fitView = (r: PaneRect, spanA: number, spanV: number, centre: [number, number]): Camera2D => ({
       centre, upp: Math.max(spanA * pad / Math.max(r.width, 1), spanV * pad / Math.max(r.height, 1)),
     });
     const ca = (doc.bounds.axisMin + doc.bounds.axisMax) / 2;
@@ -330,16 +311,12 @@ export function SculptEditor({ scene, specimen, onExit }: Props) {
   function exportSculpt() {
     if (!doc) return;
     const payload = exportDoc(doc);
-    const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }));
-    const a = document.createElement('a');
-    a.href = url; a.download = `${doc.id}-sculpt.json`; a.click();
-    URL.revokeObjectURL(url);
+    downloadJson(`${doc.id}-sculpt.json`, payload);
   }
 
   const h = historyRef.current;
   const reg = doc?.regions[region];
   const active = doc && activeStation != null ? doc.stations[activeStation] : null;
-  void historyTick;
   const edited = !!doc && !isIdentity(doc);
 
   const panel = (
@@ -350,8 +327,7 @@ export function SculptEditor({ scene, specimen, onExit }: Props) {
       </div>
       {error && <p className="sculpt-error">{error}</p>}
       <div className="sculpt-actions">
-        <button className="ghost" onClick={undo} disabled={!h?.canUndo} title="⌘/Ctrl+Z">Undo</button>
-        <button className="ghost" onClick={redo} disabled={!h?.canRedo} title="⇧⌘/Ctrl+Z · Ctrl+Y">Redo</button>
+        <UndoRedo history={h} undo={undo} redo={redo} />
         <button className="ghost" onClick={fit}>Fit</button>
       </div>
       <div className="sculpt-toggle" role="group" aria-label="Preview" title="O toggles">
@@ -492,7 +468,7 @@ export function SculptEditor({ scene, specimen, onExit }: Props) {
 interface DrawingProps {
   view: ViewName;
   doc: SculptDoc;
-  rects: Record<ViewName | 'main', Rect>;
+  rects: Record<ViewName | 'main', PaneRect>;
   cams: Record<ViewName, Camera2D>;
   region: number;
   activeStation: number | null;

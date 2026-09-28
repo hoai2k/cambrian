@@ -3,6 +3,7 @@ import type { ViewerSpecimen } from '../catalogue';
 import { rootFramePositions, type BendHandle, type ViewerScene } from '../scene';
 import { useMeasuredHash } from '../file-hash';
 import { History } from '../sculpt/history';
+import { ModelPick, UndoRedo, downloadJson, useEditorHistory, useUndoKeys } from '../editor-kit';
 import { NumberField } from '../stretch/StretchEditor';
 import {
   STRAIGHTEN_MAX, STRAIGHTEN_MIN, angleOf, apartAfter, bendBasis, describeReadingText, exportDoc,
@@ -99,8 +100,6 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
   const [error, setError] = useState('');
   const [note, setNote] = useState('');
   const [hover, setHover] = useState<BendHandle | null>(null);
-  const [historyTick, setHistoryTick] = useState(0);
-  const historyRef = useRef<History<BendDoc> | null>(null);
   const chunksRef = useRef<Float32Array[]>([]);
   const dragRef = useRef<Drag | null>(null);
   const key = bendKey(specimen.key, model);
@@ -177,14 +176,8 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
   }, [key, show]);
   useEffect(() => { const h = historyRef.current; if (h) setBend(key, h.present, note); }, [note, key]);
 
-  const step = useCallback((next: BendDoc) => { historyRef.current?.push(next); commitDoc(next); setHistoryTick((t) => t + 1); }, [commitDoc]);
+  const { historyRef, step, endGesture: endDrag, undo, redo } = useEditorHistory<BendDoc>((d) => commitDoc(d));
   const drag = useCallback((next: BendDoc) => { historyRef.current?.replace(next); commitDoc(next); }, [commitDoc]);
-  const endDrag = useCallback(() => {
-    const h = historyRef.current;
-    if (h?.inGesture) { h.commit(); commitDoc(h.present); setHistoryTick((t) => t + 1); }
-  }, [commitDoc]);
-  const undo = useCallback(() => { const h = historyRef.current; if (!h?.canUndo) return; commitDoc(h.undo()); setHistoryTick((t) => t + 1); }, [commitDoc]);
-  const redo = useCallback(() => { const h = historyRef.current; if (!h?.canRedo) return; commitDoc(h.redo()); setHistoryTick((t) => t + 1); }, [commitDoc]);
 
   // ---- the handles, on the canvas ----
   useEffect(() => {
@@ -264,17 +257,7 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
   }, [canvas, scene, error, drag, endDrag]);
 
   // ---- keyboard ----
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      const el = e.target as HTMLElement | null;
-      if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT')) return;
-      const mod = e.metaKey || e.ctrlKey;
-      if (mod && (e.key === 'z' || e.key === 'Z')) { e.preventDefault(); if (e.shiftKey) redo(); else undo(); return; }
-      if (mod && (e.key === 'y' || e.key === 'Y')) { e.preventDefault(); redo(); }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [undo, redo]);
+  useUndoKeys(undo, redo);
 
   // ---- the readings, which are what the tool is for ----
   const readings = useMemo(() => (doc ? readBend(doc, chunksRef.current) : null), [doc]);
@@ -293,14 +276,10 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
       appliesTo, note, authoredAt: new Date().toISOString(),
       readings, pinch: pinch(d, chunksRef.current), traceResidual: residuals,
     });
-    const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }));
-    const a = document.createElement('a');
-    a.href = url; a.download = `${specimen.id}-bend.json`; a.click();
-    URL.revokeObjectURL(url);
+    downloadJson(`${specimen.id}-bend.json`, payload);
   }
 
   const h = historyRef.current;
-  void historyTick;
   const hash = measured ?? sha256 ?? null;
   const edited = !!doc && !isIdentity(doc);
   const boneNames = doc?.bones.map((b) => b.name) ?? [];
@@ -358,12 +337,7 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
           </>}
           {appliesTo === 'origpose' && <> This is the untouched generation, before the builder moved anything — which is the body a correction is aimed on. What needs a rig — the bone chain's answer beside the geometry's, and the per-joint table — is on the built body, which the Model control below goes back to.</>}
         </p>
-        {stages.length > 1 && <label className="scheme-pick editor-model-pick bend-model-pick">
-          <span>Model</span>
-          <select aria-label="Which model in bend mode" value={stageId} onChange={(e) => onStage(e.target.value)}>
-            {stages.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
-          </select>
-        </label>}
+        <ModelPick mode="bend" stages={stages} stageId={stageId} onStage={onStage} />
 
         {doc && readings && <>
           <h3>What it measures</h3>
@@ -549,8 +523,7 @@ export function BendEditor({ scene, specimen, model, sha256, appliesTo, stageLab
         </>}
 
         <div className="sculpt-actions">
-          <button className="ghost" onClick={undo} disabled={!h?.canUndo} title="⌘/Ctrl+Z">Undo</button>
-          <button className="ghost" onClick={redo} disabled={!h?.canRedo} title="⇧⌘/Ctrl+Z · Ctrl+Y">Redo</button>
+          <UndoRedo history={h} undo={undo} redo={redo} />
         </div>
         <label className="mark-note">
           <span>What is this bend?</span>
