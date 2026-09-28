@@ -104,3 +104,8 @@ export function admitVisitors(defs: readonly CreatureDef[]) {
 /** Is this id a visitor rather than one of this game's own? */
 export const isVisitor = (id: string) => guests.has(id);
 export const creature = (id: CreatureId) => byId.get(id) ?? (guests.get(id as string) as typeof CREATURES[number]);
+/**
+ * Where an animal stands in the food chain, I to IV (the card's `rung`). Every roster animal has
+ * one; a body from elsewhere (a Cambrian visitor) counts as II.
+ */
+export const foodRung = (id: CreatureId): 1 | 2 | 3 | 4 => creature(id).rung ?? 2;

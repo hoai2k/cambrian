@@ -345,7 +345,7 @@ export function SelectScreen(p: Props) {
                       <dl className="kit">
                         <div><dt>{key('heavy', s)}</dt><dd>{HEAVY_SPECIALS.has(def.ability) ? def.abilityName : def.heavy.name}</dd></div>
                         <div><dt>{key('guard', s)}</dt><dd>{DEFENSIVE_SPECIALS.has(def.ability) ? def.abilityName : def.canGuard ? C.blockParry : C.evade}</dd></div>
-                        <div><dt>{key('ability', s)}</dt><dd><b>{RULES?.ySpecial(def.id)?.name ?? hideLabel(def.id)}.</b> {fillControls(RULES?.ySpecial(def.id)?.desc ?? hideDescription(def.id), s)}</dd></div>
+                        <div><dt>{key('ability', s)}</dt><dd><b>{RULES.ySpecial?.(def.id)?.name ?? hideLabel(def.id)}.</b> {fillControls(RULES.ySpecial?.(def.id)?.desc ?? hideDescription(def.id), s)}</dd></div>
                         <div><dt>{C.passiveMark}</dt><dd>{def.passive}</dd></div>
                         <div><dt>{C.weaknessMark}</dt><dd>{def.weakness}</dd></div>
                       </dl>

@@ -8,7 +8,7 @@ import { tierForScale, tierScale } from './tiers';
 import { makeBrain, peaceful, think, type AiWorld } from './ai';
 import { huntingPressure, phaseAt, untilNextPhase, type Phase } from './daynight';
 import { applyHit, endRide, GRIP_BREAK, GRIP_MEAL, GRIP_STRAIN, GRIP_STRIKE, kill, rideHold, startSwallow, takeHold, takeRide, type HitContext } from './combat';
-import { creature, isVisitor, PLAYABLE_IDS, WILD_IDS, type CreatureId, type MoveDef } from './creatures';
+import { creature, isVisitor, PLAYABLE_IDS, WILD_IDS, type CreatureDef, type CreatureId, type MoveDef } from './creatures';
 import { resolveFlora, stepFlora, type FloraContact } from './flora';
 import { SpatialHash } from './spatial';
 import { APEX_HOLD_SECONDS, clampMark, deathMark, fillOf, ladderFill, ladderMark, ladderName, ladderRung, ladderScale, LADDER_TOP, MARK_NEAR_TOP, placeOnLadder } from './ladder';
@@ -162,6 +162,13 @@ export const bitesFor = (eater: Actor, food: Actor) => clamp(Math.ceil(3 * lengt
  * cheap and a crossing is not.
  */
 const DASH_TAP = 0.12;
+/** How long a dash lasts, and its cooldown; a tail-flip (the caridoid escape) runs longer and rests longer. */
+const DASH_TIME = 0.42, DASH_COOLDOWN = 0.55;
+const FLIP_TIME = 0.5, FLIP_COOLDOWN = 0.7;
+/** How much harder a `darter`'s dash and dodge launch (Waptia). */
+const DARTER_DASH = 1.2, DARTER_DODGE = 1.25;
+/** A dash's launch speed (a tail-flip has its own, `flipLaunch`): the body's size, a darter's extra, and a punt's floor. */
+const dashLaunch = (a: Actor, def: CreatureDef, L: number, gap: number) => (L * 9.5 + 7) * (def.darter ? DARTER_DASH : 1) * punting(a, gap);
 /** How hard a released dash is reined in, per second. */
 const DASH_BRAKE = 16;
 const BREACH_GRAVITY = 14;
@@ -275,8 +282,8 @@ const GRASP_CONE = 0.35;
  */
 const GRASP_HOLD = 0.18, BITE_GRASP_HOLD = 0.45;
 /** What this animal's grip costs it: how far it reaches and how long it must hold, by build. */
-export const gripReach = (def: ReturnType<typeof creature>, L: number) => L * (def.grasp ? GRASP_REACH : BITE_GRASP_REACH);
-export const gripHold = (def: ReturnType<typeof creature>) => (def.grasp ? GRASP_HOLD : BITE_GRASP_HOLD);
+export const gripReach = (def: CreatureDef, L: number) => L * (def.grasp ? GRASP_REACH : BITE_GRASP_REACH);
+export const gripHold = (def: CreatureDef) => (def.grasp ? GRASP_HOLD : BITE_GRASP_HOLD);
 /** What a player has hold of, as the HUD needs to show it. See `Game.gripFor`. */
 export interface GripHud {
   /** Clinging to something its own size or bigger, carrying a mouthful, held in something else's jaws, or holding a spent button. */
@@ -360,7 +367,7 @@ const REVIVE_HOLD = 0.6;
  * named once so a step can say what it needs.
  */
 interface Step {
-  def: ReturnType<typeof creature>;
+  def: CreatureDef;
   /** Body length and the speed factor for this scale, wanted by nearly everything. */
   L: number; sf: number;
   /** Rising edges on the buttons, read once at the top of the frame. */
@@ -474,7 +481,7 @@ export class Game implements AiWorld {
     this.world = new World(seed);
     const nursery = nurseryAt(0);
     this.world.loadAround(nursery);
-    this.hitCtx = { events: this.events, byId: (id) => this.idMap.get(id), time: 0, rng: this.rng, armour: RULES ? (att, vic, dir) => RULES!.armour(att, vic, dir) : undefined, shield: RULES?.shield ? (att, vic) => RULES!.shield!(this, att, vic) : undefined, canEat: (pred, food) => this.canEat(pred, food) };
+    this.hitCtx = { events: this.events, byId: (id) => this.idMap.get(id), time: 0, rng: this.rng, armour: RULES.armour ? (att, vic, dir) => RULES.armour!(att, vic, dir) : undefined, shield: RULES.shield ? (att, vic) => RULES.shield!(this, att, vic) : undefined, canEat: (pred, food) => this.canEat(pred, food) };
     this.beachCtx = { events: this.events, hitCtx: this.hitCtx };
     const hatchers: Actor[] = [];
     setups.forEach((s, i) => {
@@ -485,7 +492,7 @@ export class Game implements AiWorld {
       // A visitor arrives at the size it finishes its own game at, whatever this one's ladder or
       // mode would have said. That is the reward, and it is deliberately not balanced.
       const startScale = s.visitorScale ?? (carry > 0 ? ladderScale(s.creature, carry)
-        : RULES ? RULES.startScale(mode === 'survival' ? 'rise' : mode, s.creature) : mode === 'reef' ? tierScale(s.creature, 2) : tierScale(s.creature, 0));
+        : RULES.startScale(mode === 'survival' ? 'rise' : mode, s.creature));
       const a = this.spawn(s.creature, 'player', this.spawnPoint(nursery, s.creature, startScale, i), startScale, i);
       // Arriving on the top rung means the goal is already behind you: no clock, just the sea.
       a.carriedTop = carry >= LADDER_TOP;
@@ -499,7 +506,7 @@ export class Game implements AiWorld {
       if (carry === 0 && !s.visitorScale) hatchers.push(a);
     });
     this.populate();
-    RULES?.init(this);
+    RULES.init?.(this);
     // A run that starts on the bottom rung starts in an egg, the same as every hatch after it.
     // After the era's init, because the rung a body stands on is the era's own bookkeeping and
     // does not read right until that has run — before it, every Devonian player looked like a
@@ -577,19 +584,19 @@ export class Game implements AiWorld {
       const g = groundHeight(this.world, at.x, at.z, this.scratchBoulders);
       return { x: at.x, y: Math.min(SURFACE_Y - 1.5 - L * 0.1, g + Math.max(1.2 + L * 0.5, (SURFACE_Y - g) * 0.45)), z: at.z };
     }
-    const inCover = RULES?.spawnPoint(this, center, c, s, index);
+    const inCover = RULES.spawnPoint?.(this, center, c, s, index);
     if (inCover) return inCover;
     const def = creature(c);
     const ang = index * 1.7 + this.rng() * 0.8, d = 3 + this.rng() * 6;
     const x = center.x + Math.cos(ang) * d, z = center.z + Math.sin(ang) * d;
     const g = groundHeight(this.world, x, z, this.scratchBoulders);
     const L = def.adultLength * s;
-    return { x, y: RULES ? RULES.spawnY(g, L, !!def.ground) : def.ground ? g + L * 0.13 : g + 1.2 + L * 0.5, z };
+    return { x, y: RULES.spawnY?.(g, L, !!def.ground) ?? (def.ground ? g + L * 0.13 : g + 1.2 + L * 0.5), z };
   }
 
   spawn(c: CreatureId, controller: Actor['controller'], pos: Vec3, scale: number, player = -1): Actor {
     const a = makeActor(this.nextId++, c, controller, pos, scale, player);
-    if (controller === 'player' && RULES) a.spawnProtect = RULES.spawnProtect(a);   // an era may shelter its hatchlings longer
+    if (controller === 'player' && RULES.spawnProtect) a.spawnProtect = RULES.spawnProtect(a);   // an era may shelter its hatchlings longer
     a.yaw = this.rng() * TAU; a.prevT.yaw = a.yaw;
     this.actors.push(a);
     this.idMap.set(a.id, a);
@@ -785,9 +792,9 @@ export class Game implements AiWorld {
       // anywhere in the column including the bottom, a big one up in the water where it can be
       // seen passing (`columnY`), with the occasional pass down over the floor.
       const bodyL = def.adultLength * s;
-      pos = { x, y: RULES ? RULES.spawnY(g, bodyL, !!def.ground)
-        : def.ground ? g + bodyL * 0.13
-        : columnY(g, SURFACE_Y, bodyL, this.rng, !passing && bodyL > 2.5 && this.rng() < DIP_CHANCE), z };
+      pos = { x, y: RULES.spawnY?.(g, bodyL, !!def.ground)
+        ?? (def.ground ? g + bodyL * 0.13
+        : columnY(g, SURFACE_Y, bodyL, this.rng, !passing && bodyL > 2.5 && this.rng() < DIP_CHANCE)), z };
     }
     if (!pos) return;
     const a = this.spawn(c, 'ambient', pos, s);
@@ -902,7 +909,7 @@ export class Game implements AiWorld {
     this.restockBones(dt);
     this.stepPrompts(dt);
     this.updateDiscovery();
-    RULES?.step(this, dt);
+    RULES.step?.(this, dt);
     this.updateModes(dt);
     for (const a of this.actors) if (a.state === 'dead' && a.corpseT > 45 && a.controller !== 'player') this.remove(a);
     for (const a of this.actors) if (a.state === 'dead' && a.eaten >= 1 && a.controller !== 'player') this.remove(a);
@@ -1023,7 +1030,7 @@ export class Game implements AiWorld {
     a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0; a.sparkled = false; a.reviveT = 0;
     a.hp = a.hpMax * 0.45; a.stamina = a.staminaMax * 0.5; a.poise = a.poiseMax;
     a.vel = v3(); a.bank = 0; a.pitch = 0; a.hitFlash = 0; a.tumble = v3(); a.climbTo = -Infinity; a.climbPush = 0; this.clearRide(a);
-    a.spawnProtect = RULES?.spawnProtect(a) ?? 2.5; a.hunted = 0; a.hunterId = -1; a.lastHitBy = -1; a.killer = -1;
+    a.spawnProtect = RULES.spawnProtect?.(a) ?? 2.5; a.hunted = 0; a.hunterId = -1; a.lastHitBy = -1; a.killer = -1;
     a.pos.y = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + clearanceOf(a) + 0.2;
     this.events.push({ kind: 'moult', pos: { ...a.pos }, actor: a.id, player: a.player, strength: 0.7 });
     this.progress[a.player]?.prompts.push({ text: `${creature(helper.creature).name} got you up.`, t: 3 });
@@ -1037,10 +1044,9 @@ export class Game implements AiWorld {
     // climbed — so it demotes only when you were less than halfway through, and costs the same
     // wherever in a rung it lands. The era hook still runs first for everything else a respawn
     // resets; the ladder itself is settled here so all three games price a death the same way.
-    if (RULES) RULES.onRespawn(this, a);
+    RULES.onRespawn(this, a);
     if (this.mode === 'survival') placeOnLadder(this, a, clampMark(ladderMark(this, a) - SURVIVAL_DEATH_COST));
     else if (this.mode !== 'reef') placeOnLadder(this, a, deathMark(ladderMark(this, a)));
-    else if (!RULES) a.nutrition *= 0.5;
     applyScaleStats(a, false);
     a.eaten = 0;
     a.stamina = a.staminaMax; a.poise = a.poiseMax;
@@ -1066,7 +1072,7 @@ export class Game implements AiWorld {
     a.pos = this.spawnPoint(at, a.creature, a.scale, a.player);
     a.vel = v3(); a.state = 'free'; a.stateT = 0; a.respawnT = 0; a.corpseT = 0; a.eaten = 0; a.eatBites = 0;
     a.airborne = false; a.wade = 0; a.ashore = false; a.strandT = 0; a.flopT = 0;
-    stopHiding(a); a.camoStrength = 0; a.hideCd = 0; a.emergenceHeavy = false; a.spawnProtect = RULES?.spawnProtect(a) ?? 3.5; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.swallowedBy = -1; a.bank = 0; a.pitch = 0; a.climbTo = -Infinity; a.climbPush = 0; this.clearRide(a);
+    stopHiding(a); a.camoStrength = 0; a.hideCd = 0; a.emergenceHeavy = false; a.spawnProtect = RULES.spawnProtect?.(a) ?? 3.5; a.hitFlash = 0; a.abilityActive = false; a.abilityCd = 0; a.lockTarget = -1; a.hunted = 0; a.hunterId = -1; a.wasHunted = false; a.swallowedBy = -1; a.bank = 0; a.pitch = 0; a.climbTo = -Infinity; a.climbPush = 0; this.clearRide(a);
     a.yaw = Math.PI;
     this.beginHatch(a);
     void def;
@@ -1113,7 +1119,7 @@ export class Game implements AiWorld {
    * the old second-long swell out of nothing, because it did not come from an egg.
    */
   private beginHatch(a: Actor) {
-    const egg = ladderRung(this, a) === 0 && !RULES?.liveBirth?.(a);
+    const egg = ladderRung(this, a) === 0 && !RULES.liveBirth?.(a);
     a.hatching = true; a.state = 'moult'; a.stateT = 0; a.stateDur = egg ? HATCH_HOLD : 1.0;
     a.vel = v3();
     if (egg) this.layEgg(a);
@@ -1130,7 +1136,7 @@ export class Game implements AiWorld {
   skipHatch() {
     for (const a of this.players) {
       if (!a.hatching || a.state !== 'moult') continue;
-      const era = RULES?.moultScale(this, a);
+      const era = RULES.moultScale?.(this, a);
       a.scale = era ? era.to : tierScale(a.creature, a.tier);
       a.state = 'free'; a.stateT = 0; a.stateDur = 0; a.hatching = false; this.eggAt.delete(a.id);
       applyScaleStats(a, true); a.hp = a.hpMax;
@@ -1223,7 +1229,7 @@ export class Game implements AiWorld {
     // beside a plant, paused while sprinting or dashing, and in Survival paused on an empty stomach.
     const resting = a.sinceHit > 6 && a.hp < a.hpMax && a.state !== 'dead' && input.burst <= 0.1 && a.burstT <= 0 && !input.dash && a.state !== 'dodge'
       && !(this.mode === 'survival' && a.hunger <= 0);
-    if (resting && (RULES?.canRecoverHealth?.(this, a) ?? true)) {
+    if (resting && (RULES.canRecoverHealth?.(this, a) ?? true)) {
       const nearPlant = this.world.floraHash.query(a.pos.x, a.pos.z, this.world.floraReach + L * 0.5 + 1.5, this.scratchFlora)
         .some((f) => Math.hypot(a.pos.x - f.pos.x, a.pos.z - f.pos.z) <= f.R + L * 0.5 + 1.5 && a.pos.y >= f.pos.y - L * 0.5 && a.pos.y <= f.pos.y + f.H + L * 0.5);
       a.hp = Math.min(a.hpMax, a.hp + a.hpMax * healRate(a, this.mode) * (nearPlant ? PLANT_HEAL : 1) * dt);
@@ -1280,7 +1286,7 @@ export class Game implements AiWorld {
     const slowMult = abilitySpeed(a) * (a.state === 'guard' ? (def.ability === 'anchor' ? 0 : def.ability === 'enroll' ? .8 : .45) : (a.abilityActive && def.ability === 'shellUp') ? 0.35 : a.exhausted > 0 ? 0.7 : 1);
     const burstMult = controllable && (bursting || freeBurst) ? (1 + (def.burst - 1) * (freeBurst ? 1.25 : burstIn) * (a.controller === 'swarm' ? 0.55 : giantish ? 0.35 : 1)) : 1;
     const baseCruise = def.speed * sf * slowMult * (a.controller === 'swarm' ? 0.62 : giantish ? 0.55 : 1) * (paddling ? PADDLE_SPEED : 1);
-    const sw = RULES && controllable ? RULES.swim(this, a, dir, mag, baseCruise, burstIn > 0.1 && !a.prev.burst) : undefined;
+    const sw = controllable ? RULES.swim?.(this, a, dir, mag, baseCruise, burstIn > 0.1 && !a.prev.burst) : undefined;
     // The shore slows a walker to its walk over the wade and takes a stranded swimmer's swim away (src/sim/beach.ts).
     const cruise = baseCruise * (sw?.speed ?? 1) * landSpeed(a);
     // What this body is asking for, whatever its state lets it do about it. Everything below takes
@@ -1301,7 +1307,7 @@ export class Game implements AiWorld {
     // the stick is the direction of travel for every body in the sea: swimming, sprinting and
     // dashing all go where they are aimed, and the nose goes with them. The funnel shows up in
     // the free hover and in the backward dash, not in a sprint that turns the animal round.
-    const jets = RULES?.jet(a) ?? false;
+    const jets = RULES.jet?.(a) ?? false;
     // A bell contracts and then coasts — but only when it is *going* somewhere in a hurry. Cruising
     // used to surge and coast too, which meant a jellyfish never simply swam: every crossing was a
     // stutter, and at low speed the animal read as broken rather than as a medusa. The pulse is
@@ -1331,7 +1337,7 @@ export class Game implements AiWorld {
       // What the rise and sink buttons are worth here, and anything the body does for itself: an
       // era may climb faster than the shared rate, carry a sprint into the climb, or head for the
       // surface unasked (a lung that needs air). Holding sink is always the way to stay down.
-      desired.y += RULES ? RULES.rise(this, a, input, base, burstMult) : input.rise ? base : input.sink ? -base : 0;
+      desired.y += RULES.rise(this, a, input, base, burstMult);
     }
     // A mouthful is not cargo: it is pulling too. What the pair does is both wishes summed and
     // shared out by weight, so a heavy animal that wants nothing still drags on whatever is
@@ -1531,7 +1537,7 @@ export class Game implements AiWorld {
    * stamina bar. Runs before anything else in the frame because it settles what the rest of it can
    * afford — whether this body is sprinting, paddling, or out of breath altogether.
    */
-  private stepUpkeep(a: Actor, input: InputFrame, dt: number, def: ReturnType<typeof creature>, L: number, dir: Vec3, mag: number, justLight: boolean, justHeavy: boolean, justAbility: boolean, justDash: boolean) {
+  private stepUpkeep(a: Actor, input: InputFrame, dt: number, def: CreatureDef, L: number, dir: Vec3, mag: number, justLight: boolean, justHeavy: boolean, justAbility: boolean, justDash: boolean) {
     // Timers
     a.stateT += dt;
     a.iframes = Math.max(0, a.iframes - dt);
@@ -1557,7 +1563,7 @@ export class Game implements AiWorld {
       if (a.hideMode !== 'none') {
         const buried = a.hideMode === 'burrowed'; stopHiding(a);
         if (buried) { a.emergenceHeavy = true; this.emergeStrike(a, def); }
-      } else if (RULES && RULES.useAbility(this, a, this.expansionContext())) {
+      } else if (RULES.useAbility?.(this, a, this.expansionContext())) {
         this.flag(a, 'ability');                       // the era's own Y special took the press
       } else if (a.hideCd === 0 && (BURROWERS.has(a.creature) || a.stamina >= 8)) {
         a.state = 'free'; a.abilityActive = false; a.hideT = 0; a.seen = 0;
@@ -1584,7 +1590,7 @@ export class Game implements AiWorld {
     }
     a.camoStrength = damp(a.camoStrength, a.hideMode === 'camouflage' ? 1 : 0, 3, dt);
     if (a.hideMode === 'camouflage') {
-      a.stamina = Math.max(0, a.stamina - CAMOUFLAGE_DRAIN * (RULES?.camoDrain(a) ?? 1) * dt);
+      a.stamina = Math.max(0, a.stamina - CAMOUFLAGE_DRAIN * (RULES.camoDrain?.(a) ?? 1) * dt);
       if (a.stamina === 0) stopHiding(a);
     }
     if (a.state === 'guard' || a.state === 'parry') a.guardHeld += dt;
@@ -1600,7 +1606,7 @@ export class Game implements AiWorld {
     // How much of this effort is climb, and so given away: an era may hand a body the vertical for
     // nothing. At full relief an empty bar is no longer a reason not to drive — see `emptyClimb`,
     // which keeps that sprint out of the horizontal, where it was never paid for.
-    const relief = RULES ? RULES.climbRelief(a, input, dir, mag) : 0;
+    const relief = RULES.climbRelief?.(a, input, dir, mag) ?? 0;
     const freeClimb = relief > 0.5;
     const bursting = burstIn > 0.1 && (a.stamina > 0 || freeClimb) && a.state !== 'guard' && (a.exhausted === 0 || freeClimb);
     const emptyClimb = bursting && a.stamina <= 0;
@@ -1608,7 +1614,7 @@ export class Game implements AiWorld {
     const freeBurst = a.burstT > 0;
     if (bursting && !freeBurst) a.stamina = Math.max(0, a.stamina - BURST_STAMINA * burstIn * dt * (1 - relief));
     else if (a.state === 'guard') a.stamina -= 3 * dt;
-    else if (a.hideMode !== 'camouflage') a.stamina = Math.min(a.staminaMax, a.stamina + (speed < 0.4 ? 24 : 14) * dt * (a.state === 'free' ? 1 : 0.5) * (RULES?.staminaRegen(this, a) ?? 1));
+    else if (a.hideMode !== 'camouflage') a.stamina = Math.min(a.staminaMax, a.stamina + (speed < 0.4 ? 24 : 14) * dt * (a.state === 'free' ? 1 : 0.5) * (RULES.staminaRegen?.(this, a) ?? 1));
     if (a.stamina <= 0) { a.stamina = 0; if (a.exhausted === 0 && !freeClimb) a.exhausted = 1.6; }
     return { speed, burstIn, paddling, bursting, freeBurst, relief, emptyClimb, freeClimb };
   }
@@ -1690,7 +1696,7 @@ export class Game implements AiWorld {
     // snapping it: the water taking it back.
     const held = !a.airborne && !a.ashore && !amphibious(a.creature);
     const ease = Math.max(WALL_EASE * dt, len3(a.vel) * dt * 1.5);
-    const hitWall = resolveStatic(this.world, a.pos, bodyRadius(a), this.scratchBoulders, held ? RULES?.shoreReach(a) ?? 0 : Infinity, glideOver(a), climbHeight(a), contact, ease);
+    const hitWall = resolveStatic(this.world, a.pos, bodyRadius(a), this.scratchBoulders, held ? RULES.shoreReach?.(a) ?? 0 : Infinity, glideOver(a), climbHeight(a), contact, ease);
     // And the same wall in the body's own draught: the water holds a swimmer where it can still
     // swim, whatever the fixed wall's distance means on this era's beach (`WALL_WADE`).
     if (held && a.wade > WALL_WADE) { a.pos.z -= ease; }
@@ -1772,7 +1778,7 @@ export class Game implements AiWorld {
         // The Cambrian has no rules object and never breached; it does now, on the Devonian's own
         // terms (a free-swimming body, not a shell, not hidden), because the shore is somewhere a
         // leap can land in every era and nothing else in that sea can reach it.
-        const may = RULES ? RULES.canBreach(a) : !def.shell && !def.drift && def.swimStyle !== 'pulse' && a.hideMode === 'none';
+        const may = RULES.canBreach(a);
         if (may && isAlive(a) && a.vel.y > BREACH_MIN_RISE * sf && sp > def.speed * sf * 0.85 && launching) {
           a.airborne = true;
           // What it leaves the water with is capped to a leap of about its own length; what it was
@@ -1813,9 +1819,8 @@ export class Game implements AiWorld {
       if (a.pursuit?.target !== input.pursueTarget) {
         // Use the same launch speed and duration as a normal dash, including floor resistance.
         const gap = a.pos.y - groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders);
-        const dashSpeed = def.tailFlip ? flipLaunch(a)
-          : (L * 9.5 + 7) * (def.id === 'waptia' ? 1.2 : 1) * punting(a, gap);
-        const dashLength = dashSpeed * (def.tailFlip ? 0.5 : 0.42);
+        const dashSpeed = def.tailFlip ? flipLaunch(a) : dashLaunch(a, def, L, gap);
+        const dashLength = dashSpeed * (def.tailFlip ? FLIP_TIME : DASH_TIME);
         a.pursuit = { target: input.pursueTarget, last: { ...a.pos }, traveled: 0, max: dashLength, spent: false };
       } else if (!a.pursuit.spent) {
         a.pursuit.traveled += dist(a.pos, a.pursuit.last);
@@ -1958,7 +1963,7 @@ export class Game implements AiWorld {
         // home in hard on the target; impact when the mouth reaches it
         const to = sub(t.pos, a.pos); const d = len3(to);
         const speed = chaseTarget === t.id && a.pursuit
-          ? Math.max(def.speed * sf * 3.2, a.pursuit.max / (def.tailFlip ? 0.5 : 0.42))
+          ? Math.max(def.speed * sf * 3.2, a.pursuit.max / (def.tailFlip ? FLIP_TIME : DASH_TIME))
           : Math.max(def.speed * sf * 3.2, 9 * Math.sqrt(sf));
         const dirTo = norm(to);
         a.vel = vscale(dirTo, speed);
@@ -2164,7 +2169,7 @@ export class Game implements AiWorld {
       this.updateAbility(a, def, dt, input, L, sf);
     } else if (a.state === 'moult') {
       const t = clamp(a.stateT / a.stateDur, 0, 1);
-      const era = RULES?.moultScale(this, a);
+      const era = RULES.moultScale?.(this, a);
       const to = era ? era.to : tierScale(a.creature, a.tier);
       // In an egg the animal is already most of the size it will be when it comes out — an egg is
       // not a seed. A moult out of nothing (a respawn above the bottom rung) still swells from a
@@ -2266,7 +2271,7 @@ export class Game implements AiWorld {
    * not the rider's choice — or when either animal stops being in a state to hold on: dead,
    * grabbed, staggered, hidden or swallowed.
    */
-  private updateRide(a: Actor, def: ReturnType<typeof creature>, input: InputFrame, dt: number) {
+  private updateRide(a: Actor, def: CreatureDef, input: InputFrame, dt: number) {
     const host = this.idMap.get(a.rideHost);
     const player = a.controller === 'player';
     if (!host || host.riddenBy !== a.id || !isAlive(host) || !isAlive(a) || isHidden(a) || isHidden(host)
@@ -2317,7 +2322,7 @@ export class Game implements AiWorld {
     void def; void input;
   }
 
-  private startDodge(a: Actor, def: ReturnType<typeof creature>, dir: Vec3, mag: number, L: number, sf: number) {
+  private startDodge(a: Actor, def: CreatureDef, dir: Vec3, mag: number, L: number, sf: number) {
     // A wild animal has one escape in it, and only on a near-full bar (`WILD_ESCAPE_READY`).
     if (!escapeReady(a)) return;
     // An animal that escapes by flipping its tail has only that one evasion, whichever button asked.
@@ -2330,7 +2335,7 @@ export class Game implements AiWorld {
     a.iframes = retreat ? 0 : 0.28;
     a.stamina -= retreat ? 14 : 10;
     if (!steered(a)) a.stamina = 0;   // the one escape a wild animal gets takes everything it has
-    const power = (retreat ? 9 : 7.5) * Math.sqrt(sf) * (def.id === 'waptia' ? 1.25 : 1);
+    const power = (retreat ? 9 : 7.5) * Math.sqrt(sf) * (def.darter ? DARTER_DODGE : 1);
     a.vel.x = d.x * power; a.vel.y = def.ground ? a.vel.y : d.y * power * 0.7; a.vel.z = d.z * power;
     a.dodgeDir = d; a.dodgeTapT = retreat ? 0 : 0.35;
     this.evadeSpecial(a, def, L);
@@ -2381,7 +2386,7 @@ export class Game implements AiWorld {
    * travel rather than the nose, reaches a little further along it, and costs `CHARGE_STAMINA`
    * on top of the move's own price.
    */
-  private heavyAction(a: Actor, def: ReturnType<typeof creature>, L: number, sf: number, locked: Actor | undefined, charge: boolean): boolean {
+  private heavyAction(a: Actor, def: CreatureDef, L: number, sf: number, locked: Actor | undefined, charge: boolean): boolean {
     const extra = charge ? CHARGE_STAMINA : 0;
     // A burrowed ambusher's emergence strike takes the button ahead of everything else, and is free.
     if (a.emergenceHeavy) { this.emergeStrike(a, def); return true; }
@@ -2498,7 +2503,7 @@ export class Game implements AiWorld {
    * Returns true when it took hold this frame, which is the caller's signal to leave the attack
    * buttons alone: the press bought the grip rather than the strike.
    */
-  private tryGrasp(a: Actor, def: ReturnType<typeof creature>, L: number, gripButton: boolean): GraspResult {
+  private tryGrasp(a: Actor, def: CreatureDef, L: number, gripButton: boolean): GraspResult {
     // `why` is the recorder's window onto this decision (`?debug=game`). It is written from inside
     // the real gates rather than reconstructed alongside them, so a recording can never disagree
     // with what the game actually did — which is the only way a diagnosis is worth having.
@@ -2665,7 +2670,7 @@ export class Game implements AiWorld {
   }
 
   /** LB: a burst of speed in the stick direction with invulnerability, covering a few body lengths. */
-  private emergeStrike(a: Actor, def: ReturnType<typeof creature>) {
+  private emergeStrike(a: Actor, def: CreatureDef) {
     a.emergenceHeavy = false; a.state = 'attack'; a.stateT = 0;
     a.move = { ...def.heavy, name: SAY.emergenceStrike, stamina: 0, poise: def.heavy.poise + 12 };
     a.moveKind = 'heavy'; a.hitDone.clear(); a.seen = 1;
@@ -2673,7 +2678,7 @@ export class Game implements AiWorld {
     this.flag(a, 'heavy');
   }
 
-  private blockPulse(a: Actor, def: ReturnType<typeof creature>) {
+  private blockPulse(a: Actor, def: CreatureDef) {
     if (!['bellCorral', 'shellUp'].includes(def.ability) || a.abilityCd > 0 || a.stamina < 10) return;
     if (def.ability === 'shellUp' && a.guardHeld < .6) return;
     a.stamina -= 10; a.abilityCd = 4;
@@ -2683,14 +2688,14 @@ export class Game implements AiWorld {
     }
   }
 
-  private evadeSpecial(a: Actor, def: ReturnType<typeof creature>, L: number) {
+  private evadeSpecial(a: Actor, def: CreatureDef, L: number) {
     if (['tailFlick','ribbonSlip'].includes(def.ability)) {
       this.silt.push({pos:{...a.pos},radius:L,t:2}); clearPursuit(a,this.actors);
     }
     if (def.ability === 'combCruise') { a.burstT = 1; a.stamina = Math.min(a.staminaMax,a.stamina+4); }
   }
 
-  private startDash(a: Actor, def: ReturnType<typeof creature>, dir: Vec3, L: number, sf: number, relief = 0) {
+  private startDash(a: Actor, def: CreatureDef, dir: Vec3, L: number, sf: number, relief = 0) {
     // The tail-flip costs the tail rather than a fin beat, and *defaults* backwards: asked for
     // nothing, the reflex throws the body away from whatever touched it, which is what the caridoid
     // escape is. It used to go back along its own axis whatever the stick was asking, so Odaraia
@@ -2704,7 +2709,7 @@ export class Game implements AiWorld {
     // business — but it never dashes *into* the floor, which is only a way to waste the stamina.
     if (def.ground && d.y < 0) d.y = 0;
     d = norm(d);
-    a.state = 'dodge'; a.stateT = 0; a.stateDur = flip ? 0.5 : 0.42;
+    a.state = 'dodge'; a.stateT = 0; a.stateDur = flip ? FLIP_TIME : DASH_TIME;
     // A body dashing on nothing but free climb gets the climb and not the ground: the horizontal
     // half of the burst is what the stamina was for, and it has none. A flip is the exception —
     // the reflex fires whatever is left, it just fires weakly (`flipLaunch`).
@@ -2714,13 +2719,13 @@ export class Game implements AiWorld {
     // as long as the button is held (`stepActions`). A flip is not a held move — the reflex fires
     // whole — so it pays in full on the frame it goes off.
     a.dashCost = flip ? 0 : cost;
-    const upFront = flip ? cost : cost * (DASH_TAP / (flip ? 0.5 : 0.42));
-    a.iframes = flip ? 0.5 : 0.42; a.stamina = Math.max(0, a.stamina - upFront); a.dashCd = flip ? 0.7 : 0.55;
+    const upFront = flip ? cost : cost * (DASH_TAP / DASH_TIME);
+    a.iframes = flip ? FLIP_TIME : DASH_TIME; a.stamina = Math.max(0, a.stamina - upFront); a.dashCd = flip ? FLIP_COOLDOWN : DASH_COOLDOWN;
     // A wild animal's one escape takes everything it has (`WILD_ESCAPE_READY`).
     if (!steered(a)) { a.stamina = 0; a.dashCost = 0; }
     // A punt needs the floor under it; out in the water there is nothing to push off.
     const gap = a.pos.y - groundHeight(this.world, a.pos.x, a.pos.z, []);   // own scratch: called mid-update
-    const power = flip ? flipLaunch(a) : (L * 9.5 + 7) * (def.id === 'waptia' ? 1.2 : 1) * punting(a, gap);
+    const power = flip ? flipLaunch(a) : dashLaunch(a, def, L, gap);
     const along = empty && !flip ? 0 : 1;
     // The vertical used to be cut to seven tenths, which tipped every aimed dash flatter than it
     // was pointed — about ten degrees of it — and made lining one up on prey above or below you
@@ -2741,7 +2746,7 @@ export class Game implements AiWorld {
    * body twenty units long is the difference between reaching it and hanging a body's length off
    * it wondering why nothing happened.
    */
-  private keepReaching(a: Actor, def: ReturnType<typeof creature>, L: number, sf: number): boolean {
+  private keepReaching(a: Actor, def: CreatureDef, L: number, sf: number): boolean {
     if (!a.graspHold || a.graspSpent || a.controller !== 'player') return false;
     if (a.grabbing >= 0 || a.rideHost >= 0 || a.riddenBy >= 0) return false;
     if (a.state !== 'free' || a.exhausted > 0) return false;
@@ -2790,24 +2795,24 @@ export class Game implements AiWorld {
   }
 
   /** Internal animation state for native heavy specials; Y never calls this. */
-  private startAbility(a: Actor, def: ReturnType<typeof creature>) {
+  private startAbility(a: Actor, def: CreatureDef) {
     if (!HEAVY_SPECIALS.has(def.ability)) return;
     a.abilityCd = Math.max(2, (def.abilityDuration ?? .55) + .6);
     a.abilityT = 0; a.abilityActive = true; a.state = 'ability'; a.stateT = 0;
     a.stateDur = def.abilityDuration ?? .55; a.hitDone.clear();
     beginHeavyStrike(this.expansionContext(), a, def);
     beginExpansionAbility(this.expansionContext(), a, def);
-    RULES?.beginAbility?.(this, a, this.expansionContext());
+    RULES.beginAbility?.(this, a, this.expansionContext());
     this.events.push({kind:'ability',pos:{...a.pos},actor:a.id,player:a.player,strength:lengthOf(a)});
     this.flag(a, 'heavy');
   }
 
-  private updateAbility(a: Actor, def: ReturnType<typeof creature>, dt: number, input: InputFrame, L: number, sf: number) {
+  private updateAbility(a: Actor, def: CreatureDef, dt: number, input: InputFrame, L: number, sf: number) {
     a.abilityT += dt;
     const done = a.stateT >= a.stateDur;
     stepHeavyStrike(this.expansionContext(), a, def);
     stepExpansionAbility(this.expansionContext(), a, def, dt);
-    RULES?.stepAbility(this, a, this.expansionContext(), dt);
+    RULES.stepAbility?.(this, a, this.expansionContext(), dt);
     if (a.state !== 'ability') return;
     switch (def.ability) {
       case 'snatch': {
@@ -2916,14 +2921,12 @@ export class Game implements AiWorld {
   /** Survival growth: `fraction` of the whole ladder, in whichever units this game keeps it. */
   private gainSurvivalXp(a: Actor, fraction: number) {
     if (a.state === 'dead' || a.state === 'swallowed' || fraction <= 0) return;
-    if (RULES?.survivalGrow) RULES.survivalGrow(this, a, fraction);
-    else if (RULES) RULES.onNutrition(this, a, fraction * CAMBRIAN_LADDER, undefined);
-    else { a.nutrition += fraction * CAMBRIAN_LADDER; this.checkTierUp(a); }
+    RULES.survivalGrow(this, a, fraction);
   }
 
-  private consumeSnacks(a: Actor, L: number, def: ReturnType<typeof creature>) {
+  private consumeSnacks(a: Actor, L: number, def: CreatureDef) {
     if (a.state === 'dead') return;
-    const moving = len3(a.vel) > 0.5 || def.id === 'waptia';
+    const moving = len3(a.vel) > 0.5 || !!def.snatches;
     for (const o of this.nearby(a.pos, L * 0.6 + 1)) {
       if (o.id === a.id || !isAlive(o)) continue;
       if (bandOf(a, o) !== 'snack') continue;
@@ -3004,13 +3007,14 @@ export class Game implements AiWorld {
     a.nutrition += amount;
     // co-op share
     if (this.mode === 'rise' && food && amount > 2) for (const p of this.players) if (p !== a && isAlive(p) && dist(p.pos, a.pos) < 25) p.nutrition += amount * 0.3;
-    RULES?.onNutrition(this, a, amount, food);
-    if (RULES && !RULES.growthByNutrition) return;
+    RULES.onNutrition?.(this, a, amount, food);
+    if (!RULES.growthByNutrition) return;
     this.checkTierUp(a);
     for (const p of this.players) if (p !== a) this.checkTierUp(p);
   }
 
-  private checkTierUp(a: Actor) {
+  /** The Cambrian's moult: nutrition past this tier's need grows the body a tier. */
+  checkTierUp(a: Actor) {
     if (a.tier >= 4 || a.state === 'moult' || a.state === 'dead') return;
     if (a.nutrition >= TIER_NEED[a.tier]) {
       a.nutrition -= TIER_NEED[a.tier];
@@ -3231,7 +3235,7 @@ export class Game implements AiWorld {
     const me = this.players[viewer];
     const contenders = this.actors.filter((a) => a.controller === 'player');
     const rows: ScoreRow[] = contenders.map((a) => {
-      const era = RULES?.scoreLine?.(this, a);
+      const era = RULES.scoreLine?.(this, a);
       return {
         player: a.player, creature: a.creature, name: creature(a.creature).name,
         rank: era?.rank ?? TIER_NAMES[a.tier], tier: ladderRung(this, a),
@@ -3327,7 +3331,7 @@ export class Game implements AiWorld {
     a.tier = tierForScale(a.creature, a.scale);
     // The era resyncs whatever it keeps outside the actor before the meter is filled, or the fill
     // would be measured against the stage the *old* animal was on.
-    RULES?.onSwap?.(this, a);
+    RULES.onSwap(this, a);
     ladderFill(this, a, fillOf(mark));
     a.state = 'free'; a.stateT = 0; a.move = undefined; a.hitDone.clear();
     a.combo = 0; a.comboT = 0; a.abilityCd = 0; a.abilityActive = false; a.emergenceHeavy = false;
@@ -3404,7 +3408,7 @@ export class Game implements AiWorld {
     if (nearest) out.push(nearest);
     for (const f of this.foodClusters(p, range)) out.push(f);
     // The era's own contacts: the Triassic's occupied shore posts, each with its reach as the ring.
-    if (RULES?.radar) for (const b of RULES.radar(this, p, range)) out.push(b);
+    if (RULES.radar) for (const b of RULES.radar(this, p, range)) out.push(b);
     // Landmarks are the other thing the radar is for in an endless sea: with the shore and your
     // nursery they are the only fixed points in it. Only within reach — a bearing, not a map.
     for (const m of this.world.landmarks) {
@@ -3647,26 +3651,7 @@ export class Game implements AiWorld {
         : amphibious(p.creature) ? SAY.hints.ashoreAmphibious
         : SAY.hints.ashoreLungs;
     }
-    if (RULES) return RULES.hint(this, i);
-    const f = pr.flags;
-    if (!isAlive(p)) return undefined;
-    const H = SAY.hints;
-    if (p.hunted >= 0.5) return p.cover > 0.3 ? (len3(p.vel) < 0.3 ? H.huntedStill : H.huntedInCover) : H.huntedOpen;
-    if (p.hunted > 0.2) return p.cover > 0.3 ? H.noticedInCover : H.noticedOpen;
-    if (!f.has('moved')) return H.swim;
-    if (!f.has('burst')) return H.sprint;
-    if (!f.has('ate')) return H.eatSmallFry;
-    if (!f.has('sense') && this.time > 20) return H.sense;
-    if (p.tier === 0 && !f.has('tier')) return H.growRing;
-    if (p.tier >= 1 && !f.has('light')) return H.biteAndPounce;
-    if (p.tier >= 1 && !f.has('dodge')) return H.dashClear;
-    if (p.tier >= 1 && !f.has('guard') && creature(p.creature).canGuard) return H.guardParry;
-    if (!f.has('ability')) return H.hide;
-    if (!f.has('lock') && this.time > 30) return H.aim;
-    // Graspers have a second way to use the same buttons, and nothing else in the game teaches it.
-    if (creature(p.creature).grasp && p.tier >= 1 && !f.has('ride')) return H.grip;
-    if (!f.has('teleport') && this.time > 60 && (this.players.length > 1 || distXZ(p.pos, p.home) > 150)) return H.teleport;
-    return undefined;
+    return RULES.hint(this, i);
   }
 }
 

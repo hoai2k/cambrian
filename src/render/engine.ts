@@ -1851,7 +1851,7 @@ export class Engine {
         // sting. Ordinary sprinting is a bed instead (`audio.setSprint`, driven below from the
         // frame's own inputs): it is held down for minutes at a time, and one loud whoosh per press
         // was the single most repeated sound in the game.
-        case 'burst': { const b = game.byId(e.actor); if (b && RULES?.jet(b)) { world('jet', e.pos); this.bubbles.emit(e.pos, 30, 0.9, 3, 0.1, 1.4); } break; }
+        case 'burst': { const b = game.byId(e.actor); if (b && RULES.jet?.(b)) { world('jet', e.pos); this.bubbles.emit(e.pos, 30, 0.9, 3, 0.1, 1.4); } break; }
         // Coming out of an egg: a wet tear as the soft shell opens.
         case 'eggPoke': { if (e.player != null && e.player >= 0) audio.play('eggPoke', 0.7); else world('eggPoke', e.pos, 0.7, 0.5); break; }
         case 'hatch': { if (e.player != null && e.player >= 0) audio.play('hatch'); else world('hatch', e.pos, 1, 0.5); break; }
@@ -1942,7 +1942,7 @@ export class Engine {
         const onScreen = v.z < 1 && Math.abs(v.x) < 1 && Math.abs(v.y) < 1;
         if (!onScreen) hunterAngle = Math.atan2(v.y * (v.z > 1 ? -1 : 1), v.x * (v.z > 1 ? -1 : 1));
       }
-      const era = RULES?.hud(game, i);
+      const era = RULES.hud?.(game, i);
       const scheme = schemeForDevice(this.setups[i]?.device ?? 'keyboard', this.mouseLook);
       // Sense off: nothing is drawn over the sea, so there is nothing to work out either.
       const markers: PlayerHud['bandMarkers'] = [];
@@ -2066,7 +2066,7 @@ export class Engine {
         hp: p.hp, hpMax: p.hpMax, hunger: game.mode === 'survival' ? p.hunger : undefined, stamina: p.stamina, staminaMax: p.staminaMax, exhausted: p.exhausted > 0,
         tier: p.tier, tierName: era ? `${era.stage} · ${era.rungName}` : TIER_NAMES[p.tier], // The ring means the same thing in both eras: how close the next moult is, full when it lands.
         progress: era ? era.stageProgress : p.tier >= 4 ? 1 : clamp(p.nutrition / TIER_NEED[p.tier], 0, 1), scale: p.scale,
-        abilityName: p.hideMode === 'descending' ? TEXT.sim.hide.sinking : p.hideMode === 'burrowed' ? TEXT.sim.hide.buried(controlKey('ability', scheme)) : p.hideMode === 'camouflage' ? TEXT.sim.hide.camouflaged(p.camoLabel) : RULES?.ySpecial(p.creature)?.name ?? hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : RULES?.ySpecial(p.creature) ? 1 - clamp(p.abilityCd / Math.max(1, creature(p.creature).abilityCooldown), 0, 1) : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none' || (p.state === 'ability' && !!RULES?.ySpecial(p.creature)), abilityUnlocked: true,
+        abilityName: p.hideMode === 'descending' ? TEXT.sim.hide.sinking : p.hideMode === 'burrowed' ? TEXT.sim.hide.buried(controlKey('ability', scheme)) : p.hideMode === 'camouflage' ? TEXT.sim.hide.camouflaged(p.camoLabel) : RULES.ySpecial?.(p.creature)?.name ?? hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : RULES.ySpecial?.(p.creature) ? 1 - clamp(p.abilityCd / Math.max(1, creature(p.creature).abilityCooldown), 0, 1) : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none' || (p.state === 'ability' && !!RULES.ySpecial?.(p.creature)), abilityUnlocked: true,
         senseOn: p.senseMode,
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, kind: creature(lockA.creature).kind, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,

@@ -67,9 +67,9 @@ function pickWander(a: Actor, b: BrainState, rng: Rng, radius: number) {
   if (!creature(a.creature).ground) {
     for (let i = 0; i < 4 && !fitsColumn(ground, SURFACE_Y, L); i++) { z -= 26; ground = sampleHeight(x, z); }
   }
-  const y = RULES ? RULES.wanderY(a, ground, rng)
-    : creature(a.creature).ground ? ground
-    : columnY(ground, SURFACE_Y, L, rng, L > 2.5 && rng() < DIP_CHANCE);
+  const y = RULES.wanderY?.(a, ground, rng)
+    ?? (creature(a.creature).ground ? ground
+    : columnY(ground, SURFACE_Y, L, rng, L > 2.5 && rng() < DIP_CHANCE));
   b.wanderTo = { x, y, z };
 }
 
@@ -131,7 +131,7 @@ export function updateDetection(g: AiWorld, hunter: Actor, b: BrainState, dt: nu
     if (d > range) continue;
     seenIds.add(t.id);
     const to = norm(sub(t.pos, hunter.pos));
-    const inCone = dot(head, to) > 0.2 || def.id === 'opabinia';
+    const inCone = dot(head, to) > 0.2 || !!def.allRoundEyes;
     const sight = inCone ? 1 : (d < range * 0.5 ? 0.15 : 0);
     const sizeF = clamp(lengthOf(t) / L * 2.5, 0.25, 1.5);
     const speed = len3(t.vel);
@@ -355,12 +355,12 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
         // The young in a nursery are left alone, and so is anything else standing in one. These
         // only bar it from being *food*: holding ground against it is further down, because an
         // animal that will not eat you may still be moved off the patch you are sitting on.
-        const spared = (RULES?.sanctuary(a, o) || peaceful(o.pos)) && a.lastHitBy !== o.id;
+        const spared = (RULES.sanctuary?.(a, o) || peaceful(o.pos)) && a.lastHitBy !== o.id;
         const tooFar = o.controller === 'swarm' && d > senseR * 0.8;
         if (!spared && !tooFar && d < preyD) { prey = o; preyD = d; }
       } else if (band === 'rival') {
         const provoked = o.lockTarget === a.id || (o.state === 'attack' && d < L * 2) || (o.brain?.target === a.id) || a.hitFlash > 0 || a.lastHitBy === o.id;
-        const peace = !provoked && (RULES?.sanctuary(a, o) || peaceful(o.pos) || peaceful(a.pos));
+        const peace = !provoked && (RULES.sanctuary?.(a, o) || peaceful(o.pos) || peaceful(a.pos));
         // A grumpy animal has a personal space and does not like it crossed: anything its own size
         // that comes inside it gets seen off, hungry or not, dawn or noon.
         const crowded = b.temper > 0 && d < L * (1.1 + b.temper * 1.3);
@@ -469,7 +469,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
     }
     case 'hunt': {
       if (!t || !isAlive(t) || isHidden(t)) { b.goal = 'wander'; b.target = -1; break; }
-      if ((peaceful(t.pos) && a.lastHitBy !== t.id) || (RULES?.sanctuary(a, t) && a.lastHitBy !== t.id)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 30); break; }
+      if ((peaceful(t.pos) && a.lastHitBy !== t.id) || (RULES.sanctuary?.(a, t) && a.lastHitBy !== t.id)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 30); break; }
       if (b.goalT > 9 + tellFor(t) || (t.cover > 0.45 && t.stillness > 0.8 && lengthOf(t) < L * 0.7)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; b.hunger = 0; pickWander(a, b, g.rng, 30); break; }
       const d = dist(a.pos, t.pos);
       if (stalking(b, t, a, d, L * 0.9 + lengthOf(t) * 0.4, out)) break;
@@ -523,7 +523,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
       // Without this, being approached once turns an animal into a permanent enemy.
       if (b.temper > 0 && !competitor && a.lastHitBy !== t.id && a.hitFlash <= 0
         && dist(a.pos, t.pos) > L * (2.2 + b.temper * 2.6)) { b.goal = 'wander'; b.target = -1; b.goalT = 0; break; }
-      if ((RULES?.sanctuary(a, t) || peaceful(t.pos) || peaceful(a.pos)) && a.lastHitBy !== t.id && a.hitFlash <= 0) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 30); break; }
+      if ((RULES.sanctuary?.(a, t) || peaceful(t.pos) || peaceful(a.pos)) && a.lastHitBy !== t.id && a.hitFlash <= 0) { b.goal = 'wander'; b.target = -1; b.goalT = 0; pickWander(a, b, g.rng, 30); break; }
       // An animal that holds ground stops at the edge of it, whoever the quarrel is with. The
       // leash was on `defend` only, so a rolling brawl with a neighbour could still walk a
       // territorial animal clean off its patch — the one thing the whole idea promises it will not do.

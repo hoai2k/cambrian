@@ -65,9 +65,9 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
   const facing = dot(vHead, dir); // >0 hit from behind (dir points from attacker to victim along victim heading)
   let dirBonus = 1;
   const fromAbove = attacker.pos.y > victim.pos.y + lengthOf(victim) * 0.35;
-  if (vdef.ability === 'anchor' || vdef.id === 'wiwaxia') {
+  if (vdef.ability === 'anchor' || vdef.spinedBack) {
     if (fromAbove) { dirBonus = 0.6; attacker.hp -= move.damage * 0.5 * sizeFactor(victim, attacker) * 0.5; attacker.hitFlash = 0.3; }
-  } else if (facing > 0.45 && vdef.id !== 'opabinia') dirBonus = 1.4;
+  } else if (facing > 0.45 && !vdef.allRoundEyes) dirBonus = 1.4;
 
   const sf = sizeFactor(attacker, victim);
   const base = move.damage * (1 + 0.35 * momentum) * dirBonus * sf;
@@ -83,7 +83,7 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
   const guarding = victim.state === 'guard' && vdef.canGuard;
   if (guarding && !(move.guardBreak && move.damage >= 20 && sf >= 0.8)) {
     dmg *= vdef.ability === 'shellUp' || vdef.ability === 'enroll' ? .25 : .45;
-    const cost = 10 * sf * (vdef.id === 'olenoides' ? 0.6 : 1) * (victim.abilityActive && vdef.ability === 'anchor' ? 0 : 1);
+    const cost = 10 * sf * (vdef.guardCost ?? 1) * (victim.abilityActive && vdef.ability === 'anchor' ? 0 : 1);
     victim.stamina -= cost;
     result = 'blocked';
     if (victim.stamina <= 0) {

@@ -2,7 +2,7 @@ import { TEXT } from '../../shared/text';
 import { clamp, dist, distXZ, heading, type Vec3 } from '../../shared/math';
 import type { EraHud, EraRules } from '../era-rules';
 import { applyScaleStats, bandOf, brokeSurface, isAlive, isHidden, lengthOf, speedFactor } from '../actors';
-import { creature } from '../creatures';
+import { creature, foodRung } from '../creatures';
 import type { Game } from '../game';
 import type { Actor, InputFrame, Mode, WorldEvent } from '../types';
 import { BIOME_DANGER, biomeAt, groundHeight, RISE_RATE, sampleCurrent, shoreDistance, SHORE_WALL, SURFACE_Y } from '../world';
@@ -10,7 +10,7 @@ import { bodyRadius } from '../actors';
 import { ADULT_STAGE, devActor, GROWN, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageProgress, stageScale, stateFor, type DeadZone, type DevActor } from './state';
 import { camoDrain, installDevonianSpecials, stepAbility, stepGuardSpecial, useAbility, ySpecial } from './specials';
 import { canBreach, sanctuary, spawnInCover, spawnProtect, spawnY, swim, wanderY } from './swim';
-import { apexLeft } from '../ladder';
+import { apexLeft } from '../apex';
 
 /**
  * The Devonian era rules (docs/redesign/08-devonian-domination.md).
@@ -87,9 +87,7 @@ function climbRelief(a: Actor, input: InputFrame, dir: Vec3, mag: number): numbe
   return up <= 0 ? 0 : clamp(up / (up + along), 0, 1);
 }
 
-const rungOf = (a: Actor) => creature(a.creature).rung ?? 2;
-const isPlayerish = (a: Actor) => a.controller === 'player';
-const players = (g: Game) => g.actors.filter(isPlayerish);
+const rungOf = (a: Actor) => foodRung(a.creature);
 
 /** Feeding is the only thing that grows an animal here, exactly as nutrition is in the Cambrian. */
 function gain(g: Game, a: Actor, d: DevActor, amount: number) {
@@ -234,7 +232,7 @@ function updateExuvia(g: Game, a: Actor, d: DevActor, dt: number) {
 }
 
 // ---- the rules object ----
-export const DEVONIAN_RULES: EraRules = {
+export const DEVONIAN_RULES = {
   growthByNutrition: false,
   startScale(mode: Mode, id) {
     const L = creature(id).adultLength;
@@ -254,7 +252,7 @@ export const DEVONIAN_RULES: EraRules = {
   onSwap: (g, a) => { const d = devActor(g, a); d.stage = stageForScale(creature(a.creature).adultLength, a.scale); d.standing = STAGE_AT[d.stage] ?? 0; },
   install() { installDevonianSpecials(); },
   ySpecial,
-  init(g) { installDevonianSpecials(); for (const a of players(g)) { const d = devActor(g, a); d.stage = stageForScale(creature(a.creature).adultLength, a.scale); d.standing = g.mode === 'reef' ? STAGE_AT[ADULT_STAGE] + 5 : STAGE_AT[d.stage]; } },
+  init(g) { installDevonianSpecials(); for (const a of g.players) { const d = devActor(g, a); d.stage = stageForScale(creature(a.creature).adultLength, a.scale); d.standing = g.mode === 'reef' ? STAGE_AT[ADULT_STAGE] + 5 : STAGE_AT[d.stage]; } },
 
   step(g, dt) {
     const s = stateFor(g);
@@ -262,7 +260,7 @@ export const DEVONIAN_RULES: EraRules = {
     stepDeadZones(g, s, dt);
     s.tick += dt;
     const second = s.tick >= 1; if (second) s.tick -= 1;
-    for (const a of players(g)) {
+    for (const a of g.players) {
       const d = devActor(g, a);
       const rung = rungOf(a), def = creature(a.creature);
       updateShore(g, a, d);
@@ -365,7 +363,7 @@ export const DEVONIAN_RULES: EraRules = {
     if ((def.shoreReach ?? 0) > 0 && g.time < 40) return H.shallows;
     return undefined;
   },
-};
+} satisfies EraRules;
 
 /** Exposed for tests. */
 export { FEED as FEED_WEIGHTS, WATER_REGEN, AIR_CLIMB, ZONE_R };
