@@ -396,9 +396,16 @@ unless the user explicitly asks for a PR. Steps:
   neighbours, which are also what peeks in at the edges held upright — moved with the finger once a
   drag is claimed as sideways (an upward drag still scrolls the copy), and finished on the lift: past
   a fifth of the card or flicked, the track slides on and the cursor steps; short of both it springs
-  back. The step happens *after* the slide and the track is re-seated with no motion, which is
-  invisible because the new card is already where the neighbour was. The slide is ended by a timer,
-  never by `transitionend`, which a slow renderer can deliver late or not at all.
+  back — eased from wherever the finger let go, either way. The step happens *after* the slide, and
+  the track is re-seated with no motion **in the same commit that puts the new card on stage**
+  (a layout effect waiting for that card), which is invisible because the new card is already where
+  the neighbour was; re-seating before the cursor's update landed showed the old card snap back to
+  the middle for a frame and then change. The slide is ended by the transition's own
+  `Animation.finished`, with a generous timer behind it: a timer *alone*, started on release, ran
+  before a slow phone frame had even begun the slide and cut it short into a snap, and
+  `transitionend` can arrive late or not at all. And the row's transform is written straight onto
+  the element while the finger moves, never through React state — three whole cards re-rendered per
+  move is how a card comes to trail the finger.
   `npm run touch` holds the decision, `node tools/carousel-browser.mjs` the three games at phone size.
 - **The choice screen is a naturalist's plate, because the title is one.** Every game's title is an
   engraved plate on parchment, and the pick screen after it was a dark teal app panel, so pressing
