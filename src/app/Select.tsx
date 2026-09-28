@@ -553,32 +553,71 @@ function RosterCarousel({ p, grid, renderCard }: {
    * otherwise end in — on whatever button the finger started over — is swallowed, so a swipe that
    * began on Lock In is a swipe, not a lock-in.
    */
-  const COMMIT = 0.22, FLICK = 0.45, SLIDE_MS = 240;
+  const COMMIT = 0.22, FLICK = 0.45, SLIDE_MS = 260;
   const stageRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const press = useRef<{ x: number; y: number; t: number; axis: 'x' | 'y' | null; id: number } | null>(null);
   const swiped = useRef(false);
-  const [dx, setDx] = useState(0);
-  /** 'drag' follows the finger with no easing; 'slide' eases to a rest; 'jump' re-seats the row with none. */
-  const [motion, setMotion] = useState<'drag' | 'slide' | 'jump'>('jump');
+  /** A slide under way: set from the lift until the row is re-seated under the card it went to. */
   const busy = useRef(false);
+  /** The card the row is waiting to see arrive before it re-seats itself (the slot's key). */
+  const awaiting = useRef<string | null>(null);
   const width = () => stageRef.current?.clientWidth ?? 1;
-  /** Slide the row a whole card over, then step the cursor and re-seat the row under the new card. */
+  /*
+   * The row is moved by writing its transform directly, never through React state: a finger drag
+   * re-rendering three whole cards on every move is what makes a card trail the finger on a phone.
+   * `animate` eases from wherever the row is now — the point the finger let go — to `x`.
+   */
+  const place = (x: number, animate: boolean) => {
+    const el = trackRef.current; if (!el) return;
+    el.style.transition = animate ? `transform ${SLIDE_MS}ms cubic-bezier(.2, .8, .25, 1)` : 'none';
+    el.style.transform = `translateX(${x}px)`;
+    el.dataset.moving = animate ? 'slide' : x ? 'drag' : '';
+  };
+  /**
+   * When the slide the row just started has actually finished. Asked of the animation itself — its
+   * `finished` promise runs on the animation's own clock, so it cannot resolve early the way a timer
+   * started before the first frame did (a slow frame on a phone cut the slide short into a snap), and
+   * it cannot be lost the way `transitionend` can. A generous timer stands behind it, because a
+   * transition that never started (nothing to move) has no animation to wait for.
+   */
+  const settled = () => new Promise<void>((done) => {
+    const el = trackRef.current;
+    const fallback = window.setTimeout(done, SLIDE_MS + 700);
+    requestAnimationFrame(() => {
+      const runs = el?.getAnimations() ?? [];
+      if (!runs.length) { window.clearTimeout(fallback); done(); return; }
+      Promise.all(runs.map((r) => r.finished)).then(() => { window.clearTimeout(fallback); done(); }, () => { window.clearTimeout(fallback); done(); });
+    });
+  });
+  const slotKey = (o: Slot) => `${o.kind}:${o.id}`;
+  /** Slide the row a whole card over, then step the cursor; the row is re-seated when the new card lands. */
   const go = (dir: 1 | -1) => {
     if (busy.current) return;
     busy.current = true;
-    setMotion('slide'); setDx(-dir * (width() + SLIDE_GAP));
-    // A timer rather than `transitionend`: under a slow renderer the event can arrive a frame late
-    // or not at all, and the carousel must never be left stuck mid-slide.
-    window.setTimeout(() => { step(dir); setMotion('jump'); setDx(0); busy.current = false; }, SLIDE_MS);
+    place(-dir * (width() + SLIDE_GAP), true);
+    void settled().then(() => {
+      const target = order[(at + dir + order.length) % order.length];
+      awaiting.current = target ? slotKey(target) : null;
+      step(dir);
+      // A step the roster refuses (a locked seat) never brings a new card: spring back instead.
+      window.setTimeout(() => { if (awaiting.current) { awaiting.current = null; place(0, true); void settled().then(() => { place(0, false); busy.current = false; }); } }, 400);
+    });
   };
+  // Re-seat the row in the same commit that puts the new card on stage, so the card the finger sent
+  // there is already in the middle when the row jumps back under it and nothing is seen to move.
+  useLayoutEffect(() => {
+    if (awaiting.current && awaiting.current === slotKey(slot)) { awaiting.current = null; place(0, false); busy.current = false; }
+  });
   const release = (e: ReactPointerEvent) => {
     const d = press.current; press.current = null;
     if (!d || d.axis !== 'x') return;
     const moved = e.clientX - d.x, speed = Math.abs(moved) / Math.max(1, e.timeStamp - d.t);
     swiped.current = true;
     if (Math.abs(moved) > width() * COMMIT || (speed > FLICK && Math.abs(moved) > 20)) go(moved < 0 ? 1 : -1);
-    else { setMotion('slide'); setDx(0); window.setTimeout(() => setMotion((m) => (m === 'slide' ? 'jump' : m)), SLIDE_MS); }
+    else springBack();
   };
+  const springBack = () => { busy.current = true; place(0, true); void settled().then(() => { place(0, false); busy.current = false; }); };
   // A locked visitor is an animal on stage whatever the cursor says: its arrows walk the visitors.
   const showCard = slot.kind === 'creature' || (seat?.cursor === 'visitors' && seat.ready);
   const cardPl: PlayerSetup = seat ?? { creature: (slot.kind === 'creature' ? slot.id : ACTIVE_ERA.defaults.player) as CreatureId, device: 'touch', ready: false };
@@ -606,15 +645,15 @@ function RosterCarousel({ p, grid, renderCard }: {
           const mx = e.clientX - d.x, my = e.clientY - d.y;
           if (!d.axis && Math.hypot(mx, my) > 8) {
             d.axis = Math.abs(mx) > Math.abs(my) ? 'x' : 'y';
-            if (d.axis === 'x') { try { (e.currentTarget as HTMLElement).setPointerCapture(d.id); } catch { /* */ } setMotion('drag'); }
+            if (d.axis === 'x') { try { (e.currentTarget as HTMLElement).setPointerCapture(d.id); } catch { /* */ } }
           }
-          if (d.axis === 'x') setDx(mx);
+          if (d.axis === 'x') place(mx, false);
         }}
         onPointerUp={release}
-        onPointerCancel={() => { if (press.current?.axis === 'x') { setMotion('slide'); setDx(0); } press.current = null; }}
+        onPointerCancel={() => { if (press.current?.axis === 'x') springBack(); press.current = null; }}
         onClickCapture={(e) => { if (swiped.current) { e.stopPropagation(); e.preventDefault(); swiped.current = false; } }}
       >
-        <div className={`carousel-track ${motion}`} style={{ transform: `translateX(${dx}px)`, ['--slide-ms' as string]: `${SLIDE_MS}ms` }}>
+        <div className="carousel-track" ref={trackRef}>
           <div className="carousel-slide prev" aria-hidden="true" onClickCapture={(e) => { e.stopPropagation(); e.preventDefault(); go(-1); }}>{neighbour(prevSlot)}</div>
           <div className="carousel-slide current">
             {showCard
