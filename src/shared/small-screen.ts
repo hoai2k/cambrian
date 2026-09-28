@@ -145,6 +145,13 @@ export const GRID_GAP = 10;
 export const CREW_RESERVE = 0.38;
 
 /**
+ * The width at and below which the pick screen stacks its picker into one column (the stylesheet's
+ * `max-width: 1000px`). Stated once here because the stylesheet restates it as a literal, and
+ * `npm run breakpoints` holds the two together, as it does `COMPACT_W` and `COMPACT_H`.
+ */
+export const PICKER_WIDE = 1000;
+
+/**
  * Whether the pick screen puts the roster *beside* the crew card or stacks the two.
  *
  * The stylesheet's own answer, restated so the arithmetic below asks about the same layout that is
@@ -153,7 +160,7 @@ export const CREW_RESERVE = 0.38;
  * back into two columns because 360 pixels of height cannot hold a stack.
  */
 export const pickerSideBySide = (w: number, h: number): boolean =>
-  w > 1000 || (h < COMPACT_H && w >= h);
+  w > PICKER_WIDE || (h < COMPACT_H && w >= h);
 
 /** The part of the picker the roster grid would be given. */
 export const rosterArea = (picker: Box, sideBySide: boolean): Box => sideBySide
