@@ -1,0 +1,159 @@
+/* The roster grid, the hero card and the pick layout, and the delivered art laid over them.
+   Imported by styles.css, in the cascade's order. */
+/* ---------- Roster grid ---------- */
+/*
+ * The name and the kind are sized off the width of a tile, not the page: the roster is a size
+ * container and `--cols` turns its width into one column's worth. A name that is the loudest thing
+ * on a tile is no use if the tile then has to cut it in half, and "Ctenorhabdotus" at a fixed 13px
+ * does exactly that on a 1440-wide window. So the pair scales together and keeps its ratio — the
+ * name always about half again the kind — from a roomy 1920 down to a cramped 1280.
+ *
+ * Three tracks per band of tiles — picture, name, kind — and every tile is a subgrid spanning all
+ * three. That is what keeps the *names* on one line across a row: the name track is one shared
+ * track, sized by the tallest name in the band, so a neighbour whose kind runs to two lines (or
+ * which has no kind at all, like half the Cambrian roster) can no longer shove its name up or down
+ * relative to the tiles beside it. The tile carries its own row-gap so the 10px between bands does
+ * not also open up between a creature and its own caption.
+ */
+.roster-grid { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); grid-auto-rows: auto; gap: 10px; min-height: 0; align-content: start; container-type: inline-size; }
+.cell { position: relative; display: grid; grid-row: span 3; grid-template-rows: subgrid; row-gap: 3px; padding: 6px 6px 7px; border-radius: 14px; border: 1px solid rgb(var(--foam-rgb) / .12); background: linear-gradient(180deg, rgb(var(--ink-rgb) / .55), rgb(var(--ink-rgb) / .75)); min-height: 0; overflow: hidden; transition: transform .15s, border-color .15s, background .15s; }
+/*
+ * The picture holds the proportion the tile used to, so it keeps its shape whatever the caption
+ * under it does: two lines of kind take height from the band, never from the animal.
+ *
+ * 4:3 because that is the shape of the thumbnails themselves (256x192). The box used to be wider
+ * than that, which meant `contain` fitted every render to the box's *height* and left bare tile
+ * either side of it — the art was landscape-boxed inside a landscape box and lost to the shorter
+ * axis. Matching the source is worth about 40% more animal for nothing but vertical space the
+ * roster already had going spare.
+ *
+ * And it runs past the tile's padding on purpose, four pixels beyond each edge. A render is not a
+ * photograph with a border: every thumbnail carries a wide margin of nothing (Acanthostega's ink is
+ * 60% of its file's width, Cheirolepis' 66%), so the padding was being spent twice, once in the
+ * file and once again in the tile. What hangs over the edge is transparent in every one of them,
+ * and the tile clips at its own radius if a future render ever fills its frame.
+ */
+.cell img { width: calc(100% + 20px); height: auto; aspect-ratio: 4 / 3; object-fit: contain; min-height: 0; margin: -6px -10px 0; filter: drop-shadow(0 6px 10px rgba(0,0,0,.5)); transition: transform .2s; }
+.cell-name { font: 800 calc(clamp(9.5px, calc(8.6cqw / var(--cols)), 13.5px) * var(--fit, 1))/1.15 var(--font-display); letter-spacing: .04em; color: var(--foam); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; align-self: center; }
+/* The everyday group under the genus, for rosters whose names nobody has heard of. Two lines of it
+ * at most: "great-appendage arthropod" does not fit a tile on one, and an ellipsis there tells you
+ * less than the second line does. */
+.cell-kind { font: 600 clamp(7px, calc(5.9cqw / var(--cols)), 9px)/1.25 var(--font-display); letter-spacing: .09em; text-transform: uppercase; color: var(--dim); text-align: center; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; align-self: start; }
+.cell.hover .cell-kind { color: var(--mist); }
+.cell:hover { transform: translateY(-2px); border-color: rgb(var(--foam-rgb) / .35); }
+.cell.hover { border-color: var(--c); background: linear-gradient(180deg, color-mix(in oklch, var(--c), transparent 82%), rgb(var(--ink-rgb) / .8)); }
+.cell.hover img { transform: scale(1.08); }
+.cell.hover .cell-name { color: #fff; }
+.cell-rings { position: absolute; inset: 0; pointer-events: none; }
+.cell-rings .ring { position: absolute; inset: calc(2px + var(--k) * 4px); border-radius: 12px; border: 2px solid var(--c); box-shadow: 0 0 12px color-mix(in oklch, var(--c), transparent 40%); animation: cursor-pulse 1.1s ease-in-out infinite; }
+.cell-rings .ring.locked { animation: none; border-width: 3px; }
+.lock-badge { position: absolute; top: 6px; right: 6px; font: 700 10px var(--font-display); color: var(--ink); border-radius: 6px; padding: 3px 6px; letter-spacing: .08em; animation: badge-pop .35s cubic-bezier(.2,1.4,.4,1) both; }
+.lock-badge + .lock-badge { right: 40px; }
+.cell.locked { animation: cell-lock .5s ease-out both; }
+@keyframes cursor-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+@keyframes badge-pop { from { transform: scale(0); } to { transform: scale(1); } }
+/* The grid's buttons (Random, Visitors). A card is a photograph of an animal; these are not, so
+   they are smaller and plainer, and they say so with a glyph rather than a picture. They keep the
+   cell's 3-row subgrid so the row they sit on lines up with the cards beside them, and they are
+   placed by column from the same model the cursor walks (src/app/roster-grid.ts) — right-aligned
+   under the last card column — so adding one never moves a card. */
+.cell.extra { align-content: center; justify-items: center; row-gap: 2px; background: rgb(var(--ink-rgb) / .5); border-style: dashed; }
+.cell.extra .extra-glyph { font: 700 1.6em var(--font-display); line-height: 1; color: var(--c); opacity: .9; }
+.cell.extra .extra-name { font: 700 .72em var(--font-display); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
+.cell.extra:hover, .cell.extra.hover { border-style: solid; }
+.cell.extra.hover .extra-name { color: var(--foam); }
+/* Smaller than a card: the tile keeps its grid slot, and the button shrinks inside it. */
+.cell.extra { padding: 4px; align-self: center; transform: scale(.82); transform-origin: center; }
+.cell.extra .extra-count { position: absolute; top: 3px; right: 5px; font: 700 .62em var(--font-display); color: var(--foam); opacity: .75; }
+/* A visitor is not this game's animal and carries none of its records, so the crew card says what
+   it is instead of showing a growth badge it could never fill. */
+.visitor-note { margin: .2em 0 0; font: 600 .78em var(--font-display); letter-spacing: .1em; color: #ffd27a; }
+.visitor-note b { color: var(--foam); letter-spacing: .18em; }
+@keyframes cell-lock { 0% { box-shadow: 0 0 0 0 var(--c); } 100% { box-shadow: 0 0 0 18px transparent; } }
+
+/* ---------- Hero card ---------- */
+.hero { grid-area: hero; position: relative; min-height: 0; overflow: visible; }
+.hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 18px 30px rgba(0,0,0,.55)); animation: hero-in .35s cubic-bezier(.2,.9,.3,1.2) both, float 4s ease-in-out .35s infinite; }
+.hero::before { content: ''; position: absolute; inset: 15% 20%; border-radius: 50%; background: radial-gradient(circle, color-mix(in oklch, var(--player), transparent 70%), transparent 70%); filter: blur(12px); }
+@keyframes hero-in { from { opacity: 0; transform: translateY(12px) scale(.9); } to { opacity: 1; transform: none; } }
+.crew.compact .crew-card { grid-template-rows: auto minmax(60px, 40%) minmax(0, 1fr) auto; gap: 5px; padding: 10px 12px 12px; }
+.crew-2 .kit { display: none; }
+.crew-2 .creature-copy h2 { font-size: 22px; }
+.crew.compact .creature-copy h2 { font-size: 18px; }
+.crew.compact .tagline { font-size: 12px; margin-bottom: 2px; }
+.crew.compact .ready-button { padding: 8px; font-size: 11px; }
+.crew.compact .hero img { animation: hero-in .35s both; }
+.lock-fx { position: absolute; inset: 0; border-radius: var(--radius); pointer-events: none; z-index: 2; animation: lock-burst .8s ease-out both; box-shadow: inset 0 0 0 0 var(--player); }
+.lock-fx::after { content: ''; position: absolute; left: 50%; top: 40%; width: 20px; height: 20px; border-radius: 50%; border: 3px solid var(--player); transform: translate(-50%, -50%); animation: lock-ring .7s ease-out both; }
+@keyframes lock-burst { 0% { box-shadow: inset 0 0 0 4px var(--player), 0 0 0 0 var(--player); background: color-mix(in oklch, var(--player), transparent 60%); } 100% { box-shadow: inset 0 0 0 0 transparent, 0 0 0 26px transparent; background: transparent; } }
+@keyframes lock-ring { 0% { transform: translate(-50%, -50%) scale(.2); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(14); opacity: 0; } }
+@media (max-width: 1000px) { .pick-layout { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); } .crew { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); } }
+@media (max-height: 640px) { .cell { padding: 4px; row-gap: 1px; } .cell img { aspect-ratio: 4 / 2.1; } .cell-kind { -webkit-line-clamp: 1; } .pick-layout { gap: 10px; } }
+/* A short window caps the tiles harder still: three rows of them have to fit the track. */
+@media (max-height: 760px) { .roster-grid { max-width: calc(var(--cols) * 168px); } }
+/* Below this the picture gives up some of its height so three bands still fit the track. */
+@media (max-height: 730px) { .cell img { aspect-ratio: 4 / 2.45; } }
+@media (max-height: 660px) { .cell-kind { display: none; } }
+.roster-grid.dense .cell-name { letter-spacing: .03em; }
+.roster-grid.dense .cell { padding: 5px 5px 5px; border-radius: 10px; }
+
+/* Two to four players: not enough height to stack hero, copy and button, so go side by side. */
+.crew-2 .crew-card, .crew.compact .crew-card { grid-template-columns: 38% minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; grid-template-areas: 'top top' 'hero copy' 'btn btn'; column-gap: 12px; }
+.crew-2 .crew-top, .crew.compact .crew-top { grid-area: top; }
+.crew-2 .hero, .crew.compact .hero { grid-area: hero; }
+.crew-2 .creature-copy, .crew.compact .creature-copy { grid-area: copy; align-self: stretch; }
+.crew-2 .ready-button, .crew.compact .ready-button { grid-area: btn; }
+.crew-2 .stats { grid-template-columns: repeat(2, 1fr); gap: 2px 10px; }
+.crew-2 .tagline { font-size: 13px; margin-bottom: 4px; }
+
+/* Full scientific names remain readable in the expanded roster. */
+.creature-copy { container-type: inline-size; }
+.creature-copy h2, .crew-2 .creature-copy h2, .crew.compact .creature-copy h2 { font-size: clamp(13px, 7cqw, 32px); }
+.provenance { display: block; color: var(--dim); font-size: 10px; line-height: 1.4; margin: 3px 0 7px; }
+
+/*
+ * The roster must never grow up into the header. Plain `center` overflows in both directions
+ * when the grid is taller than its track, which is exactly what happened on a wide, short window
+ * (1920 x 760): three rows of tiles, sized by their 4:3.3 aspect ratio off the column width,
+ * came out taller than the space for them and the top row landed on the mode blurb. `safe`
+ * centring falls back to start alignment in that case, and the column cap stops a wide window
+ * from inflating the tiles past the height there is for them in the first place.
+ */
+.roster-grid { grid-auto-rows: auto; align-self: safe center; justify-self: start; width: 100%; max-width: calc(var(--cols) * 214px); }
+@media (max-width: 1000px), (max-height: 700px) {
+  .select { grid-template-rows: auto minmax(0, 1fr) auto; gap: 8px; }
+  .pick-layout { overflow-y: auto; overscroll-behavior: contain; align-content: start; }
+  .roster-grid { align-self: start; }
+}
+/*
+ * Narrow windows stack the picker into a column and scroll it, so the cards get a floor to stand on.
+ * A window that is merely *short* does not: there the crew is beside the roster and a floor taller
+ * than the room available pushes the card's foot below the fold, where it reads as text sliced off
+ * rather than as something to scroll to. The card takes the height there is and `.creature-copy`
+ * scrolls inside it instead.
+ */
+@media (max-width: 1000px) {
+  .crew { min-height: 440px; }
+  .crew-1 { min-height: 540px; }
+}
+@media (max-width: 1000px) {
+  .pick-layout { grid-template-rows: auto auto; }
+  .crew { grid-auto-flow: row; }
+  .crew.compact { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(205px, 1fr); }
+}
+
+/* Delivered image assets. */
+.brand-logo { width: min(78vw, 720px); height: auto; display: block; }
+.title-logo.small .brand-logo { width: min(72vw, 420px); }
+.header-logo { width: 170px; height: auto; }
+.title-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; opacity: .6; }
+.title { isolation: isolate; }
+.mode-chip { position: relative; overflow: hidden; isolation: isolate; min-height: 78px; justify-content: flex-end; }
+.mode-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+.mode-chip::after { content: ''; position: absolute; inset: 0; background: linear-gradient(transparent, rgb(var(--ink-rgb) / .95)); z-index: -1; }
+.mode-chip small { color: var(--foam); }
+.tier-glyph { display: block; width: 28px; height: 28px; background: currentColor; mask: center / contain no-repeat; }
+.marker { width: calc(1.1em * var(--s)); height: calc(1.1em * var(--s)); transform: translate(-50%, -50%); border: 0; border-radius: 0; background: currentColor; mask: center / contain no-repeat; box-shadow: none; }
+@media (max-width: 700px) { .mode-chip { min-height: 68px; padding: 7px 10px; } .header-logo { width: 140px; } }
+.title > picture { display: contents; }
+.title-art { opacity: 1; filter: brightness(.6); }

@@ -304,7 +304,7 @@ ok(/WAIT_HINT = 700/.test(loading), 'slow means 700ms');
 // title's loading line must not wear it, or the line draws itself as a panel over the painting.
 ok(!/press-start \$\{loaded \? '' : 'loading'\}/.test(title), 'the title\'s loading line is not the boot screen');
 ok(/press-start \$\{loaded \? '' : 'waiting'\}/.test(title), 'it says waiting instead');
-ok(/\.press-start\.waiting/.test(readFileSync('src/app/styles.css', 'utf8')), 'and the stylesheet agrees');
+ok(/\.press-start\.waiting/.test(readFileSync('src/app/shell.css', 'utf8')), 'and the stylesheet agrees');
 // Three games means two era links on every title screen; they are a column, not two corners.
 ok(/className="era-switches"/.test(title), 'the other eras stack rather than sitting on each other');
 

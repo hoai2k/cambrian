@@ -1,0 +1,159 @@
+/* The pick screen: the header, the mode chips, the crew cards and the kit. Imported by styles.css,
+   in the cascade's order. */
+/* ---------- Select ---------- */
+.select { position: absolute; inset: 0; display: grid; grid-template-rows: auto 1fr auto; z-index: 10; padding: 18px 22px 80px; background: linear-gradient(180deg, rgb(var(--ink-rgb) / .78), rgb(var(--ink-rgb) / .35) 40%, rgb(var(--ink-rgb) / .78)); animation: fade-in .4s both; }
+/* The picker footer and icon toolbar share the bottom row. Reserve the toolbar's width at the
+   right of the footer so Dive In sits beside it and the roster gets the old clearance back. */
+.screen-select .select { padding-bottom: 18px; }
+.screen-select .select-footer { min-height: 44px; padding-right: 212px; }
+.select-header { display: grid; grid-template-columns: auto 1fr; grid-template-areas: 'brand modes' 'blurb blurb'; gap: 8px 24px; align-items: center; }
+/*
+ * The mark in the corner does two jobs: the emblem goes back to the title (which is why there is
+ * no longer a "Title" button in the footer), and the wordmark — or the chevron after it — drops the
+ * other game's wordmark in underneath, aligned to this one and the same width, so the two read as
+ * one list of engraved titles with the one you are playing at the top. Both controls are styled as
+ * nothing at all until pointed at: the whole point is that it stays a logo.
+ */
+.brand { grid-area: brand; display: flex; align-items: center; gap: 10px; }
+.brand-home { display: block; padding: 4px; margin: -4px; border: 0; border-radius: 12px; background: none; color: inherit; cursor: pointer; transition: background .15s, transform .15s; }
+.brand-title { display: flex; align-items: center; gap: 2px; padding: 4px; border: 0; border-radius: 12px; background: none; color: inherit; font: inherit; cursor: pointer; transition: background .15s; }
+.brand-title svg { color: var(--ember); opacity: .7; transition: opacity .15s, transform .18s; }
+.brand-title:enabled:hover svg, .brand-title:focus-visible svg, .brand-titles.open svg { opacity: 1; }
+.brand-titles.open svg { transform: rotate(180deg); }
+.brand-home:hover, .brand-home:focus-visible, .brand-title:enabled:hover, .brand-title:focus-visible { background: rgb(var(--foam-rgb) / .08); }
+.brand-home:hover, .brand-home:focus-visible { transform: translateY(-1px); }
+.brand-title:disabled { cursor: default; }
+.brand-titles { position: relative; display: flex; align-items: center; }
+/* Hung off the title's own box and padded so that its border plus padding equal the button's inset:
+   the wordmark that drops in starts on exactly the left edge of the one above it, and is the same
+   width because both are `.header-logo`. */
+.era-menu { position: absolute; top: calc(100% + 4px); left: 0; z-index: 12; width: max-content; padding: 3px; border-radius: 12px; border: 1px solid rgb(var(--foam-rgb) / .18); background: rgb(var(--ink-rgb) / .92); backdrop-filter: blur(8px); box-shadow: 0 18px 40px rgba(0,0,0,.5); animation: era-menu-in .16s ease-out both; }
+.era-item { display: block; border-radius: 9px; text-decoration: none; transition: background .15s, filter .15s; filter: saturate(.75) brightness(.85); }
+.era-item img { display: block; }
+.era-item:hover, .era-item:focus-visible { filter: none; }
+@keyframes era-menu-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.brand-name { font: 500 13px var(--font-display); letter-spacing: .18em; }
+.brand-name b { color: var(--coral); }
+.mode-picker { grid-area: modes; display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.mode-chip { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 14px; border-radius: 12px; border: 1px solid rgb(var(--foam-rgb) / .16); background: rgb(var(--ink-rgb) / .5); transition: all .15s; }
+.mode-chip span { font: 700 12px var(--font-display); letter-spacing: .08em; }
+.mode-chip small { color: var(--dim); font-size: 11px; }
+.mode-chip.active { background: linear-gradient(120deg, rgba(255,91,110,.35), rgba(255,179,107,.25)); border-color: var(--ember); }
+.mode-blurb { grid-area: blurb; margin: 0; color: var(--mist); font-size: 14px; }
+
+/* The single row is `minmax(0, 1fr)`, not `auto`: an auto row takes the crew cards' max-content
+   height and then overflows the picker, which clips it — the cards have to be told how much room
+   there actually is so the copy inside them can scroll instead of being cut off. */
+.pick-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.8fr); grid-template-rows: minmax(0, 1fr); gap: 16px; min-height: 0; padding: 8px 0; }
+.crew { display: grid; gap: 10px; align-content: stretch; grid-auto-flow: row; grid-auto-rows: minmax(0, 1fr); min-height: 0; }
+.crew-1 { grid-template-rows: minmax(0, 1fr) auto; }
+.crew-1 .join-card { min-height: 0; padding: 12px 14px; gap: 6px; grid-auto-flow: column; align-items: center; justify-content: space-between; text-align: left; }
+.crew-1 .join-card svg { display: none; }
+.crew-2 { grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
+.crew-2 .join-card, .crew.compact .join-card { display: none; }
+.crew.compact { grid-template-columns: 1fr 1fr; grid-auto-flow: row; }
+/*
+ * The card, and where its Lock In went. It used to be the last row of a four-row stack, which cost
+ * the copy a button's height at exactly the sizes where the copy had none to spare — at 1280x800
+ * four of the five kit lines were being cut off, in a box that does not scroll. It sits beside the
+ * portrait now: the portrait is a wide picture of a centred animal with room to either side, so
+ * the button costs nothing there and hands the whole of its old row back to the text.
+ */
+.crew-card { position: relative; container-type: inline-size; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'top top' 'hero btn' 'copy copy'; grid-template-rows: auto minmax(110px, 42%) minmax(0, 1fr); gap: 8px 12px; padding: 14px 16px 16px; border-radius: var(--radius); background: rgb(var(--ink-rgb) / .62); backdrop-filter: blur(16px); border: 1px solid rgb(var(--foam-rgb) / .14); box-shadow: inset 0 0 0 1px rgba(255,255,255,.03), 0 20px 60px rgba(0,0,0,.35); transition: border-color .2s, box-shadow .2s; overflow: hidden; min-height: 0; max-height: 100%; }
+.crew-card::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--player); }
+.crew-card.ready { border-color: var(--player); box-shadow: 0 0 0 1px var(--player), 0 0 48px color-mix(in oklch, var(--player), transparent 65%); }
+.crew-top { grid-area: top; display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--dim); }
+.crew-top .device { display: inline-flex; align-items: center; gap: 6px; }
+.player-chip { font: 700 11px var(--font-display); letter-spacing: .1em; background: var(--player); color: var(--ink); border-radius: 8px; padding: 4px 8px; }
+.remove { margin-left: auto; width: 28px; height: 28px; border-radius: 8px; border: 1px solid rgb(var(--foam-rgb) / .16); background: transparent; color: var(--dim); }
+.remove:hover { color: var(--coral); border-color: var(--coral); }
+/*
+ * Never cut a line off. The card's job is to say what the animal does, and this box used to hide
+ * what would not fit: `overflow: hidden` was declared twice, the second copy quietly overriding the
+ * `overflow-y: auto` further down that was meant to let it scroll, and a media rule dropped the
+ * last three kit entries outright below 640px of window — the ability, the passive and the
+ * weakness, which is most of what there is to know. Now the content is made to fit (the Lock In
+ * button left the vertical stack, and the kit goes to two columns when it is short), and the box
+ * scrolls as a last resort rather than swallowing anything.
+ */
+.creature-copy { grid-area: copy; min-height: 0; overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgb(var(--foam-rgb) / .45) rgb(var(--foam-rgb) / .09); }
+/* `data-more` is set by `CopyBox` while there is copy below the fold — see src/app/Select.tsx. */
+.creature-copy[data-more] { -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 34px), transparent); mask-image: linear-gradient(180deg, #000 calc(100% - 34px), transparent); }
+.creature-copy .role { font: 600 11px var(--font-display); letter-spacing: .18em; color: var(--ember); }
+.creature-copy h2 { font-size: clamp(20px, 2.4vw, 32px); margin: 2px 0 2px; line-height: 1; }
+/* The everyday group the animal belongs to, so an unfamiliar genus still lands somewhere. */
+/* The animal's own length, on the card, while Settings → Equivalent sizing is on: it is the one
+   thing that option changes about the creature, so it says so where the specimen line already is. */
+.real-size { color: var(--ember); font-style: normal; letter-spacing: .02em; }
+.kind { display: inline-block; margin-right: .55em; padding: .05em .5em; border-radius: .6em; background: color-mix(in srgb, var(--player, #61f2d5) 22%, transparent); border: 1px solid color-mix(in srgb, var(--player, #61f2d5) 55%, transparent); color: var(--foam); font: 700 .92em var(--font-display); letter-spacing: .04em; }
+.result-kind { color: var(--mist); font-size: .85em; letter-spacing: .06em; }
+.kind-note { margin: .3em 0 .5em; color: var(--mist); font-size: .9em; line-height: 1.4; }
+.tagline { margin: 0 0 8px; color: var(--mist); font-weight: 600; }
+
+/* The Rise record, on the expanded creature card: how far this creature has been grown before,
+   and — in Rise, where it can be taken up — the offer to start there instead of as a hatchling. */
+.best-run { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 8px; }
+.best-badge { display: inline-flex; align-items: baseline; gap: 5px; padding: 3px 8px; border-radius: 999px;
+  background: color-mix(in srgb, var(--ember, #ffb36b) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ember, #ffb36b) 55%, transparent);
+  color: var(--ember, #ffb36b); font: 700 11px/1.3 var(--font-display); letter-spacing: .06em; white-space: nowrap; }
+.best-badge b { font-size: 9px; letter-spacing: .12em; opacity: .75; }
+.carry-toggle { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 999px;
+  background: transparent; border: 1px solid color-mix(in srgb, var(--mist) 35%, transparent);
+  color: var(--mist); font: 600 11px/1.3 var(--font-body, inherit); cursor: pointer; white-space: nowrap; }
+.carry-toggle:hover { border-color: var(--mist); color: var(--ink, #eaf6f8); }
+.best-run.carrying .carry-toggle { border-color: var(--player); color: var(--player); background: color-mix(in srgb, var(--player) 14%, transparent); }
+.carry-toggle kbd { font: 700 10px var(--font-display); padding: 0 4px; border-radius: 4px; border: 1px solid currentColor; opacity: .8; }
+.crew.compact .best-run { margin-bottom: 4px; }
+.crew.compact .best-badge, .crew.compact .carry-toggle { font-size: 10px; padding: 2px 6px; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 8px; }
+.stat { display: flex; flex-direction: column; gap: 4px; }
+.stat small { color: var(--dim); font-size: 11px; letter-spacing: .06em; }
+.stat i { display: flex; gap: 3px; }
+.stat b { width: 14px; height: 6px; border-radius: 3px; background: rgb(var(--foam-rgb) / .12); }
+.stat b.on { background: var(--player); box-shadow: 0 0 8px color-mix(in oklch, var(--player), transparent 40%); }
+/*
+ * The kit is a list until the card is too short for one, and then it is two columns. Nothing here
+ * scrolls, so a line that does not fit is a line the player never sees — and these are the five
+ * lines that say what the animal actually does. Column-flow rather than a grid of cells so the
+ * split lands where the content wants it, and `break-inside` so no entry is torn across the gap.
+ */
+.kit { margin: 0; display: grid; gap: 4px; font-size: 12.5px; color: var(--mist); }
+/* Two columns rather than CSS multicol: inside a clipped, height-constrained box multicol adds
+   columns *sideways* and the overflow is cut off horizontally, which is the same bug wearing a
+   different hat. A grid grows downward, which is the axis that has room. */
+@media (max-height: 820px) { .kit { grid-template-columns: 1fr 1fr; gap: 4px 12px; } }
+/*
+ * A short window has no vertical slack to spare, so the copy tightens instead of falling back to a
+ * scrollbar — the box does scroll as a last resort, but a pad cannot reach it, so anything that can
+ * be made to fit should fit.
+ */
+@media (max-height: 760px) {
+  .creature-copy h2 { font-size: clamp(18px, 2vw, 24px); }
+  .creature-copy .tagline { font-size: 12.5px; margin-bottom: 5px; }
+  .creature-copy .best-run { margin-bottom: 5px; }
+  .creature-copy .stats { gap: 4px 8px; margin-bottom: 5px; }
+  .creature-copy .stat small { font-size: 10px; }
+  .creature-copy .kit { font-size: 11.5px; gap: 3px 12px; }
+}
+/* The button column sizes to its label: a pad says "RT", a mouse says "LMB". */
+.kit > div { display: grid; grid-template-columns: minmax(22px, max-content) 1fr; gap: 8px; align-items: start; break-inside: avoid; }
+.kit dt { font: 700 11px var(--font-display); color: var(--ink); background: var(--foam); border-radius: 6px; text-align: center; line-height: 18px; padding: 0 4px; }
+.kit dd { margin: 0; }
+.kit b { color: var(--foam); }
+.ready-button { grid-area: btn; align-self: center; max-width: min(190px, 34cqw); padding: 12px 14px; border-radius: 12px; text-align: center; border: 1px solid var(--player); background: transparent; font: 700 13px/1.25 var(--font-display); letter-spacing: .14em; color: var(--player); display: inline-flex; flex-wrap: wrap; gap: 4px 8px; justify-content: center; align-items: center; transition: all .15s; }
+.ready-button[aria-pressed='true'] { background: var(--player); color: var(--ink); }
+.join-card { display: grid; place-items: center; align-content: center; gap: 10px; padding: 24px; border-radius: var(--radius); border: 1px dashed rgb(var(--foam-rgb) / .25); color: var(--mist); text-align: center; min-height: 220px; }
+.join-card p { margin: 0; }
+.join-card small { color: var(--dim); }
+.ghost { padding: 10px 16px; border-radius: 12px; border: 1px solid rgb(var(--foam-rgb) / .2); background: rgb(var(--ink-rgb) / .4); color: var(--foam); transition: all .15s; }
+.ghost:hover { border-color: var(--ember); color: var(--ember); }
+.select-footer { display: flex; align-items: center; justify-content: flex-end; gap: 16px; }
+/* The one thing on the left of that row. `margin-right: auto` rather than space-between, so the
+   footer keeps working unchanged on a build with no feedback endpoint, where nothing renders here. */
+.feedback-button { margin-right: auto; padding: 9px 15px; border-radius: 12px; border: 1px solid rgb(var(--foam-rgb) / .18); background: rgb(var(--ink-rgb) / .5); backdrop-filter: blur(8px); color: var(--mist); font: 600 13px var(--font-body); transition: color .15s, border-color .15s, transform .15s; }
+.feedback-button:hover, .feedback-button:focus-visible { color: var(--ember); border-color: var(--ember); transform: translateY(-1px); }
+.start-wrap { display: flex; align-items: center; gap: 16px; }
+.start-button { padding: 14px 30px; border-radius: 14px; border: none; background: linear-gradient(95deg, var(--ember), var(--coral)); color: var(--ink); font: 900 15px var(--font-display); letter-spacing: .18em; box-shadow: 0 10px 40px rgba(255, 91, 110, .4); transition: transform .15s, filter .15s; }
+.start-button:hover:not(:disabled) { transform: translateY(-2px) scale(1.02); filter: brightness(1.08); }
+.start-button:disabled { opacity: .35; box-shadow: none; cursor: not-allowed; }

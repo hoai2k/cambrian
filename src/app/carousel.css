@@ -1,0 +1,125 @@
+/* The carousel (one hero card at a time) and the roster's two views on a desktop. Imported by
+   styles.css, in the cascade's order. */
+/* ---------- The carousel: one hero card at a time ---------- */
+/*
+ * What a screen too small for the grid shows instead (`carouselView`). It is keyed on its own class
+ * rather than on a media query because the decision is not a size: it is whether *this roster* fits
+ * *this picker*, which only the screen that measured it knows.
+ *
+ * The picker stops being a two-part layout — there is one thing in it now — and the rules the
+ * compact layout wrote for a stacked roster and a sticky card are all undone here, because they
+ * were about sharing the screen between two blocks and there is only one.
+ */
+.select-carousel .pick-layout { display: block; overflow: hidden; padding: 4px 0; }
+.carousel {
+  height: 100%; min-height: 0;
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: minmax(0, 1fr) auto;
+  align-items: center; gap: 6px 8px;
+}
+.carousel-stage { grid-row: 1; grid-column: 2; height: 100%; min-height: 0; touch-action: pan-y; }
+@keyframes carousel-in { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+.carousel .crew-card { height: 100%; max-height: none; min-height: 0; }
+/* The arrows are thumb-sized and sit either side of the card, so a player who does not know the
+   card can be swiped still sees at once that there is more roster to either side. */
+.carousel-step {
+  grid-row: 1; width: 40px; height: 64px; border-radius: 14px;
+  border: 1px solid rgb(var(--foam-rgb) / .2); background: rgb(var(--ink-rgb) / .55); backdrop-filter: blur(8px);
+  color: var(--foam); font: 400 30px/1 var(--font-display); display: grid; place-items: center;
+}
+.carousel-step.prev { grid-column: 1; }
+.carousel-step.next { grid-column: 3; }
+.carousel-step:active { transform: scale(.94); }
+.carousel-foot { grid-row: 2; grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 16px; }
+.carousel-dots { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; max-width: 72%; }
+.carousel-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgb(var(--foam-rgb) / .25); transition: background .15s, transform .15s; }
+.carousel-dots i.extra { border-radius: 1px; }
+.carousel-dots i.on { background: var(--player, var(--lagoon)); transform: scale(1.35); }
+.carousel-count { font: 700 11px var(--font-display); letter-spacing: .12em; color: var(--dim); white-space: nowrap; }
+
+/* An extra's card: Random or Visitors, as big as an animal's so it reads as a stop in the roster. */
+.carousel-extra {
+  /* A flex column, not a grid: the extras' glyph and name carry grid placement from the tile they
+     are drawn in on the grid, which laid this card out in two columns. */
+  height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 18px; text-align: center;
+  border-radius: var(--radius); border: 1px dashed rgb(var(--foam-rgb) / .3); background: rgb(var(--ink-rgb) / .62); backdrop-filter: blur(16px);
+  animation: carousel-in .22s ease-out both;
+}
+.carousel-extra .extra-glyph { position: static; grid-area: auto; font-size: 64px; line-height: 1; color: var(--ember); }
+.carousel-extra h2 { font-size: 22px; display: flex; gap: 8px; align-items: center; }
+.carousel-extra p { margin: 0; color: var(--mist); max-width: 26em; font-size: 13px; }
+.carousel-extra .ready-button { max-width: none; }
+
+/* Held upright there is a whole screen of height for one card, so the kit and the tagline the compact
+   layout hid to share the screen with a grid come back: this is the only place the animal is told. */
+@media (orientation: portrait) {
+  .select-carousel .creature-copy .kit, .select-carousel .creature-copy .tagline { display: grid; }
+  .select-carousel .creature-copy .tagline { display: block; }
+  .select-carousel .creature-copy .stats { display: grid; }
+  .select-carousel .crew-card { grid-template-rows: auto minmax(120px, 34%) minmax(0, 1fr); }
+}
+/* On its side the card lies down too: picture, copy and Lock In in one row under the seat line,
+   because 360 pixels cannot hold them stacked. */
+@media (orientation: landscape) and (max-height: 539px) {
+  .select-carousel .crew-card {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr) auto;
+    grid-template-areas: 'top top top' 'hero copy btn';
+    grid-template-rows: auto minmax(0, 1fr);
+    align-items: center;
+  }
+  .select-carousel .crew-card .hero { height: 100%; min-height: 0; }
+  .select-carousel .crew-card .creature-copy { align-self: stretch; }
+  .select-carousel .creature-copy .tagline { display: block; }
+  .carousel-step { height: 52px; width: 36px; }
+}
+
+/* Held upright, the neighbouring cards peek in at either edge instead of the arrows: the edge of the
+   next card says there is more roster that way without a word, and tapping it steps there. The card on
+   stage takes the width the arrows used to. The peeks are the track's own neighbour slides, shown
+   past the stage's edges, so dragging brings the one you see into the middle. */
+/* The narrower margin is the compact portrait layout's, not the carousel's: the carousel is chosen by
+   measuring the picker, so anything the carousel does to the picker's own box changes the answer that
+   chose it — a margin that came with the carousel made the grid fit, which took the margin away,
+   which made it not fit, for ever. */
+@media (orientation: portrait) and (max-width: 759px) { .select { padding-left: 6px; padding-right: 6px; } }
+@media (orientation: portrait) {
+  .select-carousel .carousel { grid-template-columns: 26px minmax(0, 1fr) 26px; column-gap: 6px; }
+  .select-carousel .carousel-step { display: none; }
+  .select-carousel .carousel-stage { overflow: visible; }
+  /* Four bars do not fit across a phone's card; two rows of two do. */
+  .select-carousel .creature-copy .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 14px; }
+}
+/* The track: the card on stage and its two neighbours side by side. Its transform and transition are
+   written by `RosterCarousel` directly (following the finger, easing from the release point, and
+   re-seating under the new card in the commit that puts it there), never through React state. */
+.carousel-stage { position: relative; overflow: hidden; }
+/* `touch-action` stops at a scrolling box, so the card's scrolling copy has to say pan-y for itself:
+   left to the default, a sideways drag that starts on the copy is taken by the browser as a pan and
+   the drag is cancelled after its first move. */
+.carousel-stage .creature-copy { touch-action: pan-y; }
+.carousel-track { position: relative; height: 100%; will-change: transform; }
+.carousel-slide { position: absolute; top: 0; bottom: 0; left: 0; width: 100%; }
+.carousel-slide.prev { left: calc(-100% - 12px); }
+.carousel-slide.next { left: calc(100% + 12px); }
+.carousel-slide.prev, .carousel-slide.next { cursor: pointer; opacity: .8; }
+.carousel-slide .carousel-extra { animation: none; }
+
+/* The roster's two views on a desktop, under folder tabs: the list, or every animal at its size. */
+.roster-pane { display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; min-width: 0; }
+.roster-tabs { display: flex; gap: 4px; padding-left: 14px; position: relative; z-index: 1; margin-bottom: -1px; }
+.roster-tab { padding: 6px 18px 5px; border: 1px solid rgb(var(--foam-rgb) / .2); border-bottom: 0; border-radius: 10px 10px 0 0; background: rgb(var(--ink-rgb) / .4); color: var(--dim); font: 700 12px var(--font-display); letter-spacing: .1em; }
+.roster-tab.active { background: rgb(var(--ink-rgb) / .8); color: var(--foam); }
+.roster-tab.pad-focus { outline: 2px solid var(--ember); outline-offset: 2px; }
+.roster-pane > .roster-grid { border-top: 1px solid rgb(var(--foam-rgb) / .2); padding-top: 12px; }
+.depth-view { position: relative; min-height: 0; overflow: hidden; border: 1px solid rgb(var(--foam-rgb) / .2); background: linear-gradient(#1f4a4c, #0b2224 80%); }
+.depth-band { position: absolute; left: 0; right: 0; pointer-events: none; }
+.depth-band + .depth-band { border-top: 1px dashed rgb(var(--foam-rgb) / .1); }
+.depth-label { position: absolute; left: 10px; top: 4px; font: 700 10px var(--font-display); letter-spacing: .16em; text-transform: uppercase; color: var(--dim); }
+.depth-surface { position: absolute; left: 0; right: 0; height: 2px; background: rgb(var(--foam-rgb) / .5); pointer-events: none; }
+.depth-floor { position: absolute; left: 0; right: 0; bottom: 0; background: linear-gradient(#5c4f38, #3e3526); pointer-events: none; }
+.depth-spot { position: absolute; display: grid; grid-template-rows: minmax(0, 1fr) auto; padding: 0; border: 0; background: none; color: var(--foam); cursor: pointer; transition: transform .15s; }
+.depth-spot img { width: 100%; height: 100%; object-fit: contain; min-height: 0; filter: drop-shadow(0 6px 8px rgba(0,0,0,.45)); transition: transform .2s; }
+.depth-spot:hover { transform: translateY(-2px); }
+.depth-spot.hover img { transform: scale(1.08); }
+.depth-name { font: 700 11px/1.2 var(--font-display); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: 20px; line-height: 20px; }
+.depth-spot.extra { place-items: center; border: 1px dashed rgb(var(--foam-rgb) / .35); border-radius: 50%; }
+.depth-spot.extra .extra-glyph { font: 700 1.6em var(--font-display); }
