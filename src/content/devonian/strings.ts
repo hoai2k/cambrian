@@ -17,6 +17,8 @@ export const DEVONIAN_STRINGS: StringOverrides = {
     ],
   },
   sim: {
+    // The win line: these seas are not a reef.
+    match: { rulesTheReef: (name) => `${name} grew up and held the sea.` },
     // The Devonian climbs five stages rather than the Cambrian's tiers.
     ladder: { rungs: ['', 'Floor', 'Shoal', 'Hunters', 'Giants'] },
     hints: {

@@ -12,6 +12,8 @@ export interface HitContext {
   rng: () => number;
   /** An era's damage multiplier for armour plates, enrolment or a withdrawn shell (1 = none). */
   armour?: (attacker: Actor, victim: Actor, dir: Vec3) => number;
+  /** A body that takes this hit instead (EraRules.shield): the victim's multiplier, used in place of `armour`. */
+  shield?: (attacker: Actor, victim: Actor) => number | undefined;
   canEat?: (predator: Actor, food: Actor) => boolean;
 }
 
@@ -63,15 +65,15 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
   const facing = dot(vHead, dir); // >0 hit from behind (dir points from attacker to victim along victim heading)
   let dirBonus = 1;
   const fromAbove = attacker.pos.y > victim.pos.y + lengthOf(victim) * 0.35;
-  if (vdef.ability === 'anchor' || vdef.id === 'wiwaxia') {
+  if (vdef.ability === 'anchor' || vdef.spinedBack) {
     if (fromAbove) { dirBonus = 0.6; attacker.hp -= move.damage * 0.5 * sizeFactor(victim, attacker) * 0.5; attacker.hitFlash = 0.3; }
-  } else if (facing > 0.45 && vdef.id !== 'opabinia') dirBonus = 1.4;
+  } else if (facing > 0.45 && !vdef.allRoundEyes) dirBonus = 1.4;
 
   const sf = sizeFactor(attacker, victim);
   const base = move.damage * (1 + 0.35 * momentum) * dirBonus * sf;
   let dmg = base * (1 - vdef.defense * (1 - clamp(move.armorPierce ?? 0, 0, 1)));
-  if (ctx.armour) {
-    const k = ctx.armour(attacker, victim, dir);
+  const k = ctx.shield?.(attacker, victim) ?? ctx.armour?.(attacker, victim, dir);
+  if (k !== undefined) {
     dmg *= k;
     if (k < 0.6) ctx.events.push({ kind: 'parry', pos: { ...victim.pos }, actor: victim.id, other: attacker.id, strength: k < 0.35 ? 0.4 : 0.7, player: victim.player });
   }
@@ -81,7 +83,7 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
   const guarding = victim.state === 'guard' && vdef.canGuard;
   if (guarding && !(move.guardBreak && move.damage >= 20 && sf >= 0.8)) {
     dmg *= vdef.ability === 'shellUp' || vdef.ability === 'enroll' ? .25 : .45;
-    const cost = 10 * sf * (vdef.id === 'olenoides' ? 0.6 : 1) * (victim.abilityActive && vdef.ability === 'anchor' ? 0 : 1);
+    const cost = 10 * sf * (vdef.guardCost ?? 1) * (victim.abilityActive && vdef.ability === 'anchor' ? 0 : 1);
     victim.stamina -= cost;
     result = 'blocked';
     if (victim.stamina <= 0) {
@@ -236,7 +238,7 @@ export const GRIP_STRAIN = 0.55;
 export function takeRide(ctx: HitContext, rider: Actor, host: Actor): boolean {
   // Only the animals somebody is steering hold on. The reef's own predators have no use for it —
   // a wild Anomalocaris clinging to a giant for nine seconds is a bug, not behaviour.
-  if (rider.controller !== 'player' && rider.controller !== 'bot') return false;
+  if (rider.controller !== 'player') return false;
   if (rider.rideHost >= 0 || host.riddenBy >= 0 || rider.riddenBy >= 0 || host.rideHost >= 0) return false;
   if (host.state === 'dead' || host.state === 'grabbed' || rider.state === 'grabbed') return false;
   const h = heading(host.yaw);

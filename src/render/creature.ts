@@ -26,7 +26,7 @@ export type Lod = 0 | 1;
 const cache = new Map<string, Promise<Loaded>>();
 const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
 
-export const creatureUrl = (id: CreatureId, lod: Lod = 0) =>
+const creatureUrl = (id: CreatureId, lod: Lod = 0) =>
   `${appBase()}${assetPaths.model(id, lod)}`;
 
 export function loadCreature(id: CreatureId, onProgress?: (loaded: number, total: number) => void, lod: Lod = 0): Promise<Loaded> {
@@ -354,7 +354,7 @@ export class CreatureView {
       // name is what fires it; a model without that clip is left to the state machine below. A
       // looping era clip (a walk down the beach, a watch at the edge) *is* the locomotion, so it
       // is decided here, ahead of the shared machine, rather than fought with Idle every frame.
-      const era = RULES?.clip?.(a);
+      const era = RULES.clip?.(a);
       const eraName = era && this.has(era.name) ? era.name : undefined;
       const eraLoop = !!(eraName && era?.loop);
       if (a.state === 'dead') { /* handled by one-shot */ }
@@ -530,7 +530,7 @@ export class CreatureView {
     // A body eaten in bites loses the meat itself, so it must not also shrink; one swallowed
     // whole has no bites to show and still closes down as it goes in.
     if (a.state === 'dead' && a.eatBites <= 1) { const e = a.eaten; sx *= 1 - e * 0.6; sy *= 1 - e * 0.6; sz *= 1 - e * 0.6; }
-    this.group.visible = !(a.state === 'dead' && a.eaten >= 1 && (a.controller === 'player' || a.controller === 'bot' || a.swallowedBy >= 0));
+    this.group.visible = !(a.state === 'dead' && a.eaten >= 1 && (a.controller === 'player' || a.swallowedBy >= 0));
     if (a.state === 'swallowed') { const t = clamp(a.stateT / a.stateDur, 0, 1); const k = 1 - t * 0.9; sx *= k; sy *= k * (1 - t * 0.3); sz *= k; }
     // shield
     const guarding = a.state === 'guard' || a.state === 'parry' || (a.abilityActive && (def.ability === 'shellUp' || def.ability === 'anchor'));

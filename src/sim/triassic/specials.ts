@@ -86,7 +86,7 @@ export function useAbility(g: Game, a: Actor, ctx: ExpansionContext): boolean {
       if (!best) return false;
       a.stamina -= 6; a.abilityCd = def.abilityCooldown;
       const pull = norm(sub(a.pos, best.pos)); best.pos.x += pull.x * bestD * 0.7; best.pos.y += pull.y * bestD * 0.7; best.pos.z += pull.z * bestD * 0.7;
-      applyHit(ctx.hit, a, best, { ...def.light, name: 'Suction snap', damage: def.light.damage * 1.5, lunge: 0 }, 0);
+      applyHit(ctx.hit, a, best, { ...def.light, name: def.abilityName ?? def.light.name, damage: def.light.damage * 1.5, lunge: 0 }, 0);
       break;
     }
     case 'ink': {                                   // a cloud that breaks every lock inside it

@@ -10,9 +10,9 @@ import { depthLayout, depthStep, habitatBand, MIN_W, type DepthItem, type DepthL
 import { CAMBRIAN_CREATURES } from '../src/content/cambrian/creatures';
 import { DEVONIAN_CREATURES } from '../src/content/devonian/creatures';
 import { TRIASSIC_CREATURES } from '../src/content/triassic/creatures';
+import { checker, finish } from './lib/test';
 
-let failed = 0;
-const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(66)} ${d}`); if (!ok) failed++; };
+const check = checker(66);
 const overlap = (a: DepthLayout['spots'][number], b: DepthLayout['spots'][number]) =>
   a.x < b.x + b.w - 0.5 && b.x < a.x + a.w - 0.5 && a.y < b.y + b.h - 0.5 && b.y < a.y + a.h - 0.5;
 const key = (s: DepthSlot) => `${s.kind}:${s.id}`;
@@ -92,6 +92,4 @@ check('a ground animal lives on the floor', habitatBand({ ground: true }) === 'f
 check('a medusa lives at the surface', habitatBand({ ground: false, swimStyle: 'pulse' }) === 'surface');
 check('a drifter lives at the surface', habitatBand({ ground: false, drift: true }) === 'surface');
 check('a swimmer lives in open water', habitatBand({ ground: false }) === 'water');
-
-console.log(failed ? `${failed} failure(s)` : 'PASS: the Size view draws every animal at its size where it lives, and the stick reaches all of it');
-process.exit(failed ? 1 : 0);
+finish('PASS: the Size view draws every animal at its size where it lives, and the stick reaches all of it');

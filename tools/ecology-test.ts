@@ -16,13 +16,13 @@ import { creature, type CreatureId } from '../src/sim/creatures';
 import { DAY_LENGTH, dayFraction, daylight, huntInterval, huntingPressure, phaseAt, placeAppetite, untilNextPhase } from '../src/sim/daynight';
 import { dangerAt } from '../src/sim/world';
 import { distXZ, makeRng } from '../src/shared/math';
+import { checker, finish, stepN } from './lib/test';
 
 /** Ordinary open water: what an hour means where nobody says where. */
 const SHELF = 0.4;
 
-let failed = 0;
-const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(60)} ${d}`); if (!ok) failed++; };
-const run = (g: Game, steps: number, f: InputFrame = emptyInput()) => { const m = new Map([[0, f]]); for (let i = 0; i < steps; i++) { g.step(1 / 60, m); g.events.length = 0; } };
+const check = checker(60);
+const run = (g: Game, steps: number, f: InputFrame = emptyInput()) => stepN(g, steps, f);
 
 // --- the shape of the day ---
 {
@@ -107,7 +107,7 @@ function withNeighbour(opts: Parameters<typeof makeBrain>[3], gap: number, seed 
   const onPlayer = () => n.brain!.goal === 'fight' && n.brain!.target === p.id;
   check('a placid animal lets you stand next to it', !onPlayer(), `goal=${n.brain!.goal} target=${n.brain!.target === p.id ? 'player' : 'other'}`);
   // exactly what a landed hit leaves behind: who did it, and how long ago
-  n.lastHitBy = p.id; n.hitFlash = 1; n.sinceHit = 0; n.courage = 1;
+  n.lastHitBy = p.id; n.hitFlash = 1; n.sinceHit = 0; n.brain!.courage = 1;
   run(g, 60);
   check('...but hits back when you hit it', onPlayer() || n.brain!.goal === 'flee', `goal=${n.brain!.goal}`);
 }
@@ -279,6 +279,4 @@ function withNeighbour(opts: Parameters<typeof makeBrain>[3], gap: number, seed 
   for (let i = 0; i < 500; i++) big = Math.max(big, bandScale(rng, 'large'));
   check('a full-grown animal is a full-grown animal', big > 2, `up to ${big.toFixed(1)} scale`);
 }
-
-console.log(failed ? `\n${failed} FAILED` : '\nall ecology tests passed');
-process.exit(failed ? 1 : 0);
+finish('all ecology tests passed');

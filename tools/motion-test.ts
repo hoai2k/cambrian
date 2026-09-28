@@ -6,10 +6,10 @@
 import { Game } from '../src/sim/game';
 import { emptyInput, type Actor, type InputFrame } from '../src/sim/types';
 import { isAlive, lengthOf } from '../src/sim/actors';
+import { checker, finish, stepN } from './lib/test';
 
-let failed = 0;
-const check = (n: string, ok: boolean, d: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(56)} ${d}`); if (!ok) failed++; };
-const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, f]]); for (let i = 0; i < steps; i++) { g.step(1 / 60, m); g.events.length = 0; } };
+const check = checker(56);
+const run = (g: Game, f: InputFrame, steps: number) => stepN(g, steps, f);
 /** The renderer snaps rather than interpolating when a step moved a body further than this. */
 const snapThreshold = (a: Actor) => Math.max(2, lengthOf(a) * 3);
 
@@ -75,6 +75,4 @@ const snapThreshold = (a: Actor) => Math.max(2, lengthOf(a) * 3);
   const jump = Math.hypot(a.pos.x - a.prevT.x, a.pos.y - a.prevT.y, a.pos.z - a.prevT.z);
   check('a teleport reads as a jump, not as motion', ok && jump > snapThreshold(a), `moved ${jump.toFixed(0)} units, threshold ${snapThreshold(a).toFixed(1)}`);
 }
-
-console.log(failed ? `\n${failed} FAILED` : '\nall motion tests passed');
-process.exit(failed ? 1 : 0);
+finish('all motion tests passed');

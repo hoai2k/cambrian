@@ -6,9 +6,9 @@
  * index, and getting this wrong is silent: the cursor lands on one tile while another lights up.
  */
 import { gridColumns, gridStep, rosterGrid, sameSlot, type ExtraId, type Slot } from '../src/app/roster-grid';
+import { checker, finish } from './lib/test';
 
-let failed = 0;
-const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(64)} ${d}`); if (!ok) failed++; };
+const check = checker(64);
 const ids = (n: number) => Array.from({ length: n }, (_, i) => `c${i}`);
 const creature = (id: string): Slot => ({ kind: 'creature', id });
 const extra = (id: ExtraId): Slot => ({ kind: 'extra', id });
@@ -111,6 +111,4 @@ const show = (s: Slot) => `${s.kind}:${s.id}`;
   const r = rosterGrid(ids(9));
   check('down into a ragged last row clamps to a real tile', sameSlot(gridStep(r, creature('c7'), 0, 1), creature('c8')), show(gridStep(r, creature('c7'), 0, 1)));
 }
-
-console.log(failed ? `FAILED (${failed})` : 'all passed');
-process.exit(failed ? 1 : 0);
+finish('all passed');

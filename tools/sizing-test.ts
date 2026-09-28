@@ -15,9 +15,9 @@ import { ACTIVE_ERA } from '../src/content';
 import { TIER_SCALE } from '../src/sim/types';
 import { LARVA_LENGTH, larvaLength, tierScale, tierForScale } from '../src/sim/tiers';
 import sizes from '../src/content/cambrian/natural-sizes.json';
+import { checker, finish } from './lib/test';
 
-let failed = 0;
-const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(64)} ${d}`); if (!ok) failed++; };
+const check = checker(64);
 const ids = CREATURES.map((c) => c.id);
 const near = (a: number, b: number, eps = 1e-6) => Math.abs(a - b) < eps;
 
@@ -100,6 +100,4 @@ check('...and the authored ladder with them',
   ids.every((id) => TIER_SCALE.every((v, t) => near(tierScale(id, t), v))), `${TIER_SCALE.join(', ')}`);
 setEquivalentSizing(false);
 check('and off again is the natural roster', !equivalentSizing() && creature('marrella').adultLength === table.marrella.adultLength);
-
-console.log(failed ? `\n${failed} FAILED` : '\nall creature-sizing checks passed');
-process.exit(failed ? 1 : 0);
+finish('all creature-sizing checks passed');

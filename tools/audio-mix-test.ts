@@ -18,7 +18,7 @@ import { lengthOf } from '../src/sim/actors';
 import { Game } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
 
-/** Mirrors `magnificationDistance` in src/render/engine.ts — how far back the camera sits. */
+/** Mirrors `magnificationDistance` in src/render/camera.ts — how far back the camera sits. */
 const camDistance = (L: number) => L * 1.45 + 1.15 + Math.max(0, 0.8 - L) * 0.9;
 
 const SECONDS = Number(process.argv[2] ?? 90);

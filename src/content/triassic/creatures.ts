@@ -247,7 +247,7 @@ export const TRIASSIC_CREATURES: readonly CreatureDef[] = [
     canGuard: false,
   },
   {
-    id: 'henodus', name: 'Henodus', species: 'H. chelyops',
+    id: 'henodus', heatTolerant: true, name: 'Henodus', species: 'H. chelyops',
     kind: 'Placodont', kindNote: 'A placodont turned square: a shell of hundreds of small plates wider than it is long, a fringed lip in place of teeth, and a home in a salt lagoon nothing else would live in.',
     locality: 'Late Triassic · Gipskeuper, Tübingen',
     tagline: 'Nothing can eat it and it can eat nothing. It is doing fine.',

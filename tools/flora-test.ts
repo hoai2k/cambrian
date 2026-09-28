@@ -13,9 +13,9 @@ import { bodyRadius, lengthOf } from '../src/sim/actors';
 import { FLORA_PHYS } from '../src/sim/flora';
 import { sampleHeight, type Flora, type FloraKind } from '../src/sim/world';
 import type { Actor } from '../src/sim/types';
+import { checker, finish } from './lib/test';
 
-let failed = 0;
-const check = (n: string, ok: boolean, d: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(52)} ${d}`); if (!ok) failed++; };
+const check = checker(52);
 const S = process.argv[2] === 'verbose';
 
 /** The flattest 20-unit stretch on the shelf near the origin nursery: the swimmer is held at plant height, so the seabed must not get in the way. */
@@ -41,7 +41,7 @@ function scene(kind: FloraKind, scale: number, creatureId: 'anomalocaris' | 'wap
   const plant: Flora = { pos: { x: x0, y, z: z0 }, kind, scale, sy: scale, rot: 0.3, shade: 0.8, H: P.h * scale, R: P.r * scale, maxB: P.maxLean * P.h * scale, bx: 0, bz: 0, bvx: 0, bvz: 0, active: false };
   g.world.frozen = true;                       // hand-built scenery must not be streamed away
   g.world.flora.length = 0; g.world.flora.push(plant);
-  g.world.floraHash.rebuild(g.world.flora);
+  g.world.reindexFlora();
   g.world.floraReach = plant.R + plant.maxB;
   g.world.boulders.length = 0; g.world.boulderHash.rebuild([]);
   g.world.activeFlora.length = 0;
@@ -198,5 +198,4 @@ for (const kind of ['stromatolite', 'saltCrust', 'mudRipple'] as const) {
   // writing a full world's step is about 5.5 ms on the slower of those two.
   check('step stays cheap', ms < 8, `${ms.toFixed(2)} ms/step`);
 }
-console.log(failed ? `${failed} FAILED` : 'all passed');
-process.exit(failed ? 1 : 0);
+finish('all passed');

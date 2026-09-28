@@ -16,6 +16,8 @@ export const TRIASSIC_STRINGS: StringOverrides = {
     ],
   },
   sim: {
+    // The win line: these seas are not a reef.
+    match: { rulesTheReef: (name) => `${name} grew up and held the sea.` },
     ladder: { rungs: ['', 'Floor', 'Shelf', 'Hunters', 'Giants'] },
     hints: {
       opening: [

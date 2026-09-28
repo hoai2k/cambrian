@@ -8,9 +8,9 @@ import { emptyInput, type InputFrame } from '../src/sim/types';
 import { isAlive, lengthOf } from '../src/sim/actors';
 import { ladderMark, ladderScale, LADDER_TOP, rungOf } from '../src/sim/ladder';
 import { PLAYABLE_IDS } from '../src/sim/creatures';
+import { checker, finish } from './lib/test';
 
-let failed = 0;
-const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(56)} ${d}`); if (!ok) failed++; };
+const check = checker(56);
 const run = (g: Game, n: number, f: InputFrame = emptyInput()) => { const m = new Map([[0, f]]); for (let i = 0; i < n; i++) { g.step(1 / 60, m); g.events.length = 0; } };
 const fresh = () => { const g = new Game('rise', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 7); g.skipHatch(); const p = g.players[0]; p.spawnProtect = 0; p.teleportCd = 0; run(g, 30); p.teleportCd = 0; return { g, p }; };
 
@@ -101,5 +101,4 @@ const fresh = () => { const g = new Game('rise', [{ creature: 'anomalocaris', de
   check('P2 can change too, into what P1 just left', g.changeCreature(1, 'anomalocaris', false));
   check("...as a hatchling: P1's progress in that body is not P2's", rungOf(ladderMark(g, other)) === 0, `rung=${rungOf(ladderMark(g, other))}`);
 }
-
-console.log(failed ? `\n${failed} FAILED` : '\nall creature-swap tests passed'); process.exit(failed ? 1 : 0);
+finish('all creature-swap tests passed');

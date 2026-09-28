@@ -4,6 +4,7 @@ import { tierScale } from './tiers';
 import { TIER_NAMES, TIER_NEED, type Actor } from './types';
 import type { Game } from './game';
 
+export { APEX_HOLD_SECONDS, apexLeft } from './apex';
 /**
  * The growth ladder, as one thing both eras can be asked about.
  *
@@ -41,16 +42,14 @@ export const clampMark = (v: number) => (Number.isFinite(v) ? Math.max(0, Math.m
 export const rungOf = (v: number) => Math.floor(clampMark(v));
 /** How far through that rung it is, 0..1. The top rung is never partial: there is nothing above it. */
 export const fillOf = (v: number) => { const m = clampMark(v); return m >= LADDER_TOP ? 0 : m - Math.floor(m); };
-/** Kept for callers that only want the rung; marks and rungs are the same number to them. */
-export const clampRung = rungOf;
 
 /** The five rung names, in this era's language. */
-export const ladderNames = (): readonly string[] => RULES?.ladderNames ?? TIER_NAMES;
+export const ladderNames = (): readonly string[] => RULES.ladderNames;
 /** The name of one rung; out-of-range marks clamp, so a stored record can never crash a screen. */
 export const ladderName = (mark: number) => ladderNames()[rungOf(mark)];
 
 /** How far up the ladder this body is right now, as a whole rung. */
-export const ladderRung = (g: Game, a: Actor): number => (RULES ? RULES.ladderRung(g, a) : a.tier);
+export const ladderRung = (g: Game, a: Actor): number => RULES.ladderRung(g, a);
 
 /**
  * The body scale a creature has on the rung this mark stands on. Both eras derive everything else
@@ -61,7 +60,7 @@ export const ladderRung = (g: Game, a: Actor): number => (RULES ? RULES.ladderRu
  */
 export const ladderScale = (id: CreatureId, mark: number): number => {
   const r = rungOf(mark);
-  return RULES ? RULES.ladderScale(id, r) : tierScale(id, r);
+  return RULES.ladderScale(id, r);
 };
 
 /**
@@ -72,8 +71,7 @@ export const ladderScale = (id: CreatureId, mark: number): number => {
  */
 export const ladderFill = (g: Game, a: Actor, fraction: number) => {
   const f = Math.max(0, Math.min(1, Number.isFinite(fraction) ? fraction : 0));
-  if (RULES) { RULES.ladderFill(g, a, f); return; }
-  a.nutrition = (TIER_NEED[a.tier] ?? 0) * f;
+  RULES.ladderFill(g, a, f);
 };
 
 /**
@@ -84,7 +82,7 @@ export const ladderFill = (g: Game, a: Actor, fraction: number) => {
  */
 export const ladderMark = (g: Game, a: Actor): number => {
   const rung = ladderRung(g, a);
-  const fill = RULES ? RULES.ladderFillOf(g, a) : (a.nutrition / Math.max(1e-6, TIER_NEED[a.tier] ?? 1));
+  const fill = RULES.ladderFillOf(g, a);
   return clampMark(rung + Math.max(0, Math.min(0.999, fill)));
 };
 
@@ -113,7 +111,7 @@ export const deathMark = (mark: number) => clampMark(mark - DEATH_COST);
 export const placeOnLadder = (g: Game, a: Actor, mark: number) => {
   const m = clampMark(mark);
   a.scale = ladderScale(a.creature, m);
-  if (RULES?.onSwap) RULES.onSwap(g, a); else if (!RULES) a.tier = rungOf(m) as Actor['tier'];
+  RULES.onSwap(g, a);
   ladderFill(g, a, fillOf(m));
 };
 

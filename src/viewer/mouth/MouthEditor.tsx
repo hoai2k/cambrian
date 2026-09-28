@@ -3,6 +3,7 @@ import type { ViewerSpecimen } from '../catalogue';
 import { rootFramePositions, type MouthHandle, type ViewerScene } from '../scene';
 import { useMeasuredHash } from '../file-hash';
 import { History } from '../sculpt/history';
+import { UndoRedo, downloadJson, useEditorHistory, useUndoKeys } from '../editor-kit';
 import { NumberField } from '../stretch/StretchEditor';
 import {
   DEFAULT_GAPE, MAX_ANGLE, MAX_GAPE, aimForward, aimHinge, countSides, cutBasis, describeSides, exportDoc, flipForward,
@@ -79,10 +80,8 @@ export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas,
   const [error, setError] = useState('');
   const [note, setNote] = useState('');
   const [hover, setHover] = useState<MouthHandle | null>(null);
-  const [historyTick, setHistoryTick] = useState(0);
   const [gape, setGapeState] = useState(0);
   const [previewing, setPreviewingState] = useState(false);
-  const historyRef = useRef<History<MouthDoc> | null>(null);
   const chunksRef = useRef<Float32Array[]>([]);
   const dragRef = useRef<Drag | null>(null);
   // The gape and the hold are read from inside `show`, which every commit goes through, so they
@@ -150,14 +149,8 @@ export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas,
   }, [key, show]);
   useEffect(() => { const h = historyRef.current; if (h) setMouth(key, h.present, note); }, [note, key]);
 
-  const step = useCallback((next: MouthDoc) => { historyRef.current?.push(next); commitDoc(next); setHistoryTick((t) => t + 1); }, [commitDoc]);
+  const { historyRef, step, endGesture: endDrag, undo, redo } = useEditorHistory<MouthDoc>((d) => commitDoc(d));
   const drag = useCallback((next: MouthDoc) => { historyRef.current?.replace(next); commitDoc(next); }, [commitDoc]);
-  const endDrag = useCallback(() => {
-    const h = historyRef.current;
-    if (h?.inGesture) { h.commit(); commitDoc(h.present); setHistoryTick((t) => t + 1); }
-  }, [commitDoc]);
-  const undo = useCallback(() => { const h = historyRef.current; if (!h?.canUndo) return; commitDoc(h.undo()); setHistoryTick((t) => t + 1); }, [commitDoc]);
-  const redo = useCallback(() => { const h = historyRef.current; if (!h?.canRedo) return; commitDoc(h.redo()); setHistoryTick((t) => t + 1); }, [commitDoc]);
 
   // ---- the gape, and the hold that clears the screen for it ----
   /**
@@ -275,17 +268,7 @@ export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas,
   }, [canvas, scene, error, drag, endDrag]);
 
   // ---- keyboard ----
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      const el = e.target as HTMLElement | null;
-      if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT')) return;
-      const mod = e.metaKey || e.ctrlKey;
-      if (mod && (e.key === 'z' || e.key === 'Z')) { e.preventDefault(); if (e.shiftKey) redo(); else undo(); return; }
-      if (mod && (e.key === 'y' || e.key === 'Y')) { e.preventDefault(); redo(); }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [undo, redo]);
+  useUndoKeys(undo, redo);
 
   // ---- export ----
   function exportMouth() {
@@ -297,14 +280,10 @@ export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas,
       appliesTo, note, authoredAt: new Date().toISOString(),
       sides: countSides(chunksRef.current, d),
     });
-    const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }));
-    const a = document.createElement('a');
-    a.href = url; a.download = `${specimen.id}-mouth.json`; a.click();
-    URL.revokeObjectURL(url);
+    downloadJson(`${specimen.id}-mouth.json`, payload);
   }
 
   const h = historyRef.current;
-  void historyTick;
   const sides = doc ? countSides(chunksRef.current, doc) : { mandible: 0, skull: 0, total: 0 };
   const gapeDeg = deg(gape);
   const squared = !!doc && !doc.pitch && !doc.yaw && !doc.roll;
@@ -362,8 +341,7 @@ export function MouthEditor({ scene, specimen, model, sha256, appliesTo, canvas,
         </section>
 
         <div className="sculpt-actions">
-          <button className="ghost" onClick={undo} disabled={!h?.canUndo} title="⌘/Ctrl+Z">Undo</button>
-          <button className="ghost" onClick={redo} disabled={!h?.canRedo} title="⇧⌘/Ctrl+Z · Ctrl+Y">Redo</button>
+          <UndoRedo history={h} undo={undo} redo={redo} />
           <button className="ghost" onClick={() => doc && step(levelCut(doc))} disabled={squared} title="Level in profile, straight across, flat">Square</button>
         </div>
 

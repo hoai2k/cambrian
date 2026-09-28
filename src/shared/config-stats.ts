@@ -25,7 +25,7 @@
  * keeping four separate counters, which is what lets /stats/ show the trilogy whole and then break
  * it down.
  */
-export const GOATCOUNTER_SITE = 'hoai';
+export const GOATCOUNTER_SITE: string = 'hoai';
 
 /**
  * Is a code shaped like one GoatCounter would have issued?

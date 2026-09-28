@@ -35,7 +35,7 @@ export const CAMBRIAN_CREATURES: readonly CreatureDef[] = [
   },
   {
     // No kind, for the same reason: Opabinia is the famous one, "opabiniid" explains nothing.
-    id: 'opabinia', name: 'Opabinia', species: 'O. regalis',
+    id: 'opabinia', allRoundEyes: true, name: 'Opabinia', species: 'O. regalis',
     grasp: true,
     tagline: 'Five eyes, one hose-nozzle claw, zero blind spots.',
     role: 'Reach specialist', ground: false, adultLength: 3.0,
@@ -51,7 +51,7 @@ export const CAMBRIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'waptia', name: 'Waptia', species: 'W. fieldensis',
+    id: 'waptia', darter: true, snatches: true, name: 'Waptia', species: 'W. fieldensis',
     kind: 'Bivalved arthropod', kindNote: 'A hymenocarine: one of the shrimp-shaped Cambrian arthropods that folded a two-valved carapace over the body, and the branch that leads on to the mandibulates — crustaceans and insects.',
     tagline: 'Blink and it’s behind you. Blink again and it’s gone.',
     role: 'Skirmisher', tailFlip: true, ground: false, adultLength: 2.7,
@@ -100,7 +100,7 @@ export const CAMBRIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'wiwaxia', name: 'Wiwaxia', species: 'W. corrugata',
+    id: 'wiwaxia', spinedBack: true, name: 'Wiwaxia', species: 'W. corrugata',
     kind: 'Early mollusc', kindNote: 'A halwaxiid, read by most as an early mollusc — its rows of teeth grow and work like a mollusc’s radula — though some place the group nearer the annelid worms.',
     tagline: 'A walking wall of blades. Good luck.',
     role: 'Tank', cling: true, ground: true, adultLength: 2.6, diet: 'grazer', grazeStill: true,
@@ -132,7 +132,7 @@ export const CAMBRIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'olenoides', name: 'Olenoides', fierce: true, species: 'O. serratus',
+    id: 'olenoides', guardCost: 0.6, name: 'Olenoides', fierce: true, species: 'O. serratus',
     kind: 'Trilobite', kindNote: 'The three-lobed armoured arthropods that crawled the sea floor for 270 million years and are the classic fossil of the Palaeozoic.',
     tagline: 'Armor, momentum, and a very bad attitude.',
     role: 'Bruiser', weedWalk: true, ground: true, adultLength: 3.0,

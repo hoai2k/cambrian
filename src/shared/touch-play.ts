@@ -204,7 +204,7 @@ export const SENSITIVITY = 0.0068;
  * because the arm is clamped to a narrow band (0.55..2.2) and a raw pinch crosses the whole of it
  * in one gesture.
  */
-export const PINCH = 0.55;
+const PINCH = 0.55;
 /**
  * Pixels the two fingers of a pinch must be apart before their separation is believed.
  *

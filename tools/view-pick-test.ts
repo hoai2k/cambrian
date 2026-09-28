@@ -3,9 +3,9 @@
  * sitting on a threshold is drawn and dropped on alternate frames. Run: npm run views
  */
 import { drawable, drawDistance, FOG_GONE, SIZE_FLOOR, viewRank } from '../src/render/view-pick';
+import { checker, finish } from './lib/test';
 
-let failed = 0;
-const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(64)} ${d}`); if (!ok) failed++; };
+const check = checker(64);
 const NEAR = 30;
 
 // The fog as the sea sets it for a big animal (density 0.0125 × 0.62) and for a hatchling (× 1.15).
@@ -42,6 +42,4 @@ check('...nor a giant wobbling on the edge of the fog', wobble(seeBig, (d) => 17
 check('a body already drawn outranks a new one its own size', viewRank(0.05, 60, NEAR, true) > viewRank(0.05, 60, NEAR, false));
 check('...but a clearly bigger newcomer still takes its place', viewRank(0.1, 60, NEAR, false) > viewRank(0.05, 60, NEAR, true));
 check('what is in front of you is always drawn', drawable(5, 0.001, seeBig, NEAR, false, false));
-
-console.log(failed ? `\n${failed} FAILED` : '\nall view tests passed');
-process.exit(failed ? 1 : 0);
+finish('all view tests passed');

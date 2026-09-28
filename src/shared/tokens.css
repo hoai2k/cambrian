@@ -1,0 +1,22 @@
+/*
+ * The palette the game, the specimen viewer and the workbench share, stated once. Each page's own
+ * stylesheet imports this first and adds what is its own (the game's `--player` and `--radius`, the
+ * standalone pages' `--panel` and `--line`).
+ *
+ * `--foam-rgb` and `--ink-rgb` are the two colours as bare channels, so a translucent wash of either
+ * is written `rgb(var(--foam-rgb) / .2)` rather than restating the numbers every time.
+ */
+:root {
+  --ink: #06161c;
+  --ink-rgb: 6 22 28;
+  --foam: #eefaf6;
+  --foam-rgb: 238 250 246;
+  --mist: rgb(var(--foam-rgb) / 0.72);
+  --dim: rgb(var(--foam-rgb) / 0.5);
+  --coral: #ff5b6e;
+  --ember: #ffb36b;
+  --lagoon: #61f2d5;
+  --font-display: 'Unbounded', 'Arial Black', 'Segoe UI', sans-serif;
+  --font-body: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+  color-scheme: dark;
+}

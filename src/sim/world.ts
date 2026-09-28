@@ -3,7 +3,7 @@ import { clamp, fbm2, makeRng, noise2, smoothstep, TAU, type Vec3 } from '../sha
 import { floraSize } from './flora';
 import { footprintOf, propShape, rockPropId } from '../content/prop-shapes';
 import { fpMax, fpReach, ROUND, type Footprint, type Reach } from './footprint';
-import { SpatialHash } from './spatial';
+import { ReachHash, SpatialHash } from './spatial';
 
 /**
  * The sea is a half-plane. A shoreline runs along +x near where players first spawn; the seabed
@@ -703,7 +703,7 @@ function applyBiomeProps(chunk: Chunk) {
 }
 
 /**
- * The streamed world. Chunks within `SIM_RADIUS` of every anchor (players, bots) are generated
+ * The streamed world. Chunks within `SIM_RADIUS` of every anchor (the players) are generated
  * and indexed; chunks further than that plus a margin are dropped. Flat arrays and hashes are
  * rebuilt whenever the loaded set changes, so the rest of the sim never sees chunks at all.
  */
@@ -717,6 +717,11 @@ export class World {
   boulderHash = new SpatialHash<Boulder>(12);
   coverHash = new SpatialHash<Cover>(4);
   floraHash = new SpatialHash<Flora>(6);
+  /**
+   * The same plants filed by their own reach, for contact: what a body could be touching comes back
+   * in the order `floraHash` would give it, without searching out to the tallest plant's reach.
+   */
+  floraContact = new ReachHash<Flora>(4);
   /** Plants currently bent away from rest; the sim springs them back and the renderer leans them. */
   activeFlora: Flora[] = [];
   /** Largest radius-plus-lean of any plant: the broad-phase query margin. */
@@ -787,12 +792,18 @@ export class World {
     }
     this.boulderHash.rebuild(this.boulders);
     this.coverHash.rebuild(this.cover);
-    this.floraHash.rebuild(this.flora);
+    this.reindexFlora();
     this.activeFlora = this.activeFlora.filter((f) => this.flora.includes(f));
+    this.version++;
+  }
+
+  /** Re-index the plants after `flora` changed: both indexes and the broad-phase margin. */
+  reindexFlora() {
+    this.floraHash.rebuild(this.flora);
+    this.floraContact.rebuild(this.flora, (f) => f.R + f.maxB, this.floraHash.ranks(this.flora));
     let reach = 0;
     for (const f of this.flora) reach = Math.max(reach, f.R + f.maxB);
     this.floraReach = reach;
-    this.version++;
   }
 }
 /** Older name for the world, kept so call sites read the same. */
@@ -841,7 +852,6 @@ export const rockRadius = (variant: Boulder['variant'], sx: number, sz: number) 
 /** The top of a rock of this shape above the point it is placed at. */
 export const rockRise = (variant: Boulder['variant'], sy: number) => ROCK_SHAPE[variant ?? 'boulder'].top * sy;
 
-export function boulderFootprint(b: Boulder): Footprint { return rockShape(b).fp; }
 const scratchReach: Reach = { d: 0, reach: 0, nx: 0, nz: 1 };
 const staticReach: Reach = { d: 0, reach: 0, nx: 0, nz: 1 };
 export function boulderReach(b: Boulder, x: number, z: number, out: Reach = scratchReach): Reach {

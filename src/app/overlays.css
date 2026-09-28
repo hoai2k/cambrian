@@ -1,0 +1,185 @@
+/* Overlays and dialogs, the record, the shared animations, and the pick screen fitted to a short
+   window. Imported by styles.css, in the cascade's order. */
+/* ---------- Overlays ---------- */
+.overlay { position: absolute; inset: 0; z-index: 20; display: grid; place-items: center; background: rgb(var(--ink-rgb) / .55); backdrop-filter: blur(6px); animation: fade-in .25s both; }
+.panel { width: min(92vw, 640px); padding: 28px 30px; border-radius: 22px; background: rgb(var(--ink-rgb) / .8); border: 1px solid rgb(var(--foam-rgb) / .14); box-shadow: 0 30px 90px rgba(0,0,0,.5); }
+.panel.pause-panel { max-height: 92vh; overflow-y: auto; }
+/* A column with a scrolling middle: the heading and the choices are pinned, only the cards and the
+   record scroll. The buttons were the last thing inside one tall scroller and fell off the bottom
+   of a short window, which is the worst place to hide the only way out of the screen. */
+.panel.results { width: min(94vw, 820px); max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; }
+.results-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-right: 4px; }
+.menu-buttons { flex: none; display: grid; gap: 8px; margin-top: 18px; }
+.menu-choices { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+/* The highlight, for a menu that is steered rather than button-mapped. Deliberately loud: on the
+   results screen it is the only thing saying which choice a press will take. */
+.menu-choices .selected { outline: 2px solid var(--ember); outline-offset: 3px; }
+.menu-choices button.ghost.selected { border-color: var(--ember); color: var(--foam); background: rgba(255,179,107,.16); }
+.result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 18px; }
+.result-card { display: grid; gap: 4px; padding: 14px; border-radius: 14px; background: rgb(var(--foam-rgb) / .05); border-top: 3px solid var(--player); }
+.result-card b { font: 700 16px var(--font-display); }
+.result-card small { color: var(--dim); }
+
+/* ---------- The record: biomes, landmarks and species taken to Apex ---------- */
+/* The record can be long; it scrolls inside the panel so AGAIN and Title never leave the screen. */
+.discoveries { margin-top: 20px; padding-top: 16px; border-top: 1px solid rgb(var(--foam-rgb) / .12); display: grid; gap: 12px; align-content: start; }
+.discovery-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.discovery-head .eyebrow { margin: 0; }
+.discovery-head span { color: var(--dim); font-size: 13px; }
+.discoveries ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+/* On a result card the mark sits in the corner the same way it does in the record strips. */
+.result-card { position: relative; }
+.result-card .best-tag { position: absolute; top: 6px; right: 6px; padding: 1px 5px; border-radius: 6px; background: var(--ember, #ffb36b); color: #06161c; font: 800 9px/1.4 var(--font-display); letter-spacing: .08em; }
+.discoveries .new-tag { position: absolute; top: 4px; right: 4px; padding: 1px 5px; border-radius: 6px; background: var(--ember, #ffb36b); color: #06161c; font: 800 9px/1.4 var(--font-display); letter-spacing: .08em; }
+
+.biome-strip { grid-template-columns: repeat(auto-fit, minmax(108px, 1fr)); }
+.biome-card { position: relative; aspect-ratio: 16 / 10; border-radius: 10px; overflow: hidden; background: rgb(var(--foam-rgb) / .05); border: 1px solid rgb(var(--foam-rgb) / .1); display: grid; align-items: end; }
+.biome-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.biome-card b { position: relative; padding: 4px 6px; font: 700 10px/1.2 var(--font-display); text-shadow: 0 1px 4px rgba(0,0,0,.9); background: linear-gradient(transparent, rgb(var(--ink-rgb) / .85)); }
+.biome-card.unfound { border-style: dashed; }
+.biome-card.unfound b { color: var(--dim); background: none; }
+.biome-card.fresh, .landmark-card.fresh, .apex-card.fresh { border-color: var(--ember, #ffb36b); box-shadow: 0 0 0 1px var(--ember, #ffb36b); }
+
+.landmark-strip { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.landmark-card { position: relative; display: grid; gap: 2px; padding: 10px 12px; border-radius: 10px; background: rgb(var(--foam-rgb) / .05); border: 1px solid rgb(var(--foam-rgb) / .1); }
+.landmark-card b { font: 700 13px var(--font-display); }
+.landmark-card small { color: var(--dim); font-size: 11px; }
+.landmark-card.unfound { border-style: dashed; }
+.landmark-card.unfound b { color: var(--dim); }
+
+.apex-strip { grid-template-columns: repeat(auto-fit, minmax(74px, 1fr)); }
+.apex-card { position: relative; display: grid; justify-items: center; gap: 2px; padding: 4px; border-radius: 10px; border: 1px solid transparent; }
+.apex-card img { width: 100%; max-width: 54px; aspect-ratio: 4 / 3; object-fit: contain; }
+.apex-card span { font-size: 9px; color: var(--dim); text-align: center; line-height: 1.2; max-width: 100%; overflow-wrap: anywhere; }
+.apex-card.unfound img { filter: grayscale(1) brightness(.32) contrast(.6); opacity: .5; }
+.apex-card.found { background: rgb(var(--foam-rgb) / .06); }
+.apex-card.found span { color: var(--foam); }
+/* The mark that says this animal is now playable in the other two games. Opposite corner to NEW,
+   since a card that has just been earned carries both, and no bigger than it has to be on a tile
+   this size. Matches the glyph on the Visitors button in the pick grid. */
+.discoveries .visitor-tag { position: absolute; top: 3px; left: 3px; display: grid; place-items: center; width: 14px; height: 14px; border-radius: 50%; background: rgb(var(--ink-rgb) / .82); font: 700 9px/1 var(--font-display); color: #ffd27a; }
+.apex-note { margin: 6px 2px 0; font-size: 10px; line-height: 1.5; color: var(--dim); }
+.apex-note b { color: var(--foam); font-weight: 700; }
+
+/* ---------- Dialogs ---------- */
+.tools-dialog { position: fixed; inset: 0; margin: auto; width: min(94vw, 900px); max-height: 92vh; padding: 0; border: 1px solid rgb(var(--foam-rgb) / .16); border-radius: 24px; background: rgb(var(--ink-rgb) / .92); color: var(--foam); box-shadow: 0 40px 100px rgba(0,0,0,.6); overflow: auto; }
+.tools-dialog::backdrop { background: rgba(3, 12, 16, .6); backdrop-filter: blur(6px); }
+.tools-close { position: sticky; float: right; top: 14px; margin: 14px 14px 0 0; z-index: 2; }
+.dialog-body { padding: 26px 30px 30px; }
+.dialog-body p { color: var(--mist); }
+.feedback-dialog { width: min(94vw, 560px); }
+.feedback-dialog h2 { margin: .2em 0 .4em; }
+.feedback-field { display: grid; gap: 6px; margin: 18px 0; }
+.feedback-field > span { font: 700 12px var(--font-display); letter-spacing: .14em; color: var(--mist); }
+.feedback-field input, .feedback-field textarea { width: 100%; padding: 11px 13px; border-radius: 12px; border: 1px solid rgb(var(--foam-rgb) / .2); background: rgb(var(--ink-rgb) / .55); color: var(--foam); font: inherit; }
+.feedback-field textarea { resize: vertical; min-height: 7em; line-height: 1.5; }
+.feedback-field input:focus, .feedback-field textarea:focus { border-color: var(--ember); }
+.feedback-field input:disabled, .feedback-field textarea:disabled { opacity: .6; }
+.feedback-field small { font-size: 12px; }
+/* Off-screen rather than display:none: some bots skip what is not rendered, and this one is meant
+   to be found and filled. aria-hidden and tabIndex -1 on the element keep every visitor out of it. */
+.feedback-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.feedback-error { color: var(--coral); }
+.feedback-actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 22px; }
+.feedback-actions .start-button { padding: 12px 26px; }
+.band { font-weight: 800; padding: 0 .35em; border-radius: 6px; color: var(--ink); }
+.band.snack { background: #7ef0a8; } .band.prey { background: #5fd9d1; } .band.rival { background: #ffc45c; } .band.threat { background: #ff8a3d; } .band.giant { background: #ff4b5c; }
+.xbox-diagram { width: 100%; max-height: 40vh; margin: 12px 0; }
+.pad-label { fill: var(--foam); font: 600 15px var(--font-body); }
+.pad-line { stroke: rgb(var(--foam-rgb) / .35); stroke-width: 1.5; }
+.kbm-diagram .key-cap { fill: var(--foam); font: 700 15px var(--font-body); }
+.kbm-diagram .key-name { fill: var(--ember); font-weight: 700; }
+.kbm-diagram .dim-label { fill: var(--dim); font-size: 13px; }
+.help-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.help-columns p { font-size: 13.5px; }
+.settings .setting-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 1px solid rgb(var(--foam-rgb) / .08); }
+.setting-row span { display: grid; font-weight: 700; }
+.setting-row small { color: var(--dim); font-weight: 400; }
+.seg { display: flex; border-radius: 10px; overflow: hidden; border: 1px solid rgb(var(--foam-rgb) / .2); }
+.seg button { padding: 8px 14px; background: transparent; border: none; }
+.seg button[aria-pressed='true'] { background: var(--ember); color: var(--ink); font-weight: 800; }
+input[type='range'] { width: 200px; accent-color: var(--ember); }
+input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); }
+
+.notice { position: absolute; left: 50%; bottom: 76px; transform: translateX(-50%); z-index: 50; display: flex; gap: 12px; align-items: center; padding: 10px 14px; border-radius: 12px; background: rgb(var(--ink-rgb) / .85); border: 1px solid var(--ember); font-size: 13px; max-width: 90vw; }
+.notice-error { border-color: var(--coral); }
+.notice button { background: transparent; border: none; color: var(--dim); font-size: 18px; }
+
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+/*
+ * Sense off leaves this and nothing else. Bright for a moment so the player sees what just
+ * happened, then down to something that barely marks the water — but never away, because it is the
+ * only thing left saying which button brings the readouts back.
+ */
+.sense-off-mark { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; align-items: center; gap: 7px; font: 600 11px/1 var(--font-display); letter-spacing: .14em; text-transform: uppercase; color: var(--foam); text-shadow: 0 1px 3px rgba(0,0,0,.7); pointer-events: none; animation: sense-off-settle 2.6s ease-out both; }
+.sense-off-mark .btn { min-width: 1.5em; padding: .25em .4em; border-radius: .5em; border: 1px solid currentColor; font-size: .95em; letter-spacing: .06em; text-shadow: none; }
+@keyframes sense-off-settle { 0%, 25% { opacity: .85; } 100% { opacity: .26; } }
+@media (prefers-reduced-motion: reduce) { .sense-off-mark { animation: none; opacity: .3; } }
+
+/* Shown over a portrait only once it has kept us waiting (`useSlow`): a warm cache never sees it. */
+.portrait-wait { position: absolute; inset: 0; margin: auto; width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgb(var(--foam-rgb) / .18); border-top-color: var(--foam); animation: portrait-spin .9s linear infinite, fade-in .2s ease both; pointer-events: none; }
+@keyframes portrait-spin { to { transform: rotate(1turn); } }
+@keyframes rise-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+/*
+ * The same rise, for a panel that is **centred by a transform of its own**.
+ *
+ * `rise-in` ends at `transform: none`, and every one of these carries `fill-mode: both`, so when the
+ * animation finishes its final keyframe keeps overriding the element's own `translateX(-50%)` — for
+ * good. Every centred HUD panel has therefore been sitting with its *left edge* on the middle of the
+ * screen rather than straddling it, ever since it was written. On a wide window a 300-pixel hint
+ * half a screen to the right still looks vaguely central and nobody caught it; on a 390-pixel phone
+ * it runs off the edge, which is what finally showed it. Animating a property an element also sets
+ * statically means the keyframes have to carry the static part too.
+ */
+@keyframes rise-in-centred { from { opacity: 0; transform: translate(-50%, 14px); } to { opacity: 1; transform: translateX(-50%); } }
+@keyframes fade-in-centred { from { opacity: 0; } to { opacity: 1; } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes pulse-mark { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+@keyframes heartbeat { 0%, 100% { opacity: .75; } 50% { opacity: 1; } }
+
+@media (max-width: 900px) {
+  .select { padding: 12px 12px 74px; }
+  .select-header { grid-template-columns: 1fr; grid-template-areas: 'brand' 'modes' 'blurb'; }
+  .mode-picker { justify-content: flex-start; }
+  .help-columns { grid-template-columns: 1fr; }
+}
+/* A near-zero duration on an infinite animation flashes or jumps every frame. Keep reduced-motion
+   screens still instead, including the start pulse and the floating creature portrait. */
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; } }
+
+/*
+ * The creature card on a laptop screen. Its copy column was overflowing by 150-250 px and
+ * being silently clipped: at 1280 x 800 the stat pips and the whole move list (RT / B / Y /
+ * passive / weakness) were cut off the bottom of the card. Give the copy the room by taking it
+ * from the portrait, tighten the move list, drop the group sentence (the chip beside the name
+ * still says the group), and let anything still too tall scroll rather than disappear.
+ */
+@media (max-height: 1010px) {
+  .crew-1 .crew-card, .crew-card { grid-template-rows: auto minmax(90px, 28%) minmax(0, 1fr) auto; }
+  .kind-note { display: none; }
+  .kit { font-size: 11.5px; gap: 3px; }
+  .kit dd { line-height: 1.35; }
+  .stats { margin-bottom: 5px; }
+}
+@media (max-height: 820px) {
+  .crew-1 .crew-card, .crew-card { grid-template-rows: auto minmax(70px, 21%) minmax(0, 1fr) auto; }
+  .tagline { font-size: 12.5px; margin-bottom: 4px; }
+  .kit { font-size: 11px; gap: 2px; }
+  .kit dt { line-height: 16px; font-size: 10px; }
+  .provenance { margin: 2px 0 5px; }
+}
+
+@media (max-height: 640px) {
+  .select { padding-top: 10px; }
+  .select-header { gap: 4px 16px; }
+  .mode-blurb { display: none; }
+  .crew-card { gap: 5px; padding: 10px 12px 12px; }
+  .creature-copy h2 { font-size: 20px; }
+  .tagline { font-size: 12.5px; margin-bottom: 4px; }
+  .kit { font-size: 11.5px; gap: 2px; }
+  .stats { margin-bottom: 4px; }
+  .ready-button { padding: 8px; }
+  .join-card { min-height: 0; padding: 14px; gap: 6px; }
+}

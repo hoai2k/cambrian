@@ -9,15 +9,15 @@
 /** Apparent size (length over distance) under which a far body is not drawn: about eight pixels. */
 export const SIZE_FLOOR = 0.011;
 /** A body already drawn keeps its place until it is this much past a threshold (hysteresis). */
-export const SHOWN_SLACK = 0.7;
+const SHOWN_SLACK = 0.7;
 /** ...and outranks a new body of the same size by this much, so the two do not trade places. */
-export const SHOWN_RANK = 1.3;
+const SHOWN_RANK = 1.3;
 /** Fog density times distance at which exponential fog has hidden 95 % of a body: sqrt(ln 20). */
 export const FOG_GONE = Math.sqrt(Math.log(20));
 /** Past the head-count cap, this many times the cap are still drawn, at reduced detail. */
 export const OVERFLOW = 1.5;
 /** The near field is weighted up in the ranking by this much (see `nearAlways` in engine.ts). */
-export const NEAR_RANK = 3;
+const NEAR_RANK = 3;
 
 /**
  * How far a body can be drawn: where the fog has taken 95 % of it. It was a flat 130 units (90 with

@@ -11,10 +11,10 @@
 import { Game } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
 import { DAY_LENGTH } from '../src/sim/daynight';
+import { checker, finish, stepN } from './lib/test';
 
-let failed = 0;
-const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(60)} ${d}`); if (!ok) failed++; };
-const run = (g: Game, steps: number, f: InputFrame = emptyInput()) => { const m = new Map([[0, f]]); for (let i = 0; i < steps; i++) { g.step(1 / 60, m); g.events.length = 0; } };
+const check = checker(60);
+const run = (g: Game, steps: number, f: InputFrame = emptyInput()) => stepN(g, steps, f);
 const which = process.argv[2];
 if (which !== 'reef' && which !== 'giants') { console.error('usage: appetite-test <reef|giants>'); process.exit(2); }
 
@@ -82,6 +82,4 @@ if (which === 'giants') {
     `${(dusk * 100).toFixed(1)}% at dusk vs ${(noon * 100).toFixed(1)}% at noon`);
   check('...and are mostly just cruising even then', dusk < 0.35, `${(dusk * 100).toFixed(1)}%`);
 }
-
-console.log(failed ? `\n${failed} FAILED` : `\nall appetite (${which}) tests passed`);
-process.exit(failed ? 1 : 0);
+finish(`all appetite (${which}) tests passed`);

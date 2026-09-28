@@ -83,8 +83,12 @@ const SUITES = {
     slow: 3,
   },
   touch: { file: 'touch-test.ts' },
+  breakpoints: { file: 'breakpoints-test.ts' },
+  lineup: { file: 'lineup-test.ts' },
   bindings: { file: 'menu-bindings-test.ts' },
   audio: { file: 'audio-mix-test.ts' },
+  // Not a test: prints the simulation's fingerprint, to compare before and after a refactor.
+  'replay-hash': { file: 'replay-hash.ts', runs: ERAS },
   // ---- per era: the ladder, the record, and what crosses between the games ----
   progress: { file: 'progress-test.ts', runs: ERAS },
   codex: { file: 'codex-test.ts', runs: ERAS },
@@ -159,13 +163,13 @@ const GATE = ['flora', 'locomotion', 'fight', 'feast', 'pursuit', 'respawn', 'co
 /** Everything that is not a simulation suite and takes seconds, not minutes. */
 const FAST = ['codex', 'results', 'visitors', 'seats', 'roster', 'depth', 'menus', 'focus', 'fullscreen', 'cursors', 'edges',
   'swap', 'immersive', 'music', 'stats', 'debug', 'ancientseas', 'mobile:memory', 'assets', 'props', 'recolor', 'eras',
-  'palettes', 'portraits', 'conform', 'rigs', 'sculpt', 'stretch', 'bend', 'mouth', 'mark', 'playback'];
+  'palettes', 'portraits', 'conform', 'rigs', 'sculpt', 'stretch', 'bend', 'mouth', 'mark', 'playback', 'breakpoints', 'lineup'];
 const GROUPS = {
   sim: SIM,
   gate: GATE,
   fast: FAST,
   ci: [...GATE, ...FAST, 'triassic'],
-  all: Object.keys(SUITES),
+  all: Object.keys(SUITES).filter((n) => n !== 'replay-hash'),
 };
 
 // ---- arguments ----

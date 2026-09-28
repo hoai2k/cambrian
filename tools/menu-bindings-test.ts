@@ -127,7 +127,7 @@ const MOUSE: { name: string; press: Partial<Record<'click' | 'hold' | 'middle' |
 ];
 const MOUSE_FORBIDDEN: (keyof RawControls)[] = ['confirm', 'back', 'menu', 'lb', 'rb', 'view', 'teleport', 'ability', 'guard', 'rise', 'sink'];
 for (const m of MOUSE) {
-  const c = applyMouse(emptyControls(), { dx: 0, dy: 0, zoom: 0, click: false, hold: false, dragging: false, middle: false, right: false, ndc: undefined, ...m.press });
+  const c = applyMouse(emptyControls(), { dx: 0, dy: 0, zoom: 0, click: false, hold: false, pursue: false, pressing: false, dragging: false, middle: false, right: false, ndc: undefined, ...m.press });
   for (const k of m.expect) if (!c[k]) fail(`${m.name} does not drive "${String(k)}"`);
   for (const k of MOUSE_FORBIDDEN) if (c[k]) fail(`${m.name} drives the menu/gameplay control "${String(k)}"`);
   const others = MOUSE.filter((o) => o !== m).flatMap((o) => o.expect).filter((k) => !m.expect.includes(k));
@@ -155,6 +155,7 @@ const TOUCH_FORBIDDEN: (keyof RawControls)[] = ['confirm', 'back', 'menu', 'lb',
 for (const m of TOUCH) {
   const c = applyTouch(emptyControls(), {
     dx: 0, dy: 0, zoom: 0, bites: 0, heavies: 0, swim: false, secondary: undefined, dash: false,
+    pursue: false, pursuitStart: false, pursuitTargetId: undefined, marker: undefined,
     dragging: false, ndc: undefined, swapped: false, pinching: false, light: false, heavy: false, ...m.press,
   });
   for (const k of m.expect) if (!c[k]) fail(`${m.name} does not drive "${String(k)}"`);
@@ -170,6 +171,7 @@ for (const a of TOUCH) for (const b of TOUCH) {
   if (a === b || !a.press.secondary || !b.press.secondary) continue;
   const c = applyTouch(emptyControls(), {
     dx: 0, dy: 0, zoom: 0, bites: 0, heavies: 0, swim: false, secondary: a.press.secondary, dash: false,
+    pursue: false, pursuitStart: false, pursuitTargetId: undefined, marker: undefined,
     dragging: false, ndc: undefined, swapped: false, pinching: false, light: false, heavy: false,
   });
   for (const k of b.expect) if (c[k]) fail(`the pad set to ${a.press.secondary} also drives ${b.press.secondary}'s "${String(k)}"`);

@@ -2,7 +2,7 @@ import { dist, distXZ, type Vec3 } from '../../shared/math';
 import { bandOf, bodyRadius, clearanceOf, isAlive, isInvulnerable, lengthOf, speedFactor } from '../actors';
 import type { Band } from '../types';
 import { applyHit, kill, startSwallow, type HitContext } from '../combat';
-import { creature, type CreatureId } from '../creatures';
+import { creature, foodRung, type CreatureId } from '../creatures';
 import type { Game, RadarBlip } from '../game';
 import type { Actor } from '../types';
 import { sampleHeight, shoreZ, SURFACE_Y } from '../world';
@@ -95,7 +95,7 @@ export const STILL_TIME_LURKER = 3.0, STILL_TIME_RUNNER = 2.2, STILL_SPEED = 0.1
 export const PEER_MIN = 8, PEER_MAX = 14;
 /** The dash into the water: how long, how far (body lengths, per kind), and never deeper than this under the surface. */
 export const CHARGE_TIME = 0.7, CHARGE_DEPTH = 1.5;
-const CHARGE_REACH: Partial<Record<CreatureId, number>> = { macrocnemus: 3, coelophysis: 2 };
+const CHARGE_REACH: Partial<Record<CreatureId, number>> = { macrocnemus: 3, coelophysis: 2, mystriosuchus: 1.5 };
 /** Between a runner's excursions, seconds, hashed per post and per excursion. */
 export const RUNNER_REST_MIN = 20, RUNNER_REST_MAX = 40;
 /** Where a body appears for its approach and vanishes after its retreat: up the beach, below every submerged sightline. */
@@ -170,8 +170,7 @@ export function occupied(k: number, seed: number, t: number): boolean {
 /** Reach of the strike in world units. */
 function reachOf(a: Actor): number {
   const def = creature(a.creature), L = lengthOf(a);
-  if (def.id === 'tanystropheus') return L * ((def.neckReach ?? 0.5) + 0.12);
-  if (def.id === 'mystriosuchus') return L * 1.5;
+  if (def.neckReach != null) return L * (def.neckReach + 0.12);          // the boom reaches with its neck
   return L * (CHARGE_REACH[def.id] ?? 0.6);
 }
 /** How long to be still before this kind commits. */
@@ -261,7 +260,7 @@ function move(post: Post, a: Actor): boolean {
 }
 
 /**
- * The stillness detector. Every player or bot within reach — at the surface, or on the sand — has
+ * The stillness detector. Every player within reach — at the surface, or on the sand — has
  * its clock run while it is under `STILL_SPEED` of its own cruise and reset the moment it is not;
  * bodies out of reach are forgotten. Returns the one that has been still longest past the post's
  * threshold and is a band this kind goes for, or nothing.
@@ -271,7 +270,7 @@ function stillest(g: Game, post: Post, a: Actor, dt: number): Actor | undefined 
   const seen = new Set<number>();
   let best: Actor | undefined, bestT = 0;
   for (const o of g.nearby(post.pos, reach + 4)) {
-    if (o.id === a.id || (o.controller !== 'player' && o.controller !== 'bot') || !isAlive(o) || isInvulnerable(o) || o.state === 'swallowed') continue;
+    if (o.id === a.id || (o.controller !== 'player') || !isAlive(o) || isInvulnerable(o) || o.state === 'swallowed') continue;
     if (!inReach(post, a, o, reach)) continue;
     seen.add(o.id);
     const cruise = creature(o.creature).speed * speedFactor(o.scale);
@@ -348,9 +347,9 @@ function stepLurker(g: Game, ctx: HitContext, post: Post, a: Actor | undefined, 
   const def = creature(a.creature);
   // A bite on the neck while it is out: severed, and the bank is clear. Coelophysis and the
   // runner have no neck to lose and the phytosaur is armoured; only the boom pays this price.
-  if (def.id === 'tanystropheus' && (post.phase === 'lower' || post.phase === 'strike') && a.sinceHit < dt * 2 && a.lastHitBy >= 0) {
+  if (def.neckReach != null && (post.phase === 'lower' || post.phase === 'strike') && a.sinceHit < dt * 2 && a.lastHitBy >= 0) {
     const attacker = g.byId(a.lastHitBy);
-    if (attacker && (creature(attacker.creature).rung ?? 1) >= 3) {
+    if (attacker && foodRung(attacker.creature) >= 3) {
       // The bank is clear, but the body is still on it for as long as a corpse lasts, and the
       // sever is the one death this animal has a clip for. `cleared` stops the step loop; the
       // flag is what `shoreClip` reads, so the neck goes down the way it was authored to.

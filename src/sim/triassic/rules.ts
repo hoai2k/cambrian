@@ -4,17 +4,18 @@ import { makeBrain } from '../ai';
 import type { EraHud, EraRules } from '../era-rules';
 import { applyScaleStats, brokeSurface, isAlive, lengthOf, speedFactor } from '../actors';
 import { kill, type HitContext } from '../combat';
-import { creature } from '../creatures';
+import { creature, foodRung } from '../creatures';
 import type { CreatureId } from '../../content/ids';
 import type { Game } from '../game';
 import type { Actor, InputFrame } from '../types';
-import { biomeWeights, coverAt, groundHeight, nurseryAt, RISE_RATE, SURFACE_Y } from '../world';
-import { DEVONIAN_RULES } from '../devonian/rules';
+import { biomeWeights, coverAt, groundHeight, RISE_RATE, SURFACE_Y } from '../world';
+import { checkStage, DEVONIAN_RULES } from '../devonian/rules';
 import { ADULT_STAGE, devActor, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageProgress, stageScale } from '../devonian/state';
-import { botNursery, canBreach as devCanBreach, sanctuary, spawnInCover, spawnProtect, spawnY, swim as devSwim, wanderY } from '../devonian/swim';
+import { canBreach as devCanBreach, spawnInCover, swim as devSwim } from '../devonian/swim';
 import { camoDrain, installTriassicSpecials, stepAbility, useAbility, ySpecial } from './specials';
 import { setShoreAnimals, shoreClip, shoreRadar, stepShore } from './shore';
 import { AIR_LOW, AIR_MAX, triActor, triState } from './state';
+import { apexLeft } from '../apex';
 
 /**
  * The Triassic era rules (docs/triassic/01-triassic-design.md).
@@ -31,8 +32,6 @@ import { AIR_LOW, AIR_MAX, triActor, triState } from './state';
  * - **Armour with a facing**, the pod, heat on the flats and cold in
  *   the deep, a held animal's lost air, and the specials in ./specials.ts.
  */
-/** The rungs of this era's ladder (`TEXT.sim.ladder.rungs`). */
-const RUNG_NAMES_TRI: readonly string[] = TEXT.sim.ladder.rungs;
 /** The stamina left, under water, at which the body starts to sound winded — a quarter bar. */
 const WINDED_BELOW = 0.25;
 /** How often the winded heartbeat sounds at a quarter bar, closing to a shade under two seconds when the bar is gone. */
@@ -49,12 +48,9 @@ const POD_SIZE = 2;
  */
 const AIR_CLIMB_FLOOR = 0.7;
 
-const isPlayerish = (a: Actor) => a.controller === 'player' || a.controller === 'bot';
-/** The game whose step is running, for the hooks that are not handed it (armour). */
-let lastGame: Game | undefined;
-const players = (g: Game) => g.actors.filter(isPlayerish);
-const rungOf = (a: Actor) => creature(a.creature).rung ?? 2;
-const breathesAir = (a: Actor) => creature(a.creature).breathing === 'air';
+const rungOf = (a: Actor) => foodRung(a.creature);
+/** Breathes air and nothing else (`beach.ts`' `breathesAir` also counts the bimodal). */
+const airOnly = (a: Actor) => creature(a.creature).breathing === 'air';
 /**
  * At the surface means *at* the surface: the body's back is out of the water (`brokeSurface`), or
  * it has left the water altogether on a breach.
@@ -68,7 +64,7 @@ const breathesAir = (a: Actor) => creature(a.creature).breathing === 'air';
 const atSurface = (a: Actor) => brokeSurface(a);
 
 // ---- the hit context the era's own strikes use (the game's is private; these are its public parts) ----
-const hitCtxFor = (g: Game): HitContext => ({ events: g.events, byId: (id) => g.byId(id), time: g.time, rng: g.rng, armour: (att, vic, dir) => TRIASSIC_RULES.armour(att, vic, dir) });
+const hitCtxFor = (g: Game): HitContext => ({ events: g.events, byId: (id) => g.byId(id), time: g.time, rng: g.rng, armour: (att, vic, dir) => TRIASSIC_RULES.armour(att, vic, dir), shield: (att, vic) => TRIASSIC_RULES.shield!(g, att, vic) });
 
 // ---- air ----
 /**
@@ -92,11 +88,9 @@ const DROWN_TIME = 8;
 const NECK_BREATH = 0.3;
 /** Seconds of held breath an exhaustion hold costs per second: half a lungful over a full grip. */
 const HELD_AIR_DRAIN = 10;
-/** The breath left at which a bot starts for the surface: long enough to climb from the deepest water. */
-const AIR_BOT_SEEK = 90;
 function updateAir(g: Game, a: Actor, dt: number) {
   const t = triActor(g, a);
-  if (!breathesAir(a)) return;
+  if (!airOnly(a)) return;
   const up = atSurface(a) && a.grabbedBy < 0;
   if (up && !t.atSurface) {
     // The blow. `strength` is how much water the breath breaks, which is what the surface draws:
@@ -108,14 +102,6 @@ function updateAir(g: Game, a: Actor, dt: number) {
   if (up) a.stamina = Math.max(a.stamina, a.staminaMax * 0.98);
   // the gauge: filled by a breath, spent by the second under water
   t.air = up ? AIR_MAX : Math.max(0, t.air - dt);
-  // A bot goes up for air. The shared brain has no notion of breathing at all — it steers for food,
-  // cover and threats and nothing else — so a gauge that can kill would kill every bot air-breather
-  // in the sea on a timer, which is not a rule the player is subject to so much as a bug with a
-  // clock on it. The assist is the same climb the player gets for free and it only ever lifts, so
-  // a bot that is eating or fleeing still does that; it simply does it on the way up.
-  if (a.controller === 'bot' && !up && isAlive(a) && a.grabbedBy < 0 && t.air < AIR_BOT_SEEK) {
-    a.vel.y = Math.max(a.vel.y, RISE_RATE * speedFactor(a.scale) * AIR_CLIMB_FLOOR);
-  }
   // drowning: out of air and out of effort together, for long enough to see it happen
   if (!up && t.air <= 0 && a.stamina <= 0 && isAlive(a)) {
     t.drownT += dt;
@@ -156,7 +142,7 @@ function updateClimate(g: Game, a: Actor, dt: number) {
   const def = creature(a.creature);
   const w = biomeWeights(a.pos.x, a.pos.z);
   const heat = w.shallows;
-  if (heat > 0.3 && !def.shell && def.id !== 'henodus' && isAlive(a)) a.stamina = Math.max(0, a.stamina - HEAT_DRAIN * heat * dt);
+  if (heat > 0.3 && !def.shell && !def.heatTolerant && isAlive(a)) a.stamina = Math.max(0, a.stamina - HEAT_DRAIN * heat * dt);
 }
 const coldAt = (a: Actor) => { const w = biomeWeights(a.pos.x, a.pos.z); return w.basin + w.escarpment * 0.6; };
 
@@ -243,7 +229,7 @@ function updateStroke(g: Game, a: Actor, dt: number) {
   t.strokeT -= dt;
   const L = lengthOf(a), h = heading(a.yaw);
   for (const o of g.nearby(a.pos, L)) {
-    if (o.id === a.id || !isAlive(o) || (creature(o.creature).rung ?? 1) > 2) continue;
+    if (o.id === a.id || !isAlive(o) || foodRung(o.creature) > 2) continue;
     const dx = o.pos.x - a.pos.x, dz = o.pos.z - a.pos.z;
     if (dx * h.x + dz * h.z < 0) continue;
     const side = { x: h.z, z: -h.x }, s = Math.sign(dx * side.x + dz * side.z) || 1;
@@ -263,37 +249,28 @@ function updateSaw(g: Game, a: Actor, dt: number) {
   v.sinceHit = 0;
 }
 
-/** Feeding grows the animal exactly as in the Devonian: the same weights, the same stages. */
-const onNutrition: EraRules['onNutrition'] = (g, a, amount, food) => DEVONIAN_RULES.onNutrition(g, a, amount, food);
-
-export const TRIASSIC_RULES: EraRules = {
-  growthByNutrition: false,
-  startScale: DEVONIAN_RULES.startScale,
-  ladderNames: STAGES,
-  ladderRung: DEVONIAN_RULES.ladderRung,
-  ladderScale: DEVONIAN_RULES.ladderScale,
-  ladderFill: DEVONIAN_RULES.ladderFill,
-  ladderFillOf: DEVONIAN_RULES.ladderFillOf,
-  onSwap: DEVONIAN_RULES.onSwap,
+/**
+ * The Triassic is the Devonian's rules with its own on top: the same five-stage ladder, feeding
+ * weights, growth, respawn placement, sanctuary and moult (so those are inherited rather than
+ * re-listed one by one), and its own air, armour, shore, swimming and specials below.
+ */
+export const TRIASSIC_RULES = {
+  ...DEVONIAN_RULES,
   install() { installTriassicSpecials(); },
   ySpecial,
   init(g) {
-    lastGame = g;
-    installTriassicSpecials();
-    for (const a of players(g)) {
+    for (const a of g.players) {
       const d = devActor(g, a);
       d.stage = stageForScale(creature(a.creature).adultLength, a.scale);
       d.standing = g.mode === 'reef' ? STAGE_AT[ADULT_STAGE] + 5 : STAGE_AT[d.stage];
-      const t = triActor(g, a);
     }
   },
 
   step(g, dt) {
-    lastGame = g;
     const s = triState(g);
     s.tick += dt;
     const ctx = hitCtxFor(g);
-    for (const a of players(g)) {
+    for (const a of g.players) {
       const t = triActor(g, a), def = creature(a.creature);
       t.shoreWarn = 0; t.shoreWatch = 0;                      // the shore module raises them again this step if it is still watching or winding up
       updateAir(g, a, dt);
@@ -301,23 +278,27 @@ export const TRIASSIC_RULES: EraRules = {
       updatePod(g, a, dt);
       updateStroke(g, a, dt);
       updateSaw(g, a, dt);
-      // the sinkers settle when the stick is still
-      if (def.sink && a.state === 'free' && Math.hypot(a.vel.x, a.vel.z) < 0.3 && !a.grabbedBy) {
+      // The sinkers settle when the stick is still — asking for nothing, climb included (`drive`).
+      // This read `!a.grabbedBy`, which is false for the -1 that means "not held", so it only ever
+      // ran on a body something had hold of, and nobody noticed that it tested speed, not the ask.
+      if (def.sink && a.state === 'free' && Math.hypot(a.vel.x, a.vel.z) < 0.3 && a.grabbedBy < 0
+        && Math.hypot(a.drive.x, a.drive.y, a.drive.z) < 0.05) {
         const floor = groundHeight(g.world, a.pos.x, a.pos.z, []) + lengthOf(a) * 0.15;
         if (a.pos.y > floor + 0.2) a.vel.y = Math.min(a.vel.y, -1.2);
       }
-      // a giant with no bite never hunts; a grazer never hunts
+    }
+    // A giant with no bite never hunts, and a grazer never hunts, whoever is steering it.
+    for (const a of g.actors) {
+      if (a.controller !== 'player' && a.controller !== 'shadow' && a.controller !== 'giant') continue;
+      const def = creature(a.creature);
       if ((def.noBite || def.peaceful) && a.brain && (a.brain.goal === 'hunt' || a.brain.goal === 'notice')) { a.brain.goal = 'patrol'; a.brain.target = -1; }
     }
-    for (const a of g.actors) if (a.controller === 'shadow' || a.controller === 'giant') { const def = creature(a.creature); if ((def.noBite || def.peaceful) && a.brain && (a.brain.goal === 'hunt' || a.brain.goal === 'notice')) { a.brain.goal = 'patrol'; a.brain.target = -1; } }
     stepShore(g, ctx, dt);
-    // a stage the food already paid for is taken as soon as the last ceremony is over: the Devonian's own step does this
-    // through checkStage; here the same happens through onNutrition's gain on the next meal, so nudge it along
-    for (const a of players(g)) { const d = devActor(g, a); if (d.stage < PRIME_STAGE && d.standing >= STAGE_AT[d.stage + 1] && a.state !== 'moult' && isAlive(a)) DEVONIAN_RULES.onNutrition(g, a, 0.0001, undefined); }
+    // A stage the food already paid for is taken as soon as the last ceremony is over, as the
+    // Devonian's own step does.
+    for (const a of g.players) checkStage(g, a, devActor(g, a));
   },
 
-  onNutrition,
-  survivalGrow: (g, a, fraction) => DEVONIAN_RULES.survivalGrow!(g, a, fraction),
 
   /**
    * Armour with a facing. `all` is a shell or a full carapace; `dorsal` plates on the back are hit
@@ -325,21 +306,24 @@ export const TRIASSIC_RULES: EraRules = {
    * attacker (`bellyTurn`, while guarding) counts as all. Without a facing the Devonian's
    * snout-to-tail fraction applies. Pierce reads exactly as it does there.
    */
+  /**
+   * The pod's shield: for eight seconds after the call, a hit on the calf lands on the nearest
+   * pod-mate instead — the mate takes the attacker's light bite and the calf almost nothing.
+   */
+  shield(g, attacker, victim) {
+    if (victim.controller !== 'player') return undefined;
+    const t = triActor(g, victim);
+    if (t.podShield <= 0) return undefined;
+    let mate: Actor | undefined, best = 12;
+    for (const id of t.pod) { const m = g.byId(id); if (m && isAlive(m)) { const d = distXZ(m.pos, victim.pos); if (d < best) { best = d; mate = m; } } }
+    if (!mate) return undefined;
+    mate.hp = Math.max(1, mate.hp - creature(attacker.creature).light.damage); mate.sinceHit = 0; mate.lastHitBy = attacker.id;
+    return 0.05;
+  },
+
   armour(attacker, victim, dir) {
     void dir;
     const vdef = creature(victim.creature);
-    // The pod's shield: for eight seconds after the call, a hit on the calf lands on the nearest
-    // pod-mate instead. The multiplier is all this hook returns, so the mate takes the attacker's
-    // light bite here and the calf takes almost nothing.
-    const g = lastGame;
-    if (g && isPlayerish(victim)) {
-      const t = triActor(g, victim);
-      if (t.podShield > 0) {
-        let mate: Actor | undefined, best = 12;
-        for (const id of t.pod) { const m = g.byId(id); if (m && isAlive(m)) { const d = distXZ(m.pos, victim.pos); if (d < best) { best = d; mate = m; } } }
-        if (mate) { mate.hp = Math.max(1, mate.hp - creature(attacker.creature).light.damage); mate.sinceHit = 0; mate.lastHitBy = attacker.id; return 0.05; }
-      }
-    }
     let f = vdef.armour ?? 0;
     const guarding = victim.state === 'guard';
     if (guarding && vdef.shell) f = 0.85;
@@ -400,7 +384,7 @@ export const TRIASSIC_RULES: EraRules = {
     const def = creature(a.creature);
     const k = def.riseRate ?? 1;
     if (input.rise) {
-      const air = breathesAir(a);
+      const air = airOnly(a);
       // `base` already carries the body's speed factor, so the floor is expressed against it. It
       // replaces the body's own rate rather than multiplying it: a Placodus climbs badly on purpose
       // (0.6) and is a small animal besides, and the two together put air out of reach — but it
@@ -431,21 +415,20 @@ export const TRIASSIC_RULES: EraRules = {
     return k;
   },
   canRecoverHealth(g, a) {
-    if (!breathesAir(a)) return true;
+    if (!airOnly(a)) return true;
     const t = triActor(g, a);
     return a.grabbedBy < 0 && (t.atSurface || t.air > 0);
   },
 
   /** The climb is free for an air-breather: there is always a way back to the surface, however spent. */
   climbRelief(a, input, dir, mag) {
-    if (!breathesAir(a)) return 0;
+    if (!airOnly(a)) return 0;
     const def = creature(a.creature), sf = speedFactor(a.scale), cruise = def.speed * sf;
     const up = Math.max(0, dir.y) * mag * cruise + (input.rise ? RISE_RATE * (def.riseRate ?? 1) * sf : 0);
     const along = Math.hypot(dir.x, dir.z) * mag * cruise + (input.sink ? RISE_RATE * sf : 0);
     return up <= 0 ? 0 : clamp(up / (up + along), 0, 1);
   },
   canBreach(a) { return !creature(a.creature).shore && devCanBreach(a); },
-  spawnY, wanderY,
 
   /**
    * Everything hatches in cover on the sea floor, the way it does in the other two eras.
@@ -461,9 +444,6 @@ export const TRIASSIC_RULES: EraRules = {
     const at = spawnInCover(g, center, id, scale, index);
     return at ? clearTheView(g, at, id, scale) : at;
   },
-  botNursery, spawnProtect, sanctuary,
-
-  moultScale: DEVONIAN_RULES.moultScale,
 
   onRespawn(g, a) {
     DEVONIAN_RULES.onRespawn(g, a);
@@ -474,9 +454,7 @@ export const TRIASSIC_RULES: EraRules = {
     t.windT = 0; t.heldT = 0; t.podShield = 0; t.strokeT = 0; t.shoreWarn = 0; t.shoreWatch = 0; t.sawT = 0;
   },
 
-  updateModes: DEVONIAN_RULES.updateModes,
-  continueMatch: DEVONIAN_RULES.continueMatch,
-  scoreLine(g, a) { const d = devActor(g, a); return { rank: `${STAGES[d.stage]} · ${RUNG_NAMES_TRI[rungOf(a)]}`, progress: stageProgress(d) }; },
+  scoreLine(g, a) { const d = devActor(g, a); return { rank: `${STAGES[d.stage]} · ${RUNG_NAMES[rungOf(a)]}`, progress: stageProgress(d) }; },
 
   /**
    * The shore animals' performance. They are pinned and brainless, so the shared state machine
@@ -491,13 +469,12 @@ export const TRIASSIC_RULES: EraRules = {
   hud(g, i): EraHud | undefined {
     const p = g.players[i]; if (!p) return undefined;
     const d = devActor(g, p), t = triActor(g, p), def = creature(p.creature);
-    void RUNG_NAMES; void nurseryAt;
     return {
-      standing: d.standing, stageProgress: stageProgress(d), rung: rungOf(p), rungName: RUNG_NAMES_TRI[rungOf(p)], stage: STAGES[d.stage],
+      standing: d.standing, stageProgress: stageProgress(d), rung: rungOf(p), rungName: RUNG_NAMES[rungOf(p)], stage: STAGES[d.stage],
       bimodal: def.breathing === 'bimodal', air: def.breathing === 'air', atSurface: t.atSurface, shoreWarn: t.shoreWarn, shoreWatch: t.shoreWatch, heldUnder: def.breathing === 'air' && p.grabbedBy >= 0,
       airLeft: def.breathing === 'air' ? clamp(t.air / AIR_MAX, 0, 1) : undefined,
       airLow: def.breathing === 'air' && t.air < AIR_LOW, drowning: t.drownT > 0,
-      beached: p.ashore, primeT: d.primeT, inDeadZone: false, deadZones: [],
+      beached: p.ashore, primeLeft: apexLeft(g, p), inDeadZone: false, deadZones: [],
     };
   },
 
@@ -517,6 +494,6 @@ export const TRIASSIC_RULES: EraRules = {
     if (def.sink && g.time < 40) return H.sink;
     return undefined;
   },
-};
+} satisfies EraRules;
 
 export { WINDED_BELOW, HEAT_DRAIN, COLD_REGEN, POD_SIZE };

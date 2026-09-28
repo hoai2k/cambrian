@@ -4,9 +4,9 @@
  * Usage: npx esbuild tools/edges-test.ts --bundle --platform=node --format=esm --outfile=/tmp/e.mjs && node /tmp/e.mjs
  */
 import { Edges } from '../src/shared/edges';
+import { checker, finish } from './lib/test';
 
-let failed = 0;
-const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(56)} ${d}`); if (!ok) failed++; };
+const check = checker(56);
 
 {
   const e = new Edges();
@@ -44,5 +44,4 @@ const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' :
   e.clear();
   check('a cleared tracker sees a fresh press', e.step({ a: true }).a === true);
 }
-
-console.log(failed ? `\n${failed} FAILED` : '\nall edge tests passed'); process.exit(failed ? 1 : 0);
+finish('all edge tests passed');

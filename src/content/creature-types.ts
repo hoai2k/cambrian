@@ -52,6 +52,27 @@ export interface CreatureDef {
   diet?: 'deposit' | 'grazer' | 'filter' | 'scavenger';
   /** Grazes only while held still, the way an animal that has to plant itself to rasp does. */
   grazeStill?: boolean;
+  /**
+   * A darting swimmer: its dash launches a fifth harder and its dodge a quarter harder
+   * (`DARTER_DASH`/`DARTER_DODGE` in src/sim/game.ts). Waptia.
+   */
+  darter?: boolean;
+  /** Takes a snack within reach even at rest, rather than only one it swims into. */
+  snatches?: boolean;
+  /**
+   * Eyes that see behind it (Opabinia's five): it notices what is behind it as well as in front,
+   * and a blow from behind is no surprise, so it gets no rear-hit bonus.
+   */
+  allRoundEyes?: boolean;
+  /**
+   * A back of spines or sclerites: a strike from above is dulled and part of it comes back on the
+   * striker, as it does for an animal braced with `anchor`. Wiwaxia.
+   */
+  spinedBack?: boolean;
+  /** Multiplier on the stamina a guarded blow costs (1 = the usual). */
+  guardCost?: number;
+  /** Takes no stamina from warm water (the Triassic's heat), as a shell already does: Henodus. */
+  heatTolerant?: boolean;
   provenance?: string;
   bodyRadius?: number; // collision radius in body lengths
   clearance?: number; // center height above terrain, in body lengths
@@ -201,7 +222,7 @@ export interface CreatureDef {
   shore?: boolean;
   /**
    * An animal the sea keeps and the pick screen does not offer. It spawns, it is hunted, it hunts,
-   * bots wear it and the ecology counts it — everything except being somebody. A roster is a menu
+   * and the ecology counts it — everything except being somebody. A roster is a menu
    * rather than a census: an animal can be worth meeting without being worth *playing*, and three
    * or four of those on a pick screen cost every other animal a share of the player's attention.
    * `shore` says the same thing about a beach animal and says much more besides (where it stands,

@@ -11,9 +11,9 @@ import { dist } from '../src/shared/math';
 import { nurseryAt, nurseryFactor, sampleHeight, SURFACE_Y } from '../src/sim/world';
 import { creature } from '../src/sim/creatures';
 import type { CreatureId } from '../src/sim/creatures';
+import { checker, finish } from './lib/test';
 
-let failed = 0;
-const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(56)} ${d}`); if (!ok) failed++; };
+const check = checker(56);
 const DT = 1 / 60;
 const OPEN = { x: 12, z: -110 };
 
@@ -281,6 +281,4 @@ function harass(preyId: CreatureId, preyScale: number, playerScale: number, seco
     check(`no school of ${id} in a sea a ${id} is playing in`, own === 0, `${own} of ${g.actors.filter((a) => a.controller === 'swarm').length} school fish`);
   }
 }
-
-console.log(failed ? `\n${failed} FAILED` : '\nall reaction tests passed');
-process.exit(failed ? 1 : 0);
+finish('all reaction tests passed');

@@ -413,10 +413,7 @@ export interface GameStrings {
       readonly distance: (distance: string, seconds: number) => string;
     };
     readonly scoreboard: {
-      readonly bot: string;
-      readonly hunting: string;
       readonly down: string;
-      readonly caught: string;
       readonly tally: (kills: number, eats: number) => string;
     };
     readonly radar: {
@@ -528,36 +525,23 @@ export interface GameStrings {
     readonly nurseryDetail: string;
     readonly teleportPlayer: (seat: number, name: string) => string;
     readonly respawning: string;
+    /** A downed player brought back by a team-mate. */
+    readonly revivedBy: (name: string) => string;
     /** The scoreboard's heading and its line of detail, per mode. */
     readonly board: {
       readonly riseTitle: string;
       readonly reefTitle: string;
-      readonly changingOver: string;
       readonly reefFree: string;
       readonly reefWon: string;
       readonly riseGoal: string;
       readonly survivalTitle: string;
       readonly survivalGoal: string;
       readonly apexHeld: (seconds: number, target: number) => string;
-      readonly huntTurn: (turn: number, turns: number) => string;
-      readonly huntingNow: (seat: number) => string;
     };
-    /** What the game says out loud as a match turns, and what the results screen leads with. */
+    /** What the results screen leads with. */
     readonly match: {
-      readonly grownUp: (name: string, caught: number) => string;
-      readonly timeUp: (name: string, caught: number) => string;
-      readonly turnAnnounce: (turn: number, turns: number, who: string) => string;
-      /** A seat, where the sentence is about who is playing rather than about a creature. */
-      readonly playerName: (seat: number) => string;
-      readonly nobody: string;
       readonly rulesTheReef: (name: string) => string;
-      readonly scoreLine: (seat: number, caught: number) => string;
-      readonly nobodyCaught: (line: string) => string;
-      readonly tie: (score: number, line: string) => string;
-      readonly huntedBest: (seat: number, score: number, line: string) => string;
     };
-    /** Something large with no name of its own. */
-    readonly theGiant: string;
     /**
      * Onboarding hints: one line at a time, low on the screen. They name *actions* in braces —
      * `{sprint}`, `{heavy}` — and `fillControls` turns those into button names for whatever that
@@ -961,10 +945,7 @@ export const SHARED_STRINGS: GameStrings = {
       distance: (distance, seconds) => `${distance} · reach them in ${seconds} s`,
     },
     scoreboard: {
-      bot: 'BOT',
-      hunting: ' · hunting',
       down: ' · down',
-      caught: 'caught',
       tally: (kills, eats) => `${kills} k · ${eats} e`,
     },
     radar: {
@@ -1050,32 +1031,20 @@ export const SHARED_STRINGS: GameStrings = {
     nurseryDetail: 'Back to where you hatched',
     teleportPlayer: (seat, name) => `Player ${seat} · ${name}`,
     respawning: 'respawning',
+    revivedBy: (name) => `${name} got you up.`,
     board: {
       riseTitle: 'Rise',
       reefTitle: 'Reef',
-      changingOver: 'Changing over…',
       reefFree: 'No goal. Just the sea.',
       reefWon: 'The reef is yours. Swim on.',
       riseGoal: 'Reach Apex and hold it for ninety seconds',
       survivalTitle: 'Survival',
       survivalGoal: 'Grow with time, fight to grow faster, eat to stay alive — then hold Apex for ninety seconds',
       apexHeld: (seconds, target) => `Apex held ${seconds} s of ${target}`,
-      huntTurn: (turn, turns) => `Turn ${turn} of ${turns}`,
-      huntingNow: (seat) => `Player ${seat} is hunting · most caught wins`,
     },
     match: {
-      grownUp: (name, caught) => `The small ones grew up. ${name} caught ${caught}.`,
-      timeUp: (name, caught) => `Time. ${name} caught ${caught}.`,
-      turnAnnounce: (turn, turns, who) => `Turn ${turn} of ${turns} — ${who} hunts.`,
-      playerName: (seat) => `Player ${seat}`,
-      nobody: 'nobody',
       rulesTheReef: (name) => `${name} rules the reef.`,
-      scoreLine: (seat, caught) => `P${seat} ${caught}`,
-      nobodyCaught: (line) => `Nobody caught anything. ${line}`,
-      tie: (score, line) => `A tie at ${score}. ${line}`,
-      huntedBest: (seat, score, line) => `Player ${seat} hunted best: ${score} caught. ${line}`,
     },
-    theGiant: 'The giant',
     hints: {
       huntedStill: 'Hold still. It is losing you.',
       huntedInCover: 'You are in cover. Now hold still.',

@@ -1,11 +1,11 @@
 import { ACTIVE_ERA } from '../content';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { audio } from '../audio/audio';
-import { gamepads, readGamepad, type RawControls } from '../input/input';
 import type { AssetProgress } from '../render/assets';
-import { Engine, type HudSnapshot } from '../render/engine';
+import { Engine } from '../render/engine';
+import type { HudSnapshot } from '../shared/hud-types';
 import type { Quality } from '../render/sea';
-import { PLAYABLE_IDS as CREATURE_IDS, PLAYABLE as CREATURES, creature, setEquivalentSizing, type CreatureId } from '../sim/creatures';
+import { PLAYABLE_IDS as CREATURE_IDS, creature, setEquivalentSizing, type CreatureId } from '../sim/creatures';
 import { MODE_IDS, type Mode, type PlayerSetup } from '../sim/types';
 import { clampMark } from '../sim/ladder';
 import { RULES } from '../sim/era-rules';
@@ -16,12 +16,12 @@ import { Dialogs, PauseMenu, Results, type MenuItem } from './Overlays';
 import { TEXT } from '../shared/text';
 import { debugGame } from '../shared/debug';
 import { enterFullscreen, rememberFullscreen, restoreFullscreenOnGesture } from '../shared/fullscreen';
-import { exportRecording, recordingPhase, resetRecording, startRecording, stopRecording } from './debug-record';
+import { exportRecording, recordingPhase, resetRecording, startRecording, stopRecording } from '../shared/debug-record';
 import { atMain, cycle, groupsFor, stops, type Focus, type FocusGroup } from './focus-ring';
 import { rectsOf, step as spatialStep, type Dir } from './spatial-nav';
 import { gridColumns, SelectScreen } from './Select';
-import { gridStep, rosterGrid, sameSlot, type ExtraId, type Slot } from './roster-grid';
-import { depthStep, type DepthLayout } from './depth-layout';
+import type { ExtraId } from './roster-grid';
+import type { DepthLayout } from './depth-layout';
 import type { RosterView } from './Select';
 import { visitorsInBrowser, type EraId, type Visitor } from '../content/visitors';
 import { registerVisitorAssets } from '../content/asset-paths';
@@ -37,6 +37,10 @@ import { RotateHint, TouchPads } from './TouchPads';
 import { useSmallScreen } from './use-small-screen';
 import { assignSeatSchemes } from '../shared/seat-schemes';
 import { freshCursor, menuPress, MENU_LOCKOUT, type MenuCursor, type MenuEvent } from './menu-cursor';
+import { useLatest, useStateRef } from './use-latest';
+import * as lineup from './lineup';
+import { usePadMenus, type MenuWiring } from './use-pad-menus';
+import { useMenuKeys } from './use-menu-keys';
 
 export type Screen = 'title' | 'select' | 'playing' | 'results';
 export type DialogKind = null | 'help' | 'settings';
@@ -64,18 +68,6 @@ export interface Settings {
 }
 
 /** The active era's modes, in its order; the first is the default selection. */
-/**
- * The size a visitor starts at.
- *
- * An **earned** visitor arrives full grown: that is the reward, and it has already been taken to
- * the top of its own game. A **standing guest** has earned nothing — it is admitted because it
- * exists — so it hatches and climbs this game's ladder like anything else on the roster, which is
- * also what lets it *be* earned: its rungs are saved (`recordableIds`) and reaching the top makes
- * it a visitor in the other two games. Handing one the apex scale for free skipped the whole game
- * and left nothing to record.
- */
-const startScale = (v: Visitor) => (v.standing ? undefined : v.scale);
-
 const MODES: Mode[] = ACTIVE_ERA.modes.map((m) => m.id);
 const SETTINGS_KEY = ACTIVE_ERA.copy.settingsKey;
 const defaultSettings = (): Settings => {
@@ -104,50 +96,17 @@ function deepLinkedToSelect(): boolean {
   try { return new URLSearchParams(location.search).get('screen') === 'select'; } catch { return false; }
 }
 
-/**
- * One direction out of a pad, for steering a group of buttons.
- *
- * The D-pad answers on the press; the stick repeats on a timer, so holding it walks along a row
- * rather than firing once or running away. `repeat` is the same per-pad map the rest of the loop
- * uses, so a stick cannot drive two things at two rates in one frame.
- */
-function padDir(
-  c: RawControls,
-  just: (k: keyof RawControls) => boolean,
-  index: number,
-  now: number,
-  repeat: Map<number, number>,
-): Dir | null {
-  if (just('dright')) return 'right';
-  if (just('dleft')) return 'left';
-  if (just('ddown')) return 'down';
-  if (just('dup')) return 'up';
-  const x = Math.abs(c.mx) > 0.6 ? Math.sign(c.mx) : 0;
-  const y = Math.abs(c.my) > 0.6 ? -Math.sign(c.my) : 0;
-  if ((x || y) && now - (repeat.get(index) ?? 0) > 240) {
-    repeat.set(index, now);
-    // A stick pushed on the diagonal answers on whichever axis it is further along.
-    if (Math.abs(c.mx) >= Math.abs(c.my)) return x > 0 ? 'right' : 'left';
-    return y > 0 ? 'up' : 'down';
-  }
-  return null;
-}
-
 export function App() {
   const canvasRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<Engine | null>(null);
-  const [screen, setScreen] = useState<Screen>(() => (deepLinkedToSelect() ? 'select' : 'title'));
-  const screenRef = useRef<Screen>(deepLinkedToSelect() ? 'select' : 'title');
-  const [players, setPlayers] = useState<PlayerSetup[]>([]);
-  const playersRef = useRef<PlayerSetup[]>([]);
-  const [mode, setMode] = useState<Mode>(MODES[0]);
-  const modeRef = useRef<Mode>(MODES[0]);
+  const [screen, go, screenRef] = useStateRef<Screen>(() => (deepLinkedToSelect() ? 'select' : 'title'));
+  const [players, setPlayersBoth, playersRef] = useStateRef<PlayerSetup[]>([]);
+  const [mode, setModeBoth, modeRef] = useStateRef<Mode>(MODES[0]);
   const [hud, setHud] = useState<HudSnapshot | null>(null);
-  const [paused, setPaused] = useState(false);
+  const [paused, setPausedState, pausedRef] = useStateRef(false);
   const [pauseScores, setPauseScores] = useState(false);
   /** The recorder's state, mirrored into React so the pause menu's one button can name itself. */
   const [recPhase, setRecPhase] = useState(recordingPhase);
-  const pausedRef = useRef(false);
   /**
    * The in-game menus (pause, results) are navigated rather than button-mapped: `menuSel` is the
    * highlighted choice and `menuShown` whether the highlight is drawn at all. The results screen
@@ -155,25 +114,19 @@ export function App() {
    * first press only makes the cursor appear, on the choice that costs least. `menuAt` is when the
    * menu opened; presses within `MENU_LOCKOUT` of that are the tail of the fight, not answers.
    */
-  const [menuCursor, setMenuCursor] = useState<MenuCursor>(freshCursor(true));
-  const menuCursorRef = useRef<MenuCursor>(freshCursor(true));
+  const [menuCursor, setMenuCursorBoth, menuCursorRef] = useStateRef<MenuCursor>(freshCursor(true));
   const menuAtRef = useRef(0);
-  const menuItemsRef = useRef<MenuItem[]>([]);
   /**
    * Which group of buttons the pad is steering, cycled with the shoulder buttons. See
    * `focus-ring.ts`: `main` is the screen's own business, and the ring reaches the era link, the
    * mode chips and the icon buttons without giving any of them a button of their own.
    */
-  const [focus, setFocus] = useState<Focus>(atMain);
-  const focusRef = useRef<Focus>(focus);
+  const [focus, setFocusBoth, focusRef] = useStateRef<Focus>(atMain);
   /** Where the icon buttons went, for the gamepad loop — which runs outside the render. */
   const toolbarRef = useRef<'left' | 'right' | 'hidden'>('right');
-  const setFocusBoth = useCallback((f: Focus) => { focusRef.current = f; setFocus(f); }, []);
-  const [dialog, setDialog] = useState<DialogKind>(null);
-  const dialogRef = useRef<DialogKind>(null);
+  const [dialog, setDialogBoth, dialogRef] = useStateRef<DialogKind>(null);
   const [settings, setSettings] = useState<Settings>(defaultSettings);
-  const settingsRef = useRef<Settings>(settings);
-  useEffect(() => { settingsRef.current = settings; }, [settings]);
+  const settingsRef = useLatest(settings);
   const [loaded, setLoaded] = useState(false);
   const [progress, setProgress] = useState<AssetProgress | null>(null);
   const [error, setError] = useState('');
@@ -196,15 +149,14 @@ export function App() {
    * live, and `typeof device === 'string'` still means "the local seat" everywhere it is asked.
    */
   const hand: PlayerSetup['device'] = small.touch ? 'touch' : 'keyboard';
-  const handRef = useRef(hand);
-  useEffect(() => { handRef.current = hand; }, [hand]);
+  const handRef = useLatest(hand);
   /**
    * The most roster columns this window has room for. One number, read by the screen that draws the
    * grid, the cursor that walks it and the loader that guesses which portraits are next — the three
    * have to agree or the cursor lands on one tile while another lights up.
    */
   const cols = rosterCap(small.width, small.height, small.layout);
-  const colsRef = useRef(cols);
+  const colsRef = useLatest(cols);
   /** Whether the choice screen is showing one card at a time (`carouselView`), as the screen reports it. */
   const carouselRef = useRef(false);
   const onView = useCallback((on: boolean) => { carouselRef.current = on; }, []);
@@ -215,7 +167,6 @@ export function App() {
    */
   const depthRef = useRef<DepthLayout | null>(null);
   const onDepth = useCallback((layout: DepthLayout | null) => { depthRef.current = layout; }, []);
-  useEffect(() => { colsRef.current = cols; }, [cols]);
   /** The secondary pad, mirrored into state so the pad's label re-renders when a swipe lands. */
   const [secondary, setSecondary] = useState<Secondary>('aim');
   /**
@@ -240,8 +191,7 @@ export function App() {
    * the select screen badges the growth record and offers to start from it, and both have to
    * change the moment a match improves on them.
    */
-  const [record, setRecord] = useState<Codex>(loadCodex);
-  const recordRef = useRef(record);
+  const [record, setRecordBoth, recordRef] = useStateRef<Codex>(loadCodex);
   const best = record.best;
   /**
    * Per player: whether they have asked to carry on from their record rather than hatch.
@@ -250,8 +200,7 @@ export function App() {
    * record and back again does not quietly switch the choice off. It is resolved against the
    * record and the current mode at the moment a match starts.
    */
-  const [carry, setCarry] = useState<boolean[]>([]);
-  const carryRef = useRef<boolean[]>([]);
+  const [carry, setCarryBoth, carryRef] = useStateRef<boolean[]>([]);
   /**
    * The buttons in the pick grid beside the creatures. Random is always there; Visitors only where
    * this device has taken something to the top in another game. Held in a ref as well as state
@@ -270,10 +219,8 @@ export function App() {
     registerVisitorAssets(visitors.map((v) => ({ id: v.id, era: v.era })));
   }, [visitors]);
   const extras = useMemo<ExtraId[]>(() => (visitors.length ? ['random', 'visitors'] : ['random']), [visitors]);
-  const extrasRef = useRef<ExtraId[]>(extras);
-  extrasRef.current = extras;
-  const visitorsRef = useRef<Visitor[]>(visitors);
-  visitorsRef.current = visitors;
+  const extrasRef = useLatest<readonly ExtraId[]>(extras);
+  const visitorsRef = useLatest<readonly Visitor[]>(visitors);
   /**
    * What this match has added to the record, so the results screen can mark it new.
    *
@@ -282,10 +229,8 @@ export function App() {
    * by the time the results screen loads the stored record, this match's finds are already in it
    * and there is nothing left to compare against.
    */
-  const [fresh, setFresh] = useState<Codex>(emptyCodex);
-  const freshRef = useRef<Codex>(fresh);
-  const clearFresh = useCallback(() => { freshRef.current = emptyCodex(); setFresh(freshRef.current); }, []);
-  const setCarryBoth = useCallback((c: boolean[]) => { carryRef.current = c; setCarry(c); }, []);
+  const [fresh, setFreshBoth, freshRef] = useStateRef<Codex>(emptyCodex);
+  const clearFresh = useCallback(() => { setFreshBoth(emptyCodex()); }, [setFreshBoth]);
 
   /**
    * Every change to the lineup goes through here, which is why the seats' colours are settled here
@@ -293,9 +238,8 @@ export function App() {
    * whole lineup is the one place that can say which of them is the duplicate.
    */
   const updatePlayers = useCallback((p: PlayerSetup[]) => {
-    const settled = assignSeatSchemes(p, Math.random);
-    playersRef.current = settled; setPlayers(settled);
-  }, []);
+    setPlayersBoth(assignSeatSchemes(p, Math.random));
+  }, [setPlayersBoth]);
   /**
    * Fold what a match finds into the record as it finds it — biomes swum through, landmarks come
    * across, species taken to the top, growth marks moved.
@@ -308,14 +252,12 @@ export function App() {
   const keepFinds = useCallback((found: Codex) => {
     if (!hasNewFinds(recordRef.current, found)) return;
     const { codex, fresh: added } = mergeCodex(recordRef.current, found);
-    recordRef.current = codex; setRecord(codex);
-    freshRef.current = mergeCodex(freshRef.current, added).codex;
-    setFresh(freshRef.current);
+    setRecordBoth(codex);
+    setFreshBoth(mergeCodex(freshRef.current, added).codex);
     recordFinds(found);
-  }, []);
-  const go = useCallback((s: Screen) => { screenRef.current = s; setScreen(s); }, []);
-  const setPausedBoth = useCallback((p: boolean) => { pausedRef.current = p; setPaused(p); engineRef.current?.setPaused(p || dialogRef.current !== null); }, []);
-  const openDialog = useCallback((d: DialogKind) => { dialogRef.current = d; setDialog(d); engineRef.current?.setPaused(pausedRef.current || d !== null); if (d) audio.play('ui-confirm'); else audio.play('ui-back'); }, []);
+  }, [recordRef, freshRef, setRecordBoth, setFreshBoth]);
+  const setPausedBoth = useCallback((p: boolean) => { setPausedState(p); engineRef.current?.setPaused(p || dialogRef.current !== null); }, [setPausedState, dialogRef]);
+  const openDialog = useCallback((d: DialogKind) => { setDialogBoth(d); engineRef.current?.setPaused(pausedRef.current || d !== null); if (d) audio.play('ui-confirm'); else audio.play('ui-back'); }, [setDialogBoth, pausedRef]);
 
   // Engine lifecycle
   useEffect(() => {
@@ -362,7 +304,7 @@ export function App() {
     // from the next step on, and a player who turns it on wants to see it now rather than next
     // match (see `setShoreAnimals` in src/sim/triassic/shore.ts).
     if (screenRef.current !== 'playing') setEquivalentSizing(settings.equivalentSizing);
-    RULES?.settings?.shoreAnimals?.(settings.shoreAnimals);
+    RULES.settings?.shoreAnimals?.(settings.shoreAnimals);
     audio.setVolume(settings.volume); audio.setMuted(settings.muted); audio.setMusic(settings.music);
     try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch { /* ignore */ }
   }, [settings]);
@@ -461,7 +403,7 @@ export function App() {
    * to draw on, the rung to hatch at. Rise and Survival share the earned ladder record.
    */
   const withCarry = useCallback((ps: PlayerSetup[]) => ps.map((p, i) => {
-    const mark = (modeRef.current === 'rise' || modeRef.current === 'survival') && carryRef.current[i] ? clampMark(recordRef.current.best[p.creature] ?? 0) : 0;
+    const mark = lineup.carriesRecord(modeRef.current) && carryRef.current[i] ? clampMark(recordRef.current.best[p.creature] ?? 0) : 0;
     return { ...p, startRung: mark > 0 ? mark : 0 };
   }), []);
 
@@ -471,7 +413,7 @@ export function App() {
     clearFresh();
     // Fixed for the length of the match, whatever the settings panel does while it runs.
     setEquivalentSizing(settingsRef.current.equivalentSizing);
-    RULES?.settings?.shoreAnimals?.(settingsRef.current.shoreAnimals);
+    RULES.settings?.shoreAnimals?.(settingsRef.current.shoreAnimals);
     // The pad goes back where the player left it before the first frame, or the match opens holding
     // something they did not choose.
     engineRef.current.setSecondary(settingsRef.current.secondary);
@@ -483,7 +425,7 @@ export function App() {
 
   const backToSelect = useCallback(() => {
     engineRef.current?.startAttract();
-    updatePlayers(playersRef.current.map((p) => ({ ...p, ready: false })));
+    updatePlayers(lineup.unready(playersRef.current));
     setPausedBoth(false);
     setHud(null);
     go('select');
@@ -518,7 +460,7 @@ export function App() {
     const items = menuItemsRef.current;
     const locked = performance.now() - menuAtRef.current < MENU_LOCKOUT;
     const { cursor, act } = menuPress(before, items.length, ev, locked);
-    if (cursor !== before) { menuCursorRef.current = cursor; setMenuCursor(cursor); audio.play('ui-move'); }
+    if (cursor !== before) { setMenuCursorBoth(cursor); audio.play('ui-move'); }
     if (act) { const it = items[cursor.sel]; if (it) { audio.play('ui-confirm'); it.run(); } }
   }, []);
 
@@ -576,9 +518,8 @@ export function App() {
   }, [groupEls, setFocusBoth]);
 
   const menuHover = useCallback((i: number) => {
-    const cursor = { sel: i, shown: true };
-    menuCursorRef.current = cursor; setMenuCursor(cursor);
-  }, []);
+    setMenuCursorBoth({ sel: i, shown: true });
+  }, [setMenuCursorBoth]);
 
   const playAgain = useCallback(() => {
     if (!engineRef.current) return;
@@ -588,9 +529,24 @@ export function App() {
     go('playing');
   }, [clearFresh, go, setPausedBoth, withCarry]);
 
-  /** Move a player's cursor on the roster grid. Locked players must unlock first (B). */
+  // ---- The lineup ----
+  // What each press does to the lineup is `lineup.ts` (pure, and `npm run lineup` holds it); these
+  // wire it to the refs it reads, the sound it makes and the one choke point every lineup change
+  // goes through (`updatePlayers`).
+  /** Apply a lineup change: the new seats, and the sound the change makes. */
+  const commitLineup = useCallback((change: lineup.LineupChange | null) => {
+    if (!change) return false;
+    updatePlayers(change.players); audio.play(change.sound);
+    return true;
+  }, [updatePlayers]);
+  /** What the pick cursor walks right now: the roster, the grid's buttons, the column cap and the view on screen. */
+  const pickGrid = useCallback((): lineup.PickGrid => ({
+    ids: CREATURE_IDS, extras: extrasRef.current, cols: colsRef.current, depth: depthRef.current,
+    carousel: carouselRef.current, visitors: visitorsRef.current,
+  }), [extrasRef, colsRef, visitorsRef]);
+
   /**
-   * Move the pick cursor around the roster grid.
+   * Move the pick cursor around the roster grid (`lineup.moveCursor`).
    *
    * The grid is only rectangular when the roster divides by three. An era whose models arrive in
    * batches has a ragged last row — the Devonian's nine playable species make a 4-wide grid whose
@@ -605,64 +561,23 @@ export function App() {
    * The grid also holds buttons now — Random, and Visitors where the player has earned one — so
    * this walks a *model* of the layout (src/app/roster-grid.ts) rather than indexing the roster.
    * A button has a position and no index in the creature list, and arithmetic over the roster
-   * would put the cursor on one tile while another lit up.
+   * would put the cursor on one tile while another lit up. Locked players must unlock first (B).
    */
   const moveCursor = useCallback((index: number, dx: number, dy: number) => {
-    const ps = [...playersRef.current];
-    const p = ps[index]; if (!p) return;
-    // The carousel is the grid laid end to end, so up and down have no row to move to: they walk it
-    // the same way left and right do, which is what a player on a pad or the arrow keys expects of a
-    // list with one card on screen.
-    if (carouselRef.current && dy && !dx) { dx = dy; dy = 0; }
-    // A seat that has taken the Visitors button is locked in on purpose, and left and right walk
-    // the animals it has earned rather than the grid behind them. This is the one place a locked
-    // seat still answers the stick.
-    if (p.cursor === 'visitors' && p.ready) {
-      const list = visitorsRef.current;
-      if (!list.length || !dx) return;
-      const at = Math.max(0, list.findIndex((v) => v.id === p.creature));
-      const v = list[(at + dx + list.length) % list.length];
-      ps[index] = { ...p, creature: v.id as CreatureId, visitorScale: startScale(v) };
-      updatePlayers(ps); audio.play('ui-move');
-      return;
-    }
-    if (p.ready) return;
-    const from: Slot = p.cursor ? { kind: 'extra', id: p.cursor } : { kind: 'creature', id: p.creature };
-    const depth = depthRef.current;
-    const to = depth
-      ? depthStep(depth, from, dx, dy) as Slot
-      : gridStep(rosterGrid(CREATURE_IDS, extrasRef.current, colsRef.current), from, dx, dy);
-    if (sameSlot(to, from)) return;
-    ps[index] = to.kind === 'extra'
-      ? { ...p, cursor: to.id }
-      : { ...p, cursor: undefined, creature: to.id as CreatureId };
-    updatePlayers(ps); audio.play('ui-move');
-  }, [updatePlayers]);
-  const cycleCreature = useCallback((index: number, dir: number) => moveCursor(index, dir, 0), [moveCursor]);
+    commitLineup(lineup.moveCursor(playersRef.current, index, dx, dy, pickGrid()));
+  }, [commitLineup, pickGrid]);
   const setCreature = useCallback((index: number, c: CreatureId) => {
-    const ps = [...playersRef.current];
     // Choosing an animal with nobody seated *is* the keyboard joining. A player who reached the
     // roster without pressing start (from the other game's picker) has no seat, and clicking a
     // creature is exactly the gesture that should open one — on the animal they clicked, rather
     // than on a default somebody has to correct.
-    if (!ps.length && index === 0) {
-      updatePlayers([{ creature: c, device: handRef.current, ready: false }]);
-      audio.init(); audio.resume(); audio.play('ui-join');
-      return;
-    }
-    if (!ps[index] || ps[index].ready) return;
-    ps[index] = { ...ps[index], creature: c }; updatePlayers(ps); audio.play('ui-move');
-  }, [updatePlayers]);
+    const change = lineup.setCreature(playersRef.current, index, c, handRef.current);
+    if (change?.joined) { updatePlayers(change.players); audio.init(); audio.resume(); audio.play(change.sound); return; }
+    commitLineup(change);
+  }, [commitLineup, updatePlayers, handRef]);
   const toggleReady = useCallback((index: number) => {
-    const ps = [...playersRef.current]; const p = ps[index]; if (!p) return;
-    const ready = !p.ready;
-    // Letting go of a visitor hands the local roster back: the seat keeps an animal this sea has,
-    // rather than a foreign body it is no longer locked in on.
-    ps[index] = ready || !p.visitorScale
-      ? { ...p, ready }
-      : { ...p, ready, visitorScale: undefined, cursor: undefined, creature: ACTIVE_ERA.defaults.player };
-    updatePlayers(ps); audio.play(ready ? 'ui-confirm' : 'ui-back');
-  }, [updatePlayers]);
+    commitLineup(lineup.toggleReady(playersRef.current, index, ACTIVE_ERA.defaults.player));
+  }, [commitLineup]);
   /**
    * Take whatever the cursor is on. On a creature that is locking in, which is what confirm has
    * always meant here; on one of the grid's buttons it is pressing the button.
@@ -672,30 +587,15 @@ export function App() {
    * able to press it again or walk away from it.
    */
   const activate = useCallback((index: number) => {
-    const ps = [...playersRef.current];
-    const p = ps[index]; if (!p) return;
-    if (p.cursor === 'random' && !p.ready) {
-      const pool = CREATURE_IDS.filter((id) => id !== p.creature);
-      const pick = (pool.length ? pool : CREATURE_IDS)[Math.floor(Math.random() * (pool.length || CREATURE_IDS.length))];
-      ps[index] = { ...p, cursor: undefined, creature: pick };
-      updatePlayers(ps); audio.play('ui-confirm');
-      return;
-    }
-    if (p.cursor === 'visitors' && !p.ready) {
-      const v = visitorsRef.current[0];
-      if (v) {
-        ps[index] = { ...p, creature: v.id as CreatureId, visitorScale: startScale(v), ready: true };
-        updatePlayers(ps); audio.play('ui-confirm');
-        return;
-      }
-    }
-    if (p.ready) startMatch(); else toggleReady(index);
-  }, [startMatch, toggleReady, updatePlayers]);
+    const r = lineup.activate(playersRef.current, index, pickGrid(), Math.random);
+    if (r === 'start') startMatch();
+    else if (r === 'toggle') toggleReady(index);
+    else commitLineup(r);
+  }, [commitLineup, pickGrid, startMatch, toggleReady]);
   /** A pointer press on one of the grid's buttons: put that seat's cursor on it, then take it. */
   const pressExtra = useCallback((index: number, id: ExtraId) => {
-    const ps = [...playersRef.current];
-    const p = ps[index]; if (!p || p.ready) return;
-    ps[index] = { ...p, cursor: id };
+    const ps = lineup.pointAtExtra(playersRef.current, index, id);
+    if (!ps) return;
     playersRef.current = ps;
     updatePlayers(ps);
     activate(index);
@@ -708,35 +608,26 @@ export function App() {
    * that is plainly unavailable — so the card only offers it when it is real.
    */
   const toggleCarry = useCallback((index: number) => {
-    const p = playersRef.current[index];
-    if (!p || (modeRef.current !== 'rise' && modeRef.current !== 'survival') || !(recordRef.current.best[p.creature] ?? 0)) return;
-    const next = [...carryRef.current];
-    next[index] = !next[index];
+    const next = lineup.toggleCarry(playersRef.current, carryRef.current, index, modeRef.current, recordRef.current.best);
+    if (!next) return;
     setCarryBoth(next); audio.play(next[index] ? 'ui-confirm' : 'ui-back');
   }, [setCarryBoth]);
   const removePlayer = useCallback((index: number) => {
-    const ps = playersRef.current.filter((_, i) => i !== index);
-    if (!ps.length) { backToTitle(); return; }
+    const r = lineup.removePlayer(playersRef.current, carryRef.current, index);
+    if (r === 'empty') { backToTitle(); return; }
     // The choice is indexed by seat, so it has to shuffle down with the seats.
-    setCarryBoth(carryRef.current.filter((_, i) => i !== index));
-    updatePlayers(ps); audio.play('ui-back');
+    setCarryBoth(r.carry);
+    updatePlayers(r.players); audio.play('ui-back');
   }, [backToTitle, setCarryBoth, updatePlayers]);
   const addPlayer = useCallback((device: PlayerSetup['device']) => {
-    const ps = playersRef.current;
-    if (ps.length >= 4 || ps.some((p) => p.device === device)) return;
-    updatePlayers([...ps, { creature: CREATURE_IDS[ps.length % CREATURE_IDS.length], device, ready: false }]);
-    audio.play('ui-join');
-  }, [updatePlayers]);
-  /**
-   * The local seat joins once and only once: two players never share the keyboard, and there is one
-   * screen to put fingers on. `typeof device === 'string'` is what "local" means here, and it covers
-   * the glass as well as the two keyboard halves.
-   */
+    commitLineup(lineup.addPlayer(playersRef.current, device, CREATURE_IDS));
+  }, [commitLineup]);
+  /** The local seat joins once and only once (`lineup.hasLocalSeat`). */
   const addKeyboard = useCallback(() => {
-    if (playersRef.current.some((p) => typeof p.device === 'string')) return;
+    if (lineup.hasLocalSeat(playersRef.current)) return;
     addPlayer(handRef.current);
-  }, [addPlayer]);
-  const changeMode = useCallback((m: Mode) => { modeRef.current = m; setMode(m); audio.play('ui-move'); updatePlayers(playersRef.current.map((p) => ({ ...p, ready: false }))); }, [updatePlayers]);
+  }, [addPlayer, handRef]);
+  const changeMode = useCallback((m: Mode) => { setModeBoth(m); audio.play('ui-move'); updatePlayers(lineup.unready(playersRef.current)); }, [setModeBoth, updatePlayers]);
 
   /**
    * Hand the sticks to the next group along. The pad that does it owns the ring, so on a shared
@@ -759,173 +650,18 @@ export function App() {
   }, [changeMode, groupEls, setFocusBoth]);
 
 
-  // ---- Gamepad menu navigation ----
-  useEffect(() => {
-    const prev = new Map<number, RawControls>();
-    const repeat = new Map<number, number>();
-    const loop = () => {
-      const pads = gamepads();
-      const live = pads.map((g) => g.index);
-      setPadIndices((old) => (old.length === live.length && old.every((v, i) => v === live[i]) ? old : live));
-      for (const gp of pads) {
-        // Re-read the screen for every pad. One pad starting the game moves everyone to the
-        // select screen immediately, and the pads after it in this same frame must see that —
-        // otherwise a second pad pressing at the same moment restarts from the title and throws
-        // the first player away.
-        const s = screenRef.current;
-        const c = readGamepad(gp);
-        const p = prev.get(gp.index);
-        const just = (k: keyof RawControls) => !!c[k] && !p?.[k];
-        const now = performance.now();
-        // A pad counts as input too, so the loader holds off while somebody is steering a menu.
-        if (c.anyButton || Math.hypot(c.mx, c.my) > 0.3) lastInputRef.current = now;
-        if (dialogRef.current) {
-          if (just('back') || just('menu')) openDialog(null);
-        } else if (s === 'title') {
-          // The shoulders reach the era link and the icon buttons; everything else is "press start"
-          // until the ring has moved off the screen's own business.
-          if (just('lb')) cycleFocus(-1, gp.index);
-          else if (just('rb')) cycleFocus(1, gp.index);
-          else if (focusRef.current.group !== 'main') {
-            const d = padDir(c, just, gp.index, now, repeat);
-            if (d) moveFocus(d);
-            else if (just('confirm')) runFocused();
-            else if (just('back')) setFocusBoth(atMain());
-          }
-          else if (c.any && !(p?.any)) startFromTitle(gp.index);
-        } else if (s === 'select') {
-          const ps = playersRef.current;
-          const idx = ps.findIndex((x) => x.device === gp.index);
-          // Any button joins, not just A. The title says PRESS START, so Start has to work here
-          // too, and a pad that reports a non-standard mapping still gets its player in.
-          if (idx < 0) { if (just('anyButton')) addPlayer(gp.index); }
-          else if (focusRef.current.owner === gp.index && focusRef.current.group !== 'main') {
-            // This pad has taken the ring off the roster. The others carry on picking.
-            if (just('lb')) cycleFocus(-1, gp.index);
-            else if (just('rb')) cycleFocus(1, gp.index);
-            else {
-              const d = padDir(c, just, gp.index, now, repeat);
-              if (d) moveFocus(d);
-              else if (just('confirm')) runFocused();
-              else if (just('back')) setFocusBoth(atMain());
-            }
-          }
-          else {
-            const stickX = Math.abs(c.mx) > 0.6 ? Math.sign(c.mx) : 0, stickY = Math.abs(c.my) > 0.6 ? -Math.sign(c.my) : 0;
-            const dx = just('dright') ? 1 : just('dleft') ? -1 : 0, dy = just('ddown') ? 1 : just('dup') ? -1 : 0;
-            const lastRep = repeat.get(gp.index) ?? 0;
-            if (dx || dy) { moveCursor(idx, dx, dy); repeat.set(gp.index, now); }
-            else if ((stickX || stickY) && now - lastRep > 240) { moveCursor(idx, stickX, stickY); repeat.set(gp.index, now); }
-            if (just('confirm')) activate(idx);
-            if (just('back')) { if (ps[idx].ready) toggleReady(idx); else removePlayer(idx); }
-            if (just('menu')) startMatch();
-            // Hatch, or carry on from your record. On `light` — X — because it is the one attack
-            // control no other menu action wants; `ability` would be worse rather than better,
-            // since two menu actions on one button is the collision that matters here.
-            if (just('light')) toggleCarry(idx);
-            // LB and RB hand the sticks to the next group along — the roster, the mode chips, the
-            // icon buttons. Bind to the raw shoulder buttons, never to a gameplay control: this
-            // used to read `burst`, which is button 0 — the same button as confirm — so every A
-            // press locked the player in and then changed mode, and changeMode un-readies
-            // everyone, which meant nobody could ever lock in or start a match.
-            if (just('lb')) cycleFocus(-1, gp.index);
-            else if (just('rb')) cycleFocus(1, gp.index);
-          }
-        } else if ((s === 'playing' && pausedRef.current) || s === 'results') {
-          // Deaf for a moment after the menu opens. The results screen arrives on its own, with a
-          // hand still working the pad, and a button that was part of the fight must not answer a
-          // question it never saw. A button held across the lockout is not an edge afterwards
-          // either, so it stays silent until it is released and pressed again.
-          const awake = menuCursorRef.current.shown;
-          const dir = padDir(c, just, gp.index, now, repeat);
-          // The shoulders reach the icon buttons from a menu too, so a pause is a way to the
-          // settings without a mouse.
-          if (just('lb')) cycleFocus(-1, gp.index);
-          else if (just('rb')) cycleFocus(1, gp.index);
-          else if (focusRef.current.group !== 'main') {
-            if (dir) moveFocus(dir);
-            else if (just('confirm')) runFocused();
-            else if (just('back')) setFocusBoth(atMain());
-          }
-          // The choices are a row, so left and right walk them; `spatial-nav` reads where they
-          // actually are, which is what makes up and down keep working on a row that wrapped.
-          else if (dir) { menuInput({ step: menuStep(dir) }); }
-          else if (just('confirm')) menuInput({ confirm: true });
-          // Any other button wakes a sleeping cursor, and only that.
-          else if (!awake && just('anyButton')) menuInput({ other: true });
-          // The pause menu was opened deliberately, so the button that opened it closes it —
-          // but never during the lockout, and never before the cursor is awake.
-          else if (awake && s === 'playing' && (just('menu') || just('back')) && now - menuAtRef.current >= MENU_LOCKOUT) setPausedBoth(false);
-        }
-        prev.set(gp.index, c);
-      }
-      // Forget pads that have gone, so a reconnect starts from a clean edge rather than
-      // inheriting the buttons that were held when it vanished.
-      for (const index of prev.keys()) if (!live.includes(index)) { prev.delete(index); repeat.delete(index); }
-    };
-    // Deliberately a timer and not requestAnimationFrame. The Gamepad API is a snapshot: a button
-    // that goes down and up between two polls is never seen at all. Polling on animation frames
-    // ties menu input to how fast the sea happens to be rendering, and a frame that runs long —
-    // parsing a creature model, building chunk geometry — swallows a whole press. At 120 Hz here
-    // a tap has to be shorter than 8 ms to be missed.
-    const id = setInterval(loop, 1000 / 120);
-    return () => clearInterval(id);
-    // padIndices is deliberately not a dependency: it is written from inside this loop, and
-    // listing it would tear the loop down and rebuild it every time a pad connects, losing the
-    // button edges held in `prev`.
-  }, [activate, addPlayer, changeMode, menuInput, moveCursor, openDialog, removePlayer, setPausedBoth, startFromTitle, startMatch, toggleCarry, toggleReady]);
+  // ---- Menu navigation: the pads, and the keyboard ----
+  // Both run outside the render (a timer, a listener) and read the shell through refs; what they
+  // may do is the `MenuWiring` below. The effects re-subscribe on exactly the callbacks they always
+  // did (see the hooks).
+  const menuWiring: MenuWiring = {
+    screenRef, dialogRef, pausedRef, playersRef, focusRef, menuCursorRef, menuAtRef, lastInputRef, handRef, modeRef, modes: MODES,
+    setPadIndices, openDialog, cycleFocus, moveFocus, runFocused, setFocusBoth, startFromTitle, addPlayer, addKeyboard, moveCursor,
+    activate, toggleReady, removePlayer, startMatch, toggleCarry, menuInput, menuStep, setPausedBoth, backToTitle, changeMode,
+  };
+  usePadMenus(menuWiring);
+  useMenuKeys(menuWiring);
 
-  // ---- Keyboard menu navigation ----
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.target as HTMLElement | null)?.matches?.('input,textarea,select')) return;
-      const s = screenRef.current;
-      if (dialogRef.current) { if (e.code === 'Escape') openDialog(null); return; }
-      if (s === 'title') { if (!e.metaKey && !e.ctrlKey && e.code !== 'F11') startFromTitle(handRef.current); return; }
-      if (s === 'select') {
-        const ps = playersRef.current;
-        // The local seat, whichever it joined on: a tablet with a keyboard case still answers keys.
-        const idx = ps.findIndex((x) => x.device === 'keyboard' || x.device === 'touch');
-        if (idx >= 0) {
-          if (e.code === 'ArrowRight' || e.code === 'KeyD') moveCursor(idx, 1, 0);
-          if (e.code === 'ArrowLeft' || e.code === 'KeyA') moveCursor(idx, -1, 0);
-          if (e.code === 'ArrowDown' || e.code === 'KeyS') moveCursor(idx, 0, 1);
-          if (e.code === 'ArrowUp' || e.code === 'KeyW') moveCursor(idx, 0, -1);
-          if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); activate(idx); }
-          if (e.code === 'Escape') { if (ps[idx].ready) toggleReady(idx); else backToTitle(); }
-          // The keyboard's own way to the same choice the pad makes with Y.
-          if (e.code === 'KeyC') toggleCarry(idx);
-        } else if (e.code === 'Enter' || e.code === 'Space') addKeyboard();
-        if (e.code === 'KeyQ') changeMode(MODES[(MODES.indexOf(modeRef.current) + MODES.length - 1) % MODES.length]);
-        if (e.code === 'KeyE') changeMode(MODES[(MODES.indexOf(modeRef.current) + 1) % MODES.length]);
-        return;
-      }
-      if (s === 'results' || (s === 'playing' && pausedRef.current)) {
-        // The same rules for the keyboard: a lockout, a cursor, and one key that acts.
-        const awake = menuCursorRef.current.shown;
-        if (e.code === 'ArrowDown' || e.code === 'KeyS') { e.preventDefault(); menuInput({ step: 1 }); return; }
-        if (e.code === 'ArrowUp' || e.code === 'KeyW') { e.preventDefault(); menuInput({ step: -1 }); return; }
-        if (e.code === 'Enter' || e.code === 'Space') { e.preventDefault(); menuInput({ confirm: true }); return; }
-        if (e.code === 'Escape' && s === 'playing' && awake && performance.now() - menuAtRef.current >= MENU_LOCKOUT) { setPausedBoth(false); return; }
-        menuInput({ other: true });
-        return;
-      }
-      if (s === 'playing') {
-        // Escape is `menu` on both keyboard layouts, so for a match with a keyboard player in it
-        // the engine already turns it into a pause (`onMenu`). Toggling here as well would flip
-        // the pause twice in the same press and leave it exactly where it started — which is what
-        // used to happen, and is why Escape appeared to do nothing on a keyboard. Only a match
-        // made entirely of controllers needs this path.
-        const onKeyboard = playersRef.current.some((pl) => typeof pl.device === 'string');
-        if (e.code === 'Escape' && !onKeyboard) { setPausedBoth(!pausedRef.current); audio.play('ui-confirm'); }
-        if (pausedRef.current && e.code === 'Enter') setPausedBoth(false);
-        return;
-      }
-
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [activate, addKeyboard, backToTitle, changeMode, menuInput, moveCursor, openDialog, setPausedBoth, startFromTitle, startMatch, toggleCarry, toggleReady]);
 
   // Idle-time preloading: tell the loader what is most likely to be needed next.
   useEffect(() => {
@@ -991,7 +727,7 @@ export function App() {
     return [];
   }, [screen, paused, small.touch, recPhase, hud?.canContinue, keepPlaying, playAgain, backToSelect]);
   useEffect(() => { if (!paused) setPauseScores(false); }, [paused]);
-  useEffect(() => { menuItemsRef.current = menuItems; }, [menuItems]);
+  const menuItemsRef = useLatest(menuItems);
   // The recorder stops itself when its buffer fills, so the menu reads the real state whenever it
   // opens rather than trusting what it last set.
   useEffect(() => { if (paused) setRecPhase(recordingPhase()); }, [paused]);
@@ -1036,8 +772,7 @@ export function App() {
   useEffect(() => {
     if (!menuOpen) return;
     // The pause menu was asked for, so its cursor is awake at once; the results screen was not.
-    const cursor = freshCursor(screen !== 'results');
-    menuCursorRef.current = cursor; setMenuCursor(cursor);
+    setMenuCursorBoth(freshCursor(screen !== 'results'));
     menuAtRef.current = performance.now();
   }, [menuOpen, screen]);
 

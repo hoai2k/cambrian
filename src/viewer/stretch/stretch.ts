@@ -185,7 +185,7 @@ export function stretchDirection(doc: Pick<StretchDoc, 'frame' | 'tiltSide' | 't
 }
 
 /** A cut's centre: where it crosses the body's own centre line. */
-export function planeCentre(doc: StretchDoc, at: number): Vec3 {
+function planeCentre(doc: StretchDoc, at: number): Vec3 {
   const { A, L, U } = axes(doc.frame);
   const c: Vec3 = [0, 0, 0];
   c[A] = at;
@@ -288,7 +288,7 @@ export interface StretchInput {
  * front third of the animal, which is where a neck is on everything this tool is for. They are
  * meant to be dragged.
  */
-export const DEFAULT_FROM = 0.34, DEFAULT_TO = 0.13;
+const DEFAULT_FROM = 0.34, DEFAULT_TO = 0.13;
 
 /** The axial coordinate a fraction of the way back from the nose. */
 export function axisAt(doc: StretchDoc, headFraction: number): number {

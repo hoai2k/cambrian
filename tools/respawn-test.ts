@@ -64,7 +64,7 @@ assert(hatchSeen,'Respawn must play its hatch/moult state');
     'the hold has to end exactly where the shell splits, or the player waits on an animation');
   const e = new Game('rise', [{ creature: 'waptia', device: 'keyboard', ready: true }], 9);
   const h = e.players[0];
-  assert(h.hatching && h.state === 'moult' && Math.abs(h.stateDur - HATCH_HOLD) < 1e-9,
+  assert(h.hatching && (h.state as string) === 'moult' && Math.abs(h.stateDur - HATCH_HOLD) < 1e-9,
     `a run starts in an egg held for the hold (${h.stateDur})`);
   const push = new Map([[0, { ...emptyInput(), my: 1, camYaw: 0 }]]);
   const run = (seconds: number) => { const at = { ...h.pos }; for (let i = 0; i < seconds * 60; i++) { e.step(1 / 60, push); e.events.length = 0; } return Math.hypot(h.pos.x - at.x, h.pos.z - at.z); };

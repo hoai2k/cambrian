@@ -1,9 +1,9 @@
-import type { Rect } from '../render/engine';
+import type { ViewportRect } from '../shared/hud-types';
 
 /** Where the icon buttons sit, or that they are not drawn at all. */
 export type ToolbarPlace = 'right' | 'left' | 'hidden';
 
-export interface ToolbarView { rect: Rect; senseOn: boolean }
+export interface ToolbarView { rect: ViewportRect; senseOn: boolean }
 
 /**
  * Which corner the icon buttons take, given who is looking at each corner.

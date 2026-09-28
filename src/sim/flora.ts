@@ -156,7 +156,7 @@ export function resolveFlora(world: WorldData, a: Actor, dt: number, scratch: Fl
   /** How deep into the growth a body that hauls itself through it is, for the pull applied below. */
   let weed = 0;
   if (out) { out.blocked = false; out.headOn = false; out.top = -Infinity; }
-  for (const f of world.floraHash.query(pos.x, pos.z, ra + world.floraReach, scratch)) {
+  for (const f of world.floraContact.query(pos.x, pos.z, ra, scratch)) {
     // Cheap rejects first: most candidates are nowhere near.
     const dx0 = pos.x - f.pos.x, dz0 = pos.z - f.pos.z;
     const reach = f.R + ra + (f.active ? f.maxB : 0);

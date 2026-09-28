@@ -1,5 +1,5 @@
 export type TriassicCreatureId =
-  // the 21 playable animals (docs/triassic/01-triassic-design.md)
+  // the roster (docs/triassic/01-triassic-design.md); which of them are offered is the card's `npc`/`shelved`
   | 'cymbospondylus' | 'shonisaurus'
   | 'nothosaurus' | 'dinocephalosaurus' | 'helicoprion' | 'rhaeticosaurus' | 'atopodentatus'
   | 'askeptosaurus' | 'placodus' | 'hybodus' | 'birgeria' | 'aphaneramma' | 'mixosaurus' | 'henodus' | 'saurichthys' | 'hupehsuchus'

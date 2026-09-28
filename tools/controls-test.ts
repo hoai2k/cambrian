@@ -6,6 +6,7 @@
 import { Game } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
 import type { CreatureId } from '../src/sim/creatures';
+import { checker, finish } from './lib/test';
 
 function drive(creature: CreatureId, camYaw: number, mx: number, my: number, seconds = 1.5) {
   const g = new Game('reef', [{ creature, device: 'keyboard', ready: true }], 42);
@@ -22,8 +23,7 @@ function drive(creature: CreatureId, camYaw: number, mx: number, my: number, sec
   return { onRight: d.x * right.x + d.z * right.z, onFwd: d.x * fwd.x + d.z * fwd.z, dist: Math.hypot(d.x, d.z) };
 }
 
-let failed = 0;
-const check = (name: string, ok: boolean, detail: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${name.padEnd(38)} ${detail}`); if (!ok) failed++; };
+const check = checker(38);
 
 for (const camYaw of [0, 0.7, 2.4, -1.9]) {
   const r = drive('waptia', camYaw, 1, 0);
@@ -103,7 +103,7 @@ check('crawler: stick right -> screen right', c.onRight > 0.5 && c.onRight > Mat
 // one only; looking up is always deliberate and is taken at close to its face value. At the end of
 // the camera's own travel, either way, the body swims at exactly the angle being looked along.
 {
-  const { swimPitch, PITCH_UP, PITCH_DOWN } = await import('../src/render/engine');
+  const { swimPitch, PITCH_UP, PITCH_DOWN } = await import('../src/render/camera');
   const deg = (d: number) => (d * Math.PI) / 180;
   for (const d of [0, 11, 20, 25]) check(`camera ${d}° down: forward stays level`, swimPitch(deg(d)) === 0, `pitch=${swimPitch(deg(d)).toFixed(3)}`);
   check('camera 40° down: forward tilts, but less than the camera', swimPitch(deg(40)) > 0 && swimPitch(deg(40)) < deg(40), `pitch=${swimPitch(deg(40)).toFixed(3)}`);
@@ -124,7 +124,7 @@ check('crawler: stick right -> screen right', c.onRight > 0.5 && c.onRight > Mat
 // degrees flatter than it was aimed and made lining one up on prey above or below harder than
 // lining it up on prey alongside.
 {
-  const { swimPitch } = await import('../src/render/engine');
+  const { swimPitch } = await import('../src/render/camera');
   const deg = (r: number) => (r * 180) / Math.PI;
   for (const camPitch of [-0.95, -0.6, -0.3, 0]) {
     const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 21);
@@ -157,6 +157,4 @@ check('crawler: stick right -> screen right', c.onRight > 0.5 && c.onRight > Mat
   hold(true, 2); hold(false, 600);
   check('...and off stays off however long you swim', !p.senseMode, `after 10 s: senseMode=${p.senseMode}`);
 }
-
-console.log(failed ? `\n${failed} FAILED` : '\nall control-direction tests passed');
-process.exit(failed ? 1 : 0);
+finish('all control-direction tests passed');

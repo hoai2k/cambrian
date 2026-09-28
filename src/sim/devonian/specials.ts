@@ -172,7 +172,7 @@ export function stepGuardSpecial(g: Game, a: Actor, d: DevActor, dt: number): vo
   if (def.ability !== 'brushDisplay') return;
   for (const [id, t] of d.bluffed) {
     if (t + 20 < g.time) { d.bluffed.delete(id); continue; }
-    // the bluff holds for six seconds even on a bot, which the shared brain never lets rout
+    // the bluff holds for six seconds, whatever the shared brain would rather do
     const o = g.byId(id);
     if (o && o.brain && isAlive(o) && t + 6 > g.time) { o.brain.goal = 'flee'; o.brain.target = a.id; }
   }

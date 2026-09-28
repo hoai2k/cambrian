@@ -4,14 +4,16 @@ import type { Game, RadarBlip } from './game';
 import type { Actor, InputFrame, Mode, WorldEvent } from './types';
 import type { CreatureId } from './creatures';
 import type { ExpansionContext } from './expansion-abilities';
+import { CAMBRIAN_RULES } from './cambrian/rules';
 import { DEVONIAN_RULES } from './devonian/rules';
 import { TRIASSIC_RULES } from './triassic/rules';
 
 /**
- * The seams where an era changes how the shared simulation behaves. Every hook is optional in
- * effect: when RULES is undefined (the Cambrian build) the Game takes exactly the paths it always
- * took. The Devonian implementation lives in src/sim/devonian/ and reaches the game only through
- * these calls, so the two eras never share gameplay code paths they do not both want.
+ * The seams where an era changes how the shared simulation behaves. Every era has a rules object
+ * (`src/sim/cambrian/rules.ts`, `devonian/rules.ts`, `triassic/rules.ts`) and `RULES` is always
+ * one of them. A required hook is somewhere each era has an answer of its own — the ladder, the
+ * climb, the breach, the hints; an optional one is an era adding to or overriding what the shared
+ * code does, and absent means the shared default, which is also what the Cambrian gets.
  */
 export interface EraHud {
   /** 0..100 growth meter: what this animal has eaten, which is what moults it up a stage. */
@@ -47,18 +49,18 @@ export interface EraHud {
   beached: boolean;
   /** Dead zones as world offsets from the player and radii, for the radar. */
   deadZones: { dx: number; dz: number; r: number }[];
-  /** Seconds this player has held Prime, for Rise's win countdown. */
-  primeT: number;
+  /** Seconds left of holding Prime before Rise is won, or 0 while not holding it. */
+  primeLeft: number;
   inDeadZone: boolean;
 }
 
 export interface EraRules {
   /** Once, when the era is chosen: registers its specials with the shared tables. */
-  install(): void;
+  install?(): void;
   /** The Y button's own special for this creature, when the era gives it one instead of the shared hide. */
-  ySpecial(id: CreatureId): { name: string; desc: string } | undefined;
-  /** Starting body scale for the player or bot at `index` in `mode`, for creature `id`. */
-  startScale(mode: Mode, index: number, id: CreatureId): number;
+  ySpecial?(id: CreatureId): { name: string; desc: string } | undefined;
+  /** Starting body scale for a player in `mode`, for creature `id`. */
+  startScale(mode: Mode, id: CreatureId): number;
   /**
    * The growth ladder, in this era's own terms (see src/sim/ladder.ts). Five rungs either way:
    * the Cambrian's tiers and the Devonian's life stages are the same ladder under two names, and
@@ -79,69 +81,67 @@ export interface EraRules {
   /** The other direction: how full this body's growth meter is, 0..1, for reading a mark back. */
   ladderFillOf(g: Game, a: Actor): number;
   /**
-   * Optional: a player has just changed which creature they are, in place. The shared code has
-   * already set the new body and its scale; an era that keeps growth in a side table of its own
-   * has to resync that table here, because nothing else derives it per step.
+   * A player's body has just been given a new scale in place (a change of creature, or a place set
+   * on the ladder): the era reads its rung back from that scale — the Cambrian's `tier`, the other
+   * two eras' stage in their side table — because nothing else derives it per step.
    */
-  onSwap?(g: Game, a: Actor): void;
+  onSwap(g: Game, a: Actor): void;
   /**
-   * Where a player or bot hatches, given the nursery centre; undefined leaves the shared placement.
+   * Where a player hatches, given the nursery centre; undefined leaves the shared placement.
    * The Devonian puts every hatchling inside plant cover, on the floor or up a column.
    */
-  spawnPoint(g: Game, center: Vec3, id: CreatureId, scale: number, index: number): Vec3 | undefined;
-  /** The nursery a bot hatches in; undefined puts it with the players. */
-  botNursery(index: number): Vec3 | undefined;
+  spawnPoint?(g: Game, center: Vec3, id: CreatureId, scale: number, index: number): Vec3 | undefined;
   /** Seconds of protection a body gets when it hatches or comes back. */
-  spawnProtect(a: Actor): number;
-  /**
-   * Optional: this body is born alive rather than hatched from an egg on the sand. The hatch is
-   * then the short swell where the era's `spawnPoint` put it (the Triassic: at the surface,
-   * beside a mother) and no egg is laid or drawn.
-   */
-  liveBirth?(a: Actor): boolean;
+  spawnProtect?(a: Actor): number;
   /**
    * True when `hunter` (an AI body) must leave `target` alone unless provoked: the era's nursery
    * sanctuary. The caller has already established the hunter is not provoked.
    */
-  sanctuary(hunter: Actor, target: Actor): boolean;
-  init(g: Game): void;
+  sanctuary?(hunter: Actor, target: Actor): boolean;
+  init?(g: Game): void;
   /** After every fixed step, before the events are drained by the renderer. */
-  step(g: Game, dt: number): void;
-  /** Nutrition a player or bot just gained; `food` is the eaten actor when there is one. */
-  onNutrition(g: Game, a: Actor, amount: number, food: Actor | undefined): void;
+  step?(g: Game, dt: number): void;
+  /** Nutrition a player just gained; `food` is the eaten actor when there is one. */
+  onNutrition?(g: Game, a: Actor, amount: number, food: Actor | undefined): void;
   /**
    * Survival's growth, which is not a meal: `fraction` of the whole ladder, hatchling to top. The
    * era turns it into its own units without the food-chain weighting a meal goes through, so every
    * animal climbs at the same pace in every game (`SURVIVAL_TOP_SECONDS`).
    */
-  survivalGrow?(g: Game, a: Actor, fraction: number): void;
+  survivalGrow(g: Game, a: Actor, fraction: number): void;
   /** When true the shared nutrition → tier growth runs; when false the era owns growth. */
   growthByNutrition: boolean;
-  /** Damage multiplier from armour, enrolment or a withdrawn shell; 1 = none. `dir` points attacker → victim. */
-  armour(attacker: Actor, victim: Actor, dir: Vec3): number;
+  /** Damage multiplier from armour, enrolment or a withdrawn shell; 1 = none. `dir` points attacker → victim. Pure. */
+  armour?(attacker: Actor, victim: Actor, dir: Vec3): number;
+  /**
+   * A hit on `victim` that something else takes instead (the Triassic's pod shield). It deals with
+   * the body that took it and returns the multiplier left for the victim, used in place of
+   * `armour`; undefined when nothing stands in.
+   */
+  shield?(g: Game, attacker: Actor, victim: Actor): number | undefined;
   /** How far past the shore wall this body may push (world units). */
-  shoreReach(a: Actor): number;
+  shoreReach?(a: Actor): number;
   /** This body sprints as a backward jet and rises/sinks for free. */
-  jet(a: Actor): boolean;
+  jet?(a: Actor): boolean;
   /** The body scales a moult ceremony grows between; undefined leaves the shared tier scales in charge. */
-  moultScale(g: Game, a: Actor): { from: number; to: number } | undefined;
+  moultScale?(g: Game, a: Actor): { from: number; to: number } | undefined;
   /** Y pressed while free or guarding and not hidden: true when the era's own special took it (the shared hide is skipped). */
-  useAbility(g: Game, a: Actor, ctx: ExpansionContext): boolean;
+  useAbility?(g: Game, a: Actor, ctx: ExpansionContext): boolean;
   /** A heavy special started (after the shared begin): the era may aim and commit it. */
   /** Optional: the shared code aims and carries every heavy strike (`HEAVY_STRIKE`); this is for
    *  anything an era needs on top of that. */
   beginAbility?(g: Game, a: Actor, ctx: ExpansionContext): void;
   /** Every step in the 'ability' state (after the shared step). */
-  stepAbility(g: Game, a: Actor, ctx: ExpansionContext, dt: number): void;
+  stepAbility?(g: Game, a: Actor, ctx: ExpansionContext, dt: number): void;
   /** Multiplier on the camouflage stamina drain. */
-  camoDrain(a: Actor): number;
+  camoDrain?(a: Actor): number;
   /**
    * How this body swims where it wants to go: `speed` scales cruise for the direction asked
    * (relative to the heading), `turn` scales the turn rate, `impulse` is an instant velocity along
    * the heading (a fast-start) on the sprint press. `dir` is the unit direction asked for, `mag`
    * the stick magnitude, `cruise` the speed the shared rules would give.
    */
-  swim(g: Game, a: Actor, dir: Vec3, mag: number, cruise: number, burstPressed: boolean): { speed: number; turn: number; impulse: number };
+  swim?(g: Game, a: Actor, dir: Vec3, mag: number, cruise: number, burstPressed: boolean): { speed: number; turn: number; impulse: number };
   /**
    * The vertical assist for this body this step, in units/s, positive up: what the rise and sink
    * buttons are worth to it and anything it does for itself. `base` is the rate the shared rules
@@ -156,7 +156,7 @@ export interface EraRules {
    * The Devonian's bimodal breathers recover at a quarter of it under water and at the full rate
    * the moment they touch the surface, which is also where the bar is handed back whole.
    */
-  staminaRegen(g: Game, a: Actor): number;
+  staminaRegen?(g: Game, a: Actor): number;
   /** Whether this body can recover health in its current breathing state. */
   canRecoverHealth?(g: Game, a: Actor): boolean;
   /**
@@ -165,25 +165,16 @@ export interface EraRules {
    * upward part of the motion is accelerated, since the climb is what is being given away and
    * nothing else. Devonian lungs climb for free; everything else pays in full.
    */
-  climbRelief(a: Actor, input: InputFrame, dir: Vec3, mag: number): number;
+  climbRelief?(a: Actor, input: InputFrame, dir: Vec3, mag: number): number;
   /** May this body leave the water when it drives hard at the surface? */
   canBreach(a: Actor): boolean;
   /** Height a body hatches at, given the floor under it and its length. */
-  spawnY(ground: number, L: number, isGround: boolean): number;
+  spawnY?(ground: number, L: number, isGround: boolean): number;
   /** Height an AI body wanders to, given the floor there. */
-  wanderY(a: Actor, ground: number, rng: () => number): number;
+  wanderY?(a: Actor, ground: number, rng: () => number): number;
   /** Replaces the death penalty. */
   onRespawn(g: Game, a: Actor): void;
-  /** Win checks for the era's own modes; the shared ones (reef, hunted) run as before. */
-  updateModes(g: Game, dt: number): void;
-  /**
-   * A finished co-op match is being carried on (`Game.continueMatch`): clear whatever the era was
-   * counting towards its win so the goal is not met again the instant play resumes. `winner` is the
-   * seat that just finished, and it is *only* that seat's clock to clear — every other seat is
-   * still growing its own animal towards its own apex.
-   */
-  continueMatch(g: Game, winner: number): void;
-  hud(g: Game, i: number): EraHud | undefined;
+  hud?(g: Game, i: number): EraHud | undefined;
   hint(g: Game, i: number): string | undefined;
   /**
    * How this contender reads on the scoreboard, when the era ranks its players by something of
@@ -207,11 +198,13 @@ export interface EraRules {
   radar?(g: Game, p: Actor, range: number): RadarBlip[];
   /**
    * Optional: the match options this era offers on the Settings screen, each a setter the shell
-   * calls once when a match starts (never mid-match: `src/sim` replays from its inputs). Absent
-   * keys are not offered; the Triassic's shore animals are the first.
+   * calls when a match starts and again whenever the player flips it. That is live on purpose (a
+   * switch that did nothing until the next match read as broken); it is safe because what it
+   * changes is pure in the place and the clock (see CLAUDE.md, the shore animals). Absent keys are
+   * not offered; the Triassic's shore animals are the first.
    */
   settings?: { shoreAnimals?: (on: boolean) => void };
 }
 
-export const RULES: EraRules | undefined = ACTIVE_ERA.id === 'devonian' ? DEVONIAN_RULES : ACTIVE_ERA.id === 'triassic' ? TRIASSIC_RULES : undefined;
-RULES?.install();
+export const RULES: EraRules = ACTIVE_ERA.id === 'devonian' ? DEVONIAN_RULES : ACTIVE_ERA.id === 'triassic' ? TRIASSIC_RULES : CAMBRIAN_RULES;
+RULES.install?.();

@@ -12,9 +12,9 @@ import { emptyInput, type InputFrame } from '../src/sim/types';
 import { bandOf, isAlive, lengthOf } from '../src/sim/actors';
 import { creature, type CreatureId } from '../src/sim/creatures';
 import { groundHeight } from '../src/sim/world';
+import { checker, finish } from './lib/test';
 
-let failed = 0;
-const check = (name: string, ok: boolean, detail: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${name.padEnd(44)} ${detail}`); if (!ok) failed++; };
+const check = checker(44);
 
 function start(id: CreatureId) {
   const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }], 42);
@@ -136,7 +136,7 @@ function run(g: Game, p: ReturnType<typeof start>['p'], f: Partial<InputFrame>, 
 // Only ever straight up by the button before this: the camera's pitch was thrown away while the
 // legs were down, so there was no way to leave the floor going anywhere in particular.
 {
-  const { swimPitch } = await import('../src/render/engine');
+  const { swimPitch } = await import('../src/render/camera');
   const up = swimPitch(-0.8);                        // camera aimed about 46 degrees above level
   const shove = (f: Partial<InputFrame>, holdSeconds: number, totalSeconds: number) => {
     const { g, p } = start('olenoides');
@@ -192,6 +192,4 @@ for (const id of ['olenoides', 'marrella'] as CreatureId[]) {
   }
   check(`${creature(id).name}: food within reach on the bottom`, low >= 10, `${low} snack/prey at or below its level`);
 }
-
-console.log(failed ? `\n${failed} FAILED` : '\nall crawler paddle tests passed');
-process.exit(failed ? 1 : 0);
+finish('all crawler paddle tests passed');

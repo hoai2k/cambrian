@@ -1,0 +1,53 @@
+/* The page itself: the base rules, the shell, the corner toolbar and the title screen. Imported by
+   styles.css, in the cascade's order. */
+/* The game's own tokens, over the shared palette in src/shared/tokens.css. */
+:root {
+  --ink-2: #0b232c;
+  --player: var(--lagoon);
+  --radius: 18px;
+}
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body { background: var(--ink); color: var(--foam); font-family: var(--font-body); font-size: 15px; line-height: 1.45; overflow: hidden; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--ember); outline-offset: 3px; }
+kbd { font: 700 11px var(--font-body); background: rgba(255,255,255,.12); border-radius: 6px; padding: 2px 7px; margin-left: 8px; letter-spacing: .04em; }
+.dim { color: var(--dim); }
+.eyebrow { font: 700 11px/1 var(--font-display); letter-spacing: .28em; color: var(--ember); margin: 0 0 10px; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; }
+h2 { font-size: clamp(22px, 3vw, 34px); font-weight: 700; line-height: 1.1; letter-spacing: -.01em; }
+h3 { font-size: 13px; letter-spacing: .12em; color: var(--ember); margin: 14px 0 6px; }
+
+.shell { position: fixed; inset: 0; overflow: hidden; }
+.sea-canvas { position: absolute; inset: 0; }
+.sea-canvas canvas { display: block; width: 100%; height: 100%; }
+.vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 55%, rgba(4, 14, 20, .55) 100%); }
+.screen-playing .vignette, .screen-results .vignette { opacity: .5; }
+
+/* ---------- Toolbar (bottom-right icon buttons) ---------- */
+/*
+ * The icon buttons keep out of the way of a player who has asked for a bare sea: bottom right
+ * normally, bottom left when the player who owns that corner has sense off, and not drawn at all
+ * when both bottom corners belong to players who do (`toolbarPlace` in src/app/toolbar-place.ts).
+ */
+.toolbar { position: absolute; bottom: 18px; display: flex; gap: 8px; z-index: 40; transition: left .25s ease, right .25s ease; }
+.toolbar-right { right: 18px; }
+.toolbar-left { left: 18px; }
+.icon-button { width: 44px; height: 44px; border-radius: 14px; border: 1px solid rgb(var(--foam-rgb) / .18); background: rgb(var(--ink-rgb) / .55); backdrop-filter: blur(14px); color: var(--foam); display: grid; place-items: center; transition: transform .15s, background .15s, border-color .15s; }
+.icon-button:hover { background: rgba(255, 91, 110, .22); border-color: rgba(255, 179, 107, .6); transform: translateY(-2px); }
+.icon-button:active { transform: translateY(0) scale(.96); }
+/* Sound off reads as off at a glance, not just by which glyph is drawn. */
+.icon-button.off { color: var(--dim); border-color: rgb(var(--foam-rgb) / .1); }
+
+/* ---------- Title ---------- */
+.title { position: absolute; inset: 0; display: grid; place-items: center; cursor: pointer; user-select: none; z-index: 10; background: radial-gradient(ellipse at 50% 60%, rgb(var(--ink-rgb) / .1), rgb(var(--ink-rgb) / .7)); }
+.title-inner { text-align: center; padding: 24px; animation: rise-in .9s cubic-bezier(.2,.8,.2,1) both; }
+.title-mark { display: inline-block; filter: drop-shadow(0 0 28px rgba(255, 91, 110, .55)); animation: pulse-mark 3.2s ease-in-out infinite; }
+.title-logo { display: flex; flex-direction: column; align-items: center; line-height: .92; margin: 6px 0 18px; }
+.logo-line-1 { font: 900 clamp(44px, 9vw, 118px)/.92 var(--font-display); letter-spacing: -.02em; color: var(--foam); text-shadow: 0 8px 40px rgba(0,0,0,.45); }
+.logo-line-2 { font: 900 clamp(38px, 8vw, 104px)/.92 var(--font-display); letter-spacing: .02em; background: linear-gradient(92deg, var(--ember) 0%, var(--coral) 55%, #ff9ac2 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 6px 30px rgba(255, 91, 110, .35)); }
+.title-tag { font-size: clamp(14px, 1.6vw, 19px); font-weight: 600; margin: 0 0 34px; color: var(--mist); }
+.title-tag em { color: var(--ember); font-style: normal; }
+.press-start { font: 700 clamp(16px, 2vw, 24px) var(--font-display); letter-spacing: .32em; color: var(--foam); margin: 0 0 12px; animation: blink 1.5s ease-in-out infinite; }
+.press-start.waiting { animation: none; color: var(--dim); letter-spacing: .2em; }
+.title-hint { font-size: 13px; color: var(--dim); margin: 0; }

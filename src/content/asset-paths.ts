@@ -26,7 +26,6 @@ const GUEST_PORTRAITS: Record<EraId, string> = {
 export function registerVisitorAssets(entries: readonly { id: string; era: EraId }[]) {
   for (const e of entries) guestEra.set(e.id, e.era);
 }
-export const visitorAssetEra = (id: string) => guestEra.get(id);
 
 /** Pure relative paths, usable from all entrypoints and asset validation scripts. */
 export function createAssetPaths(era: EraDefinition) {
@@ -55,8 +54,9 @@ export function createAssetPaths(era: EraDefinition) {
   };
 }
 /**
- * Paths for the active era. Resolved per call rather than at import, because an era entry page
- * (see src/devonian/main.tsx) selects its era after modules like the audio library have loaded.
+ * Paths for the active era. Resolved per call rather than at import, because an era may be
+ * selected after modules like the audio library have loaded (a headless suite that walks the
+ * three eras in one process does exactly that).
  */
 type AssetPaths = ReturnType<typeof createAssetPaths>;
 let cachedFor: EraDefinition | undefined, cached: AssetPaths | undefined;

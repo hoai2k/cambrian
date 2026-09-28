@@ -2,14 +2,15 @@ import { TEXT } from '../../shared/text';
 import { clamp, dist, distXZ, heading, type Vec3 } from '../../shared/math';
 import type { EraHud, EraRules } from '../era-rules';
 import { applyScaleStats, bandOf, brokeSurface, isAlive, isHidden, lengthOf, speedFactor } from '../actors';
-import { creature } from '../creatures';
+import { creature, foodRung } from '../creatures';
 import type { Game } from '../game';
 import type { Actor, InputFrame, Mode, WorldEvent } from '../types';
 import { BIOME_DANGER, biomeAt, groundHeight, RISE_RATE, sampleCurrent, shoreDistance, SHORE_WALL, SURFACE_Y } from '../world';
 import { bodyRadius } from '../actors';
-import { ADULT_STAGE, devActor, GROWN, HOLD_TO_WIN, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageProgress, stageScale, stateFor, type DeadZone, type DevActor } from './state';
+import { ADULT_STAGE, devActor, GROWN, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageProgress, stageScale, stateFor, type DeadZone, type DevActor } from './state';
 import { camoDrain, installDevonianSpecials, stepAbility, stepGuardSpecial, useAbility, ySpecial } from './specials';
-import { botNursery, canBreach, sanctuary, spawnInCover, spawnProtect, spawnY, swim, wanderY } from './swim';
+import { canBreach, sanctuary, spawnInCover, spawnProtect, spawnY, swim, wanderY } from './swim';
+import { apexLeft } from '../apex';
 
 /**
  * The Devonian era rules (docs/redesign/08-devonian-domination.md).
@@ -86,9 +87,7 @@ function climbRelief(a: Actor, input: InputFrame, dir: Vec3, mag: number): numbe
   return up <= 0 ? 0 : clamp(up / (up + along), 0, 1);
 }
 
-const rungOf = (a: Actor) => creature(a.creature).rung ?? 2;
-const isPlayerish = (a: Actor) => a.controller === 'player' || a.controller === 'bot';
-const players = (g: Game) => g.actors.filter(isPlayerish);
+const rungOf = (a: Actor) => foodRung(a.creature);
 
 /** Feeding is the only thing that grows an animal here, exactly as nutrition is in the Cambrian. */
 function gain(g: Game, a: Actor, d: DevActor, amount: number) {
@@ -103,7 +102,7 @@ function gain(g: Game, a: Actor, d: DevActor, amount: number) {
 }
 
 /** Standing reaches a stage threshold: grow to it with the moult ceremony; arthropods shed a shell. */
-function checkStage(g: Game, a: Actor, d: DevActor) {
+export function checkStage(g: Game, a: Actor, d: DevActor) {
   const next = d.stage + 1;
   if (d.stage >= PRIME_STAGE || d.standing < STAGE_AT[next] || a.state === 'moult' || !isAlive(a)) return;
   const def = creature(a.creature);
@@ -233,11 +232,11 @@ function updateExuvia(g: Game, a: Actor, d: DevActor, dt: number) {
 }
 
 // ---- the rules object ----
-export const DEVONIAN_RULES: EraRules = {
+export const DEVONIAN_RULES = {
   growthByNutrition: false,
-  startScale(mode: Mode, index: number, id) {
+  startScale(mode: Mode, id) {
     const L = creature(id).adultLength;
-    return stageScale(L, mode === 'reef' ? ADULT_STAGE : mode === 'hunted' && index === 0 ? PRIME_STAGE : 0);
+    return stageScale(L, mode === 'reef' ? ADULT_STAGE : 0);
   },
   // The Devonian grows in five life stages, which is the shared ladder under its own names.
   ladderNames: STAGES,
@@ -253,7 +252,7 @@ export const DEVONIAN_RULES: EraRules = {
   onSwap: (g, a) => { const d = devActor(g, a); d.stage = stageForScale(creature(a.creature).adultLength, a.scale); d.standing = STAGE_AT[d.stage] ?? 0; },
   install() { installDevonianSpecials(); },
   ySpecial,
-  init(g) { installDevonianSpecials(); for (const a of players(g)) { const d = devActor(g, a); d.stage = stageForScale(creature(a.creature).adultLength, a.scale); d.standing = g.mode === 'reef' ? STAGE_AT[ADULT_STAGE] + 5 : STAGE_AT[d.stage]; } },
+  init(g) { installDevonianSpecials(); for (const a of g.players) { const d = devActor(g, a); d.stage = stageForScale(creature(a.creature).adultLength, a.scale); d.standing = g.mode === 'reef' ? STAGE_AT[ADULT_STAGE] + 5 : STAGE_AT[d.stage]; } },
 
   step(g, dt) {
     const s = stateFor(g);
@@ -261,7 +260,7 @@ export const DEVONIAN_RULES: EraRules = {
     stepDeadZones(g, s, dt);
     s.tick += dt;
     const second = s.tick >= 1; if (second) s.tick -= 1;
-    for (const a of players(g)) {
+    for (const a of g.players) {
       const d = devActor(g, a);
       const rung = rungOf(a), def = creature(a.creature);
       updateShore(g, a, d);
@@ -318,7 +317,7 @@ export const DEVONIAN_RULES: EraRules = {
 
   useAbility, stepAbility, camoDrain,
   swim, rise: riseDrive, staminaRegen, climbRelief, canBreach, spawnY, wanderY,
-  spawnPoint: spawnInCover, botNursery, spawnProtect, sanctuary,
+  spawnPoint: spawnInCover, spawnProtect, sanctuary,
 
   moultScale(g, a) {
     const d = devActor(g, a);
@@ -331,48 +330,12 @@ export const DEVONIAN_RULES: EraRules = {
     // What a death costs the ladder is `DEATH_COST` and is settled centrally, in `respawn`, so all
     // three games price it the same way: half of the stage you are standing in, which demotes only
     // if you were less than halfway through it. This hook keeps the rest of what a respawn resets.
-    d.atSurface = false; d.windT = 0; d.deadT = 0; d.deadZoneIn = false; d.moultSoft = 0; d.exuvia = -1; d.followers = 0; d.primeT = 0; d.beached = false;
-  },
-
-  updateModes(g, dt) {
-    // Rise and Survival: grow through the five stages, then hold Prime. The shared `rise`
-    // case in game.ts wins on tier, which the Devonian never advances — it grows in stages — so
-    // it never fires there and the era decides this one.
-    if (g.mode !== 'rise' && g.mode !== 'survival') return;
-    for (const a of players(g)) {
-      const d = devActor(g, a);
-      // Somebody who came in on the top rung has already done this; the clock is not theirs to
-      // run. Everyone else in the same sea keeps theirs and can still win it.
-      if (a.carriedTop) { d.primeT = 0; continue; }
-      // Per seat and per animal, never per match: a bot has no seat to remember with, so the old
-      // whole-match latch is what holds one of those.
-      const pr = a.player >= 0 ? g.progress[a.player] : undefined;
-      const already = pr ? pr.apexDone.includes(a.creature) : g.endless;
-      if (d.stage >= PRIME_STAGE && isAlive(a)) {
-        d.primeT += dt;
-        if (d.primeT >= HOLD_TO_WIN && g.state.status === 'playing' && !already) {
-          const name = creature(a.creature).name;
-          // The top rung of the record is banked by finishing, never by arriving.
-          g.bankLadderTop(a);
-          pr?.apexDone.push(a.creature);
-          g.state = { status: a.player >= 0 ? 'won' : 'lost', winner: a.player,
-            message: a.player >= 0 ? `${name} grew up and held the sea.` : `A rival ${name} grew up first.` };
-        }
-      } else d.primeT = 0;
-    }
-  },
-
-  /**
-   * Rise wins on a held timer; zero the *winner's* so play resumes with the sea open. Everyone
-   * else's clock is their own and keeps running — theirs is a separate apex, on their own animal.
-   */
-  continueMatch(g, winner) {
-    for (const a of players(g)) if (a.player === winner) devActor(g, a).primeT = 0;
+    d.atSurface = false; d.windT = 0; d.deadT = 0; d.deadZoneIn = false; d.moultSoft = 0; d.exuvia = -1; d.followers = 0; d.beached = false;
   },
 
   /**
    * The Devonian ranks its animals by stage and standing rather than by tier, so the scoreboard
-   * shows those: "Adult · Apex predator" against the standing bar, for bots as well as players.
+   * shows those: "Adult · Apex predator" against the standing bar.
    */
   scoreLine(g, a) {
     const d = devActor(g, a);
@@ -385,7 +348,7 @@ export const DEVONIAN_RULES: EraRules = {
     return {
       standing: d.standing, stageProgress: stageProgress(d), rung: rungOf(p), rungName: RUNG_NAMES[rungOf(p)], stage: STAGES[d.stage],
       bimodal: def.breathing === 'bimodal',
-      beached: d.beached, primeT: d.primeT, inDeadZone: d.deadZoneIn,
+      beached: d.beached, primeLeft: apexLeft(g, p), inDeadZone: d.deadZoneIn,
       deadZones: s.deadZones.filter((z) => distXZ(z.pos, p.pos) < 400).map((z) => ({ dx: z.pos.x - p.pos.x, dz: z.pos.z - p.pos.z, r: z.r })),
     };
   },
@@ -400,7 +363,7 @@ export const DEVONIAN_RULES: EraRules = {
     if ((def.shoreReach ?? 0) > 0 && g.time < 40) return H.shallows;
     return undefined;
   },
-};
+} satisfies EraRules;
 
 /** Exposed for tests. */
 export { FEED as FEED_WEIGHTS, WATER_REGEN, AIR_CLIMB, ZONE_R };

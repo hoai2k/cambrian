@@ -17,6 +17,7 @@ import { emptyControls } from '../src/input/input';
 import { ANIMAL_ERA, ART_DIR, BIG_ANIMAL, COMING_SOON, DEFAULT_VERSION, GAMES, OPEN_GAMES, REQUESTED, SLOTS, STAGE, TRILOGY_LOGO, isDelivered, parseVersion, sourceFor } from '../src/ancientseas/page';
 import { DEBUG_GAMES, DEBUG_PAGES, DEBUG_PARAMS, DEBUG_SELF, everyHref, modeHref, paramHref } from '../src/ancientseas/debug-index';
 import { debugIndex } from '../src/shared/debug';
+import { ACTIVE_ERA, eraReadEarly, selectEra } from '../src/content';
 
 let passes = 0;
 const ok = (cond: unknown, msg: string) => { assert.ok(cond, msg); passes++; };
@@ -303,7 +304,7 @@ ok(/WAIT_HINT = 700/.test(loading), 'slow means 700ms');
 // title's loading line must not wear it, or the line draws itself as a panel over the painting.
 ok(!/press-start \$\{loaded \? '' : 'loading'\}/.test(title), 'the title\'s loading line is not the boot screen');
 ok(/press-start \$\{loaded \? '' : 'waiting'\}/.test(title), 'it says waiting instead');
-ok(/\.press-start\.waiting/.test(readFileSync('src/app/styles.css', 'utf8')), 'and the stylesheet agrees');
+ok(/\.press-start\.waiting/.test(readFileSync('src/app/shell.css', 'utf8')), 'and the stylesheet agrees');
 // Three games means two era links on every title screen; they are a column, not two corners.
 ok(/className="era-switches"/.test(title), 'the other eras stack rather than sitting on each other');
 
@@ -398,5 +399,22 @@ ok(/installStats/.test(entry), 'and an ordinary visit still is');
 // The index is a contents list, not a second composition: it must not pull in the plate's art.
 const indexSource = readFileSync('src/ancientseas/DebugIndex.tsx', 'utf8');
 ok(!/<img|ART_DIR|sourceFor|SLOTS/.test(indexSource), 'the debug index draws no pictures');
+
+// ---- the era is chosen before it is read, and choosing it too late says so ----
+// The trilogy page is no game's and must not read ACTIVE_ERA; everything above imported its data,
+// so the watch on the default era has seen nothing yet. Then the failure the watch exists for: a
+// module reads the default at its top (here, one line standing in for it), a game entry selects
+// the Devonian afterwards, and instead of a page half made of the Cambrian there is an error that
+// names the read. Selecting the Cambrian after such a read is harmless and allowed.
+eq(eraReadEarly(), undefined, 'nothing the trilogy page imports reads ACTIVE_ERA');
+ok(ACTIVE_ERA.id === 'cambrian', 'the default era is the Cambrian');
+ok(typeof eraReadEarly() === 'string', 'a read of the default before any selectEra is remembered, with where it was');
+ok(ACTIVE_ERA === CAMBRIAN, 'and after that first read the binding is the plain pack, so later reads cost nothing');
+assert.throws(() => selectEra(DEVONIAN), /selectEra\(devonian\) came after ACTIVE_ERA had already been read/,
+  'selecting another era after the default was read fails loudly');
+passes++;
+ok(ACTIVE_ERA === CAMBRIAN, 'and a refused selection changes nothing');
+selectEra(CAMBRIAN);
+ok(ACTIVE_ERA === CAMBRIAN, 'selecting the Cambrian after reading it is harmless');
 
 console.log(`ancientseas: ${passes} checks passed`);

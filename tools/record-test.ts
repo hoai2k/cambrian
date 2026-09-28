@@ -16,7 +16,7 @@ import { Game } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
 import {
   exportRecording, recordStep, recordingPhase, resetRecording, startRecording, stopRecording,
-} from '../src/app/debug-record';
+} from '../src/shared/debug-record';
 
 let passes = 0;
 const ok = (cond: unknown, msg: string) => { assert.ok(cond, msg); passes++; console.log(`PASS  ${msg}`); };
@@ -155,7 +155,7 @@ type Sample = { t: number; why: string; state: string; graspT: number; rideHost:
   const g = new Game('reef', [{ creature: 'opabinia', device: 'keyboard', ready: true }], 21);
   const p = g.players[0]; p.spawnProtect = 0; p.vel = { x: 0, y: 0, z: 0 };
   // A hatchling: the size the player actually was, not the adult the other cases use.
-  p.scale = 0.18; applyScaleStats(p, creature('opabinia'));
+  p.scale = 0.18; applyScaleStats(p);
   const o = g.spawn('anomalocaris', 'giant', { x: 40, y: 14, z: -70 }, 6);
   o.brain = undefined; o.spawnProtect = 0; o.yaw = Math.PI; o.vel = { x: 0, y: 0, z: 0 };
   // Alongside the flank, a body's length off its surface — close by every measure the grip uses,

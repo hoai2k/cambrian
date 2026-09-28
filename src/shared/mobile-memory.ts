@@ -16,7 +16,7 @@ export function constrainedTouch(h: DeviceHints): boolean {
   return h.memoryGB === undefined && h.logicalCores !== undefined && h.logicalCores <= 6;
 }
 
-export function currentDeviceHints(): DeviceHints {
+function currentDeviceHints(): DeviceHints {
   if (typeof window === 'undefined' || typeof navigator === 'undefined') return { touch: false };
   let touch = false;
   try { touch = window.matchMedia('(pointer: coarse) and (hover: none)').matches; } catch { /* unavailable */ }

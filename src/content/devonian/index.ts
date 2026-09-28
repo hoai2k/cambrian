@@ -1,6 +1,5 @@
 import { defineEra } from '../era';
 import type { DevonianCreatureId } from './ids';
-import type { Slot } from '../../shared/palettes';
 import { DEVONIAN_CREATURES } from './creatures';
 import { SNACK_SCHOOLS, GIANTS } from './ecology';
 import { BIOME_NAMES, BIOME_DANGER, ATMOS, SAND_COLORS, FLORA_BASE, FLORA_DENSITY, FLORA_PROPS, SURFACE_Y, FLOOR_DEPTH } from './environment';
@@ -12,6 +11,8 @@ import shippedBytes from './asset-sizes.json';
 import pendingRefinements from './pending-refinements.json';
 import { refinementTables, type PendingRefinement } from '../pending-refinements';
 import { DEVONIAN_STRINGS } from './strings';
+import { eraLinks } from '../era-links';
+import { authoredCreatureColors, modelBytesFor } from '../pack-tables';
 
 /**
  * The badges, derived from the one refinement queue: a creature is a preview when its *model* is
@@ -39,19 +40,13 @@ export const DEVONIAN_STAND_INS: Partial<Record<DevonianCreatureId, DevonianCrea
     
   ] as [DevonianCreatureId, DevonianCreatureId][]
 ).filter(([id]) => !SHIPPED_BYTES[id]));
-const modelBytes = Object.fromEntries(DEVONIAN_CREATURES.map((c) => [c.id, SHIPPED_BYTES[c.id] ?? SHIPPED_BYTES[DEVONIAN_STAND_INS[c.id as DevonianCreatureId] ?? ''] ?? 1]));
-
-/** Camouflage's fallback colours per creature: its default scheme's slots. */
-const authoredCreatures = Object.fromEntries(DEVONIAN_CREATURES.map((c) => {
-  // No scheme in play means the authored colours, so camouflage falls back to the creature's own.
-  const scheme = SCHEMES.find((s) => s.id === CREATURE_SCHEMES[c.id]);
-  return [c.id, scheme?.colors ?? ({ body: c.color, eyes: '#101010', fins: c.accent, legs: c.color, accent: c.accent, underside: c.color } as Record<Slot, string>)];
-}));
+const modelBytes = modelBytesFor(DEVONIAN_CREATURES.map((c) => c.id), SHIPPED_BYTES, (id) => SHIPPED_BYTES[DEVONIAN_STAND_INS[id as DevonianCreatureId] ?? '']);
+const authoredCreatures = authoredCreatureColors(DEVONIAN_CREATURES, SCHEMES, CREATURE_SCHEMES);
 
 export const DEVONIAN = defineEra({
   id: 'devonian',
   title: 'Devonian Domination',
-  copy: { tagline: 'Feed. Grow. Fight. Escape.', taglineEm: '375 million years ago, the sea had a pecking order.', loading: 'FILLING THE BASIN…', lose: 'THE SEA WINS', settingsKey: 'devonian-settings', mobileIllustration: DEVONIAN_BRAND_EXTRAS.mobileIllustration, trilogy: { title: 'Ancient Seas Trilogy', path: '', blurb: 'All three games' }, sibling: { title: 'Cambrian Conquest', path: 'cambrian/', blurb: '133 million years earlier', logo: 'assets/brand/logo-header.webp' }, siblings: [{ title: 'Triassic Triumph', path: 'triassic/', blurb: '135 million years later', logo: 'assets/triassic/brand/logo-header.webp' }] },
+  copy: { tagline: 'Feed. Grow. Fight. Escape.', taglineEm: '375 million years ago, the sea had a pecking order.', loading: 'FILLING THE BASIN…', lose: 'THE SEA WINS', settingsKey: 'devonian-settings', mobileIllustration: DEVONIAN_BRAND_EXTRAS.mobileIllustration, ...eraLinks('devonian') },
   strings: DEVONIAN_STRINGS,
   modes: [
     // The same three modes as the Cambrian, in the same order: this era changes the sea and the

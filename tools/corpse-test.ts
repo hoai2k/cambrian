@@ -3,8 +3,8 @@ import { emptyInput, type InputFrame } from '../src/sim/types';
 import { isAlive, lengthOf } from '../src/sim/actors';
 import { kill } from '../src/sim/combat';
 import { makeBrain, HUNT_TELL } from '../src/sim/ai';
-let failed = 0;
-const check = (n: string, ok: boolean, d: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(48)} ${d}`); if (!ok) failed++; };
+import { checker, finish } from './lib/test';
+const check = checker(48);
 const stepN = (g: Game, n: number, f: InputFrame = emptyInput(), onEvents?: (t: number) => void) => { const m = new Map([[0, f]]); for (let i = 0; i < n; i++) { g.step(1 / 60, m); onEvents?.((i + 1) / 60); g.events.length = 0; } };
 const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
 
@@ -61,4 +61,4 @@ const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
   check('sparkles come from the predator just before the respawn', sparkOther === giant.id && sparkAt - swallowAt > CORPSE_WINDOW - 0.6 && sparkAt - swallowAt < CORPSE_WINDOW - 0.2, `+${(sparkAt - swallowAt).toFixed(2)}s from actor ${sparkOther} (giant ${giant.id})`);
   check('respawn one death watch after the swallow', respawnAt - swallowAt > CORPSE_WINDOW - 0.1 && respawnAt - swallowAt < CORPSE_WINDOW + 0.3, `+${(respawnAt - swallowAt).toFixed(2)}s`);
 }
-console.log(failed ? `\n${failed} FAILED` : '\nall corpse tests passed'); process.exit(failed ? 1 : 0);
+finish('all corpse tests passed');
