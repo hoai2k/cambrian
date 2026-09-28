@@ -138,15 +138,16 @@ for (const era of ['cambrian', 'devonian', 'triassic']) {
 // The games, and only the games. The counter is there to answer "is anyone I don't know playing
 // these?", so a page that is not one of them is noise in the total — but a game that forgets to
 // call this is the whole failure mode above.
-const ENTRIES = [
-  'src/ancientseas/main.tsx', 'src/cambrian/main.tsx', 'src/devonian/main.tsx',
-  'src/triassic/main.tsx',
-];
+// The three games boot through one helper, which is where their counter is installed.
+const GAME_ENTRIES = ['src/cambrian/main.tsx', 'src/devonian/main.tsx', 'src/triassic/main.tsx'];
+const BOOT = 'src/shared/boot-game.tsx';
+const ENTRIES = ['src/ancientseas/main.tsx', BOOT];
 for (const entry of ENTRIES) {
   const src = read(entry);
   ok(/\binstallStats\(\)/.test(src), `${entry} installs the counter`);
-  ok(/from '\.\.?\/shared\/stats'/.test(src), `${entry} imports it from the one module`);
+  ok(/from '\.\.?\/shared\/stats'|from '\.\/stats'/.test(src), `${entry} imports it from the one module`);
 }
+for (const entry of GAME_ENTRIES) ok(/\bbootGame\(/.test(read(entry)), `${entry} boots through bootGame, which counts it`);
 // The secondary pages, which must stay uncounted. The viewer counted once and was taken back out:
 // asserting it stays out is what stops it drifting back in on the next pass through that file.
 for (const entry of ['src/workbench/main.tsx', 'src/viewer/main.tsx']) {
@@ -155,10 +156,10 @@ for (const entry of ['src/workbench/main.tsx', 'src/viewer/main.tsx']) {
 
 // The three game pages choose an era before anything else runs, and the counter is called inside
 // that discipline rather than beside it.
-for (const entry of ['src/cambrian/main.tsx', 'src/devonian/main.tsx', 'src/triassic/main.tsx']) {
-  const src = read(entry);
+{
+  const src = read(BOOT);
   ok(src.indexOf('selectEra(') < src.indexOf('installStats()'),
-    `${entry} counts after the era is chosen`);
+    `${BOOT} counts after the era is chosen`);
 }
 
 // The counter itself: one script, async, addressed by the config and by nothing else.

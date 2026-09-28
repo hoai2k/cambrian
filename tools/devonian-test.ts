@@ -42,7 +42,7 @@ type InputFrame = import('../src/sim/types').InputFrame;
 type Mode = import('../src/sim/types').Mode;
 import { heading } from '../src/shared/math';
 import { wrapAngle } from '../src/shared/math';
-import { MODE_IDS } from '../src/sim/types';
+const { MODE_IDS } = await import('../src/sim/types');
 type CreatureId = import('../src/sim/creatures').CreatureId;
 
 const DT = 1 / 60;
