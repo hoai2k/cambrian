@@ -20,10 +20,11 @@
  */
 import DELIVERED from './delivered.json';
 import { PAGE_TEXT } from './strings';
+import { GAME_TABLE, type GameId } from '../content/era-links';
 
 export type PageVersion = 1 | 2;
 export const DEFAULT_VERSION: PageVersion = 2;
-export const VERSIONS: readonly PageVersion[] = [1, 2];
+const VERSIONS: readonly PageVersion[] = [1, 2];
 
 /** `?version=2` → 2; anything else, including nothing, is the default. */
 export function parseVersion(search: string): PageVersion {
@@ -31,7 +32,7 @@ export function parseVersion(search: string): PageVersion {
   return raw !== null && VERSIONS.includes(Number(raw) as PageVersion) ? (Number(raw) as PageVersion) : DEFAULT_VERSION;
 }
 
-export type EraId = 'cambrian' | 'devonian' | 'triassic';
+export type EraId = GameId;
 
 export interface GameLink {
   readonly id: EraId;
@@ -61,26 +62,17 @@ export interface GameLink {
   readonly comingSoon?: boolean;
 }
 
-export const GAMES: readonly GameLink[] = [
-  {
-    id: 'cambrian', title: 'Cambrian Conquest', path: 'cambrian/',
-    art: 'assets/brand/logo-illustrated.webp', artWidth: 1536, artHeight: 1024,
-    wordmark: 'assets/brand/logo-header.webp',
-    when: '508 million years ago', tagline: 'Eat. Grow. Fight. Run.',
-  },
-  {
-    id: 'devonian', title: 'Devonian Domination', path: 'devonian/',
-    art: 'assets/devonian/brand/title.webp', artWidth: 1536, artHeight: 1024,
-    wordmark: 'assets/devonian/brand/logo-header.webp',
-    when: '375 million years ago', tagline: 'Feed. Grow. Fight. Escape.',
-  },
-  {
-    id: 'triassic', title: 'Triassic Triumph', path: 'triassic/',
-    art: 'assets/triassic/brand/title.webp', artWidth: 1536, artHeight: 1024,
-    wordmark: 'assets/triassic/brand/logo-header.webp',
-    when: '240 million years ago', tagline: 'Dive. Hunt. Grow. Hold.',
-  },
-];
+/** What the plate draws for each game beyond what the trilogy's own table says (`GAME_TABLE`). */
+const PLATE: Record<EraId, Pick<GameLink, 'art' | 'artWidth' | 'artHeight' | 'tagline' | 'comingSoon'>> = {
+  cambrian: { art: 'assets/brand/logo-illustrated.webp', artWidth: 1536, artHeight: 1024, tagline: 'Eat. Grow. Fight. Run.' },
+  devonian: { art: 'assets/devonian/brand/title.webp', artWidth: 1536, artHeight: 1024, tagline: 'Feed. Grow. Fight. Escape.' },
+  triassic: { art: 'assets/triassic/brand/title.webp', artWidth: 1536, artHeight: 1024, tagline: 'Dive. Hunt. Grow. Hold.' },
+};
+
+/** The three games, in the trilogy's order: its table (title, folder, date, wordmark) and the plate's own art. */
+export const GAMES: readonly GameLink[] = GAME_TABLE.map((g) => ({
+  id: g.id, title: g.title, path: g.path, wordmark: g.wordmark, when: `${g.mya} million years ago`, ...PLATE[g.id],
+}));
 
 /** The games a visitor can actually go to: what the pad walks and the keyboard steps through. */
 export const OPEN_GAMES: readonly GameLink[] = GAMES.filter((g) => !g.comingSoon);

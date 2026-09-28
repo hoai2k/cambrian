@@ -18,6 +18,7 @@ import type { AppliesTo as BendAppliesTo } from './bend/bend';
 import { BendEditor } from './bend/BendEditor';
 import { clampTime, intentMissing, tracksIntent, type ClipIntent } from './playback/selection';
 import { getIntent, setIntent } from './playback/store';
+import { downloadJson } from './editor-kit';
 
 const SPEEDS = [0.25, 0.5, 1, 2];
 
@@ -45,7 +46,108 @@ function readPicks(): Picks {
  * What the page is doing with the specimen: looking at it, reshaping it, lengthening a run of it,
  * turning a run of it, marking it up, or aiming its mouth.
  */
-type Mode = 'view' | 'sculpt' | 'mark' | 'stretch' | 'mouth' | 'bend';
+type Mode = 'view' | EditorModeId;
+type EditorModeId = 'sculpt' | 'mark' | 'stretch' | 'mouth' | 'bend';
+
+/**
+ * One body the Model control can put on stage (see `stages` in `Viewer`), and its kind, which is
+ * what the editing modes ask about.
+ */
+type Stage = { id: string; label: string; model: string; kind: 'full' | 'reduced' | 'twin' | 'generated' | 'borrowed' | 'origpose' | 'backup' };
+/** What an editing mode asks of the page before it opens: the collection, and the body on stage. */
+interface StageFacts { collection: CollectionId | undefined; showPuppet: boolean; showGenerated: boolean; ownBody: boolean }
+
+/**
+ * Which editor a body may open in, in one table. The URL reader, the buttons, the fall-back that
+ * drops a mode the stage no longer answers, the page's class and the body a mode opens on all read
+ * it, where each used to carry its own copy of the rules.
+ *
+ * - `link`: whether a `&mode=` link may open it on a specimen of this collection, before any body
+ *   is loaded. None of the modes means anything on a prop: there is no body to reshape, no run to
+ *   lengthen, and nothing to cut off one.
+ * - `stands`: whether the mode survives the body now on stage; false sends the page back to the view.
+ * - `opens`: whether its editor may be drawn over that body (once it has loaded). Stricter than
+ *   `stands` where an editor needs more than the mode does — a stretch stays open while a body it
+ *   cannot yet take is loading, and simply draws nothing until it can.
+ * - `opening`: the body the mode opens on, where that is not the specimen's own first body.
+ */
+const EDITOR_MODES: Record<EditorModeId, {
+  className: string;
+  link(collection: CollectionId | undefined): boolean;
+  stands(f: StageFacts): boolean;
+  opens(f: StageFacts): boolean;
+  opening?(list: readonly Stage[]): string | undefined;
+}> = {
+  /**
+   * Sculpting is for a body a *builder* draws from profile rows. Its export is a hand-off into
+   * those rows (docs/viewer-sculpt.md) — the change goes into the builder, never into the GLB — so
+   * it only means anything where such a table is authored by hand, which is the Cambrian and the
+   * Devonian. A Triassic body is Tripo-derived: its builder measures its profile off the intake
+   * surface rather than authoring it, so a sculpt exported there would describe a table nobody
+   * writes and could not be ported into anything — and a link to `mode=sculpt` on a Triassic
+   * animal opens the view. The Triassic's editors are Stretch, which lengthens a run of the raw
+   * generation, and Mark region, which says what to cut off it.
+   */
+  sculpt: {
+    className: 'sculpting',
+    link: (c) => !isPropCollection(c) && c !== 'triassic',
+    stands: (f) => EDITOR_MODES.sculpt.link(f.collection) && !f.showPuppet && !f.showGenerated,
+    opens: (f) => EDITOR_MODES.sculpt.stands(f),
+  },
+  /**
+   * Stretch is the one mode a *built* body still answers: there it is a measurement rather than an
+   * edit, so all it refuses is a prop and the comparison twin. It opens on the raw generation where
+   * there is one, because that is the body the bake applies to; and on an animal whose body is not
+   * built, `model` resolves to a body it borrows in play, so only the generation is its own.
+   */
+  stretch: {
+    className: 'stretching',
+    link: (c) => !isPropCollection(c),
+    stands: (f) => !isPropCollection(f.collection) && !f.showPuppet,
+    opens: (f) => EDITOR_MODES.stretch.stands(f) && (f.showGenerated || f.ownBody),
+    opening: (list) => (list.some((o) => o.kind === 'generated') ? 'generated' : undefined),
+  },
+  /**
+   * Bend sits exactly where stretch does, because it asks the same kind of question about the same
+   * run of body: stretch changes a span's *length* and bend changes its *direction*, and neither
+   * can be baked into a rigged body. So it is offered on a raw generation (where the warp on stage
+   * is the edit) and on a built body (where the rig is held at rest and the export is a measurement
+   * for the builder), and refused on the comparison twin and on props for stretch's own reasons —
+   * a measurement exported off the twin would name the right creature and describe the wrong mesh.
+   * **A bend is aimed on a body no builder has moved**, so it opens on the original pose where the
+   * animal publishes one and falls back to the raw generation (see `opening` in `Viewer`).
+   */
+  bend: {
+    className: 'bending',
+    link: (c) => !isPropCollection(c),
+    stands: (f) => EDITOR_MODES.stretch.stands(f),
+    opens: (f) => EDITOR_MODES.stretch.opens(f),
+    opening: (list) => (list.find((o) => o.kind === 'origpose') ?? list.find((o) => o.kind === 'generated'))?.id,
+  },
+  /**
+   * Marking works on whatever body is on stage, the generated mesh above all: that raw surface is
+   * the one carrying fins nobody asked for, and it is the reason the mode exists. A prop is the
+   * only thing it refuses — there is nothing on a stromatolite for a builder to cut away.
+   */
+  mark: {
+    className: 'marking',
+    link: (c) => !isPropCollection(c),
+    stands: (f) => !isPropCollection(f.collection),
+    opens: (f) => EDITOR_MODES.mark.stands(f),
+  },
+  /**
+   * The mouth editor takes whatever body is on stage as well: a cut is aimed on one file, and the
+   * file it is most wanted on is the raw generation, before any builder has measured a mouth on
+   * it. What the export says the file *is* follows the stage rather than the animal.
+   */
+  mouth: {
+    className: 'mouthing',
+    link: (c) => !isPropCollection(c),
+    stands: (f) => EDITOR_MODES.mark.stands(f),
+    opens: (f) => EDITOR_MODES.mark.opens(f),
+  },
+};
+const isEditorMode = (m: string | null): m is EditorModeId => m != null && Object.hasOwn(EDITOR_MODES, m);
 
 /**
  * The page remembers which specimen it is showing in the URL (`?specimen=<key>`, and `&mode=sculpt`,
@@ -62,14 +164,8 @@ function readUrlState(): { key: string; mode: Mode } {
   const requested = params.get('specimen') ?? '';
   const key = specimenByKey.has(requested) ? requested : SPECIMENS[0].key;
   const asked = params.get('mode');
-  // None of the editing modes means anything on a prop: there is no body to reshape, no run to
-  // lengthen, and nothing to cut off one. Sculpting is narrower still — see `sculptable` below:
-  // a link to `mode=sculpt` on a Triassic animal opens the view rather than an editor that could
-  // not export anything portable.
   const collection = specimenByKey.get(key)?.collection;
-  const editable = !isPropCollection(collection);
-  const asking = asked === 'mark' || asked === 'stretch' || asked === 'mouth' || asked === 'bend' || (asked === 'sculpt' && collection !== 'triassic');
-  return { key, mode: editable && asking ? asked as Mode : 'view' };
+  return { key, mode: isEditorMode(asked) && EDITOR_MODES[asked].link(collection) ? asked : 'view' };
 }
 function writeUrlState(key: string, mode: Mode) {
   const params = new URLSearchParams(location.search);
@@ -107,7 +203,6 @@ export function Viewer() {
    * in play — so the raw generation stands in at the head of the list, which is what the roster's
    * preview badge already says about it.
    */
-  type Stage = { id: string; label: string; model: string; kind: 'full' | 'reduced' | 'twin' | 'generated' | 'borrowed' | 'origpose' | 'backup' };
   const stages = (c: ViewerSpecimen): Stage[] => {
     const own = !c.generated || !!c.inReview;
     const out: Stage[] = [];
@@ -143,12 +238,7 @@ export function Viewer() {
    */
   const opening = (key: string, mode?: Mode): string => {
     const list = stages(specimenByKey.get(key)!);
-    if (mode === 'stretch' && list.some(o => o.kind === 'generated')) return 'generated';
-    if (mode === 'bend') {
-      const aimable = list.find(o => o.kind === 'origpose') ?? list.find(o => o.kind === 'generated');
-      if (aimable) return aimable.id;
-    }
-    return list[0].id;
+    return (mode && mode !== 'view' ? EDITOR_MODES[mode].opening?.(list) : undefined) ?? list[0].id;
   };
   const [stageId, setStageId] = useState<string>(() => opening(initial.current.key, initial.current.mode));
   const requestedId = useRef('');
@@ -256,25 +346,8 @@ export function Viewer() {
    * cannot be a commit behind.
    */
   const ready = !loading && !error && loadedId === id && sceneRef.current?.loadedModel() === modelPath;
-  /**
-   * Sculpting is for a body a *builder* draws from profile rows. Its export is a hand-off into
-   * those rows (docs/viewer-sculpt.md) — the change goes into the builder, never into the GLB — so
-   * it only means anything where such a table is authored by hand, which is the Cambrian and the
-   * Devonian. A Triassic body is Tripo-derived: its builder measures its profile off the intake
-   * surface rather than authoring it, so a sculpt exported there would describe a table nobody
-   * writes and could not be ported into anything. The Triassic's two editors are Stretch, which
-   * lengthens a run of the raw generation, and Mark region, which says what to cut off it.
-   */
-  const sculptable = !isPropCollection(collection) && collection !== 'triassic';
-  const canSculpt = sculptable && !showPuppet && !showGenerated && ready;
-  // Marking works on whatever body is on stage, the generated mesh above all: that raw surface is
-  // the one carrying fins nobody asked for, and it is the reason the mode exists. A prop is the
-  // only thing it refuses — there is nothing on a stromatolite for a builder to cut away.
-  const canMark = !isPropCollection(collection) && ready;
-  // The mouth editor takes whatever body is on stage as well: a cut is aimed on one file, and the
-  // file it is most wanted on is the raw generation, before any builder has measured a mouth on
-  // it. What the export says the file *is* follows the stage rather than the animal.
-  const canMouth = canMark;
+  /** Whether sculpting means anything for this collection at all (`EDITOR_MODES.sculpt`). */
+  const sculptable = EDITOR_MODES.sculpt.link(collection);
   const appliesTo: AppliesTo = stage.kind === 'generated' ? 'preview' : stage.kind === 'origpose' ? 'generation' : stage.kind === 'twin' ? 'twin' : 'built';
   /**
    * The same answer for the bend editor, which tells the original pose apart from the generation.
@@ -299,7 +372,10 @@ export function Viewer() {
    * sculpt is exactly right.
    */
   const ownBody = !def.generated || !!def.inReview;
-  const canStretch = !isPropCollection(collection) && !showPuppet && ready && (showGenerated || ownBody);
+  /** What `EDITOR_MODES` asks about, and whether each editor may be drawn over the body on stage now. */
+  const facts: StageFacts = { collection, showPuppet, showGenerated, ownBody };
+  const canOpen = (m: EditorModeId) => ready && EDITOR_MODES[m].opens(facts);
+  const canSculpt = canOpen('sculpt'), canStretch = canOpen('stretch'), canBend = canOpen('bend'), canMark = canOpen('mark'), canMouth = canOpen('mouth');
   /**
    * The bodies an editing mode can actually be opened on, which is what its own Model control may
    * offer. It is `canStretch`/`canBend`'s own test asked of each stage rather than of the one on
@@ -310,22 +386,9 @@ export function Viewer() {
   const editableStages = choices
     .filter(o => o.kind !== 'twin' && (ownBody || o.kind === 'generated'))
     .map(o => ({ id: o.id, label: o.label }));
-  /**
-   * Bend sits exactly where stretch does, because it asks the same kind of question about the same
-   * run of body: stretch changes a span's *length* and bend changes its *direction*, and neither
-   * can be baked into a rigged body. So it is offered on a raw generation (where the warp on stage
-   * is the edit) and on a built body (where the rig is held at rest and the export is a measurement
-   * for the builder), and refused on the comparison twin and on props for stretch's own reasons —
-   * a measurement exported off the twin would name the right creature and describe the wrong mesh.
-   */
-  const canBend = canStretch;
   useEffect(() => {
-    if (mode === 'sculpt' && (!sculptable || showPuppet || showGenerated)) setMode('view');
-    // Stretch is the one mode a *built* body still answers: there it is a measurement rather than
-    // an edit, so all it refuses is a prop and the comparison twin.
-    if ((mode === 'stretch' || mode === 'bend') && (isPropCollection(collection) || showPuppet)) setMode('view');
-    if ((mode === 'mark' || mode === 'mouth') && isPropCollection(collection)) setMode('view');
-  }, [mode, collection, sculptable, showPuppet, showGenerated]);
+    if (mode !== 'view' && !EDITOR_MODES[mode].stands({ collection, showPuppet, showGenerated, ownBody })) setMode('view');
+  }, [mode, collection, showPuppet, showGenerated, ownBody]);
 
   // The show effect must not re-run when a pick changes, so it reads the picks through a ref.
   const picksRef = useRef(picks);
@@ -409,19 +472,14 @@ export function Viewer() {
         return [c.id, { scheme: s.id, name: s.name, colors: s.colors }];
       })),
     };
-    const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }));
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${collection}-colour-schemes.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadJson(`${collection}-colour-schemes.json`, payload);
   }
 
   // Only count picks that differ from what the game already uses — those are the proposed changes.
   const changed = roster.filter((c) => (picks[c.key] ?? defaultScheme(c.key)) !== defaultScheme(c.key)).length;
 
   return (
-    <div className={`viewer ${mode === 'sculpt' ? 'sculpting' : mode === 'stretch' ? 'stretching' : mode === 'mark' ? 'marking' : mode === 'mouth' ? 'mouthing' : mode === 'bend' ? 'bending' : ''} ${previewing ? 'previewing' : ''}`}
+    <div className={`viewer ${mode === 'view' ? '' : EDITOR_MODES[mode].className} ${previewing ? 'previewing' : ''}`}
       data-mode={mode} data-previewing={previewing ? 'yes' : 'no'}>
       <div className="stage">
         <canvas ref={canvasRef} className="viewer-canvas" />

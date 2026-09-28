@@ -51,6 +51,8 @@
     "sand": "node tools/test.mjs sand",
     "spatial": "node tools/test.mjs spatial",
     "stats": "node tools/test.mjs stats",
+    "breakpoints": "node tools/test.mjs breakpoints",
+    "lineup": "node tools/test.mjs lineup",
     "debug": "node tools/test.mjs debug",
     "eras": "node tools/test.mjs eras",
     "merge": "node tools/test.mjs merge",

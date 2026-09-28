@@ -1,4 +1,4 @@
-import { emptyControls, type RawControls } from './input';
+import type { RawControls } from './input';
 import {
   SECONDARY, clear, down, freshTouch, meterEdge, move, read, secondaryOf, up,
   toNdc, type Secondary, type TouchFrame, type TouchState, type Zone,
@@ -249,6 +249,3 @@ export function applyTouch(c: RawControls, t: ReturnType<TouchPlay['read']>): Ra
   if (t.swim || t.light || t.heavy || t.dash || t.secondary) c.any = c.anyButton = true;
   return c;
 }
-
-/** A neutral frame of touch, for a seat whose fingers are nowhere. */
-export const emptyTouchControls = (): RawControls => emptyControls();

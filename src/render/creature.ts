@@ -26,7 +26,7 @@ export type Lod = 0 | 1;
 const cache = new Map<string, Promise<Loaded>>();
 const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
 
-export const creatureUrl = (id: CreatureId, lod: Lod = 0) =>
+const creatureUrl = (id: CreatureId, lod: Lod = 0) =>
   `${appBase()}${assetPaths.model(id, lod)}`;
 
 export function loadCreature(id: CreatureId, onProgress?: (loaded: number, total: number) => void, lod: Lod = 0): Promise<Loaded> {
@@ -354,7 +354,7 @@ export class CreatureView {
       // name is what fires it; a model without that clip is left to the state machine below. A
       // looping era clip (a walk down the beach, a watch at the edge) *is* the locomotion, so it
       // is decided here, ahead of the shared machine, rather than fought with Idle every frame.
-      const era = RULES?.clip?.(a);
+      const era = RULES.clip?.(a);
       const eraName = era && this.has(era.name) ? era.name : undefined;
       const eraLoop = !!(eraName && era?.loop);
       if (a.state === 'dead') { /* handled by one-shot */ }

@@ -1,28 +1,10 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { selectEra } from '../content';
 import { TRIASSIC } from '../content/triassic';
 import { TRIASSIC_SAMPLES } from '../content/triassic/sfx';
-import { nestedBase, setAppBase } from '../shared/base';
-import { installStats } from '../shared/stats';
-import '../app/styles.css';
+import { bootGame } from '../shared/boot-game';
 
 /**
- * Triassic Triumph lives at /triassic/ beside the other two games. The era is chosen and the asset
- * base pointed one directory up before the app is imported, so every module-top read of
+ * Triassic Triumph lives at /triassic/ beside the other two games. `bootGame` chooses the era and
+ * points the asset base one directory up before the app is imported, so every module-top read of
  * ACTIVE_ERA (creature tables, asset paths, era rules, the sea floor) sees the Triassic pack.
  */
-selectEra(TRIASSIC);
-setAppBase(nestedBase());
-installStats();
-
-// Everything below is imported dynamically, after the era is chosen: a static import here would be
-// evaluated first, and the audio library and the creature tables read ACTIVE_ERA as they load.
-const { registerSamples } = await import('../audio/audio');
-registerSamples(TRIASSIC_SAMPLES);
-const { Root } = await import('../app/Root');
-createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <Root />
-  </React.StrictMode>,
-);
+void bootGame(TRIASSIC, TRIASSIC_SAMPLES);

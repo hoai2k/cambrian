@@ -1,7 +1,6 @@
 import { defineEra } from '../era';
 import type { TriassicCreatureId } from './ids';
 import type { DevonianCreatureId } from '../devonian/ids';
-import type { Slot } from '../../shared/palettes';
 import { TRIASSIC_CREATURES } from './creatures';
 import { SNACK_SCHOOLS, GIANTS } from './ecology';
 import { BIOME_NAMES, BIOME_DANGER, BIOME_PLATES, ATMOS, SAND_COLORS, FLORA_BASE, FLORA_DENSITY, FLORA_PROPS, SHORE_FLORA, SURFACE_Y, FLOOR_DEPTH } from './environment';
@@ -14,6 +13,8 @@ import devonianBytes from '../devonian/asset-sizes.json';
 import pendingRefinements from './pending-refinements.json';
 import { refinementTables, type PendingRefinement } from '../pending-refinements';
 import { TRIASSIC_STRINGS } from './strings';
+import { eraLinks } from '../era-links';
+import { authoredCreatureColors, modelBytesFor } from '../pack-tables';
 
 /** The badges, derived from the one refinement queue: every Triassic model is outstanding today. */
 const { modelStatus, modelNotes, clipNotes } = refinementTables(pendingRefinements as PendingRefinement[]);
@@ -49,16 +50,9 @@ export const TRIASSIC_STAND_INS: Partial<Record<TriassicCreatureId, `devonian/${
     .filter(([id]) => !SHIPPED_BYTES[id])
     .map(([id, body]) => [id, `devonian/${body}` as const]),
 );
-const modelBytes = Object.fromEntries(TRIASSIC_CREATURES.map((c) => [c.id, SHIPPED_BYTES[c.id] ?? DEVONIAN_BYTES[BORROWED[c.id as TriassicCreatureId]] ?? 1]));
+const modelBytes = modelBytesFor(TRIASSIC_CREATURES.map((c) => c.id), SHIPPED_BYTES, (id) => DEVONIAN_BYTES[BORROWED[id as TriassicCreatureId]]);
+const authoredCreatures = authoredCreatureColors(TRIASSIC_CREATURES, SCHEMES, CREATURE_SCHEMES);
 
-/** Camouflage's fallback colours per creature: its default scheme's slots. */
-const authoredCreatures = Object.fromEntries(TRIASSIC_CREATURES.map((c) => {
-  const scheme = SCHEMES.find((s) => s.id === CREATURE_SCHEMES[c.id]);
-  return [c.id, scheme?.colors ?? ({ body: c.color, eyes: '#101010', fins: c.accent, legs: c.color, accent: c.accent, underside: c.color } as Record<Slot, string>)];
-}));
-
-const CAMBRIAN_LINK = { title: 'Cambrian Conquest', path: 'cambrian/', blurb: '268 million years earlier', logo: 'assets/brand/logo-header.webp' };
-const DEVONIAN_LINK = { title: 'Devonian Domination', path: 'devonian/', blurb: '135 million years earlier', logo: 'assets/devonian/brand/logo-header.webp' };
 
 export const TRIASSIC = defineEra({
   id: 'triassic',
@@ -72,7 +66,7 @@ export const TRIASSIC = defineEra({
     // it is, and leading on them made the game sound like a breath-holding exercise.
     tagline: 'Dive. Hunt. Grow. Hold.', taglineEm: '240 million years ago, reptiles and amphibians went back to the sea.',
     loading: 'RETURNING TO THE SEA…', lose: 'THE TIDE WINS', settingsKey: 'triassic-settings', mobileIllustration: TRIASSIC_BRAND_EXTRAS.mobileIllustration,
-    trilogy: { title: 'Ancient Seas Trilogy', path: '', blurb: 'All three games' }, sibling: CAMBRIAN_LINK, siblings: [DEVONIAN_LINK],
+    ...eraLinks('triassic'),
   },
   modes: [
     // The same three modes as the other eras: the sea and the animals change, not what a match is.

@@ -5,10 +5,11 @@ import { hideLabel, hideDescription, HEAVY_SPECIALS, DEFENSIVE_SPECIALS } from '
 import { RULES } from '../sim/era-rules';
 import { CreaturePortrait } from './CreaturePortrait';
 import { FeedbackButton } from './Feedback';
-import { PLAYER_COLORS } from '../render/engine';
+import { PLAYER_COLORS } from '../shared/hud-types';
 import { PLAYABLE as CREATURES, authoredCreature, creature, naturalSizing, realCm, type CreatureId } from '../sim/creatures';
 import type { Mode, PlayerSetup } from '../sim/types';
 import { CheckIcon, ChevronDown, Emblem, KeyboardIcon, PadIcon, TouchIcon } from './icons';
+import { roman } from './roman';
 import { appBase } from '../shared/base';
 import { btn, fillControls, key, type Scheme } from '../shared/controls';
 import { fillOf, ladderName, rungOf } from '../sim/ladder';
@@ -226,13 +227,6 @@ const EXTRA_LABEL: Record<ExtraId, { name: string; glyph: string; title: string 
  * the two can be compared; nothing on the page offers it.
  */
 const PLATE = typeof location === 'undefined' || !/[?&]plate=0(?:&|$)/.test(location.search);
-const ROMAN: [number, string][] = [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
-/** A plate number the way a folio numbers its plates. */
-export function roman(n: number): string {
-  let out = '';
-  for (const [v, r] of ROMAN) while (n >= v) { out += r; n -= v; }
-  return out;
-}
 
 export function SelectScreen(p: Props) {
   const s = p.scheme;

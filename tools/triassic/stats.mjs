@@ -34,7 +34,7 @@ const TURN_RADIUS = { sharp: 0.12, moderate: 0.2, wide: 0.35 };
 const FLIGHT = new Set(['rhaeticosaurus', 'archelon']);
 const SINK = new Set(['placodus', 'henodus', 'atopodentatus', 'cartorhynchus']);
 const SHORE = new Set(['tanystropheus', 'mystriosuchus', 'macrocnemus', 'coelophysis']);
-const mag = (L) => L * 1.45 + 1.15 + Math.max(0, 0.8 - L) * 0.9;   // magnificationDistance, src/render/engine.ts
+const mag = (L) => L * 1.45 + 1.15 + Math.max(0, 0.8 - L) * 0.9;   // magnificationDistance, src/render/camera.ts
 const r2 = (v) => Math.round(v * 100) / 100, r1 = (v) => Math.round(v * 10) / 10;
 
 const rows = [];

@@ -25,7 +25,7 @@ const PACE = 1.5;                               // game speed = research BL/s ·
 const FLOOR_SCREENS = 0.5, BURST_CAP_SCREENS = 2.4;
 const BURST_MIN = 1.6, BURST_MAX = 4.0;
 const TURN_RADIUS = { sharp: 0.12, moderate: 0.2, wide: 0.35 };
-const mag = (L) => L * 1.45 + 1.15 + Math.max(0, 0.8 - L) * 0.9;   // magnificationDistance, src/render/engine.ts
+const mag = (L) => L * 1.45 + 1.15 + Math.max(0, 0.8 - L) * 0.9;   // magnificationDistance, src/render/camera.ts
 const r2 = (v) => Math.round(v * 100) / 100, r1 = (v) => Math.round(v * 10) / 10;
 
 const rows = [];

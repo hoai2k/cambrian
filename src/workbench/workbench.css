@@ -1,17 +1,8 @@
-/* Standalone shell for the development workbenches. Same palette as the game menus. */
+/* Standalone shell for the development workbenches. Same palette as the game menus (src/shared/tokens.css). */
+@import '../shared/tokens.css';
 :root {
-  --ink: #06161c;
-  --foam: #eefaf6;
-  --mist: rgba(238, 250, 246, 0.72);
-  --dim: rgba(238, 250, 246, 0.5);
-  --coral: #ff5b6e;
-  --ember: #ffb36b;
-  --lagoon: #61f2d5;
-  --font-display: 'Unbounded', 'Arial Black', 'Segoe UI', sans-serif;
-  --font-body: 'Manrope', 'Segoe UI', system-ui, sans-serif;
-  --panel: rgba(6, 22, 28, 0.62);
-  --line: rgba(238, 250, 246, 0.16);
-  color-scheme: dark;
+  --panel: rgb(var(--ink-rgb) / 0.62);
+  --line: rgb(var(--foam-rgb) / 0.16);
 }
 * { box-sizing: border-box; }
 html, body, #root { min-height: 100%; margin: 0; }
@@ -63,10 +54,10 @@ code { font-size: .92em; color: var(--lagoon); }
 .row {
   position: relative; display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
   padding: 8px 10px; border-radius: 12px; border: 1px solid transparent;
-  background: rgba(238, 250, 246, .04);
+  background: rgb(var(--foam-rgb) / .04);
   transition: background .15s, border-color .15s;
 }
-.row:hover, .row:focus-within { background: rgba(238, 250, 246, .09); border-color: var(--line); }
+.row:hover, .row:focus-within { background: rgb(var(--foam-rgb) / .09); border-color: var(--line); }
 
 .name {
   display: flex; align-items: baseline; gap: 10px; min-width: 210px;
@@ -80,7 +71,7 @@ code { font-size: .92em; color: var(--lagoon); }
 
 .chip {
   padding: 6px 11px; border-radius: 999px; border: 1px solid var(--line);
-  background: rgba(6, 22, 28, .5); color: var(--mist);
+  background: rgb(var(--ink-rgb) / .5); color: var(--mist);
   font: 600 12px ui-monospace, 'SF Mono', Menlo, monospace;
   transition: background .15s, color .15s;
 }

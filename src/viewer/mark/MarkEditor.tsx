@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ViewerSpecimen } from '../catalogue';
 import type { MarkTarget, ViewerScene } from '../scene';
 import { History } from '../sculpt/history';
+import { UndoRedo, downloadJson, useEditorHistory, useUndoKeys } from '../editor-kit';
 import { brushHits, buildRegion, cloneMarks, describeMarked, emptyMarks, markedCount, paintInto, totalVertices, type Marks } from './region';
 import { getRegion, regionKey, setRegion } from './store';
 import { useMeasuredHash } from '../file-hash';
@@ -52,8 +53,6 @@ export function MarkEditor({ scene, specimen, model, sha256: manifestSha, canvas
   const [ring, setRing] = useState<{ x: number; y: number; r: number; on: boolean } | null>(null);
   /** The ring's last screen radius, for stepping a drag: a state read here would re-bind the listeners mid-stroke. */
   const ringRef = useRef(12);
-  const [historyTick, setHistoryTick] = useState(0);
-  const historyRef = useRef<History<Uint8Array[]> | null>(null);
   const strokeRef = useRef<{ marks: Uint8Array[]; last: [number, number] } | null>(null);
   // The pointer handlers live on the canvas for the life of the mode, so they read the current
   // brush and erase settings through refs rather than being re-bound on every slider tick.
@@ -97,13 +96,7 @@ export function MarkEditor({ scene, specimen, model, sha256: manifestSha, canvas
   }, [scene, key]);
   useEffect(() => { const h = historyRef.current; if (h) setRegion(key, h.present, note); }, [note, key]);
 
-  const step = useCallback((marks: Uint8Array[]) => {
-    historyRef.current?.push(marks);
-    publish(marks);
-    setHistoryTick((t) => t + 1);
-  }, [publish]);
-  const undo = useCallback(() => { const h = historyRef.current; if (!h?.canUndo) return; publish(h.undo()); setHistoryTick((t) => t + 1); }, [publish]);
-  const redo = useCallback(() => { const h = historyRef.current; if (!h?.canRedo) return; publish(h.redo()); setHistoryTick((t) => t + 1); }, [publish]);
+  const { historyRef, step, undo, redo } = useEditorHistory<Uint8Array[]>(publish);
   const clearAll = useCallback(() => { const t = targetRef.current; if (t) step(emptyMarks(t.meshes)); }, [step]);
 
   // ---- the brush, on the canvas ----
@@ -186,21 +179,12 @@ export function MarkEditor({ scene, specimen, model, sha256: manifestSha, canvas
   }, [canvas, scene, error, publish, step]);
 
   // ---- keyboard ----
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      const el = e.target as HTMLElement | null;
-      if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT')) return;
-      const mod = e.metaKey || e.ctrlKey;
-      if (mod && (e.key === 'z' || e.key === 'Z')) { e.preventDefault(); if (e.shiftKey) redo(); else undo(); return; }
-      if (mod && (e.key === 'y' || e.key === 'Y')) { e.preventDefault(); redo(); return; }
-      if (mod) return;
-      if (e.key === 'e' || e.key === 'E') { e.preventDefault(); setErase((v) => !v); }
-      else if (e.key === '[') { e.preventDefault(); setBrush((b) => Math.max(BRUSH_MIN, b / 1.2)); }
-      else if (e.key === ']') { e.preventDefault(); setBrush((b) => Math.min(BRUSH_MAX, b * 1.2)); }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [undo, redo]);
+  // E toggles erasing, and [ and ] step the brush.
+  useUndoKeys(undo, redo, (e) => {
+    if (e.key === 'e' || e.key === 'E') { e.preventDefault(); setErase((v) => !v); }
+    else if (e.key === '[') { e.preventDefault(); setBrush((b) => Math.max(BRUSH_MIN, b / 1.2)); }
+    else if (e.key === ']') { e.preventDefault(); setBrush((b) => Math.min(BRUSH_MAX, b * 1.2)); }
+  });
 
   // ---- export ----
   function exportRegion() {
@@ -212,15 +196,11 @@ export function MarkEditor({ scene, specimen, model, sha256: manifestSha, canvas
       locals: t.meshes.map((m) => m.local),
       marks: h.present as Marks,
     });
-    const url = URL.createObjectURL(new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' }));
-    const a = document.createElement('a');
-    a.href = url; a.download = `${specimen.id}-region.json`; a.click();
-    URL.revokeObjectURL(url);
+    downloadJson(`${specimen.id}-region.json`, file);
   }
 
   const h = historyRef.current;
   const total = target ? totalVertices(target.meshes) : 0;
-  void historyTick;
 
   return (
     <>
@@ -254,8 +234,7 @@ export function MarkEditor({ scene, specimen, model, sha256: manifestSha, canvas
           <button className={erase ? 'active' : ''} aria-pressed={erase} onClick={() => setErase(true)}>Erase</button>
         </div>
         <div className="sculpt-actions">
-          <button className="ghost" onClick={undo} disabled={!h?.canUndo} title="⌘/Ctrl+Z">Undo</button>
-          <button className="ghost" onClick={redo} disabled={!h?.canRedo} title="⇧⌘/Ctrl+Z · Ctrl+Y">Redo</button>
+          <UndoRedo history={h} undo={undo} redo={redo} />
           <button className="ghost" onClick={clearAll} disabled={!marked}>Clear all</button>
         </div>
         <label className="mark-note">

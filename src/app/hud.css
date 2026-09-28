@@ -1,0 +1,186 @@
+/* The HUD: gauges, markers, the radar, the grip, the travel menu and the scoreboard. Imported by
+   styles.css, in the cascade's order. */
+/* ---------- HUD ---------- */
+.hud-layer { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+.hud { position: absolute; overflow: hidden; font-size: 14px; }
+.hud-quarter { font-size: 11px; }
+.hud-half { font-size: 12.5px; }
+/* Health owns the outer opacity; only the inner layer pulses, so animation cannot reveal it. */
+.health-vignette { position: absolute; inset: 0; pointer-events: none; }
+.health-vignette::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 48%, rgba(255, 40, 60, .5) 100%); animation: heartbeat 1s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .health-vignette::before { animation: none; } }
+.hud-top { position: absolute; left: 1.4em; top: 1.2em; display: flex; gap: .8em; align-items: center; }
+.tier-ring { position: relative; width: 4.8em; height: 4.8em; }
+.tier-ring svg { width: 100%; height: 100%; }
+.ring-bg { fill: rgb(var(--ink-rgb) / .55); stroke: rgb(var(--foam-rgb) / .16); stroke-width: 6; }
+.ring-fg { fill: none; stroke: var(--ember); stroke-width: 6; stroke-linecap: round; transition: stroke-dasharray .3s; filter: drop-shadow(0 0 6px rgba(255,179,107,.7)); }
+.tier-num { position: absolute; inset: 0; display: grid; place-items: center; font: 700 1.3em var(--font-display); color: var(--foam); }
+.bars { display: grid; gap: .35em; width: 15em; }
+.name-row { display: flex; gap: .6em; align-items: baseline; font-size: 1em; }
+.name-row b { font: 700 1em var(--font-display); letter-spacing: .04em; }
+.tier-name { color: var(--dim); font-size: .85em; letter-spacing: .12em; text-transform: uppercase; }
+.protect { font-size: .7em; letter-spacing: .14em; color: #9be9ff; }
+.bar { height: .7em; border-radius: 1em; background: rgb(var(--ink-rgb) / .6); overflow: hidden; border: 1px solid rgb(var(--foam-rgb) / .12); }
+.bar i { display: block; height: 100%; border-radius: inherit; transition: width .12s linear; }
+.bar.hp i { background: linear-gradient(90deg, var(--coral), #ff8f7a); box-shadow: 0 0 10px rgba(255,91,110,.6); }
+.bar.stamina { height: .5em; }
+.bar.stamina i { background: linear-gradient(90deg, var(--lagoon), #a7ffe9); }
+.bar.stamina.exhausted i { background: #7a7f88; animation: blink .5s infinite; }
+/* The air mark rides on the stamina bar rather than beside it, because it is about that bar: it
+   sits just off the right end, clear of the fill at any width, and never changes the bar's height. */
+.bar.stamina { position: relative; overflow: visible; }
+.bar.stamina .air-mark {
+  position: absolute; right: -1.15em; top: 50%; translate: 0 -50%;
+  width: 1em; height: 1em; background: var(--lagoon); opacity: .72;
+  mask-repeat: no-repeat; mask-position: center; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; -webkit-mask-position: center; -webkit-mask-size: contain;
+  transition: opacity .2s linear;
+}
+.bar.stamina .air-mark.urgent { background: var(--ember); opacity: 1; animation: blink .9s infinite; }
+.bar.target i { background: currentColor; }
+.lock-panel { position: absolute; top: 1.2em; left: 50%; transform: translateX(-50%); display: grid; gap: .25em; justify-items: center; padding: .5em .9em; border-radius: 1em; background: rgb(var(--ink-rgb) / .55); backdrop-filter: blur(10px); border: 1px solid currentColor; min-width: 11em; }
+.lock-band { font: 700 .7em var(--font-display); letter-spacing: .2em; }
+.lock-panel b { font: 700 .95em var(--font-display); color: var(--foam); }
+.lock-kind { font-size: .78em; letter-spacing: .1em; color: var(--mist); text-transform: uppercase; }
+.lock-panel .bar { width: 100%; height: .4em; }
+/* The grip. Centred and low, under the reticle rather than over it, because a player who has
+   hold of something is looking at the thing they have hold of. Loud enough that its arrival is
+   the answer to "did that work"; gone the instant the grip is. */
+.grip-panel { position: absolute; left: 50%; bottom: 8.2em; transform: translateX(-50%); display: grid; gap: .3em; justify-items: center; padding: .55em 1em; border-radius: 1em; background: rgb(var(--ink-rgb) / .72); backdrop-filter: blur(10px); border: 1px solid currentColor; min-width: 13em; max-width: 92%; text-align: center; pointer-events: none; animation: rise-in-centred .25s both; }
+.grip-panel b { font: 700 .95em var(--font-display); color: var(--foam); letter-spacing: .06em; }
+.grip-panel span { font-size: .8em; letter-spacing: .06em; color: var(--mist); }
+.grip-panel .bar.grip { width: 100%; height: .35em; border-radius: .2em; background: rgb(var(--foam-rgb) / .16); overflow: hidden; }
+.grip-panel .bar.grip i { display: block; height: 100%; background: currentColor; transition: width .1s linear; }
+/* The window in which letting go is the blow the grip stood in for. Two seconds, and it decides
+   whether the animal ever knows you were there, so it reads loudly. */
+.grip-panel.strike { border-color: var(--ember); box-shadow: 0 0 22px rgba(255,179,107,.55); }
+.grip-panel.strike span { color: var(--ember); font-weight: 700; }
+/* Carried too long: it is coming loose whatever the player does next. */
+.grip-panel.lost { border-color: var(--coral); }
+.grip-panel.lost span { color: #ffd4da; }
+.grip-panel.spent { color: var(--coral); }
+.grip-panel.spent b { color: #ffd4da; }
+.hud-bottom { position: absolute; left: 1.4em; bottom: 1.4em; display: flex; gap: .6em; align-items: flex-end; }
+.chip { position: relative; display: flex; align-items: center; gap: .5em; padding: .45em .8em .45em .5em; border-radius: .9em; background: rgb(var(--ink-rgb) / .6); border: 1px solid rgb(var(--foam-rgb) / .14); overflow: hidden; }
+.chip .btn { min-width: 1.6em; height: 1.6em; padding: 0 .35em; border-radius: .8em; display: grid; place-items: center; font: 700 .8em var(--font-display); color: var(--ink); background: var(--foam); }
+.chip .btn.y { background: #f2c94c; }
+.chip .btn.dpad { background: #9be9ff; font-size: .7em; }
+.chip-label { font-weight: 700; font-size: .9em; letter-spacing: .04em; }
+.chip .cool { position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: var(--ember); transform-origin: left; transition: transform .2s linear; }
+.chip.locked { opacity: .5; }
+.chip.active { border-color: var(--ember); box-shadow: 0 0 18px rgba(255,179,107,.5); }
+.chip.sense.ready .cool { background: #9be9ff; }
+.tally { display: flex; gap: .8em; color: var(--dim); font-size: .8em; letter-spacing: .06em; padding-bottom: .3em; }
+.hint { position: absolute; left: 50%; bottom: 5.4em; transform: translateX(-50%); margin: 0; padding: .6em 1.1em; border-radius: 1em; background: rgb(var(--ink-rgb) / .72); border: 1px solid rgba(255,179,107,.5); color: var(--foam); font-weight: 700; font-size: 1em; white-space: nowrap; animation: rise-in-centred .4s both; max-width: 90%; text-overflow: ellipsis; overflow: hidden; }
+.goal-hint { top: 8em; bottom: auto; }
+.hint.danger { border-color: var(--coral); color: #ffd4da; }
+.marker { position: absolute; width: calc(.7em * var(--s)); height: calc(.7em * var(--s)); transform: translate(-50%, -50%) rotate(45deg); border: 2px solid currentColor; border-radius: 2px; opacity: .8; box-shadow: 0 0 8px currentColor; transition: left .1s linear, top .1s linear; }
+/* Only a mark that is *about* you blinks. It used to be every giant-band body on screen. */
+.marker.hot { animation: blink .8s infinite; }
+.marker:not(.hot) { opacity: .55; box-shadow: none; }
+.hunter-arrow { position: absolute; left: 50%; top: 50%; color: var(--coral); font-size: 2.2em; text-shadow: 0 0 14px var(--coral); }
+.hunter-arrow span { display: inline-block; transform: rotate(90deg); }
+/* Death: a line low on the viewport, not a panel over it. You watch what got you finish the job;
+   the screen fades out at the end of the watch, so nothing here needs to cover the picture. */
+.death-note { position: absolute; left: 50%; bottom: 3.6em; transform: translateX(-50%); display: grid; justify-items: center; gap: .15em; text-align: center; pointer-events: none; animation: fade-in-centred .5s both; text-shadow: 0 .08em .5em rgba(0,0,0,.85), 0 0 1.2em rgba(0,0,0,.6); }
+.death-note b { font: 800 1.35em var(--font-display); letter-spacing: .06em; color: var(--coral); }
+.death-note b i { font-style: normal; font-weight: 600; color: var(--mist); opacity: .85; }
+.death-note span { font-size: .85em; color: var(--mist); opacity: .75; }
+.death-note.downed b { color: var(--player, #61f2d5); }
+/* While spectating, the spectator chip already owns the bottom of the viewport; sit above it. */
+.death-note.spectating-too { bottom: 6em; }
+
+/* Co-op: a downed team-mate. An arrow pinned to the middle of the viewport pointing the way,
+   and a call-out with the seconds left to reach them. */
+.downed-arrow { position: absolute; left: 50%; top: 50%; width: 3.4em; height: 3.4em; margin: -1.7em 0 0 -1.7em; pointer-events: none; opacity: .9; filter: drop-shadow(0 0 6px currentColor); animation: downed-pulse 1.1s ease-in-out infinite; }
+.downed-arrow svg { width: 100%; height: 100%; transform: translateY(-2.6em); }
+@keyframes downed-pulse { 50% { opacity: .45; } }
+.downed-call { position: absolute; left: 50%; top: 4.2em; transform: translateX(-50%); display: grid; gap: .3em; text-align: center; pointer-events: none; }
+.downed-call p { margin: 0; padding: .45em 1em; border-radius: 1em; background: rgb(var(--ink-rgb) / .78); border: 1px solid var(--player); display: grid; gap: .1em; }
+.downed-call b { color: var(--player); font-size: .95em; letter-spacing: .04em; }
+.downed-call span { color: var(--mist); font-size: .8em; }
+.revive-bar { display: block; height: 3px; margin-top: .3em; border-radius: 2px; background: var(--player, #61f2d5); transform-origin: left; transition: transform .08s linear; }
+.revive-bar.wide { width: min(40vw, 260px); height: 4px; margin-top: .6em; }
+
+/* The change-creature page of the teleport menu: one animal at a time, cycled left and right, with
+   what you would arrive as written under it. */
+.swap-menu { min-width: 15em; }
+.swap-body { position: relative; display: flex; gap: .7em; align-items: center; margin: .4em 0 .5em; }
+.swap-body img { width: 3.4em; height: 3.4em; object-fit: contain; flex: none; }
+.swap-body > div { display: grid; gap: .1em; min-width: 0; }
+.swap-body b { font: 800 1em var(--font-display); }
+.swap-kind { font-size: .74em; color: var(--dim); }
+.swap-rung { font-size: .8em; color: var(--ember); }
+.swap-fill { display: block; height: 3px; margin-top: .25em; border-radius: 2px; background: rgb(var(--foam-rgb) / .16); }
+.swap-fill b { display: block; height: 100%; border-radius: 2px; background: var(--ember); transform-origin: left; }
+
+/* Survival: whose game you are watching while you are dead. */
+.spectating { position: absolute; left: 50%; bottom: 2.2em; transform: translateX(-50%); display: grid; justify-items: center; gap: .15em; padding: .5em 1.2em; border-radius: 1em; background: rgb(var(--ink-rgb) / .7); border: 1px solid rgb(var(--foam-rgb) / .22); pointer-events: none; }
+.spectating b { font: 900 .8em var(--font-display); letter-spacing: .18em; color: var(--mist); }
+.spectating span { font-weight: 700; }
+
+/* ---------- Scoreboard (hold View) ---------- */
+.scoreboard { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 12; width: min(92%, 26em); max-height: 82%; overflow-y: auto; padding: .9em 1em 1em; border-radius: 1em; background: rgb(var(--ink-rgb) / .9); border: 1px solid rgb(var(--foam-rgb) / .18); backdrop-filter: blur(6px); box-shadow: 0 1.4em 3em rgba(0,0,0,.5); animation: fade-in .12s both; pointer-events: none; }
+.board-head { display: flex; align-items: baseline; justify-content: space-between; gap: .6em; }
+.board-head .eyebrow { margin: 0; }
+.board-detail { margin: .15em 0 .7em; font-size: .78em; color: var(--dim); }
+.scoreboard ol { list-style: none; margin: 0; padding: 0; display: grid; gap: .3em; }
+.board-row { display: grid; grid-template-columns: 2.2em 1fr auto auto; align-items: center; gap: .55em; padding: .4em .5em; border-radius: .6em; background: rgb(var(--foam-rgb) / .05); border-left: 3px solid var(--player); }
+.board-row.you { background: rgb(var(--foam-rgb) / .13); }
+.board-row.down { opacity: .55; }
+.board-who { font: 800 .72em var(--font-display); letter-spacing: .06em; color: var(--player); }
+.board-name { display: grid; gap: .05em; min-width: 0; }
+.board-name b { font-size: .84em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.board-name small { font-size: .68em; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.board-bar { display: block; height: 2px; margin-top: .15em; border-radius: 1px; background: var(--player); opacity: .8; transform-origin: left; }
+.board-tally { display: grid; justify-items: end; gap: .05em; }
+.board-tally small { font-size: .66em; color: var(--dim); font-variant-numeric: tabular-nums; }
+.hud-quarter .scoreboard { width: min(96%, 20em); font-size: .86em; }
+
+/* A line from the simulation: a turn changing over, a team-mate picked up. */
+.notice { position: absolute; z-index: 5; left: 50%; top: 6.5em; transform: translateX(-50%); margin: 0; padding: .5em 1.1em; border-radius: 1em; background: rgb(var(--ink-rgb) / .8); border: 1px solid var(--ember); color: var(--foam); font-weight: 700; font-size: .92em; white-space: nowrap; max-width: 92%; overflow: hidden; text-overflow: ellipsis; animation: rise-in-centred .3s both; pointer-events: none; }
+
+/* The hour of the day, sitting above the radar. */
+.day-phase { position: absolute; right: 1.4em; bottom: 15.4em; display: flex; align-items: center; gap: .45em; padding: .35em .7em .35em .5em; border-radius: 1em; background: rgb(var(--ink-rgb) / .55); border: 1px solid rgb(var(--foam-rgb) / .16); color: var(--mist); pointer-events: none; transition: color .6s, border-color .6s, background .6s; }
+.hud-quarter .day-phase, .hud-half .day-phase { bottom: 11.6em; font-size: .85em; }
+.hud-half:first-child .day-phase, .hud-quarter:nth-child(3) .day-phase { bottom: 11.6em; }
+.day-mark { font-size: 1.15em; line-height: 1; }
+.day-text { display: grid; gap: 0; line-height: 1.1; }
+.day-text b { font: 800 .68em var(--font-display); letter-spacing: .13em; }
+.day-text small { font-size: .62em; color: var(--dim); font-variant-numeric: tabular-nums; }
+.day-phase.night { color: #9fc4e8; }
+.day-phase.day { color: #ffe9b0; }
+.day-phase.hunting { color: var(--ember); border-color: var(--ember); background: rgba(40,18,6,.62); }
+.day-phase.hunting .day-text small { color: var(--ember); }
+.day-phase.hunting .day-mark { animation: pulse-mark 1.6s ease-in-out infinite; }
+
+/* radar */
+.radar { position: absolute; right: 1.4em; top: 1.2em; width: 9.5em; height: 9.5em; }
+.radar svg { width: 100%; height: 100%; overflow: visible; }
+.radar-bg { fill: rgb(var(--ink-rgb) / .55); }
+.radar-ring { fill: none; stroke: rgb(var(--foam-rgb) / .12); stroke-width: .6; }
+.radar-rim { fill: none; stroke: rgb(var(--foam-rgb) / .35); stroke-width: 1.2; }
+.radar-you { color: var(--player, #61f2d5); fill: var(--player, #61f2d5); filter: drop-shadow(0 0 3px currentColor); }
+.radar-range { position: absolute; right: .2em; bottom: -1.2em; font-size: .7em; color: var(--dim); letter-spacing: .08em; }
+.blip { stroke-width: 1.3; filter: drop-shadow(0 0 2px currentColor); }
+.blip.beyond { stroke-dasharray: 2 1.2; opacity: .85; }
+.blip.hunting { animation: blink .6s infinite; }
+.blip-shore { fill: none; stroke-width: 3; opacity: .8; }
+.blip-food { filter: none; opacity: .9; }
+.hud-quarter .radar { width: 7.5em; height: 7.5em; }
+/* biome banner */
+.biome-banner { position: absolute; left: 50%; top: 22%; transform: translateX(-50%); display: grid; justify-items: center; gap: .1em; pointer-events: none; animation: banner 3.2s ease both; }
+.biome-banner span { font: 700 .75em var(--font-display); letter-spacing: .32em; color: var(--mist); }
+.biome-banner b { font: 900 2.4em var(--font-display); letter-spacing: .12em; color: var(--foam); text-shadow: 0 2px 20px rgba(0,0,0,.5), 0 0 40px rgba(97,242,213,.35); }
+.hud-quarter .biome-banner b { font-size: 1.7em; }
+@keyframes banner { 0% { opacity: 0; transform: translateX(-50%) translateY(12px) scale(.96); } 12% { opacity: 1; transform: translateX(-50%) none; } 80% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(-8px); } }
+/* teleport menu */
+.tele-menu { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); min-width: 16em; padding: 1em 1.2em; border-radius: 1.1em; background: rgb(var(--ink-rgb) / .82); border: 1px solid var(--player, rgb(var(--foam-rgb) / .2)); box-shadow: 0 0 30px rgba(0,0,0,.4), 0 0 24px color-mix(in srgb, var(--player, #61f2d5) 30%, transparent); animation: rise-in .2s both; }
+.tele-menu .eyebrow { margin: 0 0 .5em; }
+.tele-menu ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .3em; }
+.tele-menu li { display: grid; gap: .1em; padding: .5em .8em; border-radius: .7em; border: 1px solid transparent; opacity: .7; }
+.tele-menu li.sel { opacity: 1; border-color: var(--player, var(--ember)); background: rgb(var(--foam-rgb) / .06); }
+.tele-menu li b { font: 700 1em var(--font-display); letter-spacing: .04em; }
+.tele-menu li span { font-size: .85em; color: var(--mist); }
+.tele-menu small { display: block; margin-top: .7em; color: var(--dim); font-size: .8em; }
+.tele-menu kbd { font: 700 .9em var(--font-display); padding: 0 .4em; border-radius: .4em; background: var(--foam); color: var(--ink); }

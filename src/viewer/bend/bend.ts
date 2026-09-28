@@ -281,12 +281,6 @@ export interface BendDoc {
 }
 
 /**
- * The most the *straightening* can ever be: the turn is `straighten` times the angle between two
- * unit vectors, and that angle cannot exceed a half turn. Kept because the panel's fields still
- * need a range to offer.
- */
-export const MAX_TURN = Math.PI;
-/**
  * How far the slider goes either way.
  *
  * Past 1 is an overshoot — the run carried beyond straight, which is how a reviewer finds out
@@ -299,15 +293,15 @@ export const STRAIGHTEN_MIN = -0.5, STRAIGHTEN_MAX = 1.5;
 /** Where the slider starts: the body exactly as it is, which is what the editor opens on. */
 export const DEFAULT_STRAIGHTEN = 0;
 /** Where the span starts: the front third of the animal, which is where a neck is on everything this is for. */
-export const DEFAULT_BASE = 0.34, DEFAULT_TIP = 0.06;
+const DEFAULT_BASE = 0.34, DEFAULT_TIP = 0.06;
 /** How much body a centreline is traced over beyond each cut, by default. */
 export const DEFAULT_WINDOW = 0.12;
 /** How far off the trace a vertex may sit and still count, by default. */
 export const DEFAULT_REACH = 0.05;
 /** How many steps a trace takes over its window. */
-export const TRACE_STEPS = 12;
+const TRACE_STEPS = 12;
 /** How finely the bent centreline is integrated. The map is exact at these samples and interpolated between. */
-export const ARC_SAMPLES = 512;
+const ARC_SAMPLES = 512;
 /** The span may not be shorter than this share of the body: a span of no length has no length to turn over. */
 export const MIN_SPAN = 0.01;
 
@@ -487,7 +481,7 @@ export function headFractionAt(doc: Pick<BendDoc, 'frame' | 'bounds'>, p: Vec3):
 }
 
 /** A point on the body's own centre line a fraction of the way back from the nose, from the box. */
-export function pointAtHeadFraction(doc: Pick<BendDoc, 'frame' | 'bounds'>, headFraction: number): Vec3 {
+function pointAtHeadFraction(doc: Pick<BendDoc, 'frame' | 'bounds'>, headFraction: number): Vec3 {
   const { A, L, U } = axes(doc.frame);
   const { axisMin, axisMax, length } = doc.bounds;
   const p: Vec3 = [0, 0, 0];
@@ -517,9 +511,6 @@ export const isIdentity = (doc: BendShape): boolean => Math.abs(bendRotation(doc
  * anywhere that can kink the body where the span begins.
  */
 export const turnAt = (doc: BendShape, s: number): number => bendRotation(doc).angle * s;
-
-/** How fast it is turning there — constant across the span, and what pinches the inside of the bend. */
-export const turnRateAt = (doc: BendShape, _s?: number): number => bendRotation(doc).angle;
 
 // ---------------------------------------------------------------------------------------------
 // The warp
@@ -556,7 +547,7 @@ export interface BendGeometry {
   path: Float64Array;
 }
 
-export function bendGeometry(doc: BendDoc): BendGeometry {
+function bendGeometry(doc: BendDoc): BendGeometry {
   const basis = bendBasis(doc);
   const { forward, axis } = basis;
   const { angle } = bendRotation(doc);
@@ -574,7 +565,7 @@ export function bendGeometry(doc: BendDoc): BendGeometry {
 }
 
 /** The bent centreline at fraction `s` of the span, in the root frame. */
-export function centrelineAt(g: BendGeometry, s: number, out: Vec3): Vec3 {
+function centrelineAt(g: BendGeometry, s: number, out: Vec3): Vec3 {
   const n = ARC_SAMPLES;
   const x = clamp(s, 0, 1) * n;
   const i = Math.min(n - 1, Math.floor(x)), u = x - i;
@@ -906,7 +897,7 @@ export function traceCentreline(
 }
 
 /** How far each trace runs: a share of the body's length. */
-export const windowLength = (doc: Pick<BendDoc, 'window' | 'bounds'>) => Math.max(doc.window, 1e-4) * doc.bounds.length;
+const windowLength = (doc: Pick<BendDoc, 'window' | 'bounds'>) => Math.max(doc.window, 1e-4) * doc.bounds.length;
 
 /**
  * Both traces, as the stage draws them and the reading is taken from.
@@ -942,10 +933,10 @@ export function readGeometry(doc: BendDoc, chunks: readonly ArrayLike<number>[],
 // ---------------------------------------------------------------------------------------------
 
 /** A bone by name, or undefined. */
-export const boneNamed = (bones: readonly BoneNode[], name: string) => bones.find((b) => b.name === name);
+const boneNamed = (bones: readonly BoneNode[], name: string) => bones.find((b) => b.name === name);
 
 /** The direction of a chord between two bones' heads, or null if either is missing or they coincide. */
-export function boneDirection(bones: readonly BoneNode[], ref: BoneRef): Vec3 | null {
+function boneDirection(bones: readonly BoneNode[], ref: BoneRef): Vec3 | null {
   const a = boneNamed(bones, ref.from), b = boneNamed(bones, ref.to);
   if (!a || !b) return null;
   const v = sub(b.head, a.head);
@@ -1019,7 +1010,7 @@ export function boneStation(doc: Pick<BendDoc, 'base' | 'tip' | 'frame'>, b: Bon
  * neck that is chest → neck_00…03 → skull over chest → the forelimb, four joints to one. It is a
  * guess and the panel says so; the two dropdowns are what settles it.
  */
-export function defaultChain(doc: BendDoc): BoneRef | null {
+function defaultChain(doc: BendDoc): BoneRef | null {
   if (!doc.bones.length) return null;
   const f = spanDirection(doc);
   const span = spanLength(doc);
@@ -1101,7 +1092,7 @@ export function jointTurns(doc: BendDoc, bones: readonly BoneNode[] = doc.bones)
  * panel says rather than hides. Both are dropdowns: they are the question this tool exists to make
  * askable, not an answer it should be giving.
  */
-export function defaultRefs(doc: BendDoc): BendDoc {
+function defaultRefs(doc: BendDoc): BendDoc {
   if (!doc.chain || !doc.bones.length) return { ...doc, refs: null };
   const path = chainPath(doc.bones, doc.chain);
   if (path.length < 2) return { ...doc, refs: null };

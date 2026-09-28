@@ -2,7 +2,7 @@ import { hasEquivalentSizing, PLAYABLE } from '../sim/creatures';
 import { RULES } from '../sim/era-rules';
 import { ACTIVE_ERA } from '../content';
 import { useEffect, useRef } from 'react';
-import type { HudSnapshot } from '../render/engine';
+import type { HudSnapshot } from '../shared/hud-types';
 import { Scoreboard } from './Hud';
 import { creature } from '../sim/creatures';
 import type { PlayerSetup } from '../sim/types';
@@ -33,7 +33,7 @@ const LANDMARK_KINDS = ['arch', 'stack', 'bones'] as const;
  */
 export interface MenuItem { label: string; run: () => void; primary?: boolean }
 
-export function MenuButtons({ items, sel, shown, onHover }: { items: MenuItem[]; sel: number; shown: boolean; onHover: (i: number) => void }) {
+function MenuButtons({ items, sel, shown, onHover }: { items: MenuItem[]; sel: number; shown: boolean; onHover: (i: number) => void }) {
   return (
     <div className="menu-buttons">
       <div className="menu-choices" role="menu">
@@ -309,7 +309,7 @@ function SettingsPage({ settings, onSettings }: { settings: Settings; onSettings
           <input type="checkbox" checked={settings.equivalentSizing} onChange={(e) => onSettings({ ...settings, equivalentSizing: e.target.checked })} />
         </label>
       )}
-      {RULES?.settings?.shoreAnimals && (
+      {RULES.settings?.shoreAnimals && (
         <label className="setting-row">
           <span>{t.shoreAnimals} <small>{t.shoreAnimalsNote}</small></span>
           <input type="checkbox" checked={settings.shoreAnimals} onChange={(e) => onSettings({ ...settings, shoreAnimals: e.target.checked })} />

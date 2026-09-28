@@ -43,7 +43,7 @@ import fs from 'node:fs';
 const K = 8.4, EXP = 0.4;
 /** Everything hatches this long: src/sim/tiers.ts owns the same number. */
 const LARVA_LENGTH = 0.75, APEX = 2.6;
-const mag = (L) => L * 1.45 + 1.15 + Math.max(0, 0.8 - L) * 0.9;   // magnificationDistance, src/render/engine.ts
+const mag = (L) => L * 1.45 + 1.15 + Math.max(0, 0.8 - L) * 0.9;   // magnificationDistance, src/render/camera.ts
 const r2 = (v) => Math.round(v * 100) / 100;
 
 const research = JSON.parse(fs.readFileSync('docs/research/cambrian-sizes.json', 'utf8'));

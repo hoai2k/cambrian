@@ -24,14 +24,15 @@ export interface AssetItem { key: string; kind: AssetKind; url: string; size: nu
 export interface AssetProgress { loaded: number; total: number; fraction: number; done: number; count: number; current?: string; ready: Set<CreatureId>; }
 
 /** Known byte sizes so the bar is honest before the first request returns. */
-export const GLB_SIZES: Readonly<Partial<Record<CreatureId, number>>> = ACTIVE_ERA.assets.modelBytes;
+const GLB_SIZES: Readonly<Partial<Record<CreatureId, number>>> = ACTIVE_ERA.assets.modelBytes;
 /** The two images the pick screen actually draws: a 256x192 grid tile and a 1600x1200 hero. */
 const THUMB_SIZE = 60_000, SELECT_SIZE = 700_000;
 
 /**
  * Every sound the active era can play, taken from the audio library itself rather than a list kept
- * alongside it. An era registers its own sounds before this runs (see src/devonian/main.tsx), so
- * the Devonian warms its own library and the Cambrian warms its own; neither fetches the other's.
+ * alongside it. An era registers its own sounds before this runs (`bootGame` in
+ * src/shared/boot-game.tsx), so the Devonian warms its own library and the Cambrian warms its own;
+ * neither fetches the other's.
  * `sfxUrl` is the audio module's own resolver, which knows an era's sounds live in a directory of
  * their own.
  *
