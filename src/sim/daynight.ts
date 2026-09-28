@@ -30,8 +30,6 @@ export const DAY_LENGTH = 480;
 const DAWN_END = 0.10, DAY_END = 0.58, DUSK_END = 0.68;
 
 export type Phase = 'dawn' | 'day' | 'dusk' | 'night';
-export const PHASE_NAMES: Record<Phase, string> = { dawn: 'Dawn', day: 'Day', dusk: 'Dusk', night: 'Night' };
-
 /** Position in the cycle, 0..1. `offset` lets a match start somewhere other than first light. */
 export function dayFraction(time: number, offset = 0.16): number {
   const f = (time / DAY_LENGTH + offset) % 1;

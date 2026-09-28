@@ -1033,7 +1033,7 @@ export class Game implements AiWorld {
     a.spawnProtect = RULES.spawnProtect?.(a) ?? 2.5; a.hunted = 0; a.hunterId = -1; a.lastHitBy = -1; a.killer = -1;
     a.pos.y = groundHeight(this.world, a.pos.x, a.pos.z, this.scratchBoulders) + clearanceOf(a) + 0.2;
     this.events.push({ kind: 'moult', pos: { ...a.pos }, actor: a.id, player: a.player, strength: 0.7 });
-    this.progress[a.player]?.prompts.push({ text: `${creature(helper.creature).name} got you up.`, t: 3 });
+    this.progress[a.player]?.prompts.push({ text: SAY.revivedBy(creature(helper.creature).name), t: 3 });
     this.flag(helper, 'revive');
     return true;
   }
@@ -1119,7 +1119,7 @@ export class Game implements AiWorld {
    * the old second-long swell out of nothing, because it did not come from an egg.
    */
   private beginHatch(a: Actor) {
-    const egg = ladderRung(this, a) === 0 && !RULES.liveBirth?.(a);
+    const egg = ladderRung(this, a) === 0;
     a.hatching = true; a.state = 'moult'; a.stateT = 0; a.stateDur = egg ? HATCH_HOLD : 1.0;
     a.vel = v3();
     if (egg) this.layEgg(a);

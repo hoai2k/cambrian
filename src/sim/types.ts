@@ -275,7 +275,6 @@ export interface Actor {
   prevT: { x: number; y: number; z: number; yaw: number; pitch: number; bank: number };
 }
 
-export interface Corpse { id: number; }
 
 export interface SiltCloud { pos: Vec3; radius: number; t: number; }
 

@@ -42,8 +42,6 @@ export const clampMark = (v: number) => (Number.isFinite(v) ? Math.max(0, Math.m
 export const rungOf = (v: number) => Math.floor(clampMark(v));
 /** How far through that rung it is, 0..1. The top rung is never partial: there is nothing above it. */
 export const fillOf = (v: number) => { const m = clampMark(v); return m >= LADDER_TOP ? 0 : m - Math.floor(m); };
-/** Kept for callers that only want the rung; marks and rungs are the same number to them. */
-export const clampRung = rungOf;
 
 /** The five rung names, in this era's language. */
 export const ladderNames = (): readonly string[] => RULES.ladderNames;

@@ -525,6 +525,8 @@ export interface GameStrings {
     readonly nurseryDetail: string;
     readonly teleportPlayer: (seat: number, name: string) => string;
     readonly respawning: string;
+    /** A downed player brought back by a team-mate. */
+    readonly revivedBy: (name: string) => string;
     /** The scoreboard's heading and its line of detail, per mode. */
     readonly board: {
       readonly riseTitle: string;
@@ -1029,6 +1031,7 @@ export const SHARED_STRINGS: GameStrings = {
     nurseryDetail: 'Back to where you hatched',
     teleportPlayer: (seat, name) => `Player ${seat} · ${name}`,
     respawning: 'respawning',
+    revivedBy: (name) => `${name} got you up.`,
     board: {
       riseTitle: 'Rise',
       reefTitle: 'Reef',

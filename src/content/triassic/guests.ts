@@ -103,4 +103,3 @@ export const TRIASSIC_GUESTS: readonly CreatureDef[] = [
   },
 ];
 
-export const TRIASSIC_GUEST_IDS = TRIASSIC_GUESTS.map((c) => c.id as TriassicGuestId);

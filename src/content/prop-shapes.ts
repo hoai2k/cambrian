@@ -31,8 +31,6 @@ export function floraPropIds(kind: string): readonly string[] {
   return named === undefined ? [] : typeof named === 'string' ? [named] : named;
 }
 
-/** The prop id the active era draws a plant kind with, if it has one — the first of a family. */
-export const floraPropId = (kind: string): string | undefined => floraPropIds(kind)[0];
 
 /**
  * What a plant kind collides as. One prop is its own measured shape; a family of variants is the

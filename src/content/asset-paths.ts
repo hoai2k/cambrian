@@ -26,7 +26,6 @@ const GUEST_PORTRAITS: Record<EraId, string> = {
 export function registerVisitorAssets(entries: readonly { id: string; era: EraId }[]) {
   for (const e of entries) guestEra.set(e.id, e.era);
 }
-export const visitorAssetEra = (id: string) => guestEra.get(id);
 
 /** Pure relative paths, usable from all entrypoints and asset validation scripts. */
 export function createAssetPaths(era: EraDefinition) {

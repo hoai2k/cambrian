@@ -11,7 +11,6 @@ import { refinementTables, type PendingRefinement } from '../pending-refinements
  * sentence that says why it was there, and `npm run eras` checks both directions.
  */
 export const CAMBRIAN_PENDING = pending as PendingRefinement[];
-export const CAMBRIAN_PENDING_REWORKS = CAMBRIAN_PENDING.map((p) => p.id as CambrianCreatureId);
 const tables = refinementTables(CAMBRIAN_PENDING);
 export const CAMBRIAN_MODEL_STATUS = tables.modelStatus;
 export const CAMBRIAN_MODEL_NOTES = tables.modelNotes;

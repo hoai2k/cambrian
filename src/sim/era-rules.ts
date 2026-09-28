@@ -94,12 +94,6 @@ export interface EraRules {
   /** Seconds of protection a body gets when it hatches or comes back. */
   spawnProtect?(a: Actor): number;
   /**
-   * Optional: this body is born alive rather than hatched from an egg on the sand. The hatch is
-   * then the short swell where the era's `spawnPoint` put it (the Triassic: at the surface,
-   * beside a mother) and no egg is laid or drawn.
-   */
-  liveBirth?(a: Actor): boolean;
-  /**
    * True when `hunter` (an AI body) must leave `target` alone unless provoked: the era's nursery
    * sanctuary. The caller has already established the hunter is not provoked.
    */
@@ -204,8 +198,10 @@ export interface EraRules {
   radar?(g: Game, p: Actor, range: number): RadarBlip[];
   /**
    * Optional: the match options this era offers on the Settings screen, each a setter the shell
-   * calls once when a match starts (never mid-match: `src/sim` replays from its inputs). Absent
-   * keys are not offered; the Triassic's shore animals are the first.
+   * calls when a match starts and again whenever the player flips it. That is live on purpose (a
+   * switch that did nothing until the next match read as broken); it is safe because what it
+   * changes is pure in the place and the clock (see CLAUDE.md, the shore animals). Absent keys are
+   * not offered; the Triassic's shore animals are the first.
    */
   settings?: { shoreAnimals?: (on: boolean) => void };
 }

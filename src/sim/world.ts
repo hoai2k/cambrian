@@ -841,7 +841,6 @@ export const rockRadius = (variant: Boulder['variant'], sx: number, sz: number) 
 /** The top of a rock of this shape above the point it is placed at. */
 export const rockRise = (variant: Boulder['variant'], sy: number) => ROCK_SHAPE[variant ?? 'boulder'].top * sy;
 
-export function boulderFootprint(b: Boulder): Footprint { return rockShape(b).fp; }
 const scratchReach: Reach = { d: 0, reach: 0, nx: 0, nz: 1 };
 const staticReach: Reach = { d: 0, reach: 0, nx: 0, nz: 1 };
 export function boulderReach(b: Boulder, x: number, z: number, out: Reach = scratchReach): Reach {
