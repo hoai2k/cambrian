@@ -1452,11 +1452,20 @@ unless the user explicitly asks for a PR. Steps:
   sample. Guard a new term by the weight that scales it — and prove the guard **exact** rather than
   nearly right, by hashing `sampleHeight`, `biomeWeights` and `channelFactor` over a grid in all
   three eras before and after. Anything else silently redraws the world under every saved seed.
-- The `tools/*-test.ts` suites are the sim's own guards, and most of them now have an npm script:
-  `npm run sim` is the whole sweep (about twenty minutes) and `npm run sim:gate` is the cheap half
-  (about a minute), which is what the deploy workflow runs. Wire a new suite into both — a guard
-  with no script is one nobody runs, which is how `tools/flora-test.ts`'s step-cost check came to be
-  failing on `main` for a day unnoticed. That check is wall clock and so machine-dependent: the same
+- **Every headless suite is a row in `tools/test.mjs`**, which bundles them all up front and runs
+  them in parallel, one job per era (and per shard, where a suite splits itself). `npm test` is all
+  of them, `npm run sim` the simulation sweep, `npm run sim:gate` its cheap half, and `npm run ci`
+  what the deploy workflow runs — the gate plus every suite that takes seconds, plus the Triassic
+  audits; `node tools/test.mjs --list` prints each group. A new suite goes in as a row and into the
+  groups it belongs to: a guard nobody's run reaches is one nobody runs, which is how
+  `tools/flora-test.ts`'s step-cost check came to be failing on `main` for a day unnoticed, and how
+  two dozen suites once ran nowhere at all. **A test that waits on a clock winds the clock rather
+  than stepping the sea through it**: the hold at the top (`progress[i].apexT`, the era's
+  `primeT`), a Hunter & Hunted turn (`huntTurnT`), a stranding (`strandT`) and the shore's
+  occupancy schedule (`g.time`) are all plain state, and stepping two hundred seconds of full world
+  to reach the end of one is what once made `modes` take ten minutes. Step the last second or two
+  so the ending still happens the way it happens in play. The step-cost check is wall clock and so
+  machine-dependent — the runner gives it the machine to itself before the parallel batch: the same
   commit has measured 6.6 ms on one quiet 4-core machine and 8.9 ms on another, so its 8 ms is a
   ceiling with room under it rather than a target, and tightening it towards whatever the fastest
   machine to hand reports makes it fail everywhere else. Read the note beside it before touching the

@@ -27,39 +27,16 @@ jobs:
       - run: npm run typecheck
       - run: npm run check
       - run: npm run devonian:check
-      - run: npm run triassic
-      - run: npm run eras
-      # The specimen viewer's five editors, each a pure sub-second check of the document it
-      # exports: reshape a body, lengthen a run of one, turn a run of one, aim a mouth cut, name
-      # a region. Only the sculpt one was here, which left the other four as guards with a script
-      # nobody ran on a push — the exact thing the note in tools/flora-test.ts is about.
-      - run: npm run sculpt
-      - run: npm run stretch
-      - run: npm run bend
-      - run: npm run mouth
-      - run: npm run mark
-      # And the pane they all sit beside: what the Animations pane plays when a body arrives, which
-      # is sticky across a change of creature and so is a decision rather than a default.
-      - run: npm run playback
-      # The rig tests: creature anchors and the attachment pass, read off the shipped GLBs.
-      # They need no browser and no network, only the creature assets already in the repo,
-      # and take about eight seconds together — cheap enough that a rig regression can no
-      # longer sit unnoticed behind a doc that says to run them by hand.
-      - run: npm run rigs
-      # The cheap half of the sim suites, `npm run sim` being the whole sweep (22 minutes, which is
-      # why only this half is here). It exists because `tools/flora-test.ts`'s step-cost guard had
-      # been failing on main for a day without anything noticing: the gate never ran it, and until
-      # now neither did any npm script, so the only way to run it was to type the tsx line by hand.
-      # The guard is wall clock and this runner is not the machine anyone measured on, so the
-      # threshold is a ceiling with about 45% of room under it rather than a mark to hit — see the
-      # note in tools/flora-test.ts before tightening it.
-      - run: npm run sim:gate
-      # The site root and the debug entry points. Both are sub-second pure-TypeScript checks,
-      # and between them they hold the trilogy page's links and the parameter that opens each
-      # development tool — including that a bare ?debug never opens anything on a game page.
-      - run: npm run ancientseas
-      - run: npm run debug
-      - run: npm run portraits
+      # Every headless suite the deploy vouches for, in one parallel run (tools/test.mjs): the cheap
+      # half of the simulation (`gate`; `npm run sim` is the whole sweep), the Triassic's body
+      # audits and era checks, the era tables, the viewer's five editors and the Animations pane,
+      # the rig tests, the site root and debug entry points, the portraits and every other suite
+      # that takes seconds rather than minutes. Each used to be its own step here, run one after
+      # another on one core, and two dozen suites ran nowhere at all. `node tools/test.mjs --list`
+      # prints what `ci` is. The flora step-cost guard is wall clock, so the runner gives it the
+      # machine to itself before the parallel batch starts — see the note in tools/flora-test.ts
+      # before tightening its threshold.
+      - run: npm run ci
       # The feedback button exists only in a build that was given somewhere to send to. Unset —
       # a fork, or a repository variable that got lost — publishes the site without the button
       # rather than with one that fails; see docs/FEEDBACK.md. The URL is committed rather than

@@ -69,32 +69,23 @@ every push to `main` (set the repository's Pages source to "GitHub Actions").
 
 ## Headless checks
 
+Every headless suite is a row in `tools/test.mjs`, which bundles them and runs them in parallel
+across the machine's cores, one job per era. Output is held back and shown only for a job that
+fails, unless a single job was asked for.
+
 ```sh
-run() { npx esbuild "$1" --bundle --platform=node --format=esm --outfile=/tmp/t.mjs && node /tmp/t.mjs "${@:2}"; }
-npm run bindings                  # no two menu actions share a controller button
-npm run edges                     # rising-edge detection: a press fires once, a hold never repeats
-run tools/controls-test.ts        # camera-relative movement directions
-run tools/respawn-test.ts         # a giant eats a larva; it must come back
-run tools/flora-test.ts           # plants: slide around sponges, fold algae, spring back
-run tools/expansion-test.ts       # all new kits, feeding, tracking and body clearance
-run tools/world-test.ts           # the endless sea: shore, biome bands, streaming, teleport, radar, landmarks, co-op revive, discovery
-run tools/environment-test.ts     # biome prop placement, collision bounds, deterministic regeneration
-run tools/modes-test.ts           # Hunter & Hunted turns and scoring, and the scoreboard every mode shows
-run tools/assets-test.ts          # every path each era asks for exists, and neither reaches into the other's
-run tools/ecology-test.ts         # the day/night cycle, appetite by the hour, grumpy and territorial animals
-run tools/motion-test.ts          # smooth motion: the interpolation snapshot, no step-to-step oscillation
-npm run rigs                      # the rigs: every creature's anchors, and the attachment pass that feeds, grabs and aims
-npm run ancientseas               # the site root: its links, its art, and the ?debug index of every dev tool
-npm run debug                     # the debug entry points open only when asked for, and never by accident
-node tools/hallucigenia-test.mjs  # the revised rig: skinning, loop seams, gait
+npm test                          # everything headless
+npm run ci                        # what the deploy runs: the sim gate, every fast suite, the Triassic audits
+npm run sim                       # the whole simulation sweep; `npm run sim:gate` is its cheap half
+node tools/test.mjs --list        # the groups and what is in them
+npm run world                     # one suite (every suite name is also an npm script, or `node tools/test.mjs <name>`)
+node tools/test.mjs beach:triassic   # one era of a suite that runs per era
+node tools/test.mjs audio -- 30   # arguments after -- go to the suite
 node tools/check-creature-assets.mjs --strict
-npm run palettes                  # every material lands in the colour slot its scheme assumes
-npm run portraits                 # palette-aware portraits match their snapshot, or fall back
-run tools/audio-mix-test.ts       # audio density: how much of the reef's noise is in earshot
+run() { npx esbuild "$1" --bundle --platform=node --format=esm --outfile=/tmp/t.mjs && node /tmp/t.mjs "${@:2}"; }
 run tools/harness.ts all 240      # balance: hunting, growth, escapes per creature
 run tools/harness.ts duel         # rival fights between creature pairs
-npm run stretch                   # the neck stretcher: the body held still, the head rigid, the region uniform
-npm run stats                     # the visitor counter: the site code, the per-game filters, every entry counted
+node tools/hud-vignette-browser.mjs   # the HUD's health vignette and hunting alert, in Chromium
 npm run preview & node tools/smoke.mjs /tmp   # needs Chromium; writes screenshots
 npm run preview & node tools/stats-smoke.mjs /tmp   # /stats/ off and on in a browser; gc.zgo.at is intercepted
 npm run preview & node tools/stretch-browser.mjs /tmp   # stretch mode: two cuts, one direction, the export

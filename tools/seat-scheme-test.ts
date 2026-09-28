@@ -1,5 +1,5 @@
 /**
- * Telling duplicate picks apart. Run: npx tsx tools/seat-scheme-test.ts
+ * Telling duplicate picks apart. Run: npm run seats (all three eras), or node tools/test.mjs seats:<era>
  *
  * Four seats and one roster means two players on the same animal is ordinary, and until this they
  * were drawn identically. The rule under test: the first seat on a creature is never touched, the

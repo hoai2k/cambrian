@@ -55,6 +55,11 @@ for (const dir of dirs) {
     // Sockets survive: the anchors are read off the model by name.
     for (const name of anchorNames(plain.scene)) assert(fused.scene.getObjectByName(name), `${file}: lost socket ${name}`);
 
+    // Nothing merged is nothing changed: `mergeSkinnedParts` only touches the graph when it fuses a
+    // group, so posing the two copies would compare a scene with itself. That was thirty of the
+    // forty-two rigs, and most of this suite's four minutes.
+    if (after === before) { process.stdout.write(`${file.padEnd(24)} meshes ${String(before).padStart(4)} (nothing to merge)\n`); continue; }
+
     const mixA = new THREE.AnimationMixer(plain.scene), mixB = new THREE.AnimationMixer(fused.scene);
     for (const clip of plain.animations) {
       const a = mixA.clipAction(clip).play();
