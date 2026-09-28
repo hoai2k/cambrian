@@ -43,12 +43,13 @@ await pause();
 // in-game menus are steered now and their wording has changed once already, so a bare `text=`
 // match here failed as a silent thirty-second timeout.
 await page.click('.overlay .menu-buttons button:has-text("Quit")'); await page.waitForTimeout(800);
-await page.click('text=Hunter & Hunted'); await page.waitForTimeout(300);
+// A second mode, so the smoke covers a mode change as well as a quit.
+await page.click('text=Survival'); await page.waitForTimeout(300);
 await page.keyboard.press('Space'); await page.waitForTimeout(300);
 await page.keyboard.press('Enter'); await page.waitForTimeout(3500);
 await page.keyboard.down('KeyW'); await page.waitForTimeout(2500);
-await shot('play-giant');
+await shot('play-survival');
 await page.keyboard.up('KeyW');
-console.log('hud giant:', await page.evaluate(() => document.querySelector('.hud')?.textContent));
+console.log('hud survival:', await page.evaluate(() => document.querySelector('.hud')?.textContent));
 console.log('errors:', errors.length); for (const e of [...new Set(errors)].slice(0, 20)) console.log(e);
 await browser.close();
