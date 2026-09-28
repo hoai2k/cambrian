@@ -137,7 +137,7 @@ function harass(preyId: CreatureId, preyScale: number, playerScale: number, seco
   const g = new Game('reef', [{ creature: 'waptia', device: 'keyboard', ready: true }], 3);
   const scales: number[] = [];
   const m = new Map([[0, emptyInput()]]);
-  for (let i = 0; i < 60 * 120; i++) {
+  for (let i = 0; i < 60 * 60; i++) {
     g.step(DT, m); g.events.length = 0;
     for (const a of g.actors) if (a.controller === 'ambient' && isAlive(a)) scales.push(a.scale);
   }

@@ -83,12 +83,17 @@ for (const def of EXPANSION_CREATURES) {
   g.step(1/60,new Map([[0,{...emptyInput(),ability:true}]]));
   assert.equal(a.abilityCd,0);assert.notEqual(a.state,'ability');
 }
-// Tall radial bodies use their anatomical clearance at the surface too.
+// Tall radial bodies use their anatomical clearance at the surface too. A body found above the
+// ceiling settles onto it at swimming pace rather than being snapped under (game.ts, since the
+// beach landed), so it is given time to come down and then held there.
 for(const id of ['burgessomedusa','ctenorhabdotus'] as const){
   const g=new Game('reef',[{creature:id,device:'keyboard',ready:true}],78),a=g.players[0];
+  g.skipHatch();
   a.pos={x:0,y:SURFACE_Y+5,z:0};
-  g.step(1/60,new Map([[0,emptyInput()]]));
-  assert(a.pos.y+clearanceOf(a)<=SURFACE_Y-.8+1e-6,`${id}: body crosses surface`);
+  const m=new Map([[0,emptyInput()]]);
+  for(let i=0;i<60*6;i++){g.step(1/60,m);g.events.length=0;}
+  assert(a.pos.y+clearanceOf(a)<=SURFACE_Y-.8+1e-6,`${id}: body crosses surface (top at ${(a.pos.y+clearanceOf(a)).toFixed(2)}, ceiling ${SURFACE_Y-.8})`);
+  assert(a.pos.y+clearanceOf(a)>SURFACE_Y-.8-clearanceOf(a),`${id}: held at the ceiling, not sunk off it`);
 }
 /**
  * The heavy button and the crosshair have to agree. The HUD lights "RT · <move>" when the aimed

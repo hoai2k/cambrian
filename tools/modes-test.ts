@@ -6,7 +6,7 @@
  * that the body moves, that nobody is the giant during the pause, and that the score follows the
  * catch rather than the seat.
  */
-import { Game } from '../src/sim/game';
+import { APEX_HOLD_SECONDS, Game } from '../src/sim/game';
 import { emptyInput, TIER_SCALE, type InputFrame } from '../src/sim/types';
 import { isAlive } from '../src/sim/actors';
 import type { CreatureId } from '../src/sim/creatures';
@@ -16,6 +16,17 @@ const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' :
 const run = (g: Game, steps: number, f: InputFrame = emptyInput()) => {
   const m = new Map([[0, f]]);
   for (let i = 0; i < steps && g.state.status === 'playing'; i++) { g.step(1 / 60, m); g.events.length = 0; }
+};
+/**
+ * Wind a turn's clock on to a second before it runs out. What these checks are about is the
+ * hand-over and the tally, not the hundred seconds of play before them, and stepping a whole
+ * sea through every turn is what made this suite take ten minutes. The second that is left is
+ * still stepped, so the turn still ends the way it ends in play.
+ */
+const toTurnEnd = (g: Game) => { g.huntTurnT += Math.max(0, g.huntTurnLeft() - 1); };
+/** Play every remaining turn of a Hunter & Hunted match out to its verdict. */
+const playOut = (g: Game) => {
+  for (let turn = 0; turn < g.huntTurns && g.state.status === 'playing'; turn++) { toTurnEnd(g); run(g, 60 * 6); }
 };
 const hunted = (n: number, seed = 11) => new Game('hunted',
   (['anomalocaris', 'waptia', 'opabinia', 'marrella'] as CreatureId[]).slice(0, n).map((c, i) => ({ creature: c, device: i ? 'keyboard2' : 'keyboard', ready: true } as const)), seed);
@@ -27,24 +38,32 @@ const hunted = (n: number, seed = 11) => new Game('hunted',
   check('player one opens as the giant', g.hunterIndex === 0 && g.players[0].scale > g.players[1].scale * 3, `${g.players.map((p) => p.scale.toFixed(2)).join(' ')}`);
   check('...and only they are the hunter', g.isHunter(0) && !g.isHunter(1));
 
-  run(g, 60 * 101);
+  toTurnEnd(g);
+  run(g, 60 * 1.5);
   check('nobody is the giant during the hand-over', g.hunterIndex === -1 && g.huntBreakT > 0, `break=${g.huntBreakT.toFixed(1)}`);
   // The body stays until the changeover — popping it down mid-sentence reads as a glitch — so
   // what makes the turn over is that nothing can be caught during the pause.
   check('...everyone is untouchable through the pause', g.players.every((p) => p.spawnProtect > 0), g.players.map((p) => p.spawnProtect.toFixed(1)).join(' '));
+  // The hand-over is announced in every viewport.
+  const notice = g.noticeFor(0);
+  check('the turn ending is announced', !!notice && /caught/.test(notice), notice ?? 'none');
 
   run(g, 60 * 5);
+  check('...and so is the next turn', /Turn 2 of 2/.test(g.noticeFor(1) ?? ''), g.noticeFor(1) ?? 'none');
   check('the next turn hands the body over', g.hunterIndex === 1 && g.players[1].scale > g.players[0].scale * 3, `${g.players.map((p) => p.scale.toFixed(2)).join(' ')}`);
   check('...and the old giant is a juvenile again', g.players[0].tier === 1, `tier=${g.players[0].tier}`);
   check('...both alive and protected on arrival', g.players.every((p) => isAlive(p) && p.spawnProtect > 0));
   check('...the turn clock restarted', g.huntTurnLeft() > 90, `${g.huntTurnLeft().toFixed(0)} s left`);
+  run(g, 60 * 6);
+  check('...and the line expires', g.noticeFor(0) === undefined, g.noticeFor(0) ?? 'gone');
 }
 
 // --- a single player is the mode exactly as it was ---
 {
   const g = hunted(1);
   check('one player is one turn', g.huntTurns === 1 && g.hunterIndex === 0, `turns=${g.huntTurns}`);
-  run(g, 60 * 102);
+  toTurnEnd(g);
+  run(g, 60 * 2);
   check('...and the match ends when it is up', g.state.status !== 'playing', `${g.state.status}: ${g.state.message}`);
 }
 
@@ -63,7 +82,7 @@ const hunted = (n: number, seed = 11) => new Game('hunted',
 
   // play both turns out; the score decides it, not the seat
   g.huntScore[0] = 3; g.huntScore[1] = 1;
-  run(g, 60 * 220);
+  playOut(g);
   check('the best hunter wins', g.state.status === 'won' && g.state.winner === 0, `${g.state.message}`);
   check('...and the message carries both tallies', /P1 3/.test(g.state.message) && /P2 1/.test(g.state.message), g.state.message);
 }
@@ -72,13 +91,14 @@ const hunted = (n: number, seed = 11) => new Game('hunted',
 {
   const g = hunted(2, 3);
   g.huntScore[0] = 2; g.huntScore[1] = 2;
-  run(g, 60 * 220);
+  playOut(g);
   check('a tie says so', g.state.winner === -2 && /tie/i.test(g.state.message), g.state.message);
 }
 {
   const g = hunted(2, 5);
-  run(g, 60 * 220);
+  playOut(g);
   check('nobody catching anything is a loss for everyone', g.state.status === 'lost' && /Nobody/.test(g.state.message), g.state.message);
+  check('...and versus results are final', !g.continueMatch() && g.state.status !== 'playing', `status=${g.state.status}`);
 }
 
 // --- the scoreboard ---
@@ -107,25 +127,17 @@ const hunted = (n: number, seed = 11) => new Game('hunted',
   check('...sorted by size', rows.length > 1 ? rows[0].tier + rows[0].progress >= rows[1].tier + rows[1].progress : true);
 }
 
-// --- the hand-over is announced in every viewport ---
-{
-  const g = hunted(2);
-  run(g, 60 * 101);
-  const notice = g.noticeFor(0);
-  check('the turn ending is announced', !!notice && /caught/.test(notice), notice ?? 'none');
-  run(g, 60 * 5);
-  check('...and so is the next turn', /Turn 2 of 2/.test(g.noticeFor(1) ?? ''), g.noticeFor(1) ?? 'none');
-  run(g, 60 * 6);
-  check('...and the line expires', g.noticeFor(0) === undefined, g.noticeFor(0) ?? 'gone');
-}
-
 // --- a finished co-op match can carry on; a versus one cannot ---
 {
   // Rise is won by holding Apex for ninety seconds. Put a player there and let the clock run out.
   const g = new Game('rise', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 21);
   const p = g.players[0];
   p.scale = TIER_SCALE[4]; p.tier = 4; p.spawnProtect = 0;
-  run(g, 60 * 95);
+  run(g, 60 * 3);
+  check('the Apex clock runs while it is held', g.progress[0].apexT > 2, `${g.progress[0].apexT.toFixed(1)} s`);
+  // Wind the hold on to its last few seconds rather than stepping the sea through ninety of them.
+  g.progress[0].apexT = APEX_HOLD_SECONDS - 2;
+  run(g, 60 * 3);
   check('Rise ends when Apex is held', g.state.status === 'won', `${g.state.status}: ${g.state.message}`);
   check('...and the sim stops with it', (() => { const t = g.time; run(g, 60); return g.time === t; })(), `t=${g.time.toFixed(1)}`);
 
@@ -135,17 +147,14 @@ const hunted = (n: number, seed = 11) => new Game('hunted',
   check('...on the same body in the same place', p.scale === scale && p.kills === kills && p.pos.x === where.x && p.pos.z === where.z);
   check('...and time moves', (() => { const t = g.time; run(g, 60); return g.time > t; })(), `t=${g.time.toFixed(1)}`);
 
-  // The win condition must not fire again the moment play resumes, or the results screen returns.
+  // The win condition must not fire again the moment play resumes, or the results screen returns:
+  // held past the whole ninety seconds again (wound on, as above), nothing happens.
   p.tier = 4;
-  run(g, 60 * 120);
+  run(g, 60 * 3);
+  g.progress[0].apexT = APEX_HOLD_SECONDS + 5;
+  run(g, 60 * 3);
   check('...without winning all over again', g.state.status === 'playing' && g.endless, `${g.state.status} endless=${g.endless}`);
   check('...and the objective says so', /Swim on/.test(g.scoreboard(0).header.detail), g.scoreboard(0).header.detail);
-}
-{
-  const g = hunted(2);
-  run(g, 60 * 60 * 6);
-  check('Hunter & Hunted is decided', g.state.status !== 'playing', g.state.status);
-  check('...and versus results are final', !g.continueMatch() && g.state.status !== 'playing', `status=${g.state.status}`);
 }
 {
   const g = new Game('rise', [{ creature: 'waptia', device: 'keyboard', ready: true }], 22);

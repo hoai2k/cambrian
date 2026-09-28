@@ -290,7 +290,9 @@ function inFront(p: Actor, o: Actor) {
   // while you close on it, and its tail — the end you can actually hold — is another body length
   // past its middle again. The pursuit re-aims every frame and keeps its target however far the
   // swim turns out to be; it is paid for when it sets out, not by the second.
-  const chase = (creatureId: CreatureId, dist: number, moving: boolean) => {
+  // `keep` is how long to stay on after the catch before calling it: the ride itself never ends on
+  // its own, so without it every chase ran the full fourteen seconds whatever it was measuring.
+  const chase = (creatureId: CreatureId, dist: number, moving: boolean, keep = 0) => {
     const g = new Game('reef', [{ creature: creatureId, device: 'keyboard', ready: true }], 21);
     const p = g.players[0]; p.spawnProtect = 0; p.vel = { x: 0, y: 0, z: 0 };
     const o = g.spawn('anomalocaris', 'giant', { x: 40, y: 20, z: -70 }, 3.5);
@@ -304,7 +306,7 @@ function inFront(p: Actor, o: Actor) {
       o.spawnProtect = 0;
       g.step(1 / 60, m); g.events.length = 0;
       if (held < 0 && p.rideHost === o.id) { held = i / 60; stamina = p.stamina; }
-      if (held >= 0 && p.rideHost < 0) return { held, ran: i / 60 - held, stamina, endStamina: p.stamina };
+      if (held >= 0 && (p.rideHost < 0 || i / 60 - held >= keep)) return { held, ran: i / 60 - held, stamina, endStamina: p.stamina };
     }
     return { held, ran: held < 0 ? 0 : 14 - held, stamina, endStamina: p.stamina };
   };
@@ -312,7 +314,7 @@ function inFront(p: Actor, o: Actor) {
     const far = [20, 40, 60].map((d) => chase(c, d, false));
     check(`${creature(c).name} crosses open water to reach one`, far.every((r) => r.held > 0),
       far.map((r, i) => `${[20, 40, 60][i]}u ${r.held < 0 ? 'never' : r.held.toFixed(1) + 's'}`).join(' · '));
-    const swimming = chase(c, 40, true);
+    const swimming = chase(c, 40, true, 4);
     check('...and catches one that is swimming and turning', swimming.held > 0, `caught at ${swimming.held < 0 ? 'never' : swimming.held.toFixed(1) + 's'}`);
     // Holding on is free: the bar you spent getting there is not also the bar you hang on with.
     check('...and hanging on costs it nothing', swimming.held > 0 && swimming.endStamina >= swimming.stamina - 1,

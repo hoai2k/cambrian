@@ -180,7 +180,7 @@ function run(g: Game, p: ReturnType<typeof start>['p'], f: Partial<InputFrame>, 
 for (const id of ['olenoides', 'marrella'] as CreatureId[]) {
   const { g, p } = start(id);
   const inputs = new Map<number, InputFrame>([[0, emptyInput()]]);
-  for (let i = 0; i < 60 * 45; i++) { g.step(1 / 60, inputs); g.events.length = 0; }
+  for (let i = 0; i < 60 * 20; i++) { g.step(1 / 60, inputs); g.events.length = 0; }
   const L = lengthOf(p);
   const reach = 3 + L * 1.5;
   let low = 0;

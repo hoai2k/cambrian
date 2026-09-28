@@ -20,7 +20,7 @@ const { devActor, stageScale, ADULT_STAGE, PRIME_STAGE, STAGE_AT } = await impor
 const { AIR_LOW, AIR_MAX, triActor } = await import('../src/sim/triassic/state');
 /** Mirrors AIR_BOT_SEEK in the rules: the breath at which a bot starts up. Kept here so the test says what it is testing. */
 const AIR_BOT_SEEK_T = 80;
-const { setShoreAnimals, shoreAnimalsOn, shoreClip, shorePosts } = await import('../src/sim/triassic/shore');
+const { OCCUPANCY_WINDOW, setShoreAnimals, shoreAnimalsOn, shoreClip, shorePosts } = await import('../src/sim/triassic/shore');
 const { applyHit } = await import('../src/sim/combat');
 const { forceOccupancy } = await import('../src/sim/triassic/shore');
 void setShoreAnimals;
@@ -256,8 +256,12 @@ ok(opener && fs.existsSync(`public/${decodeURIComponent(paths.music(opener.name)
       const startY = bot.pos.y;
       run(gb, 20);
       ok(bot.pos.y > startY + 2, `a bot low on air climbs for the surface (${startY.toFixed(1)} → ${bot.pos.y.toFixed(1)})`);
-      run(gb, 240);
-      ok(isAlive(bot) && triActor(gb, bot).air > 0, `and does not quietly drown on the clock (air ${triActor(gb, bot).air.toFixed(0)}, hp ${bot.hp.toFixed(0)})`);
+      // It started with AIR_BOT_SEEK_T seconds in its chest, so a bot that never took a breath would
+      // have run dry by now: watching for the blow that refills it is the whole question, and stops
+      // the moment it is answered rather than stepping four more minutes of sea.
+      let breathed = false;
+      for (let i = 0; i < 60 * AIR_BOT_SEEK_T && isAlive(bot) && !breathed; i++) { tick(gb); breathed = triActor(gb, bot).air > AIR_BOT_SEEK_T; }
+      ok(isAlive(bot) && breathed, `and does not quietly drown on the clock (air ${triActor(gb, bot).air.toFixed(0)}, hp ${bot.hp.toFixed(0)})`);
     }
   }
 
@@ -414,13 +418,15 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
   p.stamina = 0;
   const m = new Map([[0, { ...emptyInput(), my: -1 } as InputFrame]]);
   let winded = 0;
-  for (let i = 0; i < 60 * 60; i++) {
+  // Twenty seconds is ten beats at the quickest the heartbeat goes (one every two seconds with the
+  // bar gone) against the twenty the old once-a-second cue would have sounded.
+  for (let i = 0; i < 60 * 20; i++) {
     g.step(1 / 60, m);
     for (const e of g.events) if (e.kind === 'winded' && e.player === 0) winded++;
     g.events.length = 0;
     p.stamina = 0;                                   // held spent, the worst case
   }
-  ok(winded > 0 && winded <= 32, `a minute spent and under water sounds the heartbeat ${winded} times, not sixty`);
+  ok(winded > 0 && winded <= 11, `twenty seconds spent and under water sounds the heartbeat ${winded} times, not twenty`);
 }
 
 // ---- armour with a facing ----
@@ -587,7 +593,12 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
     ok(!isAlive(neck) && boom.cleared, 'a rung III bite on the neck while it is out severs it: the bank is clear');
     const dead = RULES!.clip?.(neck);
     ok(dead?.name === 'Severed' && dead.dur === 2.2, `the severed neck names Severed (${dead?.name ?? 'nothing'})`);
-    run(g, 200);
+    // Past two whole occupancy windows: the schedule is pure in the clock, so the clock is moved
+    // on rather than the sea stepped through five minutes of it, and the step after is what would
+    // refill the bank if anything were going to.
+    run(g, 2);
+    g.time += OCCUPANCY_WINDOW * 2;
+    run(g, 3);
     ok(boom.cleared && boom.actor === neck.id, 'a cleared bank stays clear: the schedule never refills it');
   }
 }
@@ -623,16 +634,21 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
   const { g } = shoreMatch(seed, true);
   const posts = shorePosts(g, { x: 0, y: 0, z: 0 }, 6000).filter((q) => !w.isRunner(q.kind));
   ok(posts.length > 0, 'there are lurker posts');
-  let worst = 0, arrivals = 0, departures = 0, bodies = 0;
-  for (let i = 0; i < 60 * 700; i++) {
+  // Up to twelve minutes of match, but it stops once a lurker has walked in and another has walked
+  // all the way out again: every step of both walks is measured by then, and the rest of the
+  // twelve minutes only repeated them (the first departure finishes about fifty seconds in).
+  let worst = 0, arrivals = 0, departures = 0, bodies = 0, i = 0;
+  for (; i < 60 * 720; i++) {
     tick(g);
+    let leaving = false;
     for (const q of posts) {
       const a = q.actor >= 0 ? g.byId(q.actor) : undefined;
-      if (a) { worst = Math.max(worst, Math.hypot(a.pos.x - a.prevT.x, a.pos.z - a.prevT.z)); if (q.phase === 'arrive') arrivals++; if (q.phase === 'leave') departures++; }
+      if (a) { worst = Math.max(worst, Math.hypot(a.pos.x - a.prevT.x, a.pos.z - a.prevT.z)); if (q.phase === 'arrive') arrivals++; if (q.phase === 'leave') { departures++; leaving = true; } }
     }
     bodies = Math.max(bodies, g.actors.filter((a) => creature(a.creature).shore).length);
+    if (arrivals > 0 && departures > 0 && !leaving) break;
   }
-  ok(arrivals > 0 && departures > 0, `lurkers arrive (${arrivals} steps) and leave (${departures} steps) over twelve minutes`);
+  ok(arrivals > 0 && departures > 0, `lurkers arrive (${arrivals} steps) and leave (${departures} steps) within ${(i / 60).toFixed(0)} s`);
   ok(worst < 0.5, `and no step moves one further than a walk (${worst.toFixed(3)} units)`);
   ok(bodies > 0, `the beach held up to ${bodies} shore animals at once`);
 }
@@ -740,11 +756,6 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
   const g = new Game('reef', PLAYABLE.slice(0, 4).map((c, i) => ({ creature: c.id, device: i === 0 ? 'keyboard' as const : i - 1, ready: true })));
   g.skipHatch();
   run(g, 2);
-  for (const c of PLAYABLE) {
-    const p = g.players[0];
-    g.swapCreature ? undefined : undefined;
-    void c;
-  }
   const inputs = new Map<number, InputFrame>();
   for (let i = 0; i < 4; i++) inputs.set(i, frame({ move: { x: 0.6, y: 0.4 }, heavy: true, ability: true, burst: 1 }));
   run(g, 6, inputs);
@@ -912,7 +923,10 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
     // Inshore, where the water is shallowest and the hatchling actually starts.
     p.pos = { x: 40, y: SURFACE_Y - 4, z: shoreZ(40) - 70 };
     const seen = new Set<number>();
-    for (let i = 0; i < 60 * 90; i++) {
+    // Five seconds, not ninety: every body this sees is the opening population, placed on the first
+    // frame (measured: 26, 26 and 26 new bodies per seed at the first step and none in the ninety
+    // seconds after), so the longer run stepped the sea for nothing.
+    for (let i = 0; i < 60 * 5; i++) {
       tick(g);
       for (const o of g.actors) {
         // A shore animal stands on the beach by design and is not in the water at all — and an

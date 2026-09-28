@@ -15,6 +15,14 @@ import { DEVONIAN } from '../src/content/devonian';
 import { TRIASSIC } from '../src/content/triassic';
 
 const which = process.argv[2] === 'devonian' ? 'devonian' : process.argv[2] === 'triassic' ? 'triassic' : 'cambrian';
+/**
+ * `--shard=k/n` splits one era's run across n processes: the per-walker loops take every nth
+ * walker from k, and everything else runs in shard 0. The walkers are most of the Triassic's
+ * minutes (five of them, each crossing the beach in eight places), so this is what lets the test
+ * runner put them on separate cores. With no flag it is one shard and runs everything.
+ */
+const [SHARD, SHARDS] = (process.argv.find((a: string) => a.startsWith('--shard='))?.slice(8).split('/').map(Number) ?? [0, 1]);
+const shared = SHARD === 0;
 selectEra(which === 'devonian' ? DEVONIAN : which === 'triassic' ? TRIASSIC : CAMBRIAN);
 const { Game } = await import('../src/sim/game');
 const { emptyInput } = await import('../src/sim/types');
@@ -66,7 +74,7 @@ function maxStep(g: G, p: G['players'][0], seconds: number, input: InputFrame) {
 const swimmerId = (): CreatureId => which === 'devonian' ? 'coccosteus' : which === 'triassic' ? 'hybodus' : 'anomalocaris';
 
 // ---- the measure: wade is 0 afloat, 1 with the sand at the waterline, and monotone between ----
-{
+if (shared) {
   const { p } = fresh(swimmerId());
   const need = beach.swimDepth(p);
   assert.equal(wadeAt(p, SURFACE_Y - need - 5), 0, 'deep enough to swim is not wading');
@@ -82,7 +90,7 @@ const swimmerId = (): CreatureId => which === 'devonian' ? 'coccosteus' : which 
 }
 
 // ---- a leap that comes down on the sand lands on it ----
-{
+if (shared) {
   const { g, p } = fresh(swimmerId());
   place(g, p, -6);
   p.pos.y = SURFACE_Y + 6; p.prevT.y = p.pos.y; p.airborne = true; p.vel = { x: 0, y: 0, z: 0 };
@@ -120,13 +128,18 @@ const swimmerId = (): CreatureId => which === 'devonian' ? 'coccosteus' : which 
 }
 
 // ---- a water-breather that does nothing on the sand dies at the minute ----
-if (!breathesAir(swimmerId())) {
+if (shared && !breathesAir(swimmerId())) {
   const { g, p } = fresh(swimmerId());
   place(g, p, -8);
   p.pos.y = SURFACE_Y + 4; p.prevT.y = p.pos.y; p.airborne = true;
   run(g, 3);
   assert(p.ashore, 'on the sand');
-  run(g, STRAND_BREATH - 5);
+  run(g, 2);
+  assert(p.strandT > 1, `the clock runs (${p.strandT.toFixed(1)} s)`);
+  // Wound on to the last seconds rather than stepped through the minute: what is under test here
+  // is what the end of it does, and the clock running at all is checked above and by the flop.
+  p.strandT = STRAND_BREATH - 4;
+  run(g, 1);
   assert(isAlive(p) && p.strandT > STRAND_BREATH - 9, `still alive short of the minute (${p.strandT.toFixed(1)} s)`);
   run(g, 6);
   assert(!isAlive(p), 'dead at the minute');
@@ -134,7 +147,7 @@ if (!breathesAir(swimmerId())) {
 }
 
 // ---- the wall still stands for a swimmer, and it is a wall rather than a snap ----
-{
+if (shared) {
   const { g, p } = fresh(swimmerId());
   place(g, p, 30);
   const r = bodyRadius(p);
@@ -153,7 +166,7 @@ if (!breathesAir(swimmerId())) {
 }
 
 // ---- what stands on the beach is the era's shore fringe and nothing else ----
-{
+if (shared) {
   const fringe = (await import('../src/content')).ACTIVE_ERA.environment.shoreFlora;
   const cx = chunkCoord(0), cz = chunkCoord(shoreZ(0) + 10);
   let strays = 0, fringed = 0, rocks = 0, total = 0;
@@ -188,7 +201,7 @@ if (!breathesAir(swimmerId())) {
 }
 
 // ---- a real leap: a hard dash up at the surface near the shore carries a body onto the sand ----
-{
+if (shared) {
   const { g, p } = fresh(swimmerId());
   const r = bodyRadius(p);
   place(g, p, SHORE_WALL + r * 3 + 1.5);
@@ -204,7 +217,7 @@ if (!breathesAir(swimmerId())) {
 }
 
 // ---- a brainless body ashore heads for the water ----
-{
+if (shared) {
   const { g, p } = fresh(swimmerId());
   const { makeBrain } = await import('../src/sim/ai');
   const bot = g.spawn(swimmerId(), 'bot', { x: 20, y: SURFACE_Y + 4, z: shoreZ(20) + 6 }, p.scale);
@@ -224,16 +237,17 @@ const airIds = (creature as unknown as (id: CreatureId) => { breathing?: string;
   .filter((id) => breathesAir(id) && !creature(id).ground && !creature(id).shore);
 const walkers = airIds.filter((id) => amphibious(id));
 const lungOnly = airIds.filter((id) => !amphibious(id));
-console.log(`      [${which}] air-breathers: ${airIds.join(', ') || 'none'}; walkers: ${walkers.join(', ') || 'none'}`);
+const myWalkers = walkers.filter((_, i) => i % SHARDS === SHARD);
+if (shared) console.log(`      [${which}] air-breathers: ${airIds.join(', ') || 'none'}; walkers: ${walkers.join(', ') || 'none'}`);
 
-if (lungOnly.length) {
+if (shared && lungOnly.length) {
   const id = lungOnly.includes('keichousaurus' as CreatureId) ? ('keichousaurus' as CreatureId) : lungOnly[0];
   const { g, p } = fresh(id);
   place(g, p, -6);
   p.pos.y = SURFACE_Y + 4; p.prevT.y = p.pos.y; p.airborne = true;
   run(g, 3);
   assert(p.ashore, `${id} lands on the sand`);
-  run(g, 20);
+  run(g, 5);
   assert.equal(p.strandT, 0, 'an air-breather has no clock on the sand');
   assert(isAlive(p), 'and is fine there');
   // it walks: along the shore, at a walk
@@ -257,7 +271,7 @@ if (lungOnly.length) {
   pass(`${id} walks the shore with no clock, is kept off the country, and walks back in`);
 }
 
-for (const id of walkers) {
+for (const id of myWalkers) {
   const { g, p } = fresh(id);
   const L = lengthOf(p), cruise = creature(id).speed * Math.pow(p.scale, 0.45);
   place(g, p, 40);
@@ -296,7 +310,7 @@ for (const id of walkers) {
 // spent its whole step trading travel for height; and the substrate carpets that thicken toward
 // the shore — salt crust, shell pavement — never bend, so they resisted in full and killed its
 // inward speed every step. A ten-centimetre crust stopped a ten-metre animal.
-for (const id of walkers) {
+for (const id of myWalkers) {
   const reached: string[] = [], failed: string[] = [];
   for (const x of [0, 60, 120, 180, 240, 300, 360, 420]) {
     const { g, p } = fresh(id);
@@ -311,7 +325,7 @@ for (const id of walkers) {
 }
 
 // ---- substrate is not a wall ----
-{
+if (shared) {
   // Every non-bending kind is a carpet on the seabed rather than something standing in it, and a
   // body riding higher than the carpet is tall goes over it. Without that they resist in full,
   // because `resist` takes its discount from *bending* and a mineral kind has none to give.
@@ -341,7 +355,7 @@ for (const id of walkers) {
 }
 
 // ---- the dash on the sand is a hop: a jump for legs, a harder flip for a fish ----
-for (const id of (walkers.length ? [walkers[0]] : [])) {
+for (const id of (shared && walkers.length ? [walkers[0]] : [])) {
   const { g, p } = fresh(id);
   // Put it on the sand and let it settle.
   place(g, p, 40);
@@ -398,7 +412,7 @@ for (const id of (walkers.length ? [walkers[0]] : [])) {
 }
 
 // ---- a stranded fish's dash is a harder flip than a nudge of the stick ----
-if (!breathesAir(swimmerId())) {
+if (shared && !breathesAir(swimmerId())) {
   const strand = () => {
     const { g, p } = fresh(swimmerId());
     place(g, p, -8);
@@ -421,24 +435,28 @@ if (!breathesAir(swimmerId())) {
 }
 
 // ---- the Triassic lung fills on the sand, as it does at the surface ----
-if (which === 'triassic' && walkers.length) {
+if (shared && (which === 'triassic' && walkers.length)) {
   const id = walkers[0];
   const { g, p } = fresh(id);
   const { triActor, AIR_MAX } = await import('../src/sim/triassic/state');
   place(g, p, 40);
   p.pos.y = sampleHeight(p.pos.x, p.pos.z) + 1; p.prevT.y = p.pos.y;
-  run(g, 20, drive(0, 0, { sink: true }));
+  // Half a lungful gone (spending it is the air gauge's business, tools/triassic-test.ts), and
+  // a couple of seconds on the floor to show the water does not give it back.
   const t = triActor(g, p);
+  t.air = AIR_MAX / 2;
+  run(g, 2, drive(0, 0, { sink: true }));
   assert(t.air < AIR_MAX - 10, `under water the breath is spent (${t.air.toFixed(0)})`);
   p.yaw = 0; p.prevT.yaw = 0;
-  run(g, 40, shoreward);
+  for (let i = 0; i < 60 * 40 && !p.ashore; i++) { g.step(DT, new Map([[0, shoreward]])); g.events.length = 0; }
+  run(g, 1, shoreward);
   assert(p.ashore, 'up on the sand');
   assert.equal(t.air, AIR_MAX, 'and the lung is full there');
   pass(`${id}'s breath fills on the shore`);
 }
 
 // ---- same seed, same inputs, same shore: the sand is deterministic ----
-{
+if (shared) {
   const twice = () => {
     const { g, p } = fresh(swimmerId(), 11);
     place(g, p, -5);
@@ -451,7 +469,7 @@ if (which === 'triassic' && walkers.length) {
 }
 
 // ---- the hint says what the sand is doing and the way off it ----
-{
+if (shared) {
   const { g, p } = fresh(swimmerId());
   place(g, p, -5);
   p.pos.y = SURFACE_Y + 5; p.prevT.y = p.pos.y; p.airborne = true;

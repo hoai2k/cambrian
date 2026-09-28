@@ -1,6 +1,6 @@
 /**
  * The Rise record: the growth ladder, the high-water mark it leaves, and starting a match part
- * grown from it. Run: node tools/progress-test.mjs [cambrian|devonian]
+ * grown from it. Run: npm run progress (all three eras), or node tools/test.mjs progress:<era>
  *
  * The point of the file is that there is exactly one copy of these assertions and both eras are
  * put through it. The two eras grow a player in different state — the Cambrian moults tiers on
@@ -20,7 +20,7 @@ import { TRIASSIC } from '../src/content/triassic';
 const which = process.argv[2] === 'devonian' ? 'devonian' : process.argv[2] === 'triassic' ? 'triassic' : 'cambrian';
 selectEra(which === 'devonian' ? DEVONIAN : which === 'triassic' ? TRIASSIC : CAMBRIAN);
 
-const { Game } = await import('../src/sim/game');
+const { APEX_HOLD_SECONDS, Game } = await import('../src/sim/game');
 const { ladderName, ladderNames, ladderRung, ladderScale, clampMark, fillOf, rungOf, MARK_NEAR_TOP, LADDER_RUNGS, LADDER_TOP } = await import('../src/sim/ladder');
 const { PLAYABLE, creature } = await import('../src/sim/creatures');
 const { emptyInput, isCoop, MODE_IDS, TIER_NEED } = await import('../src/sim/types');
@@ -58,8 +58,18 @@ const DEV = which !== 'cambrian'                      // the Triassic grows in t
       },
       standing: (g: InstanceType<typeof Game>, a: import('../src/sim/types').Actor) => m.devActor(g, a).standing,
       fill: (g: InstanceType<typeof Game>, a: import('../src/sim/types').Actor) => m.stageProgress(m.devActor(g, a)),
+      prime: (g: InstanceType<typeof Game>, a: import('../src/sim/types').Actor) => m.devActor(g, a),
     }))
   : undefined;
+/**
+ * How long this seat has held the top, in whichever clock the era keeps — and a way to wind it on.
+ * The checks below are about what the hold *does* when it runs out, so they set it a second or two
+ * short rather than stepping a whole sea through ninety seconds of it, three eras over.
+ */
+const holdOf = (g: InstanceType<typeof Game>, i: number) => DEV ? DEV.prime(g, g.players[i]).primeT : g.progress[i].apexT;
+const windHold = (g: InstanceType<typeof Game>, i: number, seconds: number) => {
+  if (DEV) DEV.prime(g, g.players[i]).primeT = seconds; else g.progress[i].apexT = seconds;
+};
 /** How full this body's growth meter is, in whichever currency the era counts. */
 const meterFill = (g: InstanceType<typeof Game>, a: import('../src/sim/types').Actor) =>
   DEV ? DEV.fill(g, a) : a.nutrition / TIER_NEED[a.tier];
@@ -181,7 +191,9 @@ const meterFill = (g: InstanceType<typeof Game>, a: import('../src/sim/types').A
     `standing on ${ladderName(LADDER_TOP)} banks ${ladderName(MARK_NEAR_TOP)}, part grown — not the top`);
   ok(g.discovery.apex.has(HERO), 'though the codex still credits having been there');
   // Hold it out and the run finishes; that is what writes the top.
-  run(g, 95);
+  ok(holdOf(g, 0) > 1, `the hold is running (${holdOf(g, 0).toFixed(1)} s)`);
+  windHold(g, 0, APEX_HOLD_SECONDS - 1);
+  run(g, 3);
   ok(g.state.status === 'won', 'holding the top for ninety seconds wins the run');
   ok(g.discovery.best.get(HERO) === LADDER_TOP, `and only then is ${ladderName(LADDER_TOP)} banked`);
 }
@@ -192,8 +204,12 @@ const meterFill = (g: InstanceType<typeof Game>, a: import('../src/sim/types').A
   const a = g.players[0];
   ok(a.carriedTop, 'a player who came in on the top rung is marked as having done so');
   ok(ladderRung(g, a) === LADDER_TOP, 'and is standing on it');
-  run(g, 130);
-  ok(g.state.status === 'playing', 'the clock never runs for them: the sea just stays open');
+  run(g, 3);
+  ok(holdOf(g, 0) === 0, `the clock never runs for them (${holdOf(g, 0)})`);
+  // ...and even wound past the whole hold, it is put back rather than paid out.
+  windHold(g, 0, APEX_HOLD_SECONDS + 5);
+  run(g, 1);
+  ok(g.state.status === 'playing' && holdOf(g, 0) === 0, 'the sea just stays open');
   ok(!g.discovery.best.has(HERO), 'and nothing is banked by arriving');
   // Someone who grew there normally is not marked, and does get the clock.
   const grew = new Game('rise', setup(HERO), 43);
@@ -209,7 +225,9 @@ const meterFill = (g: InstanceType<typeof Game>, a: import('../src/sim/types').A
   const [lap, racer] = g.players;
   ok(lap.carriedTop && !racer.carriedTop, 'one seat carried a finished run in, the other did not');
   raiseToTop(g, 1);
-  run(g, 95);
+  run(g, 3);
+  windHold(g, 1, APEX_HOLD_SECONDS - 1);
+  run(g, 3);
   ok(g.state.status === 'won', 'the player who grew to the top still wins it');
   ok(g.state.winner === racer.player, `and it is credited to them (seat ${g.state.winner})`);
   ok(g.discovery.best.get(racer.creature as CreatureId) === LADDER_TOP, 'their record banks the top');
@@ -223,7 +241,9 @@ const meterFill = (g: InstanceType<typeof Game>, a: import('../src/sim/types').A
   ok(g.continueMatch(), 'a finished Rise match offers to carry on');
   ok(g.state.status === 'playing', 'and is playing again');
   // The goal must stop asking, or the match would win itself again the moment it resumed.
-  run(g, 120);
+  run(g, 3);
+  windHold(g, 0, APEX_HOLD_SECONDS + 5);
+  run(g, 2);
   ok(g.state.status === 'playing', 'and does not immediately win a second time');
   ok(!g.continueMatch(), 'a match already running has nothing to carry on');
 
