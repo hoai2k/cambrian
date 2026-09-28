@@ -14,9 +14,9 @@ import { tierScale } from '../src/sim/tiers';
 import { emptyInput, TIER_NEED, type InputFrame, type WorldEvent } from '../src/sim/types';
 import { isAlive, lengthOf } from '../src/sim/actors';
 import { creature, type CreatureId } from '../src/sim/creatures';
+import { checker, finish } from './lib/test';
 
-let failed = 0;
-const check = (name: string, ok: boolean, detail: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${name.padEnd(46)} ${detail}`); if (!ok) failed++; };
+const check = checker(46);
 
 function twoPlayers(a: CreatureId, b: CreatureId, seed = 9) {
   const g = new Game('rise', [{ creature: a, device: 'keyboard', ready: true }, { creature: b, device: 'keyboard2', ready: true }], seed);
@@ -165,6 +165,4 @@ function feast(eaterId: CreatureId, foodId: CreatureId, foodScale: number, secon
   check('...and each rung of the ladder costs more than the last', need.every((v, i) => i === 0 || v > need[i - 1]),
     need.join(' → '));
 }
-
-console.log(failed ? `\n${failed} FAILED` : '\nall feast tests passed');
-process.exit(failed ? 1 : 0);
+finish('all feast tests passed');

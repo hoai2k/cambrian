@@ -74,7 +74,7 @@ for (const id of Object.keys(files).sort()) {
 // ---- the props that were the complaint: long, flat things are no longer discs ----
 for (const [id, least] of [['devonian-log', 0.35], ['glass-fan', 0.5], ['devonian-bryozoan', 0.5], ['talus-shard', 0.15], ['devonian-algal-clump', 0.5]] as [string, number][]) {
   const w = worst.find((x) => x.id === id);
-  ok(w && w.saved > least, `${id} blocks its own shape, not a disc around it`, `${((w?.saved ?? 0) * 100).toFixed(0)}% of the disc is open water again`);
+  ok(!!w && w.saved > least, `${id} blocks its own shape, not a disc around it`, `${((w?.saved ?? 0) * 100).toFixed(0)}% of the disc is open water again`);
 }
 
 // ---- every prop an era can ask for is a file that exists ----

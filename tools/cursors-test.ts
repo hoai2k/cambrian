@@ -3,9 +3,9 @@
  * Run: npm run cursors
  */
 import { cursorFor, cursorState, type CursorState } from '../src/shared/cursors';
+import { checker, finish } from './lib/test';
 
-let failed = 0;
-const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(56)} ${d}`); if (!ok) failed++; };
+const check = checker(56);
 const m = (o: Partial<{ dragging: boolean; right: boolean; pressing: boolean }> = {}) =>
   ({ dragging: false, right: false, pressing: false, ...o });
 
@@ -37,6 +37,4 @@ for (const s of STATES) {
 // Off the match the page's own pointer comes back: a targeting reticle over a Quit button is a lie
 // about what a click does.
 check('the menus get the ordinary pointer back', cursorFor('menu') === '');
-
-console.log(failed ? `FAILED (${failed})` : 'PASS: the cursor says what it is over and what the buttons are doing');
-process.exit(failed ? 1 : 0);
+finish('PASS: the cursor says what it is over and what the buttons are doing');

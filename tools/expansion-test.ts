@@ -4,12 +4,13 @@ import { EXPANSION_CREATURES } from '../src/sim/expansion';
 import { makeActor, bodyRadius, clearanceOf, isHidden, speedFactor } from '../src/sim/actors';
 import { applyHit } from '../src/sim/combat';
 import { beginExpansionAbility, stepExpansionAbility, bloomRate, grazeRate, HEAVY_STRIKE, specialHit } from '../src/sim/expansion-abilities';
-import { HEAVY_SPECIALS } from '../src/sim/concealment';
 import { emptyInput } from '../src/sim/types';
 import { Game } from '../src/sim/game';
 import { makeBrain } from '../src/sim/ai';
 import { sampleHeight, SURFACE_Y } from '../src/sim/world';
+import { makeRng, rngFrom } from '../src/shared/math';
 import { HEAVY_SPECIALS } from '../src/sim/concealment';
+import { live } from './lib/test';
 
 assert.equal(CREATURES.length, 21);
 assert.equal(new Set(CREATURES.map(c => c.id)).size, 21);
@@ -19,7 +20,7 @@ for (const d of EXPANSION_CREATURES) {
   const a = actor(1, d.id), enemy = actor(2, 'waptia', .8), ally = actor(3, 'waptia', .8);
   a.yaw = 0; a.state = 'ability'; a.abilityActive = true;
   const others = [a, enemy, ally];
-  const ctx = { hit: { events: [], byId: (id: number) => others.find(o => o.id === id), time: 0 }, nearby: () => others, silt: [], allies: (_: any, b: any) => b.id === ally.id };
+  const ctx = { hit: { events: [], rng: makeRng(1), byId: (id: number) => others.find(o => o.id === id), time: 0 }, nearby: () => others, silt: [], allies: (_: any, b: any) => b.id === ally.id };
   assert(beginExpansionAbility(ctx, a, d));
   const hp = ally.hp, pos = { ...ally.vel };
   for (let i = 0; i < 72; i++) { a.stateT = i / 60; if (a.state === 'ability') stepExpansionAbility(ctx, a, d, 1 / 60); }
@@ -43,7 +44,7 @@ const hit = (pierce: number) => { const a = actor(1, 'sidneyia'), v = actor(2, '
 assert(hit(.75) > hit(0));
 {
   const a = actor(1, 'burgessomedusa'), v = actor(2, 'olenoides', 1); a.state = 'ability'; a.abilityActive = true; a.yaw = 0;
-  const ctx = { hit: {events: [], byId: () => undefined, time: 0}, nearby: () => [v], silt: [], allies: () => false };
+  const ctx = { hit: {events: [], rng: makeRng(1), byId: () => undefined, time: 0}, nearby: () => [v], silt: [], allies: () => false };
   beginExpansionAbility(ctx, a, creature(a.creature)); a.stateT = .4;
   stepExpansionAbility(ctx, a, creature(a.creature), 1/60); const hp = v.hp;
   for (let i=0;i<60;i++) stepExpansionAbility(ctx, a, creature(a.creature), 1/60);
@@ -70,9 +71,9 @@ for (const def of EXPANSION_CREATURES) {
 // Ribbon slip clears both player locks and the AI's acquired target/detection.
 {
   const a=actor(1), hunter=actor(2,'anomalocaris');
-  hunter.lockTarget=a.id;hunter.brain=makeBrain('giant',hunter.pos,()=>.5,{target:a.id,goal:'chase'});
+  hunter.lockTarget=a.id;hunter.brain=makeBrain('giant',hunter.pos,rngFrom(()=>.5),{target:a.id,goal:'hunt'});
   hunter.brain.detection.set(a.id,1);
-  const ctx={hit:{events:[],byId:()=>undefined,time:0},nearby:()=>[hunter],silt:[],allies:()=>false};
+  const ctx={hit:{events:[], rng: makeRng(1),byId:()=>undefined,time:0},nearby:()=>[hunter],silt:[],allies:()=>false};
   beginExpansionAbility(ctx,a,creature(a.creature));
   assert.equal(hunter.lockTarget,-1);assert.equal(hunter.brain.target,-1);assert(!hunter.brain.detection.has(a.id));
 }
@@ -195,14 +196,14 @@ for(const id of ['burgessomedusa','ctenorhabdotus'] as const){
     press(true); press(false);
     assert.equal(p.state, 'ability', `${id}: RT did not start the special (state=${p.state})`);
     // run it out, then press again while it is still cooling down
-    for (let i = 0; i < 60 * 6 && (p.state !== 'free' || p.abilityCd <= 0); i++) press(false);
-    assert(p.state === 'free' && p.abilityCd > 0, `${id}: no cooling-down window to test (state=${p.state} cd=${p.abilityCd.toFixed(2)})`);
+    for (let i = 0; i < 60 * 6 && (live(p).state !== 'free' || p.abilityCd <= 0); i++) press(false);
+    assert(live(p).state === 'free' && p.abilityCd > 0, `${id}: no cooling-down window to test (state=${p.state} cd=${p.abilityCd.toFixed(2)})`);
     const stamina = p.stamina;
     press(true); press(false);
-    assert(p.state === 'attack' || p.state === 'pounce',
+    assert(live(p).state === 'attack' || live(p).state === 'pounce',
       `${id}: RT was swallowed while the special cooled down (state=${p.state})`);
     assert(p.stamina < stamina, `${id}: RT cost nothing, so nothing happened`);
-    if (p.state === 'attack') assert.equal(p.moveKind, 'heavy', `${id}: RT fell back to something other than the heavy`);
+    if (live(p).state === 'attack') assert.equal(p.moveKind, 'heavy', `${id}: RT fell back to something other than the heavy`);
   }
 }
 

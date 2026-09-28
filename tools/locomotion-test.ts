@@ -15,9 +15,9 @@ import { floraSize } from '../src/sim/flora';
 import { chunkCoord, chunkKey, sampleHeight } from '../src/sim/world';
 import { CREATURE_IDS } from '../src/sim/creatures';
 import fs from 'node:fs';
+import { checker, finish } from './lib/test';
 
-let failed = 0;
-const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(52)} ${d}`); if (!ok) failed++; };
+const check = checker(52);
 const DT = 1 / 60;
 
 /** One player, alone and unbothered, somewhere with water above and below. */
@@ -295,13 +295,11 @@ const flat = (v: { x: number; z: number }) => Math.hypot(v.x, v.z);
   const wild = g.spawn('canadia', 'ambient', { x: pl.pos.x + 20, y: pl.pos.y, z: pl.pos.z }, 1);
   wild.brain = undefined;
   const sim = g as unknown as { startDodge(a: typeof wild, def: ReturnType<typeof creature>, dir: { x: number; y: number; z: number }, mag: number, L: number, sf: number): void };
-  const dodge = () => { wild.state = 'free'; sim.startDodge(wild, creature('canadia'), { x: 1, y: 0, z: 0 }, 1, lengthOf(wild), 1); return wild.state === 'dodge'; };
+  const dodge = () => { wild.state = 'free' as typeof wild.state; sim.startDodge(wild, creature('canadia'), { x: 1, y: 0, z: 0 }, 1, lengthOf(wild), 1); return wild.state === 'dodge'; };
   wild.stamina = wild.staminaMax;
   check('a wild animal on a full bar has its escape', dodge());
   check('...and it takes everything it has', wild.stamina === 0, `${wild.stamina.toFixed(1)} left`);
   wild.stamina = wild.staminaMax * 0.6;
   check('...and it gets no second one until its bar is full again', !dodge(), `at ${(wild.stamina / wild.staminaMax * 100).toFixed(0)}%`);
 }
-
-console.log(failed ? `\n${failed} FAILED` : '\nall locomotion tests passed');
-process.exit(failed ? 1 : 0);
+finish('all locomotion tests passed');

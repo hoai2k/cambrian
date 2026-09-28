@@ -11,13 +11,13 @@ import { selectEra } from '../src/content';
 import { CAMBRIAN } from '../src/content/cambrian';
 import { DEVONIAN } from '../src/content/devonian';
 import { TRIASSIC } from '../src/content/triassic';
+import { checker, finish } from './lib/test';
 
 const which = process.argv[2] === 'devonian' ? 'devonian' : process.argv[2] === 'triassic' ? 'triassic' : 'cambrian';
 const era = which === 'devonian' ? DEVONIAN : which === 'triassic' ? TRIASSIC : CAMBRIAN;
 selectEra(era);
 
-let failed = 0;
-const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(62)} ${d}`); if (!ok) failed++; };
+const check = checker(62);
 
 const { APEX_SCALE, ERA_IDS, earnedVisitors, recordableIds, standingVisitors, visitorFor, visitorsHere, visitorsFrom } = await import('../src/content/visitors');
 const { TRIASSIC_GUESTS } = await import('../src/content/triassic/guests');
@@ -204,6 +204,4 @@ const other: EraId[] = ERA_IDS.filter((e) => e !== playing);
   check('...and swims without the sea falling over', isAlive(p) && Number.isFinite(p.pos.x) && Number.isFinite(p.pos.y), `y ${p.pos.y.toFixed(1)}`);
   check('...with every other animal still finite', g.actors.every((a) => Number.isFinite(a.hp) && Number.isFinite(a.pos.y)), `${g.actors.length} actors`);
 }
-
-console.log(failed ? `FAILED (${failed})` : `all passed (${playing})`);
-process.exit(failed ? 1 : 0);
+finish(`all passed (${playing})`);

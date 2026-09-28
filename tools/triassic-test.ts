@@ -153,13 +153,13 @@ ok(opener && fs.existsSync(`public/${decodeURIComponent(paths.music(opener.name)
   // On the breath it is holding a lung is simply a lung: the gauge is the clock, not the bar.
   ok(notho.stamina > 40, `an air-breather on a full chest recovers like anything else (${notho.stamina.toFixed(1)} after 3 s from 20)`);
   ok(hyb.stamina > 40, `a gill-breather recovers as it always did (${hyb.stamina.toFixed(1)} after 3 s from 20)`);
-  ok(RULES.staminaRegen(g, notho) === 1 && RULES.staminaRegen(g, hyb) === 1, 'the regen hook says so directly');
+  ok(RULES.staminaRegen!(g, notho) === 1 && RULES.staminaRegen!(g, hyb) === 1, 'the regen hook says so directly');
   // ...and once the breath is gone, the old rule bites: nothing comes back at all.
   triActor(g, notho).air = 0;
   notho.stamina = 20;
   run(g, 3);
   ok(notho.stamina <= 20.01, `out of air it recovers nothing (${notho.stamina.toFixed(1)} after 3 s from 20)`);
-  ok(RULES.staminaRegen(g, notho) === 0, 'and the regen hook says so directly');
+  ok(RULES.staminaRegen!(g, notho) === 0, 'and the regen hook says so directly');
   // up for air: the bar comes back whole and the blow is heard
   notho.pos.y = swimCeiling(notho); notho.prevT.y = notho.pos.y;   // at the top, not near it
   g.step(DT, new Map()); const blew = g.events.some((e) => e.kind === 'gulp' && e.actor === notho.id);
@@ -185,20 +185,20 @@ ok(opener && fs.existsSync(`public/${decodeURIComponent(paths.music(opener.name)
       `a neck sent up alone breaks some of the surface, not none and not all (strength ${neck?.strength})`);
   }
   ok(notho.stamina > notho.staminaMax * 0.95, `and the bar comes back whole (${notho.stamina.toFixed(0)}/${notho.staminaMax})`);
-  ok(RULES.hud(g, 0)?.air === true && RULES.hud(g, 0)?.atSurface === true, 'the HUD knows it breathes air and is at the surface');
+  ok(RULES.hud!(g, 0)?.air === true && RULES.hud!(g, 0)?.atSurface === true, 'the HUD knows it breathes air and is at the surface');
   // the climb is free
-  const up = RULES.climbRelief(notho, frame({ rise: true }), { x: 0, y: 1, z: 0 }, 1);
+  const up = RULES.climbRelief!(notho, frame({ rise: true }), { x: 0, y: 1, z: 0 }, 1);
   ok(up === 1, `an air-breather's climb costs nothing (${up})`);
-  ok(RULES.climbRelief(hyb, frame({ rise: true }), { x: 0, y: 1, z: 0 }, 1) === 0, 'a gill-breather pays for its climb as it always did');
+  ok(RULES.climbRelief!(hyb, frame({ rise: true }), { x: 0, y: 1, z: 0 }, 1) === 0, 'a gill-breather pays for its climb as it always did');
   // held under: a giant's hold wears the catch
   const giant = g.spawn('cymbospondylus', 'ambient', { ...notho.pos, y: notho.pos.y - 6 }, 1);
   deep(notho); notho.stamina = 60; notho.grabbedBy = giant.id; giant.grabbing = notho.id;
   run(g, 2);
   ok(notho.stamina < 60 - 8, `held under by an exhaustion hold, the bar goes (${notho.stamina.toFixed(1)} from 60)`);
-  ok(RULES.hud(g, 0)?.heldUnder === true, 'the HUD says held under');
+  ok(RULES.hud!(g, 0)?.heldUnder === true, 'the HUD says held under');
   // ...and it costs the breath as well, which is what being held *under* means now the gauge exists
   ok(triActor(g, notho).air < AIR_MAX - 15, `and the breath goes with it (${triActor(g, notho).air.toFixed(0)} of ${AIR_MAX} after 2 s)`);
-  ok(RULES.staminaRegen(g, notho) === 0, 'nothing comes back while it is held, whatever is in its chest');
+  ok(RULES.staminaRegen!(g, notho) === 0, 'nothing comes back while it is held, whatever is in its chest');
   notho.grabbedBy = -1; giant.grabbing = -1;
 }
 
@@ -217,7 +217,7 @@ ok(opener && fs.existsSync(`public/${decodeURIComponent(paths.music(opener.name)
   ok(Math.abs(triActor(g, p).air - (AIR_MAX - 1)) < 0.2, `and it goes down a second a second (${triActor(g, p).air.toFixed(1)} after 1 s)`);
 
   // the gauge reaches the HUD, and flashes for its last minute and not before
-  const airAt = (left: number) => { triActor(g, p).air = left; deep(); run(g, 0.02); return RULES.hud(g, 0)!; };
+  const airAt = (left: number) => { triActor(g, p).air = left; deep(); run(g, 0.02); return RULES.hud!(g, 0)!; };
   ok(Math.abs((airAt(AIR_MAX * 0.5).airLeft ?? -1) - 0.5) < 0.02, 'the HUD carries the gauge as a fraction');
   ok(airAt(AIR_LOW + 20).airLow === false, `above the last minute it does not flash (${AIR_LOW + 20} s left)`);
   ok(airAt(AIR_LOW - 20).airLow === true, `inside the last minute it does (${AIR_LOW - 20} s left)`);
@@ -237,7 +237,7 @@ ok(opener && fs.existsSync(`public/${decodeURIComponent(paths.music(opener.name)
   deep(); triActor(g, p).air = 0; p.stamina = 0;
   run(g, 2);
   ok(p.hp < p.hpMax && isAlive(p), `out of both, hp starts to go (${p.hp.toFixed(0)}/${p.hpMax} after 2 s)`);
-  ok(RULES.hud(g, 0)?.drowning === true, 'and the HUD says drowning');
+  ok(RULES.hud!(g, 0)?.drowning === true, 'and the HUD says drowning');
   const half = p.hp;
   run(g, 8);
   ok(!isAlive(p), `and it finishes the job (hp ${half.toFixed(0)} → ${p.hp.toFixed(0)})`);
@@ -431,14 +431,14 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
   const at = (id: CreatureId, y = 0) => g.spawn(id, 'ambient', { x: 0, y: 0 + y, z: 60 }, 1);
   const shark = at('hybodus');
   const turtle = at('odontochelys'); turtle.yaw = 0;
-  const from = (dy: number) => { shark.pos = { x: turtle.pos.x, y: turtle.pos.y + dy, z: turtle.pos.z - lengthOf(turtle) * 0.3 }; return RULES.armour(shark, turtle, { x: 0, y: 0, z: 0 }); };
+  const from = (dy: number) => { shark.pos = { x: turtle.pos.x, y: turtle.pos.y + dy, z: turtle.pos.z - lengthOf(turtle) * 0.3 }; return RULES.armour!(shark, turtle, { x: 0, y: 0, z: 0 }); };
   ok(from(-2) < 1 && from(2) === 1, `a plastron takes the bite from below (${from(-2).toFixed(2)}) and not from above (${from(2)})`);
   const hupeh = at('hupehsuchus'); hupeh.yaw = 0;
-  const fromH = (dy: number) => { shark.pos = { x: hupeh.pos.x, y: hupeh.pos.y + dy, z: hupeh.pos.z }; return RULES.armour(shark, hupeh, { x: 0, y: 0, z: 0 }); };
+  const fromH = (dy: number) => { shark.pos = { x: hupeh.pos.x, y: hupeh.pos.y + dy, z: hupeh.pos.z }; return RULES.armour!(shark, hupeh, { x: 0, y: 0, z: 0 }); };
   ok(fromH(2) < 1 && fromH(-2) === 1, 'dorsal plates take the bite from above and not from below');
   const henodus = at('henodus');
   shark.pos = { x: henodus.pos.x, y: henodus.pos.y, z: henodus.pos.z - lengthOf(henodus) * 0.6 };
-  ok(RULES.armour(shark, henodus, { x: 0, y: 0, z: 0 }) < 1, 'a full shell is armour from every side but the aperture');
+  ok(RULES.armour!(shark, henodus, { x: 0, y: 0, z: 0 }) < 1, 'a full shell is armour from every side but the aperture');
   turtle.state = 'guard';
   ok(from(2) < 1, 'a belly turn while guarding rolls the plastron to the attacker: armour from above too');
   turtle.state = 'free';
@@ -541,7 +541,7 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
     for (let i = 0; i < 60 * 8; i++) {
       park(spot); tick(g);
       const c = RULES.clip?.(neck); if (c) clipsSeen.set(c.name, c.dur);
-      const h = RULES.hud(g, 0)!; watched = Math.max(watched, h.shoreWatch ?? 0); warned = Math.max(warned, h.shoreWarn ?? 0);
+      const h = RULES.hud!(g, 0)!; watched = Math.max(watched, h.shoreWatch ?? 0); warned = Math.max(warned, h.shoreWarn ?? 0);
       if (p.hp < p.hpMax - 1 || p.state === 'swallowed') { hit = true; break; }
     }
     ok(watched > 0, `holding still is noticed first (watch reached ${watched.toFixed(2)})`);
@@ -573,7 +573,7 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
     ok(!loweredForBig && isAlive(p) && p.hp === p.hpMax, 'a giant holding still under it is left alone');
     p.scale = small;
     // One that stops for less than the wait and moves on is not struck.
-    boom.phase = 'watch'; boom.t = 0; boom.target = -1; boom.still.clear();
+    boom.phase = 'watch' as typeof boom.phase; boom.t = 0; boom.target = -1; boom.still.clear();
     p.hp = p.hpMax; p.state = 'free'; p.hatching = false;
     park(spot);
     for (let i = 0; i < 60 * 2; i++) { park(spot); tick(g); }
@@ -754,7 +754,7 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
   g.skipHatch();
   run(g, 2);
   const inputs = new Map<number, InputFrame>();
-  for (let i = 0; i < 4; i++) inputs.set(i, frame({ move: { x: 0.6, y: 0.4 }, heavy: true, ability: true, burst: 1 }));
+  for (let i = 0; i < 4; i++) inputs.set(i, frame({ mx: 0.6, my: 0.4, heavy: true, ability: true, burst: 1 }));
   run(g, 6, inputs);
   ok(g.players.every((p) => Number.isFinite(p.pos.x) && Number.isFinite(p.pos.y) && Number.isFinite(p.pos.z)), 'four animals pressing everything for six seconds stay finite');
   ok(g.actors.every((a) => Number.isFinite(a.hp) && Number.isFinite(a.stamina)), 'every actor stays finite');
@@ -764,7 +764,7 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
   for (const c of PLAYABLE) {
     const g = new Game('reef', [{ creature: c.id, device: 'keyboard', ready: true }]);
     g.skipHatch();
-    const inputs = new Map<number, InputFrame>([[0, frame({ move: { x: 0.3, y: 0.7 }, heavy: true, ability: true, burst: 1, rise: true })]]);
+    const inputs = new Map<number, InputFrame>([[0, frame({ mx: 0.3, my: 0.7, heavy: true, ability: true, burst: 1, rise: true })]]);
     run(g, 3, inputs);
     const p = g.players[0];
     ok(isAlive(p) || true, `${c.id} plays three seconds of everything`);
@@ -780,7 +780,7 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
   const p = g.players[0];
   ok(Math.abs(p.scale - stageScale(creature(p.creature).adultLength, 0)) < 1e-6, 'Rise starts as a hatchling');
   const d = devActor(g, p);
-  d.standing = STAGE_AT[PRIME_STAGE]; RULES.onNutrition(g, p, 0.001, undefined);
+  d.standing = STAGE_AT[PRIME_STAGE]; RULES.onNutrition!(g, p, 0.001, undefined);
   run(g, 8);                                                    // four moult ceremonies of a second and a half
   ok(d.stage === PRIME_STAGE, `standing takes the animal up the stages (stage ${d.stage})`);
   const reef = new Game('reef', [{ creature: 'ceratites', device: 'keyboard', ready: true }]);
@@ -794,7 +794,7 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
   const play = () => {
     const g = new Game('rise', [{ creature: 'rhaeticosaurus', device: 'keyboard', ready: true }, { creature: 'saurichthys', device: 0, ready: true }], 77);
     g.skipHatch();
-    const inputs = new Map<number, InputFrame>([[0, frame({ move: { x: 0.5, y: 0.5 }, burst: 1, heavy: true })], [1, frame({ move: { x: -0.4, y: 0.8 }, ability: true })]]);
+    const inputs = new Map<number, InputFrame>([[0, frame({ mx: 0.5, my: 0.5, burst: 1, heavy: true })], [1, frame({ mx: -0.4, my: 0.8, ability: true })]]);
     run(g, 8, inputs);
     return JSON.stringify(g.actors.map((a) => [a.creature, a.pos.x.toFixed(4), a.pos.y.toFixed(4), a.pos.z.toFixed(4), a.hp.toFixed(3), a.stamina.toFixed(3), a.state]));
   };
@@ -871,7 +871,7 @@ const lurkerAtEdge = (g: InstanceType<typeof Game>, kind: CreatureId) => {
   // roster and its expansion register declare, nothing more and nothing left out.
   const kept = new Set(sections.filter((s) => s.title === 'NPCs' || s.title === 'Unfinished').flatMap((s) => s.rows.map((r) => r.id)));
   const want = new Set(TRIASSIC.creatures.filter((c) => c.shelved || c.npc || c.shore).map((c) => c.id));
-  ok(kept.size === want.size && [...kept].every((id) => want.has(id)), `the kept-back animals are exactly the era's own (${[...kept].join(' ')})`);
+  ok(kept.size === want.size && [...kept].every((id) => want.has(id as CreatureId)), `the kept-back animals are exactly the era's own (${[...kept].join(' ')})`);
 }
 
 // ---- the viewer's scenery catalogue ----

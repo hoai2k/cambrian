@@ -5,9 +5,9 @@
  *          --outfile=/tmp/mc.mjs && node /tmp/mc.mjs
  */
 import { freshCursor, menuPress, MENU_LOCKOUT, type MenuCursor } from '../src/app/menu-cursor';
+import { checker, finish } from './lib/test';
 
-let failed = 0;
-const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(58)} ${d}`); if (!ok) failed++; };
+const check = checker(58);
 
 const N = 3;   // Continue · Play again · Quit
 
@@ -54,5 +54,4 @@ check('...and the default is the first choice, the harmless one', freshCursor(tr
 
 // An empty menu can never act, whatever arrives.
 check('a menu with no choices cannot be confirmed', !menuPress(freshCursor(true), 0, { confirm: true }).act);
-
-console.log(failed ? `\n${failed} FAILED` : `\nall ${'menu cursor'} tests passed`); process.exit(failed ? 1 : 0);
+finish(`all ${'menu cursor'} tests passed`);

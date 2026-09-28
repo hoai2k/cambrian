@@ -31,11 +31,11 @@ const grid = (more: Partial<lineup.PickGrid> = {}): lineup.PickGrid =>
   eq(lineup.moveCursor(ps, 0, 1, 0, grid())?.players[0].creature, 'c1', 'right walks the grid');
   eq(lineup.moveCursor(ps, 0, 0, 1, grid())?.players[0].creature, 'c4', 'down moves a row');
   eq(lineup.moveCursor(ps, 0, 0, 1, grid())?.sound, 'ui-move', 'and a move sounds like one');
-  ok(lineup.moveCursor(ps, 0, 1, 0, grid())!.players !== ps && ps[0].creature === 'c0', 'the lineup it was given is left alone');
+  ok(lineup.moveCursor(ps, 0, 1, 0, grid())!.players !== ps && ps[0].creature === ids[0], 'the lineup it was given is left alone');
   eq(lineup.moveCursor(ps, 0, 0, 1, grid({ carousel: true }))?.players[0].creature, 'c1', 'in the carousel down walks along, as right does');
   const onLast = [seat('c7')];
   const toButton = lineup.moveCursor(onLast, 0, 1, 0, grid())?.players[0];
-  ok(toButton?.cursor === 'random' && toButton.creature === 'c7', 'past the last animal the cursor lands on Random, keeping the animal');
+  ok(toButton?.cursor === 'random' && toButton.creature === ids[7], 'past the last animal the cursor lands on Random, keeping the animal');
   eq(lineup.moveCursor([seat('c0', 'keyboard', { ready: true })], 0, 1, 0, grid()), null, 'a locked seat does not move');
   eq(lineup.moveCursor([], 0, 1, 0, grid()), null, 'nor does a seat nobody has');
   eq(lineup.moveCursor([seat('c0')], 0, 0, 0, grid()), null, 'a press that goes nowhere changes nothing and makes no sound');
@@ -62,19 +62,19 @@ const grid = (more: Partial<lineup.PickGrid> = {}): lineup.PickGrid =>
   const r = lineup.toggleReady([seat('c2')], 0, 'c0' as CreatureId);
   ok(r?.players[0].ready && r.sound === 'ui-confirm', 'locking in');
   const back = lineup.toggleReady(r!.players, 0, 'c0' as CreatureId);
-  ok(back && !back.players[0].ready && back.players[0].creature === 'c2' && back.sound === 'ui-back', 'and letting go keeps the animal');
+  ok(back && !back.players[0].ready && back.players[0].creature === ids[2] && back.sound === 'ui-back', 'and letting go keeps the animal');
   const v = lineup.toggleReady([seat('dunkleosteus', 'keyboard', { ready: true, cursor: 'visitors', visitorScale: 7 })], 0, 'c0' as CreatureId)?.players[0];
-  ok(v && !v.ready && v.creature === 'c0' && v.cursor === undefined && v.visitorScale === undefined, 'letting go of a visitor hands the local roster back');
+  ok(v && !v.ready && v.creature === ids[0] && v.cursor === undefined && v.visitorScale === undefined, 'letting go of a visitor hands the local roster back');
 }
 
 // ---- taking what the cursor is on ----
 {
   const g = grid({ visitors: [visitor('dunkleosteus')] });
   const rolled = lineup.activate([seat('c0', 'keyboard', { cursor: 'random' })], 0, g, () => 0.99);
-  ok(rolled !== null && typeof rolled === 'object' && rolled.players[0].creature === 'c7' && !rolled.players[0].ready && rolled.players[0].cursor === undefined,
+  ok(rolled !== null && typeof rolled === 'object' && rolled.players[0].creature === ids[7] && !rolled.players[0].ready && rolled.players[0].cursor === undefined,
     'Random rolls another animal and leaves the seat free to roll again');
   const never = lineup.activate([seat('c0', 'keyboard', { cursor: 'random' })], 0, g, () => 0);
-  ok(typeof never === 'object' && never?.players[0].creature !== 'c0', 'and never the animal already on');
+  ok(typeof never === 'object' && never?.players[0].creature !== ids[0], 'and never the animal already on');
   const vis = lineup.activate([seat('c0', 'keyboard', { cursor: 'visitors' })], 0, g, () => 0);
   ok(typeof vis === 'object' && vis?.players[0].creature === 'dunkleosteus' && vis.players[0].ready && vis.players[0].visitorScale === 7,
     'Visitors locks in on the first visitor, full grown');

@@ -17,9 +17,9 @@ import { applyTouch } from '../src/input/touch';
 import { emptyControls, type RawControls } from '../src/input/input';
 import { btn, key, menuScheme, schemeForDevice, type Action } from '../src/shared/controls';
 import { cursorFor, cursorImageFor } from '../src/shared/cursors';
+import { checker, finish } from './lib/test';
 
-let failed = 0;
-const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(66)} ${d}`); if (!ok) failed++; };
+const check = checker(66);
 const near = (a: number, b: number, tol: number) => Math.abs(a - b) <= tol;
 
 /** A surface the size of a landscape phone, which is the smallest thing this has to work on. */
@@ -486,6 +486,4 @@ check('...and never when the grid fits', carouselView('compact', 1, true) === fa
 check('two players on a wide screen are cut side by side', splitAxis(1440, 900) === 'across');
 check('two on a tall one are cut top and bottom', splitAxis(820, 1180) === 'down');
 check('a square is cut across, as it always was', splitAxis(900, 900) === 'across');
-
-console.log(failed ? `FAILED (${failed})` : 'PASS: a finger plays the game, and a small window says so');
-process.exit(failed ? 1 : 0);
+finish('PASS: a finger plays the game, and a small window says so');

@@ -42,7 +42,8 @@ type Biome = import('../src/sim/world').Biome;
 type InputFrame = import('../src/sim/types').InputFrame;
 type Mode = import('../src/sim/types').Mode;
 import { heading } from '../src/shared/math';
-import { wrapAngle } from '../src/shared/math';
+import { rngFrom, wrapAngle } from '../src/shared/math';
+import { live } from './lib/test';
 const { MODE_IDS } = await import('../src/sim/types');
 type CreatureId = import('../src/sim/creatures').CreatureId;
 
@@ -60,7 +61,7 @@ const ok = (cond: unknown, msg: string) => { assert.ok(cond, msg); passes++; };
   const p = g.players[0];
   p.pos.y = sampleHeight(p.pos.x, p.pos.z) + 2;
   p.vel = { x: 0, y: 0, z: 0 };
-  p.state = 'attack'; p.stateT = 0.02; p.move = creature('jaekelopterus').light;
+  p.state = 'attack' as typeof p.state; p.stateT = 0.02; p.move = creature('jaekelopterus').light;
   p.stamina = p.staminaMax; p.dashCd = 0; p.prev.dash = false;
   const origin = { ...p.pos };
   const dash: InputFrame = { ...emptyInput(), dash: true, touchDash: true, my: 1, camYaw: p.yaw };
@@ -219,7 +220,7 @@ ok(!RULES.growthByNutrition, 'Devonian rules active: growth is by standing, not 
   p.spawnProtect = 1e6;                                       // the bots are quick now; this one is idling on purpose
   const tier0 = p.tier;
   // feed it by hand: 40 nutrition worth of shoal
-  for (let i = 0; i < 20; i++) RULES.onNutrition(g, p, 2, undefined);
+  for (let i = 0; i < 20; i++) RULES.onNutrition!(g, p, 2, undefined);
   ok(d.standing > 0, `feeding raises the growth meter (${d.standing.toFixed(1)})`);
   ok(p.tier === tier0, 'nutrition never changes the tier in the Devonian');
   // Growth is what you eat and nothing else: idling, holding ground, driving rivals off — none of
@@ -237,10 +238,10 @@ ok(!RULES.growthByNutrition, 'Devonian rules active: growth is by standing, not 
   // straight to Prime: the stage changes with the moult ceremony, the rung never does
   // one stage per moult ceremony: standing can run ahead, the body catches up after each moult
   const stage0 = d.stage;
-  for (let i = 0; i < 80; i++) RULES.onNutrition(g, p, 10, undefined);
+  for (let i = 0; i < 80; i++) RULES.onNutrition!(g, p, 10, undefined);
   ok(d.stage === stage0 + 1 && p.state === 'moult', `a ceremony takes it up exactly one stage (${stage0} → ${d.stage}, ${p.state})`);
   const scales = [p.scale];
-  for (let m = 0; m < 4; m++) { for (let i = 0; i < 60 * 3; i++) tick(g, new Map<number, InputFrame>([[0, emptyInput()]])); RULES.onNutrition(g, p, 1, undefined); scales.push(p.scale); }
+  for (let m = 0; m < 4; m++) { for (let i = 0; i < 60 * 3; i++) tick(g, new Map<number, InputFrame>([[0, emptyInput()]])); RULES.onNutrition!(g, p, 1, undefined); scales.push(p.scale); }
   for (let i = 0; i < 60 * 3; i++) tick(g, new Map<number, InputFrame>([[0, emptyInput()]]));
   ok(d.stage === PRIME_STAGE, `a ceremony per moult all the way to Prime (stage ${d.stage})`);
   const grew = scales.filter((s, i) => i > 0 && s > scales[i - 1] + 1e-9).length;
@@ -261,7 +262,7 @@ ok(!RULES.growthByNutrition, 'Devonian rules active: growth is by standing, not 
     let moults = 0, wasFull = 0;
     for (let i = 0; i < 400 && dq.stage < PRIME_STAGE; i++) {
       const before = dq.stage;
-      RULES.onNutrition(fresh, q, 1, undefined);
+      RULES.onNutrition!(fresh, q, 1, undefined);
       const ring = RULES.hud!(fresh, 0)!.stageProgress;
       seen.push(ring);
       if (dq.stage > before) { moults++; if (seen[seen.length - 2] > 0.9) wasFull++; }
@@ -294,8 +295,8 @@ ok(!RULES.growthByNutrition, 'Devonian rules active: growth is by standing, not 
   const lung = tik.stamina / tik.staminaMax, gill = coc.stamina / coc.staminaMax;
   ok(gill > 0.1 && gill < 0.99, `gills recover at the shared rate and are still climbing (${(gill * 100).toFixed(0)}% in 1 s)`);
   ok(lung > 0 && lung < gill * 0.95, `lungs recover slower under water (${(lung * 100).toFixed(0)}% against ${(gill * 100).toFixed(0)}%)`);
-  ok(Math.abs(RULES.staminaRegen(g, tik) - 0.7) < 1e-9 && RULES.staminaRegen(g, coc) === 1,
-    `and the hook says the share directly (${RULES.staminaRegen(g, tik)})`);
+  ok(Math.abs(RULES.staminaRegen!(g, tik) - 0.7) < 1e-9 && RULES.staminaRegen!(g, coc) === 1,
+    `and the hook says the share directly (${RULES.staminaRegen!(g, tik)})`);
   // The point of the number: a lung that chose to fight at depth still has a bar to fight on. At a
   // quarter rate it effectively did not, and the round trip stopped being a choice.
   ok(lung > gill * 0.5, `a lung at depth is worse off, not shut off (${(lung * 100).toFixed(0)}% of the shared rate's ${(gill * 100).toFixed(0)}%)`);
@@ -447,8 +448,8 @@ ok(!RULES.growthByNutrition, 'Devonian rules active: growth is by standing, not 
   const mk = (id: CreatureId) => g.spawn(id, 'ambient', { x: 0, y: -10, z: 80 }, 1);
   const dir = { x: 0, y: 0, z: 1 };
   const shark = mk('cladoselache'), dunk = mk('dunkleosteus'), tusk = mk('onychodus'), plate = mk('bothriolepis'), soft = mk('cheirolepis');
-  const kSharkPlate = RULES.armour(shark, plate, dir), kSharkSoft = RULES.armour(shark, soft, dir);
-  const kDunkPlate = RULES.armour(dunk, plate, dir), kTuskPlate = RULES.armour(tusk, plate, dir);
+  const kSharkPlate = RULES.armour!(shark, plate, dir), kSharkSoft = RULES.armour!(shark, soft, dir);
+  const kDunkPlate = RULES.armour!(dunk, plate, dir), kTuskPlate = RULES.armour!(tusk, plate, dir);
   ok(kSharkSoft === 1, 'no armour, no reduction');
   ok(kSharkPlate < 0.6, `plates blunt a shark (${kSharkPlate.toFixed(2)})`);
   ok(kDunkPlate === 1, 'Dunkleosteus cuts straight through armour');
@@ -758,8 +759,8 @@ const { TIER_SCALE } = await import('../src/sim/types');
     if (!routed) { bot.brain.goal = 'hunt'; bot.brain.target = steth.id; }
     g.step(DT, hold); if (g.events.some((e) => e.kind === 'routed' && e.actor === bot.id)) routed = true; g.events.length = 0;
   }
-  ok(steth.state === 'guard' && bot.brain.goal === 'flee' && routed, `the brush display routs a hunting rival (${bot.brain.goal})`);
-  ok(RULES.camoDrain(g.spawn('furcaster', 'ambient', { x: 0, y: -10, z: 90 }, 1)) === 0.25 && RULES.camoDrain(ony) === 1, 'camouflage is nearly free for the benthos');
+  ok(steth.state === 'guard' && live(bot.brain).goal === 'flee' && routed, `the brush display routs a hunting rival (${bot.brain.goal})`);
+  ok(RULES.camoDrain!(g.spawn('furcaster', 'ambient', { x: 0, y: -10, z: 90 }, 1)) === 0.25 && RULES.camoDrain!(ony) === 1, 'camouflage is nearly free for the benthos');
 }
 
 // ---- a heavy special is a committed strike that travels and lands ----
@@ -801,7 +802,7 @@ const { TIER_SCALE } = await import('../src/sim/types');
   for (let i = 0; i < 60; i++) { shell.pos.x = at.x; shell.pos.y = at.y; shell.pos.z = at.z; shell.vel.x = shell.vel.z = 0; g.step(DT, idle()); if (g.events.some((e) => e.kind === 'shellCrush')) crushed = true; g.events.length = 0; }
   ok(crushed && shell.hp < hp0, `the crush bite cracks a shell (hp ${hp0.toFixed(0)} → ${shell.hp.toFixed(0)})`);
   const d = devActor(g, dory); const s0 = d.standing;
-  dory.pos.y = groundHeight(g.world, dory.pos.x, dory.pos.z) + lengthOf(dory) * 0.3; dory.prevT.y = dory.pos.y;   // down on the sediment
+  dory.pos.y = groundHeight(g.world, dory.pos.x, dory.pos.z, []) + lengthOf(dory) * 0.3; dory.prevT.y = dory.pos.y;   // down on the sediment
   tick(g, new Map([[0, emptyInput()], [1, { ...emptyInput(), ability: true }]]));
   ok(dory.state === 'ability' && dory.hideMode === 'none', 'floor sweep is a timed sweep, not a hide');
   for (let i = 0; i < 60 * 2; i++) tick(g, idle());
@@ -840,7 +841,7 @@ const { TIER_SCALE } = await import('../src/sim/types');
   const g = new Game('rise', [{ creature: 'cladoselache', device: 'keyboard', ready: true }, { creature: 'bothriolepis', device: 0, ready: true }]);
   g.skipHatch();
   const [shark, plate] = g.players;
-  const floorS = groundHeight(g.world, shark.pos.x, shark.pos.z), floorP = groundHeight(g.world, plate.pos.x, plate.pos.z);
+  const floorS = groundHeight(g.world, shark.pos.x, shark.pos.z, []), floorP = groundHeight(g.world, plate.pos.x, plate.pos.z, []);
   // On the sand and hidden, because it comes out of an egg and an egg is laid on the floor at the
   // foot of the growth (`layEgg` in game.ts). It used to hatch up in the high plants, which was
   // right while a hatchling simply appeared mid-water.
@@ -927,7 +928,7 @@ const { TIER_SCALE } = await import('../src/sim/types');
   const { spawnInCover } = await import('../src/sim/devonian/swim');
   const g = new Game('rise', [{ creature: 'coccosteus', device: 'keyboard', ready: true }], 77);
   g.skipHatch();
-  g.rng = () => 0; // selects the first shelter; used to produce a negative array index for bots
+  g.rng = rngFrom(() => 0); // selects the first shelter; used to produce a negative array index for bots
   for (const id of ['eldredgeops', 'coccosteus'] as const) {
     const p = spawnInCover(g, nurseryAt(0), id, 0.3, -1);
     ok(p != null && [p.x, p.y, p.z].every(Number.isFinite), `${id} bot respawns at finite coordinates in cover`);

@@ -4,12 +4,12 @@ import { emptyInput, type InputFrame } from '../src/sim/types';
 import { applyScaleStats, bandOf, isAlive, lengthOf } from '../src/sim/actors';
 import { dist } from '../src/shared/math';
 import { sampleHeight } from '../src/sim/world';
+import { checker, finish, stepN } from './lib/test';
 /** A spot on the open shelf, well clear of the seabed whatever the terrain there does. */
 const OPEN = { x: 10, y: sampleHeight(10, -100) + 8, z: -100 };
 const DEEP = { x: 60, y: sampleHeight(60, -130) + 6, z: -130 };
-let failed = 0;
-const check = (n: string, ok: boolean, d: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(44)} ${d}`); if (!ok) failed++; };
-const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, f]]); for (let i = 0; i < steps; i++) { g.step(1 / 60, m); g.events.length = 0; } };
+const check = checker(44);
+const run = (g: Game, f: InputFrame, steps: number) => stepN(g, steps, f);
 
 // --- LB dashes: the stick direction if there is one, the body's own axis if there is not ---
 {
@@ -264,5 +264,4 @@ for (const [creatureId, mode, scale] of [['waptia', 'rise', 0.25], ['anomalocari
   startSwallow(g2.hitCtx, eater, q);
   check('...and so does being swallowed', q.hunted === 0 && q.hunterId < 0, `${q.hunted.toFixed(2)}`);
 }
-
-console.log(failed ? `\n${failed} FAILED` : '\nall hunt tests passed'); process.exit(failed ? 1 : 0);
+finish('all hunt tests passed');

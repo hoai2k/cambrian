@@ -7,9 +7,9 @@
  */
 import { layoutRects } from '../src/render/camera';
 import { toolbarPlace, type ToolbarView } from '../src/app/toolbar-place';
+import { checker, finish } from './lib/test';
 
-let failed = 0;
-const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(62)} ${d}`); if (!ok) failed++; };
+const check = checker(62);
 
 /** The real split for `n` players at a plausible window size, with each player's sense state. */
 const views = (sense: boolean[]): ToolbarView[] =>
@@ -46,5 +46,4 @@ check('...however the bottom-left player has their sense set', place([false, fal
 for (const sense of [[false], [false, false], [false, false, false, false]]) {
   check(`a menu brings the buttons back (${sense.length} up)`, place(sense, true) !== 'hidden');
 }
-
-console.log(failed ? `\n${failed} FAILED` : '\nall immersive-mode toolbar tests passed'); process.exit(failed ? 1 : 0);
+finish('all immersive-mode toolbar tests passed');

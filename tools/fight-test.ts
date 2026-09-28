@@ -3,8 +3,8 @@ import { CORPSE_WINDOW, Game } from '../src/sim/game';
 import { emptyInput, type InputFrame } from '../src/sim/types';
 import { isAlive, lengthOf, bandOf } from '../src/sim/actors';
 import { makeBrain, HUNT_TELL } from '../src/sim/ai';
-let failed = 0;
-const check = (n: string, ok: boolean, d: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(46)} ${d}`); if (!ok) failed++; };
+import { checker, finish, live } from './lib/test';
+const check = checker(46);
 const run = (g: Game, f: InputFrame, steps: number, extra?: (i: number) => void) => { const m = new Map([[0, f]]); for (let i = 0; i < steps; i++) { extra?.(i); g.step(1 / 60, m); g.events.length = 0; } };
 // Balance is measured between two animals, so the reef's own residents are cleared out first:
 // with a dozen of them around the giant, some of the damage routing it is theirs and the counts
@@ -59,15 +59,15 @@ const fresh = (seed = 5) => { const g = new Game('reef', [{ creature: 'anomaloca
   const giant = g.spawn('anomalocaris', 'giant', { x: 60, y: 6, z: -30 + lengthOf(p) * 0.5 }, 3.5); giant.brain = makeBrain('giant', giant.pos, g.rng); giant.brain!.goal = 'notice';
   let bites = 0, routedAt = -1;
   for (let i = 0; i < 60 * 25; i++) {
-    if (giant.brain!.goal !== 'flee') { giant.pos = { x: p.pos.x, y: p.pos.y, z: p.pos.z + lengthOf(p) * 0.5 }; giant.vel = { x: 0, y: 0, z: 0 }; giant.brain!.goal = 'notice'; }
+    if (live(giant.brain!).goal !== 'flee') { giant.pos = { x: p.pos.x, y: p.pos.y, z: p.pos.z + lengthOf(p) * 0.5 }; giant.vel = { x: 0, y: 0, z: 0 }; giant.brain!.goal = 'notice'; }
     p.hp = p.hpMax;
     const f = { ...emptyInput(), light: i % 20 < 2 };
     g.step(1 / 60, new Map([[0, f]]));
     for (const e of g.events) { if (e.kind === 'hit' && e.actor === p.id) bites++; if (e.kind === 'routed' && routedAt < 0) routedAt = bites; }
     g.events.length = 0;
-    if (giant.brain!.goal === 'flee') break;
+    if (live(giant.brain!).goal === 'flee') break;
   }
-  check('a giant breaks off after 4-10 bites', giant.brain!.goal === 'flee' && routedAt >= 4 && routedAt <= 10, `routed after ${routedAt} bites, goal=${giant.brain!.goal}, giant hp ${Math.round(giant.hp)}/${giant.hpMax}`);
+  check('a giant breaks off after 4-10 bites', live(giant.brain!).goal === 'flee' && routedAt >= 4 && routedAt <= 10, `routed after ${routedAt} bites, goal=${giant.brain!.goal}, giant hp ${Math.round(giant.hp)}/${giant.hpMax}`);
 }
 // --- animals answer for themselves ---
 {
@@ -237,5 +237,4 @@ const fresh = (seed = 5) => { const g = new Game('reef', [{ creature: 'anomaloca
     check('...but the nose only goes so far up', steep > 0.2, `${deg(steep)}\u00b0 off the aim at 86\u00b0 overhead`);
   }
 }
-
-console.log(failed ? `\n${failed} FAILED` : '\nall fight tests passed'); process.exit(failed ? 1 : 0);
+finish('all fight tests passed');

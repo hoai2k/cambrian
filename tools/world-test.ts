@@ -4,10 +4,10 @@ import { emptyInput, type InputFrame } from '../src/sim/types';
 import { isAlive, lengthOf } from '../src/sim/actors';
 import { distXZ } from '../src/shared/math';
 import { BIOMES, biomeAt, biomeWeights, CHUNK, chunkCoord, generateChunk, landmarkAt, landmarkCell, LANDMARK_CELL, nurseryAt, resolveStatic, sampleHeight, shoreDistance, shoreZ, SIM_RADIUS, SURFACE_Y, type Biome, type Boulder, type LandmarkKind } from '../src/sim/world';
+import { checker, finish, stepN } from './lib/test';
 
-let failed = 0;
-const check = (n: string, ok: boolean, d: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(56)} ${d}`); if (!ok) failed++; };
-const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, f]]); for (let i = 0; i < steps; i++) { g.step(1 / 60, m); g.events.length = 0; } };
+const check = checker(56);
+const run = (g: Game, f: InputFrame, steps: number) => stepN(g, steps, f);
 
 // --- the shore is a wall the seabed climbs over; the sea beyond it is open ---
 {
@@ -306,7 +306,7 @@ const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, 
   // nobody near: no window, and the ordinary three-second respawn with its tier loss
   {
     const { g, a, b } = mk();
-    a.tier = 2; a.hp = 0; a.state = 'dead'; a.deathY = a.pos.y;
+    a.tier = 2 as typeof a.tier; a.hp = 0; a.state = 'dead'; a.deathY = a.pos.y;
     b.pos = { x: a.pos.x + 600, y: a.pos.y, z: a.pos.z };
     run(g, emptyInput(), 6);
     check('nobody in reach means no revive window', g.reviveWindow(a) === 0, '');
@@ -352,6 +352,4 @@ const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, 
   run(g, emptyInput(), 4);
   check('reaching Apex records the species', g.discovery.apex.has('anomalocaris'), [...g.discovery.apex].join(','));
 }
-
-console.log(failed ? `\n${failed} FAILED` : '\nall world tests passed');
-process.exit(failed ? 1 : 0);
+finish('all world tests passed');

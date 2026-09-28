@@ -1,10 +1,11 @@
 import { Game } from '../src/sim/game';
 import { emptyInput } from '../src/sim/types';
 import { lengthOf } from '../src/sim/actors';
+import { live } from './lib/test';
 
 const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 41);
 const p = g.players[0];
-p.state = 'free'; p.spawnProtect = 999;
+p.state = 'free' as typeof p.state; p.spawnProtect = 999;
 for (const a of g.actors) if (a !== p) a.pos.x += 2000;
 const target = g.spawn('anomalocaris', 'ambient', { x: p.pos.x, y: p.pos.y, z: p.pos.z + 10 }, 0.8);
 target.brain = undefined; target.spawnProtect = 0;
@@ -12,7 +13,7 @@ const initial = Math.hypot(target.pos.x - p.pos.x, target.pos.z - p.pos.z);
 g.step(1 / 60, new Map([[0, { ...emptyInput(), light: true, aim: true, aimTarget: target.id }]]));
 if (p.state !== 'attack') throw new Error('first tap did not begin a bite');
 g.step(1 / 60, new Map([[0, { ...emptyInput(), pursueTarget: target.id, pursueDash: true, aim: true, aimTarget: target.id }]]));
-if (p.state !== 'pounce') throw new Error('second tap waited for the first bite to finish');
+if (live(p).state !== 'pounce') throw new Error('second tap waited for the first bite to finish');
 g.events.length = 0;
 let landed = false;
 for (let i = 0; i < 420; i++) {
@@ -39,7 +40,7 @@ for (let i = 0; i < 420; i++) {
   exceeded ||= !!hunter.pursuit?.spent;
   far.events.length = 0;
 }
-if (!exceeded || hit || hunter.state === 'pounce' || (hunter.pursuit?.traveled ?? 0) > (hunter.pursuit?.max ?? 0) + 3)
+if (!exceeded || hit || live(hunter).state === 'pounce' || (hunter.pursuit?.traveled ?? 0) > (hunter.pursuit?.max ?? 0) + 3)
   throw new Error(`dash limit failed: spent=${exceeded}, hit=${hit}, state=${hunter.state}, travel=${hunter.pursuit?.traveled}/${hunter.pursuit?.max}`);
 console.log('PASS distant target ended the chase after one dash distance');
 

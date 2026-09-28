@@ -4,9 +4,9 @@
  */
 import { APEX_HOLD_SECONDS, Game } from '../src/sim/game';
 import { emptyInput, TIER_SCALE, type InputFrame } from '../src/sim/types';
+import { checker, finish } from './lib/test';
 
-let failed = 0;
-const check = (n: string, ok: boolean, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(58)} ${d}`); if (!ok) failed++; };
+const check = checker(58);
 const run = (g: Game, steps: number, f: InputFrame = emptyInput()) => {
   const m = new Map([[0, f]]);
   for (let i = 0; i < steps && g.state.status === 'playing'; i++) { g.step(1 / 60, m); g.events.length = 0; }
@@ -68,6 +68,4 @@ const run = (g: Game, steps: number, f: InputFrame = emptyInput()) => {
   run(g, 30);
   check('a match still running cannot be continued', !g.continueMatch() && !g.endless);
 }
-
-console.log(failed ? `\n${failed} FAILED` : '\nall mode tests passed');
-process.exit(failed ? 1 : 0);
+finish('all mode tests passed');

@@ -10,10 +10,10 @@ import { creature } from '../src/sim/creatures';
 import { floraSize } from '../src/sim/flora';
 import { BREATH_PEEK, climbAimHold, DASH_AIM_GRACE, edgePitch, fitCameraArm, FLOOR_CLOSE_HOLD, keepCreatureInFrame, PITCH_DOWN, PITCH_UP, seafloorCloseHold, swimPitch } from '../src/render/camera';
 import { damp } from '../src/shared/math';
+import { checker, finish, stepN } from './lib/test';
 
-let failed = 0;
-const check = (n: string, ok: boolean, d: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(58)} ${d}`); if (!ok) failed++; };
-const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, f]]); for (let i = 0; i < steps; i++) { g.step(1 / 60, m); g.events.length = 0; } };
+const check = checker(58);
+const run = (g: Game, f: InputFrame, steps: number) => stepN(g, steps, f);
 let jumped = 0;
 /** The climb only ever offers a height to rise to; nothing here may move a body in one go. */
 const check_no_jump = (gap: number) => { if (gap > 12) jumped++; };
@@ -105,7 +105,7 @@ const rockWorld = (boulders: Boulder[]) => ({
 
 // --- a face too steep to glide up is climbed, if the top is within two bodies ---
 {
-  const out: StaticContact = { hit: false, climbTo: -Infinity };
+  const out: StaticContact = { hit: false, climbTo: -Infinity, wallTop: -Infinity };
   const body = { radius: 0.86, glide: 2.45, climb: 7.8, rise: 2.6 };
   // A narrow steep rock, shaped the way the world builds one (`y` a quarter up its own height,
   // top at `y + sy * 1.05`): its flanks are far too steep to be glided up.
@@ -450,5 +450,4 @@ const rockWorld = (boulders: Boulder[]) => ({
 }
 
 check('no climb ever asked for a jump', jumped === 0, `${jumped} oversized lifts`);
-console.log(failed ? `FAILED (${failed})` : 'PASS: sprint endurance, floor grazing, rock colliders, ride-over, camera reach, the dash chain, the cursor steer, the breach, radar height');
-process.exit(failed ? 1 : 0);
+finish('PASS: sprint endurance, floor grazing, rock colliders, ride-over, camera reach, the dash chain, the cursor steer, the breach, radar height');

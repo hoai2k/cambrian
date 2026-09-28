@@ -33,7 +33,10 @@ export const yawOf = (v: Vec3) => Math.atan2(v.x, v.z);
 /** Deterministic LCG. */
 export function makeRng(seed = 505) {
   let t = seed >>> 0;
-  const r = () => ((t = (Math.imul(t, 1664525) + 1013904223) >>> 0) / 4294967296);
+  return rngFrom(() => ((t = (Math.imul(t, 1664525) + 1013904223) >>> 0) / 4294967296));
+}
+/** Any source of numbers in [0, 1) with the helpers every caller of an `Rng` expects. */
+export function rngFrom(r: () => number) {
   return Object.assign(r, {
     range: (lo: number, hi: number) => lo + r() * (hi - lo),
     pick: <T>(arr: readonly T[]) => arr[Math.floor(r() * arr.length)],

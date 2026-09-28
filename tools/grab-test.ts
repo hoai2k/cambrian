@@ -12,17 +12,17 @@
  * on a real hold.
  */
 import { Game, GRASP_AT, graspPoint, gripHold, gripReach } from '../src/sim/game';
-import { emptyInput, type Actor, type InputFrame, type Vec3 } from '../src/sim/types';
+import { emptyInput, type Actor, type InputFrame } from '../src/sim/types';
 import { applyScaleStats, bandOf, bodyRadius, isAlive, lengthOf, surfaceGap } from '../src/sim/actors';
 import { applyHit, endRide, GRIP_BREAK, GRIP_MEAL, GRIP_STRIKE, takeHold, takeRide, type HitContext } from '../src/sim/combat';
-import { creature, CREATURES } from '../src/sim/creatures';
-import { heading } from '../src/shared/math';
+import { creature, CREATURES, type CreatureId } from '../src/sim/creatures';
+import { heading, type Vec3 } from '../src/shared/math';
 import fs from 'node:fs';
+import { checker, finish, stepN } from './lib/test';
 
-let failed = 0;
-const check = (n: string, ok: boolean, d: string) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n.padEnd(58)} ${d}`); if (!ok) failed++; };
+const check = checker(58);
 const ctxFor = (g: Game): HitContext => ({ events: g.events, byId: (id: number) => g.byId(id), time: 0, rng: g.rng });
-const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, f]]); for (let i = 0; i < steps; i++) { g.step(1 / 60, m); g.events.length = 0; } };
+const run = (g: Game, f: InputFrame, steps: number) => stepN(g, steps, f);
 
 /**
  * A player of `id` at adult scale, with a body beside it `times` its length, and nothing else in
@@ -30,7 +30,7 @@ const run = (g: Game, f: InputFrame, steps: number) => { const m = new Map([[0, 
  * about are ratios: the roster's real lengths (docs/research/cambrian-sizes.md) mean a fixed scale
  * on one animal is prey beside one player and a giant beside another.
  */
-function pair(id: 'anomalocaris' | 'hallucigenia' | 'isoxys', times: number, otherId = 'anomalocaris') {
+function pair(id: CreatureId, times: number, otherId = 'anomalocaris') {
   const g = new Game('reef', [{ creature: id, device: 'keyboard', ready: true }], 9);
   const p = g.players[0]; p.spawnProtect = 1e6; p.state = 'free';
   // Clear the reef out of the way so only the pair matters.
@@ -552,7 +552,7 @@ function inFront(p: Actor, o: Actor) {
     for (const a of g.actors) if (a !== p && a !== o) a.pos = { x: a.pos.x + 2000, y: a.pos.y, z: a.pos.z };
     for (const a of [p, o]) { a.spawnProtect = 1e6; a.state = 'free'; a.stamina = a.staminaMax; }
     o.scale = times * lengthOf(p) / creature('anomalocaris').adultLength;
-    applyScaleStats(o, creature('anomalocaris'));
+    applyScaleStats(o);
     o.pos = { x: p.pos.x, y: p.pos.y, z: p.pos.z + lengthOf(p) * 0.4 };
     g.hash.rebuild(g.actors);
     takeHold(ctxFor(g), o, p);
@@ -761,6 +761,4 @@ function inFront(p: Actor, o: Actor) {
   // The rest of the knot is still there to be bitten again, rather than having vanished with it.
   check('...and the rest of the knot is still there', standing() === 3, `${standing()} left`);
 }
-
-console.log(failed ? `FAILED (${failed})` : 'PASS: grasp roster, held grabs, prey swallowed on release, riding, biting while ridden, shake-off, grip limits');
-process.exit(failed ? 1 : 0);
+finish('PASS: grasp roster, held grabs, prey swallowed on release, riding, biting while ridden, shake-off, grip limits');
