@@ -3,7 +3,7 @@ import { clamp, fbm2, makeRng, noise2, smoothstep, TAU, type Vec3 } from '../sha
 import { floraSize } from './flora';
 import { footprintOf, propShape, rockPropId } from '../content/prop-shapes';
 import { fpMax, fpReach, ROUND, type Footprint, type Reach } from './footprint';
-import { SpatialHash } from './spatial';
+import { ReachHash, SpatialHash } from './spatial';
 
 /**
  * The sea is a half-plane. A shoreline runs along +x near where players first spawn; the seabed
@@ -717,6 +717,11 @@ export class World {
   boulderHash = new SpatialHash<Boulder>(12);
   coverHash = new SpatialHash<Cover>(4);
   floraHash = new SpatialHash<Flora>(6);
+  /**
+   * The same plants filed by their own reach, for contact: what a body could be touching comes back
+   * in the order `floraHash` would give it, without searching out to the tallest plant's reach.
+   */
+  floraContact = new ReachHash<Flora>(4);
   /** Plants currently bent away from rest; the sim springs them back and the renderer leans them. */
   activeFlora: Flora[] = [];
   /** Largest radius-plus-lean of any plant: the broad-phase query margin. */
@@ -787,12 +792,18 @@ export class World {
     }
     this.boulderHash.rebuild(this.boulders);
     this.coverHash.rebuild(this.cover);
-    this.floraHash.rebuild(this.flora);
+    this.reindexFlora();
     this.activeFlora = this.activeFlora.filter((f) => this.flora.includes(f));
+    this.version++;
+  }
+
+  /** Re-index the plants after `flora` changed: both indexes and the broad-phase margin. */
+  reindexFlora() {
+    this.floraHash.rebuild(this.flora);
+    this.floraContact.rebuild(this.flora, (f) => f.R + f.maxB, this.floraHash.ranks(this.flora));
     let reach = 0;
     for (const f of this.flora) reach = Math.max(reach, f.R + f.maxB);
     this.floraReach = reach;
-    this.version++;
   }
 }
 /** Older name for the world, kept so call sites read the same. */

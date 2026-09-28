@@ -41,7 +41,7 @@ function scene(kind: FloraKind, scale: number, creatureId: 'anomalocaris' | 'wap
   const plant: Flora = { pos: { x: x0, y, z: z0 }, kind, scale, sy: scale, rot: 0.3, shade: 0.8, H: P.h * scale, R: P.r * scale, maxB: P.maxLean * P.h * scale, bx: 0, bz: 0, bvx: 0, bvz: 0, active: false };
   g.world.frozen = true;                       // hand-built scenery must not be streamed away
   g.world.flora.length = 0; g.world.flora.push(plant);
-  g.world.floraHash.rebuild(g.world.flora);
+  g.world.reindexFlora();
   g.world.floraReach = plant.R + plant.maxB;
   g.world.boulders.length = 0; g.world.boulderHash.rebuild([]);
   g.world.activeFlora.length = 0;

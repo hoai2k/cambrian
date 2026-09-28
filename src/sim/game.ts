@@ -316,7 +316,6 @@ export interface Step {
  * a player still, and it is the point — you hatch once a life, and the first thing the sea shows
  * you is that you are the smallest thing in it.
  */
-
 export const HATCH_TIME = 5;
 /**
  * Where in that performance the seam gives, and with it the body: the player has their animal back
@@ -331,7 +330,6 @@ export const HATCH_FREE = 0.48;
  * that runs the full `HATCH_TIME`.
  */
 export const HATCH_HOLD = HATCH_TIME * HATCH_FREE;
-
 
 export class Game implements AiWorld {
   world: WorldData;
@@ -527,25 +525,6 @@ export class Game implements AiWorld {
     this.idMap.delete(a.id);
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   /** Cover (0..1) for an actor including temporary silt. Plants are queried every fourth step (staggered) since cover changes slowly. */
   coverFor(a: Actor): number {
     let c = ((a.id + this.stepIndex) & 3) === 0 || a.controller === 'player' ? coverAt(this.world, a.pos, lengthOf(a), this.scratchCover) : a.cover;
@@ -553,7 +532,6 @@ export class Game implements AiWorld {
     if (isHidden(a)) c = 1;
     return c;
   }
-
 
   /**
    * Carry a finished match on instead of ending it. Every mode is co-op, so its goal is a milestone
@@ -617,34 +595,19 @@ export class Game implements AiWorld {
     for (const a of this.actors) if (a.state === 'dead' && a.eaten >= 1 && a.controller !== 'player') this.remove(a);
   }
 
-
-
-
-
-
   /**
    * Whether this body is a downed team-mate rather than a corpse: co-op only, with at least one
    * other player alive to come and get them, and still lying where they fell (not in a mouth).
    */
   revivable(a: Actor): boolean { return revivable(this, a); }
 
-  /** Seconds a downed player has left to be reached, or 0 when they are not revivable. */
-
   /** How far through the rescue dwell a downed player is, 0..1, for the HUD. */
   reviveProgress(a: Actor): number { return reviveProgress(this, a); }
 
-
+  /** Seconds a downed player has left to be reached, or 0 when they are not revivable. */
   reviveWindow(a: Actor): number { return reviveWindow(this, a); }
 
-
-
-
   respawn(a: Actor) { return respawn(this, a); }
-
-
-
-
-
 
   /**
    * End any hatch in progress, as if the shell had already been left behind. Headless harnesses
@@ -653,28 +616,9 @@ export class Game implements AiWorld {
    */
   skipHatch() { return skipHatch(this); }
 
-
-
-
-
-
   updateActor(a: Actor, input: InputFrame, dt: number) { return updateActor(this, a, input, dt); }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
   startDodge(a: Actor, def: CreatureDef, dir: Vec3, mag: number, L: number, sf: number) { return startDodge(this, a, def, dir, mag, L, sf); }
-
 
   pounceRange(a: Actor) { return pounceRange(this, a); }
 
@@ -709,68 +653,10 @@ export class Game implements AiWorld {
     return pounce;
   }
 
-
-
-  /**
-   * What a charge snaps onto: the body nearest the line the creature is actually travelling along.
-   *
-   * A sprint or a dash has already chosen a direction, and at that speed the nose swings around
-   * far more slowly than the body crosses ground — so a cone measured off the heading, which is
-   * what the standing pounce uses, misses the animal you are about to swim straight past. This
-   * measures how far along the line a body sits and how far off it, and takes the nearest thing
-   * inside a corridor rather than a wedge.
-   */
-
-
-
-
-  /**
-   * Turn a close attack onto what it is nearly pointing at, by at most `AIM_NUDGE`.
-   *
-   * A bite whose mouth reaches four tenths of a body length has no tolerance at all: missing by a
-   * few degrees at that range reads as the game ignoring the press rather than as the player's
-   * mistake. The cap is what keeps it honest — it will not turn you round, and it never picks
-   * another player, so who you attack is still your decision.
-   */
-
-
-
-
-
   /** Why this player's grip did or did not close, last time the question was asked. */
   graspReason(id: number): string { return graspReason(this, id); }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   attackHits(a: Actor, m: MoveDef, L: number) { return attackHits(this, a, m, L); }
-
-
-
-
-
 
   /**
    * Whether a Survival body has room to eat. Any room at all: the meal tops the bar up to full and
@@ -780,37 +666,25 @@ export class Game implements AiWorld {
    */
   canEat(a: Actor, food: Actor): boolean { return canEat(this, a, food); }
 
-
-
-
-
-
-
-
-
-
   nutritionValue(eater: Actor, food: Actor) { return nutritionValue(this, eater, food); }
 
-
   gainNutrition(a: Actor, food: Actor | undefined, amount: number) { return gainNutrition(this, a, food, amount); }
-
 
   /** The Cambrian's moult: nutrition past this tier's need grows the body a tier. */
   checkTierUp(a: Actor) { return checkTierUp(this, a); }
 
-
-
-
-
   private resolveActorOverlap() {
     for (const a of this.actors) {
-      if (!isAlive(a)) continue;
+      if (!isAlive(a) || a.state === 'grabbed' || a.state === 'swallowed') continue;
       const ra = bodyRadius(a);
       for (const o of this.hash.query(a.pos.x, a.pos.z, ra + 6, this.scratchActors)) {
         if (o.id <= a.id || !isAlive(o)) continue;
-        if (a.state === 'grabbed' || o.state === 'grabbed' || a.state === 'swallowed' || o.state === 'swallowed') continue;
+        if (o.state === 'grabbed' || o.state === 'swallowed') continue;
         const min = ra + bodyRadius(o);
         const dx = o.pos.x - a.pos.x, dy = o.pos.y - a.pos.y, dz = o.pos.z - a.pos.z;
+        // Most pairs are well clear, and `Math.hypot` is slow: the margin is far wider than the few
+        // ulps between it and the plain root, so this never turns away a pair it would have pushed.
+        if (dx * dx + dy * dy + dz * dz > min * min * (1 + 1e-9)) continue;
         const d = Math.hypot(dx, dy, dz);
         if (d < min && d > 1e-4) {
           const ma = massOf(a), mo = massOf(o);
@@ -829,23 +703,14 @@ export class Game implements AiWorld {
     this.silt = this.silt.filter((s) => s.t > 0);
   }
 
-
-
-
   /**
    * The `bones` landmark whose ribcage `pos` is inside, if any. Cheap: there is at most one
    * landmark per 320-unit cell and only loaded chunks are in the list.
    */
-  bonesNear(pos: Vec3, range = 0): Landmark | undefined { return bonesNear(this, pos, range = 0); }
-
+  bonesNear(pos: Vec3, range = 0): Landmark | undefined { return bonesNear(this, pos, range); }
 
   /** How much of a skeleton is left to strip, 0..1. Unvisited ones are whole. */
   bonesLeft(id: number) { return bonesLeft(this, id); }
-
-
-
-
-
 
   /**
    * The scoreboard for one viewport (hold View). Sorted by the thing the mode is about, so the
@@ -853,12 +718,8 @@ export class Game implements AiWorld {
    */
   scoreboard(viewer: number): { header: ScoreHeader; rows: ScoreRow[] } { return scoreboard(this, viewer); }
 
-
-
-
   /** Where this player could teleport right now. */
   teleportOptions(i: number): TeleportOption[] { return teleportOptions(this, i); }
-
 
   /**
    * Every creature this player could change into, in roster order, starting on the one they are.
@@ -868,7 +729,6 @@ export class Game implements AiWorld {
    * to raise the whole roster in one session if that is what you want to do.
    */
   swapOptions(i: number, grown: boolean): SwapOption[] { return swapOptions(this, i, grown); }
-
 
   /**
    * Change a player's body for another creature's, without moving them or restarting anything.
@@ -880,14 +740,12 @@ export class Game implements AiWorld {
    */
   changeCreature(i: number, id: CreatureId, grown: boolean): boolean { return changeCreature(this, i, id, grown); }
 
-
   /**
    * Move a player home or alongside another player. The sea is endless, so this is how a party
    * regroups. Not while dead, mid-move or on cooldown; arrival comes with a few seconds of
    * protection and a burst of sparkles at both ends.
    */
   teleport(i: number, dest: TeleportDest): boolean { return teleport(this, i, dest); }
-
 
   /**
    * Radar contacts for a player: the other players wherever they are, the nearest predator big
@@ -902,11 +760,6 @@ export class Game implements AiWorld {
    */
   radarFor(i: number, range: number): RadarBlip[] { return radarFor(this, i, range); }
 
-
-
-
-
-
   /**
    * The Rise goal has been met by this player: bank the top of the ladder for their creature.
    *
@@ -915,8 +768,6 @@ export class Game implements AiWorld {
    * the shared code can see for itself.
    */
   bankLadderTop(p: Actor) { return bankLadderTop(this, p); }
-
-
 
   /**
    * The hour of the day, and how much the reef wants to hunt at it. The renderer lights the sea
@@ -927,17 +778,13 @@ export class Game implements AiWorld {
     return { phase: phaseAt(this.time), until: untilNextPhase(this.time), pressure: huntingPressure(this.time) };
   }
 
-
   /** The dominant biome under a player, for the HUD banner. */
   biomeOf(i: number): Biome | undefined { return biomeOf(this, i); }
-
-
 
   /** A short line in every player's viewport. */
   private announce(text: string, t = 3.5) {
     for (const pr of this.progress) pr.prompts.push({ text, t });
   }
-
 
   /**
    * What this player has hold of, for the HUD.
@@ -952,7 +799,6 @@ export class Game implements AiWorld {
    * the HUD to guess at them.
    */
   gripFor(i: number): GripHud | undefined { return gripFor(this, i); }
-
 
   /** The line to show this player right now, if any. Prompts expire; the newest wins. */
   noticeFor(i: number): string | undefined { return noticeFor(this, i); }
@@ -970,7 +816,6 @@ export class Game implements AiWorld {
     if (!pr || pr.flags.has(f)) return;
     pr.flags.add(f);
   }
-
 
   /**
    * Onboarding: returns the current hint for a player, if any.

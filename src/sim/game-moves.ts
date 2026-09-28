@@ -148,6 +148,15 @@ export function handedOver(game: Game, a: Actor, o: Actor): boolean {
   return !(a.aiming && a.lockTarget === o.id);
 }
 
+/**
+ * What a charge snaps onto: the body nearest the line the creature is actually travelling along.
+ *
+ * A sprint or a dash has already chosen a direction, and at that speed the nose swings around
+ * far more slowly than the body crosses ground — so a cone measured off the heading, which is
+ * what the standing pounce uses, misses the animal you are about to swim straight past. This
+ * measures how far along the line a body sits and how far off it, and takes the nearest thing
+ * inside a corridor rather than a wedge.
+ */
 export function chargeTarget(game: Game, a: Actor): Actor | undefined {
   const L = lengthOf(a);
   const line = len3(a.vel) > 1 ? norm(a.vel) : heading(a.yaw);
@@ -170,6 +179,14 @@ export function chargeTarget(game: Game, a: Actor): Actor | undefined {
   return best;
 }
 
+/**
+ * Turn a close attack onto what it is nearly pointing at, by at most `AIM_NUDGE`.
+ *
+ * A bite whose mouth reaches four tenths of a body length has no tolerance at all: missing by a
+ * few degrees at that range reads as the game ignoring the press rather than as the player's
+ * mistake. The cap is what keeps it honest — it will not turn you round, and it never picks
+ * another player, so who you attack is still your decision.
+ */
 export function aimNudge(game: Game, a: Actor, reach: number): void {
   const h = heading(a.yaw);
   let best: Actor | undefined, bd = Infinity;

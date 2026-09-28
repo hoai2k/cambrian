@@ -269,7 +269,7 @@ const rockWorld = (boulders: Boulder[]) => ({
     const at = { x: p.pos.x + off, z: p.pos.z - 5 };
     const f = { pos: { x: at.x, y: sampleHeight(at.x, at.z), z: at.z }, kind, scale, sy: scale, rot: 0, shade: .8, ...floraSize(kind, scale, scale), bx: 0, bz: 0, bvx: 0, bvz: 0, active: false };
     g.world.flora.push(f);
-    g.world.floraHash.rebuild(g.world.flora);
+    g.world.reindexFlora();
     g.world.floraReach = Math.max(g.world.floraReach, 8);
     let peak = 0;
     const m = new Map([[0, { ...emptyInput(), my: 1, camYaw: Math.PI }]]);
