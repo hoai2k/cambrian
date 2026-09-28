@@ -7,7 +7,7 @@ import type { EraDefinition } from '../era';
  */
 export const DEVONIAN_BRAND = {
   logo: 'assets/devonian/brand/logo-header.webp',
-  illustration: 'assets/devonian/brand/title-wide.webp',
+  illustration: 'assets/devonian/brand/title-panorama.webp',
   emblem: 'assets/devonian/brand/emblem.webp',
 } as const satisfies Pick<EraDefinition['assets'], 'logo' | 'illustration' | 'emblem'>;
 

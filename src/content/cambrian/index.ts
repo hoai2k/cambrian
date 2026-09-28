@@ -15,7 +15,7 @@ import { eraLinks } from '../era-links';
 export const CAMBRIAN = defineEra({
   id: 'cambrian',
   title: 'Cambrian Conquest',
-  copy: { tagline: 'Eat. Grow. Fight. Run.', taglineEm: '508 million years ago, everything was hungry.', loading: 'WAKING THE REEF…', lose: 'THE REEF WINS', settingsKey: 'cambrian-settings', ...eraLinks('cambrian') },
+  copy: { tagline: 'Eat. Grow. Fight. Run.', taglineEm: '508 million years ago, everything was hungry.', loading: 'WAKING THE REEF…', lose: 'THE REEF WINS', settingsKey: 'cambrian-settings', mobileIllustration: 'assets/brand/logo-illustrated.webp', ...eraLinks('cambrian') },
   strings: CAMBRIAN_STRINGS,
   modes: [
     { id: 'rise', name: 'Rise', blurb: 'Hatch as a larva. Eat, grow, fight, hide. Reach Apex and hold it for ninety seconds. Share the feast with the others, or eat them.', players: '1–4' },
@@ -39,7 +39,7 @@ export const CAMBRIAN = defineEra({
     props: 'assets/props/', biomes: 'assets/biomes/', ui: 'assets/ui/', sfx: 'assets/sfx/', music: 'music/',
     // `npm run logos` derives the interface wordmark from the delivered engraved mark, so the
     // three games' marks carry the same lightness and weight at the size the pick screen uses.
-    logo: 'assets/brand/logo-header.webp', illustration: 'assets/brand/logo-illustrated-wide.webp',
+    logo: 'assets/brand/logo-header.webp', illustration: 'assets/brand/logo-illustrated-panorama.webp',
     emblem: 'assets/brand/emblem.webp', modelBytes, modelStatus: CAMBRIAN_MODEL_STATUS, modelNotes: CAMBRIAN_MODEL_NOTES, clipNotes: CAMBRIAN_CLIP_NOTES,
   },
   audio: { music: MUSIC, loops: { ambient: 'ambient-reef', drone: 'giant-drone' } },
