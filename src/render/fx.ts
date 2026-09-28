@@ -473,6 +473,10 @@ export class Tracks {
     this.geo.setAttribute('aGroove', this.aGroove);
     const mat = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false, blending: THREE.MultiplyBlending,
+      // Three only sets a multiply blend for a premultiplied material, and otherwise logs an error
+      // and leaves whatever blend was last in force. The shader writes the multiplier at alpha 1,
+      // so premultiplied it is exactly `sand × (1 − shade)`.
+      premultipliedAlpha: true,
       // The quad sits a whisker above the sand and follows its slope, but the beach is a curved
       // ramp and a mark is up to a body wide, so the far edge would still fight the terrain.
       polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,

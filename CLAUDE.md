@@ -263,7 +263,7 @@ unless the user explicitly asks for a PR. Steps:
   two would pull against each other and the pitch would sit wherever they balanced.
   The keyboard around it is the mouse's own layout: **A and D turn the animal, and the animal turns
   the camera** — they move the *body*, the stick's own sideways axis, not the view: a swimmer turns
-  into its travel (`turnRate` in `game.ts`) and the follow camera comes round behind it, so the
+  into its travel (`turnRate` in `game-actor.ts`) and the follow camera comes round behind it, so the
   order is the one a player feels, animal first and view after. Driving the camera instead put the
   view somewhere the body had not been yet and left it to catch up, which reads as steering a boat
   by leaning; it also kept a creature's own agility out of the answer, and a Waptia whipping round
@@ -533,9 +533,14 @@ unless the user explicitly asks for a PR. Steps:
   (`TRIASSIC · NPC · SWIMMER · The bottom-worker`), stably, so the roster's own order inside each
   half is untouched and an animal moved on or off the pick screen moves here by itself.
 - Devonian gameplay lives in `src/sim/devonian/` and Triassic gameplay in `src/sim/triassic/`; both
-  reach the shared simulation only through the `RULES?.` hooks in `src/sim/era-rules.ts`. Do not
-  branch on the era inside `game.ts`/`combat.ts`; add a hook. With `RULES` undefined the Cambrian
-  takes exactly its old paths. The Triassic reuses the Devonian's five-stage ladder, feeding
+  reach the shared simulation only through the `RULES` hooks in `src/sim/era-rules.ts`. Do not
+  branch on the era inside `game.ts`/`combat.ts`; add a hook. `RULES` is always defined — the
+  Cambrian has its own object (`CAMBRIAN_RULES`, `src/sim/cambrian/rules.ts`) — and each era's is
+  declared `satisfies EraRules`: a hook every era answers differently is required, and an optional
+  one (`RULES.x?.() ?? default`) means "the shared default" rather than "not the Cambrian", so a new
+  era cannot silently fall through to another's behaviour. What differs between *animals* rather
+  than eras is a trait on the card (`darter`, `snatches`, `allRoundEyes`, `spinedBack`,
+  `guardCost`, `heatTolerant`), never a creature id in shared code. The Triassic reuses the Devonian's five-stage ladder, feeding
   weights and fish swim model by importing them — none of that is Devonian — and adds its own:
   `breathing: 'air'` is a gauge *and* a stamina economy (`AIR_MAX`, five minutes, in
   `src/sim/triassic/state.ts`), armour has a facing (`armourFacing`), the sea floor sinks
@@ -1473,8 +1478,8 @@ unless the user explicitly asks for a PR. Steps:
   groups it belongs to: a guard nobody's run reaches is one nobody runs, which is how
   `tools/flora-test.ts`'s step-cost check came to be failing on `main` for a day unnoticed, and how
   two dozen suites once ran nowhere at all. **A test that waits on a clock winds the clock rather
-  than stepping the sea through it**: the hold at the top (`progress[i].apexT`, the era's
-  `primeT`), a stranding (`strandT`) and the shore's occupancy schedule (`g.time`) are all plain
+  than stepping the sea through it**: the hold at the top (`progress[i].apexT`, the same clock
+  in every era), a stranding (`strandT`) and the shore's occupancy schedule (`g.time`) are all plain
   state, and stepping two hundred seconds of full world
   to reach the end of one is what once made `modes` take ten minutes. Step the last second or two
   so the ending still happens the way it happens in play. The step-cost check is wall clock and so
@@ -1483,6 +1488,35 @@ unless the user explicitly asks for a PR. Steps:
   ceiling with room under it rather than a target, and tightening it towards whatever the fastest
   machine to hand reports makes it fail everywhere else. Read the note beside it before touching the
   number.
+  `tools/` is type-checked (`npm run typecheck` runs `tsc -p tools` after the app's own), and checking
+  it found three Triassic checks that had been sending an input field the frame does not have, so
+  the animals meant to swim while pressing everything had stood still; a fixture is a claim about
+  the code and is held to its types like the code is. What the suites share is `tools/lib/test.ts`
+  — `checker`, `finish`, `stepN`, and `live(x)` for reading a field a step has changed where
+  TypeScript's narrowing insists it cannot have — and it imports no simulation values, because an
+  era-selecting suite imports the sim only after selecting its era.
+- **A refactor of `src/sim` is proved with `tools/replay-hash.ts`** (`node tools/test.mjs
+  replay-hash`): every era, every mode, two seeds, two bot-brained seats, the whole world folded
+  into one hash every ten steps, plus the seabed's field functions on a grid. It asserts nothing.
+  Run it before and after; a change meant to be pure must leave every line identical, and one meant
+  to change behaviour will say so. It is how the `game.ts` split, the era-rules object and the step
+  performance work below were each shown to change nothing. What it cannot see is a path its bots
+  never take — the split's `bonesNear` delegate threw its `range` away and hashed identically — so
+  it is the proof of a pure change, not a substitute for the suites.
+- **`src/sim/game.ts` is the `Game` class, its state and the step loop, and the rest is modules
+  along its own seams**: `game-actor.ts` (`updateActor`, steering, swim, pose), `game-moves.ts`
+  (dash, dodge, pounce, lunge, charge, aim, the hunt warning), `game-population.ts` (spawning,
+  schools, prey), `game-life.ts` (hatch, death, respawn, revival), `game-grip.ts` (holds and rides),
+  `game-feeding.ts` (eating, nutrition, swallowing, bones), `game-readouts.ts` (scoreboard, radar,
+  notices, hints, teleports) and `game-progress.ts` (the ladder, apex, the modes). Each is free
+  functions taking the game; a method outside code calls keeps a one-line delegate on `Game`.
+- **Contact order is part of the simulation.** Plants and bodies are resolved one after another,
+  each moving the body the next one sees, so the order a query returns things in decides where a
+  body ends up. `World.floraContact` (`ReachHash` in `src/sim/spatial.ts`) files each plant under
+  every cell its own reach covers — the flat hash had to be searched out to the *tallest* plant's
+  reach and put some 180 plants in front of every body every step to find the one it touched — and
+  sorts its hits back into the order `floraHash` gives, by rank. Anything that edits `world.flora`
+  by hand calls `World.reindexFlora()`, which rebuilds both indexes and the margin together.
 - **Sprint is gone, and the dash is as long as it is held.** A steered body has one way of putting
   its back into a move. `toInput` sends `burst: 0` for a player and LB — which used to hold the
   sprint — is a second dash button; the burst machinery stays because the AI drives it and a
@@ -1504,7 +1538,7 @@ unless the user explicitly asks for a PR. Steps:
 - **A giant is a giant to you whatever brain it is carrying, and the water has to hold it.** Two
   faults met in the Triassic shallows and read as one: hatchlings eaten with no warning by
   Shonisaurus standing in water shallower than they were long. *The warning* (`updateHunted` in
-  `src/sim/game.ts`) chose its ramp by `brain.kind === 'giant'` — which is the **patrol** brain only
+  `src/sim/game-moves.ts`) chose its ramp by `brain.kind === 'giant'` — which is the **patrol** brain only
   the handful of named `GIANTS` are given. Every other big animal in the sea is an ambient spawn
   with an ordinary `needs` brain, so a seventeen-unit ichthyosaur hunting a hatchling was scored
   like a small predator: range capped at 40 units, no floor while hunting, 0.04 at thirty-four
@@ -1548,7 +1582,7 @@ unless the user explicitly asks for a PR. Steps:
   the one calm mark (`CALM_MARK`), and the glyph under it still says which size band it is. Drawn
   over every large animal in sight, red meant "something big is there", which the animal's own size
   had already said. The 3D highlight was already intent-based and is where the rule came from.
-- A mouthful a *player* takes is taken in the mouth: `takeWhole` in `src/sim/game.ts` sends it
+- A mouthful a *player* takes is taken in the mouth: `takeWhole` in `src/sim/game-feeding.ts` sends it
   through `startSwallow`, so the body is carried in front of the jaws and eaten over the next second
   rather than vanishing on contact, and swimming into an animal no longer eats it at all — a player
   has to bite or pounce. The reef's own predators, and anything out of a school, still go down in
@@ -1600,7 +1634,7 @@ unless the user explicitly asks for a PR. Steps:
   `PASSER_BY` sends a large animal through the upper water whatever the seabed holds. Ambient brains
   wander within ~32 units of where they spawned, so a population stays in its biome.
 - **Survival grows you with time and feeds you with food, and those are two different bars.**
-  The mode is Rise's shape — hatch, climb, hold the top for `APEX_HOLD_SECONDS` / `HOLD_TO_WIN`,
+  The mode is Rise's shape — hatch, climb, hold the top for `APEX_HOLD_SECONDS`,
   results screen, carry on — with growth and food pulled apart: the ladder fills on a clock and on
   fighting, and eating fills a `hunger` bar that drains and does nothing else. Its numbers live
   together in `src/sim/survival.ts` because each is priced against the others, and three things in
@@ -1642,10 +1676,12 @@ unless the user explicitly asks for a PR. Steps:
   the creatures that *seat* has taken to the top, so a seat standing at apex on an animal already
   in it simply goes on swimming, a second seat finishes its own apex in the same sea afterwards,
   and one player who grows a second animal up gets a second results screen for it. `continueMatch`
-  clears only the winner's clock, and the era hook is handed the winning seat for the same reason
-  (the Devonian and the Triassic count their own `primeT`). The `endless` latch stays for what it
-  was always about — the board's own "the reef is won" line.
-- A death costs a rung, not the swim back. `respawnAt` in `src/sim/game.ts` returns a body to the
+  clears only the winner's clock. There is one apex clock for all three games (`src/sim/apex.ts`:
+  `APEX_HOLD_SECONDS`, `apexLeft`), gated on `ladderRung(game, p) >= LADDER_TOP` so it reads the
+  Devonian and Triassic stage as well as the Cambrian tier; the two later eras used to keep a
+  second clock of their own, and the shared one read a `tier` those eras never raise. The
+  `endless` latch stays for what it was always about — the board's own "the reef is won" line.
+- A death costs a rung, not the swim back. `respawnAt` in `src/sim/game-life.ts` returns a body to the
   distance from shore it died at — the same biome, the same depth — and away from any giant;
   inshore that is still the nursery, which is the hatchery and in the shore band anyway. Every
   nursery sits a fixed 88 units off the beach, so sending a death to the nearest one returned a
@@ -2110,7 +2146,7 @@ unless the user explicitly asks for a PR. Steps:
 - **Another player is never handed to you, but one you are aiming at is your own choice.** Four
   automatic picks in `game.ts` — the charge, the grip, the bite's aim nudge and the lunge — refused
   a player-controlled target outright, which between them meant a player could aim squarely at
-  another, hold the grab, and find that nothing at all would take. `Game.handedOver` is the one
+  another, hold the grab, and find that nothing at all would take. `handedOver` (`src/sim/game-moves.ts`) is the one
   rule now: a player is skipped unless the aiming player has actually locked onto them, and then
   every path admits them. So player-versus-player grabs work the way they read — aim, hold the
   grab button — while nothing picks a friend for you by accident. Everything after that is

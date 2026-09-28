@@ -19,8 +19,8 @@ The current request covers 21 individually authored mobile creatures with action
 > **Withdrawn — Devonian mode panels.** This page used to ask for
 > `mode-domination.webp` and `mode-foodchain.webp`. Domination and Food Chain
 > were dropped when the Devonian took the Cambrian's three modes
-> (`7fcb778`, 8 September 2026): both eras now offer Rise, Hunter & Hunted and
-> Reef, which already have panels, so nothing draws empty and there is nothing
+> (`7fcb778`, 8 September 2026). Every era now offers Rise, Survival and Reef,
+> which already have panels (Survival wears the retired Hunted art), so nothing draws empty and there is nothing
 > to commission. `mode-frenzy.webp` is likewise left over from a mode that was
 > folded into Rise and is no longer requested by any pick screen.
 
