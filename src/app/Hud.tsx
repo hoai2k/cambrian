@@ -557,7 +557,7 @@ function EraStatus({ era, alive, ashore }: { era: EraHud; alive: boolean; ashore
   const danger = (era.inDeadZone && !era.bimodal) || era.heldUnder || (era.shoreWarn ?? 0) > 0 || !!era.drowning || !!era.airLow;
   return (
     <div className="era-status">
-      {era.primeT > 0 && <div className="dominant"><span>{W.primeCountdown}</span><b>{Math.max(0, Math.ceil(90 - era.primeT))}</b></div>}
+      {era.primeLeft > 0 && <div className="dominant"><span>{W.primeCountdown}</span><b>{Math.ceil(era.primeLeft)}</b></div>}
       {warn && <div className={`era-warn ${danger ? 'danger' : ''}`}>{warn}</div>}
     </div>
   );

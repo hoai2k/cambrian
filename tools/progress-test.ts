@@ -45,8 +45,9 @@ const pair = (a: CreatureId, aRung: number, b: CreatureId, bRung = 0) => [
 const raiseToTop = (g: InstanceType<typeof Game>, i: number) => {
   const p = g.players[i];
   p.scale = ladderScale(p.creature as CreatureId, LADDER_TOP);
-  p.tier = LADDER_TOP as typeof p.tier;
-  DEV?.setStage(g, p, LADDER_TOP);
+  // Only the era's own growth state: the Devonian and the Triassic never touch `tier`, and a helper
+  // that set it anyway hid every shared check that wrongly read it.
+  if (DEV) DEV.setStage(g, p, LADDER_TOP); else p.tier = LADDER_TOP as typeof p.tier;
 };
 // The Devonian keeps growth in its own side table, so a test that wants a body *put* on a rung
 // has to reach it. Nothing in the game does this — it moults — but a test must not have to run
@@ -58,18 +59,15 @@ const DEV = which !== 'cambrian'                      // the Triassic grows in t
       },
       standing: (g: InstanceType<typeof Game>, a: import('../src/sim/types').Actor) => m.devActor(g, a).standing,
       fill: (g: InstanceType<typeof Game>, a: import('../src/sim/types').Actor) => m.stageProgress(m.devActor(g, a)),
-      prime: (g: InstanceType<typeof Game>, a: import('../src/sim/types').Actor) => m.devActor(g, a),
     }))
   : undefined;
 /**
- * How long this seat has held the top, in whichever clock the era keeps — and a way to wind it on.
- * The checks below are about what the hold *does* when it runs out, so they set it a second or two
+ * How long this seat has held the top — one clock in every era — and a way to wind it on. The
+ * checks below are about what the hold *does* when it runs out, so they set it a second or two
  * short rather than stepping a whole sea through ninety seconds of it, three eras over.
  */
-const holdOf = (g: InstanceType<typeof Game>, i: number) => DEV ? DEV.prime(g, g.players[i]).primeT : g.progress[i].apexT;
-const windHold = (g: InstanceType<typeof Game>, i: number, seconds: number) => {
-  if (DEV) DEV.prime(g, g.players[i]).primeT = seconds; else g.progress[i].apexT = seconds;
-};
+const holdOf = (g: InstanceType<typeof Game>, i: number) => g.progress[i].apexT;
+const windHold = (g: InstanceType<typeof Game>, i: number, seconds: number) => { g.progress[i].apexT = seconds; };
 /** How full this body's growth meter is, in whichever currency the era counts. */
 const meterFill = (g: InstanceType<typeof Game>, a: import('../src/sim/types').Actor) =>
   DEV ? DEV.fill(g, a) : a.nutrition / TIER_NEED[a.tier];
@@ -192,6 +190,11 @@ const meterFill = (g: InstanceType<typeof Game>, a: import('../src/sim/types').A
   ok(g.discovery.apex.has(HERO), 'though the codex still credits having been there');
   // Hold it out and the run finishes; that is what writes the top.
   ok(holdOf(g, 0) > 1, `the hold is running (${holdOf(g, 0).toFixed(1)} s)`);
+  // The scoreboard reads that clock and the era's own rung. Both used to read the Cambrian's `tier`,
+  // which the Devonian and the Triassic never advance, so neither showed there.
+  const board = g.scoreboard(0);
+  ok(/held/i.test(board.header.detail), `the scoreboard counts the hold (${board.header.detail})`);
+  ok(board.rows[0].tier === LADDER_TOP, `and ranks the player on the top rung (${board.rows[0].tier})`);
   windHold(g, 0, APEX_HOLD_SECONDS - 1);
   run(g, 3);
   ok(g.state.status === 'won', 'holding the top for ninety seconds wins the run');

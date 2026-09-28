@@ -7,9 +7,10 @@ import type { Game } from '../game';
 import type { Actor, InputFrame, Mode, WorldEvent } from '../types';
 import { BIOME_DANGER, biomeAt, groundHeight, RISE_RATE, sampleCurrent, shoreDistance, SHORE_WALL, SURFACE_Y } from '../world';
 import { bodyRadius } from '../actors';
-import { ADULT_STAGE, devActor, GROWN, HOLD_TO_WIN, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageProgress, stageScale, stateFor, type DeadZone, type DevActor } from './state';
+import { ADULT_STAGE, devActor, GROWN, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageProgress, stageScale, stateFor, type DeadZone, type DevActor } from './state';
 import { camoDrain, installDevonianSpecials, stepAbility, stepGuardSpecial, useAbility, ySpecial } from './specials';
 import { canBreach, sanctuary, spawnInCover, spawnProtect, spawnY, swim, wanderY } from './swim';
+import { apexLeft } from '../ladder';
 
 /**
  * The Devonian era rules (docs/redesign/08-devonian-domination.md).
@@ -331,42 +332,7 @@ export const DEVONIAN_RULES: EraRules = {
     // What a death costs the ladder is `DEATH_COST` and is settled centrally, in `respawn`, so all
     // three games price it the same way: half of the stage you are standing in, which demotes only
     // if you were less than halfway through it. This hook keeps the rest of what a respawn resets.
-    d.atSurface = false; d.windT = 0; d.deadT = 0; d.deadZoneIn = false; d.moultSoft = 0; d.exuvia = -1; d.followers = 0; d.primeT = 0; d.beached = false;
-  },
-
-  updateModes(g, dt) {
-    // Rise and Survival: grow through the five stages, then hold Prime. The shared `rise`
-    // case in game.ts wins on tier, which the Devonian never advances — it grows in stages — so
-    // it never fires there and the era decides this one.
-    if (g.mode !== 'rise' && g.mode !== 'survival') return;
-    for (const a of players(g)) {
-      const d = devActor(g, a);
-      // Somebody who came in on the top rung has already done this; the clock is not theirs to
-      // run. Everyone else in the same sea keeps theirs and can still win it.
-      if (a.carriedTop) { d.primeT = 0; continue; }
-      // Per seat and per animal, never per match.
-      const pr = a.player >= 0 ? g.progress[a.player] : undefined;
-      const already = pr ? pr.apexDone.includes(a.creature) : g.endless;
-      if (d.stage >= PRIME_STAGE && isAlive(a)) {
-        d.primeT += dt;
-        if (d.primeT >= HOLD_TO_WIN && g.state.status === 'playing' && !already) {
-          const name = creature(a.creature).name;
-          // The top rung of the record is banked by finishing, never by arriving.
-          g.bankLadderTop(a);
-          pr?.apexDone.push(a.creature);
-          g.state = { status: a.player >= 0 ? 'won' : 'lost', winner: a.player,
-            message: a.player >= 0 ? `${name} grew up and held the sea.` : `A rival ${name} grew up first.` };
-        }
-      } else d.primeT = 0;
-    }
-  },
-
-  /**
-   * Rise wins on a held timer; zero the *winner's* so play resumes with the sea open. Everyone
-   * else's clock is their own and keeps running — theirs is a separate apex, on their own animal.
-   */
-  continueMatch(g, winner) {
-    for (const a of players(g)) if (a.player === winner) devActor(g, a).primeT = 0;
+    d.atSurface = false; d.windT = 0; d.deadT = 0; d.deadZoneIn = false; d.moultSoft = 0; d.exuvia = -1; d.followers = 0; d.beached = false;
   },
 
   /**
@@ -384,7 +350,7 @@ export const DEVONIAN_RULES: EraRules = {
     return {
       standing: d.standing, stageProgress: stageProgress(d), rung: rungOf(p), rungName: RUNG_NAMES[rungOf(p)], stage: STAGES[d.stage],
       bimodal: def.breathing === 'bimodal',
-      beached: d.beached, primeT: d.primeT, inDeadZone: d.deadZoneIn,
+      beached: d.beached, primeLeft: apexLeft(g, p), inDeadZone: d.deadZoneIn,
       deadZones: s.deadZones.filter((z) => distXZ(z.pos, p.pos) < 400).map((z) => ({ dx: z.pos.x - p.pos.x, dz: z.pos.z - p.pos.z, r: z.r })),
     };
   },

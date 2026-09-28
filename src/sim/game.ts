@@ -11,7 +11,7 @@ import { applyHit, endRide, GRIP_BREAK, GRIP_MEAL, GRIP_STRAIN, GRIP_STRIKE, kil
 import { creature, isVisitor, PLAYABLE_IDS, WILD_IDS, type CreatureId, type MoveDef } from './creatures';
 import { resolveFlora, stepFlora, type FloraContact } from './flora';
 import { SpatialHash } from './spatial';
-import { clampMark, deathMark, fillOf, ladderFill, ladderMark, ladderRung, ladderScale, LADDER_TOP, MARK_NEAR_TOP, placeOnLadder } from './ladder';
+import { APEX_HOLD_SECONDS, clampMark, deathMark, fillOf, ladderFill, ladderMark, ladderName, ladderRung, ladderScale, LADDER_TOP, MARK_NEAR_TOP, placeOnLadder } from './ladder';
 import { emptyInput, TIER_NAMES, TIER_NEED, type Actor, type Band, type BrainState, type InputFrame, type Mode, type PlayerSetup, type Prompt, type SiltCloud, type Tier, type WorldEvent } from './types';
 import { BIOME_NAMES, biomeAt, biomeWeights, coverAt, groundHeight, LIGHT_WINDOW_Y, type Landmark, type LandmarkKind, microbialAt, nearestNursery, nurseryAt, nurseryFactor, resolveStatic, RISE_RATE, sampleCurrent, sampleHeight, shoreDistance, shoreZ, type StaticContact, SURFACE_Y, World, type Biome, type Boulder, type Cover, type Flora, type WorldData } from './world';
 import { areaProfile, bandScale, drawBand, headroom, PASSER_BY, SMALLEST_BAND } from './population';
@@ -23,8 +23,7 @@ import { DASH_STAMINA_MULT, escapeReady, healRate, PLANT_HEAL, steered } from '.
 
 /** Everything the simulation says out loud; the words are in `src/content/strings.ts`. */
 const SAY = TEXT.sim;
-/** Seconds at Apex that win a Rise match — and the number the scoreboard counts up to. */
-export const APEX_HOLD_SECONDS = 90;
+export { APEX_HOLD_SECONDS } from './ladder';
 
 export interface PlayerProgress {
   prompts: Prompt[];
@@ -730,9 +729,10 @@ export class Game implements AiWorld {
     }
   }
 
-  private maxPlayerTier(): Tier {
-    let t: Tier = 0;
-    for (const p of this.players) if (p.tier > t) t = p.tier;
+  /** The highest rung any player stands on, in the era's own ladder (never the Cambrian's `tier`). */
+  private maxPlayerRung(): number {
+    let t = 0;
+    for (const p of this.players) t = Math.max(t, ladderRung(this, p));
     return t;
   }
 
@@ -814,7 +814,7 @@ export class Game implements AiWorld {
    */
   private temperament(a: Actor, pos: Vec3): Partial<BrainState> {
     const def = creature(a.creature);
-    const grown = a.scale >= tierScale(a.creature, 2) * 0.8;
+    const grown = a.scale >= ladderScale(a.creature, 2) * 0.8;
     // Filter feeders, grazers and deposit feeders have somewhere to be rather than something to
     // defend. A scavenger sitting on a body very much has something to defend.
     const settled = (!def.diet || def.diet === 'scavenger') && grown;
@@ -851,7 +851,6 @@ export class Game implements AiWorld {
     // player's apex resetting the other's: two animals grow up at their own pace and the second was
     // sent back ninety seconds every time the first arrived.
     if (winner >= 0 && this.progress[winner]) this.progress[winner].apexT = 0;
-    RULES?.continueMatch(this, winner);
     return true;
   }
 
@@ -3144,7 +3143,7 @@ export class Game implements AiWorld {
     for (const p of anchors) {
       let local = 0;
       for (const a of this.nearby(p, 170)) if (a.controller === 'ambient' && isAlive(a)) local++;
-      const want = clamp(Math.round((15 + this.maxPlayerTier() * 2) * areaProfile(p.x, p.z, this.world.seed).density), 9, 34);
+      const want = clamp(Math.round((15 + this.maxPlayerRung() * 2) * areaProfile(p.x, p.z, this.world.seed).density), 9, 34);
       if (local >= want) continue;
       // One at a time when it is nearly full, a few at once when a whole area is bare — arriving
       // one animal every two seconds forever reads as a trickle following the player about.
@@ -3235,7 +3234,7 @@ export class Game implements AiWorld {
       const era = RULES?.scoreLine?.(this, a);
       return {
         player: a.player, creature: a.creature, name: creature(a.creature).name,
-        rank: era?.rank ?? TIER_NAMES[a.tier], tier: a.tier,
+        rank: era?.rank ?? TIER_NAMES[a.tier], tier: ladderRung(this, a),
         progress: era?.progress ?? (a.tier >= 4 ? 1 : clamp(a.nutrition / TIER_NEED[a.tier], 0, 1)),
         kills: a.kills, eats: a.eats, escapes: a.escapes,
         deaths: a.player >= 0 ? (this.progress[a.player]?.deaths ?? 0) : 0,
@@ -3275,7 +3274,7 @@ export class Game implements AiWorld {
     const out: TeleportOption[] = [{ dest: 'home', label: SAY.nursery, detail: SAY.nurseryDetail, distance: distXZ(p.pos, p.home) }];
     this.players.forEach((o, j) => {
       if (j === i) return;
-      out.push({ dest: j, label: SAY.teleportPlayer(j + 1, creature(o.creature).name), detail: isAlive(o) ? TIER_NAMES[o.tier] : SAY.respawning, distance: distXZ(p.pos, o.pos) });
+      out.push({ dest: j, label: SAY.teleportPlayer(j + 1, creature(o.creature).name), detail: isAlive(o) ? ladderName(ladderRung(this, o)) : SAY.respawning, distance: distXZ(p.pos, o.pos) });
     });
     return out;
   }
@@ -3520,7 +3519,6 @@ export class Game implements AiWorld {
   biomeOf(i: number): Biome | undefined { const p = this.players[i]; return p ? biomeAt(p.pos.x, p.pos.z) : undefined; }
 
   private updateModes(dt: number) {
-    RULES?.updateModes(this, dt);
     switch (this.mode) {
       // Survival's goal is Rise's: reach the top and hold it. The results screen and the choice to
       // carry on follow from the state this sets, exactly as they do for Rise.
@@ -3531,9 +3529,11 @@ export class Game implements AiWorld {
           // Somebody who came in on the top rung has already done this; the clock is not theirs to
           // run. Everyone else in the same sea keeps theirs and can still win it.
           if (p.carriedTop) { pr.apexT = 0; return; }
-          if (p.tier >= 4 && isAlive(p)) {
+          // The top rung in whichever currency the era grows in: `tier` is the Cambrian's alone, and
+          // gating on it here left the Devonian and the Triassic running a second copy of this loop.
+          if (ladderRung(this, p) >= LADDER_TOP && isAlive(p)) {
             pr.apexT += dt;
-            if (pr.apexT > APEX_HOLD_SECONDS && this.state.status === 'playing' && !pr.apexDone.includes(p.creature)) {
+            if (pr.apexT >= APEX_HOLD_SECONDS && this.state.status === 'playing' && !pr.apexDone.includes(p.creature)) {
               this.bankLadderTop(p);
               pr.apexDone.push(p.creature);
               this.state = { status: 'won', winner: i, message: SAY.match.rulesTheReef(creature(p.creature).name) };

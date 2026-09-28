@@ -40,7 +40,6 @@ export function stageForScale(adultLength: number, scale: number): number {
 export const RUNG_NAMES: readonly string[] = TEXT.sim.ladder.rungs;
 /** Standing needed to be fully grown: the meter the five stages are cut out of. */
 export const GROWN = 100;
-export const HOLD_TO_WIN = 90;
 
 export interface DeadZone { pos: Vec3; r: number; age: number; life: number; drift: Vec3; }
 
@@ -61,7 +60,6 @@ export interface DevActor {
   followers: number;
   sinceEat: number;
   /** Seconds held at Prime, for Rise's win. */
-  primeT: number;
   bluffed: Map<number, number>; // brush display: actor id → time it was last bluffed
   dartCd: number;              // seconds until the next fast-start
 }
@@ -91,7 +89,7 @@ export function devActor(g: Game, a: Actor): DevActor {
   const s = stateFor(g);
   let d = s.actors.get(a.id);
   if (!d) {
-    d = { standing: 0, stage: 0, atSurface: false, windT: 0, beached: false, deadT: 0, deadZoneIn: false, moultSoft: 0, exuvia: -1, exuviaT: 0, followers: 0, sinceEat: 0, primeT: 0, bluffed: new Map(), dartCd: 0 };
+    d = { standing: 0, stage: 0, atSurface: false, windT: 0, beached: false, deadT: 0, deadZoneIn: false, moultSoft: 0, exuvia: -1, exuviaT: 0, followers: 0, sinceEat: 0, bluffed: new Map(), dartCd: 0 };
     s.actors.set(a.id, d);
   }
   return d;

@@ -47,8 +47,8 @@ export interface EraHud {
   beached: boolean;
   /** Dead zones as world offsets from the player and radii, for the radar. */
   deadZones: { dx: number; dz: number; r: number }[];
-  /** Seconds this player has held Prime, for Rise's win countdown. */
-  primeT: number;
+  /** Seconds left of holding Prime before Rise is won, or 0 while not holding it. */
+  primeLeft: number;
   inDeadZone: boolean;
 }
 
@@ -172,15 +172,6 @@ export interface EraRules {
   wanderY(a: Actor, ground: number, rng: () => number): number;
   /** Replaces the death penalty. */
   onRespawn(g: Game, a: Actor): void;
-  /** Win checks for the era's own modes; the shared ones (reef, hunted) run as before. */
-  updateModes(g: Game, dt: number): void;
-  /**
-   * A finished co-op match is being carried on (`Game.continueMatch`): clear whatever the era was
-   * counting towards its win so the goal is not met again the instant play resumes. `winner` is the
-   * seat that just finished, and it is *only* that seat's clock to clear — every other seat is
-   * still growing its own animal towards its own apex.
-   */
-  continueMatch(g: Game, winner: number): void;
   hud(g: Game, i: number): EraHud | undefined;
   hint(g: Game, i: number): string | undefined;
   /**

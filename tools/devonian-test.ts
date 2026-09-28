@@ -15,7 +15,8 @@ import { createAssetPaths } from '../src/content/asset-paths';
 selectEra(DEVONIAN);
 const { Game } = await import('../src/sim/game');
 const { RULES } = await import('../src/sim/era-rules');
-const { stateFor, devActor, stageScale, ADULT_STAGE, PRIME_STAGE, STAGE_AT, HOLD_TO_WIN } = await import('../src/sim/devonian/state');
+const { stateFor, devActor, stageScale, ADULT_STAGE, PRIME_STAGE, STAGE_AT } = await import('../src/sim/devonian/state');
+const { APEX_HOLD_SECONDS } = await import('../src/sim/ladder');
 const { coverAt } = await import('../src/sim/world');
 const { applyScaleStats, bandOf, isAlive, lengthOf, swimCeiling } = await import('../src/sim/actors');
 const { PLAYABLE } = await import('../src/sim/creatures');
@@ -953,7 +954,7 @@ const { TIER_SCALE } = await import('../src/sim/types');
   const g = new Game('rise', [{ creature: 'dunkleosteus', device: 'keyboard', ready: true }]);
   g.skipHatch();
   const d = devActor(g, g.players[0]);
-  d.standing = 100; d.stage = PRIME_STAGE; d.primeT = HOLD_TO_WIN - 0.01;
+  d.standing = 100; d.stage = PRIME_STAGE; g.progress[0].apexT = APEX_HOLD_SECONDS - 0.01;
   tick(g, new Map([[0, emptyInput()]]));
   ok(g.state.status === 'won' && g.state.winner === 0, `holding Prime wins (${g.state.message})`);
   const modes: Mode[] = ['rise', 'survival', 'reef'];
@@ -961,11 +962,11 @@ const { TIER_SCALE } = await import('../src/sim/types');
 
   // Rise is co-op, so its result is a milestone: the sea can be carried on into.
   ok(g.continueMatch() && g.state.status === 'playing' && g.endless, 'Rise carries on after it is won');
-  ok(devActor(g, g.players[0]).primeT === 0, '...with the hold timer cleared');
+  ok(g.progress[0].apexT === 0, '...with the hold timer cleared');
   // Held past the whole hold again — wound on rather than stepped through, since the question is
   // what the end of it does — and nothing happens.
   for (let i = 0; i < 60; i++) tick(g, new Map([[0, emptyInput()]]));
-  devActor(g, g.players[0]).primeT = HOLD_TO_WIN - 0.5;
+  g.progress[0].apexT = APEX_HOLD_SECONDS - 0.5;
   for (let i = 0; i < 120; i++) tick(g, new Map([[0, emptyInput()]]));
   ok(g.state.status === 'playing', '...and it does not win itself again');
 }
@@ -980,28 +981,28 @@ const { TIER_SCALE } = await import('../src/sim/types');
   g.skipHatch();
   const [p0, p1] = g.players;
   const d0 = devActor(g, p0), d1 = devActor(g, p1);
-  d0.standing = 100; d0.stage = PRIME_STAGE; d0.primeT = HOLD_TO_WIN - 0.01;
+  d0.standing = 100; d0.stage = PRIME_STAGE; g.progress[0].apexT = APEX_HOLD_SECONDS - 0.01;
   // The second seat is most of the way there, which is exactly what the old reset threw away.
-  d1.standing = 100; d1.stage = PRIME_STAGE; d1.primeT = HOLD_TO_WIN * 0.5;
+  d1.standing = 100; d1.stage = PRIME_STAGE; g.progress[1].apexT = APEX_HOLD_SECONDS * 0.5;
   const both = new Map([[0, emptyInput()], [1, emptyInput()]]);
   tick(g, both);
   ok(g.state.status === 'won' && g.state.winner === 0, 'the first seat to hold Prime wins');
-  const held = devActor(g, g.players[1]).primeT;
+  const held = g.progress[1].apexT;
   ok(g.continueMatch(), 'and the sea carries on');
-  ok(devActor(g, g.players[0]).primeT === 0, "...with the winner's own clock cleared");
-  ok(devActor(g, g.players[1]).primeT === held && held > 0,
-    `...and the other seat's clock untouched (${held.toFixed(1)}s of ${HOLD_TO_WIN})`);
+  ok(g.progress[0].apexT === 0, "...with the winner's own clock cleared");
+  ok(g.progress[1].apexT === held && held > 0,
+    `...and the other seat's clock untouched (${held.toFixed(1)}s of ${APEX_HOLD_SECONDS})`);
   // The second seat finishes on its own, in the same sea, after the first already has: its clock
   // keeps running from where it was, and is wound to its last second to finish it.
   for (let i = 0; i < 60; i++) tick(g, both);
-  ok(devActor(g, g.players[1]).primeT > held, "the other seat's clock keeps running");
-  devActor(g, g.players[1]).primeT = HOLD_TO_WIN - 0.5;
+  ok(g.progress[1].apexT > held, "the other seat's clock keeps running");
+  g.progress[1].apexT = APEX_HOLD_SECONDS - 0.5;
   for (let i = 0; i < 120; i++) { tick(g, both); if (g.state.status !== 'playing') break; }
   ok(g.state.status === 'won' && g.state.winner === 1, 'the second seat wins its own apex afterwards');
   ok(g.continueMatch(), 'and that one carries on too');
   // The winner standing at Prime on the same animal does not win again...
   for (let i = 0; i < 60; i++) tick(g, both);
-  devActor(g, g.players[0]).primeT = HOLD_TO_WIN - 0.5; devActor(g, g.players[1]).primeT = HOLD_TO_WIN - 0.5;
+  g.progress[0].apexT = APEX_HOLD_SECONDS - 0.5; g.progress[1].apexT = APEX_HOLD_SECONDS - 0.5;
   for (let i = 0; i < 120; i++) tick(g, both);
   ok(g.state.status === 'playing', 'an animal already taken to the top does not win a second time');
   // ...but the same seat on a *different* animal is a separate apex, which is the whole point.
@@ -1023,8 +1024,8 @@ const { TIER_SCALE } = await import('../src/sim/types');
   for (let s = 1; s <= PRIME_STAGE; s++) { devActor(g, p).standing = STAGE_AT[s]; for (let i = 0; i < 180; i++) tick(g, new Map([[0, emptyInput()]])); }
   ok(devActor(g, p).stage === PRIME_STAGE, 'feeding moults it all the way to Prime');
   ok(g.state.status === 'playing', 'reaching Prime is not the win on its own');
-  ok(devActor(g, p).primeT > 1, `the hold is running (${devActor(g, p).primeT.toFixed(1)} s)`);
-  devActor(g, p).primeT = HOLD_TO_WIN - 1;
+  ok(g.progress[0].apexT > 1, `the hold is running (${g.progress[0].apexT.toFixed(1)} s)`);
+  g.progress[0].apexT = APEX_HOLD_SECONDS - 1;
   for (let i = 0; i < 180; i++) tick(g, new Map([[0, emptyInput()]]));
   ok(g.state.status === 'won' && g.state.winner === 0, `holding Prime wins Rise (${g.state.message})`);
 }

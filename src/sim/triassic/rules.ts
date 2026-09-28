@@ -15,6 +15,7 @@ import { canBreach as devCanBreach, sanctuary, spawnInCover, spawnProtect, spawn
 import { camoDrain, installTriassicSpecials, stepAbility, useAbility, ySpecial } from './specials';
 import { setShoreAnimals, shoreClip, shoreRadar, stepShore } from './shore';
 import { AIR_LOW, AIR_MAX, triActor, triState } from './state';
+import { apexLeft } from '../ladder';
 
 /**
  * The Triassic era rules (docs/triassic/01-triassic-design.md).
@@ -464,8 +465,6 @@ export const TRIASSIC_RULES: EraRules = {
     t.windT = 0; t.heldT = 0; t.podShield = 0; t.strokeT = 0; t.shoreWarn = 0; t.shoreWatch = 0; t.sawT = 0;
   },
 
-  updateModes: DEVONIAN_RULES.updateModes,
-  continueMatch: DEVONIAN_RULES.continueMatch,
   scoreLine(g, a) { const d = devActor(g, a); return { rank: `${STAGES[d.stage]} · ${RUNG_NAMES_TRI[rungOf(a)]}`, progress: stageProgress(d) }; },
 
   /**
@@ -487,7 +486,7 @@ export const TRIASSIC_RULES: EraRules = {
       bimodal: def.breathing === 'bimodal', air: def.breathing === 'air', atSurface: t.atSurface, shoreWarn: t.shoreWarn, shoreWatch: t.shoreWatch, heldUnder: def.breathing === 'air' && p.grabbedBy >= 0,
       airLeft: def.breathing === 'air' ? clamp(t.air / AIR_MAX, 0, 1) : undefined,
       airLow: def.breathing === 'air' && t.air < AIR_LOW, drowning: t.drownT > 0,
-      beached: p.ashore, primeT: d.primeT, inDeadZone: false, deadZones: [],
+      beached: p.ashore, primeLeft: apexLeft(g, p), inDeadZone: false, deadZones: [],
     };
   },
 
