@@ -52,7 +52,7 @@ for (const g of GAMES) {
   const era = ERAS[g.id];
   eq(g.title, era.title, `${g.id}: the title is the game's own`);
   ok(existsSync(`${g.path}index.html`), `${g.id}: links to an entry page that exists (${g.path || '/'})`);
-  eq(g.art, era.assets.illustration, `${g.id}: shows the painting the game's own title screen shows`);
+  eq(g.art, era.assets.illustration.replace(/-wide(?=\.webp$)/, ''), `${g.id}: keeps the original title painting when the game uses a wider derivative`);
   ok(existsSync(`public/${g.art}`), `${g.id}: that painting is in public/`);
   eq(g.wordmark, era.assets.logo, `${g.id}: the wordmark is the game's own`);
   ok(existsSync(`public/${g.wordmark}`), `${g.id}: that wordmark is in public/`);

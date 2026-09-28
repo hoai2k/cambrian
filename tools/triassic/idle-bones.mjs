@@ -35,7 +35,7 @@ if (!ALL && !rest[0]) { console.error('usage: node tools/triassic/idle-bones.mjs
 /** Every delivered Triassic body: the authored one only, since a twin and a LOD share its rig. */
 const DIR = 'public/assets/triassic/creatures';
 const files = ALL
-  ? fs.readdirSync(DIR).filter((f) => f.endsWith('.glb') && !/\.(puppet|lod1|preview)\.glb$/.test(f)).sort()
+  ? fs.readdirSync(DIR).filter((f) => !f.startsWith('._') && f.endsWith('.glb') && !/\.(puppet|lod1|preview)\.glb$/.test(f)).sort()
       .map((f) => `${DIR}/${f}`)
   : [rest[0]];
 let failed = 0;

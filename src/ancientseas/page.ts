@@ -39,7 +39,7 @@ export interface GameLink {
   readonly title: string;
   /** The game's own folder, relative to the app root — which is this page. */
   readonly path: string;
-  /** The game's own composed title painting, the one its title screen shows. */
+  /** The game's original composed title painting; its title screen may use a wider derivative. */
   readonly art: string;
   readonly artWidth: number;
   readonly artHeight: number;

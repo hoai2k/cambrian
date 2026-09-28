@@ -8,7 +8,7 @@ import { resolve } from 'node:path';
 const root = resolve(new URL('../..', import.meta.url).pathname);
 const dir = 'assets/ancientseas/';
 const manifest = resolve(root, 'src/ancientseas/delivered.json');
-const files = readdirSync(resolve(root, 'public', dir)).filter((f) => /\.(webp|png|svg)$/.test(f)).sort().map((f) => `${dir}${f}`);
+const files = readdirSync(resolve(root, 'public', dir)).filter((f) => !f.startsWith('._') && /\.(webp|png|svg)$/.test(f)).sort().map((f) => `${dir}${f}`);
 const next = JSON.stringify({ files }, null, 2) + '\n';
 const current = readFileSync(manifest, 'utf8');
 if (process.argv.includes('--check')) {

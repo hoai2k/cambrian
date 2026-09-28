@@ -30,10 +30,10 @@ const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
 /** Every prop the two eras draw scenery with, by the id the content layer names it. */
 export function propFiles() {
   const files = {};
-  for (const f of fs.readdirSync('public/assets/props').filter((f) => f.endsWith('.glb')))
+  for (const f of fs.readdirSync('public/assets/props').filter((f) => !f.startsWith('._') && f.endsWith('.glb')))
     files[f.replace(/\.glb$/, '')] = `public/assets/props/${f}`;
   for (const dir of ['public/assets/devonian/props-instanced', 'public/assets/triassic/props-instanced'])
-    for (const f of (fs.existsSync(dir) ? fs.readdirSync(dir) : []).filter((f) => f.endsWith('.glb')))
+    for (const f of (fs.existsSync(dir) ? fs.readdirSync(dir) : []).filter((f) => !f.startsWith('._') && f.endsWith('.glb')))
       files[f.replace(/\.glb$/, '')] = `${dir}/${f}`;
   return files;
 }
