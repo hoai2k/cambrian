@@ -115,8 +115,14 @@ export interface EraRules {
   survivalGrow?(g: Game, a: Actor, fraction: number): void;
   /** When true the shared nutrition → tier growth runs; when false the era owns growth. */
   growthByNutrition: boolean;
-  /** Damage multiplier from armour, enrolment or a withdrawn shell; 1 = none. `dir` points attacker → victim. */
+  /** Damage multiplier from armour, enrolment or a withdrawn shell; 1 = none. `dir` points attacker → victim. Pure. */
   armour(attacker: Actor, victim: Actor, dir: Vec3): number;
+  /**
+   * A hit on `victim` that something else takes instead (the Triassic's pod shield). It deals with
+   * the body that took it and returns the multiplier left for the victim, used in place of
+   * `armour`; undefined when nothing stands in.
+   */
+  shield?(g: Game, attacker: Actor, victim: Actor): number | undefined;
   /** How far past the shore wall this body may push (world units). */
   shoreReach(a: Actor): number;
   /** This body sprints as a backward jet and rises/sinks for free. */

@@ -474,7 +474,7 @@ export class Game implements AiWorld {
     this.world = new World(seed);
     const nursery = nurseryAt(0);
     this.world.loadAround(nursery);
-    this.hitCtx = { events: this.events, byId: (id) => this.idMap.get(id), time: 0, rng: this.rng, armour: RULES ? (att, vic, dir) => RULES!.armour(att, vic, dir) : undefined, canEat: (pred, food) => this.canEat(pred, food) };
+    this.hitCtx = { events: this.events, byId: (id) => this.idMap.get(id), time: 0, rng: this.rng, armour: RULES ? (att, vic, dir) => RULES!.armour(att, vic, dir) : undefined, shield: RULES?.shield ? (att, vic) => RULES!.shield!(this, att, vic) : undefined, canEat: (pred, food) => this.canEat(pred, food) };
     this.beachCtx = { events: this.events, hitCtx: this.hitCtx };
     const hatchers: Actor[] = [];
     setups.forEach((s, i) => {

@@ -9,7 +9,7 @@ import type { CreatureId } from '../../content/ids';
 import type { Game } from '../game';
 import type { Actor, InputFrame } from '../types';
 import { biomeWeights, coverAt, groundHeight, nurseryAt, RISE_RATE, SURFACE_Y } from '../world';
-import { DEVONIAN_RULES } from '../devonian/rules';
+import { checkStage, DEVONIAN_RULES } from '../devonian/rules';
 import { ADULT_STAGE, devActor, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageProgress, stageScale } from '../devonian/state';
 import { canBreach as devCanBreach, sanctuary, spawnInCover, spawnProtect, spawnY, swim as devSwim, wanderY } from '../devonian/swim';
 import { camoDrain, installTriassicSpecials, stepAbility, useAbility, ySpecial } from './specials';
@@ -51,8 +51,6 @@ const POD_SIZE = 2;
 const AIR_CLIMB_FLOOR = 0.7;
 
 const isPlayerish = (a: Actor) => a.controller === 'player';
-/** The game whose step is running, for the hooks that are not handed it (armour). */
-let lastGame: Game | undefined;
 const players = (g: Game) => g.actors.filter(isPlayerish);
 const rungOf = (a: Actor) => creature(a.creature).rung ?? 2;
 const breathesAir = (a: Actor) => creature(a.creature).breathing === 'air';
@@ -69,7 +67,7 @@ const breathesAir = (a: Actor) => creature(a.creature).breathing === 'air';
 const atSurface = (a: Actor) => brokeSurface(a);
 
 // ---- the hit context the era's own strikes use (the game's is private; these are its public parts) ----
-const hitCtxFor = (g: Game): HitContext => ({ events: g.events, byId: (id) => g.byId(id), time: g.time, rng: g.rng, armour: (att, vic, dir) => TRIASSIC_RULES.armour(att, vic, dir) });
+const hitCtxFor = (g: Game): HitContext => ({ events: g.events, byId: (id) => g.byId(id), time: g.time, rng: g.rng, armour: (att, vic, dir) => TRIASSIC_RULES.armour(att, vic, dir), shield: (att, vic) => TRIASSIC_RULES.shield!(g, att, vic) });
 
 // ---- air ----
 /**
@@ -269,18 +267,14 @@ export const TRIASSIC_RULES: EraRules = {
   install() { installTriassicSpecials(); },
   ySpecial,
   init(g) {
-    lastGame = g;
-    installTriassicSpecials();
     for (const a of players(g)) {
       const d = devActor(g, a);
       d.stage = stageForScale(creature(a.creature).adultLength, a.scale);
       d.standing = g.mode === 'reef' ? STAGE_AT[ADULT_STAGE] + 5 : STAGE_AT[d.stage];
-      const t = triActor(g, a);
     }
   },
 
   step(g, dt) {
-    lastGame = g;
     const s = triState(g);
     s.tick += dt;
     const ctx = hitCtxFor(g);
@@ -292,19 +286,25 @@ export const TRIASSIC_RULES: EraRules = {
       updatePod(g, a, dt);
       updateStroke(g, a, dt);
       updateSaw(g, a, dt);
-      // the sinkers settle when the stick is still
-      if (def.sink && a.state === 'free' && Math.hypot(a.vel.x, a.vel.z) < 0.3 && !a.grabbedBy) {
+      // The sinkers settle when the stick is still — asking for nothing, climb included (`drive`).
+      // This read `!a.grabbedBy`, which is false for the -1 that means "not held", so it only ever
+      // ran on a body something had hold of, and nobody noticed that it tested speed, not the ask.
+      if (def.sink && a.state === 'free' && Math.hypot(a.vel.x, a.vel.z) < 0.3 && a.grabbedBy < 0
+        && Math.hypot(a.drive.x, a.drive.y, a.drive.z) < 0.05) {
         const floor = groundHeight(g.world, a.pos.x, a.pos.z, []) + lengthOf(a) * 0.15;
         if (a.pos.y > floor + 0.2) a.vel.y = Math.min(a.vel.y, -1.2);
       }
-      // a giant with no bite never hunts; a grazer never hunts
+    }
+    // A giant with no bite never hunts, and a grazer never hunts, whoever is steering it.
+    for (const a of g.actors) {
+      if (a.controller !== 'player' && a.controller !== 'shadow' && a.controller !== 'giant') continue;
+      const def = creature(a.creature);
       if ((def.noBite || def.peaceful) && a.brain && (a.brain.goal === 'hunt' || a.brain.goal === 'notice')) { a.brain.goal = 'patrol'; a.brain.target = -1; }
     }
-    for (const a of g.actors) if (a.controller === 'shadow' || a.controller === 'giant') { const def = creature(a.creature); if ((def.noBite || def.peaceful) && a.brain && (a.brain.goal === 'hunt' || a.brain.goal === 'notice')) { a.brain.goal = 'patrol'; a.brain.target = -1; } }
     stepShore(g, ctx, dt);
-    // a stage the food already paid for is taken as soon as the last ceremony is over: the Devonian's own step does this
-    // through checkStage; here the same happens through onNutrition's gain on the next meal, so nudge it along
-    for (const a of players(g)) { const d = devActor(g, a); if (d.stage < PRIME_STAGE && d.standing >= STAGE_AT[d.stage + 1] && a.state !== 'moult' && isAlive(a)) DEVONIAN_RULES.onNutrition(g, a, 0.0001, undefined); }
+    // A stage the food already paid for is taken as soon as the last ceremony is over, as the
+    // Devonian's own step does.
+    for (const a of players(g)) checkStage(g, a, devActor(g, a));
   },
 
   onNutrition,
@@ -316,21 +316,24 @@ export const TRIASSIC_RULES: EraRules = {
    * attacker (`bellyTurn`, while guarding) counts as all. Without a facing the Devonian's
    * snout-to-tail fraction applies. Pierce reads exactly as it does there.
    */
+  /**
+   * The pod's shield: for eight seconds after the call, a hit on the calf lands on the nearest
+   * pod-mate instead — the mate takes the attacker's light bite and the calf almost nothing.
+   */
+  shield(g, attacker, victim) {
+    if (!isPlayerish(victim)) return undefined;
+    const t = triActor(g, victim);
+    if (t.podShield <= 0) return undefined;
+    let mate: Actor | undefined, best = 12;
+    for (const id of t.pod) { const m = g.byId(id); if (m && isAlive(m)) { const d = distXZ(m.pos, victim.pos); if (d < best) { best = d; mate = m; } } }
+    if (!mate) return undefined;
+    mate.hp = Math.max(1, mate.hp - creature(attacker.creature).light.damage); mate.sinceHit = 0; mate.lastHitBy = attacker.id;
+    return 0.05;
+  },
+
   armour(attacker, victim, dir) {
     void dir;
     const vdef = creature(victim.creature);
-    // The pod's shield: for eight seconds after the call, a hit on the calf lands on the nearest
-    // pod-mate instead. The multiplier is all this hook returns, so the mate takes the attacker's
-    // light bite here and the calf takes almost nothing.
-    const g = lastGame;
-    if (g && isPlayerish(victim)) {
-      const t = triActor(g, victim);
-      if (t.podShield > 0) {
-        let mate: Actor | undefined, best = 12;
-        for (const id of t.pod) { const m = g.byId(id); if (m && isAlive(m)) { const d = distXZ(m.pos, victim.pos); if (d < best) { best = d; mate = m; } } }
-        if (mate) { mate.hp = Math.max(1, mate.hp - creature(attacker.creature).light.damage); mate.sinceHit = 0; mate.lastHitBy = attacker.id; return 0.05; }
-      }
-    }
     let f = vdef.armour ?? 0;
     const guarding = victim.state === 'guard';
     if (guarding && vdef.shell) f = 0.85;

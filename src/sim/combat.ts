@@ -12,6 +12,8 @@ export interface HitContext {
   rng: () => number;
   /** An era's damage multiplier for armour plates, enrolment or a withdrawn shell (1 = none). */
   armour?: (attacker: Actor, victim: Actor, dir: Vec3) => number;
+  /** A body that takes this hit instead (EraRules.shield): the victim's multiplier, used in place of `armour`. */
+  shield?: (attacker: Actor, victim: Actor) => number | undefined;
   canEat?: (predator: Actor, food: Actor) => boolean;
 }
 
@@ -70,8 +72,8 @@ export function applyHit(ctx: HitContext, attacker: Actor, victim: Actor, move: 
   const sf = sizeFactor(attacker, victim);
   const base = move.damage * (1 + 0.35 * momentum) * dirBonus * sf;
   let dmg = base * (1 - vdef.defense * (1 - clamp(move.armorPierce ?? 0, 0, 1)));
-  if (ctx.armour) {
-    const k = ctx.armour(attacker, victim, dir);
+  const k = ctx.shield?.(attacker, victim) ?? ctx.armour?.(attacker, victim, dir);
+  if (k !== undefined) {
     dmg *= k;
     if (k < 0.6) ctx.events.push({ kind: 'parry', pos: { ...victim.pos }, actor: victim.id, other: attacker.id, strength: k < 0.35 ? 0.4 : 0.7, player: victim.player });
   }

@@ -407,6 +407,23 @@ for (const [id, kind] of [['mixosaurus', 'a live-bearer'], ['placodus', 'an egg-
   ok(winded > 0 && winded <= 11, `twenty seconds spent and under water sounds the heartbeat ${winded} times, not twenty`);
 }
 
+// ---- the sinkers settle when the stick is still, and not when they are asked to climb ----
+{
+  const g = new Game('reef', [{ creature: 'placodus', device: 'keyboard', ready: true }], 17);
+  g.skipHatch();
+  const p = g.players[0]; p.spawnProtect = 1e9;
+  const floor = () => groundHeight(g.world, p.pos.x, p.pos.z, []);
+  // Mid-water, well under the ceiling and well off the sand.
+  const place = () => { p.pos.y = (floor() + swimCeiling(p)) / 2; p.prevT.y = p.pos.y; p.vel = { x: 0, y: 0, z: 0 }; return p.pos.y; };
+  ok(swimCeiling(p) - floor() > lengthOf(p), `there is water to settle through (${(swimCeiling(p) - floor()).toFixed(1)})`);
+  let y0 = place();
+  run(g, 1);
+  ok(p.pos.y < y0 - 0.5, `a sinker left alone settles toward the floor (${(y0 - p.pos.y).toFixed(2)} down in a second)`);
+  y0 = place();
+  run(g, 1, new Map([[0, frame({ rise: true })]]));
+  ok(p.pos.y > y0, `...and one holding the climb climbs (${(p.pos.y - y0).toFixed(2)} up)`);
+}
+
 // ---- armour with a facing ----
 {
   const g = new Game('reef', [{ creature: 'hybodus', device: 'keyboard', ready: true }]);

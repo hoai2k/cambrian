@@ -104,7 +104,7 @@ function gain(g: Game, a: Actor, d: DevActor, amount: number) {
 }
 
 /** Standing reaches a stage threshold: grow to it with the moult ceremony; arthropods shed a shell. */
-function checkStage(g: Game, a: Actor, d: DevActor) {
+export function checkStage(g: Game, a: Actor, d: DevActor) {
   const next = d.stage + 1;
   if (d.stage >= PRIME_STAGE || d.standing < STAGE_AT[next] || a.state === 'moult' || !isAlive(a)) return;
   const def = creature(a.creature);
