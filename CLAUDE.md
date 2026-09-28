@@ -139,18 +139,26 @@ unless the user explicitly asks for a PR. Steps:
   must read as a jump. `tools/motion-test.ts` guards this.
 - Three eras, one engine, and the site root is none of them: it is the trilogy's page, with
   `/cambrian/` (entry `src/cambrian/main.tsx`), `/devonian/` and `/triassic/` below it. Each entry
-  calls `selectEra(...)` and `setAppBase(nestedBase())` *before* dynamically importing the app, because
-  many modules read `ACTIVE_ERA` at module top. Anything new that reads the era at import time must
-  stay behind that import (or resolve lazily like `assetPaths` and `music()`); the entry page itself
-  must not statically import the audio library or the sim for the same reason. Headless tests that
-  need the Devonian do the same: select the era, then `await import(...)` (`tools/devonian-test.ts`).
+  is one call to `bootGame` (`src/shared/boot-game.tsx`), which calls `selectEra(...)` and
+  `setAppBase(nestedBase())` *before* dynamically importing the app, because many modules read
+  `ACTIVE_ERA` at module top. Anything new that reads the era at import time must stay behind that
+  import (or resolve lazily like `assetPaths` and `music()`); the entry page itself must not
+  statically import the audio library or the sim for the same reason. Headless tests that need the
+  Devonian do the same: select the era, then `await import(...)` (`tools/devonian-test.ts`).
+  **Selecting too late fails loudly**: the default `ACTIVE_ERA` is a watch over the Cambrian that
+  remembers its first read, and a first `selectEra` of another era after one throws and names the
+  read (`src/content/index.ts`; selecting the Cambrian after reading it is harmless). It swaps
+  itself for the plain pack on that first read, so it costs nothing after. It has already caught one:
+  `tools/devonian-test.ts` statically imported `src/sim/types`, which built `TEXT` from the
+  Cambrian's strings before the test chose the Devonian. `npm run ancientseas` holds both halves.
 - The site root is the trilogy's page (entry `src/ancientseas/main.tsx`, data in
   `src/ancientseas/page.ts`); `/ancientseas/`, the address it was first published at, is a redirect
   up to it in `public/`. Every game's title screen offers it, bottom left, in place of the card per
   other era that used to sit there — three games made two of somebody else's titles on a screen
   meant to say press start, and the page they pointed towards holds all three. The pick screen
-  keeps its own menu of the other games (`copy.sibling`/`siblings`), because mid-flow a player who
-  wants another roster is saved a screen. The page itself: one plate in the three games' own engraved style, filling the window,
+  keeps its own menu of the other games (`copy.sibling`/`siblings`, derived like the plate's `GAMES`
+  from the one table of titles, folders and dates in `src/content/era-links.ts`), because mid-flow a
+  player who wants another roster is saved a screen. The page itself: one plate in the three games' own engraved style, filling the window,
   with the three titles on it as links. It is `SLOTS` — pieces placed by centre and width on a
   16:10 desktop stage and a 9:27 phone one — and the plate is built the same way three times over,
   one big animal arching above each era's title with two bottom-dwellers gathered under it, because
@@ -247,7 +255,7 @@ unless the user explicitly asks for a PR. Steps:
   it steers itself: `FOLLOW_RATE` eases the camera round behind the body and back to the resting
   pitch, and `FOLLOW_HOLD` stands it aside after a drag so looking somewhere on purpose sticks.
   **The cursor's own height is the other half of the view.** Outside a dead zone either side of the
-  middle (`edgePitch` in `src/render/engine.ts`, `EDGE_DEAD`), the cursor tilts the camera — up in
+  middle (`edgePitch` in `src/render/camera.ts`, `EDGE_DEAD`), the cursor tilts the camera — up in
   the top of the screen, down in the bottom, squared past the edge so the first part of the push is
   gentle and the corner is quick — which is how a player angles the view so what they are swimming
   at arrives near the middle. The middle is left alone precisely because that is where the aiming
@@ -359,9 +367,14 @@ unless the user explicitly asks for a PR. Steps:
   menu down together with its proportions intact; what is left is the few things that have to *move*
   rather than shrink, because the pads own the bottom-left corner and the drawn buttons the top-right.
   The menus reflow in CSS at the same two figures and **the media query has to keep matching the
-  constants**, or a window gets one half of the compact layout and not the other; it is a query as
-  well as a class because the standalone pages have no React shell to set one and because a stylesheet
-  that only reflows once JavaScript says so flashes the wide layout first.
+  constants** (`npm run breakpoints` reads every `@media` and holds each literal to `COMPACT_W`,
+  `COMPACT_H` or `PICKER_WIDE`), or a window gets one half of the compact layout and not the other;
+  it is a query as well as a class because the standalone pages have no React shell to set one and
+  because a stylesheet that only reflows once JavaScript says so flashes the wide layout first.
+  `src/app/styles.css` is an index of `@import`s over contiguous parts of what was one file, in the
+  order the cascade reads them, so a rule moved between parts moves in the cascade too; the palette
+  the game, the viewer and the workbench share is `src/shared/tokens.css`, with `--foam-rgb` and
+  `--ink-rgb` for a translucent wash of either (`rgb(var(--foam-rgb) / .2)`).
   One old breakpoint was backwards rather than merely tight: every rule under 1000px read "not wide"
   as "stack the picker and scroll it", which is right at 900x1200 and wrong at 780x360 — 360 pixels of
   height is not something scrolling fixes, and the crew card ended up laid *over* the roster. That one
@@ -588,7 +601,7 @@ unless the user explicitly asks for a PR. Steps:
   cooldown 0.55 s, the drift ran through both on a 1.7-second time constant, and by the time the
   button came back the aim had flattened, so the second dash went along the surface rather than
   through it. Breaking the surface is what a chain of dashes is for. `climbAimHold` in
-  `src/render/engine.ts` suspends the drift while a dash fired above the horizon is still on
+  `src/render/camera.ts` suspends the drift while a dash fired above the horizon is still on
   cooldown and for `DASH_AIM_GRACE` (reaction time) past it, reading the simulation's own
   `dashCd` rather than naming a number `src/sim` owns — so a tail flip's longer cooldown is
   followed for free. Only the *drift* is held, never the stick, so a player who wants to level off
@@ -637,7 +650,7 @@ unless the user explicitly asks for a PR. Steps:
   always finishes, including the one that carries a body over the `ashore` threshold, or a body
   walking the line restarts a hop it never gets to take.
 - **A body on the beach leaves prints in it.** `Tracks` in `src/render/fx.ts`, laid by
-  `shoreTracks` in the engine: footprints where a walker's feet come down, a groove behind a body
+  `ShoreTracks` in `src/render/shore-fx.ts`: footprints where a walker's feet come down, a groove behind a body
   hauling itself along on its belly, and a broad slap wherever a stranded flopper lands. They fill
   in over `TRACK_LIFE`, about a minute, so a stretch of beach carries where you have just been and
   not where you were ten minutes ago.
@@ -689,7 +702,7 @@ unless the user explicitly asks for a PR. Steps:
 - **Aim mode is framed across the viewport, not across the world.** The over-the-shoulder shift that
   makes room for the crosshair is measured in body lengths, which is right, but the room it needs is
   measured across the *view* — and a split screen has half of one, so two players side by side put
-  the animal off the edge. `aimRoom` in `src/render/engine.ts` scales the shift by the view's own
+  the animal off the edge. `aimRoom` in `src/render/camera.ts` scales the shift by the view's own
   aspect (`AIM_SHOULDER`), and `AIM_CLOSER` brings the camera in further than it did at every width.
 - The climb for air is the era's central act and must stay usable at every size. The shared rise
   rate is scaled by the body, but the water is not — the surface is the same twelve units above the
@@ -1726,7 +1739,7 @@ unless the user explicitly asks for a PR. Steps:
   `PLAYABLE`. But a guest **grows**: an earned visitor arrives full grown because that is the
   reward and it has already been taken to the top of its own game, where a guest has earned nothing
   and is admitted because it exists — so it hatches and climbs this game's ladder like anything on
-  the roster (`startScale` in `App.tsx` gives a standing pick no `visitorScale`), which is also what
+  the roster (`startScale` in `src/app/lineup.ts` gives a standing pick no `visitorScale`), which is also what
   lets it *be* earned. Two halves make that work: `recordableIds` is the roster **plus** that era's
   guests, so `loadCodex` stops throwing their rungs and their apex away — it cleans against the
   roster alone, and Archelon and Mosasaurus climbed the ladder and were forgotten the moment the
@@ -2075,7 +2088,7 @@ unless the user explicitly asks for a PR. Steps:
   `localStorage` should get a control there; `npm run debug` checks the gate.
 - `?debug=game` arms the match recorder instead of replacing the game: the pause menu grows one
   button that walks Start → End → Export and hands a JSON file to the player's machine
-  (`src/app/debug-record.ts`, sampled from the engine's step loop). It is for answering "why did
+  (`src/shared/debug-record.ts`, sampled from the engine's step loop). It is for answering "why did
   that not work" with the match's own numbers. Each sample carries the input, the body, the bodies
   near it — with the *surface* gap every reach test actually uses — and the simulation's own account
   of the frame, written from inside the gates that decide (`Game.graspReason`) rather than
@@ -2219,8 +2232,8 @@ unless the user explicitly asks for a PR. Steps:
   up and down by where the buttons actually are (`src/app/spatial-nav.ts`), so the line was
   explaining something that needs no explaining and naming one input device out of four while doing
   it. The `pick` action went with it, since nothing else asked for its name.
-- A burrower shows the sand it is moving. `Sand` in `src/render/fx.ts` and `burrowSand` in
-  `src/render/engine.ts`: a steady shower while a body works itself down, one throw as the floor
+- A burrower shows the sand it is moving. `Sand` in `src/render/fx.ts` and `BurrowSand` in
+  `src/render/shore-fx.ts`: a steady shower while a body works itself down, one throw as the floor
   closes over it, and a harder one thrown clear as it surfaces — so both ends of the act are seen
   rather than only the disappearing. Presentation only, off the actors' own `hideMode`, so `src/sim`
   keeps its determinism and gains no event; the silt cloud it already pushes on burial is the
