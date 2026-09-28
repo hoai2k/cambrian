@@ -1336,22 +1336,20 @@ input[type='checkbox'] { width: 20px; height: 20px; accent-color: var(--ember); 
   /* Four bars do not fit across a phone's card; two rows of two do. */
   .select-carousel .creature-copy .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 14px; }
 }
-/* The track: the card on stage and its two neighbours side by side, moved by the finger (`drag`, no
-   easing), eased to a rest (`slide`) and re-seated under the new card with no motion at all (`jump`),
-   which is invisible because the new card is already where the old neighbour was. */
+/* The track: the card on stage and its two neighbours side by side. Its transform and transition are
+   written by `RosterCarousel` directly (following the finger, easing from the release point, and
+   re-seating under the new card in the commit that puts it there), never through React state. */
 .carousel-stage { position: relative; overflow: hidden; }
 /* `touch-action` stops at a scrolling box, so the card's scrolling copy has to say pan-y for itself:
    left to the default, a sideways drag that starts on the copy is taken by the browser as a pan and
    the drag is cancelled after its first move. */
 .carousel-stage .creature-copy { touch-action: pan-y; }
 .carousel-track { position: relative; height: 100%; will-change: transform; }
-.carousel-track.slide { transition: transform var(--slide-ms, 240ms) cubic-bezier(.2, .8, .25, 1); }
 .carousel-slide { position: absolute; top: 0; bottom: 0; left: 0; width: 100%; }
 .carousel-slide.prev { left: calc(-100% - 12px); }
 .carousel-slide.next { left: calc(100% + 12px); }
 .carousel-slide.prev, .carousel-slide.next { cursor: pointer; opacity: .8; }
 .carousel-slide .carousel-extra { animation: none; }
-@media (prefers-reduced-motion: reduce) { .carousel-track.slide { transition-duration: 90ms; } }
 
 /* The roster's two views on a desktop, under folder tabs: the list, or every animal at its size. */
 .roster-pane { display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; min-width: 0; }

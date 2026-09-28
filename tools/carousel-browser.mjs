@@ -20,7 +20,7 @@ const failures = [];
 const stepper = async (page, side) => ((await page.locator(`.carousel-step.${side}`).isVisible()) ? page.locator(`.carousel-step.${side}`) : page.locator(`.carousel-slide.${side}`));
 // The track at rest: no slide under way. A press during a slide is ignored by design (the slide
 // finishes first), so a walk that presses again before it lands would press nothing.
-const rest = (page) => page.waitForFunction(() => document.querySelector('.carousel-track')?.classList.contains('jump'), null, { timeout: 20000 });
+const rest = (page) => page.waitForFunction(() => !document.querySelector('.carousel-track')?.dataset.moving, null, { timeout: 20000 });
 const title = (page) => page.evaluate(() => document.querySelector('.carousel-slide.current .crew-card h2')?.textContent ?? '');
 // Every wait says which step it was, so a timeout names the part of the journey that stopped.
 let stepName = '';
