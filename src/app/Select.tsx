@@ -564,71 +564,102 @@ function RosterCarousel({ p, grid, renderCard }: {
    * otherwise end in — on whatever button the finger started over — is swallowed, so a swipe that
    * began on Lock In is a swipe, not a lock-in.
    */
-  const COMMIT = 0.22, FLICK = 0.45, SLIDE_MS = 260;
+  const COMMIT = 0.22, FLICK = 0.45;
   const stageRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const press = useRef<{ x: number; y: number; t: number; axis: 'x' | 'y' | null; id: number } | null>(null);
+  const press = useRef<{ x: number; y: number; t: number; axis: 'x' | 'y' | null; id: number; trail: { x: number; t: number }[] } | null>(null);
   const swiped = useRef(false);
   /** A slide under way: set from the lift until the row is re-seated under the card it went to. */
   const busy = useRef(false);
-  /** The card the row is waiting to see arrive before it re-seats itself (the slot's key). */
-  const awaiting = useRef<string | null>(null);
-  const width = () => stageRef.current?.clientWidth ?? 1;
+  /** Where the row is, in pixels, as last written: what the next slide starts from. */
+  const xNow = useRef(0);
+  const run = useRef<Animation | null>(null);
+  /** The card the row is seated under. When the card on stage is anything else, the row re-seats. */
+  const seated = useRef<string | null>(null);
+  /** The card on stage before the slide that is under way, so a refused step can be told apart. */
+  const leaving = useRef<string | null>(null);
+  // The exact width, not `clientWidth`: that is rounded, the slides are laid out at 100% of a width
+  // that is often fractional on a phone, and the difference is a pixel the re-seat jumps by.
+  const width = () => stageRef.current?.getBoundingClientRect().width || 1;
   /*
    * The row is moved by writing its transform directly, never through React state: a finger drag
    * re-rendering three whole cards on every move is what makes a card trail the finger on a phone.
-   * `animate` eases from wherever the row is now — the point the finger let go — to `x`.
    */
-  const place = (x: number, animate: boolean) => {
+  const put = (x: number) => {
     const el = trackRef.current; if (!el) return;
-    el.style.transition = animate ? `transform ${SLIDE_MS}ms cubic-bezier(.2, .8, .25, 1)` : 'none';
-    el.style.transform = `translateX(${x}px)`;
-    el.dataset.moving = animate ? 'slide' : x ? 'drag' : '';
+    run.current?.cancel(); run.current = null;
+    xNow.current = x;
+    el.style.transform = `translate3d(${x}px, 0, 0)`;
+    el.dataset.moving = x ? 'drag' : '';
   };
-  /**
-   * When the slide the row just started has actually finished. Asked of the animation itself — its
-   * `finished` promise runs on the animation's own clock, so it cannot resolve early the way a timer
-   * started before the first frame did (a slow frame on a phone cut the slide short into a snap), and
-   * it cannot be lost the way `transitionend` can. A generous timer stands behind it, because a
-   * transition that never started (nothing to move) has no animation to wait for.
+  /*
+   * The lift is animated with the Web Animations API from the exact point the finger let go, at the
+   * speed it was travelling, and the promise is the animation's own. That replaces a CSS transition
+   * switched on in the same task as the transform it was meant to animate, which is three iOS
+   * gotchas at once: whether WebKit starts the transition at all depends on when it next resolves
+   * style; `getAnimations()` asked in the next frame could come back empty there, which ended the
+   * "slide" at once and stepped the cursor under a card still mid-air (the snap); and a fixed
+   * duration eased from rest after a quick flick is a visible stall at the moment of release. The
+   * duration is chosen so the curve's opening speed is the finger's: the curve starts at `SLOPE`
+   * times its average speed, so covering `d` pixels leaving at `v` px/ms takes `SLOPE * d / v`.
    */
-  const settled = () => new Promise<void>((done) => {
-    const el = trackRef.current;
-    const fallback = window.setTimeout(done, SLIDE_MS + 700);
-    requestAnimationFrame(() => {
-      const runs = el?.getAnimations() ?? [];
-      if (!runs.length) { window.clearTimeout(fallback); done(); return; }
-      Promise.all(runs.map((r) => r.finished)).then(() => { window.clearTimeout(fallback); done(); }, () => { window.clearTimeout(fallback); done(); });
-    });
+  const SLOPE = 4, EASE = 'cubic-bezier(.2, .8, .25, 1)';
+  const slide = (to: number, speed = 0) => new Promise<void>((done) => {
+    const el = trackRef.current; if (!el) { done(); return; }
+    const from = xNow.current, d = Math.abs(to - from);
+    run.current?.cancel();
+    xNow.current = to;
+    el.style.transform = `translate3d(${to}px, 0, 0)`;
+    el.dataset.moving = 'slide';
+    if (d < 0.5 || typeof el.animate !== 'function') { done(); return; }
+    const ms = Math.min(420, Math.max(170, speed > 0.05 ? SLOPE * d / speed : 240 + d * 0.15));
+    const a = el.animate([{ transform: `translate3d(${from}px, 0, 0)` }, { transform: `translate3d(${to}px, 0, 0)` }], { duration: ms, easing: EASE });
+    run.current = a;
+    // A generous timer behind the promise: a tab hidden mid-slide pauses the animation's clock.
+    const fallback = window.setTimeout(done, ms + 700);
+    const end = () => { window.clearTimeout(fallback); if (run.current === a) run.current = null; done(); };
+    a.finished.then(end, end);
   });
   const slotKey = (o: Slot) => `${o.kind}:${o.id}`;
   /** Slide the row a whole card over, then step the cursor; the row is re-seated when the new card lands. */
-  const go = (dir: 1 | -1) => {
+  const go = (dir: 1 | -1, speed = 0) => {
     if (busy.current) return;
     busy.current = true;
-    place(-dir * (width() + SLIDE_GAP), true);
-    void settled().then(() => {
-      const target = order[(at + dir + order.length) % order.length];
-      awaiting.current = target ? slotKey(target) : null;
+    leaving.current = slotKey(slot);
+    void slide(-dir * (width() + SLIDE_GAP), speed).then(() => {
       step(dir);
-      // A step the roster refuses (a locked seat) never brings a new card: spring back instead.
-      window.setTimeout(() => { if (awaiting.current) { awaiting.current = null; place(0, true); void settled().then(() => { place(0, false); busy.current = false; }); } }, 400);
+      // A step the roster refuses (a locked seat) never brings a new card: spring back instead. It is
+      // decided by whether the card changed, never by how long the commit took — a timer that sprang
+      // back after 400 ms raced a slow phone's commit and slid the old card home under the new one.
+      window.setTimeout(() => {
+        if (busy.current && leaving.current && seated.current === leaving.current) { leaving.current = null; springBack(); }
+      }, 900);
     });
   };
-  // Re-seat the row in the same commit that puts the new card on stage, so the card the finger sent
+  // Re-seat the row in the same commit that puts a new card on stage, so the card the finger sent
   // there is already in the middle when the row jumps back under it and nothing is seen to move.
   useLayoutEffect(() => {
-    if (awaiting.current && awaiting.current === slotKey(slot)) { awaiting.current = null; place(0, false); busy.current = false; }
+    const k = slotKey(slot);
+    if (seated.current === k) return;
+    seated.current = k; leaving.current = null;
+    put(0); busy.current = false;
   });
   const release = (e: ReactPointerEvent) => {
     const d = press.current; press.current = null;
     if (!d || d.axis !== 'x') return;
-    const moved = e.clientX - d.x, speed = Math.abs(moved) / Math.max(1, e.timeStamp - d.t);
+    const moved = e.clientX - d.x;
+    // The speed at the lift, from the last tenth of a second of travel, not the average since the
+    // press: a slow drag finished with a flick is a flick.
+    const trail = d.trail.filter((s) => e.timeStamp - s.t < 100);
+    const first = trail[0] ?? { x: d.x, t: d.t };
+    const v = (e.clientX - first.x) / Math.max(8, e.timeStamp - first.t);
     swiped.current = true;
-    if (Math.abs(moved) > width() * COMMIT || (speed > FLICK && Math.abs(moved) > 20)) go(moved < 0 ? 1 : -1);
-    else springBack();
+    const dir = moved < 0 ? 1 : -1;
+    const withIt = Math.sign(v) === -dir;
+    if (Math.abs(moved) > width() * COMMIT && (withIt || Math.abs(v) < FLICK) || (withIt && Math.abs(v) > FLICK && Math.abs(moved) > 20)) go(dir, withIt ? Math.abs(v) : 0);
+    else springBack(withIt ? 0 : Math.abs(v));
   };
-  const springBack = () => { busy.current = true; place(0, true); void settled().then(() => { place(0, false); busy.current = false; }); };
+  const springBack = (speed = 0) => { busy.current = true; void slide(0, speed).then(() => { put(0); busy.current = false; }); };
   // A locked visitor is an animal on stage whatever the cursor says: its arrows walk the visitors.
   const showCard = slot.kind === 'creature' || (seat?.cursor === 'visitors' && seat.ready);
   const cardPl: PlayerSetup = seat ?? { creature: (slot.kind === 'creature' ? slot.id : ACTIVE_ERA.defaults.player) as CreatureId, device: 'touch', ready: false };
@@ -660,7 +691,7 @@ function RosterCarousel({ p, grid, renderCard }: {
           // swipe (which ends in no click at all) leaves the next real tap — Lock In — swallowed.
           swiped.current = false;
           if (busy.current) return;
-          press.current = { x: e.clientX, y: e.clientY, t: e.timeStamp, axis: null, id: e.pointerId };
+          press.current = { x: e.clientX, y: e.clientY, t: e.timeStamp, axis: null, id: e.pointerId, trail: [] };
         }}
         onPointerMove={(e) => {
           const d = press.current; if (!d) return;
@@ -669,7 +700,11 @@ function RosterCarousel({ p, grid, renderCard }: {
             d.axis = Math.abs(mx) > Math.abs(my) ? 'x' : 'y';
             if (d.axis === 'x') { try { (e.currentTarget as HTMLElement).setPointerCapture(d.id); } catch { /* */ } }
           }
-          if (d.axis === 'x') place(mx, false);
+          if (d.axis === 'x') {
+            d.trail.push({ x: e.clientX, t: e.timeStamp });
+            if (d.trail.length > 12) d.trail.shift();
+            put(mx);
+          }
         }}
         onPointerUp={release}
         onPointerCancel={() => { if (press.current?.axis === 'x') springBack(); press.current = null; }}

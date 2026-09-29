@@ -422,12 +422,21 @@ unless the user explicitly asks for a PR. Steps:
   the track is re-seated with no motion **in the same commit that puts the new card on stage**
   (a layout effect waiting for that card), which is invisible because the new card is already where
   the neighbour was; re-seating before the cursor's update landed showed the old card snap back to
-  the middle for a frame and then change. The slide is ended by the transition's own
-  `Animation.finished`, with a generous timer behind it: a timer *alone*, started on release, ran
-  before a slow phone frame had even begun the slide and cut it short into a snap, and
-  `transitionend` can arrive late or not at all. And the row's transform is written straight onto
-  the element while the finger moves, never through React state — three whole cards re-rendered per
-  move is how a card comes to trail the finger.
+  the middle for a frame and then change. **The lift is a Web Animation, never a CSS transition switched on
+  under the finger** — it starts from the exact point the finger let go, at the finger's own speed
+  (the duration is picked so the curve's opening slope is the release velocity, measured over the
+  last tenth of a second rather than averaged since the press), and it is ended by that animation's
+  own `finished`, with a generous timer behind it. Chrome's phone emulation passed the transition
+  version and an iPhone did not, for iOS reasons that stack: setting `transition` and `transform` in
+  one task starts a transition only when WebKit next resolves style, `getAnimations()` asked in the
+  next frame could find nothing there and end the "slide" at once — stepping the cursor under a
+  card still in mid-air — and a fixed duration eased from rest is a stall at the moment of a flick.
+  The re-seat is decided by **the card on stage changing**, never by a timer: a 400 ms guard for a
+  refused step raced a slow phone's commit and slid the old card home under the new one. The row is
+  measured with `getBoundingClientRect` (`clientWidth` is rounded, and the slides sit at 100% of a
+  fractional width), and the portraits' float pauses while it moves. And the row's transform is
+  written straight onto the element while the finger moves, never through React state — three
+  whole cards re-rendered per move is how a card comes to trail the finger.
   **A slide's three cards are keyed by the animal, not by the position.** Keyed `prev`/`current`/
   `next`, the card sliding in was a *different element* from the one that had been peeking — React
   unmounted the neighbour and mounted a fresh card on stage, whose portrait replayed its entrance

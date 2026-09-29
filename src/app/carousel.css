@@ -106,6 +106,10 @@
    the drag is cancelled after its first move. */
 .carousel-stage .creature-copy { touch-action: pan-y; }
 .carousel-track { position: relative; height: 100%; will-change: transform; }
+/* While the row moves, the portraits hold their float: three separately animated layers, each with a
+   drop shadow and a multiply blend against the paper, riding inside a fourth that is moving is work a
+   phone's compositor does on every frame of the slide, and the float cannot be seen mid-swipe anyway. */
+.carousel-track:is([data-moving='slide'], [data-moving='drag']) .hero img { animation-play-state: paused; }
 .carousel-slide { position: absolute; top: 0; bottom: 0; left: 0; width: 100%; }
 .carousel-slide.prev { left: calc(-100% - 12px); }
 .carousel-slide.next { left: calc(100% + 12px); }
