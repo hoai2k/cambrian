@@ -1470,6 +1470,8 @@ unless the user explicitly asks for a PR. Steps:
   sample. Guard a new term by the weight that scales it — and prove the guard **exact** rather than
   nearly right, by hashing `sampleHeight`, `biomeWeights` and `channelFactor` over a grid in all
   three eras before and after. Anything else silently redraws the world under every saved seed.
+  `shoreZ` and `sampleHeight` carry an exact one-entry memo (the same inputs give back the number
+  they gave last time), which is the only kind of cache a field function may have.
 - **Every headless suite is a row in `tools/test.mjs`**, which bundles them all up front and runs
   them in parallel, one job per era (and per shard, where a suite splits itself). `npm test` is all
   of them, `npm run sim` the simulation sweep, `npm run sim:gate` its cheap half, and `npm run ci`
@@ -1517,6 +1519,40 @@ unless the user explicitly asks for a PR. Steps:
   reach and put some 180 plants in front of every body every step to find the one it touched — and
   sorts its hits back into the order `floraHash` gives, by rank. Anything that edits `world.flora`
   by hand calls `World.reindexFlora()`, which rebuilds both indexes and the margin together.
+- **What nobody can see is spared the work that only shows, and "nobody" means every seat.** Three
+  places decide it and all of them count every local player's camera, never just the first:
+  `syncViews` frustum-tests each view against every viewport before animating it (an unseen view
+  banks the time it missed in `owed` and spends it when seen again, and is frozen out of the matrix
+  walk by `ViewRoot`, src/render/view-root.ts; what a rider, a mouthful or a swallow hangs on is
+  posed regardless), and the simulation marks school fish no camera could be drawing `unseen`
+  (src/sim/sight.ts), which skip rocks, plants and body-on-body pushes but keep the seabed, the
+  surface and the shore wall. Sight is measured from every seat at its widest zoom, sized on the
+  predator for a swallowed seat and eased off a host for a rider exactly as the camera is, and the
+  numbers it uses (camera arm, zoom limit, size floor, near field) are the renderer's own, shared
+  through `src/shared/view-reach.ts` so the two cannot drift. `npm run sight` asks the renderer's
+  `drawable` from thousands of camera placements with one to four seats whether it could draw
+  anything marked unseen. The scene's matrices are brought up to date once a frame
+  (`matrixWorldAutoUpdate` off), so anything moved *per viewport* updates its own, as the water
+  surface and the drift motes do in `setViewLength`.
+- **The HUD snapshot is not `App`'s state.** It arrives 24 times a second and lives in
+  `src/app/hud-store.ts`: the HUD and the results panel read every snapshot (`useHud`), and `App`
+  reads only the few facts it decides on (`useHudShell`), which change a few times a match. Put a
+  per-frame value in `App`'s state and the whole shell re-renders at that rate again. And the
+  engine reads the container's size on resize, never per frame: a read after the HUD had touched
+  the page forced a layout every frame.
+- **The title comes first and the engine after it.** Each game's `index.html` draws its title
+  painting as static markup inside `#root`, and `App` imports the engine (and three.js, its own
+  long-lived chunk) only once that painting is on screen (`titleShown`); anything that talks to the
+  engine re-runs when it exists (`engineReady`). Nothing the title screen imports statically may
+  reach `src/render` or `three`. Full-detail creature bodies are reference-counted by the views
+  drawing them and freed when idle beyond a small allowance (`evictIdleModels`), and the title and
+  pick screens never fetch one: the queue wants the picked and hovered animals, and the sea behind
+  those screens, which they cover, draws decimated bodies.
+- **Frames are kept by giving things up only while they are long** (`src/render/frame-governor.ts`,
+  pure, `npm run governor`): the shadow every other frame, then 85 % and 72 % resolution on high;
+  antialiasing first on low, taken once a session because it costs a new renderer. Nothing changes
+  while frames are fine, hitches over 150 ms do not count, and browser automation is left alone so
+  a harness measuring pixels keeps its resolution.
 - **Sprint is gone, and the dash is as long as it is held.** A steered body has one way of putting
   its back into a move. `toInput` sends `burst: 0` for a player and LB — which used to hold the
   sprint — is a second dash button; the burst machinery stays because the AI drives it and a
