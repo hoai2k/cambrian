@@ -12,7 +12,7 @@ import {
   AIM_HOLD, DOUBLE, DRAG, PINCH_MIN, SECONDARY, SWAP, TAP_TIME,
   clear, down, freshTouch, meterEdge, move, read, secondaryOf, stepSlot, toNdc, up,
 } from '../src/shared/touch-play';
-import { COMPACT_H, COMPACT_W, MIN_TILE, layoutFor, rosterCap, rotateHint, splitAxis, touchFirst, carouselView, gridFits, pickerSideBySide, rosterArea } from '../src/shared/small-screen';
+import { COMPACT_H, COMPACT_W, MIN_TILE, layoutFor, rosterCap, splitAxis, touchFirst, carouselView, gridFits, pickerSideBySide, rosterArea } from '../src/shared/small-screen';
 import { applyTouch } from '../src/input/touch';
 import { emptyControls, type RawControls } from '../src/input/input';
 import { btn, key, menuScheme, schemeForDevice, type Action } from '../src/shared/controls';
@@ -417,8 +417,8 @@ check('a landscape phone is compact', layoutFor(780, 360) === 'compact');
 check('a portrait phone is compact', layoutFor(390, 844) === 'compact');
 check('a tablet in landscape is the full layout', layoutFor(1180, 820) === 'full');
 // A tablet upright is 820 across, which is more room than the pick screen's own one-column
-// breakpoint asks for and plenty for the HUD. It is *tall*, which is a thing `rotateHint` mentions
-// and not a thing that needs panels taking away — the two questions are deliberately separate.
+// breakpoint asks for and plenty for the HUD. It is *tall*, which is not a thing that needs panels
+// taking away — how much room there is and which way up the screen is are separate questions.
 check('a tablet in portrait keeps the full layout', layoutFor(820, 1180) === 'full');
 check('...and a phone held up does not, being genuinely narrow', layoutFor(430, 932) === 'compact');
 check('a short desktop window is compact too', layoutFor(1440, 420) === 'compact');
@@ -434,14 +434,6 @@ check('a mouse never does', touchFirst(false, false, 0) === false);
 check('a touch laptop being used with its trackpad does not', touchFirst(true, true, 0) === false);
 check('a pad in the session wins, as it does over the mouse', touchFirst(true, false, 1) === false);
 
-check('a tall phone is asked to turn round', rotateHint(390, 844, true) === true);
-check('a short portrait phone is gated too', rotateHint(540, 600, true) === true);
-check('a narrow portrait tablet may still play', rotateHint(600, 960, true) === false);
-check('a landscape phone is not', rotateHint(780, 360, true) === false);
-check('a 4:3 tablet upright is not nagged', rotateHint(820, 1093, true) === false);
-check('...nor a 3:2 one', rotateHint(800, 1200, true) === false);
-check('a big phone held up is', rotateHint(430, 932, true) === true);
-check('and a desktop window is never asked', rotateHint(390, 844, false) === false);
 check('touch marks reuse the mouse art', cursorFor('zoom').includes(cursorImageFor('zoom')) && cursorFor('target').includes(cursorImageFor('target')));
 
 // The roster's columns. `gridColumns` packs the whole roster into three rows, which is a rule about

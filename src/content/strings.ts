@@ -153,6 +153,8 @@ export interface GameStrings {
       readonly visitorNote: (origin: string) => string;
       readonly lockIn: (confirmKey: string) => string;
       readonly lockedIn: (confirmKey: string) => string;
+      /** Lock In on a phone with no pad: one player needs no second step, so it dives straight in. */
+      readonly diveNow: string;
     };
     /** What this animal has grown into before, in Rise, and the offer to carry on from it. */
     readonly best: {
@@ -454,6 +456,8 @@ export interface GameStrings {
      * explanation, and anything longer would be covering the game in order to describe itself.
      */
     readonly pads: {
+      /** Over the aim pad the first time something edible is in front of a new touch player. */
+      readonly holdToAim: string;
       readonly swim: string;
       readonly swimAria: string;
       /** The swappable pad, once per action it can be set to. Keyed by the action's own name. */
@@ -469,8 +473,6 @@ export interface GameStrings {
       readonly travel: string;
       readonly scores: string;
     };
-    /** Asked once, on a phone held upright: the sea is a wide thing to look at. */
-    readonly rotate: string;
   };
 
   /** The Send Feedback button on the pick screen, and the dialog behind it. */
@@ -724,6 +726,7 @@ export const SHARED_STRINGS: GameStrings = {
       visitorNote: (origin) => `VISITOR · ${origin} · left / right for the others`,
       lockIn: (confirmKey) => `LOCK IN  ·  ${confirmKey}`,
       lockedIn: (confirmKey) => `LOCKED IN · ${confirmKey} DIVES`,
+      diveNow: 'Dive in',
     },
     best: {
       badge: 'BEST',
@@ -975,6 +978,7 @@ export const SHARED_STRINGS: GameStrings = {
       airRunningOut: 'AIR RUNNING OUT · start for the surface',
     },
     pads: {
+      holdToAim: 'Hold to aim',
       swim: 'SWIM',
       swimAria: 'Hold to swim forward, wherever the view is pointing',
       aim: 'AIM',
@@ -987,7 +991,6 @@ export const SHARED_STRINGS: GameStrings = {
       travel: 'Travel',
       scores: 'Scores',
     },
-    rotate: 'Turn your phone sideways to play',
   },
 
   feedback: {

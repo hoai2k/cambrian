@@ -11,6 +11,17 @@ try {
     const page = await browser.newPage({ viewport: { width, height }, hasTouch: mobile, isMobile: mobile });
     await page.addInitScript(() => localStorage.setItem('cambrian-settings', JSON.stringify({ quality: 'low', muted: true, music: false })));
     await page.goto((process.env.QA_BASE_URL || 'http://127.0.0.1:4181/') + 'cambrian/?screen=select', { waitUntil: 'domcontentloaded', timeout: 120000 });
+    if (mobile) {
+      // A phone with no pad has no Dive In in the footer at all: one player, one step, and the card's
+      // own Lock In is the button that dives (see `oneStep` in src/app/Select.tsx).
+      await page.locator('.select').waitFor();
+      assert.equal(await page.locator('.select-footer .start-button').count(), 0, `${width}x${height}: a phone with no pad has one step, not two`);
+      const icons = await page.evaluate(() => { const r = document.querySelector('.toolbar').getBoundingClientRect(); return { x: r.x, w: r.width }; });
+      assert.ok(icons.x >= 0 && icons.x + icons.w <= width, `${width}x${height}: the icons should stay on screen`);
+      console.log(`${width}x${height}: one step, icons on screen`);
+      await page.close();
+      continue;
+    }
     await page.locator('.select-footer .start-button').waitFor();
     const layout = await page.evaluate(() => {
       const rect = (selector) => {

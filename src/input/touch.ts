@@ -54,6 +54,8 @@ export class TouchPlay {
   private owedHeavies = 0;
   /** Called when a swipe changes the secondary pad, so the shell can remember and make a noise. */
   onSwap: ((s: Secondary) => void) | null = null;
+  /** Called when a finger lands on the swim or the secondary pad, so the shell can retire a lesson. */
+  onZone: ((z: 'swim' | 'secondary') => void) | null = null;
   /** Whether any finger has touched the game yet. The shell uses it to decide the scheme is live. */
   used = false;
 
@@ -120,6 +122,7 @@ export class TouchPlay {
       const onTarget = zone === 'water' && this.targetAt
         ? this.targetAt(toNdc(p.x, p.y, size.w, size.h)) : this.overTarget;
       down(this.state, touch.identifier, zone, p.x, p.y, t, onTarget, size);
+      if (zone === 'swim' || zone === 'secondary') this.onZone?.(zone);
       this.mine.add(touch.identifier);
       took = true;
     }

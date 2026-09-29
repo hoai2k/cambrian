@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { layoutFor, rotateHint, touchFirst, type Layout } from '../shared/small-screen';
+import { layoutFor, touchFirst, type Layout } from '../shared/small-screen';
 
 /**
  * What this window is, and when it changes.
@@ -26,8 +26,6 @@ export interface SmallScreen {
   width: number; height: number;
   /** A finger is the pointer and no pad is connected: the pads are drawn and touch plays. */
   touch: boolean;
-  /** A small phone is in portrait and gameplay is blocked until landscape. */
-  rotate: boolean;
 }
 
 /** Whether a media query holds, safely: `matchMedia` is missing in a headless renderer or two. */
@@ -38,7 +36,7 @@ const media = (q: string): boolean => {
 const measure = (pads: number): SmallScreen => {
   const width = window.innerWidth || 1, height = window.innerHeight || 1;
   const touch = touchFirst(media('(pointer: coarse)'), media('(hover: hover)'), pads);
-  return { layout: layoutFor(width, height), width, height, touch, rotate: rotateHint(width, height, touch) };
+  return { layout: layoutFor(width, height), width, height, touch };
 };
 
 export function useSmallScreen(pads: number): SmallScreen {
@@ -48,7 +46,7 @@ export function useSmallScreen(pads: number): SmallScreen {
       const now = measure(pads);
       // Same answer, same object: this feeds a class name and a couple of booleans, and re-rendering
       // the whole shell on every pixel of a window drag would be paid for in dropped frames.
-      return was.layout === now.layout && was.touch === now.touch && was.rotate === now.rotate
+      return was.layout === now.layout && was.touch === now.touch
         && was.width === now.width && was.height === now.height ? was : now;
     });
     read();

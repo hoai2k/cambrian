@@ -35,6 +35,16 @@ interface Props {
   carry: boolean[];
   /** Which mode chip the pad is pointing at, or -1 when the shoulder ring is elsewhere. */
   modeFocus?: number;
+  /**
+   * A phone with no pad: one player, one step. Lock In *is* Dive In (`onDive`) and the footer's
+   * button goes away, because locking in and then diving is two presses to say one thing when there
+   * is nobody else to wait for. A pad connecting brings the split back, since then there can be.
+   */
+  oneStep?: boolean;
+  onDive?: (i: number) => void;
+  /** Draw Dive In with a glow behind it once it is enabled — a compact window, where no cursor is
+   *  resting on it the way a desktop's is. */
+  glowStart?: boolean;
   /** Which of the List and Size tabs the pad is pointing at, or -1. */
   viewFocus?: number;
   /** How the roster is drawn on a desktop: the list, or the animals at size where they live. */
@@ -226,7 +236,7 @@ const EXTRA_LABEL: Record<ExtraId, { name: string; glyph: string; title: string 
  * animal a numbered figure and the chosen one a plate. `?plate=0` still reaches the old dark panel so
  * the two can be compared; nothing on the page offers it.
  */
-const PLATE = typeof location === 'undefined' || !/[?&]plate=0(?:&|$)/.test(location.search);
+export const PLATE = typeof location === 'undefined' || !/[?&]plate=0(?:&|$)/.test(location.search);
 
 export function SelectScreen(p: Props) {
   const s = p.scheme;
@@ -349,9 +359,11 @@ export function SelectScreen(p: Props) {
                 {/* A phantom card is the carousel's, shown before anybody has a seat (arriving from
                     another game's picker): locking it in is the gesture that takes the seat, on the
                     animal on the card, exactly as a tap on a grid tile would. */}
-                <button className="ready-button" aria-pressed={pl.ready} onClick={() => { if (phantom) p.onPick(i, pl.creature); p.onReady(i); }}>
-                  {pl.ready ? <><CheckIcon width={18} height={18} /> {C.lockedIn(key('confirm', s).toUpperCase())}</> : C.lockIn(key('confirm', s).toUpperCase())}
-                </button>
+                {p.oneStep && p.onDive
+                  ? <button className="ready-button dive-now" onClick={() => { if (phantom) p.onPick(i, pl.creature); p.onDive?.(i); }}>{C.diveNow}</button>
+                  : <button className="ready-button" aria-pressed={pl.ready} onClick={() => { if (phantom) p.onPick(i, pl.creature); p.onReady(i); }}>
+                    {pl.ready ? <><CheckIcon width={18} height={18} /> {C.lockedIn(key('confirm', s).toUpperCase())}</> : C.lockIn(key('confirm', s).toUpperCase())}
+                  </button>}
               </article>
             );
   };
@@ -455,7 +467,7 @@ export function SelectScreen(p: Props) {
             unless a feedback endpoint was compiled in — see src/shared/feedback.ts. */}
         <FeedbackButton />
         <div className="start-wrap">
-          <button className={`start-button ${p.allReady ? 'focused' : ''}`} disabled={!p.allReady} onClick={p.onStart}>{T.dive(key('confirm', s).toUpperCase())}</button>
+          {!p.oneStep && <button className={`start-button ${p.allReady ? 'focused' : ''} ${p.glowStart && p.allReady ? 'glow' : ''}`} disabled={!p.allReady} onClick={p.onStart}>{T.dive(key('confirm', s).toUpperCase())}</button>}
         </div>
       </footer>
     </section>
@@ -615,13 +627,24 @@ function RosterCarousel({ p, grid, renderCard }: {
   // A locked visitor is an animal on stage whatever the cursor says: its arrows walk the visitors.
   const showCard = slot.kind === 'creature' || (seat?.cursor === 'visitors' && seat.ready);
   const cardPl: PlayerSetup = seat ?? { creature: (slot.kind === 'creature' ? slot.id : ACTIVE_ERA.defaults.player) as CreatureId, device: 'touch', ready: false };
-  /** A neighbour's card: the same card, drawn for an animal nobody is on yet. */
-  const neighbour = (o: Slot | undefined) => {
-    if (!o) return null;
-    if (o.kind === 'extra') return <ExtraCard id={o.id as ExtraId} count={p.visitorCount} onTake={() => {}} />;
-    return renderCard({ creature: o.id as CreatureId, device: seat?.device ?? 'touch', ready: false }, 0, true);
+  /*
+   * The three slides are keyed by the slot they show, not by their place in the row. After a slide the
+   * card that came in *stays the same element* — it simply changes role from neighbour to stage in the
+   * commit that re-seats the row — so nothing about it is rebuilt: a positional row swapped the
+   * contents instead, and the new card mounted fresh and replayed its portrait's entrance on arrival,
+   * which read as the card snapping into place. A neighbour is drawn exactly as the card on stage will
+   * be (the same seat's device, the same phantom rule) so the change of role changes nothing visible.
+   */
+  const cardFor = (o: Slot, onStage: boolean): ReactNode => {
+    if (onStage && showCard) return renderCard(cardPl, 0, !seat);
+    if (o.kind === 'extra') return <ExtraCard id={o.id as ExtraId} count={p.visitorCount} onTake={() => { if (onStage) p.onExtra(0, o.id as ExtraId); }} />;
+    return renderCard({ creature: o.id as CreatureId, device: seat?.device ?? 'touch', ready: false }, 0, !seat);
   };
-  const prevSlot = order[(at - 1 + order.length) % order.length], nextSlot = order[(at + 1) % order.length];
+  const row: { role: 'prev' | 'current' | 'next'; slot: Slot; dir: -1 | 0 | 1 }[] = [
+    { role: 'prev', slot: order[(at - 1 + order.length) % order.length], dir: -1 },
+    { role: 'current', slot, dir: 0 },
+    { role: 'next', slot: order[(at + 1) % order.length], dir: 1 },
+  ];
   return (
     <div className="carousel" role="group" aria-roledescription="carousel" aria-label={K.label}>
       <button className="carousel-step prev" aria-label={K.prev} onClick={() => go(-1)}><span aria-hidden="true">‹</span></button>
@@ -648,13 +671,13 @@ function RosterCarousel({ p, grid, renderCard }: {
         onClickCapture={(e) => { if (swiped.current) { e.stopPropagation(); e.preventDefault(); swiped.current = false; } }}
       >
         <div className="carousel-track" ref={trackRef}>
-          <div className="carousel-slide prev" aria-hidden="true" onClickCapture={(e) => { e.stopPropagation(); e.preventDefault(); go(-1); }}>{neighbour(prevSlot)}</div>
-          <div className="carousel-slide current">
-            {showCard
-              ? renderCard(cardPl, 0, !seat)
-              : <ExtraCard id={slot.id as ExtraId} count={p.visitorCount} onTake={() => p.onExtra(0, slot.id as ExtraId)} />}
-          </div>
-          <div className="carousel-slide next" aria-hidden="true" onClickCapture={(e) => { e.stopPropagation(); e.preventDefault(); go(1); }}>{neighbour(nextSlot)}</div>
+          {row.map(({ role, slot: o, dir }) => (
+            <div key={`${slotKey(o)}#${role === 'current' || slotKey(o) !== slotKey(slot) ? '' : role}`} className={`carousel-slide ${role}`}
+              aria-hidden={role === 'current' ? undefined : true}
+              onClickCapture={dir ? (e) => { e.stopPropagation(); e.preventDefault(); go(dir as 1 | -1); } : undefined}>
+              {cardFor(o, role === 'current')}
+            </div>
+          ))}
         </div>
       </div>
       <button className="carousel-step next" aria-label={K.next} onClick={() => go(1)}><span aria-hidden="true">›</span></button>

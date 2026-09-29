@@ -241,3 +241,15 @@
 .select.plate .depth-name, .depth-name { overflow: visible; text-overflow: clip; justify-self: center; width: max-content; max-width: 150px; }
 /* The same shade under the lettering of a stamp, which is flat and has no highlight to lean on. */
 .select.plate .crew-2 .ready-button, .select.plate .crew.compact .ready-button { text-shadow: 0 1px 2px rgba(20, 12, 4, .55); }
+
+/* Dive In glows once it is enabled on a compact window, where no cursor is resting on it to say it is
+   the next thing to press. The ribbon is clipped to its notched shape, which clips a box-shadow too,
+   so the glow is a separate layer behind it in the wrapper. */
+.start-wrap { position: relative; isolation: isolate; }
+.start-wrap:has(.start-button.glow)::before {
+  content: ''; position: absolute; inset: -16px -22px; z-index: -1; pointer-events: none; border-radius: 999px;
+  background: radial-gradient(closest-side, rgba(255, 196, 96, .9), rgba(255, 150, 60, .35) 60%, transparent);
+  animation: dive-glow 1.5s ease-in-out infinite;
+}
+@keyframes dive-glow { 0%, 100% { opacity: .45; transform: scale(.92); } 50% { opacity: 1; transform: scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .start-wrap:has(.start-button.glow)::before { animation: none; opacity: .8; } }

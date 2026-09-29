@@ -100,7 +100,8 @@
 .carousel-slide { position: absolute; top: 0; bottom: 0; left: 0; width: 100%; }
 .carousel-slide.prev { left: calc(-100% - 12px); }
 .carousel-slide.next { left: calc(100% + 12px); }
-.carousel-slide.prev, .carousel-slide.next { cursor: pointer; opacity: .8; }
+/* No dimming: the card that slides in must look exactly as it will on stage, or it pops on arrival. */
+.carousel-slide.prev, .carousel-slide.next { cursor: pointer; }
 .carousel-slide .carousel-extra { animation: none; }
 
 /* The roster's two views on a desktop, under folder tabs: the list, or every animal at its size. */

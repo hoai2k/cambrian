@@ -195,9 +195,17 @@ export class PlayerInput {
     // *is* the pointing ray and a neutral stick is pushed forward along it. Held, the body keeps
     // going that way, which is what a dash as long as it is held should do. A finger is the same
     // gesture with the same answer, and re-aims as it moves.
+    //
+    // The ray is taken whole, never through `swimPitch`: that is the *resting* stick's reading of a
+    // camera tilt, with a flat slice for a lazy view and a cap at the end of the camera's travel, and
+    // a dash is not lazy — it is pointed. Squashed through it, a dash at something straight overhead
+    // climbed at 54°, and one aimed past overhead (up and behind, from a camera already looking up, or
+    // through a camera that has looped upside down) went somewhere else entirely. The yaw from the
+    // ray's own heading and the pitch from its own climb describe any direction exactly, the pole and
+    // beyond included, whichever way up the camera happens to be.
     if (cursor && (this.mouseFrame?.right || this.touchFrame?.dash)) {
       f.camYaw = Math.atan2(cursor.x, cursor.z);
-      f.camPitch = swimPitch(-Math.asin(clamp(cursor.y, -1, 1)));
+      f.camPitch = -Math.asin(clamp(cursor.y, -1, 1));
       if (Math.hypot(f.mx, f.my) < 0.3) { f.mx = 0; f.my = 1; }
     }
     void a;

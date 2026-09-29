@@ -23,13 +23,17 @@ import type { Secondary } from '../shared/touch-play';
  * button is the exception and a real `<button>`: it leaves the game, which is the one thing that must
  * work however the page is being read.
  */
-export function TouchPads({ secondary, swapped, teleportOpen, onPause }: {
+export function TouchPads({ secondary, swapped, teleportOpen, onPause, swimHint = false, aimHint = 'off' }: {
   secondary: Secondary;
   /** The pad was just swapped: name what it is now, for a moment. */
   swapped: boolean;
   /** The travel menu is up, so the game pads stand down while the player chooses. */
   teleportOpen: boolean;
   onPause: () => void;
+  /** Ring the swim pad: nobody has held it yet. */
+  swimHint?: boolean;
+  /** Point the aim pad out, pulsing at first and then steady, with the words over it. */
+  aimHint?: 'off' | 'pulse' | 'steady';
 }) {
   const COPY = TEXT.hud.pads;
   const label = COPY[secondary];
@@ -37,17 +41,18 @@ export function TouchPads({ secondary, swapped, teleportOpen, onPause }: {
     <div className="touch-pads">
       {!teleportOpen && <div className="touch-left">
         <div className="touch-pad-row">
-          <div className="touch-pad touch-swim" data-touch-zone="swim" aria-hidden="true">
+          <div className={`touch-pad touch-swim ${swimHint ? 'teach' : ''}`} data-touch-zone="swim" aria-hidden="true">
             <span>{COPY.swim}</span>
           </div>
           <div
-            className={`touch-pad touch-secondary ${swapped ? 'just-swapped' : ''}`}
+            className={`touch-pad touch-secondary ${swapped ? 'just-swapped' : ''} ${aimHint !== 'off' ? `teach ${aimHint}` : ''}`}
             data-touch-zone="secondary"
             aria-hidden="true"
             title={COPY.secondaryAria(label)}
           >
             {/* The arrows are the affordance: a pad that can be swiped and does not look it is a pad
                 nobody swipes. They are part of the drawing rather than a hint that goes away. */}
+            {aimHint !== 'off' && <em className="touch-teach-note">{COPY.holdToAim}</em>}
             <i className="swipe-mark left" />
             <span>{label}</span>
             <i className="swipe-mark right" />
@@ -62,9 +67,3 @@ export function TouchPads({ secondary, swapped, teleportOpen, onPause }: {
   );
 }
 
-/**
- * Active play stops behind this gate. Pausing opens the normal menu in either orientation.
- */
-export function RotateHint({ onPause }: { onPause: () => void }) {
-  return <div className="rotate-gate"><p role="status">{TEXT.hud.rotate}</p><button type="button" onClick={onPause}>{TEXT.hud.pads.pause}</button></div>;
-}

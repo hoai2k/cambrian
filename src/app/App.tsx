@@ -21,10 +21,9 @@ import { enterFullscreen, rememberFullscreen, restoreFullscreenOnGesture } from 
 import { exportRecording, recordingPhase, resetRecording, startRecording, stopRecording } from '../shared/debug-record';
 import { atMain, cycle, groupsFor, stops, type Focus, type FocusGroup } from './focus-ring';
 import { rectsOf, step as spatialStep, type Dir } from './spatial-nav';
-import { gridColumns, SelectScreen } from './Select';
+import { gridColumns, PLATE, SelectScreen, type RosterView } from './Select';
 import type { ExtraId } from './roster-grid';
 import type { DepthLayout } from './depth-layout';
-import type { RosterView } from './Select';
 import { visitorsInBrowser, type EraId, type Visitor } from '../content/visitors';
 import { registerVisitorAssets } from '../content/asset-paths';
 import { admitVisitors } from '../sim/creatures';
@@ -35,7 +34,7 @@ import { menuScheme } from '../shared/controls';
 import { SECONDARY, type Secondary } from '../shared/touch-play';
 import { rosterCap } from '../shared/small-screen';
 import { qualityForDevice } from '../shared/mobile-memory';
-import { RotateHint, TouchPads } from './TouchPads';
+import { TouchPads } from './TouchPads';
 import { useSmallScreen } from './use-small-screen';
 import { assignSeatSchemes } from '../shared/seat-schemes';
 import { freshCursor, menuPress, MENU_LOCKOUT, type MenuCursor, type MenuEvent } from './menu-cursor';
@@ -53,6 +52,9 @@ export type DialogKind = null | 'help' | 'settings';
  * input to almost everything in the simulation, and `src/sim` has to replay the same way from the
  * same inputs.
  */
+/** How long the aim pad's glow pulses before settling, in milliseconds. */
+const AIM_PULSE = 3000;
+
 export interface Settings {
   quality: Quality; lookSpeed: number; invertY: boolean; volume: number; muted: boolean; music: boolean;
   /** Distinguishes a deliberate high setting from the old automatic high default on mobile. */
@@ -65,6 +67,12 @@ export interface Settings {
    * swipe back to it every time they hatch.
    */
   secondary: Secondary;
+  /**
+   * What a touch player has been shown and has since done, so the teaching marks stop for good: the
+   * glow round the swim pad until it is first held, and "hold to aim" over the aim pad the first time
+   * something edible is in front of them, until that pad is first touched.
+   */
+  taught?: { swim?: boolean; aim?: boolean };
   /** How the pick screen's roster is drawn on a desktop: the list, or the Size view (`depth-layout.ts`). */
   rosterView: RosterView;
 }
@@ -138,10 +146,10 @@ export function App() {
   const padCount = padIndices.length;
   /** How much room this window has, and whether a finger is what is working it. */
   const small = useSmallScreen(padCount);
+  const smallRef = useLatest(small);
   // The reef bed is the sea's sound, and only a match shows the sea: the title and the choice
   // screen are paper, so the water is heard from the dive in and fades when the menus return.
   useEffect(() => { audio.setWater(screen === 'playing' || screen === 'results'); }, [screen]);
-  const orientationBlocked = small.rotate && screen === 'playing' && !paused && dialog === null;
   /**
    * Which device the one local seat joins on.
    *
@@ -177,6 +185,17 @@ export function App() {
    * did on purpose and is worth acknowledging for long enough to read.
    */
   const [swapped, setSwapped] = useState(false);
+  /**
+   * The aim pad's lesson: `pulse` for its first `AIM_PULSE` ms, then `steady` — the words stay over the
+   * pad until it is touched, but a glow that went on pulsing would be nagging.
+   */
+  const [aimHint, setAimHint] = useState<'off' | 'pulse' | 'steady'>('off');
+  const aimHintRef = useLatest(aimHint);
+  useEffect(() => {
+    if (aimHint !== 'pulse') return;
+    const t = setTimeout(() => setAimHint((h) => (h === 'pulse' ? 'steady' : h)), AIM_PULSE);
+    return () => clearTimeout(t);
+  }, [aimHint]);
   /** Counted rather than flagged, so a second swipe restarts the moment instead of being swallowed. */
   const [swapTick, setSwapTick] = useState(0);
   useEffect(() => {
@@ -282,6 +301,10 @@ export function App() {
       onHud: (s) => {
         hudStore.set(s);
         keepFinds(s.discovery);
+        // The first time something edible is right in front of a touch player who has never used the
+        // aim pad, the pad is pointed out.
+        if (aimHintRef.current === 'off' && smallRef.current.touch && !settingsRef.current.taught?.aim
+          && settingsRef.current.secondary === 'aim' && s.players[0]?.preyAhead) setAimHint('pulse');
         if (s.status !== 'playing' && screenRef.current === 'playing') { go('results'); engineRef.current?.releasePointer(); audio.play(s.status === 'won' ? 'won' : 'death'); }
       },
       onMenu: () => { if (screenRef.current === 'playing') { setPausedBoth(!pausedRef.current); audio.play('ui-confirm'); } },
@@ -293,6 +316,15 @@ export function App() {
       onProgress: (p) => setProgress(p),
       // A swipe on the secondary pad. Remembered, so the choice outlasts the match, and flagged for a
       // moment so the pad can show what it has become without making a UI sound in the HUD.
+      // A finger landing on a pad for the first time retires that pad's lesson.
+      onTouchZone: (zone) => {
+        const t = settingsRef.current.taught ?? {};
+        if (zone === 'swim' && !t.swim) setSettings((x) => ({ ...x, taught: { ...x.taught, swim: true } }));
+        if (zone === 'secondary') {
+          if (!t.aim) setSettings((x) => ({ ...x, taught: { ...x.taught, aim: true } }));
+          setAimHint('off');
+        }
+      },
       onSecondary: (sec) => {
         setSecondary(sec);
         setSettings((x) => ({ ...x, secondary: sec }));
@@ -302,7 +334,6 @@ export function App() {
   }
   function makeEngine(engine: Engine) {
     engineRef.current = engine;
-    engine.setOrientationBlocked(false);
     // Visitors stream like anything else. Queued here rather than where they are registered,
     // because the queue builds its URLs from `assetPaths` and there is no queue to add them to
     // until the engine exists.
@@ -312,7 +343,8 @@ export function App() {
     return engine;
   }
 
-  useLayoutEffect(() => { engineRef.current?.setOrientationBlocked(orientationBlocked); }, [orientationBlocked, engineReady]);
+  // The title and the plate choice screen are opaque: the sea behind them is not drawn at all.
+  useLayoutEffect(() => { engineRef.current?.setBackdropHidden(screen === 'title' || (screen === 'select' && PLATE)); }, [screen, engineReady]);
 
   useEffect(() => {
     engineRef.current?.setQuality(settings.quality);
@@ -596,6 +628,11 @@ export function App() {
   const toggleReady = useCallback((index: number) => {
     commitLineup(lineup.toggleReady(playersRef.current, index, ACTIVE_ERA.defaults.player));
   }, [commitLineup]);
+  /** One step on a phone with no pad: lock the seat in (if it is not) and start. */
+  const diveNow = useCallback((index: number) => {
+    if (!playersRef.current[index]?.ready) toggleReady(index);
+    startMatch();
+  }, [toggleReady, startMatch]);
   /**
    * Take whatever the cursor is on. On a creature that is locking in, which is what confirm has
    * always meant here; on one of the grid's buttons it is pressing the button.
@@ -839,6 +876,7 @@ export function App() {
           best={best} carry={carry} modeFocus={focus.group === 'modes' ? focus.index : -1} viewFocus={focus.group === 'views' ? focus.index : -1}
           rosterView={settings.rosterView} onRosterView={(v) => setSettings((x) => ({ ...x, rosterView: v }))} onDepth={onDepth}
           extras={extras} onExtra={pressExtra} maxCols={cols}
+          oneStep={small.touch} onDive={diveNow} glowStart={small.layout === 'compact'}
           layout={small.layout} onStep={(i, dir) => moveCursor(i, dir, 0)} onView={onView}
           visitorCount={visitors.length} visitorOrigin={(id) => visitors.find((v) => v.id === id)?.origin}
           onPick={setCreature} onReady={toggleReady} onRemove={removePlayer}
@@ -860,6 +898,8 @@ export function App() {
           // The nudge is worth one or two matches and then it is in the way. It also stands down the
           // moment the player swipes, because at that point they have plainly found it.
           swapped={swapped}
+          swimHint={!settings.taught?.swim}
+          aimHint={secondary === 'aim' ? aimHint : 'off'}
           teleportOpen={hud.teleportOpen}
           onPause={() => { setPausedBoth(true); }}
         />
@@ -876,7 +916,6 @@ export function App() {
           <button aria-label={TEXT.common.dismiss} onClick={() => { setNotice(''); setError(''); }}>×</button>
         </div>
       )}
-      {orientationBlocked && <RotateHint onPause={() => { setPausedBoth(true); }} />}
     </main>
   );
 }

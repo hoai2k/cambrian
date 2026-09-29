@@ -42,8 +42,8 @@ try {
     return [e.quality, e.conserveMemory, e.assets.conserveMemory];
   }), ['high', false, false], 'switching to High must lift the model limit immediately');
   await limited.evaluate(() => window.__cambrian.setQuality('low'));
-  await limited.locator('.ready-button').first().click();
-  await limited.locator('.start-button').click();
+  await limited.locator(".carousel-slide.current .ready-button, .select:not(:has(.carousel-slide)) .ready-button").first().click();   // one step on a phone: this dives
+  if (await limited.locator('.start-button').count()) await limited.locator('.start-button').click();
   await limited.waitForFunction(() => {
     const e = window.__cambrian;
     return !e.isAttract && e.game?.players?.length > 0 && e.game.time > 0.3;

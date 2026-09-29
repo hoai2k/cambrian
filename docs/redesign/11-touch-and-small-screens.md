@@ -267,10 +267,10 @@ change the box it measured (see CLAUDE.md).
 
 ### Portrait
 
-The game runs in portrait and is not stopped from doing so — a screen that refused to draw until it
-was rotated would be worse than a narrow one. `rotateHint` asks once, over the sea, and only past 3:2:
-a phone held up is 2.16 and every tablet in portrait is 1.33, so it catches the shape that is actually
-a problem and leaves alone the one that is merely taller than it is wide.
+The game runs in portrait and says nothing about it — a screen that refused to draw until it was
+rotated would be worse than a narrow one, and a hint asking for landscape (there was one, past 3:2)
+told a player the way they held the phone was wrong when the layout already answers both shapes.
+Turning the phone mid-match simply carries on (`tools/portrait-browser.mjs`).
 
 Two players on a tall window are now cut **top and bottom** rather than side by side (`splitAxis`,
 read by `layoutRects`): two views 400 across and 1100 down are two slots, not two views, and every HUD
@@ -294,9 +294,9 @@ pinch-to-zoom on the camera.
 | File | What |
 | --- | --- |
 | `src/shared/touch-play.ts` | The whole scheme as a state machine over touch events. Pure: no DOM, no clock of its own. |
-| `src/shared/small-screen.ts` | How small the window is, whether a finger is working it, the rotate hint, the split axis. Pure. |
+| `src/shared/small-screen.ts` | How small the window is, whether a finger is working it, the split axis. Pure. |
 | `src/input/touch.ts` | `TouchPlay`, the DOM adapter, and `applyTouch` beside `applyMouse`. |
-| `src/app/TouchPads.tsx` | The pads, the drawn buttons and the rotate line. |
+| `src/app/TouchPads.tsx` | The pads, the drawn buttons and the two lessons (swim ring, hold to aim). |
 | `src/app/use-small-screen.ts` | The one place in `src/app` that measures the window. |
 | `src/app/styles.css` | The `.is-touch` and `.layout-compact` layer, appended last. |
 | `src/app/roster-grid.ts` | `gridColumns(n, cap)`: the same model the screen and the cursor read, now with a ceiling. |

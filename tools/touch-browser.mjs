@@ -123,11 +123,15 @@ try {
 
   // 3. Picking an animal by tapping it seats the *touch* device, not the keyboard: choosing is how
   //    the local seat joins, and which device it joins on is what decides the whole scheme.
-  await page.getByRole('option', { name: 'Opabinia', exact: true }).click();
-  const device = await page.evaluate(() => document.querySelector('.crew-card') ? true : false);
+  //    A landscape phone is a carousel, where the tap that started the game has already seated the
+  //    finger on the card on stage; the grid still needs a tile tapped.
+  if (!(await page.locator('.carousel-slide.current').count())) await page.getByRole('option', { name: 'Opabinia', exact: true }).click();
+  const device = await page.evaluate(() => !!document.querySelector('.carousel-slide.current .crew-card .remove, .select:not(:has(.carousel-slide)) .crew-card .remove'));
   assert.ok(device, 'tapping a creature should open a seat');
-  await page.locator('.ready-button').first().click();
-  await page.getByRole('button', { name: /DIVE IN/ }).click();
+  // One player on a phone with no pad: Lock In *is* Dive In, and there is no second button.
+  await page.locator('.ready-button.dive-now').first().waitFor({ timeout: 30000 });
+  await page.locator(".carousel-slide.current .ready-button, .select:not(:has(.carousel-slide)) .ready-button").first().click();
+  if (await page.locator('.select .start-button').count()) await page.locator('.select .start-button').click();
   await page.locator('.hud').first().waitFor({ timeout: 90000 });
   await page.waitForFunction(() => !document.body.textContent.includes('Your creature is taking shape'), null, { timeout: 90000 });
 
