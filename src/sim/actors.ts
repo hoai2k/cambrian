@@ -143,7 +143,7 @@ export function makeActor(id: number, creatureId: CreatureId, controller: Contro
     hp: 0, hpMax: 0, hunger: 100, stamina: 0, staminaMax: 0, exhausted: 0, poise: 0, poiseMax: 0,
     state: 'free', stateT: 0, stateDur: 0, combo: 0, comboT: 0, hitDone: new Set(),
     iframes: 0, lockTarget: -1, guardHeld: 0,
-    hideMode: 'none', hideT: 0, hideCd: 0, camoStrength: 0, camoScheme: 'default', camoLabel: '', camoSource: -1, emergenceHeavy: false,
+    hideMode: 'none', hideT: 0, hideCd: 0, stillT: 0, camoStrength: 0, camoScheme: 'default', camoLabel: '', camoSource: -1, emergenceHeavy: false,
     abilityCd: 0, abilityT: 0, abilityActive: false, senseMode: true, senseT: 0, pulseT: 0, burstT: 0,
     hitFlash: 0, hitDir: v3(), hitStop: 0,
     grabbedBy: -1, grabbing: -1, grabT: 0, grabOff: v3(0, 0, 1), eatingTarget: -1, eatProgress: 0,

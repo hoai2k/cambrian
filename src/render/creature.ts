@@ -14,7 +14,8 @@ import { Carcass } from './carcass';
 import { ArmConform, type Surface } from './conform';
 import { schemeForCreature } from '../shared/palettes';
 import { creature, type CreatureId } from '../sim/creatures';
-import { lengthOf } from '../sim/actors';
+import { clearanceOf, lengthOf } from '../sim/actors';
+import { sampleHeight } from '../sim/world';
 import { bellPhase, bellTilt } from '../sim/locomotion';
 import { ASHORE_WADE, breathesAir, LAND_WALK_LEGS } from '../sim/beach';
 import { RULES } from '../sim/era-rules';
@@ -126,6 +127,8 @@ export class CreatureView {
   owed = 0;
   /** Whether there is a body to draw at all: a carcass eaten to nothing, or one gone down a throat, is not. */
   present = true;
+  /** How far the body is drawn down into the sand, as a share of its length (see `burrowed`). */
+  private burySink = 0;
   readonly group = new THREE.Group();
   private inner = new THREE.Group();
   private model: THREE.Object3D;
@@ -579,7 +582,14 @@ export class CreatureView {
       }
     } else if (def.swimStyle === 'pulse') this.inner.rotation.x = this.bellAim(a, cruise, dt);
     else this.inner.rotation.x = damp(this.inner.rotation.x, 0, 8, dt);
-    if (a.hideMode === 'burrowed') { const k = clamp(a.hideT / .6, 0, 1); oy -= L * .5 * k; sy *= 1 - .35*k; }
+    // Into the sand and back out of it: eased both ways, so a body coming up rises through the
+    // sand it throws rather than appearing on top of it. A body settling from the floor starts
+    // sinking while it works itself down; one still coming down through the water does not.
+    const onSand = a.pos.y <= sampleHeight(a.pos.x, a.pos.z) + clearanceOf(a) + 0.2;
+    const sinkTo = a.hideMode === 'burrowed' ? 0.2 + 0.3 * clamp(a.hideT / .6, 0, 1)
+      : a.hideMode === 'descending' && onSand ? 0.2 * clamp(a.hideT, 0, 1) : 0;
+    this.burySink = damp(this.burySink, sinkTo, sinkTo > this.burySink ? 8 : 5, dt);
+    if (this.burySink > 1e-3) { oy -= L * this.burySink; sy *= 1 - .7 * this.burySink; }
     // A body eaten in bites loses the meat itself, so it must not also shrink; one swallowed
     // whole has no bites to show and still closes down as it goes in.
     if (a.state === 'dead' && a.eatBites <= 1) { const e = a.eaten; sx *= 1 - e * 0.6; sy *= 1 - e * 0.6; sz *= 1 - e * 0.6; }

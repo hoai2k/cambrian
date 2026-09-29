@@ -137,6 +137,8 @@ export interface Actor {
   abilityCd: number; abilityT: number; abilityActive: boolean;
   hideMode: 'none' | 'descending' | 'burrowed' | 'camouflage';
   hideT: number; hideCd: number; camoStrength: number;
+  /** Seconds a still-burrower has lain still on open sand (`stillBurrow`, `STILL_BURY`). */
+  stillT: number;
   camoColors?: import('./concealment').CamoColors; camoScheme: string; camoLabel: string; camoSource: number;
   emergenceHeavy: boolean;
   /**

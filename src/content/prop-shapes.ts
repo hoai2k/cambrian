@@ -16,6 +16,14 @@ export interface PropShape {
   r: number[];
   /** The same radii measured again in each of five height bands, bottom to top. */
   bands: number[][];
+  /**
+   * Rocks only: the top surface over the footprint. `top[ring][spoke]` is the highest point of the
+   * mesh near that fraction of the footprint's radius (rings from the centre, q = 0, to the edge,
+   * q = 1) along that spoke (evenly spaced from +z toward +x), in the prop's own units and never
+   * below 0 — an envelope, so a body held above it is never inside the mesh. What a body resting on
+   * the rock stands on.
+   */
+  top?: number[][];
 }
 const SHAPES = shapes as Record<string, PropShape>;
 
@@ -51,6 +59,7 @@ export function unionShape(ids: readonly string[]): PropShape | undefined {
     rmax: Math.max(...shapes.map((s) => s.rmax)),
     r: shapes[0].r.map((_, i) => Math.max(...shapes.map((s) => s.r[i]))),
     bands: shapes[0].bands.map((band, b) => band.map((_, i) => Math.max(...shapes.map((s) => s.bands[b][i])))),
+    top: shapes.every((s) => s.top) ? shapes[0].top!.map((ring, j) => ring.map((_, i) => Math.max(...shapes.map((s) => s.top![j][i])))) : undefined,
   };
 }
 

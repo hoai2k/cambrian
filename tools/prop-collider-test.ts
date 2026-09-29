@@ -11,9 +11,9 @@
  */
 import assert from 'node:assert/strict';
 // @ts-expect-error - the generator is plain JS, shared so the test measures exactly what it writes.
-import { measure, propFiles, shapes as measureAll, BINS, BANDS } from './prop-shapes.mjs';
+import { measure, meshTop, propFiles, shapes as measureAll, BINS, BANDS, ROCK_PROPS } from './prop-shapes.mjs';
 import table from '../src/content/prop-shapes.json';
-import { fpRadius, fpRadiusAt } from '../src/sim/footprint';
+import { fpRadius, fpRadiusAt, topAt } from '../src/sim/footprint';
 import { FLORA_PHYS } from '../src/sim/flora';
 import { unionShape } from '../src/content/prop-shapes';
 import { DEVONIAN_SCENERY } from '../src/content/devonian/scenery';
@@ -105,6 +105,37 @@ for (const [era, scenery] of [['Devonian', DEVONIAN_SCENERY], ['Triassic', TRIAS
   for (const id of new Set(used))
     ok(named.has(id), `${era} ${id}: is declared in the pack rather than resolved by fallback`,
       named.has(id) ? '' : 'unnamed ids resolve under the era folder and 404 when it is empty');
+}
+
+// ---- a rock is stood on at its own top ----
+// A body lying on a rock is held above `PropShape.top`, the rock's measured height map. It used to
+// be a dome over the footprint, and the authored rocks are not domes: a body sliding over the
+// Devonian's boulder was a third of the rock's height inside it towards the edge. So the map is held
+// against the mesh itself at points it was never sampled at — between spokes and between rings —
+// out to 0.95 of the edge, where the last ring is still a surface rather than the rim.
+{
+  // Every rock an era draws with is measured for a top. The pebble scatter is not one: it is drawn
+  // over the floor and nothing collides with it.
+  const used = new Set<string>(['blade-spire', 'talus-shard']);
+  for (const scenery of [DEVONIAN_SCENERY, TRIASSIC_SCENERY])
+    for (const slot of ['boulder', 'blade-spire', 'talus-shard'] as const) { const id = scenery.rocks?.[slot]; if (id) used.add(id); }
+  const missing = [...used].filter((id) => !(ROCK_PROPS as string[]).includes(id));
+  ok(missing.length === 0, 'every prop an era draws a rock with is measured for its top', missing.join(', '));
+}
+for (const id of ROCK_PROPS as string[]) {
+  const shape = (table as Record<string, { y1: number; r: number[]; top?: number[][] }>)[id];
+  if (!shape?.top) { ok(false, `${id}: has a measured top`); continue; }
+  const probe = await meshTop(files[id]);
+  let worst = 0, worstDome = 0, lift = 0;
+  for (let k = 0; k < 400; k++) {
+    const ang = ((k * 0.618034) % 1) * Math.PI * 2, q = 0.95 * Math.sqrt(((k * 0.414214) % 1));
+    const d = fpRadius(shape.r, ang) * q, mesh = probe(Math.sin(ang) * d, Math.cos(ang) * d);
+    worst = Math.max(worst, (mesh - topAt(shape.top, ang, q)) / shape.y1);
+    lift += (topAt(shape.top, ang, q) - mesh) / shape.y1 / 400;
+    worstDome = Math.max(worstDome, (mesh - shape.y1 * Math.sqrt(1 - q * q) * 0.95) / shape.y1);
+  }
+  ok(worst < 0.02, `${id}: a body resting on it rests on the mesh, not inside it`,
+    `mesh at most ${(worst * 100).toFixed(1)}% of its height above the map (a dome: ${(worstDome * 100).toFixed(0)}%), map on average ${(lift * 100).toFixed(1)}% above the mesh`);
 }
 
 // ---- a plant's collider is as tall as the mesh it is drawn from ----

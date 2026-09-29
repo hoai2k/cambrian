@@ -7,7 +7,7 @@ import { clamp, makeRng, TAU } from '../shared/math';
 import { loadPropGeometry, type PropId } from './props';
 import { FLORA_PHYS } from '../sim/flora';
 import { daylight } from '../sim/daynight';
-import { BIOMES, biomeAt, biomeWeights, CHUNK, chunkCoord, chunkKey, chunkSeed, addChannelPull, channelPull, driftCurrent, generateChunk, LIGHT_WINDOW_Y, sampleHeight, shoreDistance, SURFACE_Y, type Biome, type BiomeWeights, type Chunk, type Flora, type WorldData } from '../sim/world';
+import { BIOMES, biomeAt, biomeWeights, CHUNK, chunkCoord, chunkKey, chunkSeed, addChannelPull, channelPull, driftCurrent, generateChunk, LIGHT_WINDOW_Y, sampleHeight, SEABED_STEP, shoreDistance, SURFACE_Y, type Biome, type BiomeWeights, type Chunk, type Flora, type WorldData } from '../sim/world';
 
 export type Quality = 'high' | 'low';
 
@@ -35,6 +35,12 @@ export interface SeaEnvironment {
   prime(x: number, z: number, radius?: number): void;
   /** Streaming counters for the profiler. */
   stats(): { chunks: number; far: number; pending: number };
+  /**
+   * The seabed's own material with white for a base, for things that are the seabed heaped up —
+   * a burrower's mound (`BurrowSand`) — so they take the floor's light and caustics and their
+   * colour from the instance.
+   */
+  sediment: THREE.Material;
 }
 
 /** Coarse terrain and big rocks are drawn out to here around every camera (the fog limit is 300). */
@@ -144,6 +150,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const sedimentMat = seaMaterial('#ffffff', 'sediment');
   sedimentMat.vertexColors = true;                       // biome tint is painted per vertex on each tile
   const rockMat = seaMaterial('#75837a', 'rock');
+  const heapMat = seaMaterial('#ffffff', 'sediment');
   const spongeMat = seaMaterial('#c9a468', 'sponge', false, true);
   const spongeMat2 = seaMaterial('#b8a97c', 'sponge', false, true);
   const algaeMat = seaMaterial('#7a6040', 'algae', true, true);
@@ -555,7 +562,10 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     const chunk: Chunk = detail === 'full' ? (world.chunks.get(key) ?? generateChunk(world.seed, cx, cz)) : generateChunk(world.seed, cx, cz, 'far');
     const view: ChunkView = { key, x: chunk.x, z: chunk.z, detail, meshes: [], own: [], flora: chunk.flora };
     const crng = makeRng(chunkSeed(world.seed + 7, cx, cz, 3));
-    terrainTile(view, detail === 'full' ? (high ? 32 : 20) : 8);
+    // Near tiles are drawn at the simulation's own grid at every quality (`SEABED_STEP`): a body
+    // resting on the floor is held above exactly these triangles, and a coarser tile stands above
+    // the field in different places, which is a body drawn under the sand.
+    terrainTile(view, detail === 'full' ? CHUNK / SEABED_STEP : 8);
     instanced(view, 'boulders', boulderGeo, rockMat, chunk.boulders,
       (b, d) => { d.position.set(b.pos.x, b.pos.y, b.pos.z); d.rotation.set(0, b.rot, 0); d.scale.set(b.sx, b.sy, b.sz); },
       { prop: scenery?.rocks?.boulder, include: b => !b.variant, castShadow: detail === 'full', range: 400, color: (b) => scenery?.rocks?.boulder ? color.setScalar(b.shade) : color.fromArray(rockTint(b)) });
@@ -775,6 +785,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   void rng;
 
   return {
+    sediment: heapMat,
     group, sun,
     /**
      * Per-viewport magnification: small creatures live in a denser, closer world with fine detail;

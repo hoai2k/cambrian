@@ -30,8 +30,9 @@ export interface DepthLayout {
 }
 
 /** Where an animal lives, from the traits the simulation already moves it by. */
-export function habitatBand(def: { ground: boolean; drift?: boolean; swimStyle?: string }): Band {
-  if (def.ground) return 'floor';
+export function habitatBand(def: { ground: boolean; drift?: boolean; swimStyle?: string; stillBurrow?: boolean }): Band {
+  // A swimmer that lies buried in the sand lives on the floor, whatever it moves by.
+  if (def.ground || def.stillBurrow) return 'floor';
   if (def.drift || def.swimStyle === 'pulse') return 'surface';
   return 'water';
 }

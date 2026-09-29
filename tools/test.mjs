@@ -72,6 +72,7 @@ const SUITES = {
   motion: { file: 'motion-test.ts' },
   hiding: { file: 'hiding-test.ts' },
   sand: { file: 'sand-test.ts' },
+  seabed: { file: 'seabed-test.ts', runs: ERAS },
   tracks: { file: 'tracks-test.ts' },
   sizing: { file: 'sizing-test.ts' },
   spatial: { file: 'spatial-test.ts' },
@@ -159,9 +160,9 @@ const SUITES = {
  */
 const SIM = ['world', 'swim', 'flora', 'locomotion', 'reactions', 'grab', 'fight', 'feast', 'paddle', 'pursuit', 'hunt',
   'survival', 'survival-eras', 'views', 'sight', 'respawn', 'ecology', 'appetite', 'environment', 'corpse', 'modes', 'controls', 'motion',
-  'hiding', 'sand', 'tracks', 'sizing', 'spatial', 'record', 'expansion', 'beach', 'touch', 'bindings'];
+  'hiding', 'sand', 'seabed', 'tracks', 'sizing', 'spatial', 'record', 'expansion', 'beach', 'touch', 'bindings'];
 const GATE = ['flora', 'locomotion', 'fight', 'feast', 'pursuit', 'respawn', 'corpse', 'environment', 'hunt', 'survival',
-  'survival-eras', 'views', 'sight', 'motion', 'hiding', 'sand', 'tracks', 'sizing', 'spatial', 'record', 'expansion', 'touch',
+  'survival-eras', 'views', 'sight', 'motion', 'hiding', 'sand', 'seabed', 'tracks', 'sizing', 'spatial', 'record', 'expansion', 'touch',
   'bindings', 'modes', 'controls', 'beach'];
 /** Everything that is not a simulation suite and takes seconds, not minutes. */
 const FAST = ['codex', 'results', 'visitors', 'seats', 'roster', 'depth', 'menus', 'focus', 'fullscreen', 'cursors', 'mouse:strike', 'edges',

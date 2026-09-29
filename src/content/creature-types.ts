@@ -40,7 +40,21 @@ export interface CreatureDef {
   grasp?: boolean;
   tagline: string;     // energetic one-liner for the select screen
   role: string;
+  /**
+   * A walker: it lives on the floor and gets about on legs or a foot, and its swimming is a
+   * paddle at best (its dash waits for the floor, it cannot climb for long, it lies along the
+   * slope). This is how the body moves, not where the animal likes to be: a ray-shaped placoderm
+   * that lies on the sand all day swims like any fish, and a bottom-keeper is a swimmer with a
+   * `diet` or an ability that keeps it low. Seafloor is the trilobites, the sea scorpion, the brittle
+   * star, the lobopod and the slug-footed mollusc — not every animal with a flat belly.
+   */
   ground: boolean;
+  /**
+   * Lying still on open sand buries it (`STILL_BURY`): it works itself under, a mound of sand
+   * shows where it lies, and moving brings it out through the sand again. The ambusher's hide,
+   * reached by waiting rather than by a button. Needs to be a burrower (`BURROWERS`).
+   */
+  stillBurrow?: boolean;
   /**
    * What this animal actually eats, where that is something other than live prey it catches.
    *

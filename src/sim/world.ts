@@ -2,7 +2,7 @@ import { ACTIVE_ERA } from '../content';
 import { clamp, fbm2, makeRng, noise2, smoothstep, TAU, type Vec3 } from '../shared/math';
 import { floraSize } from './flora';
 import { footprintOf, propShape, rockPropId } from '../content/prop-shapes';
-import { fpMax, fpReach, ROUND, type Footprint, type Reach } from './footprint';
+import { fpMax, fpReach, ROUND, topAt, type Footprint, type Reach } from './footprint';
 import { ReachHash, SpatialHash } from './spatial';
 
 /**
@@ -876,9 +876,9 @@ export function coverAt(world: WorldData, pos: Vec3, length: number, scratch: Co
  * you can stand on.
  */
 const ROCK_SHAPE = {
-  boulder: { fp: footprintOf(rockPropId()), top: propShape(rockPropId())?.y1 ?? 1 },
-  'blade-spire': { fp: footprintOf(rockPropId('blade-spire')), top: propShape(rockPropId('blade-spire'))?.y1 ?? 4 },
-  'talus-shard': { fp: footprintOf(rockPropId('talus-shard')), top: propShape(rockPropId('talus-shard'))?.y1 ?? 0.8 },
+  boulder: { fp: footprintOf(rockPropId()), top: propShape(rockPropId())?.y1 ?? 1, map: propShape(rockPropId())?.top },
+  'blade-spire': { fp: footprintOf(rockPropId('blade-spire')), top: propShape(rockPropId('blade-spire'))?.y1 ?? 4, map: propShape(rockPropId('blade-spire'))?.top },
+  'talus-shard': { fp: footprintOf(rockPropId('talus-shard')), top: propShape(rockPropId('talus-shard'))?.y1 ?? 0.8, map: propShape(rockPropId('talus-shard'))?.top },
 } as const;
 const rockShape = (b: Boulder) => ROCK_SHAPE[b.variant ?? 'boulder'];
 /** The radius a rock of this shape and scale needs around it. */
@@ -896,13 +896,25 @@ export function boulderQ(b: Boulder, x: number, z: number, pad = 0): number {
   const r = boulderReach(b, x, z, scratchReach);
   return r.d / Math.max(r.reach + pad, 1e-6);
 }
-/** Height of a rock's dome above its own centre at `q` (0 outside it). */
-const domeRise = (b: Boulder, q: number) =>
-  q >= 1 ? 0 : rockRise(b.variant, b.sy) * Math.sqrt(Math.max(0, 1 - q * q)) * .95;
+/**
+ * How far a rock's surface stands above the point it was placed at, over (x,z), where `q` is how
+ * far out across its footprint that is (0 outside it). A rock whose mesh was measured
+ * (`PropShape.top`) is its own drawn top; the procedural unit rock, which is a sphere to within its
+ * noise, is the dome it is. It used to be the dome for every rock, and the authored ones are not
+ * domes: a body resting on one sat inside the mesh wherever the rock is fuller than a dome.
+ */
+function rockSurface(b: Boulder, x: number, z: number, q: number): number {
+  if (q >= 1) return 0;
+  const map = rockShape(b).map;
+  if (!map) return rockRise(b.variant, b.sy) * Math.sqrt(Math.max(0, 1 - q * q)) * .95;
+  // Into the rock's own frame, as `fpReach` does, to read the spoke.
+  const dx = x - b.pos.x, dz = z - b.pos.z, c = Math.cos(b.rot), s = Math.sin(b.rot);
+  return topAt(map, Math.atan2((c * dx + s * dz) / b.sx, (-s * dx + c * dz) / b.sz), q) * b.sy;
+}
 /** The top of a rock directly above (x,z), or undefined where the rock is not underneath. */
 export function boulderTop(b: Boulder, x: number, z: number): number | undefined {
   const q = boulderQ(b, x, z);
-  return q >= 1 ? undefined : b.pos.y + domeRise(b, q);
+  return q >= 1 ? undefined : b.pos.y + rockSurface(b, x, z, q);
 }
 
 /** What a body found when it was pushed out of the scenery. */
@@ -960,7 +972,7 @@ export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scrat
     if (rr.d >= rr.reach + radius) continue;
     if (b.floor === undefined) {
       // Angled and low: let the floor carry the body over rather than stopping it here.
-      if (glide > 0 && b.pos.y + domeRise(b, rr.d / Math.max(rr.reach, 1e-6)) <= pos.y + glide) continue;
+      if (glide > 0 && b.pos.y + rockSurface(b, pos.x, pos.z, rr.d / Math.max(rr.reach, 1e-6)) <= pos.y + glide) continue;
       // Too steep to glide: block, and say how high the top is. Within `climb` that is an offer to
       // go over; higher, it is only what it would take, for a body stubborn enough to want it.
       if (out) {
@@ -979,9 +991,53 @@ export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scrat
   return hit;
 }
 
-/** Ground height including boulder tops. Only where a rock actually is: its drawn ellipse, not a circle around it. */
+/**
+ * The spacing of the drawn seabed's near tiles (`terrainTile` in src/render/sea.ts draws a chunk as
+ * `CHUNK / SEABED_STEP` squares a side, at every quality): the surface a player actually sees up
+ * close. Tiles are chunk-aligned, so its vertices sit on multiples of this.
+ */
+export const SEABED_STEP = CHUNK / 32;
+const VERTEX_SLOTS = 4096;
+const vertexKeyX = new Float64Array(VERTEX_SLOTS).fill(NaN), vertexKeyZ = new Float64Array(VERTEX_SLOTS), vertexH = new Float64Array(VERTEX_SLOTS);
+/**
+ * The field at one vertex of the drawn grid. Every floor query reads three of these and bodies sit
+ * on the same few, so they are kept in a small direct-mapped table: exact, like the one-entry memos
+ * (a slot holds the very number `sampleHeight` gave for that vertex), so nothing about a replay
+ * depends on what the table happens to hold.
+ */
+function vertexHeight(gx: number, gz: number): number {
+  const slot = ((gx * 73856093) ^ (gz * 19349663)) & (VERTEX_SLOTS - 1);
+  if (vertexKeyX[slot] === gx && vertexKeyZ[slot] === gz) return vertexH[slot];
+  const h = sampleHeight(gx * SEABED_STEP, gz * SEABED_STEP);
+  vertexKeyX[slot] = gx; vertexKeyZ[slot] = gz; vertexH[slot] = h;
+  return h;
+}
+
+/**
+ * The seabed as it is drawn: the tile's own triangle over (x,z), with its vertices on the field.
+ * A straight-edged triangle stands above the field wherever the field dips between its corners —
+ * a hollow, the foot of a slope — by up to a unit in places, so a body held to the field alone was
+ * drawn under the sand it was lying on.
+ */
+export function drawnSeabed(x: number, z: number): number {
+  const u = x / SEABED_STEP, w = z / SEABED_STEP, gx = Math.floor(u), gz = Math.floor(w), fx = u - gx, fz = w - gz;
+  // The tile's own split (`terrainTile`): (i,j) (i,j+1) (i+1,j), then (i+1,j) (i,j+1) (i+1,j+1).
+  if (fx + fz <= 1) {
+    const h00 = vertexHeight(gx, gz);
+    return h00 + (vertexHeight(gx + 1, gz) - h00) * fx + (vertexHeight(gx, gz + 1) - h00) * fz;
+  }
+  const h11 = vertexHeight(gx + 1, gz + 1);
+  return h11 + (vertexHeight(gx, gz + 1) - h11) * (1 - fx) + (vertexHeight(gx + 1, gz) - h11) * (1 - fz);
+}
+
+/**
+ * Ground height including boulder tops: what a body lying on the floor is held above. The seabed
+ * is the higher of the field and the surface drawn over it (`drawnSeabed`), and a rock counts only
+ * where it actually is — its drawn footprint, not a circle around it.
+ */
 export function groundHeight(world: WorldData, x: number, z: number, scratch: Boulder[]): number {
-  let h = sampleHeight(x, z);
+  const drawn = drawnSeabed(x, z);
+  let h = Math.max(sampleHeight(x, z), drawn);
   for (const b of world.boulderHash.query(x, z, 8, scratch)) {
     const top = boulderTop(b, x, z);
     if (top !== undefined && top > h) h = top;
