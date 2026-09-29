@@ -17,7 +17,7 @@ import { BIOME_NAMES, biomeAt, groundHeight, nurseryAt, SURFACE_Y, type Boulder 
 import { breathesAir, STRAND_BREATH, STRAND_LOW } from '../sim/beach';
 import { AssetQueue, type AssetProgress } from './assets';
 import { fillOf, ladderName } from '../sim/ladder';
-import { CreatureView, ensureLoaded, loadedSync, type Lod } from './creature';
+import { CreatureView, ensureLoaded, evictIdleModels, loadedSync, type Lod } from './creature';
 import { conserveCreatureMemory } from '../shared/mobile-memory';
 import { Edges } from '../shared/edges';
 import { Attachments } from './attachments';
@@ -80,6 +80,7 @@ export class Engine {
   /** The frustums views are animated against this frame: every viewport's camera, as it stood last frame. */
   private animFrustums: THREE.Frustum[] = [];
   private animMat = new THREE.Matrix4();
+  private evictT = 0;
   /** Bodies another body's pose depends on this frame — a ride's host, a holder, a swallower. */
   private posed = new Set<number>();
   private sea?: SeaEnvironment;
@@ -206,7 +207,12 @@ export class Engine {
   readonly assets: AssetQueue;
   private bootDone = false; private bootStart = performance.now();
   /** Tell the loader which creatures are most likely to be needed next. */
-  prioritize(creatures: CreatureId[], phase: 'boot' | 'title' | 'select' | 'playing', committed: CreatureId[] = []) { this.assets.prioritize(creatures, phase, committed); }
+  prioritize(creatures: CreatureId[], phase: 'boot' | 'title' | 'select' | 'playing', committed: CreatureId[] = [], hovered: CreatureId[] = []) {
+    this.likely = new Set(phase === 'select' ? [...committed, ...hovered] : phase === 'playing' ? creatures : []);
+    this.assets.prioritize(creatures, phase, committed, hovered);
+  }
+  /** What the menus last said is likely to be needed next: never evicted (`evictIdleModels`). */
+  private likely = new Set<CreatureId>();
 
   private onResize() {
     // Read here, when the size changes, and nowhere else: a frame that asked the container for its
@@ -728,6 +734,10 @@ export class Engine {
       // On low-quality touch play in the large-model eras, keep full skinned bodies for players
       // only. The NPCs use decimated copies so a long match does not retain the whole roster.
       if ((this.conserveMemory || pastCap) && a.controller !== 'player') wantLod = 1;
+      // Behind the title and the pick screen, whose painting and plate cover the whole window, the
+      // sea is drawn with decimated bodies only: a full one there was a download of up to 22 MB, and
+      // a main-thread decode, for an animal nobody could see.
+      if (this.attract) wantLod = 1;
       // The budget only ever demotes: your own body, and anything already at full detail whose
       // share is still affordable, keep it.
       const full = loadedSync(a.creature, 0);
@@ -802,6 +812,16 @@ export class Engine {
     this.attachments.sync(game, this.views, dt);
     this.breathe(game, keep);
     for (const [id, v] of this.views) if (!keep.has(id)) { v.dispose(); this.views.delete(id); }
+    // Now and then, let go of full-detail bodies nothing is drawing (`evictIdleModels`). The
+    // players' own are always kept; a handful of the most recent others are, too, since a body
+    // that has just swum out of view is the likeliest to swim back.
+    this.evictT += dt;
+    if (this.evictT > 2) {
+      this.evictT = 0;
+      const keep = new Set<CreatureId>([...this.likely, ...this.setups.map((s) => s.creature)]);
+      for (const p of game.players) keep.add(p.creature);
+      evictIdleModels(keep, this.conserveMemory ? 1 : this.quality === 'high' ? 6 : 3);
+    }
   }
 
   /**

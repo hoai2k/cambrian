@@ -9,6 +9,11 @@ export default defineConfig({
     target: 'es2022',
     chunkSizeWarningLimit: 1200,
     rollupOptions: {
+      output: {
+        // three.js on its own: it changes only when the dependency does, so it stays cached across
+        // every deploy of the game code instead of riding in a chunk whose hash changes with it.
+        manualChunks: (id) => (/node_modules\/three\//.test(id) ? 'three' : undefined),
+      },
       // Seven pages: the trilogy's own page at /, the three games at /cambrian/, /devonian/ and
       // /triassic/, the specimen viewer at /viewer/, the dev benches at /workbench/, and the
       // visitor stats at /stats/. (The address the trilogy page was first published at,
