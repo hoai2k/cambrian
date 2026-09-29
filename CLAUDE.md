@@ -426,7 +426,10 @@ unless the user explicitly asks for a PR. Steps:
   under the finger** — it starts from the exact point the finger let go, at the finger's own speed
   (the duration is picked so the curve's opening slope is the release velocity, measured over the
   last tenth of a second rather than averaged since the press), and it is ended by that animation's
-  own `finished`, with a generous timer behind it. Chrome's phone emulation passed the transition
+  own `finished`, with a generous timer behind it — and **held** there (`fill: 'forwards'`) until the next
+  write cancels it in the same task, because an animation left to lapse on an iPhone flashed the
+  previous animal: WebKit ran it on the compositor and the layer it handed back still carried the
+  transform from before the slide until style caught up. Chrome's phone emulation passed the transition
   version and an iPhone did not, for iOS reasons that stack: setting `transition` and `transform` in
   one task starts a transition only when WebKit next resolves style, `getAnimations()` asked in the
   next frame could find nothing there and end the "slide" at once — stepping the cursor under a
