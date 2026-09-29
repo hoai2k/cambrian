@@ -104,10 +104,13 @@ try {
           // Pinned there on every frame until the check is over: a body put inside another's reach
           // is pushed apart by the collision, and one that keeps to the sand is put back on it, so
           // an animal merely *dropped* under the cursor has left it again by the time the press lands.
-          const at = { x: o.pos.x, y: o.pos.y, z: o.pos.z };
+          // Held at its offset from the *player*, not at a point in the sea: a body still gliding
+          // out of the last step would otherwise carry itself out of reach of the one it placed.
+          const off = { x: o.pos.x - a.pos.x, y: o.pos.y - a.pos.y, z: o.pos.z - a.pos.z };
           window.__pin = o.id;
           const pin = () => {
             if (window.__pin !== o.id) return;
+            const at = { x: a.pos.x + off.x, y: a.pos.y + off.y, z: a.pos.z + off.z };
             o.pos.x = at.x; o.pos.y = at.y; o.pos.z = at.z; o.prevT.x = at.x; o.prevT.y = at.y; o.prevT.z = at.z;
             o.vel.x = o.vel.y = o.vel.z = 0;
             requestAnimationFrame(pin);
@@ -147,7 +150,7 @@ try {
   // 3. A click on an animal is the attack its distance calls for: a bite in reach, a pounce further
   // off. Both are locked on the animal the press was on.
   await page.mouse.move(centre.x, centre.y); await frames(2);
-  let id = await placeUnderCursor((g, a) => 0.1 + a.scale * 0.5);
+  let id = await placeUnderCursor((g, a) => 0.1 + a.scale * 0.3);
   assert(id >= 0, 'an animal went under the cursor in reach');
   await watch(['attack', 'pounce']);
   await page.mouse.click(centre.x, centre.y, { delay: 30 });
@@ -168,31 +171,22 @@ try {
   await page.evaluate(() => { window.__pin = -1; });
   await settled();
 
-  // ...and held on one out of reach, it chases: the pointer goes away, the mark stays on the animal,
-  // and the body swims at it until it is in reach and then pounces.
-  id = await placeUnderCursor((g, a) => g.pounceRange(a) * 2.2);
-  assert(id >= 0, 'an animal went under the cursor out of reach');
+  // ...and the right button aims: held, the body is aiming at what the cursor is on, and let go
+  // there, it pounces at it.
+  id = await placeUnderCursor((g, a) => g.pounceRange(a) * 0.8);
+  assert(id >= 0, 'an animal went under the cursor to aim at');
+  await page.mouse.down({ button: 'right' });
+  await page.waitForFunction((t) => { const a = window.__cambrian.game.players[0]; return a.aiming && a.lockTarget === t; }, id, { timeout: 60000 });
   await watch(['pounce']);
-  const start = await page.evaluate((t) => { const g = window.__cambrian.game, a = g.players[0], o = g.byId(t); return Math.hypot(o.pos.x - a.pos.x, o.pos.y - a.pos.y, o.pos.z - a.pos.z); }, id);
-  await page.mouse.down();
-  await frames(6);
-  const chasing = await page.evaluate((t) => {
-    const e = window.__cambrian, g = e.game, a = g.players[0], o = g.byId(t);
-    return { cursor: e.container.style.cursor, lock: a.lockTarget, d: Math.hypot(o.pos.x - a.pos.x, o.pos.y - a.pos.y, o.pos.z - a.pos.z), mark: !!document.querySelector('.hud .touch-cursor') };
-  }, id);
-  assert.equal(chasing.cursor, 'none', 'a chase puts the pointer away');
-  assert.equal(chasing.lock, id, 'and holds the target on the animal');
-  assert(chasing.mark, 'and draws its mark where the animal is');
-  assert(chasing.d < start, `and closes on it (${start.toFixed(1)} → ${chasing.d.toFixed(1)})`);
-  // The swim to it is a few seconds of simulation, which under the software renderer is a few
-  // minutes of wall clock: the wait is long because the page is slow, not because the chase is.
-  await page.waitForFunction(() => !!window.__seen, null, { timeout: 240000 });
-  assert.equal((await seen()).state, 'pounce', 'and pounces once it is in reach');
-  await page.mouse.up(); await frames(2);
+  await page.mouse.up({ button: 'right' });
+  await page.waitForFunction(() => !!window.__seen, null, { timeout: 60000 });
+  got = await seen();
+  assert.equal(got.state, 'pounce', `letting go of aim on an animal pounces (got ${got.state})`);
+  assert.equal(got.lock, id, 'at the animal the crosshair was on');
   await page.evaluate(() => { window.__pin = -1; });
   await settled();
 
-  // 4. Held past the move it began, the left button steers: the pointer is away and moving the
+  // 4. Held, the left button steers: the pointer is away and moving the
   // mouse turns the view, and letting go gives the cursor back.
   await page.mouse.move(centre.x, centre.y); await frames(2);
   await clearWater(); await frames(2);
@@ -232,15 +226,7 @@ try {
   const back = await page.evaluate(() => { const e = window.__cambrian; return Math.abs(((e.cams[0].yaw - e.game.players[0].yaw + Math.PI * 3) % (Math.PI * 2)) - Math.PI); });
   assert(back < off * 0.5, `the camera follows the body (${off.toFixed(2)} rad off, then ${back.toFixed(2)})`);
 
-  // 6. The right button dashes, at the water under the cursor.
-  await settled();
-  await page.mouse.move(900, 300);
-  await page.mouse.down({ button: 'right' });
-  await page.waitForFunction(() => window.__cambrian.game.players[0].state === 'dodge', null, { timeout: 30000 });
-  const dashed = await state(); await page.mouse.up({ button: 'right' });
-  assert.equal(dashed.state, 'dodge', `the right button dashes (got ${dashed.state})`);
-
-  // 7. A and D turn the *animal*, and the camera comes round after it — the order a player feels.
+  // 6. A and D turn the *animal*, and the camera comes round after it — the order a player feels.
   await settled();
   await page.evaluate(() => { const e = window.__cambrian; e.cams[0].followHold = 0; });
   const before = await page.evaluate(() => ({ yaw: window.__cambrian.game.players[0].yaw, cam: window.__cambrian.cams[0].yaw }));
@@ -252,23 +238,17 @@ try {
   const followed = await page.evaluate(() => ({ yaw: window.__cambrian.game.players[0].yaw, cam: window.__cambrian.cams[0].yaw }));
   assert(wrap(followed.cam - followed.yaw) < wrap(turned.cam - turned.yaw) + 0.02, 'and the camera comes round after it');
 
-  // 8. The cursor's height steers the view. *Where* the dead zone ends and how hard the push ramps
-  // is a pure function and is checked exactly in `npm run swim`; what only a browser can say is
-  // that the wiring is live and pulls in the right direction from each half of the screen.
+  // 7. The cursor's height does *not* move the view: a hovering cursor is pointing, not looking.
   await settled();
-  // Long enough for the follow to finish easing the view back: the steps before this one dragged
-  // it about, and the dead zone means the cursor is no longer holding it anywhere.
   await page.mouse.move(centre.x, centre.y); await frames(80);
   const rest = await page.evaluate(() => window.__cambrian.cams[0].pitch);
   await page.mouse.move(centre.x, 30); await frames(12);
-  const up = await page.evaluate(() => window.__cambrian.cams[0].pitch);
-  await page.mouse.move(centre.x, 780); await frames(16);
-  const down = await page.evaluate(() => window.__cambrian.cams[0].pitch);
-  // Centred, the view settles toward its resting pitch rather than running anywhere.
+  const top = await page.evaluate(() => window.__cambrian.cams[0].pitch);
+  await page.mouse.move(centre.x, 780); await frames(12);
+  const bottom = await page.evaluate(() => window.__cambrian.cams[0].pitch);
   assert(Math.abs(rest - 0.2) < 0.25, `a centred cursor leaves the view at rest (${rest.toFixed(2)})`);
-  assert(up < rest - 0.15, `the top of the screen tilts the view up (${rest.toFixed(2)} → ${up.toFixed(2)})`);
-  assert(down > up + 0.3, `and the bottom tilts it down (${up.toFixed(2)} → ${down.toFixed(2)})`);
+  assert(Math.abs(top - rest) < 0.05 && Math.abs(bottom - rest) < 0.05, `the cursor's height leaves the view alone (${rest.toFixed(2)}, ${top.toFixed(2)}, ${bottom.toFixed(2)})`);
 
   assert.deepEqual(errors, [], `page errors: ${errors.join(' · ')}`);
-  console.log('PASS browser: a click dashes at the water, bites or pounces by distance, a hold chases then pounces, a hold after steers with the pointer away, an upside-down view rights itself, the camera follows, the right button dashes, A and D turn the animal, and the cursor\'s height steers the view');
+  console.log('PASS browser: a click dashes at the water and bites or pounces by distance, letting go of aim on an animal pounces, a hold steers with the pointer away, an upside-down view rights itself, the camera follows, A and D turn the animal, and the cursor\'s height leaves the view alone');
 } finally { await browser.close(); }

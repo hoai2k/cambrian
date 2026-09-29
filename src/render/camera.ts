@@ -108,29 +108,6 @@ const AIM_CLOSER = 0.42, AIM_SHOULDER = 0.75;
  * straight back and the drag would have been pointless.
  */
 export const FOLLOW_RATE = 1.6, FOLLOW_HOLD = 1.2;
-/**
- * The cursor's *height* nudges the camera's pitch, in mouse play.
- *
- * A mouse has one hand and two jobs — point at an animal, and look where you are going — and with
- * the pointer free the second one only happened on a drag. So the top and bottom of the screen
- * steer: carry the cursor up and the view tilts up with it, carry it down and it tilts down, and
- * the middle `EDGE_DEAD` of the screen does nothing at all, which is the band a player aims in.
- * That is the whole trade — the dead zone is what keeps pointing and looking from being the same
- * gesture — so it is generous, and the push ramps in from its edge rather than starting at full
- * rate, so there is no line the view jumps at.
- *
- * It is a *rate*, not a position: holding the cursor near the top keeps tilting, the way an
- * edge-scroll does, because a screen's top edge is not a camera angle and cannot be mapped to one.
- */
-const EDGE_DEAD = 0.38, EDGE_RATE = 0.85;
-/** Radians per second of pitch the cursor at `ndcY` is asking for. Positive tilts the view down. */
-export function edgePitch(ndcY: number): number {
-  const over = Math.abs(ndcY) - EDGE_DEAD;
-  if (over <= 0) return 0;
-  const k = Math.min(1, over / (1 - EDGE_DEAD));
-  // Squared, so the first part of the push past the dead zone is gentle and the corner is quick.
-  return -Math.sign(ndcY) * k * k * EDGE_RATE;
-}
 /** 1 at a full-width view, falling off for a narrow one; never less than a third of the shift. */
 const aimRoom = (aspect: number) => clamp(aspect / 1.6, 0.34, 1);
 export const PITCH_UP = -0.95;   // ~54° above the horizon

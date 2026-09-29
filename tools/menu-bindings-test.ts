@@ -121,12 +121,13 @@ const MOUSE: { name: string; press: Partial<Record<'pressed' | 'left' | 'middle'
   // and on the body, so `stepStrike` decides it in `PlayerInput`. What it must still never do is
   // reach a menu action — a click aimed at the sea must not also answer what a menu is asking.
   { name: 'left press', press: { pressed: true, left: true }, expect: [] },
-  { name: 'right click', press: { right: true }, expect: ['dash', 'dodge'] },
+  // The right button is aim now, held; its release is a pounce, which `stepStrike` decides too.
+  { name: 'right hold', press: { right: true }, expect: ['aim', 'lock'] },
   { name: 'middle click', press: { middle: true }, expect: ['aim', 'lock'] },
 ];
 const MOUSE_FORBIDDEN: (keyof RawControls)[] = ['confirm', 'back', 'menu', 'lb', 'rb', 'view', 'teleport', 'ability', 'guard', 'rise', 'sink'];
 for (const m of MOUSE) {
-  const c = applyMouse(emptyControls(), { dx: 0, dy: 0, zoom: 0, left: false, pressed: false, dragging: false, steering: false, middle: false, right: false, ndc: undefined, ...m.press });
+  const c = applyMouse(emptyControls(), { dx: 0, dy: 0, zoom: 0, left: false, pressed: false, moved: 0, rightUp: false, dragging: false, steering: false, middle: false, right: false, ndc: undefined, ...m.press });
   for (const k of m.expect) if (!c[k]) fail(`${m.name} does not drive "${String(k)}"`);
   for (const k of MOUSE_FORBIDDEN) if (c[k]) fail(`${m.name} drives the menu/gameplay control "${String(k)}"`);
   const others = MOUSE.filter((o) => o !== m).flatMap((o) => o.expect).filter((k) => !m.expect.includes(k));

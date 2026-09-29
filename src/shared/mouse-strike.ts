@@ -1,33 +1,29 @@
 /**
- * What one press of the left mouse button comes to, as a state machine over the press and the body.
+ * What one press of a mouse button comes to, as a state machine over the press and the body.
  *
- * The button used to be read three ways by how it moved — a click bit, a hold was the heavy, a drag
- * was the camera — which made the one button that matters most ask the player to know which of
- * three gestures they were making. It is read by **what it was pressed on** now, and does it at the
- * press:
+ * **The left button swims unless it is clicked.** Pressed and held — or pressed and moved — it is
+ * *steering*: the pointer is put away and the mouse turns the animal and the view together until
+ * the button comes up. Pressed and let go quickly, it is a *click*, and a click is the attack the
+ * place it was on calls for: open water is a **dash** there, down the cursor's own ray; an animal
+ * within a bite is a **bite**; an animal further off is a **pounce**, which homes on it. A click is
+ * decided on its *release*, because until the button comes up it is not known whether it is a click
+ * or the start of a steer — and that is exactly the wait a double-click skips: the **second press
+ * of a double-click acts at once**, and held, the dash it threw runs for as long as it is held (the
+ * dash is as long as it is held) and then steers.
  *
- *   - on open water it **dashes** there, down the cursor's own ray;
- *   - on an animal within a bite it **bites**, within a pounce it **pounces**, and further off it
- *     **chases**: swims flat out at the animal, the target held on it however it moves, and pounces
- *     the moment it is in reach. A chase lasts as long as the button; a quick click on something out
- *     of reach is a pounce *tried* anyway, because a click is a request for the attack and not for
- *     a swim.
- *
- * And whatever the press began, the button still down once it is over is **steering**: the pointer
- * is put away and the mouse turns the animal and the camera together, in every direction, until the
- * button comes up and the cursor is a pointer again. That is the whole hand-off between aiming and
- * swimming, on one button, without a keyboard.
+ * **The right button is aim.** Held, it is aim mode's framing with the cursor as the crosshair; let
+ * go with the crosshair on an animal it pounces there, and let go on anything else it simply ends.
  *
  * Pure, no clock of its own and nothing of the simulation's: `src/render/player-input.ts` hands it
  * what the body is doing and what is in reach, and turns what comes back into the frame. Held by
  * `npm run mouse:strike`.
  */
 
-export type StrikeKind = 'dash' | 'bite' | 'pounce' | 'chase' | 'steer';
+export type StrikeKind = 'pending' | 'dash' | 'bite' | 'pounce' | 'steer';
 
 export interface Strike {
   kind: StrikeKind;
-  /** The animal the press was on, or -1. Kept for the whole press: the target stays where it was put. */
+  /** The animal the press was on, or -1. Kept for the whole press. */
   target: number;
   /** When the current kind began, in seconds. */
   t: number;
@@ -35,11 +31,15 @@ export interface Strike {
   down: number;
   /** The move this kind asked for has been seen to start in the body. */
   began: boolean;
-  /** The one-frame asks (the bite, the dash's first frame) have been made. */
+  /** The one-frame asks (the bite, the dash's throw) have been made. */
   fired: boolean;
-  /** The button is still down. */
+  /** The left button is still down for this press. */
   held: boolean;
 }
+
+/** The left button's memory between presses: the press in progress, and when the last click was. */
+export interface StrikeState { strike?: Strike; lastClick: number }
+export const freshStrike = (): StrikeState => ({ lastClick: -Infinity });
 
 export interface StrikeFacts {
   now: number;
@@ -47,14 +47,15 @@ export interface StrikeFacts {
   left: boolean;
   /** It went down since the last frame. */
   pressed: boolean;
-  /** The animal under the cursor, or -1. Read only on the frame of the press. */
+  /** Pixels the pointer has travelled since the left button went down. */
+  moved: number;
+  /** The animal under the cursor, or -1. */
   over: number;
+  /** The right button was let go this frame with the crosshair on this animal (-1: on nothing). */
+  aimRelease?: number;
   /** Surface gap from the body to an animal, or undefined when it is gone, dead or hidden. */
   gapTo: (id: number) => number | undefined;
   biteReach: number;
-  pounceReach: number;
-  /** A pounce started now would be taken (cooldown, stamina, winded). */
-  canPounce: boolean;
   /** The body's state machine, which is how the move being asked for is seen to have started. */
   state: string;
 }
@@ -64,92 +65,97 @@ export interface StrikeOut {
   dash: boolean; aimRay: boolean;
   /** One bite, at `target`. */
   bite: boolean;
-  /** Pounce at this animal (and keep homing while it is held), or -1. */
+  /** Pounce at this animal (and keep homing while the press holds), or -1. */
   pounce: number;
-  /** Swim flat out at this animal, or -1. */
-  chase: number;
   /** The mouse is steering: pointer away, motion turns the body and the view. */
   steer: boolean;
   target: number;
-  /** What to draw where the cursor was: the dash mark, a target held on an animal, or nothing. */
+  /** What to draw: the dash's mark, a target held on an animal a pounce is going at, or nothing. */
   mark: 'none' | 'zoom' | 'target';
 }
 
 /** Seconds a press has to last to be a hold rather than a click. */
-export const STRIKE_HOLD = 0.18;
+export const STRIKE_HOLD = 0.2;
+/** Pixels a press may travel and still be a click. */
+export const STRIKE_DRAG = 6;
+/** Seconds between a click and the next press for the two to be a double-click. */
+export const STRIKE_DOUBLE = 0.32;
 /** Seconds a move is given to show up in the body before the press stops asking for it. */
 export const STRIKE_GRACE = 0.25;
-/** How far inside the pounce's reach a chase commits, so it does not spring at the very edge. */
-export const CHASE_COMMIT = 0.92;
 
-const none = (): StrikeOut => ({ dash: false, aimRay: false, bite: false, pounce: -1, chase: -1, steer: false, target: -1, mark: 'none' });
+const none = (): StrikeOut => ({ dash: false, aimRay: false, bite: false, pounce: -1, steer: false, target: -1, mark: 'none' });
 
 /** The state the body is in while each move runs. */
 const RUNS: Record<'dash' | 'bite' | 'pounce', string> = { dash: 'dodge', bite: 'attack', pounce: 'pounce' };
 
-/** What a press on this animal (or on nothing) should be, by how far away it is. */
-export function strikeKind(over: number, gap: number | undefined, biteReach: number, pounceReach: number): StrikeKind {
+/** What a click on this animal (or on nothing) is, by how far away it is. */
+export function clickKind(over: number, gap: number | undefined, biteReach: number): 'dash' | 'bite' | 'pounce' {
   if (over < 0 || gap === undefined) return 'dash';
-  if (gap <= biteReach) return 'bite';
-  if (gap <= pounceReach) return 'pounce';
-  return 'chase';
+  return gap <= biteReach ? 'bite' : 'pounce';
 }
 
-export function stepStrike(prev: Strike | undefined, f: StrikeFacts): { strike: Strike | undefined; out: StrikeOut } {
-  let s = prev ? { ...prev } : undefined;
+export function stepStrike(prev: StrikeState, f: StrikeFacts): { state: StrikeState; out: StrikeOut } {
+  const st: StrikeState = { lastClick: prev.lastClick, strike: prev.strike ? { ...prev.strike } : undefined };
+  const act = (target: number, held: boolean): Strike => {
+    const kind = clickKind(target, target >= 0 ? f.gapTo(target) : undefined, f.biteReach);
+    return { kind, target: kind === 'dash' ? -1 : target, t: f.now, down: f.now, began: false, fired: false, held };
+  };
   if (f.pressed) {
-    const gap = f.over >= 0 ? f.gapTo(f.over) : undefined;
-    const kind = strikeKind(f.over, gap, f.biteReach, f.pounceReach);
-    s = { kind, target: kind === 'dash' ? -1 : f.over, t: f.now, down: f.now, began: false, fired: false, held: true };
+    // The second press of a double-click does not wait to find out what it is: it is the attack.
+    st.strike = f.now - prev.lastClick <= STRIKE_DOUBLE
+      ? act(f.over, true)
+      : { kind: 'pending', target: f.over, t: f.now, down: f.now, began: false, fired: false, held: true };
+    if (f.now - prev.lastClick <= STRIKE_DOUBLE) st.lastClick = -Infinity;
+  } else if (f.aimRelease !== undefined && f.aimRelease >= 0 && !st.strike?.held) {
+    // Letting go of aim with the crosshair on an animal springs at it.
+    st.strike = { kind: 'pounce', target: f.aimRelease, t: f.now, down: f.now, began: false, fired: false, held: false };
   }
   const out = none();
-  if (!s) return { strike: s, out };
+  let s = st.strike;
+  if (!s) return { state: st, out };
   const become = (kind: StrikeKind) => { s = { ...s!, kind, t: f.now, began: false, fired: false }; };
-  // Whatever the press began, a button still down once it is over is the steering.
   const finish = () => { if (s!.held) become('steer'); else s = undefined; };
 
   if (s.held && !f.left) {
     s.held = false;
-    // A click on something out of reach is a pounce tried anyway: the click asked for the attack.
-    if (s.kind === 'chase' && f.now - s.down < STRIKE_HOLD) become('pounce');
-    else if (s.kind === 'steer' || s.kind === 'chase') return { strike: undefined, out };
+    if (s.kind === 'pending') {
+      // A click: the press came up before it was a hold. It is the attack, decided now.
+      const clicked = act(s.target, false);
+      s = clicked;
+      st.lastClick = f.now;
+    } else if (s.kind === 'steer') {
+      st.strike = undefined;
+      return { state: st, out };
+    }
   }
+  if (s.kind === 'pending' && (f.moved > STRIKE_DRAG || f.now - s.down >= STRIKE_HOLD)) become('steer');
+
   const gap = s.target >= 0 ? f.gapTo(s.target) : undefined;
-  if (s.target >= 0 && gap === undefined && (s.kind === 'pounce' || s.kind === 'chase' || s.kind === 'bite')) {
+  if (s.target >= 0 && gap === undefined && (s.kind === 'pounce' || s.kind === 'bite')) {
     // What it was on has gone — eaten, dead, hidden. There is nothing left to go at.
     s.target = -1;
     finish();
   }
-  if (!s) return { strike: s, out };
-
-  if (s.kind === 'chase' && gap !== undefined && gap <= f.pounceReach * CHASE_COMMIT && f.canPounce) become('pounce');
-
-  if (s.kind === 'dash' || s.kind === 'bite' || s.kind === 'pounce') {
+  if (s && (s.kind === 'dash' || s.kind === 'bite' || s.kind === 'pounce')) {
     const running = f.state === RUNS[s.kind];
     if (running) s.began = true;
-    if ((s.began && !running) || (!s.began && f.now - s.t > STRIKE_GRACE)) {
-      // A pounce that could not start (cooling down, out of breath) goes back to the chase while
-      // the button is down, and tries again when the body can.
-      if (s.kind === 'pounce' && !s.began && s.held) become('chase');
-      else finish();
-    }
+    if ((s.began && !running) || (!s.began && f.now - s.t > STRIKE_GRACE)) finish();
   }
-  if (!s) return { strike: s, out };
+  st.strike = s;
+  if (!s) return { state: st, out };
   const k: StrikeKind = s.kind;
-  out.target = s.target;
+  out.target = k === 'pending' ? -1 : s.target;
   if (k === 'dash') {
     out.dash = true; out.aimRay = !s.began; out.mark = 'zoom';
   } else if (k === 'bite') {
     out.bite = !s.fired; s.fired = true;
   } else if (k === 'pounce') {
-    // Asked for until it starts; kept on while it runs only for as long as the button is held,
-    // which is what lets a held pounce keep homing on a body that is getting away.
+    // Asked for until it starts; kept on while it runs only for as long as the press is held,
+    // which is what lets a held double-click keep homing on a body that is getting away.
     if (!s.began || s.held) out.pounce = s.target;
     out.mark = 'target';
-  } else if (k === 'chase') {
-    out.chase = s.target; out.mark = 'target';
-  } else {
+  } else if (k === 'steer') {
     out.steer = true;
   }
-  return { strike: s, out };
+  return { state: st, out };
 }

@@ -32,7 +32,7 @@ import { PLAYER_COLORS, type HudSnapshot, type PlayerHud, type RadarBlipHud, typ
 import { ViewRoot } from './view-root';
 import { freshGovernor, governFrame, planFor, type GovernorPlan } from './frame-governor';
 import { NEAR_MIN, nearAlwaysFor, ZOOM_MAX } from '../shared/view-reach';
-import { BREATH_PEEK, climbAimHold, edgePitch, FOLLOW_HOLD, FOLLOW_RATE, inverted, layoutRects, magnificationDistance, PITCH_DOWN, PITCH_UP, RIGHT_AFTER, RIGHT_RATE, rightSideUp, spectatorTarget, updateCamera, type CamState } from './camera';
+import { BREATH_PEEK, climbAimHold, FOLLOW_HOLD, FOLLOW_RATE, inverted, layoutRects, magnificationDistance, PITCH_DOWN, PITCH_UP, RIGHT_AFTER, RIGHT_RATE, rightSideUp, spectatorTarget, updateCamera, type CamState } from './camera';
 import { freshTele, PlayerInput, updateTeleMenu } from './player-input';
 import { BurrowSand, ShoreTracks } from './shore-fx';
 
@@ -555,26 +555,17 @@ export class Engine {
             // `FOLLOW_HOLD` after a drag or a swipe so a player who has just looked somewhere on
             // purpose is not immediately turned away from it.
             if ((this.input.mouseLook || this.input.touchPlay) && p) {
-              // The cursor's height is a second way of aiming the view, and it is *asking* for
-              // something just as a drag is — so it holds the follow off while it pushes, or the
-              // two would pull against each other and the pitch would sit wherever they balanced.
-              //
-              // Only the *mouse* gets it. A hovering cursor is otherwise idle information — it is
-              // somewhere whether or not the player is doing anything with it — and a finger is the
-              // opposite: it is only on the glass while it is being used, and while it is, its travel
-              // is already the camera. Reading its height as a tilt as well would have one gesture
-              // pulling the pitch two ways.
-              const edge = this.input.mouseLook && this.input.mouseFrame?.ndc && !this.input.mouseFrame.dragging ? edgePitch(this.input.mouseFrame.ndc.y) : 0;
-              if (edge !== 0 && !inverted(cs.pitch)) cs.pitch = clamp(cs.pitch + edge * dt, PITCH_UP, PITCH_DOWN);
+              // Only a hand *on* the view holds the follow off: a drag, a steer, a swipe or a stick.
+              // A hovering cursor is not one — where it sits is where it points, and it no longer
+              // tilts the view at the top and bottom of the screen, because a player pointing at
+              // something up there was being turned to look at it whether they meant to or not.
               if (this.input.mouseFrame?.dragging || this.input.touchFrame?.dragging || Math.abs(c.lookX) > 0.05 || Math.abs(c.lookY) > 0.05) cs.followHold = FOLLOW_HOLD;
               else cs.followHold = Math.max(0, cs.followHold - dt);
               // Not while the view is upside down or still turning the right way up: the follow
               // would pull it back the way it came, through the pole, fighting the righting.
               if (cs.followHold === 0 && cs.climbHold === 0 && !inverted(cs.pitch) && Math.abs(cs.roll) < 0.3) {
                 cs.yaw = wrapAngle(cs.yaw + wrapAngle(p.yaw - cs.yaw) * (1 - Math.exp(-FOLLOW_RATE * dt)));
-                // The pitch only settles back while the cursor is in the dead zone: the follow is
-                // what a view does when nobody is asking, and the cursor up there is an ask.
-                if (edge === 0) cs.pitch = damp(cs.pitch, 0.2, FOLLOW_RATE * 0.5, dt);
+                cs.pitch = damp(cs.pitch, 0.2, FOLLOW_RATE * 0.5, dt);
               }
             }
           }
@@ -716,7 +707,7 @@ export class Engine {
     // The pointer is put away while the left button is steering or holding a mark on an animal,
     // and while a dash is running, whose mark the HUD draws so that it can move (`cursors.ts`).
     const out = this.input.strikeOut;
-    const want = cursorFor(cursorState({ dragging: m.dragging, dashing: m.right || out?.mark === 'zoom', hidden: !!out && (out.steer || out.mark === 'target') }, over));
+    const want = cursorFor(cursorState({ dragging: m.dragging && !m.steering, dashing: out?.mark === 'zoom', hidden: !!out && (out.steer || out.mark === 'target') }, over));
     if (want !== this.cursorNow) { this.cursorNow = want; this.container.style.cursor = want; }
   }
 
@@ -1373,8 +1364,6 @@ export class Engine {
         }
       } else if (strike?.mark === 'zoom' && this.input.strikeAt) {
         touchMark = { kind: 'zoom', at: this.input.strikeAt };
-      } else if (mouseSeat && this.input.mouseFrame?.right && this.input.mouseFrame.ndc) {
-        touchMark = { kind: 'zoom', at: this.input.mouseFrame.ndc };
       } else if (chaseId !== -1 && this.input.touchPlay && this.input.touchFrame?.marker && this.input.touchFrame.ndc) {
         touchMark = { kind: this.input.touchFrame.marker, at: this.input.touchFrame.ndc };
       }

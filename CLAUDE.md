@@ -223,24 +223,29 @@ unless the user explicitly asks for a PR. Steps:
 - **The mouse plays the game without being taken — until the hand asks it to swim.** It used to be
   pointer lock for the whole match: the cursor gone, the mouse turning the camera, the middle of the
   screen the only thing you could point at. That is a shooter's scheme and this is a game about
-  pointing at an *animal*, so the cursor stays and the camera holds itself. The left button is read
-  by **what it was pressed on**, and acts at the press (`stepStrike` in
-  `src/shared/mouse-strike.ts`, pure, `npm run mouse:strike`): **open water is a dash there**, down
-  the cursor's own ray; **an animal is the attack its distance calls for** — a bite within
-  `mouthReach` plus the bite's lunge, a pounce within `pounceRange`, and further off a **chase**: the
-  body is pointed at the animal and swims flat out, the target held on it however it moves, and it
-  pounces the moment it is `CHASE_COMMIT` inside the reach. A chase lasts as long as the button; a
-  quick click on something out of reach is a pounce *tried* anyway, because a click asks for the
-  attack and not for a swim. **Whatever the press began, a button still down once it is over is
-  steering**: the pointer is locked away (`MousePlay.steer`; hidden instead where a browser will not
-  lock) and the mouse turns the animal and the view together, the body swimming where the camera
-  looks, until the button comes up and the cursor is back where the press was. It used to read the
-  button three ways by how it *moved* — click bite, hold heavy, drag camera — which asked the player
-  to know which of three gestures they were making on the one button that matters most. The mouse's
-  pounce is priced and cooled down like any pounce (a finger's double-tap has paid for its chase
-  already and stays free), and a chase whose pounce the body will not start yet goes on chasing.
-  The right button still dashes at the cursor for as long as it is held, and the middle button is
-  aim mode's framing and, dragged, turns the view.
+  pointing at an *animal*, so the cursor stays and the camera holds itself. **The left button swims
+  unless it is clicked** (`stepStrike` in `src/shared/mouse-strike.ts`, pure, `npm run mouse:strike`).
+  Held past `STRIKE_HOLD`, or moved past `STRIKE_DRAG` while down, it is **steering**: the pointer is
+  locked away (`MousePlay.steer`; hidden instead where a browser will not lock) and the mouse turns
+  the animal and the view together, the body swimming where the camera looks, until the button
+  comes up and the cursor is back where the press was. Let go quickly, it is a **click**, and a
+  click is the attack its place calls for — open water is a **dash** there down the cursor's own
+  ray, an animal within `mouthReach` plus the bite's lunge a **bite**, anything further a
+  **pounce**, which homes. A click is decided on the *release*, because until the button comes up it
+  is not known to be a click rather than the start of a steer; the **second press of a
+  double-click** is known already and acts at once, and held, its dash runs as long as it is held
+  and then steers. **The right button is aim**: held, aim mode's framing with the cursor as the
+  crosshair; let go with it on an animal, a pounce there, and on anything else nothing. The middle
+  button is the same framing, and dragged, turns the view. The mouse's pounce is priced and cooled
+  like any pounce (a finger's double-tap has paid for its chase already and stays free).
+  This is the third reading of the one button, and each was paid for: by *how it moved* (click
+  bite, hold heavy, drag camera) asked the player to know which gesture they were making; by *what
+  it was pressed on*, acting at the press, turned every attempt to swim into an attack on whatever
+  was under the cursor. A hold now always swims and a click always strikes.
+  **A hovering cursor never moves the view.** The top and bottom of the screen used to tilt it
+  (`edgePitch`), which meant a player pointing at something overhead was turned to look at it
+  whether they meant to or not; the view moves only for a steer, a drag, the arrow keys or the
+  follow.
   Two things follow from there. `cursorDir` unprojects the cursor into the world, and `updateAim`
   ranks targets along *that* rather than along the camera's centre — pointing at an animal is
   aiming at it — so the frame carries `aim: true` with the target under the cursor while the
@@ -255,9 +260,9 @@ unless the user explicitly asks for a PR. Steps:
   own**: it is the ordinary cross, drawn by the HUD rather than as the CSS cursor because a CSS
   cursor cannot move — flung into the distance as the dash is thrown and grown back as the body
   arrives (`.touch-cursor.dashing`, the same on a finger) — where it used to be an arrow pointing up
-  at a screen whose forward is *into* it. A chase puts the pointer away and the HUD holds the red
-  ring on the animal being chased instead, since the cursor would otherwise sit where the press was
-  while the target swam off. They are different *drawings* rather
+  at a screen whose forward is *into* it. A running pounce puts the pointer away and the HUD holds
+  the red ring on the animal instead, since the cursor would otherwise sit where the click was while
+  the target swam off. They are different *drawings* rather
   than recolours of one, so they read without relying on colour, and each carries a dark companion
   stroke because a pale cursor vanishes over a pale animal. `cursorState` puts what a held button is
   **doing** above what the cursor is **over**, since a press in progress is the more urgent fact.
@@ -265,13 +270,6 @@ unless the user explicitly asks for a PR. Steps:
   no second stick and no lock, nothing is steering the view frame to frame outside a held button, so
   it steers itself: `FOLLOW_RATE` eases the camera round behind the body and back to the resting
   pitch, and `FOLLOW_HOLD` stands it aside after a drag so looking somewhere on purpose sticks.
-  **The cursor's own height is the other half of the view.** Outside a dead zone either side of the
-  middle (`edgePitch` in `src/render/camera.ts`, `EDGE_DEAD`), the cursor tilts the camera — up in
-  the top of the screen, down in the bottom, squared past the edge so the first part of the push is
-  gentle and the corner is quick — which is how a player angles the view so what they are swimming
-  at arrives near the middle. The middle is left alone precisely because that is where the aiming
-  happens, and a push is an *ask* like a drag is: it holds the follow off while it lasts, or the
-  two would pull against each other and the pitch would sit wherever they balanced.
   The keyboard around it is the mouse's own layout: **A and D turn the animal, and the animal turns
   the camera** — they move the *body*, the stick's own sideways axis, not the view: a swimmer turns
   into its travel (`turnRate` in `game-actor.ts`) and the follow camera comes round behind it, so the
@@ -324,9 +322,8 @@ unless the user explicitly asks for a PR. Steps:
   the mouse switches it off, and moves it: the mouse has a cursor doing that job, a pad has no pointer
   and draws it dead centre where its aim axis is, and touch needs a mark standing where the player
   pointed and back in the middle once it has lapsed. Touch takes the **follow camera** (no second
-  stick steers the view) but **not** `edgePitch` and not the pad's pitch drift: a hovering cursor is
-  idle information and a finger is the opposite — it is only on the glass while it is being used, and
-  while it is, its travel is *already* the camera.
+  stick steers the view) but not the pad's pitch drift, which would fight the hand: a finger is only
+  on the glass while it is being used, and while it is, its travel is *already* the camera.
   **A sideways swipe turns the animal with the camera**, the same angle on the same frame, carried as
   `InputFrame.turn` (touch seats only, so every other scheme takes its old path and `src/sim` stays
   deterministic). Turning only the view left the body behind, and the follow camera then swung back
