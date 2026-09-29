@@ -613,11 +613,16 @@ function RosterCarousel({ p, grid, renderCard }: {
     el.dataset.moving = 'slide';
     if (d < 0.5 || typeof el.animate !== 'function') { done(); return; }
     const ms = Math.min(420, Math.max(170, speed > 0.05 ? SLOPE * d / speed : 240 + d * 0.15));
-    const a = el.animate([{ transform: `translate3d(${from}px, 0, 0)` }, { transform: `translate3d(${to}px, 0, 0)` }], { duration: ms, easing: EASE });
+    const a = el.animate([{ transform: `translate3d(${from}px, 0, 0)` }, { transform: `translate3d(${to}px, 0, 0)` }], { duration: ms, easing: EASE, fill: 'forwards' });
     run.current = a;
     // A generous timer behind the promise: a tab hidden mid-slide pauses the animation's clock.
     const fallback = window.setTimeout(done, ms + 700);
-    const end = () => { window.clearTimeout(fallback); if (run.current === a) run.current = null; done(); };
+    // The finished animation is *held* (`fill: 'forwards'`) and only cancelled by the next `put` or
+    // `slide`, in the same task as the transform that replaces it. Letting it lapse on its own was a
+    // flash of the previous animal on an iPhone: WebKit ran the slide on the compositor, and the
+    // layer it handed back when the animation ended still carried the transform from before the
+    // slide — the drag's last position, mostly the old card — until the next style commit caught up.
+    const end = () => { window.clearTimeout(fallback); done(); };
     a.finished.then(end, end);
   });
   const slotKey = (o: Slot) => `${o.kind}:${o.id}`;
