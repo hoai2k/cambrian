@@ -91,6 +91,8 @@
     "flora": "node tools/test.mjs flora",
     "survival": "node tools/test.mjs survival",
     "views": "node tools/test.mjs views",
+    "sight": "node tools/test.mjs sight",
+    "governor": "node tools/test.mjs governor",
     "hunt": "node tools/test.mjs hunt",
     "respawn": "node tools/test.mjs respawn",
     "ecology": "node tools/test.mjs ecology",
