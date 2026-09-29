@@ -119,6 +119,32 @@ check('crawler: stick right -> screen right', c.onRight > 0.5 && c.onRight > Mat
   check('nothing exceeds the camera it came from', [-89, -54, -20, 0, 20, 54, 89].every((d) => Math.abs(swimPitch(deg(d))) <= Math.abs(deg(d)) + 1e-9), 'monotone and bounded by the look angle');
 }
 
+// --- a finger's camera loops, and rights itself ---------------------------------------------
+// Past the end of the ordinary travel — only a looping camera gets there — the body swims the angle
+// it is looking along, straight up included. The righting is a view-preserving swap: the same
+// direction seen from the right way up, plus the half turn of roll that makes the swap invisible, and
+// the up vector is continuous through the poles where a world-up `lookAt` flips the picture.
+{
+  const THREE = await import('three');
+  const { swimPitch, rightSideUp, cameraUp, inverted } = await import('../src/render/camera');
+  const deg = (d: number) => (d * Math.PI) / 180;
+  check('looking straight up, swim goes straight up', Math.abs(swimPitch(-Math.PI / 2) + Math.PI / 2) < 1e-9, `pitch=${swimPitch(-Math.PI / 2).toFixed(3)}`);
+  check('between the travel and the pole, swim follows the look', Math.abs(swimPitch(deg(-70)) + deg(70)) < 1e-9, `pitch=${swimPitch(deg(-70)).toFixed(3)}`);
+  check('a looped pitch reads as upside down', inverted(deg(-120)) && inverted(deg(170)) && !inverted(deg(-80)) && !inverted(deg(60)));
+  const fwd = (yaw: number, pitch: number) => new THREE.Vector3(Math.sin(yaw) * Math.cos(pitch), -Math.sin(pitch), Math.cos(yaw) * Math.cos(pitch));
+  for (const [yaw, pitch] of [[0.4, deg(-120)], [-2.1, deg(150)], [3, deg(-179)], [1, deg(95)]]) {
+    const r = rightSideUp(yaw, pitch);
+    const same = fwd(yaw, pitch).distanceTo(fwd(r.yaw, r.pitch)) < 1e-9;
+    const upSame = cameraUp(yaw, pitch, 0, new THREE.Vector3()).distanceTo(cameraUp(r.yaw, r.pitch, r.roll, new THREE.Vector3())) < 1e-9;
+    check(`righting keeps the view: yaw ${yaw.toFixed(1)}, pitch ${(pitch * 180 / Math.PI).toFixed(0)}°`, same && upSame && !inverted(r.pitch), `direction ${same ? 'same' : 'moved'}, up ${upSame ? 'same' : 'moved'}`);
+  }
+  const up = (p: number) => cameraUp(0.7, p, 0, new THREE.Vector3());
+  check('up is world up at level', up(0).distanceTo(new THREE.Vector3(0, 1, 0)) < 1e-9);
+  check('up is always square to the view', [-3, -2, -1.6, -1.5, 0, 1.4, 2.5].every((p) => Math.abs(up(p).dot(fwd(0.7, p))) < 1e-9));
+  check('up is continuous through the pole', up(-Math.PI / 2 - 0.01).distanceTo(up(-Math.PI / 2 + 0.01)) < 0.03);
+  check('half way round a loop the picture is upside down', up(-Math.PI).y < -0.999);
+}
+
 // --- a dash goes where the camera is pointed, in all three directions ------------------------
 // The vertical of a dash used to be cut to seven tenths, which tipped every aimed dash about ten
 // degrees flatter than it was aimed and made lining one up on prey above or below harder than

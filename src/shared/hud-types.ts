@@ -21,6 +21,11 @@ export interface PlayerHud {
   tier: number; tierName: string; progress: number; scale: number;
   abilityName: string; abilityReady: number; abilityActive: boolean; abilityUnlocked: boolean;
   lock?: { name: string; kind?: string; band: Band; hp: number; color: string };
+  /**
+   * Something this player could eat is right in front of them, near the middle of their view. Only
+   * worked out for a touch seat, where it is what tells a new player the aim pad exists.
+   */
+  preyAhead?: boolean;
   aim?: {
     hasTarget: boolean; inRange: boolean; name?: string; color: string; band?: Band; ready: boolean;
     /** What RT does for this creature: POUNCE, or the special's own name. */ action: string;

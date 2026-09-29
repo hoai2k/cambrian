@@ -381,8 +381,9 @@ unless the user explicitly asks for a PR. Steps:
   is keyed on the **aspect ratio**, because it is the shape that decides and no single width tells
   780x360 apart from 820x1180. Two players on a tall window are now cut top and bottom (`splitAxis`,
   read by `layoutRects`); the HUD follows the rects by percentage and needed no telling. Portrait is
-  never *blocked* — `rotateHint` asks once, past 3:2, so a phone held up (2.16) is asked and every
-  tablet upright (1.33) is left alone.
+  played, not tolerated: there is no rotate hint any more, because a line asking a player to turn
+  the phone is a line telling them the way they are holding it is wrong, and the layout already
+  answers both shapes.
   The four game entries gained `viewport-fit=cover` (without which `env(safe-area-inset-*)` is always
   zero and the pads sit under a notch) and `maximum-scale=1, user-scalable=no` — a real accessibility
   cost taken knowingly, because **double-tap is a move in this game** and a browser that answered it
@@ -419,7 +420,38 @@ unless the user explicitly asks for a PR. Steps:
   `transitionend` can arrive late or not at all. And the row's transform is written straight onto
   the element while the finger moves, never through React state — three whole cards re-rendered per
   move is how a card comes to trail the finger.
+  **A slide's three cards are keyed by the animal, not by the position.** Keyed `prev`/`current`/
+  `next`, the card sliding in was a *different element* from the one that had been peeking — React
+  unmounted the neighbour and mounted a fresh card on stage, whose portrait replayed its entrance
+  animation — so what a phone showed on release was a card popping in, which read as the snap. The
+  neighbours are also drawn at full strength, because a card that brightens as it arrives is a
+  second change on top of the slide; and the engine skips its attract frames behind an opaque
+  screen (`setBackdropHidden`: the title and the plate), because a sea nobody can see was taking
+  the GPU a phone needed to run the slide.
   `npm run touch` holds the decision, `node tools/carousel-browser.mjs` the three games at phone size.
+- **One player on glass has one step to the sea.** With no pad connected (`small.touch`) the crew
+  card's Lock In *is* Dive In (`oneStep`, `.dive-now`) and the footer's second button is gone: the
+  lock exists so several seats can agree, and a phone with nobody else to agree with was asking
+  twice. Plug in a pad and the split comes back. Where the footer's Dive In is shown on a compact
+  window it glows once it is live (`glowStart`), because a desktop focuses it for you and a thumb
+  has nothing to tell it where to go.
+  **A new player is taught the two pads by the pads themselves** (`Settings.taught`): the swim pad
+  wears a ring until it is first held, and the first time something edible is dead ahead
+  (`PlayerHud.preyAhead`, touch seats only) the aim pad pulses for `AIM_PULSE` and then holds a
+  steady ring under *Hold to aim* until it is touched. Both are retired for good by the touch
+  itself (`TouchPlay.onZone`), never by a timer, so the lesson is not over until it has been learned.
+- **A finger's camera goes over the top; a mouse's does not.** Touch pitch wraps rather than
+  clamping (`loops` in the engine), so a swipe upward carries on past straight up and round — and a
+  view upside down has to know it: horizontal swipes turn the other way while `inverted` (or the
+  world would turn against the finger), the follow camera stands off, and `lookIdle` past
+  `RIGHT_AFTER` flips the view to the *same* direction the right way up (`rightSideUp`: yaw + π,
+  pitch mirrored through the pole) and hands the half-turn to `roll`, which then eases out at
+  `RIGHT_RATE` — so the righting is a roll the player watches, never a jump of where they are
+  looking. `cameraUp` carries the roll into the camera's up vector. `swimPitch` passes the look
+  angle through past its limit up to straight up, and a pointer's dash takes the cursor ray's
+  **raw** pitch (`player-input.ts`), because the swim pitch is a rest-pose clamp and a dash aimed
+  at a point overhead is exactly the case it would flatten. The mouse keeps its clamp: it never
+  inverts, and a dash overhead is served by the raw ray. `npm run controls` holds the geometry.
 - **The choice screen is a naturalist's plate, because the title is one.** Every game's title is an
   engraved plate on parchment, and the pick screen after it was a dark teal app panel, so pressing
   start felt like arriving in a different game. `src/app/plate.css` draws the same screen in ink on

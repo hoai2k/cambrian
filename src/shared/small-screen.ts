@@ -68,15 +68,6 @@ export const touchFirst = (coarse: boolean, hover: boolean, pads: number): boole
   coarse && !hover && pads === 0;
 
 /**
- * Whether to gate play until a phone is turned sideways.
- *
- * Only for a touch session narrower than 600 CSS pixels. The width distinguishes phones from
- * tablets; every portrait phone is blocked, even when its viewport is nearly square.
- */
-export const rotateHint = (w: number, h: number, touch: boolean): boolean =>
-  touch && w < 600 && h > w;
-
-/**
  * Which way to cut a two-player split.
  *
  * `layoutRects` has always halved left and right, which is right on every screen the game was

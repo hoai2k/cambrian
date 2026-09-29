@@ -159,7 +159,54 @@ export function swimPitch(pitch: number): number {
   const mag = Math.abs(pitch);
   if (mag <= flat) return 0;
   const limit = up ? -PITCH_UP : PITCH_DOWN;
-  return Math.sign(pitch) * limit * Math.min(1, (mag - flat) / (limit - flat));
+  // Past the end of the ordinary travel — which only a camera that loops can reach, a finger's — the
+  // body swims the angle it is looking along, up to straight up or down: looking over the top of
+  // your own animal and holding swim goes over the top.
+  if (mag >= limit) return Math.sign(pitch) * Math.min(mag, Math.PI / 2);
+  return Math.sign(pitch) * limit * ((mag - flat) / (limit - flat));
+}
+
+/**
+ * The camera can loop, and a loop is carried in the pitch alone.
+ *
+ * A finger's vertical swipe used to stop at `PITCH_UP`, so looking up ran into a wall at 54°; now it
+ * wraps, and pitch runs all the way round (-π..π). Past ±π/2 the camera has gone over the top — or
+ * under the bottom — and is **upside down**, which is exactly what the view should be doing half way
+ * round a loop. Only touch loops: a mouse and a pad keep their clamp, because neither has a gesture
+ * that means "keep going round".
+ */
+export const inverted = (pitch: number) => Math.cos(pitch) < 0;
+/**
+ * How long a looped camera is left upside down with nobody turning it before it rights itself, and
+ * how fast the righting turns. It is a roll about the view axis — the direction you are looking stays
+ * exactly where it was and the picture turns the right way up round it — so a player who meant to be
+ * upside down has a second and a bit to carry on swiping, and one who did not is set right.
+ */
+export const RIGHT_AFTER = 1.2;
+export const RIGHT_RATE = 3.2;
+/**
+ * The same view direction as `(yaw, pitch)`, described from the right way up: turned half round and
+ * pitched back across the pole, with the half-turn of roll that makes the picture identical at the
+ * moment of the swap. Easing that roll to nothing is the righting.
+ */
+export function rightSideUp(yaw: number, pitch: number): { yaw: number; pitch: number; roll: number } {
+  return { yaw: wrapAngle(yaw + Math.PI), pitch: pitch > 0 ? Math.PI - pitch : -Math.PI - pitch, roll: Math.PI };
+}
+/**
+ * Which way is up for a camera at `yaw`, `pitch` with `roll` about its view axis. Continuous through
+ * both poles, which `lookAt` with a fixed world up is not: at straight up or straight down it has no
+ * answer, and past them it flips the picture over on a single frame.
+ */
+export function cameraUp(yaw: number, pitch: number, roll: number, out: THREE.Vector3): THREE.Vector3 {
+  const sy = Math.sin(yaw), cy = Math.cos(yaw), sp = Math.sin(pitch), cp = Math.cos(pitch);
+  // Forward is (sy·cp, -sp, cy·cp); this is the one perpendicular to it that is world up at level.
+  const ux = sy * sp, uy = cp, uz = cy * sp;
+  if (!roll) return out.set(ux, uy, uz);
+  const fx = sy * cp, fy = -sp, fz = cy * cp;
+  // Rodrigues about the forward axis, with up already perpendicular to it.
+  const c = Math.cos(roll), s = Math.sin(roll);
+  const cx = fy * uz - fz * uy, cyy = fz * ux - fx * uz, cz = fx * uy - fy * ux;
+  return out.set(ux * c + cx * s, uy * c + cyy * s, uz * c + cz * s);
 }
 
 /**
@@ -215,7 +262,11 @@ export function layoutRects(n: number, w: number, h: number): ViewportRect[] {
 }
 
 /** One seat's camera rig: where it is, where it looks, and every eased blend that frames it. */
-export interface CamState { showBoard: boolean; hatchShot: number; breathT: number; rideBlend: number; yaw: number; pitch: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; climbHold: number; followHold: number; floorCloseT: number; floorCloseBlend: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
+export interface CamState { showBoard: boolean; hatchShot: number; breathT: number; rideBlend: number; yaw: number; pitch: number;
+  /** A turn about the view axis, left over from righting a looped camera (`rightSideUp`); eases to nothing. */
+  roll: number;
+  /** Seconds since a finger last turned this camera, for the righting. */
+  lookIdle: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; climbHold: number; followHold: number; floorCloseT: number; floorCloseBlend: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
 
 /** Scratch, so a frame's camera work allocates nothing. */
 const tmpV = new THREE.Vector3(), tmpLook = new THREE.Vector3(), tmpRide = new THREE.Vector3(), tmpDesired = new THREE.Vector3();
@@ -371,7 +422,7 @@ export function updateCamera(cs: CamState, p0: Actor, dt: number, game: Game, re
   // tipping flat: you see *past* your own creature into the water above, which is the whole point
   // of aiming up from the floor. Not while locked on — there the target is the shot.
   if (!locked) lookAt.y += clamp(fit.lift, -L * 1.5, L * 1.5);
-  if (!locked && !pred && cs.pitch < -0.2) {
+  if (!locked && !pred && cs.pitch < -0.2 && cs.pitch > -Math.PI / 2) {
     const range = Math.hypot(lookAt.x - desired.x, lookAt.z - desired.z);
     const bodyRange = Math.hypot(pp.x - desired.x, pp.z - desired.z);
     lookAt.y = keepCreatureInFrame(desired.y, lookAt.y, range, pp.y + L * 0.3, bodyRange, cs.camera.fov);
@@ -379,7 +430,7 @@ export function updateCamera(cs: CamState, p0: Actor, dt: number, game: Game, re
   const k = jumped ? 1 : p.state === 'dodge' ? 5 : 7;
   if (jumped) { cs.pos.copy(desired); cs.look.copy(lookAt); }
   else { cs.pos.lerp(desired, 1 - Math.exp(-k * dt)); cs.look.lerp(lookAt, 1 - Math.exp(-10 * dt)); }
-  if (!locked && !pred && cs.pitch < -0.2) {
+  if (!locked && !pred && cs.pitch < -0.2 && cs.pitch > -Math.PI / 2) {
     const range = Math.hypot(cs.look.x - cs.pos.x, cs.look.z - cs.pos.z);
     const bodyRange = Math.hypot(pp.x - cs.pos.x, pp.z - cs.pos.z);
     cs.look.y = keepCreatureInFrame(cs.pos.y, cs.look.y, range, pp.y + L * 0.3, bodyRange, cs.camera.fov);
@@ -387,6 +438,9 @@ export function updateCamera(cs: CamState, p0: Actor, dt: number, game: Game, re
   cs.shake = Math.max(0, cs.shake - dt * 2.2);
   const sh = cs.shake * cs.shake * 0.35;
   cs.camera.position.copy(cs.pos).add(tmpV.set((Math.random() - 0.5) * sh, (Math.random() - 0.5) * sh, (Math.random() - 0.5) * sh));
+  // Up follows the camera round a loop and turns with the righting roll, instead of being the world's
+  // up — which has no answer at the poles and flips the picture over past them.
+  cameraUp(yaw, pitch, cs.roll, cs.camera.up);
   cs.camera.lookAt(cs.look);
   const baseFov = 64 - 9 * clamp(Math.log(L + 0.3) / Math.log(11), 0, 1);
   cs.camera.fov = damp(cs.camera.fov, baseFov + (p.burstT > 0 || (Math.hypot(p.vel.x, p.vel.z) > def.speed * Math.pow(p.scale, 0.45) * 1.25) ? 8 : 0) + p.hunted * 4, 4, dt);

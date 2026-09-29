@@ -32,7 +32,7 @@ import { PLAYER_COLORS, type HudSnapshot, type PlayerHud, type RadarBlipHud, typ
 import { ViewRoot } from './view-root';
 import { freshGovernor, governFrame, planFor, type GovernorPlan } from './frame-governor';
 import { NEAR_MIN, nearAlwaysFor, ZOOM_MAX } from '../shared/view-reach';
-import { BREATH_PEEK, climbAimHold, edgePitch, FOLLOW_HOLD, FOLLOW_RATE, layoutRects, magnificationDistance, PITCH_DOWN, PITCH_UP, spectatorTarget, updateCamera, type CamState } from './camera';
+import { BREATH_PEEK, climbAimHold, edgePitch, FOLLOW_HOLD, FOLLOW_RATE, inverted, layoutRects, magnificationDistance, PITCH_DOWN, PITCH_UP, RIGHT_AFTER, RIGHT_RATE, rightSideUp, spectatorTarget, updateCamera, type CamState } from './camera';
 import { freshTele, PlayerInput, updateTeleMenu } from './player-input';
 import { BurrowSand, ShoreTracks } from './shore-fx';
 
@@ -50,6 +50,8 @@ export interface EngineCallbacks {
    * time they hatch.
    */
   onSecondary?(s: Secondary): void;
+  /** A finger has landed on one of the touch pads. */
+  onTouchZone?(zone: 'swim' | 'secondary'): void;
 }
 
 
@@ -72,6 +74,13 @@ const HUNTER_HAZE = 0.4;
 
 /** Radar colour for a shoal in the water above you, against the snack green of one on the floor. */
 const FOOD_ABOVE = '#9ec2ff';
+
+/**
+ * Which way a sideways swipe turns this camera: the other way round when the picture is upside down —
+ * through a loop, or still rolling back the right way up — so the view always turns the way the finger
+ * moved across it.
+ */
+const lookFlip = (cs: CamState | undefined) => (cs && Math.cos(cs.pitch) * Math.cos(cs.roll) < 0 ? -1 : 1);
 
 export class Engine {
   private renderer: THREE.WebGLRenderer;
@@ -135,7 +144,13 @@ export class Engine {
   private acc = 0;
   private disposed = false;
   private paused = false;
-  private orientationBlocked = false;
+  /**
+   * The menus in front of the attract sea are opaque paper now (the title's painting, the choice
+   * screen's plate), so drawing the sea behind them is a whole frame of GPU work nobody sees — and on a
+   * phone it is the same GPU the page's own animations need, which is how the choice screen's card
+   * slide came to stutter. While this is set the attract loop streams but neither steps nor draws.
+   */
+  private backdropHidden = false;
   private hudT = 0;
   /** The pause button, per device: `onMenu` fires on the press, never on the hold. */
   private menuEdges = new Map<string, Edges>();
@@ -176,6 +191,7 @@ export class Engine {
       return this.input.pointingAt(game, p, cs) !== 'none' ? cs.aimTarget : -1;
     };
     this.input.touch.onSwap = (sec) => { this.cb.onSecondary?.(sec); };
+    this.input.touch.onZone = (zone) => { this.cb.onTouchZone?.(zone); };
     this.scene.add(this.viewRoot);
     // The whole graph is brought up to date once a frame before the viewports draw, not once per
     // `render()` call: with split screen that walk was paid again for every viewport.
@@ -287,14 +303,14 @@ export class Engine {
   }
   setLook(speed: number, invert: boolean) { this.lookSpeed = speed; this.invertY = invert; }
   setPaused(p: boolean) { this.paused = p; this.syncPointer(); }
-  setOrientationBlocked(blocked: boolean) { this.orientationBlocked = blocked; this.syncPointer(); }
+  setBackdropHidden(hidden: boolean) { this.backdropHidden = hidden; }
   private syncPointer() {
-    const playing = this.pointerWanted && !this.paused && !this.orientationBlocked && !this.attract;
-    if (this.paused || this.orientationBlocked || this.attract) this.input.pursuitTargets.clear();
+    const playing = this.pointerWanted && !this.paused && !this.attract;
+    if (this.paused || this.attract) this.input.pursuitTargets.clear();
     this.input.mouse.want(playing);
     // The fingers stand down for exactly the same reasons the mouse does: paused, in a dialog, on
     // the results screen or back at the menus, a tap belongs to whatever button it landed on.
-    this.input.touch.want(this.input.touchPlay && !this.paused && !this.orientationBlocked && !this.attract);
+    this.input.touch.want(this.input.touchPlay && !this.paused && !this.attract);
     // Paused, in a dialog, on the results screen or back at the menus, the cursor belongs to the
     // buttons again: a targeting reticle over a *Quit to title* is a lie about what a click does.
     if (!playing) { this.cursorNow = ''; this.container.style.cursor = ''; }
@@ -409,7 +425,7 @@ export class Engine {
     this.cams = setups.map((_, i) => {
       const p = this.game!.players[i];
       const cam = new THREE.PerspectiveCamera(60, 1, 0.08, 420);
-      const cs: CamState = { showBoard: false, hatchShot: -1, breathT: 0, rideBlend: 0, yaw: p.yaw, pitch: 0.2, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, climbHold: 0, followHold: 0, floorCloseT: 0, floorCloseBlend: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4(), tele: freshTele() };
+      const cs: CamState = { showBoard: false, hatchShot: -1, breathT: 0, rideBlend: 0, yaw: p.yaw, pitch: 0.2, roll: 0, lookIdle: 0, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, climbHold: 0, followHold: 0, floorCloseT: 0, floorCloseBlend: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4(), tele: freshTele() };
       cam.position.copy(cs.pos); cam.lookAt(cs.look);
       return cs;
     });
@@ -455,8 +471,7 @@ export class Engine {
     this.fpsFrames++; this.fpsT += elapsed; if (this.fpsT > 1) { this.fps = this.fpsFrames / this.fpsT; this.fpsFrames = 0; this.fpsT = 0; }
     const game = this.game;
     if (!game) return;
-    // The portrait phone screen may stream assets, but neither simulation nor rendering runs behind it.
-    if (this.orientationBlocked) return;
+    if (this.attract && this.backdropHidden) return;
     const running = !this.paused;
     const dt = running ? dtReal : 0;
     this.time += dt;
@@ -480,7 +495,7 @@ export class Engine {
         // with the same sign convention (the follow camera eases `cs.yaw` onto the body's `yaw`), so
         // the two stay locked together rather than the view going round and the body being left.
         if (s.device === 'touch' && running && !menuOpen && c.lookDX) {
-          this.pendingTurn.set(i, (this.pendingTurn.get(i) ?? 0) - c.lookDX * this.lookSpeed);
+          this.pendingTurn.set(i, (this.pendingTurn.get(i) ?? 0) - c.lookDX * this.lookSpeed * lookFlip(this.cams[i]));
         }
         // Camera orbit. The right stick is the ONLY thing that turns the camera: yaw is absolute
         // and never follows the creature's heading, so swimming back does not swing the view.
@@ -503,8 +518,24 @@ export class Engine {
           } else {
             // A stick is a rate and the mouse is a distance, so the stick term is scaled by the
             // frame time and the mouse term is not; one of the two is always zero.
-            cs.yaw = wrapAngle(cs.yaw - (c.lookX * dt * 2.6 + c.lookDX) * this.lookSpeed);
-            cs.pitch = clamp(cs.pitch + (c.lookY * dt * 1.6 + c.lookDY) * this.lookSpeed * (this.invertY ? -1 : 1), PITCH_UP, PITCH_DOWN);
+            // A finger loops the camera (`inverted` in camera.ts); everything else keeps its clamp.
+            // Upside down, a sideways swipe has to turn the view the way the finger went on the
+            // picture, which is the other way round in yaw — and the animal turns with it.
+            const loops = s.device === 'touch';
+            cs.yaw = wrapAngle(cs.yaw - (c.lookX * dt * 2.6 + c.lookDX * (loops ? lookFlip(cs) : 1)) * this.lookSpeed);
+            const dPitch = (c.lookY * dt * 1.6 + c.lookDY) * this.lookSpeed * (this.invertY ? -1 : 1);
+            cs.pitch = loops ? wrapAngle(cs.pitch + dPitch) : clamp(cs.pitch + dPitch, PITCH_UP, PITCH_DOWN);
+            if (loops) {
+              // Left upside down with nobody turning it, the camera rights itself: the same view
+              // direction taken from the right way up, and the half turn of roll that makes the swap
+              // invisible eased away, so the picture turns over about the middle of the screen.
+              cs.lookIdle = c.lookDX || c.lookDY || this.input.touchFrame?.dragging ? 0 : cs.lookIdle + dt;
+              if (inverted(cs.pitch) && cs.lookIdle > RIGHT_AFTER) {
+                const r = rightSideUp(cs.yaw, cs.pitch);
+                cs.yaw = r.yaw; cs.pitch = r.pitch; cs.roll = wrapAngle(cs.roll + r.roll);
+              }
+            }
+            cs.roll = Math.abs(cs.roll) < 1e-3 ? 0 : cs.roll * Math.exp(-RIGHT_RATE * dt);
             // Pitch drifts back to level when a stick is let go, which is what makes a pad feel
             // like it is swimming for you. A mouse holds where it was put and so does a finger: the
             // same drift under either would fight the hand every frame. Both of them get the *follow*
@@ -530,7 +561,9 @@ export class Engine {
               if (edge !== 0) cs.pitch = clamp(cs.pitch + edge * dt, PITCH_UP, PITCH_DOWN);
               if (this.input.mouseFrame?.dragging || this.input.touchFrame?.dragging || Math.abs(c.lookX) > 0.05 || Math.abs(c.lookY) > 0.05) cs.followHold = FOLLOW_HOLD;
               else cs.followHold = Math.max(0, cs.followHold - dt);
-              if (cs.followHold === 0 && cs.climbHold === 0) {
+              // Not while the view is upside down or still turning the right way up: the follow
+              // would pull it back the way it came, through the pole, fighting the righting.
+              if (cs.followHold === 0 && cs.climbHold === 0 && !inverted(cs.pitch) && Math.abs(cs.roll) < 0.3) {
                 cs.yaw = wrapAngle(cs.yaw + wrapAngle(p.yaw - cs.yaw) * (1 - Math.exp(-FOLLOW_RATE * dt)));
                 // The pitch only settles back while the cursor is in the dead zone: the follow is
                 // what a view does when nobody is asking, and the cursor up there is an ask.
@@ -1180,6 +1213,24 @@ export class Engine {
 
   private shake(player: number, amount: number) { const cs = this.cams[player]; if (cs) cs.shake = Math.min(1.6, cs.shake + amount * 0.6); }
 
+  /**
+   * Whether something edible is right in front of this player: within a few body lengths and near the
+   * middle of their view, which is where the aim pad would put the crosshair on it. Asked at the HUD's
+   * rate, for touch seats only.
+   */
+  private preyAhead(game: Game, p: Actor, cs: CamState): boolean {
+    if (!isAlive(p)) return false;
+    const L = lengthOf(p);
+    for (const a of game.nearby(p.pos, L * 8 + 6)) {
+      if (a.id === p.id || !isAlive(a) || isHidden(a)) continue;
+      const band = bandOf(p, a);
+      if (band !== 'snack' && band !== 'prey') continue;
+      const v = this.tmpProj.set(a.pos.x, a.pos.y, a.pos.z).project(cs.camera);
+      if (v.z < 1 && Math.abs(v.x) < 0.35 && Math.abs(v.y) < 0.45) return true;
+    }
+    return false;
+  }
+
   private snapshot(game: Game, rects: ViewportRect[]): HudSnapshot {
     const players: PlayerHud[] = game.players.map((p, i) => {
       const def = creature(p.creature);
@@ -1326,7 +1377,7 @@ export class Engine {
         hint: game.hintFor(i), respawnIn: p.state === 'dead' ? Math.max(0, (game.reviveWindow(p) || CORPSE_WINDOW) - (game.reviveWindow(p) ? 0 : p.respawnT)) : 0, fade: cs?.fade ?? 0, state: p.state, modelReady: !!loadedSync(p.creature),
         downedFor: game.reviveWindow(p), reviveProgress: game.reviveProgress(p), downedAllies: downed, spectating: spectate,
         death: p.state === 'dead' || p.state === 'swallowed' ? { eaten: p.swallowedBy >= 0 || p.eaten > 0, by: nameOf(killer) } : undefined,
-        kills: p.kills, eats: p.eats, escapes: p.escapes, protect: p.spawnProtect > 0, bandMarkers: markers.slice(0, 24),
+        kills: p.kills, eats: p.eats, escapes: p.escapes, protect: p.spawnProtect > 0, bandMarkers: markers.slice(0, 24), preyAhead: this.setups[i]?.device === 'touch' && cs ? this.preyAhead(game, p, cs) : undefined,
         grip: game.gripFor(i), biome: BIOME_NAMES[game.biomeOf(i) ?? 'shelf'], day: game.dayPhase(), radar: { range: radarRange, blips }, teleport: tele, swap, board, notice: game.noticeFor(i), era,
       };
     });

@@ -95,7 +95,9 @@ async function drive(era, w, h, full) {
     const vis = await page.evaluate(() => {
       const r = (s) => document.querySelector(s)?.getBoundingClientRect();
       const b = r('.carousel-slide.current .ready-button'), c = r('.carousel-slide.current .crew-card'), d = r('.start-button');
-      return { btn: !!b && b.bottom <= innerHeight && b.top >= 0, card: !!c && c.bottom <= innerHeight + 1, dive: !!d && d.bottom <= innerHeight };
+      // With no pad the card's own button is the dive (one step), and the footer has none.
+      const oneStep = !!document.querySelector('.carousel-slide.current .ready-button.dive-now');
+      return { btn: !!b && b.bottom <= innerHeight && b.top >= 0, card: !!c && c.bottom <= innerHeight + 1, dive: oneStep ? !d : !!d && d.bottom <= innerHeight };
     });
     assert.ok(vis.btn && vis.card && vis.dive, `the card, its Lock In and Dive In must all be on screen (${JSON.stringify(vis)})`);
     if (OUT) await page.screenshot({ path: `${OUT}/${name}.png` });
@@ -113,9 +115,12 @@ async function drive(era, w, h, full) {
     if (full) {
       // Lock In and Dive In still reach the sea.
       await rest(page);
+      const oneStep = await page.locator('.carousel-slide.current .ready-button.dive-now').count();
       await page.locator('.carousel-slide.current .ready-button').click();
-      await until(page, () => document.querySelector('.carousel-slide.current .ready-button')?.getAttribute('aria-pressed') === 'true');
-      await page.locator('.start-button').click();
+      if (!oneStep) {
+        await until(page, () => document.querySelector('.carousel-slide.current .ready-button')?.getAttribute('aria-pressed') === 'true');
+        await page.locator('.start-button').click();
+      }
       await page.locator('.hud').first().waitFor({ timeout: 90000 });
     }
     assert.deepEqual(errors, [], `page errors: ${errors.join(' | ')}`);
@@ -144,9 +149,8 @@ async function keepsGrid(era, w, h) {
 const ONLY = process.env.ONLY;
 for (const era of ['cambrian', 'devonian', 'triassic']) {
   if (ONLY && ONLY !== era) continue;
-  // The dive is driven on its side: a match held upright is asked to turn round rather than drawn,
-  // so a HUD never arrives in portrait and waiting for one there measures the rotate screen.
-  await drive(era, 390, 844, false);
+  // The dive is driven both ways up now that a phone plays upright, on the Cambrian where it is cheapest.
+  await drive(era, 390, 844, era === 'cambrian');
   await drive(era, 780, 360, era === 'cambrian');
 }
 await keepsGrid('cambrian', 1280, 800);
