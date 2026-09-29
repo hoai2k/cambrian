@@ -33,7 +33,8 @@ export function propFiles() {
   for (const f of fs.readdirSync('public/assets/props').filter((f) => !f.startsWith('._') && f.endsWith('.glb')))
     files[f.replace(/\.glb$/, '')] = `public/assets/props/${f}`;
   for (const dir of ['public/assets/devonian/props-instanced', 'public/assets/triassic/props-instanced'])
-    for (const f of (fs.existsSync(dir) ? fs.readdirSync(dir) : []).filter((f) => !f.startsWith('._') && f.endsWith('.glb')))
+    // A `.lod1.glb` is a far copy of a prop drawn nowhere near anything that collides with it.
+    for (const f of (fs.existsSync(dir) ? fs.readdirSync(dir) : []).filter((f) => !f.startsWith('._') && f.endsWith('.glb') && !f.includes('.lod')))
       files[f.replace(/\.glb$/, '')] = `${dir}/${f}`;
   return files;
 }

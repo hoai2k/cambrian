@@ -1,17 +1,19 @@
 import type { InstancedScenery } from '../era';
 
 const path = (id: string) => `assets/devonian/props-instanced/${id}.glb`;
+/** Far copies from `tools/devonian/props-instancing/lods.mjs`. */
+const lod = (id: string) => `assets/devonian/props-instanced/${id}.lod1.glb`;
 
 /** Game-space proxies baked from shipped specimens; all original metric models stay available. */
 export const DEVONIAN_SCENERY: InstancedScenery = {
   props: {
-    'devonian-crinoid': { path: path('devonian-crinoid'), material: 'algae', sway: true, bend: true },
-    'devonian-stromatoporoid': { path: path('devonian-stromatoporoid'), material: 'rock', bend: true },
-    'devonian-tabulate': { path: path('devonian-tabulate'), material: 'rock', bend: true },
-    'devonian-rugose': { path: path('devonian-rugose'), material: 'sponge', bend: true },
-    'devonian-bryozoan': { path: path('devonian-bryozoan'), material: 'sponge', sway: true, bend: true, doubleSided: true },
-    'devonian-algal-clump': { path: path('devonian-algal-clump'), material: 'algae', sway: true, bend: true, doubleSided: true },
-    'devonian-log': { path: path('devonian-log'), material: 'rock', bend: true },
+    'devonian-crinoid': { path: path('devonian-crinoid'), lod: lod('devonian-crinoid'), material: 'algae', sway: true, bend: true },
+    'devonian-stromatoporoid': { path: path('devonian-stromatoporoid'), lod: lod('devonian-stromatoporoid'), material: 'rock', bend: true },
+    'devonian-tabulate': { path: path('devonian-tabulate'), lod: lod('devonian-tabulate'), material: 'rock', bend: true },
+    'devonian-rugose': { path: path('devonian-rugose'), lod: lod('devonian-rugose'), material: 'sponge', bend: true },
+    'devonian-bryozoan': { path: path('devonian-bryozoan'), lod: lod('devonian-bryozoan'), material: 'sponge', sway: true, bend: true, doubleSided: true },
+    'devonian-algal-clump': { path: path('devonian-algal-clump'), lod: lod('devonian-algal-clump'), material: 'algae', sway: true, bend: true, doubleSided: true },
+    'devonian-log': { path: path('devonian-log'), lod: lod('devonian-log'), material: 'rock', bend: true },
     'devonian-boulder': { path: path('devonian-boulder'), material: 'rock' },
     'devonian-outcrop': { path: path('devonian-outcrop'), material: 'rock' },
     'devonian-talus': { path: path('devonian-talus'), material: 'rock' },

@@ -86,6 +86,17 @@ for (const [era, scenery] of [['Devonian', DEVONIAN_SCENERY], ['Triassic', TRIAS
   const declared = Object.entries(scenery.props);
   for (const [id, prop] of declared)
     ok(existsSync(`public/${prop.path}`), `${era} ${id}: the mesh behind the mapping exists`, prop.path);
+  // A far copy is drawn in place of the full prop and collides as the full prop does, so it must
+  // be the same shape: the same height from the same pivot, no wider than the collider allows.
+  for (const [id, prop] of declared) {
+    if (!prop.lod) continue;
+    if (!existsSync(`public/${prop.lod}`)) { ok(false, `${era} ${id}: the far copy behind the mapping exists`, prop.lod); continue; }
+    const full = await measure(`public/${prop.path}`), far = await measure(`public/${prop.lod}`);
+    const h = full.y1 - full.y0, fh = far.y1 - far.y0;
+    ok(Math.abs(far.y0 - full.y0) < 0.01 * h && Math.abs(fh - h) < 0.1 * h && far.rmax <= full.rmax * 1.05,
+      `${era} ${id}: the far copy is the full prop's shape`,
+      `height ${fh.toFixed(3)} of ${h.toFixed(3)}, reach ${far.rmax.toFixed(3)} of ${full.rmax.toFixed(3)}`);
+  }
   const named = new Set(declared.map(([id]) => id));
   const used = [
     ...Object.values(scenery.flora).flatMap((v) => (typeof v === 'string' ? [v] : [...(v ?? [])])),
