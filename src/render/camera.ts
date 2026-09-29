@@ -18,7 +18,8 @@ import { coverAt, sampleHeight, SURFACE_Y } from '../sim/world';
 import type { TeleMenu } from './player-input';
 
 /** Follow-camera distance for a body length: about two body lengths back plus a floor so larvae are still readable. */
-export const magnificationDistance = (L: number) => L * 1.45 + 1.15 + Math.max(0, 0.8 - L) * 0.9;
+import { magnificationDistance } from '../shared/view-reach';
+export { magnificationDistance };
 
 /**
  * How much of the camera's pitch the stick's forward should follow.

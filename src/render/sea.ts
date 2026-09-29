@@ -1,4 +1,5 @@
 import { ACTIVE_ERA } from '../content';
+import { colorOf } from './colors';
 import { FLORA_BASE, SAND_COLORS, floraTint, rockTint } from '../shared/environment-colors';
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
@@ -6,7 +7,7 @@ import { clamp, makeRng, TAU } from '../shared/math';
 import { loadPropGeometry, type PropId } from './props';
 import { FLORA_PHYS } from '../sim/flora';
 import { daylight } from '../sim/daynight';
-import { BIOMES, biomeAt, biomeWeights, CHUNK, chunkCoord, chunkKey, chunkSeed, generateChunk, LIGHT_WINDOW_Y, sampleCurrent, sampleHeight, shoreDistance, SURFACE_Y, type Biome, type BiomeWeights, type Chunk, type Flora, type WorldData } from '../sim/world';
+import { BIOMES, biomeAt, biomeWeights, CHUNK, chunkCoord, chunkKey, chunkSeed, addChannelPull, channelPull, driftCurrent, generateChunk, LIGHT_WINDOW_Y, sampleHeight, shoreDistance, SURFACE_Y, type Biome, type BiomeWeights, type Chunk, type Flora, type WorldData } from '../sim/world';
 
 export type Quality = 'high' | 'low';
 
@@ -696,7 +697,15 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
   const bloomMat = M(new THREE.PointsMaterial({ color: '#bdf7c8', size: 0.14, transparent: true, opacity: 0.85, depthWrite: false, sizeAttenuation: true }));
 
   const baseFog = high ? 0.0105 : 0.0125;
-  const cur = { x: 0, y: 0, z: 0 };
+  const cur = { x: 0, y: 0, z: 0 }, pull = { x: 0, y: 0, z: 0 };
+  /**
+   * Each mote's share of a tidal channel's pull. The channel is noise over hundreds of units and
+   * a mote moves a fraction of one a frame, so it is refreshed for an eighth of them each frame
+   * rather than sampled for all 1600 every frame, which was the whole cost of the drift.
+   */
+  const pPull = new Float32Array(pCount * 2).fill(NaN);
+  let pPullTurn = 0;
+  const pShift = new THREE.Vector3();
   const shaftDummy = new THREE.Object3D();
   let pOrigin = new THREE.Vector3();
   const hemi = group.children.find((o): o is THREE.HemisphereLight => o instanceof THREE.HemisphereLight)!;
@@ -725,7 +734,7 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
       for (const b of BIOMES) {
         const w = atmosW[b]; if (w <= 0.001) continue;
         const a = ATMOS[b];
-        tmpColor.set(a.fog); fogColor.r += tmpColor.r * w; fogColor.g += tmpColor.g * w; fogColor.b += tmpColor.b * w;
+        tmpColor.copy(colorOf(a.fog)); fogColor.r += tmpColor.r * w; fogColor.g += tmpColor.g * w; fogColor.b += tmpColor.b * w;
         density += a.density * w; sky += a.sky * w; sunI += a.sun * w;
       }
       if (above) {
@@ -761,6 +770,9 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
       }
       (particles.material as THREE.ShaderMaterial).opacity = 1;
       particles.scale.setScalar(THREE.MathUtils.clamp(L * 0.6, 0.6, 3));
+      // The scene's matrices are brought up to date once a frame, before the first viewport; these
+      // two move per viewport, so they bring their own up to date for the one about to draw.
+      surface.updateMatrixWorld(); particles.updateMatrixWorld();
       return fog.density;
     },
     update(time, dt, focus, cams = [focus], simTime) {
@@ -783,11 +795,14 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
       shafts.instanceMatrix.needsUpdate = true;
       // particles: wrap around the focus
       const n = Math.min(dt, 0.05);
-      const shift = focus.clone().sub(pOrigin);
+      const shift = pShift.copy(focus).sub(pOrigin);
       pOrigin.copy(focus);
+      pPullTurn = (pPullTurn + 1) & 7;
       for (let i = 0; i < pCount; i++) {
-        const r = i * 3;
-        sampleCurrent(cur, pPos[r] + pOrigin.x, pPos[r + 1], pPos[r + 2] + pOrigin.z, time);
+        const r = i * 3, x = pPos[r] + pOrigin.x, z = pPos[r + 2] + pOrigin.z;
+        if ((i & 7) === pPullTurn || pPull[i * 2] !== pPull[i * 2]) { channelPull(x, z, pull); pPull[i * 2] = pull.x; pPull[i * 2 + 1] = pull.z; }
+        driftCurrent(cur, x, pPos[r + 1], z, time);
+        addChannelPull(cur, pPull[i * 2], pPull[i * 2 + 1], pPos[r + 1], time);
         pPos[r] += cur.x * n - shift.x; pPos[r + 1] += (cur.y - 0.02) * n; pPos[r + 2] += cur.z * n - shift.z;
         if (pPos[r] > pRange) pPos[r] -= pRange * 2; else if (pPos[r] < -pRange) pPos[r] += pRange * 2;
         if (pPos[r + 2] > pRange) pPos[r + 2] -= pRange * 2; else if (pPos[r + 2] < -pRange) pPos[r + 2] += pRange * 2;

@@ -1,4 +1,5 @@
 import { assetPaths } from '../content/asset-paths';
+import { colorOf } from './colors';
 import { isOralGeometryNamed, drawsOralGeometry } from '../shared/oral-geometry';
 import * as THREE from 'three';
 import { CreatureAnchors } from './anchors';
@@ -74,6 +75,10 @@ const FEEDING_PERFORMANCE: ReadonlySet<CreatureId> = new Set<CreatureId>([
 ]);
 
 export class CreatureView {
+  /** Animation time this view has not been advanced through while nobody could see it (`syncViews`). */
+  owed = 0;
+  /** Whether there is a body to draw at all: a carcass eaten to nothing, or one gone down a throat, is not. */
+  present = true;
   readonly group = new THREE.Group();
   private inner = new THREE.Group();
   private model: THREE.Object3D;
@@ -309,7 +314,7 @@ export class CreatureView {
   /** This body shapes itself to what it is on. */
   get conforms() { return !!this.armConform; }
 
-  setHighlight(intensity: number, color?: string) { this.highlight = intensity; if (color) this.highlightColor.set(color); }
+  setHighlight(intensity: number, color?: string) { this.highlight = intensity; if (color) this.highlightColor.copy(colorOf(color)); }
 
   /**
    * Distance haze. Fog alone leaves a far-off giant reading as a solid dark shape; this washes the
@@ -530,7 +535,8 @@ export class CreatureView {
     // A body eaten in bites loses the meat itself, so it must not also shrink; one swallowed
     // whole has no bites to show and still closes down as it goes in.
     if (a.state === 'dead' && a.eatBites <= 1) { const e = a.eaten; sx *= 1 - e * 0.6; sy *= 1 - e * 0.6; sz *= 1 - e * 0.6; }
-    this.group.visible = !(a.state === 'dead' && a.eaten >= 1 && (a.controller === 'player' || a.swallowedBy >= 0));
+    this.present = !(a.state === 'dead' && a.eaten >= 1 && (a.controller === 'player' || a.swallowedBy >= 0));
+    this.group.visible = this.present;
     if (a.state === 'swallowed') { const t = clamp(a.stateT / a.stateDur, 0, 1); const k = 1 - t * 0.9; sx *= k; sy *= k * (1 - t * 0.3); sz *= k; }
     // shield
     const guarding = a.state === 'guard' || a.state === 'parry' || (a.abilityActive && (def.ability === 'shellUp' || def.ability === 'anchor'));
@@ -538,7 +544,7 @@ export class CreatureView {
     this.shield.visible = this.shieldA > 0.02;
     if (this.shield.visible) {
       this.shieldMat.opacity = this.shieldA * 0.36;
-      this.shieldMat.color.set(a.state === 'parry' ? '#ffffff' : a.hitFlash > 0.25 ? '#dfffff' : '#7ff0ff');
+      this.shieldMat.color.copy(colorOf(a.state === 'parry' ? '#ffffff' : a.hitFlash > 0.25 ? '#dfffff' : '#7ff0ff'));
       const r = 0.36;                            // group is scaled by L; shield is in unit (body-length) space
       this.shield.scale.setScalar(r * (1 + (1 - this.shieldA) * 0.25));
       this.shield.position.set(0, 0.04, 0.36);
@@ -559,11 +565,11 @@ export class CreatureView {
     for (let i = 0; i < this.materials.length; i++) {
       const m = this.materials[i];
       m.emissive.copy(this.baseEmissive[i]);
-      if (flash > 0) m.emissive.lerp(new THREE.Color('#ff6a5a'), flash * 0.85);
+      if (flash > 0) m.emissive.lerp(colorOf('#ff6a5a'), flash * 0.85);
       if (glow > 0) m.emissive.lerp(this.highlightColor, glow * 0.7);
-      if (abilityGlow > 0) m.emissive.lerp(new THREE.Color(this.def.accent), abilityGlow);
-      if (moult > 0) m.emissive.lerp(new THREE.Color('#fff2c2'), moult);
-      if (protect > 0) m.emissive.lerp(new THREE.Color('#9be9ff'), protect);
+      if (abilityGlow > 0) m.emissive.lerp(colorOf(this.def.accent), abilityGlow);
+      if (moult > 0) m.emissive.lerp(colorOf('#fff2c2'), moult);
+      if (protect > 0) m.emissive.lerp(colorOf('#9be9ff'), protect);
       if (dead) m.emissive.multiplyScalar(0.3);
       m.emissiveIntensity = 1;
       m.opacity = this.baseOpacity[i] * (dead ? clamp(1 - Math.max(0, a.corpseT - 35) / 10, 0, 1) : 1);

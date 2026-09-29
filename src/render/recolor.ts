@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { scheme, slotFor, SLOTS, type Slot } from '../shared/palettes';
+import { colorOf } from './colors';
 
 /**
  * Runtime recolouring for creatures, with no new art.
@@ -171,21 +172,28 @@ export function makeRecolor(root: THREE.Object3D): Recolor {
     }
   });
 
+  /** What the tints were last blended from, so an unchanged frame is skipped (`blend`). */
+  const last: { base?: string; colors?: Record<Slot, string>; k: number } = { k: -1 };
   return {
     // Palette order, not the order the meshes happen to be traversed in.
     slots: SLOTS.filter((s) => used.has(s)),
     blend(baseId, colors, amount) {
-      const base = scheme(baseId).colors;
       const k = THREE.MathUtils.clamp(amount, 0, 1);
+      // Called for every view every frame, and nearly always with what it was called with last
+      // time: the uniforms already hold the answer.
+      if (baseId === last.base && colors === last.colors && k === last.k) return;
+      last.base = baseId; last.colors = colors; last.k = k;
+      const base = scheme(baseId).colors;
       for (const t of targets) {
         t.amount.value = colors ? (base ? 1 : k) : (base ? 1 : 0);
         if (colors) {
-          t.tint.value.set(colors[t.slot]);
-          if (base) t.tint.value.lerp(new THREE.Color(base[t.slot]), 1-k);
-        } else if (base) t.tint.value.set(base[t.slot]);
+          t.tint.value.copy(colorOf(colors[t.slot]));
+          if (base) t.tint.value.lerp(colorOf(base[t.slot]), 1-k);
+        } else if (base) t.tint.value.copy(colorOf(base[t.slot]));
       }
     },
     setScheme(id) {
+      last.base = undefined;
       const colors = scheme(id).colors;
       for (const t of targets) {
         t.amount.value = colors ? 1 : 0;
