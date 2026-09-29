@@ -4,6 +4,8 @@ import { audio } from '../audio/audio';
 import type { AssetProgress } from '../render/assets';
 import { Engine } from '../render/engine';
 import type { HudSnapshot } from '../shared/hud-types';
+import { hudStore, useHud, useHudShell } from './hud-store';
+import type { TouchTravelActions } from './Hud';
 import type { Quality } from '../render/sea';
 import { PLAYABLE_IDS as CREATURE_IDS, creature, setEquivalentSizing, type CreatureId } from '../sim/creatures';
 import { MODE_IDS, type Mode, type PlayerSetup } from '../sim/types';
@@ -102,7 +104,7 @@ export function App() {
   const [screen, go, screenRef] = useStateRef<Screen>(() => (deepLinkedToSelect() ? 'select' : 'title'));
   const [players, setPlayersBoth, playersRef] = useStateRef<PlayerSetup[]>([]);
   const [mode, setModeBoth, modeRef] = useStateRef<Mode>(MODES[0]);
-  const [hud, setHud] = useState<HudSnapshot | null>(null);
+  const hud = useHudShell();
   const [paused, setPausedState, pausedRef] = useStateRef(false);
   const [pauseScores, setPauseScores] = useState(false);
   /** The recorder's state, mirrored into React so the pause menu's one button can name itself. */
@@ -264,7 +266,7 @@ export function App() {
     if (!canvasRef.current) return;
     const engine = new Engine(canvasRef.current, settings.quality, {
       onHud: (s) => {
-        setHud(s);
+        hudStore.set(s);
         keepFinds(s.discovery);
         if (s.status !== 'playing' && screenRef.current === 'playing') { go('results'); engineRef.current?.releasePointer(); audio.play(s.status === 'won' ? 'won' : 'death'); }
       },
@@ -427,7 +429,7 @@ export function App() {
     engineRef.current?.startAttract();
     updatePlayers(lineup.unready(playersRef.current));
     setPausedBoth(false);
-    setHud(null);
+    hudStore.set(null);
     go('select');
     audio.play('ui-back');
   }, [go, setPausedBoth, updatePlayers]);
@@ -436,7 +438,7 @@ export function App() {
     engineRef.current?.startAttract();
     updatePlayers([]);
     setPausedBoth(false);
-    setHud(null);
+    hudStore.set(null);
     go('title');
     audio.play('ui-back');
   }, [go, setPausedBoth, updatePlayers]);
@@ -693,8 +695,8 @@ export function App() {
     if (screen === 'results') {
       const items: MenuItem[] = [];
       // Co-op modes are milestones, not verdicts: the sea is still there to swim in.
-      if (hud?.canContinue) items.push({ label: TEXT.results.continue, run: keepPlaying, primary: true });
-      items.push({ label: TEXT.results.playAgain, run: playAgain, primary: !hud?.canContinue });
+      if (hud.canContinue) items.push({ label: TEXT.results.continue, run: keepPlaying, primary: true });
+      items.push({ label: TEXT.results.playAgain, run: playAgain, primary: !hud.canContinue });
       // Quitting the match lands on the choice screen, which is where you go to play again with
       // something else and where the way back to the title already is. A second button that left
       // the game altogether sat one careless press from the end of a session.
@@ -725,7 +727,7 @@ export function App() {
       return items;
     }
     return [];
-  }, [screen, paused, small.touch, recPhase, hud?.canContinue, keepPlaying, playAgain, backToSelect]);
+  }, [screen, paused, small.touch, recPhase, hud.canContinue, keepPlaying, playAgain, backToSelect]);
   useEffect(() => { if (!paused) setPauseScores(false); }, [paused]);
   const menuItemsRef = useLatest(menuItems);
   // The recorder stops itself when its buffer fills, so the menu reads the real state whenever it
@@ -752,15 +754,25 @@ export function App() {
     return `${name ? `${name} · ` : ''}${Math.round(bootFraction * 100)}%`;
   }, [progress, bootFraction]);
 
+  // One object for as long as the seat is a touch seat, so the HUD's props do not change every render.
+  const touchTravel = useMemo<TouchTravelActions | undefined>(() => small.touch ? {
+    dismiss: () => engineRef.current?.closeTouchTravel(),
+    select: (index) => engineRef.current?.touchTravelSelect(index),
+    swapStep: (dir) => engineRef.current?.touchSwapStep(dir),
+    swapToggle: () => engineRef.current?.touchSwapToggle(),
+    swapBack: () => engineRef.current?.touchSwapBack(),
+    swapConfirm: () => engineRef.current?.touchSwapConfirm(),
+  } : undefined, [small.touch]);
+
   /**
    * The icon buttons sit in somebody's viewport, so they answer to whether that somebody asked for
    * a bare sea. Only in play, and only while there is a HUD to read the split from.
    */
   const toolbar = useMemo(() => {
-    if (screen !== 'playing' || !hud) return 'right' as const;
+    if (screen !== 'playing' || !hud.present) return 'right' as const;
     // A menu is already drawn over the water, so the buttons may as well be there with it.
-    const anyMenu = paused || dialog !== null || hud.players.some((p) => p.teleport || p.swap || p.board);
-    return toolbarPlace(hud.players.map((p, i) => ({ rect: hud.rects[i] ?? { x: 0, y: 0, w: 1, h: 1 }, senseOn: p.senseOn })), anyMenu);
+    const anyMenu = paused || dialog !== null || hud.playerMenu;
+    return toolbarPlace(hud.views, anyMenu);
   }, [screen, hud, paused, dialog]);
 
   useEffect(() => { toolbarRef.current = toolbar; }, [toolbar]);
@@ -818,14 +830,7 @@ export function App() {
         />
       )}
 
-      {(screen === 'playing' || screen === 'results') && hud && <Hud snapshot={hud} touchTravel={small.touch ? {
-        dismiss: () => engineRef.current?.closeTouchTravel(),
-        select: (index) => engineRef.current?.touchTravelSelect(index),
-        swapStep: (dir) => engineRef.current?.touchSwapStep(dir),
-        swapToggle: () => engineRef.current?.touchSwapToggle(),
-        swapBack: () => engineRef.current?.touchSwapBack(),
-        swapConfirm: () => engineRef.current?.touchSwapConfirm(),
-      } : undefined} />}
+      {(screen === 'playing' || screen === 'results') && hud.present && <LiveHud touchTravel={touchTravel} />}
       {/*
         * The pads are drawn only while the game is actually being played: paused, on the results
         * screen or in a dialog the fingers belong to the buttons, which is the same rule the mouse
@@ -839,12 +844,12 @@ export function App() {
           // The nudge is worth one or two matches and then it is in the way. It also stands down the
           // moment the player swipes, because at that point they have plainly found it.
           swapped={swapped}
-          teleportOpen={!!hud?.players.some((p) => p.teleport)}
+          teleportOpen={hud.teleportOpen}
           onPause={() => { setPausedBoth(true); }}
         />
       )}
       {screen === 'playing' && paused && <PauseMenu items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} board={small.touch && pauseScores ? engineRef.current?.pauseScoreboard() : undefined} />}
-      {screen === 'results' && hud && <Results snapshot={hud} players={players} record={record} fresh={fresh} items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
+      {screen === 'results' && hud.present && <LiveResults players={players} record={record} fresh={fresh} items={menuItems} sel={menuCursor.sel} shown={menuCursor.shown} onHover={menuHover} />}
 
       {(!small.touch || screen !== 'playing' || paused) && <Toolbar place={toolbar} isFs={isFs} muted={settings.muted} focus={focus.group === 'icons' ? focus.index : -1} onHelp={() => openDialog(dialog === 'help' ? null : 'help')} onSettings={() => openDialog(dialog === 'settings' ? null : 'settings')} onMute={() => setSettings((s) => ({ ...s, muted: !s.muted }))} onFullscreen={toggleFullscreen} />}
       <Dialogs kind={dialog} onClose={() => openDialog(null)} settings={settings} onSettings={setSettings} scheme={scheme} />
@@ -866,3 +871,15 @@ export const MODE_INFO: Record<Mode, { name: string; blurb: string; players: str
 ) as Record<Mode, { name: string; blurb: string; players: string }>;
 
 export { creature };
+
+/** The HUD, reading every snapshot from the store itself so the shell around it need not (`hud-store.ts`). */
+function LiveHud({ touchTravel }: { touchTravel?: TouchTravelActions }) {
+  const snapshot = useHud();
+  return snapshot ? <Hud snapshot={snapshot} touchTravel={touchTravel} /> : null;
+}
+
+/** The results panel, on the same terms as `LiveHud`. */
+function LiveResults(props: Omit<Parameters<typeof Results>[0], 'snapshot'>) {
+  const snapshot = useHud();
+  return snapshot ? <Results snapshot={snapshot as HudSnapshot} {...props} /> : null;
+}

@@ -1,6 +1,16 @@
 import * as THREE from 'three';
 import type { SiltCloud } from '../sim/types';
 
+/**
+ * Wake a particle pool that has gone quiet: draw it again and upload what an emit just wrote.
+ * Every pool here hides itself and stops updating once nothing in it is alive, and the attributes
+ * only an emit changes are marked here rather than every frame.
+ */
+function wake(points: THREE.Points, geo: THREE.BufferGeometry, ...attrs: string[]) {
+  points.visible = true;
+  for (const a of attrs) (geo.attributes[a] as THREE.BufferAttribute).needsUpdate = true;
+}
+
 /** Pooled bubbles / debris particles. */
 export class Bubbles {
   readonly points: THREE.Points;
@@ -22,6 +32,7 @@ export class Bubbles {
     this.points.frustumCulled = false; this.points.name = 'bubbles';
   }
   emit(p: { x: number; y: number; z: number }, n: number, spread: number, speed: number, size = 0.08, life = 1.2) {
+    if (n > 0) wake(this.points, this.geo, 'position', 'aLife', 'aSize');
     for (let i = 0; i < n; i++) {
       const k = this.cursor; this.cursor = (this.cursor + 1) % this.max;
       const a = Math.random() * 6.283, b = Math.random() * 3.14;
@@ -31,15 +42,20 @@ export class Bubbles {
     }
   }
   update(dt: number) {
+    if (!this.points.visible) return;
+    let live = 0;
     for (let k = 0; k < this.max; k++) {
       if (this.life[k] <= 0) continue;
       this.life[k] -= dt;
       this.pos[k * 3] += this.vel[k * 3] * dt; this.pos[k * 3 + 1] += this.vel[k * 3 + 1] * dt; this.pos[k * 3 + 2] += this.vel[k * 3 + 2] * dt;
       this.vel[k * 3] *= 0.96; this.vel[k * 3 + 2] *= 0.96; this.vel[k * 3 + 1] += 1.5 * dt;
+      if (this.life[k] > 0) live++;
     }
+    // Nothing left alive: stop walking the pool and uploading it, and stop drawing it, until the
+    // next emit wakes it (`emit`, which also marks what only an emit changes).
+    if (live === 0) { this.points.visible = false; return; }
     (this.geo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
     (this.geo.attributes.aLife as THREE.BufferAttribute).needsUpdate = true;
-    (this.geo.attributes.aSize as THREE.BufferAttribute).needsUpdate = true;
   }
   dispose() { this.geo.dispose(); (this.points.material as THREE.Material).dispose(); }
 }
@@ -130,6 +146,7 @@ export class Splash {
   burst(p: { x: number; y: number; z: number }, strength: number, kind: 'out' | 'in', bodyLength = 1) {
     const s = Math.max(0.3, strength), radius = Math.max(0.4, bodyLength * 0.35);
     const n = Math.round((kind === 'in' ? 110 : 60) * s);
+    if (n > 0) wake(this.points, this.geo, 'position', 'aLife', 'aSize');
     for (let i = 0; i < n; i++) {
       const k = this.cursor; this.cursor = (this.cursor + 1) % this.max;
       const a = Math.random() * 6.283, rr = Math.sqrt(Math.random()) * radius;
@@ -149,16 +166,22 @@ export class Splash {
     if (kind === 'in') ring(radius * 3 * Math.sqrt(s), 1.0, 0.9);
   }
   update(dt: number) {
-    for (let k = 0; k < this.max; k++) {
-      if (this.life[k] <= 0) continue;
-      this.life[k] -= dt;
-      this.vel[k * 3 + 1] -= 16 * dt;
-      this.pos[k * 3] += this.vel[k * 3] * dt; this.pos[k * 3 + 1] += this.vel[k * 3 + 1] * dt; this.pos[k * 3 + 2] += this.vel[k * 3 + 2] * dt;
-      if (this.pos[k * 3 + 1] < this.surfaceY - 0.2 && this.vel[k * 3 + 1] < 0) this.life[k] = 0;   // back in the sea
+    if (this.points.visible) {
+      let live = 0;
+      for (let k = 0; k < this.max; k++) {
+        if (this.life[k] <= 0) continue;
+        this.life[k] -= dt;
+        this.vel[k * 3 + 1] -= 16 * dt;
+        this.pos[k * 3] += this.vel[k * 3] * dt; this.pos[k * 3 + 1] += this.vel[k * 3 + 1] * dt; this.pos[k * 3 + 2] += this.vel[k * 3 + 2] * dt;
+        if (this.pos[k * 3 + 1] < this.surfaceY - 0.2 && this.vel[k * 3 + 1] < 0) this.life[k] = 0;   // back in the sea
+        if (this.life[k] > 0) live++;
+      }
+      if (live === 0) this.points.visible = false;
+      else {
+        (this.geo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
+        (this.geo.attributes.aLife as THREE.BufferAttribute).needsUpdate = true;
+      }
     }
-    (this.geo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
-    (this.geo.attributes.aLife as THREE.BufferAttribute).needsUpdate = true;
-    (this.geo.attributes.aSize as THREE.BufferAttribute).needsUpdate = true;
     for (let i = this.rings.length - 1; i >= 0; i--) {
       const r = this.rings[i]; r.t += dt;
       const f = Math.min(1, r.t / r.dur);
@@ -263,6 +286,7 @@ void main(){vec4 mv=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatr
    * coming out of a point.
    */
   emit(p: { x: number; y: number; z: number }, color: { r: number; g: number; b: number }, n: number, spread: number, speed: number, up: number, size = 0.07, life = 1.1) {
+    if (n > 0) wake(this.points, this.geo, 'position', 'aLife', 'aSize', 'aColor', 'aSpan');
     for (let i = 0; i < n; i++) {
       const k = this.cursor; this.cursor = (this.cursor + 1) % this.max;
       const a = Math.random() * 6.283, rr = Math.sqrt(Math.random()) * spread;
@@ -277,20 +301,22 @@ void main(){vec4 mv=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatr
     }
   }
   update(dt: number) {
+    if (!this.points.visible) return;
+    // Water takes the throw out of a grain quickly, and then it falls at its own slow rate.
+    const drag = Math.exp(-3.4 * dt);
+    let live = 0;
     for (let k = 0; k < this.max; k++) {
       if (this.life[k] <= 0) continue;
       this.life[k] -= dt;
       this.pos[k * 3] += this.vel[k * 3] * dt; this.pos[k * 3 + 1] += this.vel[k * 3 + 1] * dt; this.pos[k * 3 + 2] += this.vel[k * 3 + 2] * dt;
-      // Water takes the throw out of a grain quickly, and then it falls at its own slow rate.
-      const drag = Math.exp(-3.4 * dt);
       this.vel[k * 3] *= drag; this.vel[k * 3 + 2] *= drag;
       this.vel[k * 3 + 1] = this.vel[k * 3 + 1] * drag - 1.6 * dt;
+      if (this.life[k] > 0) live++;
     }
+    if (live === 0) { this.points.visible = false; return; }
+    // Colour, span and size are set when a grain is thrown and never after (`emit`).
     (this.geo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
-    (this.geo.attributes.aColor as THREE.BufferAttribute).needsUpdate = true;
     (this.geo.attributes.aLife as THREE.BufferAttribute).needsUpdate = true;
-    (this.geo.attributes.aSpan as THREE.BufferAttribute).needsUpdate = true;
-    (this.geo.attributes.aSize as THREE.BufferAttribute).needsUpdate = true;
   }
   dispose() { this.geo.dispose(); (this.points.material as THREE.Material).dispose(); }
 }
@@ -528,10 +554,13 @@ void main(){
     this.mesh.setMatrixAt(k, this.m);
     this.mesh.instanceMatrix.needsUpdate = true;
     this.born[k] = this.time; this.depth[k] = gait.depth; this.groove[k] = gait.groove; this.fade[k] = 1;
-    this.aDepth.needsUpdate = true; this.aGroove.needsUpdate = true;
+    this.aDepth.needsUpdate = true; this.aGroove.needsUpdate = true; this.aFade.needsUpdate = true;
+    this.mesh.visible = true;
   }
   update(dt: number) {
     this.time += dt;
+    // An empty beach costs nothing: no walk of the pool, no upload, no draw (`lay` wakes it).
+    if (this.live === 0 && !this.mesh.visible) return;
     let live = 0;
     for (let k = 0; k < this.max; k++) {
       if (this.born[k] < 0) continue;
@@ -541,6 +570,7 @@ void main(){
     }
     this.live = live;
     this.aFade.needsUpdate = true;
+    this.mesh.visible = live > 0;
   }
   /** A new match starts on clean sand. */
   clear() {

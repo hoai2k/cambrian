@@ -6,10 +6,8 @@
  * drawn and dropped on alternate frames. Pure so `npm run views` can drive it frame by frame.
  */
 
-/** Apparent size (length over distance) under which a far body is not drawn: about eight pixels. */
-export const SIZE_FLOOR = 0.011;
-/** A body already drawn keeps its place until it is this much past a threshold (hysteresis). */
-const SHOWN_SLACK = 0.7;
+import { SHOWN_SLACK, SIZE_FLOOR } from '../shared/view-reach';
+export { SIZE_FLOOR };
 /** ...and outranks a new body of the same size by this much, so the two do not trade places. */
 const SHOWN_RANK = 1.3;
 /** Fog density times distance at which exponential fog has hidden 95 % of a body: sqrt(ln 20). */

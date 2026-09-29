@@ -29,6 +29,8 @@ import { RULES } from '../sim/era-rules';
 import { key as controlKey, schemeForDevice } from '../shared/controls';
 import { TEXT } from '../shared/text';
 import { PLAYER_COLORS, type HudSnapshot, type PlayerHud, type RadarBlipHud, type ViewportRect } from '../shared/hud-types';
+import { ViewRoot } from './view-root';
+import { NEAR_MIN, nearAlwaysFor, ZOOM_MAX } from '../shared/view-reach';
 import { BREATH_PEEK, climbAimHold, edgePitch, FOLLOW_HOLD, FOLLOW_RATE, layoutRects, magnificationDistance, PITCH_DOWN, PITCH_UP, spectatorTarget, updateCamera, type CamState } from './camera';
 import { freshTele, PlayerInput, updateTeleMenu } from './player-input';
 import { BurrowSand, ShoreTracks } from './shore-fx';
@@ -57,6 +59,13 @@ export interface EngineCallbacks {
  * magnification and the biome's fog, so a larva's short world and an apex's long one fade alike.
  */
 const distanceHaze = (d: number, far: number) => THREE.MathUtils.smoothstep(d, far * 0.12, far * 0.62) * 0.9;
+/**
+ * The most animation time a view off screen banks. A clip picks up where it would have got to, but
+ * past a few seconds that is a guess about a loop anyway, and a huge step through a mixer's damped
+ * weights would show a pose change rather than hide one.
+ */
+const OWED_MAX = 4;
+
 /** Something hunting you keeps most of its presence, however far off: the warning has to read. */
 const HUNTER_HAZE = 0.4;
 
@@ -66,6 +75,13 @@ const FOOD_ABOVE = '#9ec2ff';
 export class Engine {
   private renderer: THREE.WebGLRenderer;
   private scene = new THREE.Scene();
+  /** Every creature view hangs from this, which skips the ones frozen off screen (`view-root.ts`). */
+  private viewRoot = new ViewRoot();
+  /** The frustums views are animated against this frame: every viewport's camera, as it stood last frame. */
+  private animFrustums: THREE.Frustum[] = [];
+  private animMat = new THREE.Matrix4();
+  /** Bodies another body's pose depends on this frame — a ride's host, a holder, a swallower. */
+  private posed = new Set<number>();
   private sea?: SeaEnvironment;
   game?: Game;
   private views = new Map<number, CreatureView>();
@@ -123,6 +139,8 @@ export class Engine {
   private menuEdges = new Map<string, Edges>();
   private fps = 60; private fpsFrames = 0; private fpsT = 0;
   private resize: ResizeObserver;
+  /** The container's size as the last resize left it (`onResize`). */
+  private viewW = 0; private viewH = 0;
   private scratchBoulders: Boulder[] = [];
   private cullSphere = new THREE.Sphere();
   private tmpV = new THREE.Vector3(); private tmpProj = new THREE.Vector3();
@@ -166,6 +184,10 @@ export class Engine {
       return this.input.pointingAt(game, p, cs) !== 'none' ? cs.aimTarget : -1;
     };
     this.input.touch.onSwap = (sec) => { this.cb.onSecondary?.(sec); };
+    this.scene.add(this.viewRoot);
+    // The whole graph is brought up to date once a frame before the viewports draw, not once per
+    // `render()` call: with split screen that walk was paid again for every viewport.
+    this.scene.matrixWorldAutoUpdate = false;
     this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.sand.points, this.tracks.mesh, this.splash.group, this.mouthfuls.group, this.eggs.group);
     (window as any).__cambrian = this;
     this.resize = new ResizeObserver(() => this.onResize());
@@ -187,7 +209,11 @@ export class Engine {
   prioritize(creatures: CreatureId[], phase: 'boot' | 'title' | 'select' | 'playing', committed: CreatureId[] = []) { this.assets.prioritize(creatures, phase, committed); }
 
   private onResize() {
-    const w = this.container.clientWidth || 1, h = this.container.clientHeight || 1;
+    // Read here, when the size changes, and nowhere else: a frame that asked the container for its
+    // size after the HUD had touched the page forced the browser to lay the whole page out again,
+    // once a frame, to answer.
+    this.viewW = this.container.clientWidth; this.viewH = this.container.clientHeight;
+    const w = this.viewW || 1, h = this.viewH || 1;
     this.renderer.setSize(w, h, false);
     this.renderer.domElement.style.width = '100%'; this.renderer.domElement.style.height = '100%';
   }
@@ -413,7 +439,7 @@ export class Engine {
           if (this.input.touchPlay) this.input.touch.aimingAt(this.input.pointingAt(game, p, cs) !== 'none');
           if (c.rsClick) {
             // Right stick pressed in: up/down zooms instead of pitching.
-            cs.zoom = clamp(cs.zoom * Math.exp(c.lookY * dt * 1.6), 0.55, 2.2);
+            cs.zoom = clamp(cs.zoom * Math.exp(c.lookY * dt * 1.6), 0.55, ZOOM_MAX);
           } else {
             // A stick is a rate and the mouse is a distance, so the stick term is scaled by the
             // frame time and the mouse term is not; one of the two is always zero.
@@ -452,7 +478,7 @@ export class Engine {
               }
             }
           }
-          if (c.zoomDelta) cs.zoom = clamp(cs.zoom * Math.exp(c.zoomDelta), 0.55, 2.2);
+          if (c.zoomDelta) cs.zoom = clamp(cs.zoom * Math.exp(c.zoomDelta), 0.55, ZOOM_MAX);
         }
       });
     }
@@ -537,8 +563,9 @@ export class Engine {
 
     // Render
     const tRender = performance.now();
-    const W = this.container.clientWidth, H = this.container.clientHeight;
+    const W = this.viewW, H = this.viewH;
     const r = this.renderer;
+    this.scene.updateMatrixWorld();
     r.setScissorTest(false); r.setViewport(0, 0, W, H); r.clear();
     if (this.quality === 'high') r.shadowMap.needsUpdate = true;   // rebuilt on the first render() below
     if (this.attract) {
@@ -597,9 +624,47 @@ export class Engine {
     return out.set(t.x + (a.pos.x - t.x) * k, t.y + (a.pos.y - t.y) * k, t.z + (a.pos.z - t.z) * k);
   };
 
+  /**
+   * Take this frame's animation frustums, and note which bodies another body's pose hangs on.
+   *
+   * A view is only worth animating if some viewport can see it, but the frustum a viewport culls
+   * with is not settled until its far plane and aspect are, which is after the views are updated.
+   * So this uses each camera where it stands now with the projection it drew with last frame, and
+   * the test that reads it pads every body generously: a view the viewport then draws after all is
+   * at worst one frame behind, and it is caught up the frame after.
+   */
+  private prepareAnimation(game: Game) {
+    const cams = this.attract ? [this.attractCam] : this.cams.map((cs) => cs.camera);
+    while (this.animFrustums.length < cams.length) this.animFrustums.push(new THREE.Frustum());
+    this.animFrustums.length = cams.length;
+    cams.forEach((cam, i) => {
+      cam.updateMatrixWorld();
+      this.animMat.multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse);
+      this.animFrustums[i].setFromProjectionMatrix(this.animMat);
+    });
+    // A rider is seated on its host's bones and a mouthful on its holder's jaws, so a host has to be
+    // posed even when only what it carries is on screen.
+    const posed = this.posed; posed.clear();
+    for (const a of game.actors) {
+      if (a.rideHost >= 0) posed.add(a.rideHost);
+      if (a.grabbedBy >= 0) posed.add(a.grabbedBy);
+      if (a.swallowedBy >= 0) posed.add(a.swallowedBy);
+    }
+  }
+
+  /** Whether any viewport could be looking at this body (see `prepareAnimation`). */
+  private onScreen(a: Actor) {
+    const s = this.cullSphere;
+    s.center.set(a.pos.x, a.pos.y, a.pos.z);
+    s.radius = lengthOf(a) * 1.25 + 3;
+    for (const f of this.animFrustums) if (f.intersectsSphere(s)) return true;
+    return false;
+  }
+
   private syncViews(game: Game, cams: THREE.Vector3[], dt: number) {
     const players = Math.max(1, this.cams.length);
     const keep = new Set<number>();
+    this.prepareAnimation(game);
     const nearDist = (a: Actor) => { let best = Infinity; for (const c of cams) { const d = Math.hypot(a.pos.x - c.x, a.pos.y - c.y, a.pos.z - c.z); if (d < best) best = d; } return best; };
     // Rank by apparent size (body length over distance), not distance alone: a giant 80 units away
     // matters far more than a 0.2-unit snack at 20. Anything under ~8 screen pixels is skipped.
@@ -616,7 +681,7 @@ export class Engine {
      * is always drawn no matter how small it is or how large you are.
      */
     const nearAlways = game.players.reduce(
-      (m, p) => Math.max(m, magnificationDistance(p ? lengthOf(p) : 1) * 1.8 + 10), 22);
+      (m, p) => Math.max(m, nearAlwaysFor(p ? lengthOf(p) : 1)), NEAR_MIN);
     // How far a body can be drawn is how far the water lets you see, not a fixed number. The limit
     // was 130 units (90 with three or four players), and the fog thins as the animal you play grows:
     // playing a big Triassic reptile, a seventeen-unit ichthyosaur at 135 was still two thirds
@@ -690,7 +755,7 @@ export class Engine {
         const loaded = loadedSync(a.creature, wantLod);
         if (!loaded) { void ensureLoaded(a.creature, undefined, wantLod); continue; }
         v = new CreatureView(a.creature, loaded, { shieldGeo: this.shieldGeo }, wantLod);
-        this.scene.add(v.group);
+        this.viewRoot.add(v.group);
         this.views.set(a.id, v);
         v.update(a, 0, this.time, true);
       }
@@ -704,11 +769,17 @@ export class Engine {
       // Only nearby creatures cast shadows: the shadow pass has no frustum culling for these
       // meshes, so every distant swimmer was being rasterised into the shadow map for nothing.
       v.setShadow(d < 32 && lengthOf(a) > 0.45);
-      // Animate far views less often
+      // Animate only what could be seen, and far views less often. A view that is skipped banks the
+      // time it missed and spends it the next frame it is animated, so it comes back into view where
+      // its clip would have got to rather than where it was left. What something else is seated on
+      // or held in is posed whether it is seen or not, because what it carries may be.
       const far = d > 45;
-      const continuous = a.state === 'eating' || a.holdT > 0;
-      const animate = continuous || !far || ((a.id + Math.floor(this.time * 60)) % 3 === 0);
-      v.update(a, animate && far && !continuous ? dt * 3 : dt, this.time, animate, this.alpha);
+      const hold = a.state === 'eating' || a.holdT > 0 || this.posed.has(a.id);
+      const seen = this.onScreen(a);
+      const animate = hold || (seen && (!far || ((a.id + Math.floor(this.time * 60)) % 3 === 0)));
+      v.group.userData.frozen = !seen && !hold;
+      if (animate) { v.update(a, dt + v.owed, this.time, true, this.alpha); v.owed = 0; }
+      else { v.owed = Math.min(v.owed + dt, OWED_MAX); v.update(a, dt, this.time, false, this.alpha); }
       // Arms that lie along what they are on. Near views only: it is a per-segment solve, and at
       // any distance the shape it makes is smaller than a pixel.
       if (v.conforms && d < 26 && animate) {
@@ -822,7 +893,7 @@ export class Engine {
       if (cs) {
         this.cullSphere.center.copy(v.group.position);
         this.cullSphere.radius = lengthOf(a) * 0.9 + 0.5;
-        v.group.visible = (!isHidden(a) || a.hideT <= 0.6) && cs.frustum.intersectsSphere(this.cullSphere);
+        v.group.visible = v.present && (!isHidden(a) || a.hideT <= 0.6) && cs.frustum.intersectsSphere(this.cullSphere);
         if (!v.group.visible) continue;
       }
       const haze = distanceHaze(Math.hypot(v.group.position.x - camPos.x, v.group.position.y - camPos.y, v.group.position.z - camPos.z), camFar);

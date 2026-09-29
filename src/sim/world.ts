@@ -309,19 +309,41 @@ function depthProfile(x: number, z: number, s: number, u: number): number {
 
 export function sampleCurrent(out: Vec3, x: number, y: number, z: number, t: number) {
   const chan = channelFactor(x, z);
-  const pulse = 0.8 + 0.2 * Math.sin(t * 0.065);
-  const depthFade = clamp(1 - (y + 4) / (SURFACE_Y + 4), 0.15, 1);
-  // gentle along-shore drift everywhere
-  const dx = 0.14 + 0.16 * Math.sin(z * 0.03 + t * 0.085) + 0.08 * Math.cos(y * 0.3);
-  const dz = 0.1 + 0.08 * Math.cos(x * 0.04 - t * 0.07);
-  out.x = dx * pulse; out.y = 0.035 * Math.sin(x * 0.14 + z * 0.08 + t * 0.12); out.z = dz * pulse;
+  driftCurrent(out, x, y, z, t);
   if (chan > 0.05) {
     channelFlow(x, z, scratchFlow);
-    out.x += scratchFlow.x * chan * 2.4 * depthFade * pulse;
-    out.z += scratchFlow.z * chan * 2.4 * depthFade * pulse;
+    addChannelPull(out, scratchFlow.x * chan, scratchFlow.z * chan, y, t);
   }
   return out;
 }
+/** The gentle along-shore drift everywhere: `sampleCurrent` without the channels. Cheap, no noise. */
+export function driftCurrent(out: Vec3, x: number, y: number, z: number, t: number) {
+  const pulse = currentPulse(t);
+  const dx = 0.14 + 0.16 * Math.sin(z * 0.03 + t * 0.085) + 0.08 * Math.cos(y * 0.3);
+  const dz = 0.1 + 0.08 * Math.cos(x * 0.04 - t * 0.07);
+  out.x = dx * pulse; out.y = 0.035 * Math.sin(x * 0.14 + z * 0.08 + t * 0.12); out.z = dz * pulse;
+  return out;
+}
+/**
+ * A tidal channel's pull at (x, z) before depth and the tide are applied — the part of the current
+ * that costs noise to find and changes over hundreds of units, which the renderer's drifting motes
+ * therefore sample now and then rather than every frame. Zero outside a channel.
+ */
+export function channelPull(x: number, z: number, out: Vec3) {
+  const chan = channelFactor(x, z);
+  if (chan > 0.05) { channelFlow(x, z, out); out.x *= chan; out.z *= chan; } else { out.x = 0; out.z = 0; }
+  out.y = 0;
+  return out;
+}
+/** Add a channel's pull (`channelPull`), faded by depth and pulsed by the tide. */
+export function addChannelPull(out: Vec3, px: number, pz: number, y: number, t: number) {
+  const pulse = currentPulse(t);
+  const depthFade = clamp(1 - (y + 4) / (SURFACE_Y + 4), 0.15, 1);
+  out.x += px * 2.4 * depthFade * pulse;
+  out.z += pz * 2.4 * depthFade * pulse;
+  return out;
+}
+const currentPulse = (t: number) => 0.8 + 0.2 * Math.sin(t * 0.065);
 const scratchFlow: Vec3 = { x: 0, y: 0, z: 0 };
 
 export function microbialAt(x: number, z: number) {
