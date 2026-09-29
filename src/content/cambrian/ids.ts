@@ -5,8 +5,10 @@ export type CambrianCreatureId =
   | 'sidneyia' | 'leanchoilia' | 'isoxys' | 'odontogriphus' | 'ctenorhabdotus' | 'vetulicola' | 'tamisiocaris';
 
 export type CambrianAbilityId =
-  | 'ambushSurge' | 'snatch' | 'tailFlick' | 'bristleFlare'
+  /** No special: Y hides, B guards or dodges, and nothing else is claimed for the animal. */
+  | 'none'
+  | 'snatch' | 'bristleFlare'
   | 'anchor' | 'shellUp' | 'burrow' | 'enroll'
-  | 'ribbonSlip' | 'tentacleSeize' | 'bellCorral' | 'collectorWake' | 'sedimentDive' | 'basketRake'
+  | 'tentacleSeize' | 'bellCorral' | 'collectorWake' | 'sedimentDive' | 'basketRake'
   | 'shellCrush' | 'whipSearch' | 'spineIntercept' | 'adhesiveGlide' | 'combCruise' | 'pharyngealPump' | 'planktonComb';
 

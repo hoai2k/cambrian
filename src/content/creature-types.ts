@@ -96,6 +96,12 @@ export interface CreatureDef {
   light: MoveDef;
   heavy: MoveDef;
   ability: AbilityId;
+  /**
+   * The real animal gets by on camouflage or a burrow. That decides where a player finds its special
+   * (`specialSlot` in src/sim/special-slot.ts): an animal that hides keeps its hide on Y and has
+   * its special on B; one that does not has the special on Y, because Y is overridden first.
+   */
+  hides?: boolean;
   abilityName: string;
   abilityCooldown: number;
   abilityDesc: string;

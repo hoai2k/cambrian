@@ -1,7 +1,8 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
 import { ACTIVE_ERA } from '../content';
 import { assetPaths } from '../content/asset-paths';
-import { hideLabel, hideDescription, HEAVY_SPECIALS, DEFENSIVE_SPECIALS } from '../sim/concealment';
+import { hideLabel, hideDescription } from '../sim/concealment';
+import { specialSlot } from '../sim/special-slot';
 import { RULES } from '../sim/era-rules';
 import { CreaturePortrait } from './CreaturePortrait';
 import { FeedbackButton } from './Feedback';
@@ -296,6 +297,7 @@ export function SelectScreen(p: Props) {
   /** One seat's card. Drawn beside the grid, or as the carousel's whole stage. */
   const renderCard = (pl: PlayerSetup, i: number, phantom = false) => {
             const def = creature(pl.creature);
+            const slot = specialSlot(def);
             // The bars describe the fighter and must not move with the sizing option; the length
             // beside the locality is what the sizing actually changes, so that is where it shows —
             // and only while the roster is at those lengths.
@@ -347,9 +349,12 @@ export function SelectScreen(p: Props) {
                       </div>
                       {def.kindNote && <p className="kind-note">{def.kindNote}</p>}
                       <dl className="kit">
-                        <div><dt>{key('heavy', s)}</dt><dd>{HEAVY_SPECIALS.has(def.ability) ? def.abilityName : def.heavy.name}</dd></div>
-                        <div><dt>{key('guard', s)}</dt><dd>{DEFENSIVE_SPECIALS.has(def.ability) ? def.abilityName : def.canGuard ? C.blockParry : C.evade}</dd></div>
-                        <div><dt>{key('ability', s)}</dt><dd><b>{RULES.ySpecial?.(def.id)?.name ?? hideLabel(def.id)}.</b> {fillControls(RULES.ySpecial?.(def.id)?.desc ?? hideDescription(def.id), s)}</dd></div>
+                        {/* Which button a special is on is one rule (`specialSlot`): RT is always the
+                            animal's own heavy, Y its special unless it hides in life, B the special
+                            where it does or where the special is a way of guarding. */}
+                        <div><dt>{key('heavy', s)}</dt><dd>{def.heavy.name}</dd></div>
+                        <div><dt>{key('guard', s)}</dt><dd>{slot === 'b' || slot === 'guard' ? <><b>{def.abilityName}.</b> {fillControls(def.abilityDesc, s)}</> : def.canGuard ? C.blockParry : C.evade}</dd></div>
+                        <div><dt>{key('ability', s)}</dt><dd>{slot === 'y' ? <><b>{def.abilityName}.</b> {fillControls(def.abilityDesc, s)}</> : <><b>{hideLabel(def.id)}.</b> {fillControls(hideDescription(def.id), s)}</>}</dd></div>
                         <div><dt>{C.passiveMark}</dt><dd>{def.passive}</dd></div>
                         <div><dt>{C.weaknessMark}</dt><dd>{def.weakness}</dd></div>
                       </dl>

@@ -12,6 +12,5 @@ export type DevonianCreatureId =
  */
 export type DevonianAbilityId =
   | 'jawShear' | 'filterGulp' | 'armourFlank' | 'shieldPush' | 'sandAmbush' | 'floorSweep'
-  | 'runThrough' | 'brushDisplay' | 'shoalDart' | 'crushBite' | 'tuskLunge' | 'neckSnap' | 'limbHaul'
-  | 'enroll' | 'tridentShove' | 'cheliceraeGrab' | 'scavenge' | 'armSpread' | 'stiltWalk'
-  | 'shellHover' | 'shellJet';
+  | 'runThrough' | 'brushDisplay' | 'crushBite' | 'tuskLunge' | 'neckSnap'
+  | 'enroll' | 'tridentShove' | 'cheliceraeGrab';

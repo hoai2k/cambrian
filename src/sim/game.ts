@@ -651,12 +651,11 @@ export class Game implements AiWorld {
     // came to promise a pounce the action would refuse — the exact window a player hunts in.
     const need = 12 + (a.state === 'dodge' || a.prev.burst ? CHARGE_STAMINA : 0);
     const pounce = { name: 'POUNCE', reach: pounceRange(this, a), ready: a.pounceCd === 0 && a.stamina >= need && a.exhausted === 0 };
+    // A player's RT is always the pounce; their special is on Y or B (`specialSlot`).
+    if (a.controller === 'player') return pounce;
     if (HEAVY_SPECIALS.has(def.ability)) {
       if (a.abilityCd <= 0 && a.stamina >= 18) return { name: def.abilityName.toUpperCase(), reach: heavyStrikeReach(a, def), ready: true };
-      // The special is down. A player's press falls through to the pounce rather than being
-      // swallowed, so the prompt follows the button instead of greying out on a move it will not
-      // play. Bots have no fallback, so for them the special is still the whole answer.
-      if (a.controller === 'player') return pounce;
+      // The special is down, and a bot has no fallback: for it the special is still the answer.
       return { name: def.abilityName.toUpperCase(), reach: heavyStrikeReach(a, def), ready: false };
     }
     return pounce;

@@ -1,5 +1,17 @@
 # Specials audit (2026-09-29)
 
+**Applied**, with the owner's answers:
+
+- **The scheme is live for players:** `specialSlot` in `src/sim/special-slot.ts`, held by
+  `npm run specials`.
+- **Strike specials are kept and play their body's own clip** where one was built for them.
+- **Invisible buffs, dash riders and passives are retired** to `ability: 'none'`.
+- **Guard specials stay on B.**
+- **Bots keep the old routing.**
+- **The two dead specials** (`whipSearch`, `sedimentDive`) now fire from their button.
+
+What follows is the audit as it was taken, before those changes.
+
 Two questions, for every playable animal in all three games:
 
 - **Does its special look and behave like a distinct action?** Burrowing is the benchmark: you see

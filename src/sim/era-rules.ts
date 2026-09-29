@@ -57,8 +57,6 @@ export interface EraHud {
 export interface EraRules {
   /** Once, when the era is chosen: registers its specials with the shared tables. */
   install?(): void;
-  /** The Y button's own special for this creature, when the era gives it one instead of the shared hide. */
-  ySpecial?(id: CreatureId): { name: string; desc: string } | undefined;
   /** Starting body scale for a player in `mode`, for creature `id`. */
   startScale(mode: Mode, id: CreatureId): number;
   /**
@@ -133,8 +131,6 @@ export interface EraRules {
   beginAbility?(g: Game, a: Actor, ctx: ExpansionContext): void;
   /** Every step in the 'ability' state (after the shared step). */
   stepAbility?(g: Game, a: Actor, ctx: ExpansionContext, dt: number): void;
-  /** Multiplier on the camouflage stamina drain. */
-  camoDrain?(a: Actor): number;
   /**
    * How this body swims where it wants to go: `speed` scales cruise for the direction asked
    * (relative to the heading), `turn` scales the turn rate, `impulse` is an instant velocity along

@@ -1605,6 +1605,24 @@ unless the user explicitly asks for a PR. Steps:
   **The crinoid is rebuilt rather than simplified:** it is 727 separate pieces, and a simplifier
   erases every thin one and leaves a dotted stick with a ball on it. Re-run the tool whenever a
   proxy is rebuilt.
+- **A player's special is on Y or B, never on RT** (`specialSlot`, `src/sim/special-slot.ts`,
+  `npm run specials`). RT is the pounce on every animal: a special there took the one attack every
+  body has away from exactly the bodies that had a special, and which ones those were was nothing a
+  player could guess. **Y is overridden first** — an animal that never hid in life has its special on
+  Y, in place of a camouflage the real animal never had; one that did (`hides` on its card, or a
+  burrower) keeps the hide on Y and has its special on B, in place of the guard, which B falls back to
+  while the special is not ready. A special that *is* a way of guarding (`DEFENSIVE_SPECIALS`) stays
+  on B whatever the animal hides by, and one that is the burrow is the hide itself. `fireSpecial` is
+  the one way in from a button, and gave `whipSearch` and `sedimentDive` their first entry point —
+  both were written, wired to nothing and unreachable. **Bots are not routed by this**: they reach
+  specials the way they always did, so seeded replays of their behaviour are untouched. And a special
+  has to *look* like its own act: the invisible buffs, dash riders and passive multipliers
+  (`ambushSurge`, `shoalDart`, `limbHaul`, `shellJet`, `powerStroke`, `tailFlick`, `ribbonSlip`,
+  `shellHover`, `scavenge`, `armSpread`, `stiltWalk`) were retired to `ability: 'none'` after the
+  audit in `docs/specials-audit.md`, and a body built with a clip of its own for its special
+  (`NeckStrike`, `CrushBite`, `Gulp`, `Graze`, `Lunge`, `FastStart`, `SpineBrace`, `Coil`) plays it
+  (`SPECIAL_CLIP` in `src/render/creature.ts`) where it used to play the generic `Ability` — which is
+  most of why a special could look like a heavier bite.
 - **Sprint is gone, and the dash is as long as it is held.** A steered body has one way of putting
   its back into a move. `toInput` sends `burst: 0` for a player and LB — which used to hold the
   sprint — is a second dash button; the burst machinery stays because the AI drives it and a

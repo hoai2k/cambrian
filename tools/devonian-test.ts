@@ -709,6 +709,7 @@ const { TIER_SCALE } = await import('../src/sim/types');
 // ---- per-creature specials ----
 {
   const { HEAVY_SPECIALS, BURROWERS } = await import('../src/sim/concealment');
+  const { specialSlot } = await import('../src/sim/special-slot');
   const g = new Game('reef', [
     { creature: 'onychodus', device: 'keyboard', ready: true }, { creature: 'cheirolepis', device: 0, ready: true },
     { creature: 'stethacanthus', device: 1, ready: true }, { creature: 'gemuendina', device: 2, ready: true },
@@ -730,18 +731,19 @@ const { TIER_SCALE } = await import('../src/sim/types');
   const idle = () => new Map<number, InputFrame>(g.players.map((_, i) => [i, emptyInput()]));
   const press = (i: number, key: 'heavy' | 'ability' | 'guard') => { const m = idle(); m.set(i, { ...emptyInput(), [key]: true }); return m; };
   for (let i = 0; i < 90; i++) tick(g, idle());               // through the hatch-in
-  // Y specials: the everyman's dart, the burrower's sand ambush
-  const st0 = chei.stamina;
+  // Y is the hide on an animal with no special, and the burrower's sand ambush is its hide.
   tick(g, press(1, 'ability'));
-  ok(chei.burstT > 0 && chei.hideMode === 'none' && chei.stamina < st0, `shoal dart is a cheap burst, not a hide (burst ${chei.burstT.toFixed(1)})`);
+  ok(chei.hideMode === 'camouflage', `with no special, Y is the camouflage (${chei.hideMode})`);
   tick(g, press(3, 'ability'));
   ok(gem.hideMode === 'descending' || gem.hideMode === 'burrowed', `Gemuendina buries for its sand ambush (${gem.hideMode})`);
   // a heavy special: the tusk lunge lands on an armoured rival ahead of it
   const plate = g.spawn('bothriolepis', 'ambient', { x: ony.pos.x + Math.sin(ony.yaw) * lengthOf(ony) * 0.9, y: ony.pos.y, z: ony.pos.z + Math.cos(ony.yaw) * lengthOf(ony) * 0.9 }, 1.0);
   plate.yaw = ony.yaw; plate.spawnProtect = 0; ony.spawnProtect = 0;
   const hp0 = plate.hp;
-  tick(g, press(0, 'heavy'));
-  ok(ony.state === 'ability' && creature(ony.creature).ability === 'tuskLunge', `heavy starts the tusk lunge (${ony.state})`);
+  // A player's special is on Y where the animal never hid (`specialSlot`), and RT is the pounce.
+  ok(specialSlot(creature('onychodus')) === 'y', 'Onychodus never hid, so its special is on Y');
+  tick(g, press(0, 'ability'));
+  ok(ony.state === 'ability' && creature(ony.creature).ability === 'tuskLunge', `Y starts the tusk lunge (${ony.state})`);
   for (let i = 0; i < 60; i++) { plate.pos.x = ony.pos.x + Math.sin(ony.yaw) * lengthOf(ony) * 0.8; plate.pos.y = ony.pos.y; plate.pos.z = ony.pos.z + Math.cos(ony.yaw) * lengthOf(ony) * 0.8; plate.vel.x = plate.vel.y = plate.vel.z = 0; tick(g, idle()); }
   ok(plate.hp < hp0, `the lunge lands through part of the armour (hp ${hp0.toFixed(0)} → ${plate.hp.toFixed(0)})`);
   // the brush display bluffs an AI rival off
@@ -760,7 +762,6 @@ const { TIER_SCALE } = await import('../src/sim/types');
     g.step(DT, hold); if (g.events.some((e) => e.kind === 'routed' && e.actor === bot.id)) routed = true; g.events.length = 0;
   }
   ok(steth.state === 'guard' && live(bot.brain).goal === 'flee' && routed, `the brush display routs a hunting rival (${bot.brain.goal})`);
-  ok(RULES.camoDrain!(g.spawn('furcaster', 'ambient', { x: 0, y: -10, z: 90 }, 1)) === 0.25 && RULES.camoDrain!(ony) === 1, 'camouflage is nearly free for the benthos');
 }
 
 // ---- a heavy special is a committed strike that travels and lands ----
@@ -776,8 +777,10 @@ const { TIER_SCALE } = await import('../src/sim/types');
     const prey = g.spawn(target, 'ambient', { x: a.pos.x + Math.sin(a.yaw) * L * 1.8, y: a.pos.y, z: a.pos.z + Math.cos(a.yaw) * L * 1.8 }, 1.0);
     prey.spawnProtect = 0;
     const hp0 = prey.hp, at = { ...prey.pos }, from = { ...a.pos };
-    tick(g, new Map([[0, { ...emptyInput(), heavy: true }]]));
-    ok(a.state === 'ability', `${id}: the heavy button starts its special (${a.state})`);
+    const { specialSlot } = await import('../src/sim/special-slot');
+    const key = specialSlot(creature(id)) === 'b' ? 'guard' : 'ability';
+    tick(g, new Map([[0, { ...emptyInput(), [key]: true }]]));
+    ok(a.state === 'ability', `${id}: its special's button starts it (${key}, ${a.state})`);
     for (let i = 0; i < 90; i++) { prey.pos.x = at.x; prey.pos.y = at.y; prey.pos.z = at.z; prey.vel.x = prey.vel.y = prey.vel.z = 0; tick(g, idle()); }
     const travelled = Math.hypot(a.pos.x - from.x, a.pos.z - from.z);
     ok(travelled > L * 0.8, `${id}: the strike carries the body forward (${(travelled / L).toFixed(2)} body lengths)`);
@@ -797,14 +800,15 @@ const { TIER_SCALE } = await import('../src/sim/types');
   const shell = g.spawn('manticoceras', 'ambient', { x: lung.pos.x + Math.sin(lung.yaw) * lengthOf(lung) * 1.2, y: lung.pos.y, z: lung.pos.z + Math.cos(lung.yaw) * lengthOf(lung) * 1.2 }, 1.0);
   shell.spawnProtect = 0;
   const hp0 = shell.hp, at = { ...shell.pos };
-  tick(g, new Map([[0, { ...emptyInput(), heavy: true }], [1, emptyInput()]]));
+  tick(g, new Map([[0, { ...emptyInput(), ability: true }], [1, emptyInput()]]));
   let crushed = false;
   for (let i = 0; i < 60; i++) { shell.pos.x = at.x; shell.pos.y = at.y; shell.pos.z = at.z; shell.vel.x = shell.vel.z = 0; g.step(DT, idle()); if (g.events.some((e) => e.kind === 'shellCrush')) crushed = true; g.events.length = 0; }
   ok(crushed && shell.hp < hp0, `the crush bite cracks a shell (hp ${hp0.toFixed(0)} → ${shell.hp.toFixed(0)})`);
   const d = devActor(g, dory); const s0 = d.standing;
   dory.pos.y = groundHeight(g.world, dory.pos.x, dory.pos.z, []) + lengthOf(dory) * 0.3; dory.prevT.y = dory.pos.y;   // down on the sediment
-  tick(g, new Map([[0, emptyInput()], [1, { ...emptyInput(), ability: true }]]));
-  ok(dory.state === 'ability' && dory.hideMode === 'none', 'floor sweep is a timed sweep, not a hide');
+  // Doryaspis hides in life, so its sweep is on B and Y stays the camouflage.
+  tick(g, new Map([[0, emptyInput()], [1, { ...emptyInput(), guard: true }]]));
+  ok(dory.state === 'ability' && dory.hideMode === 'none', 'floor sweep is a timed sweep on B, not a hide');
   for (let i = 0; i < 60 * 2; i++) tick(g, idle());
   ok(d.standing > s0, `sweeping the floor feeds growth (${s0.toFixed(1)} → ${d.standing.toFixed(1)})`);
 }

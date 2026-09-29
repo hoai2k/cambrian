@@ -12,7 +12,7 @@ import { biomeWeights, coverAt, groundHeight, RISE_RATE, SURFACE_Y } from '../wo
 import { checkStage, DEVONIAN_RULES } from '../devonian/rules';
 import { ADULT_STAGE, devActor, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageProgress, stageScale } from '../devonian/state';
 import { canBreach as devCanBreach, spawnInCover, swim as devSwim } from '../devonian/swim';
-import { camoDrain, installTriassicSpecials, stepAbility, useAbility, ySpecial } from './specials';
+import { installTriassicSpecials, stepAbility, useAbility } from './specials';
 import { setShoreAnimals, shoreClip, shoreRadar, stepShore } from './shore';
 import { AIR_LOW, AIR_MAX, triActor, triState } from './state';
 import { apexLeft } from '../apex';
@@ -222,21 +222,6 @@ function updatePod(g: Game, a: Actor, dt: number) {
   }
 }
 
-// ---- the power stroke's shove ----
-function updateStroke(g: Game, a: Actor, dt: number) {
-  const t = triActor(g, a);
-  if (t.strokeT <= 0) return;
-  t.strokeT -= dt;
-  const L = lengthOf(a), h = heading(a.yaw);
-  for (const o of g.nearby(a.pos, L)) {
-    if (o.id === a.id || !isAlive(o) || foodRung(o.creature) > 2) continue;
-    const dx = o.pos.x - a.pos.x, dz = o.pos.z - a.pos.z;
-    if (dx * h.x + dz * h.z < 0) continue;
-    const side = { x: h.z, z: -h.x }, s = Math.sign(dx * side.x + dz * side.z) || 1;
-    o.vel.x += side.x * s * 4 * dt * 10; o.vel.z += side.z * s * 4 * dt * 10;
-  }
-}
-
 // ---- the whorl ----
 function updateSaw(g: Game, a: Actor, dt: number) {
   const t = triActor(g, a);
@@ -257,7 +242,6 @@ function updateSaw(g: Game, a: Actor, dt: number) {
 export const TRIASSIC_RULES = {
   ...DEVONIAN_RULES,
   install() { installTriassicSpecials(); },
-  ySpecial,
   init(g) {
     for (const a of g.players) {
       const d = devActor(g, a);
@@ -276,7 +260,6 @@ export const TRIASSIC_RULES = {
       updateAir(g, a, dt);
       updateClimate(g, a, dt);
       updatePod(g, a, dt);
-      updateStroke(g, a, dt);
       updateSaw(g, a, dt);
       // The sinkers settle when the stick is still — asking for nothing, climb included (`drive`).
       // This read `!a.grabbedBy`, which is false for the -1 that means "not held", so it only ever
@@ -349,7 +332,7 @@ export const TRIASSIC_RULES = {
   shoreReach(a) { return creature(a.creature).shore ? 80 : 0; },
   jet(a) { return !!creature(a.creature).shell; },
 
-  useAbility, stepAbility, camoDrain,
+  useAbility, stepAbility,
 
   /**
    * How a body swims: the Devonian's fish model (reverse slow, turn sharp when slow, a fast-start
@@ -451,7 +434,7 @@ export const TRIASSIC_RULES = {
     // The gauge comes back with the body. A hatchling that respawned on the empty chest it drowned
     // with would start the next life already out of air, and drown again the moment its bar went.
     t.atSurface = false; t.air = AIR_MAX; t.drownT = 0;
-    t.windT = 0; t.heldT = 0; t.podShield = 0; t.strokeT = 0; t.shoreWarn = 0; t.shoreWatch = 0; t.sawT = 0;
+    t.windT = 0; t.heldT = 0; t.podShield = 0; t.shoreWarn = 0; t.shoreWatch = 0; t.sawT = 0;
   },
 
   scoreLine(g, a) { const d = devActor(g, a); return { rank: `${STAGES[d.stage]} · ${RUNG_NAMES[rungOf(a)]}`, progress: stageProgress(d) }; },

@@ -27,6 +27,6 @@ export type TriassicGuestId = 'archelon' | 'mosasaurus';
  * The three shore ids name what the shore module does with each animal; nothing presses them.
  */
 export type TriassicAbilityId =
-  | 'exhaustionHold' | 'podCall' | 'fangTrap' | 'neckStrike' | 'whorlSaw' | 'powerStroke' | 'scrapeSieve'
+  | 'exhaustionHold' | 'podCall' | 'fangTrap' | 'neckStrike' | 'whorlSaw' | 'scrapeSieve'
   | 'coil' | 'sideSwipe' | 'comb' | 'suctionSnap' | 'bellyTurn' | 'ink'
   | 'boomStrike' | 'surfaceLunge' | 'bolt';

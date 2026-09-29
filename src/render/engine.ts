@@ -1,5 +1,6 @@
 import { ACTIVE_ERA } from '../content';
 import { hideLabel } from '../sim/concealment';
+import { specialSlot } from '../sim/special-slot';
 import * as THREE from 'three';
 import { drawable, drawDistance, OVERFLOW, viewRank } from './view-pick';
 import { audio, SAMPLES } from '../audio/audio';
@@ -1333,6 +1334,8 @@ export class Engine {
       // their seat, anything else by its species.
       const killerId = p.swallowedBy >= 0 ? p.swallowedBy : p.killer;
       const killer = killerId >= 0 ? game.byId(killerId) : undefined;
+      // Y shows the special where the animal's special is on Y (`specialSlot`), and the hide otherwise.
+      const ySlot = specialSlot(creature(p.creature)) === 'y';
       const nameOf = (a: Actor | undefined) => (a ? (a.player >= 0 ? TEXT.common.playerChip(a.player + 1) : creature(a.creature).name) : undefined);
       const watched = spectatorTarget(game, i);
       const spectate = watched ? { index: watched.player, name: TEXT.common.playerChip(watched.player + 1), color: PLAYER_COLORS[watched.player % 4], creature: watched.creature } : undefined;
@@ -1373,7 +1376,7 @@ export class Engine {
         hp: p.hp, hpMax: p.hpMax, hunger: game.mode === 'survival' ? p.hunger : undefined, stamina: p.stamina, staminaMax: p.staminaMax, exhausted: p.exhausted > 0,
         tier: p.tier, tierName: era ? `${era.stage} · ${era.rungName}` : TIER_NAMES[p.tier], // The ring means the same thing in both eras: how close the next moult is, full when it lands.
         progress: era ? era.stageProgress : p.tier >= 4 ? 1 : clamp(p.nutrition / TIER_NEED[p.tier], 0, 1), scale: p.scale,
-        abilityName: p.hideMode === 'descending' ? TEXT.sim.hide.sinking : p.hideMode === 'burrowed' ? TEXT.sim.hide.buried(controlKey('ability', scheme)) : p.hideMode === 'camouflage' ? TEXT.sim.hide.camouflaged(p.camoLabel) : RULES.ySpecial?.(p.creature)?.name ?? hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : RULES.ySpecial?.(p.creature) ? 1 - clamp(p.abilityCd / Math.max(1, creature(p.creature).abilityCooldown), 0, 1) : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none' || (p.state === 'ability' && !!RULES.ySpecial?.(p.creature)), abilityUnlocked: true,
+        abilityName: p.hideMode === 'descending' ? TEXT.sim.hide.sinking : p.hideMode === 'burrowed' ? TEXT.sim.hide.buried(controlKey('ability', scheme)) : p.hideMode === 'camouflage' ? TEXT.sim.hide.camouflaged(p.camoLabel) : ySlot ? creature(p.creature).abilityName : hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : ySlot ? 1 - clamp(p.abilityCd / Math.max(1, creature(p.creature).abilityCooldown), 0, 1) : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none' || (p.state === 'ability' && ySlot), abilityUnlocked: true,
         senseOn: p.senseMode,
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, kind: creature(lockA.creature).kind, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,

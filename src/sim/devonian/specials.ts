@@ -22,7 +22,7 @@ import { DEVONIAN_RULES } from './rules';
  */
 const HEAVY = ['jawShear', 'runThrough', 'tuskLunge', 'crushBite', 'neckSnap', 'cheliceraeGrab', 'tridentShove', 'shieldPush', 'armourFlank'] as const;
 const GUARD = ['brushDisplay'] as const;
-const Y = ['shoalDart', 'shellJet', 'shellHover', 'limbHaul', 'floorSweep', 'filterGulp'] as const;
+const Y = ['floorSweep', 'filterGulp'] as const;
 
 let installed = false;
 /** Registers the Devonian ids with the shared special tables (idempotent; ids never collide). */
@@ -34,19 +34,6 @@ export function installDevonianSpecials() {
   BURROWERS.add('gemuendina');                   // sand ambush: the shared burrow with its emergence strike
 }
 
-/** The Y specials by name, for the HUD and the select card; undefined keeps the shared hide copy. */
-export function ySpecial(id: CreatureId): { name: string; desc: string } | undefined {
-  const def = creature(id);
-  if (!(Y as readonly string[]).includes(def.ability)) return undefined;
-  return { name: def.abilityName, desc: def.abilityDesc };
-}
-
-/** Camouflage is nearly free for the slow benthos; everyone else pays the shared drain. */
-export function camoDrain(a: Actor): number {
-  const ab = creature(a.creature).ability;
-  return ab === 'armSpread' || ab === 'stiltWalk' ? 0.25 : 1;
-}
-
 /** Y pressed while free or guarding, not hidden. Returns true when a Devonian special took it. */
 export function useAbility(g: Game, a: Actor, ctx: ExpansionContext): boolean {
   const def = creature(a.creature);
@@ -54,20 +41,6 @@ export function useAbility(g: Game, a: Actor, ctx: ExpansionContext): boolean {
   const L = lengthOf(a);
   const start = (dur: number) => { a.state = 'ability'; a.stateT = 0; a.stateDur = dur; a.abilityT = 0; a.abilityActive = true; a.hitDone.clear(); };
   switch (def.ability) {
-    case 'shoalDart':                            // the everyman's cheap dash
-      if (a.stamina < 6) return false;
-      a.stamina -= 6; a.burstT = 1.4; a.abilityCd = def.abilityCooldown; break;
-    case 'limbHaul':                             // a lunge of the limbs: strongest where the water is thin
-      if (a.stamina < 8) return false;
-      a.stamina -= 8; a.burstT = devActor(g, a).beached ? 2.2 : 1.5; a.abilityCd = def.abilityCooldown; break;
-    case 'shellJet': {                           // the big jet: a backward blast with a moment of cover
-      if (a.stamina < 10) return false;
-      a.stamina -= 10; a.burstT = 1.8; a.iframes = 0.25; a.abilityCd = def.abilityCooldown;
-      ctx.silt.push({ pos: { ...a.pos }, radius: L * 0.9, t: 2 });
-      break;
-    }
-    case 'shellHover':                           // hang in the water: still, quiet, hard to notice
-      start(def.abilityDuration ?? 2.5); a.abilityCd = def.abilityCooldown; a.vel.y = 0; a.seen = 0; break;
     case 'floorSweep':                           // sweep the sediment: standing from the floor
     case 'filterGulp':                           // gape and strain: standing from the water column
       start(def.abilityDuration ?? 2.5); a.abilityCd = def.abilityCooldown; break;
@@ -101,9 +74,6 @@ export function stepAbility(g: Game, a: Actor, ctx: ExpansionContext, dt: number
   const L = lengthOf(a), h = heading(a.yaw), t = a.stateT;
   const d = devActor(g, a);
   switch (def.ability) {
-    case 'shellHover':
-      a.vel.x *= 0.9; a.vel.z *= 0.9; a.vel.y = 0; a.seen = Math.min(a.seen, 0.2);
-      return;
     case 'floorSweep': {
       const floor = groundHeight(g.world, a.pos.x, a.pos.z, []);
       if (a.pos.y < floor + L * 0.8) DEVONIAN_RULES.onNutrition(g, a, 1.6 * dt, undefined);
