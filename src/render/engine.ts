@@ -398,9 +398,13 @@ export class Engine {
   private frame = (now: number) => {
     if (this.disposed) return;
     this.raf = requestAnimationFrame(this.frame);
-    const dtReal = Math.max(0, Math.min((now - this.last) / 1000, 0.08));
+    // The frame's real length, and the length the game is allowed to advance by: a long stall is
+    // clamped so the world does not leap, but the counters measure what actually happened — timed
+    // off the clamped figure, the fps readout could never report below 12.5.
+    const elapsed = Math.max(0, (now - this.last) / 1000);
+    const dtReal = Math.min(elapsed, 0.08);
     this.last = now;
-    this.fpsFrames++; this.fpsT += dtReal; if (this.fpsT > 1) { this.fps = this.fpsFrames / this.fpsT; this.fpsFrames = 0; this.fpsT = 0; }
+    this.fpsFrames++; this.fpsT += elapsed; if (this.fpsT > 1) { this.fps = this.fpsFrames / this.fpsT; this.fpsFrames = 0; this.fpsT = 0; }
     const game = this.game;
     if (!game) return;
     // The portrait phone screen may stream assets, but neither simulation nor rendering runs behind it.
@@ -605,7 +609,7 @@ export class Engine {
       audio.update(dtReal);
     }
     this.renderMs = this.renderMs * 0.9 + (performance.now() - tRender) * 0.1;
-    this.frameMs = this.frameMs * 0.9 + dtReal * 1000 * 0.1;
+    this.frameMs = this.frameMs * 0.9 + Math.min(elapsed, 1) * 1000 * 0.1;
   }
 
   /**

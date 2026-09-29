@@ -8,7 +8,7 @@ await silenceCounter(page);
 const errors = [];
 page.on('console', (m) => { if (m.type() === 'error') errors.push(`[${m.type()}] ${m.text().slice(0, 300)}`); });
 page.on('pageerror', (e) => errors.push('[pageerror] ' + e.message + '\n' + (e.stack || '').split('\n').slice(0, 4).join('\n')));
-await page.addInitScript(() => localStorage.setItem('cambrian-settings', JSON.stringify({ quality: 'low', lookSpeed: 1, invertY: false, volume: 0.8, muted: true })));
+await page.addInitScript(() => localStorage.setItem('cambrian-settings', JSON.stringify({ quality: 'low', qualityExplicit: true, lookSpeed: 1, invertY: false, volume: 0.8, muted: true })));
 const shot = (name) => page.screenshot({ path: `${S}/shot-${name}.png`, timeout: 120000 });
 await page.goto('http://localhost:4173/cambrian/', { waitUntil: 'load' });
 await page.waitForTimeout(9000);
@@ -30,11 +30,16 @@ console.log('hud larva:', await page.evaluate(() => document.querySelector('.hud
  * a tap, which Playwright sends as a keydown and keyup in the same tick, usually falls between two
  * samples and is never seen at all. Holding the key spans a frame, and re-pressing covers the case
  * where even that lands in a gap. This was a coin flip before, not a broken pause.
+ *
+ * And the wait before pressing again has to outlast a frame. A press toggles the pause, so one that
+ * was seen late — the frame that sampled it took longer than the wait — was undone by the retry,
+ * and the menu opened and shut between two looks at it: a third of runs failed that way, on the
+ * code before any change and after it alike.
  */
 const pause = async () => {
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 4; i++) {
     await page.keyboard.down('Escape'); await page.waitForTimeout(300); await page.keyboard.up('Escape');
-    try { await page.waitForSelector('.overlay .menu-buttons', { timeout: 4000 }); return; } catch { /* frame gap: press again */ }
+    try { await page.waitForSelector('.overlay .menu-buttons', { timeout: 20000 }); return; } catch { /* frame gap: press again */ }
   }
   throw new Error('pause menu never opened');
 };
