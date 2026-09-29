@@ -30,6 +30,7 @@ import { key as controlKey, schemeForDevice } from '../shared/controls';
 import { TEXT } from '../shared/text';
 import { PLAYER_COLORS, type HudSnapshot, type PlayerHud, type RadarBlipHud, type ViewportRect } from '../shared/hud-types';
 import { ViewRoot } from './view-root';
+import { freshGovernor, governFrame, planFor, type GovernorPlan } from './frame-governor';
 import { NEAR_MIN, nearAlwaysFor, ZOOM_MAX } from '../shared/view-reach';
 import { BREATH_PEEK, climbAimHold, edgePitch, FOLLOW_HOLD, FOLLOW_RATE, layoutRects, magnificationDistance, PITCH_DOWN, PITCH_UP, spectatorTarget, updateCamera, type CamState } from './camera';
 import { freshTele, PlayerInput, updateTeleMenu } from './player-input';
@@ -158,17 +159,7 @@ export class Engine {
     this.conserveMemory = conserveCreatureMemory(quality);
     this.assets = new AssetQueue(this.conserveMemory);
     this.quality = quality;
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-    this.renderer.setPixelRatio(Math.min(devicePixelRatio, quality === 'high' ? 1.5 : 1));
-    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-    // Carcasses are eaten away with per-material clipping planes (see carcass.ts).
-    this.renderer.localClippingEnabled = true;
-    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.25;
-    this.renderer.shadowMap.enabled = quality === 'high';
-    this.renderer.shadowMap.type = THREE.PCFShadowMap;
-    // Split-screen renders the scene once per player; without this the shadow map is rebuilt every time.
-    this.renderer.shadowMap.autoUpdate = false;
+    this.renderer = this.makeRenderer(true);
     container.appendChild(this.renderer.domElement);
     // The mouse is attached to the canvas host, not the canvas: the canvas is torn down and rebuilt
     // when quality changes, and the pointer lock has to survive that.
@@ -214,6 +205,60 @@ export class Engine {
   /** What the menus last said is likely to be needed next: never evicted (`evictIdleModels`). */
   private likely = new Set<CreatureId>();
 
+  /** A renderer set up the way the game draws. Antialiasing is fixed for a renderer's life (`governed`). */
+  private makeRenderer(antialias: boolean) {
+    const r = new THREE.WebGLRenderer({ antialias, powerPreference: 'high-performance' });
+    r.setPixelRatio(this.pixelRatio());
+    r.outputColorSpace = THREE.SRGBColorSpace;
+    // Carcasses are eaten away with per-material clipping planes (see carcass.ts).
+    r.localClippingEnabled = true;
+    r.toneMapping = THREE.ACESFilmicToneMapping;
+    r.toneMappingExposure = 1.25;
+    r.shadowMap.enabled = this.quality === 'high';
+    r.shadowMap.type = THREE.PCFShadowMap;
+    // Split-screen renders the scene once per player; without this the shadow map is rebuilt every time.
+    r.shadowMap.autoUpdate = false;
+    this.antialias = antialias;
+    return r;
+  }
+  private antialias = true;
+  /** The quality's own pixel ratio, scaled by what the frame governor has given up (`frame-governor.ts`). */
+  private pixelRatio() { return Math.min(devicePixelRatio, this.quality === 'high' ? 1.5 : 1) * this.plan.resolution; }
+
+  /**
+   * Keep the frame rate by giving things up only while frames are actually long, and take them back
+   * when they are not (src/render/frame-governor.ts). Browser automation keeps what it was given:
+   * the harnesses run under a software renderer at a frame a second, and a check that measures pixels
+   * must not have the resolution change under it.
+   */
+  private governed(frameMs: number, active: boolean) {
+    if (navigator.webdriver) return;
+    this.gov = governFrame(this.gov, frameMs, active, this.quality === 'low');
+    const plan = planFor(this.gov, this.quality === 'low');
+    if (plan.resolution === this.plan.resolution && plan.antialias === this.plan.antialias && plan.shadowEvery === this.plan.shadowEvery) return;
+    const res = plan.resolution !== this.plan.resolution;
+    this.plan = plan;
+    if (plan.antialias !== this.antialias) this.swapRenderer(plan.antialias);
+    else if (res) { this.renderer.setPixelRatio(this.pixelRatio()); this.onResize(); }
+  }
+  private gov = freshGovernor();
+  private plan: GovernorPlan = planFor(this.gov, false);
+  private frameNo = 0;
+
+  /**
+   * Replace the renderer with one that differs in antialiasing, which a live WebGL context cannot
+   * change. Everything on the GPU is uploaded again to the new context as it is next drawn, so this
+   * is a hitch, and the governor takes it once a session at most.
+   */
+  private swapRenderer(antialias: boolean) {
+    const old = this.renderer;
+    const next = this.makeRenderer(antialias);
+    this.container.replaceChild(next.domElement, old.domElement);
+    this.renderer = next;
+    old.dispose(); old.forceContextLoss();
+    this.onResize();
+  }
+
   private onResize() {
     // Read here, when the size changes, and nowhere else: a frame that asked the container for its
     // size after the HUD had touched the page forced the browser to lay the whole page out again,
@@ -233,7 +278,10 @@ export class Engine {
     if (q === this.quality) return;
     this.quality = q;
     this.renderer.shadowMap.enabled = q === 'high';
-    this.renderer.setPixelRatio(Math.min(devicePixelRatio, q === 'high' ? 1.5 : 1));
+    // A new quality is a fresh start for the governor, and antialiasing comes back if it had gone.
+    this.gov = freshGovernor(); this.plan = planFor(this.gov, q === 'low');
+    if (!this.antialias) this.swapRenderer(true);
+    this.renderer.setPixelRatio(this.pixelRatio());
     if (this.game) { this.sea?.dispose(); this.sea = createSea(this.scene, this.game.world, q); }
     this.onResize();
   }
@@ -412,6 +460,8 @@ export class Engine {
     const running = !this.paused;
     const dt = running ? dtReal : 0;
     this.time += dt;
+    this.frameNo++;
+    this.governed(elapsed * 1000, running && !this.attract && document.visibilityState === 'visible');
 
     // Inputs
     const inputs = new Map<number, InputFrame>();
@@ -577,7 +627,7 @@ export class Engine {
     const r = this.renderer;
     this.scene.updateMatrixWorld();
     r.setScissorTest(false); r.setViewport(0, 0, W, H); r.clear();
-    if (this.quality === 'high') r.shadowMap.needsUpdate = true;   // rebuilt on the first render() below
+    if (this.quality === 'high' && this.frameNo % this.plan.shadowEvery === 0) r.shadowMap.needsUpdate = true;   // rebuilt on the first render() below
     if (this.attract) {
       const density = this.sea?.setViewLength(1.2, this.attractCam.position.x, this.attractCam.position.z) ?? 0.0105;
       this.attractCam.far = clamp(2.1 / density, 110, 300);

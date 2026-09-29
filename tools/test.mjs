@@ -61,6 +61,7 @@ const SUITES = {
   'survival-eras': { file: 'survival-eras-test.ts', runs: ['devonian', 'triassic'] },
   views: { file: 'view-pick-test.ts' },
   sight: { file: 'sight-test.ts' },
+  governor: { file: 'governor-test.ts' },
   respawn: { file: 'respawn-test.ts' },
   ecology: { file: 'ecology-test.ts', also: ['appetite'] },
   appetite: { file: 'appetite-test.ts', runs: ['reef', 'giants'], slow: 5 },
@@ -164,7 +165,7 @@ const GATE = ['flora', 'locomotion', 'fight', 'feast', 'pursuit', 'respawn', 'co
 /** Everything that is not a simulation suite and takes seconds, not minutes. */
 const FAST = ['codex', 'results', 'visitors', 'seats', 'roster', 'depth', 'menus', 'focus', 'fullscreen', 'cursors', 'edges',
   'swap', 'immersive', 'music', 'stats', 'debug', 'ancientseas', 'mobile:memory', 'assets', 'props', 'recolor', 'eras',
-  'palettes', 'portraits', 'conform', 'rigs', 'sculpt', 'stretch', 'bend', 'mouth', 'mark', 'playback', 'breakpoints', 'lineup'];
+  'palettes', 'portraits', 'conform', 'rigs', 'sculpt', 'stretch', 'bend', 'mouth', 'mark', 'playback', 'breakpoints', 'lineup', 'governor'];
 const GROUPS = {
   sim: SIM,
   gate: GATE,
