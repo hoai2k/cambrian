@@ -80,7 +80,16 @@
    measuring the picker, so anything the carousel does to the picker's own box changes the answer that
    chose it — a margin that came with the carousel made the grid fit, which took the margin away,
    which made it not fit, for ever. */
-@media (orientation: portrait) and (max-width: 759px) { .select { padding-left: 6px; padding-right: 6px; } }
+@media (orientation: portrait) and (max-width: 759px) {
+  .select { padding-left: 6px; padding-right: 6px; }
+  /* The peeks come in from the edge of the glass, not from an inset: the carousel reaches out over
+     the screen's side padding and the picker stops clipping it there. Both are on the carousel and
+     inside the picker's box, never on the box `gridFits` measures (see the note above), and the
+     screen itself clips what runs past the glass. */
+  .select-carousel { overflow: hidden; }
+  .select-carousel .pick-layout { overflow: visible; }
+  .select-carousel .carousel { margin-inline: -6px; }
+}
 @media (orientation: portrait) {
   .select-carousel .carousel { grid-template-columns: 26px minmax(0, 1fr) 26px; column-gap: 6px; }
   .select-carousel .carousel-step { display: none; }
