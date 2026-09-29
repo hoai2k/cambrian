@@ -51,7 +51,7 @@ export const CAMBRIAN_CREATURES: readonly CreatureDef[] = [
     canGuard: true,
   },
   {
-    id: 'waptia', darter: true, snatches: true, name: 'Waptia', species: 'W. fieldensis',
+    id: 'waptia', hides: true, darter: true, snatches: true, name: 'Waptia', species: 'W. fieldensis',
     kind: 'Bivalved arthropod', kindNote: 'A hymenocarine: one of the shrimp-shaped Cambrian arthropods that folded a two-valved carapace over the body, and the branch that leads on to the mandibulates — crustaceans and insects.',
     tagline: 'Blink and it’s behind you. Blink again and it’s gone.',
     role: 'Skirmisher', tailFlip: true, ground: false, adultLength: 2.7,

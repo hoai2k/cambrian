@@ -15,7 +15,7 @@ const animal = (d: Pick<CreatureDef, 'id' | 'name' | 'species' | 'tagline' | 'ro
 
 /** Biological inspiration is documented separately from invented combat mechanics. */
 export const EXPANSION_CREATURES: readonly CreatureDef[] = [
-  animal({ id: 'pikaia', name: 'Pikaia', species: 'P. gracilens', role: 'Evasive forager',
+  animal({ id: 'pikaia', hides: true, name: 'Pikaia', species: 'P. gracilens', role: 'Evasive forager',
     kind: 'Early chordate', kindNote: 'A chordate: the lineage built around a stiffening rod and blocks of swimming muscle, which went on to produce the vertebrates.',
     tagline: 'A ribbon of muscle. One bend ahead of danger.', color: '#d2a8a2',
     speed: 6.2, agility: 6.2, turnRate: 4.2, hp: 70, poise: 28, bodyRadius: .12, diet: 'deposit',
