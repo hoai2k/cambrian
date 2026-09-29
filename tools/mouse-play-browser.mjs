@@ -270,5 +270,5 @@ try {
   assert(down > up + 0.3, `and the bottom tilts it down (${up.toFixed(2)} → ${down.toFixed(2)})`);
 
   assert.deepEqual(errors, [], `page errors: ${errors.join(' · ')}`);
-  console.log('PASS browser: a click dashes at the water, bites or pounces by distance, a hold chases then pounces, a hold after steers with the pointer away, the camera follows, the right button dashes, A and D turn the animal, and the cursor\'s height steers the view');
+  console.log('PASS browser: a click dashes at the water, bites or pounces by distance, a hold chases then pounces, a hold after steers with the pointer away, an upside-down view rights itself, the camera follows, the right button dashes, A and D turn the animal, and the cursor\'s height steers the view');
 } finally { await browser.close(); }
