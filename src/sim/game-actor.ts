@@ -773,9 +773,12 @@ export function stepActions(game: Game, a: Actor, input: InputFrame, dt: number,
     // place, so a charge out of a sprint (below) or out of a dash reaches exactly the same move.
     // Sprinting makes it a charge: it aims along the line of travel and costs extra stamina.
     if (grasped) { /* the grip took the button */ }
-    else if (chaseTarget != null && a.controller === 'player') {
+    // A held pursuit springs at the one animal it names. A finger's double-tap has already paid
+    // for its dash-length chase, so its pounce is free; the mouse's is an ordinary pounce and is
+    // priced and cooled down like one — until it can be afforded, the pointer keeps swimming at it.
+    else if (chaseTarget != null && a.controller === 'player' && (input.pursueDash || (a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0))) {
       const target = game.idMap.get(chaseTarget);
-      if (target && isAlive(target) && !isHidden(target)) startPounce(game, a, target, L, sf, true);
+      if (target && isAlive(target) && !isHidden(target)) startPounce(game, a, target, L, sf, !!input.pursueDash);
     }
     else if (justHeavy && heavyAction(game, a, def, L, sf, locked, bursting)) { /* the button was taken */ }
     // Holding the grip button at something too big to bite keeps swimming at it until it has

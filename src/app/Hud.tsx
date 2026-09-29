@@ -171,11 +171,13 @@ function SensePanel({ p }: { p: PlayerHud }) {
       </div>
       {p.ashore && p.alive && <ShoreStatus stranded={p.strandLeft != null} low={!!p.strandLow} />}
       {p.era && <EraStatus era={p.era} alive={p.alive} ashore={p.ashore} />}
-      {p.scheme === 'touch' && (p.touchMark || p.aim) && (() => {
+      {/* A finger's aim mark, and the marks a mouse press draws itself: the dash, and the target
+          held on an animal a chase is going after while the pointer is away. */}
+      {(p.scheme === 'touch' ? p.touchMark || p.aim : p.touchMark) && (() => {
         const mark = p.touchMark;
         const at = mark?.at ?? p.aim?.at;
         const kind = mark?.kind === 'target' ? 'attack' : mark?.kind ?? (p.aim?.hasTarget ? (p.aim.band === 'snack' || p.aim.band === 'prey' ? 'edible' : 'attack') : 'idle');
-        return <img className="touch-cursor" src={cursorImageFor(kind)} alt=""
+        return <img className={`touch-cursor ${kind === 'zoom' ? 'dashing' : ''}`} src={cursorImageFor(kind)} alt=""
           style={{ left: at ? `${(at.x + 1) * 50}%` : '50%', top: at ? `${(1 - at.y) * 50}%` : '50%' }} />;
       })()}
       {p.aim && p.scheme !== 'touch' && (

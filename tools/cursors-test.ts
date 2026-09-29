@@ -2,12 +2,12 @@
  * The cursor is the crosshair in mouse play, so what it draws is a readout like any other.
  * Run: npm run cursors
  */
-import { cursorFor, cursorState, type CursorState } from '../src/shared/cursors';
+import { cursorFor, cursorImageFor, cursorState, type CursorState } from '../src/shared/cursors';
 import { checker, finish } from './lib/test';
 
 const check = checker(56);
-const m = (o: Partial<{ dragging: boolean; right: boolean; pressing: boolean }> = {}) =>
-  ({ dragging: false, right: false, pressing: false, ...o });
+const m = (o: Partial<{ dragging: boolean; dashing: boolean; hidden: boolean }> = {}) =>
+  ({ dragging: false, dashing: false, hidden: false, ...o });
 
 // What the buttons are *doing* outranks what the cursor is *over*: a press in progress is the more
 // urgent fact, and a cursor that still said "edible" while the camera was being dragged would be
@@ -15,17 +15,19 @@ const m = (o: Partial<{ dragging: boolean; right: boolean; pressing: boolean }> 
 check('over nothing, it is the plain cross', cursorState(m(), 'none') === 'idle');
 check('over something you could eat, it says so', cursorState(m(), 'edible') === 'edible');
 check('over a fight, it says that instead', cursorState(m(), 'attack') === 'attack');
-check('a press on a target is winding up a pounce', cursorState(m({ pressing: true }), 'edible') === 'target');
-check('...and on a fight it is the same wind-up', cursorState(m({ pressing: true }), 'attack') === 'target');
-check('a press over nothing is not a wind-up', cursorState(m({ pressing: true }), 'none') === 'idle');
-check('a drag is looking around, whatever is under it', cursorState(m({ dragging: true }), 'edible') === 'look');
-check('the right button is the dash, whatever is under it', cursorState(m({ right: true }), 'attack') === 'zoom');
-check('...and it outranks a drag', cursorState(m({ right: true, dragging: true }), 'none') === 'zoom');
+check('a middle drag is looking around, whatever is under it', cursorState(m({ dragging: true }), 'edible') === 'look');
+check('a dash is the dash, whatever is under it', cursorState(m({ dashing: true }), 'attack') === 'zoom');
+check('...and it outranks a drag', cursorState(m({ dashing: true, dragging: true }), 'none') === 'zoom');
+check('steering or a chase puts the pointer away', cursorState(m({ hidden: true, dashing: true }), 'attack') === 'hidden');
+// The dash is drawn by the HUD so it can move — the CSS pointer is put away under it — and what it
+// draws is the ordinary cross, flung into the distance, rather than an arrow of its own.
+check('the dash puts the CSS pointer away', cursorFor('zoom') === 'none' && cursorFor('hidden') === 'none');
+check('...and its mark is the idle cross', cursorImageFor('zoom') === cursorImageFor('idle') && cursorImageFor('idle').startsWith('data:image/svg+xml,'));
 
 // Every state has to *look* different, or the readout says nothing. And each has to be a real CSS
 // cursor value with a fallback after it, because a data URI the browser rejects leaves no pointer
 // at all — the one failure a player cannot recover from without alt-tabbing.
-const STATES: CursorState[] = ['idle', 'edible', 'attack', 'target', 'zoom', 'look'];
+const STATES: CursorState[] = ['idle', 'edible', 'attack', 'look'];
 const drawn = STATES.map(cursorFor);
 check('every state draws something', drawn.every((c) => c.length > 0));
 check('...and no two are the same drawing', new Set(drawn).size === drawn.length, `${new Set(drawn).size} of ${drawn.length}`);

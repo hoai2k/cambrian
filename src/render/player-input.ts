@@ -13,7 +13,9 @@ import { applyMouse, emptyControls, KeyboardInput, MousePlay, readGamepad, type 
 import { applyTouch, TouchPlay } from '../input/touch';
 import { Edges } from '../shared/edges';
 import { clamp, damp, wrapAngle } from '../shared/math';
-import { bandOf, isAlive, isHidden, lengthOf } from '../sim/actors';
+import { stepStrike, type Strike, type StrikeOut } from '../shared/mouse-strike';
+import { bandOf, bodyGap, isAlive, isHidden, lengthOf, mouthReach } from '../sim/actors';
+import { creature } from '../sim/creatures';
 import type { Game } from '../sim/game';
 import { emptyInput, type Actor, type InputFrame, type PlayerSetup } from '../sim/types';
 import { PITCH_DOWN, PITCH_UP, swimPitch, type CamState } from './camera';
@@ -124,6 +126,11 @@ export class PlayerInput {
   touchPlay = false;
   /** What the fingers did this frame, kept between `controlsFor` and the camera, as the mouse's is. */
   touchFrame: ReturnType<TouchPlay['read']> | undefined;
+  /** The left mouse button's press in progress (`stepStrike`), and what it came to this frame. */
+  strike: Strike | undefined;
+  strikeOut: StrikeOut | undefined;
+  /** Where the cursor was when the left button went down: where a dash's mark is drawn. */
+  strikeAt: { x: number; y: number } | undefined;
   /** A held double gesture keeps its original animal even after it leaves the pointer. */
   readonly pursuitTargets = new Map<number, number>();
   /** Scratch for the ray from the camera through the cursor. */
@@ -181,8 +188,6 @@ export class PlayerInput {
     if (touchPursuit) {
       if (this.touchFrame?.pursuitStart) { this.pursuitTargets.set(a.player, this.touchFrame.pursuitTargetId ?? cs.aimTarget); a.pursuit = undefined; }
       else if (this.pursuitTargets.get(a.player) === -1 && (this.touchFrame?.bites || !this.touchFrame?.ndc)) this.pursuitTargets.delete(a.player);
-    } else if (this.mouseLook && this.mouseFrame?.pursue) {
-      if (!this.pursuitTargets.has(a.player)) this.pursuitTargets.set(a.player, cs.aimTarget);
     } else this.pursuitTargets.delete(a.player);
     if (this.pursuitTargets.has(a.player)) {
       const target = this.pursuitTargets.get(a.player) ?? -1;
@@ -203,13 +208,62 @@ export class PlayerInput {
     // through a camera that has looped upside down) went somewhere else entirely. The yaw from the
     // ray's own heading and the pitch from its own climb describe any direction exactly, the pole and
     // beyond included, whichever way up the camera happens to be.
-    if (cursor && (this.mouseFrame?.right || this.touchFrame?.dash)) {
+    const mouseSeat = this.mouseLook && setups[a.player]?.device === 'keyboard' && !!this.mouseFrame;
+    const out = mouseSeat && game ? this.mouseStrike(a, game, cs, f) : undefined;
+    if (cursor && (this.mouseFrame?.right || this.touchFrame?.dash || out?.aimRay)) {
       f.camYaw = Math.atan2(cursor.x, cursor.z);
       f.camPitch = -Math.asin(clamp(cursor.y, -1, 1));
       if (Math.hypot(f.mx, f.my) < 0.3) { f.mx = 0; f.my = 1; }
     }
-    void a;
     return f;
+  }
+
+  /**
+   * The left mouse button, turned into the frame: the press is read by what it was on and the body
+   * it belongs to (`stepStrike`), and what it asks for is written here — the dash down the cursor's
+   * ray, a bite or a pounce locked on the animal it was pressed on, a chase that points the body at
+   * that animal and swims flat out, or steering, where the body swims along the camera and the
+   * mouse's motion turns them both.
+   */
+  private mouseStrike(a: Actor, game: Game, cs: CamState, f: InputFrame): StrikeOut {
+    const m = this.mouseFrame!;
+    const L = lengthOf(a);
+    const def = creature(a.creature);
+    const gapTo = (id: number) => {
+      const o = id >= 0 ? game.byId(id) : undefined;
+      return o && o.id !== a.id && isAlive(o) && !isHidden(o) ? Math.max(0, bodyGap(a, o)) : undefined;
+    };
+    const alive = isAlive(a);
+    if (m.pressed) this.strikeAt = m.ndc;
+    const { strike, out } = stepStrike(alive ? this.strike : undefined, {
+      now: performance.now() / 1000,
+      left: alive && m.left, pressed: alive && m.pressed,
+      over: this.mouse.over ? cs.aimTarget : -1,
+      gapTo,
+      biteReach: mouthReach(a, L) + def.light.lunge * L,
+      pounceReach: game.pounceRange(a),
+      canPounce: a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0,
+      state: a.state,
+    });
+    this.strike = strike; this.strikeOut = out;
+    this.mouse.steer(out.steer);
+    const neutral = Math.hypot(f.mx, f.my) < 0.3;
+    if (out.target >= 0) { f.aim = true; f.aimTarget = out.target; }
+    if (out.dash) f.dash = true;
+    if (out.bite) f.light = true;
+    if (out.pounce >= 0) f.pursueTarget = out.pounce;
+    if (out.chase >= 0) {
+      // Point the body at the animal and go: the direction is taken whole, as a dash's is, because
+      // what is being chased can be anywhere — overhead included.
+      const t = game.byId(out.chase)!;
+      const d = this.tmpDesired.set(t.pos.x - a.pos.x, t.pos.y - a.pos.y, t.pos.z - a.pos.z).normalize();
+      f.camYaw = Math.atan2(d.x, d.z);
+      f.camPitch = -Math.asin(clamp(d.y, -1, 1));
+      f.mx = 0; f.my = 1; f.burst = 1;
+    }
+    // Steering: the body swims where the camera looks, and the mouse is turning the camera.
+    if (out.steer && neutral) { f.mx = 0; f.my = 1; }
+    return out;
   }
 
   /**

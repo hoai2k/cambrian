@@ -521,7 +521,9 @@ export class Engine {
             // A finger loops the camera (`inverted` in camera.ts); everything else keeps its clamp.
             // Upside down, a sideways swipe has to turn the view the way the finger went on the
             // picture, which is the other way round in yaw — and the animal turns with it.
-            const loops = s.device === 'touch';
+            // The mouse loops too, now that holding the left button steers: the hand is flying the
+            // animal then, and a flight that stops dead at straight up is not one.
+            const loops = s.device === 'touch' || (this.input.mouseLook && s.device === 'keyboard');
             cs.yaw = wrapAngle(cs.yaw - (c.lookX * dt * 2.6 + c.lookDX * (loops ? lookFlip(cs) : 1)) * this.lookSpeed);
             const dPitch = (c.lookY * dt * 1.6 + c.lookDY) * this.lookSpeed * (this.invertY ? -1 : 1);
             cs.pitch = loops ? wrapAngle(cs.pitch + dPitch) : clamp(cs.pitch + dPitch, PITCH_UP, PITCH_DOWN);
@@ -529,7 +531,12 @@ export class Engine {
               // Left upside down with nobody turning it, the camera rights itself: the same view
               // direction taken from the right way up, and the half turn of roll that makes the swap
               // invisible eased away, so the picture turns over about the middle of the screen.
-              cs.lookIdle = c.lookDX || c.lookDY || this.input.touchFrame?.dragging ? 0 : cs.lookIdle + dt;
+              // The hand counts as busy while a finger is dragging or the left button is down, and
+              // so does a dash or a pounce: the righting waits for the body to have stopped being
+              // thrown about before it turns the picture over.
+              const busy = c.lookDX || c.lookDY || this.input.touchFrame?.dragging || this.input.mouseFrame?.left
+                || p?.state === 'dodge' || p?.state === 'pounce';
+              cs.lookIdle = busy ? 0 : cs.lookIdle + dt;
               if (inverted(cs.pitch) && cs.lookIdle > RIGHT_AFTER) {
                 const r = rightSideUp(cs.yaw, cs.pitch);
                 cs.yaw = r.yaw; cs.pitch = r.pitch; cs.roll = wrapAngle(cs.roll + r.roll);
@@ -558,7 +565,7 @@ export class Engine {
               // is already the camera. Reading its height as a tilt as well would have one gesture
               // pulling the pitch two ways.
               const edge = this.input.mouseLook && this.input.mouseFrame?.ndc && !this.input.mouseFrame.dragging ? edgePitch(this.input.mouseFrame.ndc.y) : 0;
-              if (edge !== 0) cs.pitch = clamp(cs.pitch + edge * dt, PITCH_UP, PITCH_DOWN);
+              if (edge !== 0 && !inverted(cs.pitch)) cs.pitch = clamp(cs.pitch + edge * dt, PITCH_UP, PITCH_DOWN);
               if (this.input.mouseFrame?.dragging || this.input.touchFrame?.dragging || Math.abs(c.lookX) > 0.05 || Math.abs(c.lookY) > 0.05) cs.followHold = FOLLOW_HOLD;
               else cs.followHold = Math.max(0, cs.followHold - dt);
               // Not while the view is upside down or still turning the right way up: the follow
@@ -706,7 +713,10 @@ export class Engine {
   private showCursor(m: ReturnType<MousePlay['read']>, game: Game, p: Actor | undefined, cs: CamState) {
     const over = this.input.pointingAt(game, p, cs);
     this.input.mouse.aimingAt(over !== 'none');
-    const want = m.pursue ? 'none' : cursorFor(cursorState(m, over));
+    // The pointer is put away while the left button is steering or holding a mark on an animal,
+    // and while a dash is running, whose mark the HUD draws so that it can move (`cursors.ts`).
+    const out = this.input.strikeOut;
+    const want = cursorFor(cursorState({ dragging: m.dragging, dashing: m.right || out?.mark === 'zoom', hidden: !!out && (out.steer || out.mark === 'target') }, over));
     if (want !== this.cursorNow) { this.cursorNow = want; this.container.style.cursor = want; }
   }
 
@@ -1338,7 +1348,10 @@ export class Engine {
       let aim: PlayerHud['aim'];
       // On a mouse the *cursor* is the crosshair (`src/shared/cursors.ts`), so the reticle is off:
       // two crosshairs on one screen, one of them nailed to the middle, is worse than either alone.
-      const chaseId = this.input.touchPlay ? this.input.pursuitTargets.get(i) : undefined;
+      const mouseSeat = this.input.mouseLook && this.setups[i]?.device === 'keyboard';
+      const strike = mouseSeat ? this.input.strikeOut : undefined;
+      const chaseId = this.input.touchPlay ? this.input.pursuitTargets.get(i)
+        : strike?.mark === 'target' ? strike.target : undefined;
       const chasing = chaseId != null && chaseId >= 0;
       if (p.aiming && cs && !this.input.mouseLook && !chasing && chaseId !== -1) {
         const t = lockA && isAlive(lockA) ? lockA : undefined;
@@ -1358,6 +1371,10 @@ export class Engine {
           if (screen.z >= -1 && screen.z <= 1 && Math.abs(screen.x) <= 1 && Math.abs(screen.y) <= 1)
             touchMark = { kind: 'target', at: { x: screen.x, y: screen.y } };
         }
+      } else if (strike?.mark === 'zoom' && this.input.strikeAt) {
+        touchMark = { kind: 'zoom', at: this.input.strikeAt };
+      } else if (mouseSeat && this.input.mouseFrame?.right && this.input.mouseFrame.ndc) {
+        touchMark = { kind: 'zoom', at: this.input.mouseFrame.ndc };
       } else if (chaseId !== -1 && this.input.touchPlay && this.input.touchFrame?.marker && this.input.touchFrame.ndc) {
         touchMark = { kind: this.input.touchFrame.marker, at: this.input.touchFrame.ndc };
       }
