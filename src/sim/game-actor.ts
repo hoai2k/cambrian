@@ -5,7 +5,7 @@
  */
 import { specialSlot } from './special-slot';
 import { RULES } from './era-rules';
-import { BURROWERS, HEAVY_SPECIALS, DEFENSIVE_SPECIALS, CAMOUFLAGE_DRAIN, camouflageMatch, clearPursuit, stopHiding } from './concealment';
+import { BURROWERS, HEAVY_SPECIALS, DEFENSIVE_SPECIALS, CAMOUFLAGE_DRAIN, camouflageMatch, clearPursuit, STILL_SETTLE, stillBury, stopHiding } from './concealment';
 import { abilitySpeed, stepExpansionAbility, bloomRate, grazeRate } from './expansion-abilities';
 import { clamp, damp, dist, dot, heading, len3, lerp, norm, scale as vscale, sub, v3, wrapAngle, yawOf, type Vec3 } from '../shared/math';
 import { applyScaleStats, bandOf, bodyGap, bodyRadius, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, isAlive, isHidden, lengthOf, massOf, speedFactor, staminaCost, swimCeiling } from './actors';
@@ -401,9 +401,14 @@ export function updateActor(game: Game, a: Actor, input: InputFrame, dt: number)
   // On the sand a body lies along the slope like a crawler does, and a flop holds the twist and
   // the nose-up the beach rules gave it (src/sim/beach.ts).
   const flopping = a.flopT > 0, onLand = a.wade > 0 && !a.airborne;
+  // A swimmer lying on the floor lies along it too — a ray on a slope, a fish settled into a
+  // hollow — or the uphill half of a long flat body is under the sand. Only while it is resting
+  // there: under way, the pitch follows its travel, which the floor already bends.
+  const lying = !def.ground && !a.airborne && !flopping && len3(a.vel) < Math.max(0.3, L * 0.25) && Math.abs(a.vel.y) < 0.3
+    && a.pos.y - groundHeight(game.world, a.pos.x, a.pos.z, game.scratchBoulders) <= floorClearance(a) + 0.05 + L * 0.03;
   if (!flopping) a.bank = damp(a.bank, def.ground || onLand ? 0 : clamp(-turnRate * 0.16, -0.7, 0.7), 4, dt);
   if (flopping) { /* set by the flop */ }
-  else if (def.ground || onLand) {
+  else if (def.ground || onLand || lying) {
     const ahead = groundHeight(game.world, a.pos.x + Math.sin(a.yaw) * L * 0.4, a.pos.z + Math.cos(a.yaw) * L * 0.4, game.scratchBoulders);
     const behind = groundHeight(game.world, a.pos.x - Math.sin(a.yaw) * L * 0.4, a.pos.z - Math.cos(a.yaw) * L * 0.4, game.scratchBoulders);
     a.pitch = damp(a.pitch, -Math.atan2(ahead - behind, L * 0.8), 8, dt);
@@ -483,9 +488,18 @@ export function stepUpkeep(game: Game, a: Actor, input: InputFrame, dt: number, 
     a.emergenceHeavy = false;
     if (buried && (justLight || justHeavy)) emergeStrike(game, a, def);
   }
+  // A still-burrower goes under by lying still on bare sand, and comes up by moving.
+  if (def.stillBurrow && isAlive(a) && !justAbility) {
+    const moving = Math.abs(input.mx) + Math.abs(input.my) > .08 || !!input.rise || !!input.sink || !!(input.worldMove && len3(input.worldMove) > .08);
+    const seabed = sampleHeight(a.pos.x, a.pos.z);
+    const resting = a.state === 'free' && !a.airborne && !a.ashore && a.wade === 0 && len3(a.vel) < Math.max(0.15, L * 0.1)
+      && a.pos.y - seabed <= floorClearance(a) + L * 0.05 + 0.05
+      && groundHeight(game.world, a.pos.x, a.pos.z, game.scratchBoulders) <= seabed + 1e-3;   // sand, not a rock
+    if (stillBury(a, resting, moving, dt) === 'buried') clearPursuit(a, game.actors);
+  }
   if (a.hideMode !== 'none') a.hideT += dt;
   if (a.hideMode === 'descending' && a.hideT > 10 && a.grounded && a.pos.y > sampleHeight(a.pos.x,a.pos.z) + clearanceOf(a) + .3) stopHiding(a);
-  if (a.hideMode === 'descending' && a.pos.y <= sampleHeight(a.pos.x, a.pos.z) + clearanceOf(a) + .15) {
+  if (a.hideMode === 'descending' && a.pos.y <= sampleHeight(a.pos.x, a.pos.z) + clearanceOf(a) + .15 && (!def.stillBurrow || a.hideT >= STILL_SETTLE)) {
     a.hideMode = 'burrowed'; a.hideT = 0; a.seen = 0; a.vel = v3();
     clearPursuit(a, game.actors);
     game.silt.push({pos:{...a.pos}, radius:L*.7, t:1.5});

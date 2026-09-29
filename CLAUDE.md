@@ -697,6 +697,24 @@ unless the user explicitly asks for a PR. Steps:
   nothing left, and bounding is meant to be the land gait rather than a sprint. A hop once thrown
   always finishes, including the one that carries a body over the `ashore` threshold, or a body
   walking the line restarts a hop it never gets to take.
+- **A body is held above the floor that is drawn, never inside it** (`groundHeight` in
+  `src/sim/world.ts`, `npm run seabed`). Two things were drawn above what the simulation stood bodies
+  on, and a flat animal sliding along the bottom disappeared into both. *The terrain*: the near tiles
+  are straight-edged triangles over the field, and in a hollow a triangle stands above the field — by
+  up to a unit — so the seabed a body rests on is the higher of the field and the drawn triangle
+  (`drawnSeabed`, on the `SEABED_STEP` grid), and near tiles are drawn at that grid at **every**
+  quality, since a coarser low tile stood above the field somewhere else. Its vertex heights are kept
+  in a small direct-mapped table that, like the one-entry memos, only ever holds exact values. *The
+  rocks*: a rock's top was a dome over its footprint, and the authored rocks are not domes — the
+  Devonian's boulder stood a quarter of its height above that dome towards its edge and the outcrop
+  over half. `npm run shapes` now measures each rock prop's own top (`PropShape.top`, `ROCK_PROPS` in
+  `tools/prop-shapes.mjs`) as an **envelope**: every value covers its neighbouring spokes and rings,
+  so the interpolated top can never dip inside the mesh, at the price of riding about a tenth of the
+  rock's height above it on average (more over a pile of shards, whose gaps it fills). `npm run props`
+  holds each map to its mesh and every era's rock to having one. What a body may still do is overlap a
+  rock at its edges — a glide over a low rock starts with the nose over it — because approaching a
+  rock closely is worth more than a hard shell round every body; the whole body going under is what
+  is ruled out.
 - **A body on the beach leaves prints in it.** `Tracks` in `src/render/fx.ts`, laid by
   `ShoreTracks` in `src/render/shore-fx.ts`: footprints where a walker's feet come down, a groove behind a body
   hauling itself along on its belly, and a broad slap wherever a stranded flopper lands. They fill
@@ -1427,6 +1445,14 @@ unless the user explicitly asks for a PR. Steps:
   body back to the shared state machine to be animated like anything else: not "nothing to draw"
   but "nothing special about it". Which animal has what, and how well each is actually
   attested, is `docs/research/locomotion-ideas.md`.
+- **`ground` means a walker, not an animal that likes the floor.** It is how the body *moves* —
+  legs or a foot, a paddle at best off the floor, a dash that waits for the sand — so it belongs to
+  the trilobites, the sea scorpion, the brittle star, the lobopod and the slug-footed mollusc. A fish
+  that lies on the sand all day swims like a fish: Gemuendina (a ray-shaped placoderm) and Bothriolepis
+  are swimmers, and what keeps them low is their own traits (`sandAmbush`/`diet: 'deposit'` in
+  `wanderY`, Bothriolepis' `punt` off the floor). A swimmer resting on the floor lies along its slope
+  as a walker does (`lying` in `game-actor.ts`), or the uphill half of a long flat body is in the
+  sand. The Size view still stands a `stillBurrow` animal on the floor, because that is where it lives.
 - **A stick direction is an instruction, on every body.** The tail-flip (`tailFlip`, the caridoid
   escape) used to go straight back along the animal's own axis *whatever the stick asked*, so
   Odaraia swimming forward and dashing went backwards. It now defaults backwards — asked for
@@ -2377,7 +2403,14 @@ unless the user explicitly asks for a PR. Steps:
 - A burrower shows the sand it is moving. `Sand` in `src/render/fx.ts` and `BurrowSand` in
   `src/render/shore-fx.ts`: a steady shower while a body works itself down, one throw as the floor
   closes over it, and a harder one thrown clear as it surfaces — so both ends of the act are seen
-  rather than only the disappearing. Presentation only, off the actors' own `hideMode`, so `src/sim`
+  rather than only the disappearing. While it is under, a **mound** of the floor's own sand (the
+  seabed's material, `SeaEnvironment.sediment`, in `floorColor`) shows where it lies — the fair half
+  of an ambush — rising as the sand closes and slumping as the body comes out through it, and the
+  body itself is eased into the sand and back out rather than snapped. **Gemuendina buries itself by
+  lying still** (`stillBurrow` on the card, `stillBury` in `src/sim/concealment.ts`): `STILL_BURY`
+  seconds still on bare sand (not a rock) and it works itself under over `STILL_SETTLE`, so the
+  shower has time to show; moving brings it out, as itself — the ambush out of the sand is still the
+  attack buttons' (`emergeStrike`). Presentation only, off the actors' own `hideMode`, so `src/sim`
   keeps its determinism and gains no event; the silt cloud it already pushes on burial is the
   *rule* (that is what hides the animal) and stays where it is. The grains take the biome's own
   floor colour per grain, because a burrow in the shelf mosaic and one in the black basin must not

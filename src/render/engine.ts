@@ -197,7 +197,7 @@ export class Engine {
     // The whole graph is brought up to date once a frame before the viewports draw, not once per
     // `render()` call: with split screen that walk was paid again for every viewport.
     this.scene.matrixWorldAutoUpdate = false;
-    this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.sand.points, this.tracks.mesh, this.splash.group, this.mouthfuls.group, this.eggs.group);
+    this.scene.add(this.bubbles.points, this.sparkles.points, this.impacts.group, this.silt.group, this.sand.points, this.burrowSand.mounds, this.tracks.mesh, this.splash.group, this.mouthfuls.group, this.eggs.group);
     (window as any).__cambrian = this;
     this.resize = new ResizeObserver(() => this.onResize());
     this.resize.observe(container);
@@ -646,6 +646,7 @@ export class Engine {
 
     // Views
     this.syncViews(game, camPositions, dt);
+    this.burrowSand.useMaterial(this.sea?.sediment);
     this.burrowSand.update(game, dt, this.lastFocus, this.sand);
     this.shoreTracks.update(game, this.views, this.tracks, this.scratchBoulders);
     this.bubbles.update(dt); this.sparkles.update(dt); this.splash.update(dt); this.mouthfuls.update(dt); this.sand.update(dt); this.tracks.update(dt);
@@ -1420,7 +1421,7 @@ export class Engine {
     this.assets.dispose();
     this.clearMatch();
     this.sea?.dispose();
-    this.bubbles.dispose(); this.splash.dispose(); this.sparkles.dispose(); this.impacts.dispose(); this.silt.dispose(); this.sand.dispose(); this.tracks.dispose();
+    this.bubbles.dispose(); this.splash.dispose(); this.sparkles.dispose(); this.impacts.dispose(); this.silt.dispose(); this.sand.dispose(); this.burrowSand.dispose(); this.tracks.dispose();
     this.shieldGeo.dispose();
     this.mouthfuls.dispose(); this.eggs.dispose();
     this.renderer.dispose();
