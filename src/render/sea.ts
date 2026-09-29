@@ -39,6 +39,19 @@ export interface SeaEnvironment {
 
 /** Coarse terrain and big rocks are drawn out to here around every camera (the fog limit is 300). */
 const FAR_RADIUS = 340;
+/**
+ * Past this a plant is drawn as its reduced-detail copy (`lod` on an instanced prop) rather than in
+ * full. It is decided per quarter-chunk (`LOD_CELL`) and measured the way every scenery range here
+ * is, from the camera to the cell's centre less three quarters of a cell. It is not scaled by the
+ * body's reach, because what a copy has to survive is its size on screen and that is set by the
+ * distance alone. Twenty-four keeps every cell whose centre is within forty-eight units at full
+ * detail, so the nearest far copy is twenty-five units off at worst (the corner of a diagonal
+ * cell): a crinoid there is about ninety pixels tall on a 1080-line screen, where the copy's
+ * silhouette still holds, and most far copies are a good deal further into the fog than that.
+ */
+export const SCENERY_LOD_NEAR = 24;
+/** The unit that choice is made in: a quarter of a chunk. */
+const LOD_CELL = CHUNK / 2;
 
 /**
  * Atmosphere per biome: fog colour, fog density multiplier, sky and sun intensity. Blended by the
@@ -165,13 +178,14 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     propMaterials[id] = material;
   }
   // One load per prop per sea, shared by all streamed cells. Failed loads retain their fallback.
-  const propLoads = new Map<PropId, Promise<THREE.BufferGeometry | undefined>>();
-  function useProp(id: PropId, mesh: THREE.InstancedMesh, view: ChunkView) {
-    let pending = propLoads.get(id);
+  const propLoads = new Map<string, Promise<THREE.BufferGeometry | undefined>>();
+  function useProp(id: PropId, mesh: THREE.InstancedMesh, view: ChunkView, lod = false) {
+    const key = lod ? `${id}#lod` : id;
+    let pending = propLoads.get(key);
     if (!pending) {
-      pending = loadPropGeometry(id).then(g => { if (disposed) { g.dispose(); return; } return G(g); })
-        .catch(e => { console.warn(`Keeping scenery fallback for ${id}`, e); return undefined; });
-      propLoads.set(id, pending);
+      pending = loadPropGeometry(id, undefined, undefined, lod).then(g => { if (disposed) { g.dispose(); return; } return G(g); })
+        .catch(e => { console.warn(`Keeping scenery fallback for ${key}`, e); return undefined; });
+      propLoads.set(key, pending);
     }
     void pending.then(geo => {
       if (!geo || disposed || views.get(view.key) !== view) return;
@@ -191,17 +205,50 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
    * bounding sphere, so it is frustum-culled per viewport; each carries the range past which it is
    * not worth drawing and the magnification it stops mattering at.
    */
-  interface CulledMesh { mesh: THREE.Object3D; range: number; maxLength: number; }
+  interface CulledMesh {
+    mesh: THREE.Object3D; range: number; maxLength: number;
+    /**
+     * Split a prop between its full mesh and its far copy (`SCENERY_LOD_NEAR`): unscaled distance
+     * to the quarter-chunk `cell` the batch covers, measured as `range` is.
+     */
+    cell?: { x: number; z: number }; until?: number; from?: number;
+  }
   interface ChunkView { key: number; x: number; z: number; detail: 'full' | 'far'; meshes: CulledMesh[]; own: THREE.BufferGeometry[]; flora: Flora[]; }
   const views = new Map<number, ChunkView>();
   const pending: { cx: number; cz: number; d: number; detail: 'full' | 'far' }[] = [];
   const dummy = new THREE.Object3D();
   const color = new THREE.Color();
 
+  type BatchOpts<T> = { prop?: PropId; include?: (item: T) => boolean; castShadow?: boolean; color?: (item: T) => THREE.Color; range?: number; maxLength?: number; bend?: (item: T, attr: THREE.InstancedBufferAttribute, index: number) => void };
+
+  /**
+   * One instanced batch per kind per chunk — or, for a prop with a reduced-detail copy, one per
+   * quarter of the chunk, each drawn full or far by its own distance (`SCENERY_LOD_NEAR`). A whole
+   * chunk is too coarse a unit for that choice: the four nearest chunks are where a hatchling's
+   * reed bed is thickest, and deciding for all of each at once kept plants ninety units off at
+   * full detail. The tints are taken in the chunk's own order first, because a tint may draw on
+   * the chunk's RNG and the reef's detail depends on that order.
+   */
   const instanced = <T extends { pos: { x: number; y: number; z: number } }>(
     view: ChunkView, name: string, geo: THREE.BufferGeometry, mat: THREE.Material, arr: T[],
-    place: (item: T, d: THREE.Object3D) => void,
-    opts: { prop?: PropId; include?: (item: T) => boolean; castShadow?: boolean; color?: (item: T) => THREE.Color; range?: number; maxLength?: number; bend?: (item: T, attr: THREE.InstancedBufferAttribute, index: number) => void } = {},
+    place: (item: T, d: THREE.Object3D) => void, opts: BatchOpts<T> = {},
+  ) => {
+    const lod = !!opts.prop && !!scenery?.props[opts.prop]?.lod && (opts.range ?? 1e6) > SCENERY_LOD_NEAR;
+    if (!lod) { batch(view, name, geo, mat, arr, place, opts); return; }
+    const tints = new Map<T, THREE.Color>();
+    for (const it of arr) { const t = opts.color?.(it); if (t) tints.set(it, t.clone()); }
+    const kept = opts.include ? arr.filter(opts.include) : arr;
+    const quarter = (it: T) => (it.pos.x < view.x ? 0 : 1) + (it.pos.z < view.z ? 0 : 2);
+    for (let q = 0; q < 4; q++) {
+      const cell = { x: view.x + (q & 1 ? 1 : -1) * LOD_CELL / 2, z: view.z + (q & 2 ? 1 : -1) * LOD_CELL / 2 };
+      batch(view, name, geo, mat, kept.filter((it) => quarter(it) === q), place,
+        { ...opts, include: undefined, color: opts.color && ((it: T) => tints.get(it)!) }, cell);
+    }
+  };
+
+  const batch = <T extends { pos: { x: number; y: number; z: number } }>(
+    view: ChunkView, name: string, geo: THREE.BufferGeometry, mat: THREE.Material, arr: T[],
+    place: (item: T, d: THREE.Object3D) => void, opts: BatchOpts<T>, cell?: { x: number; z: number },
   ) => {
     const count = opts.include ? arr.filter(opts.include).length : arr.length;
     // Consume the original tint RNG even for replaced objects, preserving the reef's detail.
@@ -227,8 +274,19 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
     });
     im.computeBoundingSphere();
     group.add(im);
-    view.meshes.push({ mesh: im, range: opts.range ?? 1e6, maxLength: opts.maxLength ?? Infinity });
+    const range = opts.range ?? 1e6, maxLength = opts.maxLength ?? Infinity;
+    view.meshes.push({ mesh: im, range, maxLength, cell, until: cell && SCENERY_LOD_NEAR });
     if (opts.prop) useProp(opts.prop, im, view);
+    if (!cell) return;
+    // The far copy is a second mesh over the same instances: it shares the matrices, the tints and
+    // the bend, so a plant leaning in one is leaning in the other.
+    const far = new THREE.InstancedMesh(cg, mat, count);
+    far.instanceMatrix = im.instanceMatrix; far.instanceColor = im.instanceColor;
+    far.name = `${name}-far`; far.castShadow = im.castShadow; far.receiveShadow = true;
+    far.computeBoundingSphere();
+    group.add(far);
+    view.meshes.push({ mesh: far, range, maxLength, cell, from: SCENERY_LOD_NEAR });
+    useProp(opts.prop!, far, view, true);
   };
 
   /**
@@ -766,7 +824,14 @@ export function createSea(scene: THREE.Scene, world: WorldData, quality: Quality
       const reach = THREE.MathUtils.clamp(0.75 + L * 0.14, 0.85, 1.9);
       for (const v of views.values()) {
         const d = Math.hypot(camX - v.x, camZ - v.z) - CHUNK * 0.75;
-        for (const c of v.meshes) c.mesh.visible = L < c.maxLength && d < c.range * reach;
+        for (const c of v.meshes) {
+          let show = L < c.maxLength && d < c.range * reach;
+          if (show && c.cell) {
+            const dc = Math.hypot(camX - c.cell.x, camZ - c.cell.z) - LOD_CELL * 0.75;
+            show = c.until !== undefined ? dc < c.until : dc >= c.from!;
+          }
+          c.mesh.visible = show;
+        }
       }
       (particles.material as THREE.ShaderMaterial).opacity = 1;
       particles.scale.setScalar(THREE.MathUtils.clamp(L * 0.6, 0.6, 3));

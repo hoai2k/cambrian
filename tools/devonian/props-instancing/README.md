@@ -43,7 +43,30 @@ The same deterministic QA camera (seed 5052026) records:
 | Final low, authored rocks only | 104 | 1,307,304 |
 | Final high, authored flora + rocks | 104 | 8,087,473 |
 
-Low overhead is **96,101 triangles / 7.93%**, rather than the initial unrestricted candidate's 6.50× regression. High is still costly in dense scenes because thousands of crinoids/algae are instanced; dedicated scatter LODs remain future work. No seed or density was changed to hide cost. These counters are the colour pass with shadows disabled in the controlled QA renderer; the game's high shadow passes add their own cost. SwiftShader verifies correctness, so no real-device FPS claim is made.
+Low overhead is **96,101 triangles / 7.93%**, rather than the initial unrestricted candidate's 6.50× regression. High was still costly in dense scenes because thousands of crinoids/algae are instanced; the far copies below answer that. No seed or density was changed to hide cost. These counters are the colour pass with shadows disabled in the controlled QA renderer; the game's high shadow passes add their own cost. SwiftShader verifies correctness, so no real-device FPS claim is made.
+
+## Far copies
+
+Each flora proxy has a reduced-detail copy, `<id>.lod1.glb`, written beside it by
+`node tools/devonian/props-instancing/lods.mjs` and named as `lod` in `scenery.ts`. Past
+`SCENERY_LOD_NEAR` (`src/render/sea.ts`) a quarter-chunk draws the copy instead of the full prop.
+The copy shares the full prop's instance matrices, tints and bend.
+
+| Placement | Full | Far copy |
+|---|---:|---:|
+| crinoid | 2,154 | 560 (rebuilt from its parts) |
+| reed | 1,600 | 240 |
+| stromatoporoid | 1,400 | 210 |
+| tabulate | 1,800 | 270 |
+| rugose | 2,239 | 559 |
+| bryozoan | 1,621 | 404 |
+| log | 1,588 | 396 |
+
+The crinoid cannot be simplified whole. It is 727 separate pieces, and a simplifier erases every
+thin one, so the tool rebuilds it: the stem is one tube through the discs' centres, and the arms
+are kept whole. The copies are render-only; collision is measured off the full prop, and
+`npm run props` checks each copy keeps the full prop's height, pivot and reach. Re-run the tool
+after any flora proxy is rebuilt.
 
 ## Reproduce
 
@@ -53,6 +76,7 @@ Run from the repository root with Node on PATH. The local authoring directory is
 node tools/devonian/props-instancing/decode.mjs
 /Applications/Blender.app/Contents/MacOS/Blender -b --threads 2 --python tools/devonian/props-instancing/build.py
 node tools/devonian/props-instancing/package.mjs
+node tools/devonian/props-instancing/lods.mjs
 node_modules/.bin/esbuild tools/devonian/props-instancing/loader-test.ts --bundle --platform=node --format=esm --external:three '--external:three/*' --outfile=node_modules/.cache/props-loader-test.mjs
 node node_modules/.cache/props-loader-test.mjs
 npm run typecheck

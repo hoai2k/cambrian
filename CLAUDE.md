@@ -1553,6 +1553,15 @@ unless the user explicitly asks for a PR. Steps:
   antialiasing first on low, taken once a session because it costs a new renderer. Nothing changes
   while frames are fine, hitches over 150 ms do not count, and browser automation is left alone so
   a harness measuring pixels keeps its resolution.
+- **A plant planted by the thousand has a far copy** (`lod` on an instanced prop, the Devonian's
+  seven flora kinds, `tools/devonian/props-instancing/lods.mjs`). Past `SCENERY_LOD_NEAR` a
+  quarter-chunk draws the copy over the same instances, so the matrices, tints and bend are
+  shared, and the choice is made per viewport. Crinoids and reeds were 5.5 M of a Devonian frame's
+  9.3 M triangles; main-pass scenery is now 2.4–3.0 M. A copy is render-only and collision stays on
+  the full prop, so `npm run props` holds each copy to the full prop's height, pivot and reach.
+  **The crinoid is rebuilt rather than simplified:** it is 727 separate pieces, and a simplifier
+  erases every thin one and leaves a dotted stick with a ball on it. Re-run the tool whenever a
+  proxy is rebuilt.
 - **Sprint is gone, and the dash is as long as it is held.** A steered body has one way of putting
   its back into a move. `toInput` sends `burst: 0` for a player and LB — which used to hold the
   sprint — is a second dash button; the burst machinery stays because the AI drives it and a

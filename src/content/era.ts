@@ -54,6 +54,12 @@ export interface InstancedScenery {
     readonly sway?: boolean;
     readonly bend?: boolean;
     readonly doubleSided?: boolean;
+    /**
+     * A reduced-detail copy drawn in chunks past `SCENERY_LOD_NEAR` (src/render/sea.ts): the same
+     * silhouette, pigment and pivot in a fraction of the triangles, for plants planted by the
+     * thousand. Render-only; collision is measured off `path`.
+     */
+    readonly lod?: string;
   }>>;
   /**
    * Which prop draws each plant kind. A kind may name **several**, and then it is one family with

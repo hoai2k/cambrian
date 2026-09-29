@@ -1,10 +1,11 @@
 # Performance: what is held for review
 
 From the September 2026 performance audit. Everything else the audit recommended has landed on
-`main`; these are held because they would change how the game looks or feels, or because the
-measurement said the change would not pay. Each needs a decision before anyone builds it.
+`main`, item 11 included (below). Items 9, 10 and 14 are held because they would change how the
+game looks or feels, or because the measurement said the change would not pay. Each needs a
+decision before anyone builds it.
 
-## Why the Devonian draws 9.3 M triangles a frame (investigation only)
+## Why the Devonian drew 9.3 M triangles a frame (audit item 11, done)
 
 Measured in a real Devonian match at high quality, one frame, per draw (the Cambrian beside it):
 
@@ -14,7 +15,7 @@ Measured in a real Devonian match at high quality, one frame, per draw (the Camb
 | Scenery, main pass | 7.39 M | 1.78 M |
 | Shadow pass | 0.25 M | 0.12 M |
 
-Almost all of it is two plants:
+Almost all of it was two plants:
 
 - **Crinoids: 3.66 M triangles in 7 draws.** Each is 2,154 triangles
   (`public/assets/devonian/props-instanced/devonian-crinoid.glb`). The forest band plants them at
@@ -22,18 +23,23 @@ Almost all of it is two plants:
 - **Reeds (`devonian-algal-clump`): 1.86 M in 7 draws.** Each is 1,600 triangles, and the
   nursery and the shallows plant them at 26 and 16, so about 1,160 are drawn.
 
-Creatures are not the problem: the per-frame creature budget works as designed.
+**What was done:** every Devonian plant prop now has a reduced-detail copy
+(`<id>.lod1.glb`, built by `tools/devonian/props-instancing/lods.mjs`), drawn instead of the full
+one past `SCENERY_LOD_NEAR` in `src/render/sea.ts`. The choice is made per quarter-chunk and per
+viewport, so split screen gets it right for every seat.
 
-Ways out, in rough order of how little they change the picture:
+- **The copies.** Six kinds are simplified by meshopt at 15–25 %. The crinoid is rebuilt from its
+  own parts (560 triangles against 2,154), because a simplifier erases its thin arms and pinnules
+  and breaks its stem of seventy separate discs into dots.
+- **Render-only.** Collision is still measured off the full prop, and `npm run props` checks that
+  each copy keeps the full prop's height, pivot and reach.
+- **Results.** Main-pass scenery went from 8.8–9.0 M triangles to 2.4–3.0 M across four runs. That
+  cost about 75 more instanced draws (scenery 120 → 200). In the same scene with and without the
+  copies, 180 of 921,600 pixels differ, all in the fogged background.
 
-1. **A decimated copy of each plant past a few tens of units.** Every creature already has one
-   (`lod1`). A 300-triangle crinoid drawn past about 25 units would take most of the 3.66 M away,
-   and those plants are fog-washed at that range anyway. This needs new prop meshes built by the
-   prop pipeline, which is the reason it is held.
-2. **A shorter draw range for these two kinds** (`range` on the flora meshes in
-   `src/render/sea.ts`). This is cheap, but the carpet thins out visibly at the edge of the fog.
-3. **Thinner forest and nursery density.** This is a design change: that density is the cover a
-   hatchling hides in.
+The other two ways out stay available if more is ever needed: a shorter draw range for these
+kinds (the carpet thins visibly at the fog's edge), or thinner forest and nursery density (a design
+change, since that density is the cover a hatchling hides in).
 
 ## A step cap for slow frames (audit item 9)
 
@@ -52,7 +58,7 @@ Held because the measurement says it would not pay:
 - Batching chunks into larger regions coarsens culling, so each region draws more of what is off
   screen. That makes the real problem worse.
 
-The plant copies above would do more.
+The plant copies above did more.
 
 ## Creature textures (audit item 14)
 

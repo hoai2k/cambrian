@@ -16,9 +16,11 @@ import { appBase } from '../shared/base';
 export type PropId = string;
 
 /** Caller owns the returned geometry; source materials, textures and rig helpers are released. */
-export async function loadPropGeometry(id: PropId, base = appBase(), scenery: InstancedScenery | undefined = ACTIVE_ERA.assets.instancedScenery): Promise<BufferGeometry> {
+export async function loadPropGeometry(id: PropId, base = appBase(), scenery: InstancedScenery | undefined = ACTIVE_ERA.assets.instancedScenery, lod = false): Promise<BufferGeometry> {
   const override = scenery?.props[id];
-  const gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(`${base}${override?.path ?? assetPaths.prop(id)}`);
+  if (lod && !override?.lod) throw new Error(`No reduced-detail copy of ${id}`);
+  const file = lod ? override!.lod : override?.path;
+  const gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(`${base}${file ?? assetPaths.prop(id)}`);
   const meshes: Mesh[] = [];
   gltf.scene.updateMatrixWorld(true);
   gltf.scene.traverse(o => { if (o instanceof Mesh) meshes.push(o); });
@@ -48,7 +50,7 @@ export async function loadPropGeometry(id: PropId, base = appBase(), scenery: In
     }
     const geometry = mergeGeometries(parts, false);
     if (!geometry) throw new Error(`Cannot merge instanced prop: ${id}`);
-    geometry.name = id;
+    geometry.name = lod ? `${id}.lod1` : id;
     geometry.computeBoundingBox(); geometry.computeBoundingSphere();
     return geometry;
   } finally {
