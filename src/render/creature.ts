@@ -63,6 +63,53 @@ export async function ensureLoaded(id: CreatureId, onProgress?: (loaded: number,
   return l;
 }
 
+/**
+ * How many views are drawing each loaded body, and when one last was. A full-detail body is the
+ * largest thing the game holds — tens to hundreds of megabytes of texture once decoded, the whole
+ * Devonian roster about 1.5 GB — and nothing used to let one go, so a long match kept every animal
+ * it had ever swum past. `evictIdleModels` frees the ones nothing is drawing.
+ */
+const refs = new Map<string, number>();
+const lastUse = new Map<string, number>();
+function retainModel(key: string) { refs.set(key, (refs.get(key) ?? 0) + 1); lastUse.set(key, performance.now()); }
+function releaseModel(key: string) { refs.set(key, Math.max(0, (refs.get(key) ?? 1) - 1)); lastUse.set(key, performance.now()); }
+
+/**
+ * Free the full-detail bodies no view is drawing, keeping the `spare` most recently used of them
+ * (a body that has just swum out of view is the likeliest to swim back) and anything in `keep`
+ * (the players' own). The decimated copies are small and are kept. A body freed here is simply
+ * loaded again the next time something needs it, from the browser's cache.
+ */
+export function evictIdleModels(keep: ReadonlySet<CreatureId>, spare: number) {
+  const idle: string[] = [];
+  for (const key of loadedMap.keys()) {
+    const [id, lod] = key.split(':');
+    if (lod !== '0' || (refs.get(key) ?? 0) > 0 || keep.has(id as CreatureId)) continue;
+    idle.push(key);
+  }
+  if (idle.length <= spare) return 0;
+  idle.sort((a, b) => (lastUse.get(b) ?? 0) - (lastUse.get(a) ?? 0));
+  const gone = idle.slice(spare);
+  for (const key of gone) {
+    disposeLoaded(loadedMap.get(key)!);
+    loadedMap.delete(key); cache.delete(key); refs.delete(key); lastUse.delete(key);
+  }
+  return gone.length;
+}
+
+/** Everything a loaded body owns on the GPU and off it: geometry, materials, textures, skeletons. */
+function disposeLoaded(l: Loaded) {
+  l.gltf.scene.traverse((o) => {
+    if (!(o instanceof THREE.Mesh)) return;
+    o.geometry.dispose();
+    for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
+      for (const v of Object.values(m)) if (v instanceof THREE.Texture) { (v.image as { close?: () => void } | undefined)?.close?.(); v.dispose(); }
+      m.dispose();
+    }
+    if (o instanceof THREE.SkinnedMesh) o.skeleton.dispose();
+  });
+}
+
 const SPINE_RE = /^(body|segment)_(\d+)$/;
 /**
  * Rigs whose Eat clip is an authored reach/grasp/carry performance, scrubbed by consumption progress
@@ -131,6 +178,7 @@ export class CreatureView {
   readonly authoredFeeding?: AuthoredFeeding;
 
   constructor(readonly creatureId: CreatureId, loaded: Loaded, private shared: { shieldGeo: THREE.BufferGeometry }, readonly lod: Lod = 0) {
+    retainModel(`${creatureId}:${lod}`);
     this.def = creature(creatureId);
     this.model = SkeletonUtils.clone(loaded.gltf.scene);
     this.model.scale.setScalar(loaded.unit);
@@ -578,7 +626,11 @@ export class CreatureView {
     this.lastUpdate = time;
   }
 
+  private disposed = false;
   dispose() {
+    if (this.disposed) return;
+    this.disposed = true;
+    releaseModel(`${this.creatureId}:${this.lod}`);
     this.mixer.stopAllAction();
     this.mixer.uncacheRoot(this.model);
     this.materials.forEach((m) => m.dispose());

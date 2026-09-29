@@ -62,7 +62,12 @@ export class AssetQueue {
   private disposed = false;
 
   constructor(private conserveMemory = false) {
-    this.wanted = new Set<CreatureId>(conserveMemory ? [ACTIVE_ERA.defaults.player] : ACTIVE_ERA.defaults.boot);
+    // Full bodies are fetched for what is picked, not for what the title screen might show: the
+    // title and the pick screen are painted over the whole window, and the sea behind them draws
+    // decimated copies perfectly well. The boot list used to be fetched whole behind the title — 31 MB
+    // in the Cambrian and 62 MB in the Devonian, each one a main-thread decode — before anybody
+    // had chosen anything.
+    this.wanted = new Set<CreatureId>([ACTIVE_ERA.defaults.player]);
     this.lodWanted = new Set<CreatureId>([ACTIVE_ERA.defaults.player, ...ACTIVE_ERA.defaults.title]);
     const B = base();
     // A creature still borrowing another's body has no art of its own either; the pick screen
@@ -107,8 +112,6 @@ export class AssetQueue {
     if (on) {
       this.wanted = new Set<CreatureId>([ACTIVE_ERA.defaults.player]);
       this.lodWanted = new Set<CreatureId>([ACTIVE_ERA.defaults.player, ...ACTIVE_ERA.defaults.title]);
-    } else {
-      for (const id of ACTIVE_ERA.defaults.boot) this.wanted.add(id);
     }
     this.pump();
   }
@@ -144,13 +147,17 @@ export class AssetQueue {
     put('select', creaturePortrait(id, 'select').src, SELECT_SIZE, 255);
   }
 
-  prioritize(creatures: CreatureId[], phase: 'boot' | 'title' | 'select' | 'playing', committed: CreatureId[] = []) {
+  prioritize(creatures: CreatureId[], phase: 'boot' | 'title' | 'select' | 'playing', committed: CreatureId[] = [], hovered: CreatureId[] = []) {
     if (this.conserveMemory) {
       // Browsing the roster uses portraits. A confirmed choice is worth preloading, while
       // merely hovering dozens of animals must not leave dozens of full rigs resident.
       if (phase === 'select') for (const id of committed) this.wanted.add(id);
-      if (phase === 'playing') for (const id of creatures) this.wanted.add(id);
-    } else for (const id of creatures) this.wanted.add(id);
+    } else if (phase === 'select') {
+      // What a player has picked or is resting on is worth a body in advance, so the match starts
+      // on it; the roster neighbours are only worth their tiles (ordered below).
+      for (const id of [...committed, ...hovered]) this.wanted.add(id);
+    }
+    if (phase === 'playing') for (const id of creatures) this.wanted.add(id);
     const order = [...creatures, ...WILD_IDS.filter((c) => !creatures.includes(c))];
     order.forEach((id, i) => {
       // A visitor from another game is not on this era's list and so has no queue entry of its

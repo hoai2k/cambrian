@@ -2,7 +2,7 @@ import { ACTIVE_ERA } from '../content';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { audio } from '../audio/audio';
 import type { AssetProgress } from '../render/assets';
-import { Engine } from '../render/engine';
+import type { Engine } from '../render/engine';
 import type { HudSnapshot } from '../shared/hud-types';
 import { hudStore, useHud, useHudShell } from './hud-store';
 import type { TouchTravelActions } from './Hud';
@@ -261,10 +261,24 @@ export function App() {
   const setPausedBoth = useCallback((p: boolean) => { setPausedState(p); engineRef.current?.setPaused(p || dialogRef.current !== null); }, [setPausedState, dialogRef]);
   const openDialog = useCallback((d: DialogKind) => { setDialogBoth(d); engineRef.current?.setPaused(pausedRef.current || d !== null); if (d) audio.play('ui-confirm'); else audio.play('ui-back'); }, [setDialogBoth, pausedRef]);
 
-  // Engine lifecycle
+  // Engine lifecycle.
+  //
+  // The engine, and three.js with it, is most of the game's script, and the title screen needs none
+  // of it to be drawn. So it is fetched after the title painting is on screen rather than ahead of
+  // it: the page used to stay blank until about 400 KB of compressed script had arrived. Anything
+  // that talks to the engine re-runs once it exists (`engineReady`).
+  const [engineReady, setEngineReady] = useState(false);
   useEffect(() => {
-    if (!canvasRef.current) return;
-    const engine = new Engine(canvasRef.current, settings.quality, {
+    let cancelled = false, engine: Engine | undefined;
+    void titleShown().then(() => import('../render/engine')).then(({ Engine }) => {
+      if (cancelled || !canvasRef.current) return;
+      engine = makeEngine(new Engine(canvasRef.current, settings.quality, engineCallbacks()));
+    });
+    return () => { cancelled = true; engine?.dispose(); engineRef.current = null; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  function engineCallbacks(): ConstructorParameters<typeof Engine>[2] {
+    return {
       onHud: (s) => {
         hudStore.set(s);
         keepFinds(s.discovery);
@@ -284,7 +298,9 @@ export function App() {
         setSettings((x) => ({ ...x, secondary: sec }));
         setSwapTick((n) => n + 1);
       },
-    });
+    };
+  }
+  function makeEngine(engine: Engine) {
     engineRef.current = engine;
     engine.setOrientationBlocked(false);
     // Visitors stream like anything else. Queued here rather than where they are registered,
@@ -292,11 +308,11 @@ export function App() {
     // until the engine exists.
     for (const v of visitorsRef.current) engine.assets.addVisitor(v.id);
     engine.setLook(settings.lookSpeed, settings.invertY);
-    return () => { engine.dispose(); engineRef.current = null; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setEngineReady(true);
+    return engine;
+  }
 
-  useLayoutEffect(() => { engineRef.current?.setOrientationBlocked(orientationBlocked); }, [orientationBlocked]);
+  useLayoutEffect(() => { engineRef.current?.setOrientationBlocked(orientationBlocked); }, [orientationBlocked, engineReady]);
 
   useEffect(() => {
     engineRef.current?.setQuality(settings.quality);
@@ -309,7 +325,7 @@ export function App() {
     RULES.settings?.shoreAnimals?.(settings.shoreAnimals);
     audio.setVolume(settings.volume); audio.setMuted(settings.muted); audio.setMusic(settings.music);
     try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch { /* ignore */ }
-  }, [settings]);
+  }, [settings, engineReady]);
 
   /**
    * Fullscreen tracking, and carrying it across a change of game.
@@ -674,9 +690,9 @@ export function App() {
       const committed = players.filter((p) => p.ready).map((p) => p.creature);
       const hovered = players.filter((p) => !p.ready).map((p) => p.creature);
       const neighbours = players.flatMap((p) => { const i = CREATURE_IDS.indexOf(p.creature); return [i + 1, i - 1, i + cols, i - cols].filter((j) => j >= 0 && j < n).map((j) => CREATURE_IDS[j]); });
-      e.prioritize([...new Set([...committed, ...hovered, ...neighbours])], 'select', committed);
+      e.prioritize([...new Set([...committed, ...hovered, ...neighbours])], 'select', committed, hovered);
     } else e.prioritize([...new Set(players.map((p) => p.creature))], 'playing');
-  }, [screen, players, loaded]);
+  }, [screen, players, loaded, engineReady]);
 
   const allReady = players.length > 0 && players.every((p) => p.ready);
   // Menus are shared, so they speak whichever device is in the room. A pad the browser has not
@@ -882,4 +898,21 @@ function LiveHud({ touchTravel }: { touchTravel?: TouchTravelActions }) {
 function LiveResults(props: Omit<Parameters<typeof Results>[0], 'snapshot'>) {
   const snapshot = useHud();
   return snapshot ? <Results snapshot={snapshot as HudSnapshot} {...props} /> : null;
+}
+
+/**
+ * Resolves once the title painting is on screen — or at once, where there is none to wait for (a
+ * deep link to the roster) — so the engine is not fetched ahead of the picture the player is waiting
+ * to see. Bounded, so a painting that never arrives cannot hold the game back.
+ */
+function titleShown(): Promise<void> {
+  return new Promise((resolve) => {
+    const done = () => { clearTimeout(timer); resolve(); };
+    const timer = setTimeout(done, 1500);
+    requestAnimationFrame(() => {
+      const img = document.querySelector<HTMLImageElement>('.title-illustration');
+      if (!img || img.complete) done();
+      else { img.addEventListener('load', done, { once: true }); img.addEventListener('error', done, { once: true }); }
+    });
+  });
 }
