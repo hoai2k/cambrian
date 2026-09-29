@@ -181,8 +181,8 @@ try {
   if (process.env.DEBUG_STRIKE) {
     for (let k = 0; k < 8; k++) {
       await frames(4);
-      console.log(await page.evaluate((t) => { const e = window.__cambrian, g = e.game, a = g.players[0], o = g.byId(t);
-        return [a.state, e.input.strike?.kind, Math.hypot(o.pos.x - a.pos.x, o.pos.y - a.pos.y, o.pos.z - a.pos.z).toFixed(2), g.pounceRange(a).toFixed(2), a.stamina.toFixed(0), a.pounceCd.toFixed(2), Math.hypot(a.vel.x, a.vel.y, a.vel.z).toFixed(2)]; }, id));
+      console.log("CHASE", JSON.stringify(await page.evaluate((t) => { const e = window.__cambrian, g = e.game, a = g.players[0], o = g.byId(t);
+        return [a.state, e.input.strike?.kind, Math.hypot(o.pos.x - a.pos.x, o.pos.y - a.pos.y, o.pos.z - a.pos.z).toFixed(2), g.pounceRange(a).toFixed(2), a.stamina.toFixed(0), a.pounceCd.toFixed(2), Math.hypot(a.vel.x, a.vel.y, a.vel.z).toFixed(2), JSON.stringify(e.input.strikeOut)]; }, id)));
     }
   }
   await page.waitForFunction(() => !!window.__seen, null, { timeout: 60000 });
