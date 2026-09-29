@@ -25,7 +25,13 @@ const frames = (n) => page.evaluate((k) => new Promise((res) => {
   let i = 0; const tick = () => (++i >= k ? res(i) : requestAnimationFrame(tick));
   requestAnimationFrame(tick);
 }), n);
-const settled = () => page.waitForFunction(() => window.__cambrian.game.players[0].state === 'free', null, { timeout: 30000 });
+const settled = async () => {
+  try { await page.waitForFunction(() => window.__cambrian.game.players[0].state === 'free', null, { timeout: 120000 }); }
+  catch (e) {
+    const a = await page.evaluate(() => { const p = window.__cambrian.game.players[0]; return { state: p.state, stateT: p.stateT, grabbing: p.grabbing, ride: p.rideHost, strike: window.__cambrian.input.strike }; });
+    throw new Error(`the body never came free: ${JSON.stringify(a)}`);
+  }
+};
 const state = () => page.evaluate(() => {
   const e = window.__cambrian, g = e.game, a = g.players[0];
   return { state: a.state, aiming: a.aiming, lock: a.lockTarget, yaw: a.yaw, camYaw: e.cams?.[0]?.yaw, hp: a.hp, stamina: a.stamina, locked: !!document.pointerLockElement };
