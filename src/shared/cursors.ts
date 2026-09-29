@@ -6,23 +6,28 @@
  * in mouse play precisely because this replaces it, and two crosshairs on one screen, one of them
  * stuck in the middle, is worse than either alone.
  *
- * Six states, each a different drawing rather than a recolour of one, so they are told apart at a
+ * The states, each a different drawing rather than a recolour of one, so they are told apart at a
  * glance and without relying on colour:
  *
  *   - `idle`    a faint open cross. Over nothing in particular.
  *   - `edible`  a green ring on the cross: something you could eat.
- *   - `attack`  a red ring with barbs: something that is a fight.
- *   - `target`  four arrows pointing inwards, while the left button is held on a target. The
- *               pounce is winding up, and the arrows say the animal is being closed on.
- *   - `zoom`    a forward arrow with speed lines, while the right button dashes at the cursor.
- *   - `look`    a hand, while a drag is turning the camera.
+ *   - `attack`  a red ring with barbs: something that is a fight. Also the mark held on an animal a
+ *               press is chasing or pouncing at, drawn by the HUD where that animal is.
+ *   - `zoom`    the dash. Not a drawing of its own: it is the idle cross, drawn by the HUD rather
+ *               than as the CSS cursor because a CSS cursor cannot move — it shrinks away as the
+ *               dash is thrown, as though the mark had been flung into the distance, and grows back
+ *               as the body arrives where it was (`.touch-cursor.dashing`). An arrow pointing up
+ *               said "forward" on a screen where forward is into it.
+ *   - `look`    a hand, while the middle button is dragging the view.
+ *   - `hidden`  no pointer at all, while the left button is steering or a chase is holding the
+ *               mark on an animal: the mouse is not pointing then, it is swimming.
  *
  * Each is one SVG data URI with its hotspot named, which is all a CSS `cursor` is. They are drawn
  * here rather than shipped as files because every one of them is a dozen lines of path data: a
  * build step and six more network requests would buy nothing, and a cursor that has not loaded is
  * a cursor that is not there.
  */
-export type CursorState = 'idle' | 'edible' | 'attack' | 'target' | 'zoom' | 'look' | 'menu';
+export type CursorState = 'idle' | 'edible' | 'attack' | 'zoom' | 'look' | 'hidden' | 'menu';
 
 /** Wrap an SVG body as a cursor, with the hotspot at its centre. */
 const svg = (size: number, body: string) =>
@@ -46,30 +51,20 @@ const ATTACK = svg(32, shadow(cross('#04141a', 4)) + cross('#ff8a6a', 2)
   + `<circle cx="16" cy="16" r="7.5" fill="none" stroke="#04141a" stroke-width="3.4" opacity="0.55"/>`
   + `<circle cx="16" cy="16" r="7.5" fill="none" stroke="#ff8a6a" stroke-width="2"/>`
   + `<g stroke="#ff8a6a" stroke-width="2" stroke-linecap="round"><path d="M16 4.5V8M16 24V27.5M4.5 16H8M24 16H27.5"/></g>`);
-/** Four arrows closing inwards: the pounce is winding up on the animal under the cursor. */
-const arrow = (c: string, w: number) =>
-  `<g stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" fill="none">`
-  + `<path d="M16 3.5l-4 5h8zM16 28.5l-4-5h8zM3.5 16l5-4v8zM28.5 16l-5-4v8z"/></g>`;
-const TARGET = svg(32, shadow(arrow('#04141a', 5)) + arrow('#ffd08a', 2.2)
-  + `<circle cx="16" cy="16" r="2.4" fill="#ffd08a"/>`);
-/** Forward, fast: an arrow with the water streaming past it. */
-const ZOOM_BODY = `<g stroke="#9ff6ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">`
-  + `<path d="M16 5l7 9h-4.5v13h-5V14H9z"/></g>`
-  + `<g stroke="#9ff6ff" stroke-width="1.6" stroke-linecap="round" opacity="0.8"><path d="M5 22v6M27 22v6"/></g>`;
-const ZOOM = svg(32, shadow(ZOOM_BODY.replace(/#9ff6ff/g, '#04141a').replace(/stroke-width="2.2"/, 'stroke-width="5"')) + ZOOM_BODY);
 /** The browser's own grab hands: every player already knows what they mean. */
 const LOOK = 'grabbing';
 
+/** The dash and the hidden states put the CSS pointer away: the HUD draws the dash itself. */
 const CURSORS: Record<CursorState, string> = {
-  idle: IDLE, edible: EDIBLE, attack: ATTACK, target: TARGET, zoom: ZOOM, look: LOOK, menu: '',
+  idle: IDLE, edible: EDIBLE, attack: ATTACK, zoom: 'none', look: LOOK, hidden: 'none', menu: '',
 };
 
 /** The CSS `cursor` value for this state. `menu` is the empty string: the page's own pointer. */
 export const cursorFor = (s: CursorState): string => CURSORS[s];
 
-/** The same artwork as an image for touch, where a CSS mouse cursor is never visible. */
-export const cursorImageFor = (s: 'idle' | 'edible' | 'attack' | 'target' | 'zoom'): string =>
-  CURSORS[s].match(/^url\("([^"]+)"\)/)?.[1] ?? '';
+/** The artwork as an image, for the marks the HUD draws itself. The dash is the idle cross. */
+export const cursorImageFor = (s: 'idle' | 'edible' | 'attack' | 'zoom'): string =>
+  (s === 'zoom' ? IDLE : CURSORS[s]).match(/^url\("([^"]+)"\)/)?.[1] ?? '';
 
 /**
  * Which cursor the match wants, from what the mouse is doing and what it is over.
@@ -77,9 +72,9 @@ export const cursorImageFor = (s: 'idle' | 'edible' | 'attack' | 'target' | 'zoo
  * Order matters and is the order a player reads it in: what a held button is *doing* beats what the
  * cursor is *over*, because a press in progress is the more urgent fact.
  */
-export function cursorState(m: { dragging: boolean; right: boolean; pressing: boolean }, over: 'none' | 'edible' | 'attack'): CursorState {
-  if (m.right) return 'zoom';
+export function cursorState(m: { dragging: boolean; dashing: boolean; hidden: boolean }, over: 'none' | 'edible' | 'attack'): CursorState {
+  if (m.hidden) return 'hidden';
+  if (m.dashing) return 'zoom';
   if (m.dragging) return 'look';
-  if (m.pressing && over !== 'none') return 'target';
   return over === 'edible' ? 'edible' : over === 'attack' ? 'attack' : 'idle';
 }

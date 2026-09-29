@@ -434,7 +434,7 @@ check('a mouse never does', touchFirst(false, false, 0) === false);
 check('a touch laptop being used with its trackpad does not', touchFirst(true, true, 0) === false);
 check('a pad in the session wins, as it does over the mouse', touchFirst(true, false, 1) === false);
 
-check('touch marks reuse the mouse art', cursorFor('zoom').includes(cursorImageFor('zoom')) && cursorFor('target').includes(cursorImageFor('target')));
+check('touch marks reuse the mouse art', cursorFor('attack').includes(cursorImageFor('attack')) && cursorFor('idle').includes(cursorImageFor('zoom')));
 
 // The roster's columns. `gridColumns` packs the whole roster into three rows, which is a rule about
 // a laptop: the Triassic's 26 animals are nine columns, and nine columns of a phone is a 36-pixel

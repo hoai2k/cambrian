@@ -151,35 +151,30 @@ export function rumble(index: number, strong: number, weak: number, ms: number) 
 /**
  * Mouse and keyboard, for a session with no controller in it.
  *
- * **The pointer is not taken.** It used to be: pointer lock, the mouse turning the camera, and the
- * cursor gone for the match. That is the right scheme for a shooter and the wrong one for this —
- * the thing a player wants to point at here is an *animal*, and a locked pointer can only ever
- * point at the middle of the screen. So the cursor stays, the camera follows the body by itself
- * (`followCam` in the engine), and the mouse is what aims: the creature under it is the one your
- * attacks go to, and the water under it is where a dash goes.
+ * **The pointer is not taken while it is pointing.** It used to be for the whole match: pointer
+ * lock, the mouse turning the camera, the cursor gone. That is a shooter's scheme and the thing a
+ * player wants to point at here is an *animal*, so the cursor stays, the camera follows the body by
+ * itself (`followCam` in the engine), and the creature under the cursor is the one attacks go to.
  *
- * One button, three meanings, told apart the way every drawing program tells them apart:
- *   - a **click** — pressed and released without travelling — is a bite, and it fires on the
- *     *release*, because until the button comes up it is not yet known to be a click;
- *   - a **hold** past `HOLD` is the heavy: the pounce, the special, whatever that animal's RT does;
- *   - a **drag** past `DRAG` is the camera, and it cancels the attack. Moving the mouse is how you
- *     look around, so a press that turned into a movement was never an attack.
+ * The left button is read by **what it was pressed on**, and acts at the press: open water is a
+ * dash there, an animal is a bite, a pounce or a chase by how far off it is. Held past the move it
+ * began, it is **steering** — the pointer is locked away and the mouse turns the body and the view
+ * together until the button comes up. The decision is `stepStrike` in `src/shared/mouse-strike.ts`,
+ * pure; this class only reports the button and the motion, and takes the pointer when told to
+ * (`steer`).
  *
- * The right button dashes at whatever is under the cursor, for as long as it is held (the dash is
- * as long as it is held). The middle button is aim mode, as it was.
+ * The right button dashes at whatever is under the cursor, for as long as it is held. The middle
+ * button is aim mode's framing, and dragging with it turns the view.
  *
  * `ndc` is the cursor in normalised device coordinates (-1..1, y up), which is what a camera
- * unprojects; it is `undefined` until the mouse has been somewhere over the canvas.
+ * unprojects; it is `undefined` until the mouse has been somewhere over the canvas. While the
+ * pointer is locked it stays where the press was, which is where the cursor comes back.
  */
 export class MousePlay {
   /** Radians of camera per pixel of drag. Multiplied by the player's camera-speed setting. */
   static readonly SENSITIVITY = 0.0042;
   /** Wheel notches to zoom exponent; a notch is ~100 in `deltaY` on most mice. */
   static readonly WHEEL = 0.0011;
-  /** Pixels of travel that turn a press into a camera drag rather than an attack. */
-  static readonly DRAG = 6;
-  /** Seconds a press must be held to be the heavy rather than a bite. */
-  static readonly HOLD = 0.18;
 
   private el: HTMLElement | null = null;
   private buttons = new Set<number>();
@@ -187,38 +182,27 @@ export class MousePlay {
   private wanted = false;
   /** Where the cursor is, in NDC. Undefined until it has been over the canvas. */
   private ndc: { x: number; y: number } | undefined;
-  /** The left press in progress: when it started, how far it has travelled, what it became. */
-  private press: { t: number; moved: number; dragging: boolean; targeted: boolean; pursue: boolean } | undefined;
-  private lastClick = -Infinity;
-  /** A completed click, waiting to be read as one bite. */
-  private clicked = false;
-  /**
-   * Whether the cursor is over something worth attacking. Written by the engine each frame (it is
-   * the only thing that knows), and read on the next press: see `onDown`.
-   */
+  /** The left button went down since the last read. */
+  private pressed = false;
+  /** Whether the mouse is steering, as `steer` was last told. */
+  private steering = false;
+  /** Whether the cursor is over something worth attacking. Written by the engine each frame. */
   private overTarget = false;
-  /** Kept for the engine's benefit: nothing is locked, so nothing is ever lost. */
+  /** Whether the pointer is currently locked to the canvas for steering. */
   locked = false;
   onLost: (() => void) | null = null;
 
   private onMove = (e: MouseEvent) => {
     const el = this.el;
-    if (el) {
+    if (el && !this.locked) {
       const r = el.getBoundingClientRect();
       if (r.width > 0 && r.height > 0) {
         this.ndc = { x: ((e.clientX - r.left) / r.width) * 2 - 1, y: -(((e.clientY - r.top) / r.height) * 2 - 1) };
       }
     }
-    const mx = e.movementX ?? 0, my = e.movementY ?? 0;
-    const p = this.press;
-    if (p) {
-      p.moved += Math.hypot(mx, my);
-      // Past the threshold the press is a camera drag, and stays one until the button comes up.
-      if (!p.dragging && !p.pursue && p.moved > MousePlay.DRAG) p.dragging = true;
-    }
-    // Only a drag turns the camera. A bare mouse move is the cursor going somewhere, which is
-    // aiming rather than looking — that is the whole difference between this and pointer lock.
-    if (p?.dragging || this.buttons.has(1)) { this.dx += mx; this.dy += my; }
+    // Only steering and a middle-button drag turn the view. A bare move is the cursor going
+    // somewhere, which is aiming rather than looking.
+    if (this.steering || this.buttons.has(1)) { this.dx += e.movementX ?? 0; this.dy += e.movementY ?? 0; }
   };
   private onWheel = (e: WheelEvent) => {
     if (!this.wanted) return;
@@ -230,33 +214,17 @@ export class MousePlay {
     if (!this.wanted) return;
     e.preventDefault();
     this.buttons.add(e.button);
-    // A press with **nothing under the cursor** is the camera from the first pixel. There is no
-    // attack to make out there, so waiting `DRAG` pixels to find that out only costs the player the
-    // start of the movement — and the whole point of a left button that both attacks and looks is
-    // that it is never ambiguous about which. Over an animal, it is the attack until it travels.
-    if (e.button === 0) {
-      const now = performance.now() / 1000;
-      const pursue = this.overTarget && now - this.lastClick <= 0.28;
-      this.press = { t: now, moved: 0, dragging: !this.overTarget, targeted: this.overTarget, pursue };
-      this.lastClick = -Infinity;
-    }
+    if (e.button === 0) this.pressed = true;
   };
   private onUp = (e: MouseEvent) => {
     this.buttons.delete(e.button);
-    if (e.button !== 0) return;
-    const p = this.press; this.press = undefined;
-    // A click is a click wherever it lands: pressed and let go without *travelling*, which is the
-    // test whether or not there was anything under it. Biting at the water ahead of you is a real
-    // move — it is how you attack something you have not pointed at — so the bite is never taken
-    // away, only the heavy is. It is read once, on the frame after the release, because a bite is
-    // an edge and not a state.
-    if (p && p.moved <= MousePlay.DRAG && performance.now() / 1000 - p.t < MousePlay.HOLD && !p.pursue) {
-      this.clicked = true;
-      if (p.targeted) this.lastClick = performance.now() / 1000;
-    }
+    if (e.button === 0) this.steer(false);
   };
   private onContext = (e: Event) => { if (this.wanted) e.preventDefault(); };
-  private onBlur = () => { this.buttons.clear(); this.press = undefined; };
+  private onBlur = () => { this.buttons.clear(); this.steer(false); };
+  private onLockChange = () => {
+    this.locked = !!this.el && document.pointerLockElement === this.el;
+  };
 
   attach(el: HTMLElement) {
     this.el = el;
@@ -266,42 +234,56 @@ export class MousePlay {
     window.addEventListener('mousemove', this.onMove);
     window.addEventListener('mouseup', this.onUp);
     window.addEventListener('blur', this.onBlur);
+    document.addEventListener('pointerlockchange', this.onLockChange);
   }
 
   /** Tell the mouse whether the cursor is over a creature. Cheap, and called every frame. */
   aimingAt(on: boolean) { this.overTarget = on; }
+  /** Whether the cursor was over a creature when the engine last looked. */
+  get over() { return this.overTarget; }
 
-  /** Whether the mouse is playing the game. Nothing is locked either way. */
+  /**
+   * Put the pointer away for steering, or give it back. Locked, the mouse can turn the view as far
+   * as the hand goes rather than stopping at the edge of the screen; where the browser will not
+   * lock (no recent gesture, a harness) the cursor is hidden by the engine instead and steering
+   * still works up to the screen's edge. Given back, the cursor reappears where the press was.
+   */
+  steer(on: boolean) {
+    if (this.steering === on) return;
+    this.steering = on;
+    const el = this.el;
+    if (!el) return;
+    try {
+      if (on && document.pointerLockElement !== el) {
+        const r = el.requestPointerLock?.() as unknown;
+        if (r && typeof (r as Promise<void>).catch === 'function') (r as Promise<void>).catch(() => { /* stays unlocked: hidden instead */ });
+      } else if (!on && document.pointerLockElement === el) document.exitPointerLock?.();
+    } catch { /* stays unlocked */ }
+  }
+
+  /** Whether the mouse is playing the game. */
   want(on: boolean) {
     if (this.wanted === on) return;
     this.wanted = on;
-    if (!on) { this.buttons.clear(); this.press = undefined; this.clicked = false; this.lastClick = -Infinity; this.dx = this.dy = this.wheel = 0; }
+    if (!on) { this.buttons.clear(); this.pressed = false; this.steer(false); this.dx = this.dy = this.wheel = 0; }
   }
 
-  /** Everything the mouse has done since the last frame. Drains the deltas and the click. */
+  /** Everything the mouse has done since the last frame. Drains the deltas and the press. */
   read() {
-    const p = this.press;
-    // A **hold is the heavy only over something**. With nothing under the cursor there is nothing
-    // to pounce at, so holding the button there is the camera and only the camera — which is what
-    // makes the one button unambiguous: what it does is decided by what you pointed it at.
-    const pursuing = !!p?.pursue;
-    const held = !!p && !p.pursue && p.targeted && p.moved <= MousePlay.DRAG && performance.now() / 1000 - p.t >= MousePlay.HOLD;
     const r = {
       dx: this.dx * MousePlay.SENSITIVITY, dy: this.dy * MousePlay.SENSITIVITY,
       zoom: this.wheel * MousePlay.WHEEL,
-      /** The heavy: the left button held still past `HOLD`. */
-      hold: held,
-      pursue: pursuing,
-      /** One bite, on the frame after a click was completed. */
-      click: this.clicked,
-      /** Turning the camera this frame, so the follow camera knows to stand aside. */
-      dragging: !!p?.dragging || this.buttons.has(1),
-      /** The left button is down on a target and has not travelled: a pounce is winding up. */
-      pressing: !!p && p.targeted && p.moved <= MousePlay.DRAG,
+      /** The left button is down. */
+      left: this.buttons.has(0),
+      /** The left button went down since the last frame: a strike starts (`stepStrike`). */
+      pressed: this.pressed,
+      /** Turning the camera this frame (steering, or a middle drag), so the follow stands aside. */
+      dragging: this.steering || this.buttons.has(1),
+      steering: this.steering,
       middle: this.buttons.has(1), right: this.buttons.has(2),
       ndc: this.ndc,
     };
-    this.dx = this.dy = this.wheel = 0; this.clicked = false;
+    this.dx = this.dy = this.wheel = 0; this.pressed = false;
     return r;
   }
 
@@ -316,16 +298,20 @@ export class MousePlay {
     window.removeEventListener('mousemove', this.onMove);
     window.removeEventListener('mouseup', this.onUp);
     window.removeEventListener('blur', this.onBlur);
+    document.removeEventListener('pointerlockchange', this.onLockChange);
     this.el = null;
   }
 }
 
+/**
+ * Fold a frame of mouse into the controls. The left button is not here: what it does depends on
+ * what it was pressed on and on the body, so `PlayerInput` decides it (`stepStrike`) with both in
+ * hand. What is here is what never depends on either.
+ */
 export function applyMouse(c: RawControls, m: ReturnType<MousePlay['read']>): RawControls {
   c.lookDX = m.dx; c.lookDY = m.dy; c.zoomDelta = m.zoom;
-  if (m.click) c.light = true;
-  if (m.hold) c.heavy = true;
   if (m.right) { c.dash = true; c.dodge = true; }
   if (m.middle) { c.aim = true; c.lock = true; }
-  if (m.click || m.hold || m.middle || m.right) c.any = c.anyButton = true;
+  if (m.pressed || m.middle || m.right) c.any = c.anyButton = true;
   return c;
 }

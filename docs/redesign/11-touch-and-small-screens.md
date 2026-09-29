@@ -16,9 +16,12 @@ still gets them. Answering the two questions together would have been wrong in b
 ## The scheme
 
 The mouse scheme already answered the hard question, so this is written the way that one is written
-rather than invented from scratch. `MousePlay` reads *one* button three ways — a click is the bite, a
-hold is the heavy, a travel is the camera — and tells them apart by what the press **did**, not by
-which button it was on. A finger is the same problem with better hands: there are several of them,
+rather than invented from scratch. `MousePlay` read *one* button three ways — a click was the bite, a
+hold the heavy, a travel the camera — and told them apart by what the press **did**, not by which
+button it was on. (The mouse has since moved on to reading its left button by what it was pressed
+*on* — water, or an animal near or far — and treating a held button as steering; see
+`src/shared/mouse-strike.ts`. The finger kept the older argument, which suits a hand that does not
+hover.) A finger is the same problem with better hands: there are several of them,
 they arrive and leave, and none of them hovers.
 
 ### Where a touch starts is what it is for

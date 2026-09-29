@@ -118,6 +118,7 @@ const SUITES = {
   focus: { file: 'focus-test.ts' },
   fullscreen: { file: 'fullscreen-test.ts' },
   cursors: { file: 'cursors-test.ts' },
+  'mouse:strike': { file: 'mouse-strike-test.ts' },
   edges: { file: 'edges-test.ts' },
   swap: { file: 'swap-test.ts' },
   immersive: { file: 'immersive-test.ts' },
@@ -163,7 +164,7 @@ const GATE = ['flora', 'locomotion', 'fight', 'feast', 'pursuit', 'respawn', 'co
   'survival-eras', 'views', 'sight', 'motion', 'hiding', 'sand', 'tracks', 'sizing', 'spatial', 'record', 'expansion', 'touch',
   'bindings', 'modes', 'controls', 'beach'];
 /** Everything that is not a simulation suite and takes seconds, not minutes. */
-const FAST = ['codex', 'results', 'visitors', 'seats', 'roster', 'depth', 'menus', 'focus', 'fullscreen', 'cursors', 'edges',
+const FAST = ['codex', 'results', 'visitors', 'seats', 'roster', 'depth', 'menus', 'focus', 'fullscreen', 'cursors', 'mouse:strike', 'edges',
   'swap', 'immersive', 'music', 'stats', 'debug', 'ancientseas', 'mobile:memory', 'assets', 'props', 'recolor', 'eras',
   'palettes', 'portraits', 'conform', 'rigs', 'sculpt', 'stretch', 'bend', 'mouth', 'mark', 'playback', 'breakpoints', 'lineup', 'governor'];
 const GROUPS = {
