@@ -3,6 +3,7 @@ import {Game} from '../src/sim/game';
 import {emptyInput, type Actor, type InputFrame} from '../src/sim/types';
 import {applyScaleStats, clearanceOf, isHidden, isInvulnerable} from '../src/sim/actors';
 import {camouflageMatch} from '../src/sim/concealment';
+import {specialSlot} from '../src/sim/special-slot';
 import {creature, type CreatureId} from '../src/sim/creatures';
 import {sampleHeight, type Flora, type Boulder} from '../src/sim/world';
 import {floorColor, floraColor, rockColor} from '../src/shared/environment-colors';
@@ -18,7 +19,8 @@ function setup(id:CreatureId){
 }
 function tick(g:Game,a:Actor,input:Partial<InputFrame>={},n=1){const f={...emptyInput(),...input};for(let i=0;i<n;i++)(g as any).updateActor(a,f,1/60);}
 {
- const {g,a}=setup('opabinia');a.tier=0;const start=a.stamina;
+ // Waptia has no special, so its Y is the camouflage (`specialSlot`); an animal that never hid has its special there instead.
+ const {g,a}=setup('waptia');a.tier=0;const start=a.stamina;
  tick(g,a,{ability:true});assert.equal(a.hideMode,'camouflage');
  tick(g,a,{},120);assert(a.camoStrength>.99);assert(a.stamina<start-8);assert(a.pos.y<sampleHeight(0,0)+11.8);
  assert(!isInvulnerable(a));
@@ -34,8 +36,10 @@ for(const id of ['marrella','ottoia'] as const){
  console.log('PASS',id,'descend, free indefinite burial, vulnerable if revealed, free emergence heavy');
 }
 for(const id of ['opabinia','nectocaris','cambroraster','sidneyia','isoxys'] as const){
- const {g,a}=setup(id);tick(g,a,{heavy:true});assert.equal(a.state,'ability');assert(a.abilityActive);assert(a.stamina<a.staminaMax-15);assert.equal(a.hideMode,'none');
- console.log('PASS',id,'heavy dispatches signature');
+ // A player's special is on Y or B (`specialSlot`), never on RT.
+ const key=specialSlot(creature(id))==='b'?'guard':'ability';
+ const {g,a}=setup(id);tick(g,a,{[key]:true});assert.equal(a.state,'ability');assert(a.abilityActive);assert(a.stamina<a.staminaMax-15);assert.equal(a.hideMode,'none');
+ console.log('PASS',id,key==='guard'?'B':'Y','dispatches signature');
 }
 {
  const {g,a}=setup('hallucigenia');tick(g,a,{guard:true});assert.equal(a.state,'parry');assert(a.abilityActive);
@@ -45,7 +49,8 @@ for(const id of ['opabinia','nectocaris','cambroraster','sidneyia','isoxys'] as 
  console.log('PASS Hallucigenia timed counter and sustained non-invulnerable block');
 }
 {
- const {g,a}=setup('opabinia');const o=g.spawn('waptia','ambient',{...a.pos,x:1},1);o.spawnProtect=0;
+ // Nectocaris hides in life, so its Y is the camouflage; Opabinia's Y is its snatch now (`specialSlot`).
+ const {g,a}=setup('nectocaris');const o=g.spawn('waptia','ambient',{...a.pos,x:1},1);o.spawnProtect=0;
  const match=camouflageMatch(a,g.world,[a,o]);assert.equal(match.actor,o.id);assert.equal(match.scheme,'sandflat-tan');
  tick(g,a,{ability:true});tick(g,a,{},90);assert(a.camoStrength>.9);
  applyHit((g as any).hitCtx,o,a,creature('waptia').light,0);assert.equal(a.hideMode,'none','hit breaks camouflage');
@@ -84,7 +89,9 @@ for(const id of ['opabinia','nectocaris','cambroraster','sidneyia','isoxys'] as 
  console.log('PASS zero-energy attack emergence and no banked free-heavy exploit');
 }
 
+// The escape riders (tail flick, ribbon slip) were retired in the specials audit: B is the plain
+// parry or dodge on these two now, and throws no silt of its own.
 for (const id of ['waptia','pikaia'] as const) {
- const {g,a}=setup(id);tick(g,a,{guard:true});assert.equal(a.state,creature(id).canGuard?'parry':'dodge');assert(g.silt.length>0,'B evade incorporates the escape special');
+ const {g,a}=setup(id);tick(g,a,{guard:true});assert.equal(a.state,creature(id).canGuard?'parry':'dodge');assert.equal(g.silt.length,0,'B is the plain evade');
 }
 console.log('All hiding/combat input checks passed');

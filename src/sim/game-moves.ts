@@ -382,6 +382,8 @@ const BUTTON_SPECIALS = new Set(['whipSearch', 'sedimentDive']);
  * can fall back to what it does for an animal with no special when the special is not ready.
  */
 export function fireSpecial(game: Game, a: Actor, def: CreatureDef): boolean {
+  // A dive into the sediment needs sediment under it: off the bottom there is nothing to dive into.
+  if (def.ability === 'sedimentDive' && !a.grounded) return false;
   if (RULES.useAbility?.(game, a, expansionContext(game))) { game.flag(a, 'ability'); return true; }
   if ((HEAVY_SPECIALS.has(def.ability) || BUTTON_SPECIALS.has(def.ability)) && a.abilityCd <= 0 && a.stamina >= 18) {
     a.stamina -= 18; startAbility(game, a, def); a.abilityCd = Math.max(2, a.stateDur + .6); game.flag(a, 'heavy');
