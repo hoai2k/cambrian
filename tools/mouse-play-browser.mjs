@@ -178,14 +178,9 @@ try {
   assert.equal(chasing.lock, id, 'and holds the target on the animal');
   assert(chasing.mark, 'and draws its mark where the animal is');
   assert(chasing.d < start, `and closes on it (${start.toFixed(1)} → ${chasing.d.toFixed(1)})`);
-  if (process.env.DEBUG_STRIKE) {
-    for (let k = 0; k < 8; k++) {
-      await frames(4);
-      console.log("CHASE", JSON.stringify(await page.evaluate((t) => { const e = window.__cambrian, g = e.game, a = g.players[0], o = g.byId(t);
-        return [a.state, e.input.strike?.kind, Math.hypot(o.pos.x - a.pos.x, o.pos.y - a.pos.y, o.pos.z - a.pos.z).toFixed(2), g.pounceRange(a).toFixed(2), a.stamina.toFixed(0), a.pounceCd.toFixed(2), Math.hypot(a.vel.x, a.vel.y, a.vel.z).toFixed(2), JSON.stringify(e.input.strikeOut)]; }, id)));
-    }
-  }
-  await page.waitForFunction(() => !!window.__seen, null, { timeout: 60000 });
+  // The swim to it is a few seconds of simulation, which under the software renderer is a few
+  // minutes of wall clock: the wait is long because the page is slow, not because the chase is.
+  await page.waitForFunction(() => !!window.__seen, null, { timeout: 240000 });
   assert.equal((await seen()).state, 'pounce', 'and pounces once it is in reach');
   await page.mouse.up(); await frames(2);
   await page.evaluate(() => { window.__pin = -1; });
@@ -210,6 +205,16 @@ try {
   assert.equal((await state()).locked, false, 'and the pointer is not left locked');
   await page.mouse.move(60, 60); await frames(3);
   assert(!(await page.locator('.hud .aim').count()), 'no on-screen reticle in mouse play');
+
+  // A view steered over the top rights itself once nothing is turning it and the body has stopped
+  // being thrown about: the same way a finger's does (`rightSideUp`), now that a mouse can steer.
+  await settled();
+  await page.mouse.move(centre.x, centre.y);
+  await page.evaluate(() => { const cs = window.__cambrian.cams[0]; cs.pitch = -2.3; cs.lookIdle = 0; });
+  await frames(2);
+  const flipped = await page.evaluate(() => Math.cos(window.__cambrian.cams[0].pitch) < 0);
+  await page.waitForFunction(() => { const cs = window.__cambrian.cams[0]; return Math.cos(cs.pitch) > 0 && Math.abs(cs.roll) < 0.05; }, null, { timeout: 120000 });
+  assert(flipped, 'a mouse seat can be upside down (the pitch loops rather than clamping)');
 
   // 5. The camera comes round behind the animal by itself.
   await settled();
