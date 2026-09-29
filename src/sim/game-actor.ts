@@ -82,6 +82,9 @@ const STALL = 0.05;
  */
 const PADDLE_RISE = 1.5; 
 
+/** The current at a body, read and spent within its own update: one object, not one per body per step. */
+const currentScratch: Vec3 = { x: 0, y: 0, z: 0 };
+
 export function updateActor(game: Game, a: Actor, input: InputFrame, dt: number) {
   // Inside the egg nothing the player presses reaches the water: the body is held where it
   // hatched until it has wriggled out of the shell.
@@ -188,7 +191,7 @@ export function updateActor(game: Game, a: Actor, input: InputFrame, dt: number)
     ? { x: dir.x * mag * cruise, y: dir.y * mag * cruise, z: dir.z * mag * cruise }
     : v3();
   if (!def.ground && !a.ashore) a.drive.y += input.rise ? RISE_RATE * sf : input.sink ? -RISE_RATE * sf : 0;
-  const cur = sampleCurrent(v3(), a.pos.x, a.pos.y, a.pos.z, game.time);
+  const cur = sampleCurrent(currentScratch, a.pos.x, a.pos.y, a.pos.z, game.time);
   // A drifter on a neutral stick gives up steering and takes the whole current; a walking body
   // down on the floor holds station against it. Everything else feels the usual fraction.
   const drifting = !!def.drift && mag < 0.08 && !input.rise && !input.sink;
@@ -588,14 +591,14 @@ export function stepScenery(game: Game, a: Actor, input: InputFrame, dt: number,
   // snapping it: the water taking it back.
   const held = !a.airborne && !a.ashore && !amphibious(a.creature);
   const ease = Math.max(WALL_EASE * dt, len3(a.vel) * dt * 1.5);
-  const hitWall = resolveStatic(game.world, a.pos, bodyRadius(a), game.scratchBoulders, held ? RULES.shoreReach?.(a) ?? 0 : Infinity, glideOver(a), climbHeight(a), contact, ease);
+  const hitWall = resolveStatic(game.world, a.pos, bodyRadius(a), game.scratchBoulders, held ? RULES.shoreReach?.(a) ?? 0 : Infinity, glideOver(a), climbHeight(a), contact, ease, !a.unseen);
   // And the same wall in the body's own draught: the water holds a swimmer where it can still
   // swim, whatever the fixed wall's distance means on this era's beach (`WALL_WADE`).
   if (held && a.wade > WALL_WADE) { a.pos.z -= ease; }
   if (hitWall && !def.ground) { a.vel.x *= 0.6; a.vel.z *= 0.6; }
   // Plants: swarm snacks are numerous and tiny, so they take turns on alternate steps.
   floraHit.blocked = false; floraHit.headOn = false; floraHit.top = -Infinity;
-  if (!isHidden(a) && a.state !== 'grabbed') {
+  if (!isHidden(a) && a.state !== 'grabbed' && !a.unseen) {
     resolveFlora(game.world, a, dt, game.scratchFlora, floraHit);
   }
   // What is worth climbing, and what has to be asked for. A rock inside two bodies is taken on
@@ -605,14 +608,15 @@ export function stepScenery(game: Game, a: Actor, input: InputFrame, dt: number,
   // A rock is a slope, not a step: come up its flank at the speed the body is actually going.
   // A face too steep to make any headway on is a contact as much as a wall is, and is climbed.
   const clear = floorClearance(a), px = a.pos.x, pz = a.pos.z;
-  let floor = groundHeight(game.world, a.pos.x, a.pos.z, game.scratchBoulders) + clear;
+  // A school fish nobody can see keeps to the seabed and nothing on it (src/sim/sight.ts).
+  let floor = (a.unseen ? sampleHeight(a.pos.x, a.pos.z) : groundHeight(game.world, a.pos.x, a.pos.z, game.scratchBoulders)) + clear;
   // A body on the beach's own terms walks up the slope rather than swimming up it, so the climb
   // trade stands down (src/sim/beach.ts `onFoot`). It is a trade of travel for height, and on the
   // last stretch of sand — where the floor rises into a ceiling that is not going anywhere — it
   // spends a walker's whole step on height the beach rules then take back, which is what wedged
   // a grown Nothosaurus sixteen units out and stopped it reaching the sand at all.
   const walking = onFoot(a);
-  const stalled = walking ? -Infinity : followFloor(game, a, dt, floor, clear);
+  const stalled = walking || a.unseen ? -Infinity : followFloor(game, a, dt, floor, clear);
   if (a.pos.x !== px || a.pos.z !== pz) floor = groundHeight(game.world, a.pos.x, a.pos.z, game.scratchBoulders) + clear;
   const leaning = controllable && mag > 0.35 && (contact.hit || floraHit.blocked || Number.isFinite(stalled));
   a.climbPush = leaning ? Math.min(1, a.climbPush + dt) : Math.max(0, a.climbPush - dt * 2);
