@@ -24,6 +24,7 @@ import { beginHatch, respawn, revivable, reviveProgress, reviveWindow, skipHatch
 import { pounceRange, startDodge } from './game-moves';
 import { bonesLeft, bonesNear, populate, restockBones, updatePopulation } from './game-population';
 import { bankLadderTop, changeCreature, continueMatch, teleport, updateDiscovery, updateModes } from './game-progress';
+import { updateEyes, withinSight, type Eye } from './sight';
 import { biomeOf, hintFor, noticeFor, radarFor, scoreboard, swapOptions, teleportOptions } from './game-readouts';
 
 /** Everything the simulation says out loud; the words are in `src/content/strings.ts`. */
@@ -346,6 +347,9 @@ export class Game implements AiWorld {
   nextId = 1;
   mode: Mode;
   players: Actor[] = [];
+  /** Every seat's camera as the simulation can know it, for what is out of sight (src/sim/sight.ts). */
+  private eyes: Eye[] = [];
+  private byIdFn = (id: number) => this.idMap.get(id);
   /**
    * Every creature each player has worn this match, and how far it had grown when they left it.
    *
@@ -555,6 +559,11 @@ export class Game implements AiWorld {
     // The sea streams in around whoever is in it, a couple of chunks a step so nothing hitches.
     this.world.stream(this.anchors(), 2);
     this.hash.rebuild(this.actors);
+    // Which school fish nobody could be looking at: they swim on without the collision only a
+    // camera would notice (src/sim/sight.ts). Only schools — anything a player might meet, fight,
+    // ride or be hunted by keeps every contact wherever it is.
+    updateEyes(this.players, this.byIdFn, dt, this.eyes);
+    for (const a of this.actors) a.unseen = a.controller === 'swarm' && !withinSight(this.players, this.eyes, a);
 
     for (const a of this.actors) {
       if (a.state === 'dead') { updateCorpse(this, a, dt); continue; }
@@ -675,11 +684,11 @@ export class Game implements AiWorld {
 
   private resolveActorOverlap() {
     for (const a of this.actors) {
-      if (!isAlive(a) || a.state === 'grabbed' || a.state === 'swallowed') continue;
+      if (!isAlive(a) || a.state === 'grabbed' || a.state === 'swallowed' || a.unseen) continue;
       const ra = bodyRadius(a);
       for (const o of this.hash.query(a.pos.x, a.pos.z, ra + 6, this.scratchActors)) {
         if (o.id <= a.id || !isAlive(o)) continue;
-        if (o.state === 'grabbed' || o.state === 'swallowed') continue;
+        if (o.state === 'grabbed' || o.state === 'swallowed' || o.unseen) continue;
         const min = ra + bodyRadius(o);
         const dx = o.pos.x - a.pos.x, dy = o.pos.y - a.pos.y, dz = o.pos.z - a.pos.z;
         // Most pairs are well clear, and `Math.hypot` is slow: the margin is far wider than the few

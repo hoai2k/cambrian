@@ -101,8 +101,14 @@ export const NURSERY_R = 24;
 
 /** z of the waterline at this x. The shore wanders by ±40 units so it is a coast, not a ruler. */
 export function shoreZ(x: number) {
-  return NURSERY_OFF + (noise2(x / 520 + 3.1, 0.7) - 0.5) * 70 + (noise2(x / 210 + 5.5, 1.9) - 0.5) * 30 + (noise2(x / 140 + 9, 2.3) - 0.5) * 16;
+  // The coast is asked about the same x several times over in a row — a body's shore distance, then
+  // the seabed under it, then its biome — and half of the thousand-odd asks a step are the one just
+  // before. An exact one-entry memo: the same x gives back the very number it gave last time.
+  if (x === shoreLastX) return shoreLastZ;
+  shoreLastX = x;
+  return (shoreLastZ = NURSERY_OFF + (noise2(x / 520 + 3.1, 0.7) - 0.5) * 70 + (noise2(x / 210 + 5.5, 1.9) - 0.5) * 30 + (noise2(x / 140 + 9, 2.3) - 0.5) * 16);
 }
+let shoreLastX = NaN, shoreLastZ = 0;
 /** Distance from the shore into the sea (negative on land). The sea lies toward -z. */
 export const shoreDistance = (x: number, z: number) => shoreZ(x) - z;
 
@@ -251,6 +257,13 @@ export function biomeAt(x: number, z: number): Biome {
  * the shelf undulates around zero, channels carve 7 deep, the escarpment drops 13 into the basin.
  */
 export function sampleHeight(x: number, z: number) {
+  // Exact one-entry memo, like `shoreZ`: a body's seabed is often asked for twice at one point.
+  if (x === heightLastX && z === heightLastZ) return heightLast;
+  heightLastX = x; heightLastZ = z;
+  return (heightLast = seabedHeight(x, z));
+}
+let heightLastX = NaN, heightLastZ = NaN, heightLast = 0;
+function seabedHeight(x: number, z: number) {
   const s = shoreDistance(x, z);
   let h = -0.55
     + 0.9 * Math.sin(x * 0.045 + 0.7) * Math.cos(z * 0.039)
@@ -931,14 +944,16 @@ export interface StaticContact {
  * could have moved this step, so a body that is *found* inside the wall (it walked back down the
  * beach into water it cannot wade) is eased out rather than teleported.
  */
-export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scratch: Boulder[], reach = 0, glide = 0, climb = 0, out?: StaticContact, ease = Infinity): boolean {
+export function resolveStatic(world: WorldData, pos: Vec3, radius: number, scratch: Boulder[], reach = 0, glide = 0, climb = 0, out?: StaticContact, ease = Infinity, rocks = true): boolean {
   let hit = false;
   if (out) { out.hit = false; out.climbTo = -Infinity; out.wallTop = -Infinity; }
   // The shore is the one wall in the sea. Push straight back along -z; the coast wanders gently
   // enough that the local normal is close to that. `reach` lets a limbed body push that far past it.
   const s = shoreDistance(pos.x, pos.z), wall = reach === Infinity ? -LAND_REACH : Math.max(radius, SHORE_WALL + radius * 3 - reach);
   if (s < wall) { pos.z -= Math.min(wall - s, ease); hit = true; }
-  for (const b of world.boulderHash.query(pos.x, pos.z, radius + 8, scratch)) {
+  // `rocks` false is the shore wall alone: a body nobody can see keeps out of the beach but is not
+  // held off every boulder (src/sim/sight.ts).
+  if (rocks) for (const b of world.boulderHash.query(pos.x, pos.z, radius + 8, scratch)) {
     if (pos.y > b.height + radius * 0.5) continue;
     if (b.floor !== undefined && pos.y < b.floor - radius * 0.5) continue;   // pass under a raised span
     const rr = boulderReach(b, pos.x, pos.z, staticReach);

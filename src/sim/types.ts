@@ -191,6 +191,12 @@ export interface Actor {
    * ashore, against `STRAND_BREATH`; `flopT` counts down through one flop, 0 between them.
    */
   wade: number; ashore: boolean; strandT: number; flopT: number;
+  /**
+   * A school fish no camera could be drawing this step (`withinSight`, src/sim/sight.ts). It still
+   * swims, eats and is eaten, keeps to the seabed and out of the beach; what it skips is colliding
+   * with rocks, plants and other bodies, which only shows.
+   */
+  unseen: boolean;
   prev: { light: boolean; heavy: boolean; ability: boolean; dodge: boolean; guard: boolean; lock: boolean; sense: boolean; rise: boolean; burst: boolean; dash: boolean; aim: boolean };
   brain?: BrainState;
   respawnT: number; hatching: boolean;
