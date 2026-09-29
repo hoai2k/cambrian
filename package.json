@@ -49,6 +49,7 @@
     "sculpt:measure": "esbuild tools/sculpt-measure.ts --bundle --platform=node --format=esm --packages=external --outfile=node_modules/.cache/sculpt-measure.mjs && node node_modules/.cache/sculpt-measure.mjs",
     "stretch": "node tools/test.mjs stretch",
     "sand": "node tools/test.mjs sand",
+    "seabed": "node tools/test.mjs seabed",
     "spatial": "node tools/test.mjs spatial",
     "stats": "node tools/test.mjs stats",
     "breakpoints": "node tools/test.mjs breakpoints",

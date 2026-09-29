@@ -110,3 +110,20 @@ export function fpMax(fp: Footprint, sx = 1, sz = 1): number {
   }
   return m;
 }
+
+/**
+ * A prop's top at `q` of its footprint's radius along `ang` (the prop's own frame, from +z toward
+ * +x), from the measured height map (`PropShape.top`, rings of evenly spaced spokes): bilinear
+ * between the spokes either side
+ * and the rings either side, in the prop's own units. Past the edge there is no top.
+ */
+export function topAt(top: readonly (readonly number[])[], ang: number, q: number): number {
+  if (q >= 1) return 0;
+  const rings = top.length - 1;
+  const rq = Math.max(0, q) * rings, j = Math.min(rings - 1, Math.floor(rq)), fq = rq - j;
+  const a = top[j], b = top[j + 1], n = a.length;
+  const t = ((ang / TAU) * n % n + n) % n;
+  const i = Math.floor(t) % n, i2 = (i + 1) % n, f = t - Math.floor(t);
+  const inner = a[i] * (1 - f) + a[i2] * f, outer = b[i] * (1 - f) + b[i2] * f;
+  return inner * (1 - fq) + outer * fq;
+}

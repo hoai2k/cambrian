@@ -43,7 +43,35 @@ export function camouflageMatch(a: Actor, world: WorldData, actors: Actor[]): Ca
  return best;
 }
 export function stopHiding(a:Actor) {
- a.hideMode='none';a.hideT=0;a.hideCd=2;
+ a.hideMode='none';a.hideT=0;a.hideCd=2;a.stillT=0;
+}
+
+/** How long a still-burrower (`stillBurrow`) lies still on open sand before it works itself under. */
+export const STILL_BURY = 1.5;
+/**
+ * How long working itself under takes before the sand closes over it. A burrow reached from the
+ * floor would otherwise be covered on the step it started, and the shower that shows it going
+ * down (`sandThrow`) would last one frame.
+ */
+export const STILL_SETTLE = 0.9;
+
+/**
+ * The still-burrower's hide: lie still on open sand for `STILL_BURY` and it goes under; move and it
+ * comes up through the sand. `resting` is the caller's word that the body is lying on bare sand
+ * (not a rock, not in the water column, not in the middle of anything), `moving` that it was asked
+ * to move this step. Coming up this way is not an ambush — the strike out of the sand is still the
+ * attack buttons' (`emergeStrike`).
+ */
+export function stillBury(a: Actor, resting: boolean, moving: boolean, dt: number): 'buried' | 'emerged' | null {
+ if (a.hideMode === 'descending' || a.hideMode === 'burrowed') {
+  if (!moving) return null;
+  stopHiding(a);
+  return 'emerged';
+ }
+ a.stillT = resting && !moving && a.hideMode === 'none' && a.hideCd === 0 ? a.stillT + dt : 0;
+ if (a.stillT < STILL_BURY) return null;
+ a.hideMode = 'descending'; a.hideT = 0; a.seen = 0; a.stillT = 0;
+ return 'buried';
 }
 export function clearPursuit(a:Actor,actors:Actor[]) {
  for(const o of actors){

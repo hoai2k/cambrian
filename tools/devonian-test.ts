@@ -882,8 +882,8 @@ const { TIER_SCALE } = await import('../src/sim/types');
   ok(breached > 0 && splashed > 0, `a fish driving at the surface leaves the water and comes back (${breached} leaps, ${splashed} splashes)`);
   ok(peak > SURFACE_Y + 1, `the leap clears the surface (peak ${(peak - SURFACE_Y).toFixed(1)} above it)`);
   ok(!a.airborne || a.pos.y > SURFACE_Y - 2, 'it is never airborne under water');
-  // a crawler never does
-  const g2 = new Game('rise', [{ creature: 'bothriolepis', device: 'keyboard', ready: true }]);
+  // a crawler never does (a walker: Bothriolepis lies on the floor but swims, and is no crawler)
+  const g2 = new Game('rise', [{ creature: 'eldredgeops', device: 'keyboard', ready: true }]);
   g2.skipHatch();
   const b = g2.players[0];
   for (let i = 0; i < 120; i++) { g2.step(DT, new Map([[0, emptyInput()]])); g2.events.length = 0; }

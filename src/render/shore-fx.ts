@@ -4,8 +4,8 @@
  * pose) and neither writes to it, so `src/sim` keeps its determinism and gains no event.
  */
 import * as THREE from 'three';
-import { SAND_COLORS } from '../shared/environment-colors';
-import { floorClearance, isAlive, lengthOf } from '../sim/actors';
+import { floorColor, SAND_COLORS } from '../shared/environment-colors';
+import { bodyRadius, floorClearance, isAlive, lengthOf } from '../sim/actors';
 import { amphibious, breathesAir } from '../sim/beach';
 import type { Game } from '../sim/game';
 import { biomeAt, groundHeight, LAND_REACH, sampleHeight, shoreDistance, SURFACE_Y, type Biome, type Boulder } from '../sim/world';
@@ -34,6 +34,39 @@ function sandColorAt(x: number, z: number): THREE.Color {
   return SAND_SWATCH.copy(c);
 }
 
+/** Seconds for a mound to heap up to full, and to slump away once the body is out. */
+const MOUND_RISE = 0.7;
+const MOUND_FALL = 0.35;
+/** A mound's height at full, as a share of the body's length: a lump, not a dune. */
+const MOUND_HEIGHT = 0.09;
+const MOUND_AT = new THREE.Object3D();
+const MOUND_COLOR = new THREE.Color();
+
+/**
+ * How heaped the sand over a body should be (0..1): nothing in open water, a start while it works
+ * itself down, and all of it once the floor has closed over. Pure in the body's own hiding state.
+ */
+export function moundLevel(hideMode: string, hideT: number): number {
+  if (hideMode === 'burrowed') return 1;
+  if (hideMode === 'descending') return Math.min(0.5, hideT * 0.5);
+  return 0;
+}
+
+/** A low lump of sand: a flattened dome with a rough top, sitting on its own base. */
+function moundGeometry(): THREE.BufferGeometry {
+  const g = new THREE.SphereGeometry(1, 32, 8, 0, Math.PI * 2, 0, Math.PI / 2);
+  const p = g.attributes.position as THREE.BufferAttribute;
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i), y = p.getY(i), z = p.getZ(i);
+    // A little unevenness so it reads as heaped grains rather than a moulded shell, and a skirt
+    // that runs out flat into the floor rather than standing up at the edge.
+    const k = 1 + 0.08 * Math.sin(x * 5.1 + z * 3.3) * Math.cos(z * 4.7 - x * 1.9);
+    p.setXYZ(i, x * k, Math.pow(Math.max(0, y), 1.3) * k, z * k);
+  }
+  g.computeVertexNormals();
+  return g;
+}
+
 /**
  * Sand around a body going into the seabed, and again as it comes back out.
  *
@@ -48,7 +81,22 @@ function sandColorAt(x: number, z: number): THREE.Color {
  * in the floor, which on any roster is a handful.
  */
 export class BurrowSand {
+  /**
+   * The sand heaped over a body lying under it: a low lump the length and width of the animal, in
+   * the floor's own colour and material, so a buried animal is something a player can spot if they
+   * look — which is the fair half of an ambush. It rises as the sand closes over and slumps back as
+   * the body comes out through it, rather than appearing and vanishing.
+   */
+  readonly mounds: THREE.InstancedMesh;
+  constructor(private maxMounds = 24) {
+    this.mounds = new THREE.InstancedMesh(moundGeometry(), new THREE.MeshStandardMaterial({ roughness: 0.92 }), maxMounds);
+    this.mounds.name = 'burrow-mounds';
+    this.mounds.count = 0; this.mounds.frustumCulled = false; this.mounds.receiveShadow = true;
+    this.mounds.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    this.mounds.setColorAt(0, SAND_SWATCH.set(1, 1, 1));   // the colour attribute from the start, so the program never changes under it
+  }
   update(game: Game, dt: number, focus: THREE.Vector3, sand: Sand) {
+    this.updateMounds(game, dt, focus);
     for (const a of game.actors) {
       const was = this.burrowing.get(a.id) ?? 'none';
       const now = a.hideMode === 'descending' || a.hideMode === 'burrowed' ? a.hideMode : 'none';
@@ -76,6 +124,42 @@ export class BurrowSand {
     // Bodies that left the sea while in the floor: the map is only ever a few entries deep.
     for (const id of this.burrowing.keys()) if (!game.byId(id)) { this.burrowing.delete(id); this.sandOwed.delete(id); }
   }
+  /** How far each mound has heaped (0..1), by body. A handful of entries at most. */
+  private heaped = new Map<number, number>();
+  private updateMounds(game: Game, dt: number, focus: THREE.Vector3) {
+    let n = 0;
+    for (const a of game.actors) {
+      const want = moundLevel(a.hideMode, a.hideT);
+      const was = this.heaped.get(a.id) ?? 0;
+      if (want === 0 && was === 0) continue;
+      // Up as fast as the sand closes over, down faster: coming out throws the sand clear.
+      const level = want > was ? Math.min(want, was + dt / MOUND_RISE) : Math.max(want, was - dt / MOUND_FALL);
+      if (level <= 0) { this.heaped.delete(a.id); continue; }
+      this.heaped.set(a.id, level);
+      const dx = a.pos.x - focus.x, dz = a.pos.z - focus.z;
+      if (n >= this.maxMounds || dx * dx + dz * dz > SAND_RANGE * SAND_RANGE * 2) continue;
+      const L = lengthOf(a), w = bodyRadius(a);
+      MOUND_AT.position.set(a.pos.x, sampleHeight(a.pos.x, a.pos.z) - L * 0.015, a.pos.z);
+      MOUND_AT.rotation.set(0, a.yaw, 0);
+      MOUND_AT.scale.set(w * 1.15, L * MOUND_HEIGHT * level, L * 0.55);
+      MOUND_AT.updateMatrix();
+      this.mounds.setMatrixAt(n, MOUND_AT.matrix);
+      // The floor's own blended colour, the one the tile under it was painted with, so the heap is
+      // the same sand as the ground it rises out of rather than the nearest biome's swatch.
+      this.mounds.setColorAt(n, MOUND_COLOR.set(floorColor(a.pos.x, a.pos.z)));
+      n++;
+    }
+    for (const id of this.heaped.keys()) if (!game.byId(id)) this.heaped.delete(id);
+    this.mounds.count = n;
+    this.mounds.visible = n > 0;
+    if (n > 0) {
+      this.mounds.instanceMatrix.needsUpdate = true;
+      if (this.mounds.instanceColor) this.mounds.instanceColor.needsUpdate = true;
+    }
+  }
+  /** Draw the mounds in the seabed's own material (`SeaEnvironment.sediment`). */
+  useMaterial(m: THREE.Material | undefined) { if (m && this.mounds.material !== m) this.mounds.material = m; }
+  dispose() { this.mounds.geometry.dispose(); }
   /** Which bodies are in the seabed, so both the going in and the coming up are seen. */
   private burrowing = new Map<number, Exclude<BurrowPhase, 'none'>>();
   /** Fractional grains carried between frames, so a trickle is a rate and not a per-frame count. */
