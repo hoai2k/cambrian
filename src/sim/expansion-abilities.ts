@@ -15,7 +15,6 @@ export interface ExpansionContext {
 export const abilitySpeed = (a: Actor): number => {
   if (!a.abilityActive || a.state !== 'ability') return 1;
   switch (creature(a.creature).ability) {
-    case 'ribbonSlip': return 1.55;
     case 'sedimentDive': return .85;
     case 'combCruise': return 1.35;
     case 'pharyngealPump': return 1.3;
@@ -152,7 +151,7 @@ export function beginExpansionAbility(ctx: ExpansionContext, a: Actor, def: Crea
   if (!def.abilityDuration) return false;
   a.stateDur = def.abilityDuration;
   a.hitDone.clear();
-  if (def.ability === 'ribbonSlip' || def.ability === 'sedimentDive') {
+  if (def.ability === 'sedimentDive') {
     a.iframes = .3;
     a.seen = 0;
     a.lockTarget = -1;

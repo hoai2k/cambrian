@@ -13,7 +13,7 @@ import { applyMouse, emptyControls, KeyboardInput, MousePlay, readGamepad, type 
 import { applyTouch, TouchPlay } from '../input/touch';
 import { Edges } from '../shared/edges';
 import { clamp, damp, wrapAngle } from '../shared/math';
-import { stepStrike, type Strike, type StrikeOut } from '../shared/mouse-strike';
+import { freshStrike, stepStrike, type StrikeOut, type StrikeState } from '../shared/mouse-strike';
 import { bandOf, bodyGap, isAlive, isHidden, lengthOf, mouthReach } from '../sim/actors';
 import { creature } from '../sim/creatures';
 import type { Game } from '../sim/game';
@@ -126,8 +126,8 @@ export class PlayerInput {
   touchPlay = false;
   /** What the fingers did this frame, kept between `controlsFor` and the camera, as the mouse's is. */
   touchFrame: ReturnType<TouchPlay['read']> | undefined;
-  /** The left mouse button's press in progress (`stepStrike`), and what it came to this frame. */
-  strike: Strike | undefined;
+  /** The mouse's press in progress and its last click (`stepStrike`), and what it came to this frame. */
+  strike: StrikeState = freshStrike();
   strikeOut: StrikeOut | undefined;
   /** Where the cursor was when the left button went down: where a dash's mark is drawn. */
   strikeAt: { x: number; y: number } | undefined;
@@ -219,11 +219,11 @@ export class PlayerInput {
   }
 
   /**
-   * The left mouse button, turned into the frame: the press is read by what it was on and the body
-   * it belongs to (`stepStrike`), and what it asks for is written here — the dash down the cursor's
-   * ray, a bite or a pounce locked on the animal it was pressed on, a chase that points the body at
-   * that animal and swims flat out, or steering, where the body swims along the camera and the
-   * mouse's motion turns them both.
+   * The mouse's buttons, turned into the frame: a press is read by what it was on and the body it
+   * belongs to (`stepStrike`), and what it asks for is written here — the dash down the cursor's
+   * ray, a bite or a pounce locked on the animal it was on, or steering, where the body swims along
+   * the camera and the mouse's motion turns them both. The right button's aim is `applyMouse`'s;
+   * only its release, which springs at the animal under the crosshair, comes through here.
    */
   private mouseStrike(a: Actor, game: Game, cs: CamState, f: InputFrame): StrikeOut {
     const m = this.mouseFrame!;
@@ -235,34 +235,23 @@ export class PlayerInput {
     };
     const alive = isAlive(a);
     if (m.pressed) this.strikeAt = m.ndc;
-    const { strike, out } = stepStrike(alive ? this.strike : undefined, {
+    const over = this.mouse.over ? cs.aimTarget : -1;
+    const { state, out } = stepStrike(alive ? this.strike : freshStrike(), {
       now: performance.now() / 1000,
-      left: alive && m.left, pressed: alive && m.pressed,
-      over: this.mouse.over ? cs.aimTarget : -1,
+      left: alive && m.left, pressed: alive && m.pressed, moved: m.moved,
+      over, aimRelease: alive && m.rightUp ? over : undefined,
       gapTo,
       biteReach: mouthReach(a, L) + def.light.lunge * L,
-      pounceReach: game.pounceRange(a),
-      canPounce: a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0,
       state: a.state,
     });
-    this.strike = strike; this.strikeOut = out;
+    this.strike = state; this.strikeOut = out;
     this.mouse.steer(out.steer);
-    const neutral = Math.hypot(f.mx, f.my) < 0.3;
     if (out.target >= 0) { f.aim = true; f.aimTarget = out.target; }
     if (out.dash) f.dash = true;
     if (out.bite) f.light = true;
     if (out.pounce >= 0) f.pursueTarget = out.pounce;
-    if (out.chase >= 0) {
-      // Point the body at the animal and go: the direction is taken whole, as a dash's is, because
-      // what is being chased can be anywhere — overhead included.
-      const t = game.byId(out.chase)!;
-      const d = this.tmpDesired.set(t.pos.x - a.pos.x, t.pos.y - a.pos.y, t.pos.z - a.pos.z).normalize();
-      f.camYaw = Math.atan2(d.x, d.z);
-      f.camPitch = -Math.asin(clamp(d.y, -1, 1));
-      f.mx = 0; f.my = 1; f.burst = 1;
-    }
     // Steering: the body swims where the camera looks, and the mouse is turning the camera.
-    if (out.steer && neutral) { f.mx = 0; f.my = 1; }
+    if (out.steer && Math.hypot(f.mx, f.my) < 0.3) { f.mx = 0; f.my = 1; }
     return out;
   }
 

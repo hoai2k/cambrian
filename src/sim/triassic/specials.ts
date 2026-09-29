@@ -8,7 +8,7 @@ import type { Game } from '../game';
 import type { Actor } from '../types';
 import { biomeAt, groundHeight } from '../world';
 import { DEVONIAN_RULES } from '../devonian/rules';
-import { installDevonianSpecials, stepAbility as devStepAbility, useAbility as devUseAbility, ySpecial as devYSpecial } from '../devonian/specials';
+import { installDevonianSpecials, stepAbility as devStepAbility, useAbility as devUseAbility } from '../devonian/specials';
 import { triActor } from './state';
 
 /**
@@ -20,7 +20,7 @@ import { triActor } from './state';
  */
 const HEAVY = ['exhaustionHold', 'fangTrap', 'neckStrike', 'whorlSaw', 'sideSwipe'] as const;
 const GUARD = ['bellyTurn'] as const;
-const Y = ['podCall', 'powerStroke', 'scrapeSieve', 'coil', 'comb', 'suctionSnap', 'ink'] as const;
+const Y = ['podCall', 'scrapeSieve', 'coil', 'comb', 'suctionSnap', 'ink'] as const;
 
 const STRIKES: Record<string, HeavyStrike> = {
   exhaustionHold: { reach: 0.95, lunge: 1.4 }, fangTrap: { reach: 1.0, lunge: 1.3 },
@@ -40,15 +40,6 @@ export function installTriassicSpecials() {
 const isTriY = (id: string) => (Y as readonly string[]).includes(id);
 const isTriHeavy = (id: string) => (HEAVY as readonly string[]).includes(id);
 
-export function ySpecial(id: CreatureId): { name: string; desc: string } | undefined {
-  const def = creature(id);
-  if (isTriY(def.ability)) return { name: def.abilityName, desc: def.abilityDesc };
-  return devYSpecial(id);
-}
-
-/** Camouflage is the shared drain; nothing here hides for less. */
-export function camoDrain(): number { return 1; }
-
 /** Where the floor feeds: the algal meadows and the reef's biofilm for the grazer, the mats of the flats for the comb. */
 const MEADOW = new Set(['shelf', 'boulders', 'forest']);
 const MATS = new Set(['shallows', 'nursery']);
@@ -64,11 +55,6 @@ export function useAbility(g: Game, a: Actor, ctx: ExpansionContext): boolean {
       if (!t.pod.length) return false;
       t.podShield = 8; a.abilityCd = def.abilityCooldown;
       for (const id of t.pod) { const m = g.byId(id); if (m?.brain) { m.brain.home = { ...a.pos }; m.brain.goal = 'wander'; m.brain.wanderTo = { ...a.pos }; } }
-      break;
-    case 'powerStroke':                             // four flippers at once: a long shoulders-first dash
-      if (a.stamina < 10) return false;
-      a.stamina -= 10; a.burstT = 1.6; t.strokeT = 0.9; a.abilityCd = def.abilityCooldown;
-      { const h = heading(a.yaw); const v = def.speed * 2.2; a.vel.x += h.x * v; a.vel.z += h.z * v; }
       break;
     case 'coil':                                    // the head goes where the tail was
       if (a.stamina < 5) return false;

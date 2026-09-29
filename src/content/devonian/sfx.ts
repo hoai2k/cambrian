@@ -20,9 +20,8 @@ export const DEVONIAN_SAMPLES: Record<string, string[]> = {
   'ability:jawShear': ['devonian/jaw-shear'], 'ability:runThrough': ['devonian/run-through'], 'ability:tuskLunge': ['devonian/tusk-lunge'],
   'ability:crushBite': ['devonian/crush-bite'], 'ability:neckSnap': ['devonian/neck-snap'], 'ability:cheliceraeGrab': ['devonian/chelicerae-grab'],
   'ability:tridentShove': ['devonian/trident-shove'], 'ability:shieldPush': ['devonian/shield-push'], 'ability:armourFlank': ['devonian/armour-flank'],
-  'ability:brushDisplay': ['devonian/brush-display'], 'ability:shoalDart': ['devonian/shoal-dart'], 'ability:limbHaul': ['devonian/limb-haul'],
-  'ability:shellHover': ['devonian/shell-hover'], 'ability:floorSweep': ['devonian/floor-sweep'], 'ability:filterGulp': ['devonian/filter-gulp'],
-  'ability:shellJet': ['devonian/jet-1', 'devonian/jet-2'],
+  'ability:brushDisplay': ['devonian/brush-display'],
+  'ability:floorSweep': ['devonian/floor-sweep'], 'ability:filterGulp': ['devonian/filter-gulp'],
   breach: ['devonian/breach'],
   splash: ['devonian/splash-1', 'devonian/splash-2'],
 };

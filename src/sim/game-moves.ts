@@ -95,7 +95,9 @@ export function heavyAction(game: Game, a: Actor, def: CreatureDef, L: number, s
   // moves are for. Held, it is why an Opabinia beside a giant now does something: the button was
   // being spent on a claw strike aimed at an animal it cannot hurt.
   if (a.graspHold && a.graspT >= gripHold(def) && keepReaching(game, a, def, L, sf)) return true;
-  if (HEAVY_SPECIALS.has(def.ability) && a.abilityCd <= 0 && a.stamina >= 18 + extra) {
+  // A player's RT is always the pounce: their special is on Y or B (`specialSlot`), and a special
+  // here took the one attack every body has away from exactly the bodies that had a special.
+  if (a.controller !== 'player' && HEAVY_SPECIALS.has(def.ability) && a.abilityCd <= 0 && a.stamina >= 18 + extra) {
     a.stamina -= 18 + extra; startAbility(game, a, def); a.abilityCd = Math.max(2, a.stateDur + .6); game.flag(a, 'heavy');
     return true;
   }
@@ -270,9 +272,6 @@ export function blockPulse(game: Game, a: Actor, def: CreatureDef) {
 }
 
 export function evadeSpecial(game: Game, a: Actor, def: CreatureDef, L: number) {
-  if (['tailFlick','ribbonSlip'].includes(def.ability)) {
-    game.silt.push({pos:{...a.pos},radius:L,t:2}); clearPursuit(a,game.actors);
-  }
   if (def.ability === 'combCruise') { a.burstT = 1; a.stamina = Math.min(a.staminaMax,a.stamina+4); }
 }
 
@@ -370,6 +369,29 @@ export function startPounce(game: Game, a: Actor, target: Actor, L: number, sf: 
   void sf;
 }
 
+/**
+ * Specials that have no way in but a button. They were written as timed abilities and wired to
+ * nothing, so they sat unreachable; a player's Y or B is their way in now (`fireSpecial`).
+ */
+const BUTTON_SPECIALS = new Set(['whipSearch', 'sedimentDive']);
+
+/**
+ * A player pressed the button their special is on (`specialSlot`): fire it. The era's own specials
+ * (a gulp, a pod call, ink) answer first; a strike or a timed special is started the way RT used to
+ * start it, on the same cooldown and price. Returns whether anything took the press, so the button
+ * can fall back to what it does for an animal with no special when the special is not ready.
+ */
+export function fireSpecial(game: Game, a: Actor, def: CreatureDef): boolean {
+  // A dive into the sediment needs sediment under it: off the bottom there is nothing to dive into.
+  if (def.ability === 'sedimentDive' && !a.grounded) return false;
+  if (RULES.useAbility?.(game, a, expansionContext(game))) { game.flag(a, 'ability'); return true; }
+  if ((HEAVY_SPECIALS.has(def.ability) || BUTTON_SPECIALS.has(def.ability)) && a.abilityCd <= 0 && a.stamina >= 18) {
+    a.stamina -= 18; startAbility(game, a, def); a.abilityCd = Math.max(2, a.stateDur + .6); game.flag(a, 'heavy');
+    return true;
+  }
+  return false;
+}
+
 export function expansionContext(game: Game) {
   return { hit: game.hitCtx, nearby: (pos: Vec3, radius: number) => game.nearby(pos, radius), silt: game.silt,
     allies: (a: Actor, b: Actor) => (game.mode === 'rise' || game.mode === 'survival') && a.controller === 'player' && b.controller === 'player' };
@@ -377,7 +399,7 @@ export function expansionContext(game: Game) {
 
 /** Internal animation state for native heavy specials; Y never calls this. */
 export function startAbility(game: Game, a: Actor, def: CreatureDef) {
-  if (!HEAVY_SPECIALS.has(def.ability)) return;
+  if (!HEAVY_SPECIALS.has(def.ability) && !BUTTON_SPECIALS.has(def.ability)) return;
   a.abilityCd = Math.max(2, (def.abilityDuration ?? .55) + .6);
   a.abilityT = 0; a.abilityActive = true; a.state = 'ability'; a.stateT = 0;
   a.stateDur = def.abilityDuration ?? .55; a.hitDone.clear();

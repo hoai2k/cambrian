@@ -1,5 +1,6 @@
 import { ACTIVE_ERA } from '../content';
 import { hideLabel } from '../sim/concealment';
+import { specialSlot } from '../sim/special-slot';
 import * as THREE from 'three';
 import { drawable, drawDistance, OVERFLOW, viewRank } from './view-pick';
 import { audio, SAMPLES } from '../audio/audio';
@@ -32,7 +33,7 @@ import { PLAYER_COLORS, type HudSnapshot, type PlayerHud, type RadarBlipHud, typ
 import { ViewRoot } from './view-root';
 import { freshGovernor, governFrame, planFor, type GovernorPlan } from './frame-governor';
 import { NEAR_MIN, nearAlwaysFor, ZOOM_MAX } from '../shared/view-reach';
-import { BREATH_PEEK, climbAimHold, edgePitch, FOLLOW_HOLD, FOLLOW_RATE, inverted, layoutRects, magnificationDistance, PITCH_DOWN, PITCH_UP, RIGHT_AFTER, RIGHT_RATE, rightSideUp, spectatorTarget, updateCamera, type CamState } from './camera';
+import { BREATH_PEEK, climbAimHold, FOLLOW_HOLD, FOLLOW_RATE, inverted, layoutRects, magnificationDistance, PITCH_DOWN, PITCH_UP, RIGHT_AFTER, RIGHT_RATE, rightSideUp, spectatorTarget, updateCamera, type CamState } from './camera';
 import { freshTele, PlayerInput, updateTeleMenu } from './player-input';
 import { BurrowSand, ShoreTracks } from './shore-fx';
 
@@ -555,26 +556,17 @@ export class Engine {
             // `FOLLOW_HOLD` after a drag or a swipe so a player who has just looked somewhere on
             // purpose is not immediately turned away from it.
             if ((this.input.mouseLook || this.input.touchPlay) && p) {
-              // The cursor's height is a second way of aiming the view, and it is *asking* for
-              // something just as a drag is — so it holds the follow off while it pushes, or the
-              // two would pull against each other and the pitch would sit wherever they balanced.
-              //
-              // Only the *mouse* gets it. A hovering cursor is otherwise idle information — it is
-              // somewhere whether or not the player is doing anything with it — and a finger is the
-              // opposite: it is only on the glass while it is being used, and while it is, its travel
-              // is already the camera. Reading its height as a tilt as well would have one gesture
-              // pulling the pitch two ways.
-              const edge = this.input.mouseLook && this.input.mouseFrame?.ndc && !this.input.mouseFrame.dragging ? edgePitch(this.input.mouseFrame.ndc.y) : 0;
-              if (edge !== 0 && !inverted(cs.pitch)) cs.pitch = clamp(cs.pitch + edge * dt, PITCH_UP, PITCH_DOWN);
+              // Only a hand *on* the view holds the follow off: a drag, a steer, a swipe or a stick.
+              // A hovering cursor is not one — where it sits is where it points, and it no longer
+              // tilts the view at the top and bottom of the screen, because a player pointing at
+              // something up there was being turned to look at it whether they meant to or not.
               if (this.input.mouseFrame?.dragging || this.input.touchFrame?.dragging || Math.abs(c.lookX) > 0.05 || Math.abs(c.lookY) > 0.05) cs.followHold = FOLLOW_HOLD;
               else cs.followHold = Math.max(0, cs.followHold - dt);
               // Not while the view is upside down or still turning the right way up: the follow
               // would pull it back the way it came, through the pole, fighting the righting.
               if (cs.followHold === 0 && cs.climbHold === 0 && !inverted(cs.pitch) && Math.abs(cs.roll) < 0.3) {
                 cs.yaw = wrapAngle(cs.yaw + wrapAngle(p.yaw - cs.yaw) * (1 - Math.exp(-FOLLOW_RATE * dt)));
-                // The pitch only settles back while the cursor is in the dead zone: the follow is
-                // what a view does when nobody is asking, and the cursor up there is an ask.
-                if (edge === 0) cs.pitch = damp(cs.pitch, 0.2, FOLLOW_RATE * 0.5, dt);
+                cs.pitch = damp(cs.pitch, 0.2, FOLLOW_RATE * 0.5, dt);
               }
             }
           }
@@ -717,7 +709,7 @@ export class Engine {
     // The pointer is put away while the left button is steering or holding a mark on an animal,
     // and while a dash is running, whose mark the HUD draws so that it can move (`cursors.ts`).
     const out = this.input.strikeOut;
-    const want = cursorFor(cursorState({ dragging: m.dragging, dashing: m.right || out?.mark === 'zoom', hidden: !!out && (out.steer || out.mark === 'target') }, over));
+    const want = cursorFor(cursorState({ dragging: m.dragging && !m.steering, dashing: out?.mark === 'zoom', hidden: !!out && (out.steer || out.mark === 'target') }, over));
     if (want !== this.cursorNow) { this.cursorNow = want; this.container.style.cursor = want; }
   }
 
@@ -1343,6 +1335,8 @@ export class Engine {
       // their seat, anything else by its species.
       const killerId = p.swallowedBy >= 0 ? p.swallowedBy : p.killer;
       const killer = killerId >= 0 ? game.byId(killerId) : undefined;
+      // Y shows the special where the animal's special is on Y (`specialSlot`), and the hide otherwise.
+      const ySlot = specialSlot(creature(p.creature)) === 'y';
       const nameOf = (a: Actor | undefined) => (a ? (a.player >= 0 ? TEXT.common.playerChip(a.player + 1) : creature(a.creature).name) : undefined);
       const watched = spectatorTarget(game, i);
       const spectate = watched ? { index: watched.player, name: TEXT.common.playerChip(watched.player + 1), color: PLAYER_COLORS[watched.player % 4], creature: watched.creature } : undefined;
@@ -1374,8 +1368,6 @@ export class Engine {
         }
       } else if (strike?.mark === 'zoom' && this.input.strikeAt) {
         touchMark = { kind: 'zoom', at: this.input.strikeAt };
-      } else if (mouseSeat && this.input.mouseFrame?.right && this.input.mouseFrame.ndc) {
-        touchMark = { kind: 'zoom', at: this.input.mouseFrame.ndc };
       } else if (chaseId !== -1 && this.input.touchPlay && this.input.touchFrame?.marker && this.input.touchFrame.ndc) {
         touchMark = { kind: this.input.touchFrame.marker, at: this.input.touchFrame.ndc };
       }
@@ -1385,7 +1377,7 @@ export class Engine {
         hp: p.hp, hpMax: p.hpMax, hunger: game.mode === 'survival' ? p.hunger : undefined, stamina: p.stamina, staminaMax: p.staminaMax, exhausted: p.exhausted > 0,
         tier: p.tier, tierName: era ? `${era.stage} · ${era.rungName}` : TIER_NAMES[p.tier], // The ring means the same thing in both eras: how close the next moult is, full when it lands.
         progress: era ? era.stageProgress : p.tier >= 4 ? 1 : clamp(p.nutrition / TIER_NEED[p.tier], 0, 1), scale: p.scale,
-        abilityName: p.hideMode === 'descending' ? TEXT.sim.hide.sinking : p.hideMode === 'burrowed' ? TEXT.sim.hide.buried(controlKey('ability', scheme)) : p.hideMode === 'camouflage' ? TEXT.sim.hide.camouflaged(p.camoLabel) : RULES.ySpecial?.(p.creature)?.name ?? hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : RULES.ySpecial?.(p.creature) ? 1 - clamp(p.abilityCd / Math.max(1, creature(p.creature).abilityCooldown), 0, 1) : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none' || (p.state === 'ability' && !!RULES.ySpecial?.(p.creature)), abilityUnlocked: true,
+        abilityName: p.hideMode === 'descending' ? TEXT.sim.hide.sinking : p.hideMode === 'burrowed' ? TEXT.sim.hide.buried(controlKey('ability', scheme)) : p.hideMode === 'camouflage' ? TEXT.sim.hide.camouflaged(p.camoLabel) : ySlot ? creature(p.creature).abilityName : hideLabel(p.creature), abilityReady: p.hideMode === 'camouflage' ? p.stamina / p.staminaMax : ySlot ? 1 - clamp(p.abilityCd / Math.max(1, creature(p.creature).abilityCooldown), 0, 1) : 1 - clamp(p.hideCd / 2, 0, 1), abilityActive: p.hideMode !== 'none' || (p.state === 'ability' && ySlot), abilityUnlocked: true,
         senseOn: p.senseMode,
         lock: lockA && isAlive(lockA) ? { name: creature(lockA.creature).name, kind: creature(lockA.creature).kind, band: bandOf(p, lockA), hp: lockA.hp / lockA.hpMax, color: BAND_COLOR[bandOf(p, lockA)] } : undefined,
         hunted: p.hunted, hunterAngle, hunterName: hunter ? creature(hunter.creature).name : undefined,

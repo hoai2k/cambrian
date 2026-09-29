@@ -8,7 +8,7 @@ import type { Actor, InputFrame, Mode, WorldEvent } from '../types';
 import { BIOME_DANGER, biomeAt, groundHeight, RISE_RATE, sampleCurrent, shoreDistance, SHORE_WALL, SURFACE_Y } from '../world';
 import { bodyRadius } from '../actors';
 import { ADULT_STAGE, devActor, GROWN, PRIME_STAGE, RUNG_NAMES, STAGE_AT, STAGES, stageForScale, stageProgress, stageScale, stateFor, type DeadZone, type DevActor } from './state';
-import { camoDrain, installDevonianSpecials, stepAbility, stepGuardSpecial, useAbility, ySpecial } from './specials';
+import { installDevonianSpecials, stepAbility, stepGuardSpecial, useAbility } from './specials';
 import { canBreach, sanctuary, spawnInCover, spawnProtect, spawnY, swim, wanderY } from './swim';
 import { apexLeft } from '../apex';
 
@@ -251,7 +251,6 @@ export const DEVONIAN_RULES = {
   // The stage is stored, not derived per step, so a body that changed species has to be told.
   onSwap: (g, a) => { const d = devActor(g, a); d.stage = stageForScale(creature(a.creature).adultLength, a.scale); d.standing = STAGE_AT[d.stage] ?? 0; },
   install() { installDevonianSpecials(); },
-  ySpecial,
   init(g) { installDevonianSpecials(); for (const a of g.players) { const d = devActor(g, a); d.stage = stageForScale(creature(a.creature).adultLength, a.scale); d.standing = g.mode === 'reef' ? STAGE_AT[ADULT_STAGE] + 5 : STAGE_AT[d.stage]; } },
 
   step(g, dt) {
@@ -286,7 +285,6 @@ export const DEVONIAN_RULES = {
     d.sinceEat = 0;
     const def = creature(a.creature);
     let k = FEED[rungOf(a)] * amount;
-    if (food && food.state === 'dead' && def.ability === 'scavenge') k *= 2;
     gain(g, a, d, k);
   },
 
@@ -315,7 +313,7 @@ export const DEVONIAN_RULES = {
   shoreReach(a) { return creature(a.creature).shoreReach ?? 0; },
   jet(a) { return !!creature(a.creature).shell; },
 
-  useAbility, stepAbility, camoDrain,
+  useAbility, stepAbility,
   swim, rise: riseDrive, staminaRegen, climbRelief, canBreach, spawnY, wanderY,
   spawnPoint: spawnInCover, spawnProtect, sanctuary,
 

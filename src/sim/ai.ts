@@ -461,7 +461,7 @@ export function thinkNeeds(g: AiWorld, a: Actor, b: BrainState, dt: number): Inp
         if (dist(a.pos, cover.pos) < cover.radius * 0.5 && a.sinceHit > 2) { out.worldMove = v3(); out.burst = 0; return out; }
       }
       out.worldMove = dir; out.burst = a.stamina > 25 ? 1 : 0;
-      if (a.hideMode === 'none' && a.hideCd <= 0 && a.stamina > 10 && (def.ability === 'tailFlick' || def.ability === 'burrow' || def.ability === 'enroll' || def.ability === 'shellUp' || ['ribbonSlip', 'sedimentDive', 'combCruise', 'adhesiveGlide', 'bellCorral'].includes(def.ability)) && dist(a.pos, t.pos) < L * 3) out.ability = true;
+      if (a.hideMode === 'none' && a.hideCd <= 0 && a.stamina > 10 && ((def.hides && def.ability === 'none') || def.ability === 'burrow' || def.ability === 'enroll' || def.ability === 'shellUp' || ['sedimentDive', 'combCruise', 'adhesiveGlide', 'bellCorral'].includes(def.ability)) && dist(a.pos, t.pos) < L * 3) out.ability = true;
       if(out.ability) out.burst = 0;
       if(a.hideMode === 'burrowed') { out.worldMove = v3(); out.burst = 0; }
       else if(a.hideMode !== 'none') out.burst = 0;

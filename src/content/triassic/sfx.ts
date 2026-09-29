@@ -18,9 +18,9 @@ export const TRIASSIC_SAMPLES: Record<string, string[]> = {
   breach: ['devonian/breach'],
   splash: ['devonian/splash-1', 'devonian/splash-2'],
   'ability:exhaustionHold': ['devonian/jaw-shear'], 'ability:fangTrap': ['devonian/chelicerae-grab'], 'ability:neckStrike': ['devonian/neck-snap'],
-  'ability:whorlSaw': ['devonian/tusk-lunge'], 'ability:powerStroke': ['devonian/shoal-dart'], 'ability:scrapeSieve': ['devonian/floor-sweep'],
+  'ability:whorlSaw': ['devonian/tusk-lunge'], 'ability:scrapeSieve': ['devonian/floor-sweep'],
   'ability:coil': ['devonian/shoal-dart'], 'ability:sideSwipe': ['devonian/armour-flank'], 'ability:comb': ['devonian/filter-gulp'],
   'ability:suctionSnap': ['devonian/filter-gulp'], 'ability:ink': ['devonian/jet-1'], 'ability:podCall': ['devonian/shoal-join'],
-  'ability:crushBite': ['devonian/crush-bite'], 'ability:runThrough': ['devonian/run-through'], 'ability:shoalDart': ['devonian/shoal-dart'],
-  'ability:filterGulp': ['devonian/filter-gulp'], 'ability:shellHover': ['devonian/shell-hover'], 'ability:cheliceraeGrab': ['devonian/chelicerae-grab'],
+  'ability:crushBite': ['devonian/crush-bite'], 'ability:runThrough': ['devonian/run-through'],
+  'ability:filterGulp': ['devonian/filter-gulp'], 'ability:cheliceraeGrab': ['devonian/chelicerae-grab'],
 };

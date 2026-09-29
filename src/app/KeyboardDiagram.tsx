@@ -23,10 +23,10 @@ const ROWS: [string, string][] = [
   [btn('look', 'kbm'), 'Steer (hold) · look around'],
   [btn('zoom', 'kbm'), 'Zoom the camera'],
   [btn('light', 'kbm'), 'Bite — click an animal in reach'],
-  [btn('heavy', 'kbm'), 'Pounce — click one further off; hold to chase'],
+  [btn('heavy', 'kbm'), 'Pounce — click one further off, or let go of aim on it'],
   [btn('sprint', 'kbm'), 'Sprint (hold)'],
-  [btn('dash', 'kbm'), 'Dash · click the water to dash there'],
-  [`${btn('aim', 'kbm')} / Tab`, 'Aim (hold) · crosshair'],
+  [btn('dash', 'kbm'), 'Dash · click the water; double-click and hold to go on'],
+  [`${btn('aim', 'kbm')} / Tab`, 'Aim (hold) · the cursor is the crosshair'],
   [btn('guard', 'kbm'), 'Shield (tap = parry)'],
   [btn('ability', 'kbm'), 'Hide / camouflage'],
   [btn('sense', 'kbm'), 'Sense: marks and radar on/off'],
@@ -42,11 +42,11 @@ export function KeyboardDiagram() {
     <svg className="xbox-diagram kbm-diagram" viewBox="0 0 860 400" role="img" aria-labelledby="kbm-title">
       <title id="kbm-title">
         Mouse and keyboard layout: W swims forward and X backwards, A and D turn, the camera
-        follows the creature, the wheel zooms. A left click on open water dashes there; on an
-        animal it bites one in reach, pounces at one further off and, held, chases one out of reach
-        until it can pounce. Held after that, the left button steers: the pointer goes away and the
-        mouse turns the animal and the view until it is let go. The right button dashes at the
-        cursor and the middle button aims. Space dashes, Shift sprints, E or Q
+        follows the creature, the wheel zooms. A left click on open water dashes there, and on an
+        animal bites one in reach or pounces at one further off; a double-click does it at once and,
+        held, keeps going. Holding the left button steers: the pointer goes away and the mouse turns
+        the animal and the view until it is let go. Holding the right button aims, and letting it go
+        with the cursor on an animal pounces at it. Space dashes, Shift sprints, E or Q
         rise, S or C sink, R shields, Z is camouflage, I is the sense pulse, J or F bite, G or K is
         the heavy, T opens the teleport menu, V holds the scoreboard open and Escape pauses.
       </title>
@@ -72,10 +72,10 @@ export function KeyboardDiagram() {
         <line x1="300" y1="134" x2="375" y2="134" stroke="#7ea4ae" strokeWidth="1.5" />
       </g>
       <line x1="310" y1="98" x2="300" y2="70" className="pad-line" />
-      <text x={296} y={64} textAnchor="end" className="pad-label">Left · Dash, bite, pounce, steer</text>
+      <text x={296} y={64} textAnchor="end" className="pad-label">Left · Click to strike, hold to steer</text>
       <line x1="365" y1="98" x2="375" y2="70" className="pad-line" />
-      <text x={379} y={64} className="pad-label">Right · Dash</text>
-      <text x={337} y={254} textAnchor="middle" className="pad-label dim-label">wheel zooms · press to aim</text>
+      <text x={379} y={64} className="pad-label">Right · Aim</text>
+      <text x={337} y={254} textAnchor="middle" className="pad-label dim-label">wheel zooms · middle-drag looks</text>
 
       {ROWS.map(([control, what], i) => {
         const y = 46 + i * 21.5;

@@ -3,9 +3,10 @@ import { CREATURES, creature } from '../src/sim/creatures';
 import { EXPANSION_CREATURES } from '../src/sim/expansion';
 import { makeActor, bodyRadius, clearanceOf, isHidden, speedFactor } from '../src/sim/actors';
 import { applyHit } from '../src/sim/combat';
-import { beginExpansionAbility, stepExpansionAbility, bloomRate, grazeRate, HEAVY_STRIKE, specialHit } from '../src/sim/expansion-abilities';
+import { beginExpansionAbility, stepExpansionAbility, bloomRate, grazeRate, HEAVY_STRIKE, heavyStrikeReach, specialHit } from '../src/sim/expansion-abilities';
 import { emptyInput } from '../src/sim/types';
 import { Game } from '../src/sim/game';
+import { specialSlot } from '../src/sim/special-slot';
 import { makeBrain } from '../src/sim/ai';
 import { sampleHeight, SURFACE_Y } from '../src/sim/world';
 import { makeRng, rngFrom } from '../src/shared/math';
@@ -50,17 +51,21 @@ assert(hit(.75) > hit(0));
   for (let i=0;i<60;i++) stepExpansionAbility(ctx, a, creature(a.creature), 1/60);
   assert.equal(v.hp, hp);
 }
-// Every selectable creature can hide, emerge and resume moving through the actual simulation.
+// Every selectable creature whose Y is the hide (`specialSlot`) can hide, emerge and resume moving
+// through the actual simulation; one whose Y is its special fires it and is not left stuck in it.
 for (const def of EXPANSION_CREATURES) {
+  const yIsSpecial = specialSlot(def) === 'y';
   const g = new Game('reef', [{creature:def.id,device:'keyboard',ready:true}], 432);
   const a = g.players[0];
   for (const o of [...g.actors]) if (o !== a) (g as any).remove(o);
   a.pos = {x:0,y:def.ground ? 0 : 8,z:0}; a.yaw=0; a.spawnProtect=20;
   const f = {...emptyInput(),my:1,camYaw:0,ability:true};
   g.step(1/60,new Map([[0,f]])); f.ability=false;
-  assert.notEqual(a.hideMode, 'none', `${def.id}: hiding did not activate`);
-  g.step(1/60,new Map([[0,f]])); f.ability=true; g.step(1/60,new Map([[0,f]])); f.ability=false;
-  assert.equal(a.hideMode,'none',`${def.id}: hiding did not cancel`);
+  if (!yIsSpecial) {
+    assert.notEqual(a.hideMode, 'none', `${def.id}: hiding did not activate`);
+    g.step(1/60,new Map([[0,f]])); f.ability=true; g.step(1/60,new Map([[0,f]])); f.ability=false;
+    assert.equal(a.hideMode,'none',`${def.id}: hiding did not cancel`);
+  } else assert.equal(a.hideMode, 'none', `${def.id}: Y is its special, and it did not hide`);
   const start={...a.pos};
   for(let i=0;i<300;i++) {g.step(1/60,new Map([[0,f]]));g.events.length=0;}
   assert.notEqual(a.state,'ability',`${def.id}: stuck in ability`);
@@ -68,9 +73,9 @@ for (const def of EXPANSION_CREATURES) {
   assert(Math.hypot(a.pos.x-start.x,a.pos.z-start.z)>.2,`${def.id}: cannot move`);
   assert(Object.values(a.pos).every(Number.isFinite));
 }
-// Ribbon slip clears both player locks and the AI's acquired target/detection.
+// The sediment dive clears both player locks and the AI's acquired target/detection.
 {
-  const a=actor(1), hunter=actor(2,'anomalocaris');
+  const a=actor(1,'ottoia'), hunter=actor(2,'anomalocaris');
   hunter.lockTarget=a.id;hunter.brain=makeBrain('giant',hunter.pos,rngFrom(()=>.5),{target:a.id,goal:'hunt'});
   hunter.brain.detection.set(a.id,1);
   const ctx={hit:{events:[], rng: makeRng(1),byId:()=>undefined,time:0},nearby:()=>[hunter],silt:[],allies:()=>false};
@@ -82,6 +87,9 @@ for (const def of EXPANSION_CREATURES) {
   const g=new Game('reef',[{creature:'ottoia',device:'keyboard',ready:true}],77),a=g.players[0];
   a.grounded=false;a.pos={x:0,y:20,z:0};a.hopVel=1;
   g.step(1/60,new Map([[0,{...emptyInput(),ability:true}]]));
+  assert.equal(a.abilityCd,0);assert.notEqual(a.state,'ability');
+  // ...and its dive, on B now that Y is the burrow, is refused off the bottom too.
+  g.step(1/60,new Map([[0,{...emptyInput(),guard:true}]]));
   assert.equal(a.abilityCd,0);assert.notEqual(a.state,'ability');
 }
 // Tall radial bodies use their anatomical clearance at the surface too. A body found above the
@@ -135,18 +143,19 @@ for(const id of ['burgessomedusa','ctenorhabdotus'] as const){
     // Let a benthic creature settle onto the seabed first, so the target sits at its own depth.
     for (let i = 0; i < 60; i++) g.step(1 / 60, new Map([[0, emptyInput()]]));
     a.yaw = 0; a.vel = { x: 0, y: 0, z: 0 }; a.stamina = a.staminaMax; a.abilityCd = 0; a.exhausted = 0;
-    const move = g.heavyMove(a);
-    assert.equal(move.name, def.abilityName.toUpperCase(), `${def.id}: prompt names the wrong move`);
-    assert(move.ready, `${def.id}: rested creature reads as not ready`);
+    // A player's RT is the pounce; the special is on its own button (`specialSlot`), with its own reach.
+    assert.equal(g.heavyMove(a).name, 'POUNCE', `${def.id}: a player's RT should be named the pounce`);
+    const move = { reach: heavyStrikeReach(a, def) };
     assert(move.reach > 0, `${def.id}: a strike with no reach`);
+    const key = specialSlot(def) === 'b' ? 'guard' : 'ability';
     // A body at the far edge of what the crosshair promises, dead ahead and at the same depth.
     const prey = g.spawn('waptia', 'ambient', { x: a.pos.x, y: a.pos.y, z: a.pos.z + move.reach * 0.95 }, 1);
     prey.scale = a.scale; prey.hp = prey.hpMax = 400; prey.iframes = 0;
     a.lockTarget = prey.id; a.aiming = true;
     const before = prey.hp;
-    const input = { ...emptyInput(), heavy: true, aim: true, aimTarget: prey.id };
-    for (let i = 0; i < 90; i++) g.step(1 / 60, new Map([[0, i < 2 ? input : { ...input, heavy: false }]]));
-    assert(before > prey.hp, `${def.id}: RT at a target the crosshair called in range never connected`);
+    const input = { ...emptyInput(), [key]: true, aim: true, aimTarget: prey.id };
+    for (let i = 0; i < 90; i++) g.step(1 / 60, new Map([[0, i < 2 ? input : { ...input, [key]: false }]]));
+    assert(before > prey.hp, `${def.id}: the special at a target in its reach never connected`);
     // A special takes the heavy button's place, so whatever numbers it was authored with, it must
     // not land softer than the heavy it displaced — the button would be worse to own. Every heavy
     // special's hit goes through `specialHit`, so flooring the weakest possible authored values
@@ -181,9 +190,10 @@ for(const id of ['burgessomedusa','ctenorhabdotus'] as const){
   }
 }
 
-// --- RT always does something: the special when it is ready, the heavy attack or a pounce when
-// it is not. The eight creatures whose special sits on RT used to swallow the press entirely
-// while the special cooled down, so their `heavy` move was unreachable for a player. ---
+// --- RT always does something, and for a player it is never the special: the special is on its
+// own button (`specialSlot`), and RT is the heavy attack or a pounce whether the special is ready
+// or cooling down. The creatures whose special used to sit on RT once swallowed the press entirely
+// while it cooled down, so their `heavy` move was unreachable for a player. ---
 {
   const HEAVY_SPECIAL_IDS = EXPANSION_CREATURES.filter((d) => HEAVY_SPECIALS.has(d.ability)).map((d) => d.id);
   assert(HEAVY_SPECIAL_IDS.length > 0, 'no creatures carry a special on RT');
@@ -192,9 +202,10 @@ for(const id of ['burgessomedusa','ctenorhabdotus'] as const){
     const p = g.players[0];
     p.spawnProtect = 0; p.pos = { x: 0, y: 6, z: 0 };
     const press = (held: boolean) => g.step(1 / 60, new Map([[0, { ...emptyInput(), heavy: held }]]));
-    // first press: the special
-    press(true); press(false);
-    assert.equal(p.state, 'ability', `${id}: RT did not start the special (state=${p.state})`);
+    const key = specialSlot(creature(id)) === 'b' ? 'guard' : 'ability';
+    // first press: the special, on its own button
+    g.step(1 / 60, new Map([[0, { ...emptyInput(), [key]: true }]])); press(false);
+    assert.equal(p.state, 'ability', `${id}: its button did not start the special (state=${p.state})`);
     // run it out, then press again while it is still cooling down
     for (let i = 0; i < 60 * 6 && (live(p).state !== 'free' || p.abilityCd <= 0); i++) press(false);
     assert(live(p).state === 'free' && p.abilityCd > 0, `${id}: no cooling-down window to test (state=${p.state} cd=${p.abilityCd.toFixed(2)})`);

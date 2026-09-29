@@ -115,6 +115,7 @@
     "select:shots": "node tools/select-shots.mjs",
     "cursors": "node tools/test.mjs cursors",
     "mouse:strike": "node tools/test.mjs mouse:strike",
+    "specials": "node tools/test.mjs specials",
     "tracks": "node tools/test.mjs tracks",
     "tracks:browser": "node tools/tracks-browser.mjs"
   },

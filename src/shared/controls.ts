@@ -34,7 +34,7 @@ interface Label { pad: string; kbm: string; key1: string; key2: string; touch: s
 /** Long names, for prose and for the diagrams. `short` overrides them inside a chip or a <kbd>. */
 const LABELS: Record<Action, Label> = {
   swim:     { pad: 'Left stick', kbm: 'W forward, X back, A / D turn', key1: 'W / X, A / D turn', key2: 'IJKL', touch: 'Swim pad', short: { touch: 'Swim' } },
-  look:     { pad: 'Right stick', kbm: 'Hold click and move, or middle-drag', key1: 'Arrow keys', key2: 'IJKL (no camera)', touch: 'Swipe' },
+  look:     { pad: 'Right stick', kbm: 'Hold left click and move, or middle-drag', key1: 'Arrow keys', key2: 'IJKL (no camera)', touch: 'Swipe' },
   zoom:     { pad: 'Right stick click + up/down', kbm: 'Mouse wheel', key1: 'PgUp / PgDn', key2: '—', touch: 'Pinch', short: { pad: 'RS + ▲▼', kbm: 'Wheel' } },
   sprint:   { pad: 'LB', kbm: 'Shift', key1: 'Shift', key2: 'Right Shift', touch: '—', short: { key2: 'R-Shift' } },
   rise:     { pad: 'RB', kbm: 'E or Q', key1: 'E or Q', key2: 'N', touch: 'Look up and swim', short: { touch: 'Look up' } },
@@ -44,7 +44,7 @@ const LABELS: Record<Action, Label> = {
   ability:  { pad: 'Y', kbm: 'Z', key1: 'Z', key2: 'P', touch: 'Pad set to hide', short: { touch: 'Pad' } },
   dash:     { pad: 'A', kbm: 'Space, or click open water', key1: 'Space', key2: '/', touch: 'Double-tap the water', short: { touch: 'Double-tap', pad: 'A', kbm: 'Space / LMB' } },
   guard:    { pad: 'B', kbm: 'R', key1: 'R', key2: 'U', touch: 'Pad set to guard', short: { touch: 'Pad' } },
-  aim:      { pad: 'LT', kbm: 'Middle click', key1: 'Tab', key2: 'O', touch: 'Pad set to aim', short: { touch: 'Pad', kbm: 'MMB' } },
+  aim:      { pad: 'LT', kbm: 'Hold right click', key1: 'Tab', key2: 'O', touch: 'Pad set to aim', short: { touch: 'Pad', kbm: 'RMB' } },
   sense:    { pad: 'D-pad up', kbm: 'I', key1: 'I', key2: 'Y', touch: 'Always on', short: { touch: 'On', pad: '▲' } },
   teleport: { pad: 'D-pad down', kbm: 'T', key1: 'T', key2: 'H', touch: 'Pause, then Travel', short: { touch: 'Travel', pad: '▼' } },
   view:     { pad: 'View', kbm: 'V', key1: 'V', key2: ',', touch: 'Pause, then Scores', short: { touch: 'Scores' } },

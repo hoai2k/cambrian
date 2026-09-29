@@ -3,6 +3,7 @@
  * the floor, the scenery it meets, and the actions and state machine. `Step` is what the earlier
  * passes worked out about this frame. Split out of src/sim/game.ts; every function takes the Game.
  */
+import { specialSlot } from './special-slot';
 import { RULES } from './era-rules';
 import { BURROWERS, HEAVY_SPECIALS, DEFENSIVE_SPECIALS, CAMOUFLAGE_DRAIN, camouflageMatch, clearPursuit, STILL_SETTLE, stillBury, stopHiding } from './concealment';
 import { abilitySpeed, stepExpansionAbility, bloomRate, grazeRate } from './expansion-abilities';
@@ -22,7 +23,7 @@ import { BREACH_GRAVITY, DASH_TAP, DASH_TIME, FLIP_TIME, GRASP_AT, HATCH_TIME, t
 import { attackHits, canEat, consumeSnacks, corpseInReach, gainNutrition, nutritionValue, startEating, takeWhole } from './game-feeding';
 import { breakLoose, closeGrip, tryGrasp, updateRide } from './game-grip';
 import { inShell } from './game-life';
-import { aimNudge, blockPulse, emergeStrike, evadeSpecial, expansionContext, heavyAction, keepReaching, pickLockTarget, startDash, startDodge, startPounce, updateAbility, updateHunted } from './game-moves';
+import { aimNudge, blockPulse, emergeStrike, evadeSpecial, expansionContext, fireSpecial, heavyAction, keepReaching, pickLockTarget, startDash, startDodge, startPounce, updateAbility, updateHunted } from './game-moves';
 import { feedOnBones } from './game-population';
 
 /** Everything the simulation says out loud; the words are in `src/content/strings.ts`. */
@@ -177,7 +178,7 @@ export function updateActor(game: Game, a: Actor, input: InputFrame, dt: number)
   // climb for nothing, and what counts as climb is where this frame is pointed.
   const { speed, burstIn, paddling, bursting, freeBurst, relief, emptyClimb, freeClimb } = stepUpkeep(game, a, input, dt, def, L, dir, mag, justLight, justHeavy, justAbility, justDash);
 
-  const controllable = a.holdT === 0 && (a.state === 'free' || a.state === 'guard' || (a.state === 'ability' && (def.mobileAbility || def.ability === 'shellUp' || def.ability === 'bristleFlare' || def.ability === 'ambushSurge')));
+  const controllable = a.holdT === 0 && (a.state === 'free' || a.state === 'guard' || (a.state === 'ability' && (def.mobileAbility || def.ability === 'shellUp' || def.ability === 'bristleFlare')));
   const slowMult = abilitySpeed(a) * (a.state === 'guard' ? (def.ability === 'anchor' ? 0 : def.ability === 'enroll' ? .8 : .45) : (a.abilityActive && def.ability === 'shellUp') ? 0.35 : a.exhausted > 0 ? 0.7 : 1);
   const burstMult = controllable && (bursting || freeBurst) ? (1 + (def.burst - 1) * (freeBurst ? 1.25 : burstIn) * (a.controller === 'swarm' ? 0.55 : giantish ? 0.35 : 1)) : 1;
   const baseCruise = def.speed * sf * slowMult * (a.controller === 'swarm' ? 0.62 : giantish ? 0.55 : 1) * (paddling ? PADDLE_SPEED : 1);
@@ -460,10 +461,16 @@ export function stepUpkeep(game: Game, a: Actor, input: InputFrame, dt: number, 
   a.hideCd = Math.max(0, a.hideCd - dt);
   if (a.hideMode !== 'none' && (!isAlive(a) || ['grabbed', 'grabbing', 'stagger', 'swallowed', 'moult'].includes(a.state))) stopHiding(a);
   if (justAbility && (a.state === 'free' || a.state === 'guard')) {
+    // A player's Y is their special where the animal does not hide in life, and the hide where it
+    // does (`specialSlot`). Bots keep the old order — the era's special, else the hide — so every
+    // seeded replay that depends on them is unchanged.
+    const slot = a.controller === 'player' ? specialSlot(def) : undefined;
     if (a.hideMode !== 'none') {
       const buried = a.hideMode === 'burrowed'; stopHiding(a);
       if (buried) { a.emergenceHeavy = true; emergeStrike(game, a, def); }
-    } else if (RULES.useAbility?.(game, a, expansionContext(game))) {
+    } else if (slot === 'y') {
+      fireSpecial(game, a, def);                     // an animal that never hid has no hide to fall back to
+    } else if (slot === undefined && RULES.useAbility?.(game, a, expansionContext(game))) {
       game.flag(a, 'ability');                       // the era's own Y special took the press
     } else if (a.hideCd === 0 && (BURROWERS.has(a.creature) || a.stamina >= 8)) {
       a.state = 'free'; a.abilityActive = false; a.hideT = 0; a.seen = 0;
@@ -499,7 +506,7 @@ export function stepUpkeep(game: Game, a: Actor, input: InputFrame, dt: number, 
   }
   a.camoStrength = damp(a.camoStrength, a.hideMode === 'camouflage' ? 1 : 0, 3, dt);
   if (a.hideMode === 'camouflage') {
-    a.stamina = Math.max(0, a.stamina - CAMOUFLAGE_DRAIN * (RULES.camoDrain?.(a) ?? 1) * dt);
+    a.stamina = Math.max(0, a.stamina - CAMOUFLAGE_DRAIN * dt);
     if (a.stamina === 0) stopHiding(a);
   }
   if (a.state === 'guard' || a.state === 'parry') a.guardHeld += dt;
@@ -519,7 +526,6 @@ export function stepUpkeep(game: Game, a: Actor, input: InputFrame, dt: number, 
   const freeClimb = relief > 0.5;
   const bursting = burstIn > 0.1 && (a.stamina > 0 || freeClimb) && a.state !== 'guard' && (a.exhausted === 0 || freeClimb);
   const emptyClimb = bursting && a.stamina <= 0;
-  if (def.ability === 'ambushSurge' && input.burst > .1 && !a.prev.burst && a.abilityCd <= 0) { a.burstT = 2.2; a.abilityCd = 10; }
   const freeBurst = a.burstT > 0;
   if (bursting && !freeBurst) a.stamina = Math.max(0, a.stamina - BURST_STAMINA * burstIn * dt * (1 - relief));
   else if (a.state === 'guard') a.stamina -= 3 * dt;
@@ -815,7 +821,10 @@ export function stepActions(game: Game, a: Actor, input: InputFrame, dt: number,
     // Dodge (B for creatures that cannot guard, bots)
     else if (justDodge && a.controller !== 'player' && a.stamina >= 10 && a.exhausted === 0) startDodge(game, a, def, dir, mag, L, sf);
     // Guard / parry
-    else if (justGuard && def.canGuard && a.stamina > 5) { a.state = 'parry'; a.stateT = 0; a.hitDone.clear(); a.stateDur = def.ability === 'anchor' || def.ability === 'bristleFlare' ? .28 : .15; a.abilityActive = DEFENSIVE_SPECIALS.has(def.ability); blockPulse(game, a, def); if (['ribbonSlip','combCruise'].includes(def.ability) && a.abilityCd <= 0 && a.stamina >= 10) { a.stamina -= 8; a.abilityCd = 4; evadeSpecial(game, a, def, L); } game.flag(a, 'guard'); }
+    // A player whose animal hides in life has its special on B; when the special is not ready the
+    // button does what it does for an animal with none.
+    else if (justGuard && a.controller === 'player' && specialSlot(def) === 'b' && fireSpecial(game, a, def)) { /* the special took B */ }
+    else if (justGuard && def.canGuard && a.stamina > 5) { a.state = 'parry'; a.stateT = 0; a.hitDone.clear(); a.stateDur = def.ability === 'anchor' || def.ability === 'bristleFlare' ? .28 : .15; a.abilityActive = DEFENSIVE_SPECIALS.has(def.ability); blockPulse(game, a, def); if (def.ability === 'combCruise' && a.abilityCd <= 0 && a.stamina >= 10) { a.stamina -= 8; a.abilityCd = 4; evadeSpecial(game, a, def, L); } game.flag(a, 'guard'); }
     else if (justGuard && !def.canGuard && a.stamina >= 10 && a.exhausted === 0) startDodge(game, a, def, dir, mag, L, sf);
     else if (input.guard && def.canGuard && a.state === 'free' && a.stamina > 0 && a.stateT > 0.05) { a.state = 'guard'; a.stateT = 0; }
     else if (!input.guard && a.state === 'guard') { if (def.ability === 'shellUp' && a.guardHeld > .6) blockPulse(game, a, def); a.state = 'free'; a.stateT = 0; a.abilityActive = false; }

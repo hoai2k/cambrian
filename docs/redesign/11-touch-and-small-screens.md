@@ -142,11 +142,9 @@ a dash's own line, a grip. A frame is not a step, so the engine banks what a fra
 reused for every sub-step, and a turn left on it was applied three times over — which the browser
 harness caught as the body turning *the other way*, 5.3 radians round a 1.8 radian swipe.
 
-It does **not** take the cursor's edge tilt (`edgePitch`). A hovering cursor is idle information — it
-is somewhere whether or not the player is doing anything with it — and a finger is the opposite: it is
-only on the glass while it is being used, and while it is, its travel is *already* the camera. Reading
-its height as a tilt as well would have one gesture pulling the pitch two ways. Nor does it take the
-pad's pitch drift, which would fight the hand.
+It never took the cursor's old edge tilt (since removed from the mouse too: a hovering cursor is
+pointing, not looking). A finger is only on the glass while it is being used, and while it is, its
+travel is *already* the camera. Nor does it take the pad's pitch drift, which would fight the hand.
 
 ### A gesture is timed by when it happened
 

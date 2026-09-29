@@ -13,7 +13,7 @@ import { mergeSkinnedParts } from './merge-skins';
 import { Carcass } from './carcass';
 import { ArmConform, type Surface } from './conform';
 import { schemeForCreature } from '../shared/palettes';
-import { creature, type CreatureId } from '../sim/creatures';
+import { creature, type CreatureDef, type CreatureId } from '../sim/creatures';
 import { clearanceOf, lengthOf } from '../sim/actors';
 import { sampleHeight } from '../sim/world';
 import { bellPhase, bellTilt } from '../sim/locomotion';
@@ -121,6 +121,12 @@ const SPINE_RE = /^(body|segment)_(\d+)$/;
 const FEEDING_PERFORMANCE: ReadonlySet<CreatureId> = new Set<CreatureId>([
   'opabinia', 'leanchoilia', 'anomalocaris', 'nectocaris', 'cambroraster', 'tamisiocaris', 'isoxys', 'waptia', 'sidneyia', 'marrella', 'olenoides',
 ]);
+
+/** Specials that some bodies were built with a clip of their own for (see `specialClip`). */
+const SPECIAL_CLIP: Partial<Record<string, string>> = {
+  neckStrike: 'NeckStrike', crushBite: 'CrushBite', exhaustionHold: 'Lunge', filterGulp: 'Gulp',
+  scrapeSieve: 'Graze', comb: 'Graze', runThrough: 'FastStart', coil: 'Coil', bristleFlare: 'SpineBrace',
+};
 
 export class CreatureView {
   /** Animation time this view has not been advanced through while nobody could see it (`syncViews`). */
@@ -264,6 +270,13 @@ export class CreatureView {
 
   /** First clip name that exists on this rig. Lets hand-authored clips replace the stand-ins by name alone. */
   private pick(...names: string[]) { return names.find((n) => this.actions.has(n)); }
+  /**
+   * The body's own clip for its special, where it was built with one. Every body carries a generic
+   * `Ability`; a few were given the special itself — a neck strike, a crush bite, a gulp — and those
+   * sat unplayed while the special drew the generic clip, which is most of why a special could look
+   * like a heavier bite. Keyed by the special, so a body without the clip falls back to `Ability`.
+   */
+  private specialClip(def: CreatureDef) { const c = SPECIAL_CLIP[def.ability]; return c && this.actions.has(c) ? c : undefined; }
   has(name: string) { return this.actions.has(name); }
 
   private playLoop(name: string) {
@@ -417,7 +430,7 @@ export class CreatureView {
       else if (eraLoop) { this.playLoop(eraName!); this.loco?.setEffectiveTimeScale(1); }
       else if (a.state === 'eating' || a.holdT > 0) { this.playLoop((this.authoredFeeding && a.state !== 'eating' ? this.pick('Grab', 'Idle') : this.pick('Eat', 'Grab')) ?? (def.ground ? 'Crawl' : 'Swim')); this.loco?.setEffectiveTimeScale(this.has('Eat') ? 1 : 0.55); }
       else if (a.state === 'swallowed') { this.playLoop(this.pick('Stagger', 'Hit') ?? 'Idle'); this.loco?.setEffectiveTimeScale(0.8); }
-      else if ((a.hideMode === 'burrowed' || ((a.state === 'guard' || a.state === 'parry') && ['anchor','enroll','shellUp','bristleFlare'].includes(def.ability))) && this.has('Ability')) { this.playLoop('Ability'); this.loco?.setEffectiveTimeScale(.55); }
+      else if ((a.hideMode === 'burrowed' || ((a.state === 'guard' || a.state === 'parry') && ['anchor','enroll','shellUp','bristleFlare'].includes(def.ability))) && this.has('Ability')) { this.playLoop(this.specialClip(def) ?? 'Ability'); this.loco?.setEffectiveTimeScale(.55); }
       else if ((a.state === 'guard') && this.has('Guard')) { this.playLoop('Guard'); this.loco?.setEffectiveTimeScale(1); }
       // Clinging to something bigger: the grip is held, so the grab pose is the locomotion.
       else if (a.rideHost >= 0 && a.state === 'free' && this.has('Grab')) { this.playLoop('Grab'); this.loco?.setEffectiveTimeScale(0.4); }
@@ -480,7 +493,7 @@ export class CreatureView {
           this.playOnce(clip, Math.max(0.35, a.move.windup + a.move.active + a.move.recovery * 0.6), false);
         } else if (a.state === 'grabbing') this.playOnce(this.pick('Grab', 'Heavy', 'Attack')!, 0.9, false);
         else if (a.state === 'pounce') this.playOnce(this.pick('Heavy', 'Attack')!, Math.max(0.4, a.stateDur + 0.2), false);
-        else this.playOnce(this.pick('Ability', 'Attack')!, Math.max(0.4, a.stateDur), false);
+        else this.playOnce(this.specialClip(def) ?? this.pick('Ability', 'Attack')!, Math.max(0.4, a.stateDur), false);
       }
       if (a.state === 'grabbing' && this.wasAttack && this.oneShotT <= 0) this.playOnce(this.pick('Grab', 'Attack')!, 0.9, false);
       // A dash and a dodge are different moves — one drives, one jinks — so a model that has been

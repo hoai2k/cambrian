@@ -98,6 +98,7 @@ const SUITES = {
   results: { file: 'results-test.tsx', runs: ERAS },
   visitors: { file: 'visitors-test.ts', runs: ERAS },
   seats: { file: 'seat-scheme-test.ts', runs: ERAS },
+  specials: { file: 'special-slot-test.ts', runs: ERAS },
   devonian: { file: 'devonian-test.ts', slow: 3 },
   triassic: {
     file: 'triassic-test.ts',
@@ -165,7 +166,7 @@ const GATE = ['flora', 'locomotion', 'fight', 'feast', 'pursuit', 'respawn', 'co
   'survival-eras', 'views', 'sight', 'motion', 'hiding', 'sand', 'seabed', 'tracks', 'sizing', 'spatial', 'record', 'expansion', 'touch',
   'bindings', 'modes', 'controls', 'beach'];
 /** Everything that is not a simulation suite and takes seconds, not minutes. */
-const FAST = ['codex', 'results', 'visitors', 'seats', 'roster', 'depth', 'menus', 'focus', 'fullscreen', 'cursors', 'mouse:strike', 'edges',
+const FAST = ['codex', 'results', 'visitors', 'seats', 'specials', 'roster', 'depth', 'menus', 'focus', 'fullscreen', 'cursors', 'mouse:strike', 'edges',
   'swap', 'immersive', 'music', 'stats', 'debug', 'ancientseas', 'mobile:memory', 'assets', 'props', 'recolor', 'eras',
   'palettes', 'portraits', 'conform', 'rigs', 'sculpt', 'stretch', 'bend', 'mouth', 'mark', 'playback', 'breakpoints', 'lineup', 'governor'];
 const GROUPS = {

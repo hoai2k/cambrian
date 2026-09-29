@@ -156,15 +156,17 @@ export function rumble(index: number, strong: number, weak: number, ms: number) 
  * player wants to point at here is an *animal*, so the cursor stays, the camera follows the body by
  * itself (`followCam` in the engine), and the creature under the cursor is the one attacks go to.
  *
- * The left button is read by **what it was pressed on**, and acts at the press: open water is a
- * dash there, an animal is a bite, a pounce or a chase by how far off it is. Held past the move it
- * began, it is **steering** — the pointer is locked away and the mouse turns the body and the view
- * together until the button comes up. The decision is `stepStrike` in `src/shared/mouse-strike.ts`,
+ * The left button swims unless it is clicked. Held, or moved while down, it is **steering** — the
+ * pointer is locked away and the mouse turns the body and the view together until the button comes
+ * up. Clicked, it is the attack the place it was on calls for: a dash on open water, a bite or a
+ * pounce on an animal — decided on the release, except for a double-click's second press, which
+ * acts at once. The decision is `stepStrike` in `src/shared/mouse-strike.ts`,
  * pure; this class only reports the button and the motion, and takes the pointer when told to
  * (`steer`).
  *
- * The right button dashes at whatever is under the cursor, for as long as it is held. The middle
- * button is aim mode's framing, and dragging with it turns the view.
+ * The right button is aim: held, aim mode's framing with the cursor as the crosshair; let go on an
+ * animal, a pounce at it (`stepStrike` again). The middle button is the same framing, and dragging
+ * with it turns the view.
  *
  * `ndc` is the cursor in normalised device coordinates (-1..1, y up), which is what a camera
  * unprojects; it is `undefined` until the mouse has been somewhere over the canvas. While the
@@ -184,6 +186,10 @@ export class MousePlay {
   private ndc: { x: number; y: number } | undefined;
   /** The left button went down since the last read. */
   private pressed = false;
+  /** Pixels travelled since the left button went down: a press that travels is a steer. */
+  private travel = 0;
+  /** The right button came up since the last read: the end of an aim. */
+  private rightUp = false;
   /** Whether the mouse is steering, as `steer` was last told. */
   private steering = false;
   /** Whether the cursor is over something worth attacking. Written by the engine each frame. */
@@ -201,7 +207,9 @@ export class MousePlay {
       }
     }
     // Only steering and a middle-button drag turn the view. A bare move is the cursor going
-    // somewhere, which is aiming rather than looking.
+    // somewhere, which is aiming rather than looking — and it never tilts the view either: a
+    // cursor at the top of the screen is pointing at something up there, not asking to look up.
+    if (this.buttons.has(0)) this.travel += Math.hypot(e.movementX ?? 0, e.movementY ?? 0);
     if (this.steering || this.buttons.has(1)) { this.dx += e.movementX ?? 0; this.dy += e.movementY ?? 0; }
   };
   private onWheel = (e: WheelEvent) => {
@@ -214,11 +222,12 @@ export class MousePlay {
     if (!this.wanted) return;
     e.preventDefault();
     this.buttons.add(e.button);
-    if (e.button === 0) this.pressed = true;
+    if (e.button === 0) { this.pressed = true; this.travel = 0; }
   };
   private onUp = (e: MouseEvent) => {
     this.buttons.delete(e.button);
     if (e.button === 0) this.steer(false);
+    if (e.button === 2) this.rightUp = true;
   };
   private onContext = (e: Event) => { if (this.wanted) e.preventDefault(); };
   private onBlur = () => { this.buttons.clear(); this.steer(false); };
@@ -265,7 +274,7 @@ export class MousePlay {
   want(on: boolean) {
     if (this.wanted === on) return;
     this.wanted = on;
-    if (!on) { this.buttons.clear(); this.pressed = false; this.steer(false); this.dx = this.dy = this.wheel = 0; }
+    if (!on) { this.buttons.clear(); this.pressed = this.rightUp = false; this.steer(false); this.dx = this.dy = this.wheel = 0; }
   }
 
   /** Everything the mouse has done since the last frame. Drains the deltas and the press. */
@@ -277,13 +286,17 @@ export class MousePlay {
       left: this.buttons.has(0),
       /** The left button went down since the last frame: a strike starts (`stepStrike`). */
       pressed: this.pressed,
+      /** Pixels the pointer has travelled since the left button went down. */
+      moved: this.travel,
+      /** The right button came up since the last frame: an aim is let go of. */
+      rightUp: this.rightUp,
       /** Turning the camera this frame (steering, or a middle drag), so the follow stands aside. */
       dragging: this.steering || this.buttons.has(1),
       steering: this.steering,
       middle: this.buttons.has(1), right: this.buttons.has(2),
       ndc: this.ndc,
     };
-    this.dx = this.dy = this.wheel = 0; this.pressed = false;
+    this.dx = this.dy = this.wheel = 0; this.pressed = this.rightUp = false;
     return r;
   }
 
@@ -310,8 +323,7 @@ export class MousePlay {
  */
 export function applyMouse(c: RawControls, m: ReturnType<MousePlay['read']>): RawControls {
   c.lookDX = m.dx; c.lookDY = m.dy; c.zoomDelta = m.zoom;
-  if (m.right) { c.dash = true; c.dodge = true; }
-  if (m.middle) { c.aim = true; c.lock = true; }
+  if (m.right || m.middle) { c.aim = true; c.lock = true; }
   if (m.pressed || m.middle || m.right) c.any = c.anyButton = true;
   return c;
 }
