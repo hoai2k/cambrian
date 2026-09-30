@@ -20,7 +20,7 @@ import { amphibious, ASHORE_WADE, landSpeed, onFoot, stepBeach, wadeAt, WALL_EAS
 import { escapeReady, healRate, PLANT_HEAL } from './effort';
 import { TEXT } from '../shared/text';
 import { BREACH_GRAVITY, DASH_TAP, DASH_TIME, FLIP_TIME, GRASP_AT, HATCH_TIME, type Step, breachSpeed, dashLaunch, graspPoint, type Game } from './game';
-import { attackHits, canEat, consumeSnacks, corpseInReach, gainNutrition, nutritionValue, startEating, takeWhole } from './game-feeding';
+import { atMouth, attackHits, canEat, consumeSnacks, corpseInReach, gainNutrition, nutritionValue, startEating, takeWhole } from './game-feeding';
 import { breakLoose, closeGrip, tryGrasp, updateRide } from './game-grip';
 import { inShell } from './game-life';
 import { aimNudge, blockPulse, emergeStrike, evadeSpecial, expansionContext, fireSpecial, heavyAction, keepReaching, pickLockTarget, startDash, startDodge, startPounce, updateAbility, updateHunted } from './game-moves';
@@ -85,6 +85,9 @@ const PADDLE_RISE = 1.5;
 
 /** The current at a body, read and spent within its own update: one object, not one per body per step. */
 const currentScratch: Vec3 = { x: 0, y: 0, z: 0 };
+
+/** The longest a pounce may run, in seconds, while it closes the last of the gap to the mouth. */
+const POUNCE_REACH_MAX = 1.6;
 
 export function updateActor(game: Game, a: Actor, input: InputFrame, dt: number) {
   // Inside the egg nothing the player presses reaches the water: the body is held where it
@@ -861,7 +864,7 @@ export function stepActions(game: Game, a: Actor, input: InputFrame, dt: number,
       a.move = undefined;
       startDash(game, a, def, mag > 0.3 ? dir : vscale(heading(a.yaw), jets || def.tailFlip ? -1 : 1), L, sf, relief);
     } else {
-      if (a.stateT >= m.windup && a.stateT < m.windup + m.active) attackHits(game, a, m, L);
+      if (a.stateT >= m.windup && a.stateT < m.windup + m.active) attackHits(game, a, m, L, dt);
       // cancel recovery into dodge, or chain lights
       if (a.stateT > m.windup + m.active + m.recovery * 0.45 && (justDodge || (justDash && mag > 0.3)) && a.stamina >= 10) { a.dashUsed = true; startDodge(game, a, def, dir, mag, L, sf); }
       else if (a.stateT >= total) { a.state = 'free'; a.stateT = 0; a.move = undefined; }
@@ -890,9 +893,18 @@ export function stepActions(game: Game, a: Actor, input: InputFrame, dt: number,
       const dirTo = norm(to);
       a.vel = vscale(dirTo, speed);
       a.yaw = yawOf(dirTo); a.pitch = def.ground ? a.pitch : clamp(-Math.asin(clamp(dirTo.y, -1, 1)) * 0.8, -0.9, 0.9);
-      if (bodyGap(t, a) < L * 0.45) {
-        const band = bandOf(a, t);
-        const bigger = band === 'threat' || band === 'giant';
+      const band = bandOf(a, t);
+      const bigger = band === 'threat' || band === 'giant';
+      // Something the pounce could take in the jaws is taken *at the jaws*: the body swims on until
+      // its mouth is on the animal, then bites it there. It used to land half a body length short
+      // and pull the victim across the gap into the mouth, which read as prey jumping into you.
+      // Anything bigger is a flank to strike or grip, and meets the body wherever the body meets it.
+      const edible = band === 'snack' || band === 'prey';
+      const arrived = edible ? atMouth(a, t, L) : bodyGap(t, a) < L * 0.45;
+      // The last stretch to the mouth is part of the same spring: a pounce whose clock runs out
+      // with its jaws a hair short would otherwise stop dead beside what it was going for.
+      if (!arrived && edible && bodyGap(t, a) < L * 0.6 && a.stateT < POUNCE_REACH_MAX) a.stateDur = Math.max(a.stateDur, a.stateT + 0.1);
+      if (arrived) {
         // A pounce made with the grip armed arrives as a grip. Nothing is settled on impact:
         // what it lands is carried, and what happens to it is decided by when the button comes
         // up. A mouthful is held ready and eaten on release; something too big to be a mouthful

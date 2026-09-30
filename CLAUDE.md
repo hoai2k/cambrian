@@ -1775,7 +1775,14 @@ unless the user explicitly asks for a PR. Steps:
   swim-through path in `consumeSnacks` also ate the fish a pounce was homing on half a body length
   before the pounce arrived. Now a bite or a pounce carries it in the mouth (`startSwallow`) and only
   a school fish a player merely swims through goes down in passing, because a swallow holds the body
-  still and brushing a shoal must not stop you dead. `npm run hunt` holds both.
+  still and brushing a shoal must not stop you dead. **And it is caught at the mouth, not across a
+  gap**: a pounce on anything the jaws could take swims on until `atMouth` (the mouth — `mouthPoint`,
+  the same point `updateSwallowed` carries the catch from — is inside the animal, give or take
+  `MOUTH_TOUCH`) and bites it there, and a bite whose mouthful is in reach but not yet in the jaws
+  carries the *body* onto it at `BITE_CLOSE` rather than pulling the animal in. The pounce used to
+  land at a surface gap of 0.45 of a body and yank the victim 0.16 of a body into the mouth, which
+  read as prey jumping into you. `npm run hunt` measures where the catch was taken and the largest
+  step the prey moves beyond the eater's own.
 - **A hunt on you is framed, not only reported** (`src/render/threat-frame.ts`, pure, `npm run
   threat-frame`). While the hunt score is at the HUD's "hunting" line (`HUNT_ON`, let go at
   `HUNT_OFF`), `updateCamera` lengthens the arm along the view it already has — never turning it,

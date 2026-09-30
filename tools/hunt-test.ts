@@ -1,7 +1,8 @@
 import { Game } from '../src/sim/game';
 import { kill, startSwallow } from '../src/sim/combat';
 import { emptyInput, type InputFrame } from '../src/sim/types';
-import { applyScaleStats, bandOf, isAlive, lengthOf } from '../src/sim/actors';
+import { applyScaleStats, bandOf, bodyRadius, isAlive, lengthOf } from '../src/sim/actors';
+import { mouthPoint } from '../src/sim/game-feeding';
 import { dist } from '../src/shared/math';
 import { sampleHeight } from '../src/sim/world';
 import { checker, finish, stepN } from './lib/test';
@@ -55,13 +56,26 @@ const run = (g: Game, f: InputFrame, steps: number) => stepN(g, steps, f);
     const prey = g.spawn('waptia', 'ambient', { x: OPEN.x, y: OPEN.y, z: OPEN.z + gap }, 0.3);
     prey.brain = undefined as never; (prey as any).controller = 'swarm';
     const m = new Map([[0, { ...emptyInput(), aim: true, aimTarget: prey.id, pursueTarget: how === 'pounce' ? prey.id : undefined, light: how === 'bite' } as InputFrame]]);
-    let swallowed = false, removed = false;
+    let swallowed = false, removed = false, caughtAt = Infinity, jump = 0;
+    let last = { ...prey.pos }, lastP = { ...p.pos };
     for (let i = 0; i < 120 && !removed; i++) {
       g.step(1 / 60, m);
-      if (prey.state === 'swallowed') swallowed = true;
-      if (!g.byId(prey.id)) removed = true;
+      if (!g.byId(prey.id)) { removed = true; break; }
+      if (prey.state === 'swallowed' && !swallowed) {
+        swallowed = true;
+        caughtAt = dist(prey.pos, mouthPoint(p)) - bodyRadius(prey);
+      }
+      // How far the prey moved this step beyond what the eater moved: a catch across a gap is a
+      // prey that leaps into the mouth, and is exactly the discontinuity this guards.
+      if (swallowed) jump = Math.max(jump, dist(prey.pos, last) - dist(p.pos, lastP));
+      last = { ...prey.pos }; lastP = { ...p.pos };
     }
+    const L = lengthOf(p);
     check(`a ${how} at a school fish swallows it in the jaws`, swallowed, `state=${prey.state} removed=${removed} player=${p.state}`);
+    {
+      check('...caught with the mouth on it, not across a gap', caughtAt <= L * 0.07, `${(caughtAt / L).toFixed(3)} L from the mouth`);
+      check('...and carried in without a leap', jump < L * 0.012, `largest step ${(jump / L).toFixed(3)} L beyond the eater's own`);
+    }
   }
 }
 // --- LT aims at prey; X pounces when in range and eats it ---
@@ -142,7 +156,9 @@ for (const [creatureId, mode, scale] of [['waptia', 'rise', 0.25], ['anomalocari
     `alive=${isAlive(snack)} inWorld=${g.actors.includes(snack)} gap=${dist(p.pos, snack.pos).toFixed(2)}`);
   // now take it: the bite that lands carries it into the mouth and eats it there
   snack.pos = { x: p.pos.x, y: p.pos.y, z: p.pos.z + lengthOf(p) * 0.35 };
-  run(g, { ...emptyInput(), light: true, camYaw: 0 }, 6);
+  // A bite's jaws close at the end of its wind-up, and the body carries itself onto the animal then
+  // rather than pulling the animal in, so the catch is a quarter of a second in, not the first frame.
+  run(g, { ...emptyInput(), light: true, camYaw: 0 }, 20);
   check('a bite that lands puts it in the mouth', snack.state === 'swallowed' && snack.swallowedBy === p.id,
     `state=${snack.state} by=${snack.swallowedBy}`);
   const eats = p.eats;

@@ -13,9 +13,31 @@ import { hungerWorth } from './survival';
 import { bitesFor, type Game } from './game';
 import { closeGrip } from './game-grip';
 
-export function attackHits(game: Game, a: Actor, m: MoveDef, L: number) {
+/**
+ * Where the mouth is: the point a bite reaches from and a swallowed body is carried to
+ * (`updateSwallowed` starts it here). Kept in one place so that a catch is decided at the same
+ * point the catch is then drawn at, and nothing jumps between the two.
+ */
+export function mouthPoint(a: Actor, L = lengthOf(a)) {
   const h = heading(a.yaw);
-  const mouth = m.sweep ? a.pos : { x: a.pos.x + h.x * L * 0.42, y: a.pos.y - Math.sin(a.pitch) * L * 0.3, z: a.pos.z + h.z * L * 0.42 };
+  return { x: a.pos.x + h.x * L * MOUTH_AHEAD, y: a.pos.y - Math.sin(a.pitch) * L * 0.3, z: a.pos.z + h.z * L * MOUTH_AHEAD };
+}
+/** How far forward of the body's centre the mouth sits, in body lengths. */
+export const MOUTH_AHEAD = 0.42;
+/** A body is at the mouth when the mouth is inside it, give or take this share of the eater's length. */
+export const MOUTH_TOUCH = 0.06;
+
+/**
+ * Whether `o` is in the mouth — actually touching it, not merely near the body. A pounce and a
+ * player's contact bite take their catch only here, so the animal is caught where it swims rather
+ * than snatched across the gap into the jaws.
+ */
+export function atMouth(a: Actor, o: Actor, L = lengthOf(a)) {
+  return dist(mouthPoint(a, L), o.pos) <= bodyRadius(o) + L * MOUTH_TOUCH;
+}
+
+export function attackHits(game: Game, a: Actor, m: MoveDef, L: number, dt = 1 / 60) {
+  const mouth = m.sweep ? a.pos : mouthPoint(a, L);
   const reach = m.sweep ? L * 0.85 : mouthReach(a, L);
   /**
    * A bite takes **one** mouthful.
@@ -29,6 +51,7 @@ export function attackHits(game: Game, a: Actor, m: MoveDef, L: number) {
    * predator that is not steered still eats the way it always did.
    */
   let mouthful: Actor | undefined, mouthfulD = Infinity;
+  let reaching: Actor | undefined, reachingD = Infinity;
   const steered = a.controller === 'player';
   for (const o of game.nearby(a.pos, L * 1.5 + 4)) {
     if (o.id === a.id || !isAlive(o) || a.hitDone.has(o.id) || isHidden(o)) continue;
@@ -46,6 +69,9 @@ export function attackHits(game: Game, a: Actor, m: MoveDef, L: number) {
       const band = bandOf(a, o);
       if (band === 'snack' && (o.controller === 'swarm' || (o.controller === 'ambient' && lengthOf(o) < lengthOf(a) * 0.3))) {
         if (!steered) { takeWhole(game, a, o); continue; }
+        // In reach is not in the mouth. The bite carries the body the rest of the way (below) and
+        // takes the animal when the jaws are on it, so nothing is pulled across the gap.
+        if (!atMouth(a, o, L)) { a.hitDone.delete(o.id); if (d < reachingD) { reachingD = d; reaching = o; } continue; }
         if (d < mouthfulD) { mouthfulD = d; mouthful = o; }
         continue;
       }
@@ -55,7 +81,19 @@ export function attackHits(game: Game, a: Actor, m: MoveDef, L: number) {
     }
   }
   if (mouthful && isAlive(mouthful)) takeWhole(game, a, mouthful);
+  else if (reaching) {
+    // Close on it: the body moves, never the prey, at a lunge's pace and no further than the jaws
+    // need to go. Checked again next step, while the bite is still live.
+    const mp = mouthPoint(a, L);
+    const to = sub(reaching.pos, mp);
+    const gap = len3(to) - bodyRadius(reaching);
+    const step = Math.min(Math.max(0, gap), L * BITE_CLOSE * dt);
+    if (step > 0) { const n = norm(to); a.pos.x += n.x * step; a.pos.y += n.y * step; a.pos.z += n.z * step; }
+  }
 }
+
+/** Body lengths a second a bite closes the last of the gap to a mouthful at. */
+export const BITE_CLOSE = 5;
 
 export function corpseInReach(game: Game, a: Actor): Actor | undefined {
   const L = lengthOf(a);
@@ -118,6 +156,9 @@ export function consumeSnacks(game: Game, a: Actor, L: number, def: CreatureDef)
       // with no swallow, which is the fish vanishing ahead of the chase.
       const striking = a.state === 'attack' || a.state === 'pounce';
       if (a.controller === 'player' && o.controller === 'swarm' && !striking) consume(game, a, o);
+      // A player striking takes only what its mouth has reached, so nothing beside the body is
+      // pulled across into the jaws.
+      else if (a.controller === 'player' && !atMouth(a, o, L)) continue;
       else takeWhole(game, a, o);
     }
   }

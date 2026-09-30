@@ -15,7 +15,7 @@ import { coverAt, groundHeight, nearestNursery, nurseryAt, sampleCurrent, shoreD
 import { SURVIVAL_DEATH_COST } from './survival';
 import { TEXT } from '../shared/text';
 import { CORPSE_WINDOW, HATCH_HOLD, HATCH_TIME, type Game } from './game';
-import { canEat, gainNutrition, nutritionValue } from './game-feeding';
+import { canEat, gainNutrition, MOUTH_AHEAD, nutritionValue } from './game-feeding';
 import { clearRide } from './game-grip';
 
 /** Everything the simulation says out loud; the words are in `src/content/strings.ts`. */
@@ -55,7 +55,7 @@ export function updateSwallowed(game: Game, a: Actor, dt: number) {
   if (!pred || !isAlive(pred)) { kill(game.hitCtx, a, pred); a.swallowedBy = -1; return; }
   const h = heading(pred.yaw); const PL = lengthOf(pred);
   const t = clamp(a.stateT / a.stateDur, 0, 1);
-  const depth = 0.42 - t * 0.25;                         // slides from the mouth toward the gut
+  const depth = MOUTH_AHEAD - t * 0.25;                  // slides from the mouth toward the gut
   const tx = pred.pos.x + h.x * PL * depth, ty = pred.pos.y - Math.sin(pred.pitch) * PL * depth * 0.6, tz = pred.pos.z + h.z * PL * depth;
   a.pos.x = damp(a.pos.x, tx, 16, dt); a.pos.y = damp(a.pos.y, ty, 16, dt); a.pos.z = damp(a.pos.z, tz, 16, dt);
   a.yaw = pred.yaw; a.pitch = pred.pitch; a.bank = damp(a.bank, Math.PI * 0.5, 4, dt);
