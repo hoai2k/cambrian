@@ -419,17 +419,20 @@ unless the user explicitly asks for a PR. Steps:
   drag is claimed as sideways (an upward drag still scrolls the copy), and finished on the lift: past
   a fifth of the card or flicked, the track slides on and the cursor steps; short of both it springs
   back — eased from wherever the finger let go, either way. The step happens *after* the slide, and
-  the track is re-seated with no motion **in the same commit that puts the new card on stage**
-  (a layout effect waiting for that card), which is invisible because the new card is already where
-  the neighbour was; re-seating before the cursor's update landed showed the old card snap back to
-  the middle for a frame and then change. **The lift is a Web Animation, never a CSS transition switched on
+  **nothing moves when it lands**: every card has a place along the track that it keeps while it is
+  drawn (`home`, counted up and down by the steps taken, so going round the roster's end is one more
+  place rather than a jump back), the track is shifted back by the place on stage, and the card a
+  slide goes to is drawn where it already was. It used to be *re-seated* — the track snapped back to
+  zero in the same commit that moved each card into its new slot — which is invisible only if the
+  browser lands both changes on one frame. Chrome does; an iPhone put the track's change on screen a
+  frame before the cards' and flashed the previous animal in the middle on every swipe, and holding
+  the finished animation (below) did not cure it, because the two changes were still two. **The lift is a Web Animation, never a CSS transition switched on
   under the finger** — it starts from the exact point the finger let go, at the finger's own speed
   (the duration is picked so the curve's opening slope is the release velocity, measured over the
   last tenth of a second rather than averaged since the press), and it is ended by that animation's
   own `finished`, with a generous timer behind it — and **held** there (`fill: 'forwards'`) until the next
-  write cancels it in the same task, because an animation left to lapse on an iPhone flashed the
-  previous animal: WebKit ran it on the compositor and the layer it handed back still carried the
-  transform from before the slide until style caught up. Chrome's phone emulation passed the transition
+  write cancels it in the same task, so the moment an animation lapses is never a moment the
+  compositor can show a stale transform. Chrome's phone emulation passed the transition
   version and an iPhone did not, for iOS reasons that stack: setting `transition` and `transform` in
   one task starts a transition only when WebKit next resolves style, `getAnimations()` asked in the
   next frame could find nothing there and end the "slide" at once — stepping the cursor under a
