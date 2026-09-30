@@ -277,9 +277,13 @@ unless the user explicitly asks for a PR. Steps:
   view somewhere the body had not been yet and left it to catch up, which reads as steering a boat
   by leaning; it also kept a creature's own agility out of the answer, and a Waptia whipping round
   where a giant does not is a thing the camera cannot say. The arrow keys still move the view
-  itself. Turning composes with swimming (hold W, press D and the body swims forward along a
-  curve) — W forward, X back, E or Q up, S or C down, R the
-  shield, Z camouflage, I sense, space to dash, Shift to sprint. Every attack has a key as well as a
+  itself. **W and S turn the animal up and down the way A and D turn it left and right**, and
+  **Shift — or the held left button — is what swims it forward**: forward is camera-relative, so W
+  and S tilt the view (the arrow keys' own axis) and a keyboard seat's pitch is left where it was
+  turned for as long as the body is being swum forward, rather than eased back to level the way the
+  pad's and the follow camera's are. Turning composes with swimming (hold Shift, press D and the
+  body swims forward along a curve) — X back, E or Q straight up, C straight down, R the shield, Z
+  camouflage, I sense, space to dash, B to sprint. Every attack has a key as well as a
   mouse button, because a hand already on the keys should not have to reach: J and F bite, G and K
   are the heavy. `npm run mouse` drives the whole of it in a real browser, where every part of it is something a headless test cannot vouch for. That harness
   waits on the *game's own state and frames*, never on the clock: this page draws about a frame a
@@ -1765,6 +1769,21 @@ unless the user explicitly asks for a PR. Steps:
   carries the same four-second grudge the bitten one does. The schoolmate check rides in the loop
   the boids already walk, because a second `nearby` query per fish per think is two hundred of
   them twelve times a second. `npm run reactions` holds all of it.
+- **Whatever a player goes for is swallowed in the jaws, school fish included.** `takeWhole` used
+  to send every school fish straight to `consume` — removed on contact, no swallow — and a school
+  fish is what a hatchling hunts most, so a double-click chase ended with its fish simply gone; the
+  swim-through path in `consumeSnacks` also ate the fish a pounce was homing on half a body length
+  before the pounce arrived. Now a bite or a pounce carries it in the mouth (`startSwallow`) and only
+  a school fish a player merely swims through goes down in passing, because a swallow holds the body
+  still and brushing a shoal must not stop you dead. `npm run hunt` holds both.
+- **A hunt on you is framed, not only reported** (`src/render/threat-frame.ts`, pure, `npm run
+  threat-frame`). While the hunt score is at the HUD's "hunting" line (`HUNT_ON`, let go at
+  `HUNT_OFF`), `updateCamera` lengthens the arm along the view it already has — never turning it,
+  because the hand owns the direction — just far enough that the hunter stands inside the frame with
+  a margin, up to `THREAT_ZOOM_MAX` of the ordinary arm (`THREAT_ZOOM_HOLD` once framing, so a hunter
+  at the edge does not flicker in and out), and eases back in when the hunt lapses or the hunter is
+  further off than that. The old rule pulled the camera *in* by 15 % when hunted, which put the
+  danger further out of the picture.
 - **A dash is priced for players and rationed for wildlife** (`src/sim/effort.ts`). A steered
   body's dash costs `DASH_STAMINA_MULT` (2) times its base. A wild animal gets **one** escape — its
   dodge, or a tail-flip — only on a bar at least `WILD_ESCAPE_READY` full, and it empties the bar,

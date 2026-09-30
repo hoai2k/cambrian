@@ -18,9 +18,9 @@ await page.keyboard.press('ArrowRight'); await page.waitForTimeout(300);
 await page.keyboard.press('Space'); await page.waitForTimeout(400);
 await shot('select');
 await page.keyboard.press('Enter'); await page.waitForTimeout(3500);
-await page.keyboard.down('KeyW'); await page.keyboard.down('ShiftLeft'); await page.waitForTimeout(2500); await page.keyboard.up('ShiftLeft');
+await page.keyboard.down('ShiftLeft'); await page.keyboard.down('KeyB'); await page.waitForTimeout(2500); await page.keyboard.up('KeyB');
 await shot('play-larva');
-await page.keyboard.up('KeyW');
+await page.keyboard.up('ShiftLeft');
 console.log('hud larva:', await page.evaluate(() => document.querySelector('.hud')?.textContent));
 // Hunted mode: player one is a giant → large magnification
 /**
@@ -52,9 +52,9 @@ await page.click('.overlay .menu-buttons button:has-text("Quit")'); await page.w
 await page.click('text=Survival'); await page.waitForTimeout(300);
 await page.keyboard.press('Space'); await page.waitForTimeout(300);
 await page.keyboard.press('Enter'); await page.waitForTimeout(3500);
-await page.keyboard.down('KeyW'); await page.waitForTimeout(2500);
+await page.keyboard.down('ShiftLeft'); await page.waitForTimeout(2500);
 await shot('play-survival');
-await page.keyboard.up('KeyW');
+await page.keyboard.up('ShiftLeft');
 console.log('hud survival:', await page.evaluate(() => document.querySelector('.hud')?.textContent));
 console.log('errors:', errors.length); for (const e of [...new Set(errors)].slice(0, 20)) console.log(e);
 await browser.close();

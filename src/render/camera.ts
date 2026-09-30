@@ -19,6 +19,7 @@ import type { TeleMenu } from './player-input';
 
 /** Follow-camera distance for a body length: about two body lengths back plus a floor so larvae are still readable. */
 import { magnificationDistance } from '../shared/view-reach';
+import { framingHunt, THREAT_IN, THREAT_OUT, THREAT_ZOOM_HOLD, THREAT_ZOOM_MAX, threatZoom } from './threat-frame';
 export { magnificationDistance };
 
 /**
@@ -243,7 +244,10 @@ export interface CamState { showBoard: boolean; hatchShot: number; breathT: numb
   /** A turn about the view axis, left over from righting a looped camera (`rightSideUp`); eases to nothing. */
   roll: number;
   /** Seconds since a finger last turned this camera, for the righting. */
-  lookIdle: number; zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; climbHold: number; followHold: number; floorCloseT: number; floorCloseBlend: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
+  lookIdle: number;
+  /** A hunt is being framed (`framingHunt`), and the arm's current stretch for it (`threatZoom`). */
+  threatOn: boolean; threatZoom: number;
+  zoom: number; fade: number; aimBlend: number; aimTarget: number; aimSnapT: number; climbHold: number; followHold: number; floorCloseT: number; floorCloseBlend: number; pos: THREE.Vector3; look: THREE.Vector3; shake: number; camera: THREE.PerspectiveCamera; lockBlend: number; lastPos: THREE.Vector3; frustum: THREE.Frustum; projScreen: THREE.Matrix4; tele: TeleMenu; }
 
 /** Scratch, so a frame's camera work allocates nothing. */
 const tmpV = new THREE.Vector3(), tmpLook = new THREE.Vector3(), tmpRide = new THREE.Vector3(), tmpDesired = new THREE.Vector3();
@@ -288,7 +292,6 @@ export function updateCamera(cs: CamState, p0: Actor, dt: number, game: Game, re
   // In the egg the animal is a fraction of its hatched size and the camera would be pressed
   // against the shell. Frame the egg instead, and ease back in as the body comes out of it.
   if (p.hatching && p.state === 'moult' && p.stateDur > 1.5) dist *= 1 + 0.9 * (1 - Math.min(1, p.stateT / p.stateDur / 0.85));
-  if (p.hunted > 0.5) dist *= 0.85;
   // Snap in behind the creature when it teleports (respawn), otherwise keep the player's framing.
   const jumped = cs.lastPos.distanceTo(pp) > 20;
   cs.lastPos.copy(pp);
@@ -367,6 +370,20 @@ export function updateCamera(cs: CamState, p0: Actor, dt: number, game: Game, re
     lookAt.y += L * 0.1 * cs.aimBlend;
   }
   const pitch = cs.pitch + (locked ? 0.1 : 0) + (def.ground ? 0.12 : 0);
+  // Something is hunting you: pull the arm back along the view until the hunter is in the picture,
+  // and ease back in when the hunt lapses or it is too far off for any reasonable zoom to show it.
+  // Only on your own living body, not while eaten, riding, locked on or aiming — each of those is
+  // a shot with its own reason for its distance.
+  const hunter = p === p0 && isAlive(p) && p.hunterId >= 0 ? game.byId(p.hunterId) : undefined;
+  cs.threatOn = !!hunter && isAlive(hunter) && !pred && !riding && !locked && cs.aimBlend < 0.5 && framingHunt(cs.threatOn, p.hunted);
+  let threatTarget = 1;
+  if (cs.threatOn && hunter) {
+    const hp = renderPos(hunter, tmpPred);
+    threatTarget = threatZoom(lookAt, yaw, pitch, dist, hp, lengthOf(hunter) * 0.35, cs.camera.fov * Math.PI / 180,
+      cs.camera.aspect, cs.threatZoom > 1.05 ? THREAT_ZOOM_HOLD : THREAT_ZOOM_MAX);
+  }
+  cs.threatZoom = damp(cs.threatZoom, threatTarget, threatTarget > cs.threatZoom ? THREAT_OUT : THREAT_IN, dt);
+  dist *= cs.threatZoom;
   const place = (d: number) => tmpDesired.set(
     lookAt.x - Math.sin(yaw) * Math.cos(pitch) * d,
     lookAt.y + Math.sin(pitch) * d + L * 0.18,

@@ -426,7 +426,7 @@ export class Engine {
     this.cams = setups.map((_, i) => {
       const p = this.game!.players[i];
       const cam = new THREE.PerspectiveCamera(60, 1, 0.08, 420);
-      const cs: CamState = { showBoard: false, hatchShot: -1, breathT: 0, rideBlend: 0, yaw: p.yaw, pitch: 0.2, roll: 0, lookIdle: 0, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, climbHold: 0, followHold: 0, floorCloseT: 0, floorCloseBlend: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4(), tele: freshTele() };
+      const cs: CamState = { showBoard: false, hatchShot: -1, breathT: 0, rideBlend: 0, yaw: p.yaw, pitch: 0.2, roll: 0, lookIdle: 0, threatOn: false, threatZoom: 1, zoom: 1, fade: 0, aimBlend: 0, aimTarget: -1, aimSnapT: 0, climbHold: 0, followHold: 0, floorCloseT: 0, floorCloseBlend: 0, pos: new THREE.Vector3(p.pos.x - Math.sin(p.yaw) * 6, p.pos.y + 2.5, p.pos.z - Math.cos(p.yaw) * 6), look: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), shake: 0, camera: cam, lockBlend: 0, lastPos: new THREE.Vector3(p.pos.x, p.pos.y, p.pos.z), frustum: new THREE.Frustum(), projScreen: new THREE.Matrix4(), tele: freshTele() };
       cam.position.copy(cs.pos); cam.lookAt(cs.look);
       return cs;
     });
@@ -548,7 +548,11 @@ export class Engine {
             // like it is swimming for you. A mouse holds where it was put and so does a finger: the
             // same drift under either would fight the hand every frame. Both of them get the *follow*
             // camera's gentler return instead, just below.
-            if (!this.input.mouseLook && !this.input.touchPlay && Math.abs(c.lookY) < 0.05 && cs.climbHold === 0) cs.pitch = damp(cs.pitch, 0.2, 0.6, dt);
+            // A keyboard seat's W and S *turn* the animal up and down (`KeyboardInput`), so while it
+            // is being swum forward the pitch it was turned to is its heading and stays put; the
+            // return to level waits until the swimming stops, as a turn left with A stays turned.
+            const heldPitch = (s.device === 'keyboard' || s.device === 'keyboard2') && c.my > 0.3;
+            if (!this.input.mouseLook && !this.input.touchPlay && Math.abs(c.lookY) < 0.05 && cs.climbHold === 0 && !heldPitch) cs.pitch = damp(cs.pitch, 0.2, 0.6, dt);
             // On a mouse or a finger the camera *follows the body* unless a hand is on it. There is
             // no second stick and no pointer lock, so nothing is steering the view frame to frame:
             // left to itself it would stay pointing wherever the animal last turned away from. It
@@ -566,7 +570,7 @@ export class Engine {
               // would pull it back the way it came, through the pole, fighting the righting.
               if (cs.followHold === 0 && cs.climbHold === 0 && !inverted(cs.pitch) && Math.abs(cs.roll) < 0.3) {
                 cs.yaw = wrapAngle(cs.yaw + wrapAngle(p.yaw - cs.yaw) * (1 - Math.exp(-FOLLOW_RATE * dt)));
-                cs.pitch = damp(cs.pitch, 0.2, FOLLOW_RATE * 0.5, dt);
+                if (!heldPitch) cs.pitch = damp(cs.pitch, 0.2, FOLLOW_RATE * 0.5, dt);
               }
             }
           }

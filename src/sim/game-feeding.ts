@@ -110,7 +110,16 @@ export function consumeSnacks(game: Game, a: Actor, L: number, def: CreatureDef)
     if ((a.controller === 'player') && o.controller !== 'swarm' && a.state !== 'attack' && a.state !== 'pounce') continue;
     // A nursery is a peace, and a mouthful taken in passing breaks it as surely as a hunt does.
     if (peaceful(o.pos) && a.lastHitBy !== o.id) continue;
-    if (dist(a.pos, o.pos) < L * 0.4 + bodyRadius(o) && (moving || a.state === 'attack')) takeWhole(game, a, o);
+    if (dist(a.pos, o.pos) < L * 0.4 + bodyRadius(o) && (moving || a.state === 'attack')) {
+      // A school fish a player merely swims through goes down in passing, with no swallow: a
+      // swallow holds the body still for its length, and brushing a shoal must not stop you dead.
+      // One met in a bite or a pounce is being *caught*, and is carried in the jaws like any other
+      // catch — this path used to eat the fish a pounce was homing on half a body length early,
+      // with no swallow, which is the fish vanishing ahead of the chase.
+      const striking = a.state === 'attack' || a.state === 'pounce';
+      if (a.controller === 'player' && o.controller === 'swarm' && !striking) consume(game, a, o);
+      else takeWhole(game, a, o);
+    }
   }
 }
 
@@ -126,9 +135,11 @@ export function consumeSnacks(game: Game, a: Actor, L: number, def: CreatureDef)
  */
 export function takeWhole(game: Game, a: Actor, o: Actor) {
   if (!canEat(game, a, o)) { kill(game.hitCtx, o, a); return; }
-  // A fish out of a school is a mouthful taken in passing, and a cloud of them is how a filter
-  // feeder eats: no ceremony there either, or crossing a shoal would be a hundred performances.
-  if (o.controller === 'swarm' || (a.controller !== 'player')) { consume(game, a, o); return; }
+  // Wildlife eats without ceremony. Anything a player *goes for* — a bite, a pounce — is taken in
+  // the mouth, school fish included. The school fish used to be the exception here, and a school
+  // fish is what a hatchling hunts most, so a double-click chase ended with the fish simply gone.
+  // (Swimming *through* a school is still a mouthful in passing: `consumeSnacks` does that itself.)
+  if (a.controller !== 'player') { consume(game, a, o); return; }
   const ratio = clamp(lengthOf(o) / Math.max(lengthOf(a), 1e-3), 0.05, 1);
   startSwallow(game.hitCtx, a, o);
   // A mouthful is not a meal: the chew and the pause both follow how big the thing was.
