@@ -43,6 +43,27 @@ const run = (g: Game, f: InputFrame, steps: number) => stepN(g, steps, f);
   const dashed = Math.hypot(w.pos.x - x0.x, w.pos.z - x0.z) / lengthOf(w);
   check('dash covers 2.5+ body lengths in 0.45 s', dashed > 2.5, `${dashed.toFixed(2)} body lengths`);
 }
+// --- A school fish a player goes for is swallowed in the jaws, never removed on contact ---
+{
+  // A double-click chase at a school fish used to end with the fish simply gone: `takeWhole` sent
+  // every school fish straight to `consume`, and the swim-through path ate the fish the pounce was
+  // homing on before the pounce arrived. Both the pounce and the bite now carry it in the mouth.
+  for (const how of ['pounce', 'bite'] as const) {
+    const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 9);
+    const p = g.players[0]; g.skipHatch(); p.pos = { ...OPEN }; p.yaw = 0; p.spawnProtect = 0;
+    const gap = how === 'pounce' ? 6 : lengthOf(p) * 0.55;
+    const prey = g.spawn('waptia', 'ambient', { x: OPEN.x, y: OPEN.y, z: OPEN.z + gap }, 0.3);
+    prey.brain = undefined as never; (prey as any).controller = 'swarm';
+    const m = new Map([[0, { ...emptyInput(), aim: true, aimTarget: prey.id, pursueTarget: how === 'pounce' ? prey.id : undefined, light: how === 'bite' } as InputFrame]]);
+    let swallowed = false, removed = false;
+    for (let i = 0; i < 120 && !removed; i++) {
+      g.step(1 / 60, m);
+      if (prey.state === 'swallowed') swallowed = true;
+      if (!g.byId(prey.id)) removed = true;
+    }
+    check(`a ${how} at a school fish swallows it in the jaws`, swallowed, `state=${prey.state} removed=${removed} player=${p.state}`);
+  }
+}
 // --- LT aims at prey; X pounces when in range and eats it ---
 {
   const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 9);

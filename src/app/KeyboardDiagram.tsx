@@ -12,7 +12,7 @@ import { btn } from '../shared/controls';
 const KEYS: { cap: string; x: number; y: number; w?: number }[] = [
   { cap: 'Q', x: 40, y: 90 }, { cap: 'W', x: 82, y: 90 }, { cap: 'E', x: 124, y: 90 }, { cap: 'R', x: 166, y: 90 }, { cap: 'T', x: 208, y: 90 },
   { cap: 'A', x: 61, y: 132 }, { cap: 'S', x: 103, y: 132 }, { cap: 'D', x: 145, y: 132 }, { cap: 'F', x: 187, y: 132 }, { cap: 'G', x: 229, y: 132 },
-  { cap: 'Z', x: 82, y: 174 }, { cap: 'X', x: 124, y: 174 }, { cap: 'C', x: 166, y: 174 }, { cap: 'V', x: 208, y: 174 },
+  { cap: 'Z', x: 82, y: 174 }, { cap: 'X', x: 124, y: 174 }, { cap: 'C', x: 166, y: 174 }, { cap: 'V', x: 208, y: 174 }, { cap: 'B', x: 250, y: 174 },
   { cap: 'Shift', x: 40, y: 216, w: 96 }, { cap: 'Space', x: 142, y: 216, w: 150 },
   { cap: 'I', x: 330, y: 90 }, { cap: 'J', x: 320, y: 132 }, { cap: 'K', x: 362, y: 132 },
 ];
@@ -41,13 +41,14 @@ export function KeyboardDiagram() {
   return (
     <svg className="xbox-diagram kbm-diagram" viewBox="0 0 860 400" role="img" aria-labelledby="kbm-title">
       <title id="kbm-title">
-        Mouse and keyboard layout: W swims forward and X backwards, A and D turn, the camera
-        follows the creature, the wheel zooms. A left click on open water dashes there, and on an
+        Mouse and keyboard layout: Shift or a held left button swims forward and X backwards, A and
+        D turn left and right, W and S turn up and down, the camera follows the creature, the wheel
+        zooms. A left click on open water dashes there, and on an
         animal bites one in reach or pounces at one further off; a double-click does it at once and,
         held, keeps going. Holding the left button steers: the pointer goes away and the mouse turns
         the animal and the view until it is let go. Holding the right button aims, and letting it go
-        with the cursor on an animal pounces at it. Space dashes, Shift sprints, E or Q
-        rise, S or C sink, R shields, Z is camouflage, I is the sense pulse, J or F bite, G or K is
+        with the cursor on an animal pounces at it. Space dashes, B sprints, E or Q
+        rise, C sinks, R shields, Z is camouflage, I is the sense pulse, J or F bite, G or K is
         the heavy, T opens the teleport menu, V holds the scoreboard open and Escape pauses.
       </title>
       <defs>

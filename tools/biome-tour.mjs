@@ -17,7 +17,7 @@ await page.keyboard.press('Enter'); await page.waitForTimeout(1200);
 await page.keyboard.press('Space'); await page.waitForTimeout(400);
 await page.keyboard.press('Enter'); await page.waitForTimeout(4000);
 const stats = () => page.evaluate(() => { const e = window.__cambrian; const p = e.game.players[0]; return { ...e.stats(), pos: [Math.round(p.pos.x), Math.round(p.pos.y), Math.round(p.pos.z)], biome: document.querySelector('.radar')?.getAttribute('aria-label') }; });
-await page.keyboard.down('KeyW'); await page.waitForTimeout(2000); await page.keyboard.up('KeyW');
+await page.keyboard.down('ShiftLeft'); await page.waitForTimeout(2000); await page.keyboard.up('ShiftLeft');
 console.log('start', JSON.stringify(await stats()));
 await shot('nursery');
 // teleport menu (hold the key across a frame: headless frames are slow)
@@ -31,7 +31,7 @@ for (const [name, x, s, yaw] of spots) {
   await page.evaluate(([x, s, yaw]) => { const g = window.__cambrian.game; const p = g.players[0]; const z = g.world.constructor.length === -1 ? 0 : (window.__shoreZ ??= (xx) => g.radarFor(0, 1).find((b) => b.kind === 'shore').dz + g.players[0].pos.z)(x); void z; }, [x, s, yaw]);
   await page.evaluate(([x, s, yaw]) => { const g = window.__cambrian.game; const p = g.players[0]; p.pos = { x, y: 0, z: 0 }; const shore = g.radarFor(0, 1).find((b) => b.kind === 'shore'); const z = shore.dz - s; g.world.loadAround({ x, y: 0, z }); p.pos = { x, y: 6, z }; p.vel = { x: 0, y: 0, z: 0 }; p.yaw = yaw; }, [x, s, yaw]);
   await page.waitForTimeout(5000);
-  await page.keyboard.down('KeyW'); await page.waitForTimeout(1500); await page.keyboard.up('KeyW');
+  await page.keyboard.down('ShiftLeft'); await page.waitForTimeout(1500); await page.keyboard.up('ShiftLeft');
   console.log(name, JSON.stringify(await stats()));
   await shot(`biome-${name}`);
 }
@@ -73,7 +73,7 @@ await page.keyboard.press('Enter'); await page.waitForTimeout(5000);
 console.log('two players:', await page.evaluate(() => window.__cambrian.game.players.length));
 await page.evaluate(() => { const g = window.__cambrian.game; const b = g.players[1]; if (b) { const shore = g.radarFor(1, 1).find((x) => x.kind === 'shore'); b.pos = { x: 300, y: 6, z: b.pos.z + shore.dz - 900 }; b.vel = { x: 0, y: 0, z: 0 }; g.world.loadAround(b.pos); } });
 await page.waitForTimeout(8000);
-await page.keyboard.down('KeyW'); await page.keyboard.down('KeyI'); await page.waitForTimeout(2000); await page.keyboard.up('KeyW'); await page.keyboard.up('KeyI');
+await page.keyboard.down('ShiftLeft'); await page.keyboard.down('KeyI'); await page.waitForTimeout(2000); await page.keyboard.up('ShiftLeft'); await page.keyboard.up('KeyI');
 console.log('split far apart', JSON.stringify(await stats()));
 await shot('split-far');
 console.log('errors:', errors.length); for (const e of [...new Set(errors)].slice(0, 20)) console.log(e);

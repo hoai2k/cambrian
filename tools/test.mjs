@@ -60,6 +60,7 @@ const SUITES = {
   survival: { file: 'survival-test.ts', also: ['survival-eras'] },
   'survival-eras': { file: 'survival-eras-test.ts', runs: ['devonian', 'triassic'] },
   views: { file: 'view-pick-test.ts' },
+  'threat-frame': { file: 'threat-frame-test.ts' },
   sight: { file: 'sight-test.ts' },
   governor: { file: 'governor-test.ts' },
   respawn: { file: 'respawn-test.ts' },
@@ -160,10 +161,10 @@ const SUITES = {
  * deploy workflow runs `ci`, which is `gate` plus the rest of the fast checks); `all` is everything.
  */
 const SIM = ['world', 'swim', 'flora', 'locomotion', 'reactions', 'grab', 'fight', 'feast', 'paddle', 'pursuit', 'hunt',
-  'survival', 'survival-eras', 'views', 'sight', 'respawn', 'ecology', 'appetite', 'environment', 'corpse', 'modes', 'controls', 'motion',
+  'survival', 'survival-eras', 'views', 'threat-frame', 'sight', 'respawn', 'ecology', 'appetite', 'environment', 'corpse', 'modes', 'controls', 'motion',
   'hiding', 'sand', 'seabed', 'tracks', 'sizing', 'spatial', 'record', 'expansion', 'beach', 'touch', 'bindings'];
 const GATE = ['flora', 'locomotion', 'fight', 'feast', 'pursuit', 'respawn', 'corpse', 'environment', 'hunt', 'survival',
-  'survival-eras', 'views', 'sight', 'motion', 'hiding', 'sand', 'seabed', 'tracks', 'sizing', 'spatial', 'record', 'expansion', 'touch',
+  'survival-eras', 'views', 'threat-frame', 'sight', 'motion', 'hiding', 'sand', 'seabed', 'tracks', 'sizing', 'spatial', 'record', 'expansion', 'touch',
   'bindings', 'modes', 'controls', 'beach'];
 /** Everything that is not a simulation suite and takes seconds, not minutes. */
 const FAST = ['codex', 'results', 'visitors', 'seats', 'specials', 'roster', 'depth', 'menus', 'focus', 'fullscreen', 'cursors', 'mouse:strike', 'edges',
