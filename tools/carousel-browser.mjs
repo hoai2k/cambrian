@@ -21,6 +21,9 @@ const stepper = async (page, side) => ((await page.locator(`.carousel-step.${sid
 // The track at rest: no slide under way. A press during a slide is ignored by design (the slide
 // finishes first), so a walk that presses again before it lands would press nothing.
 const rest = (page) => page.waitForFunction(() => !document.querySelector('.carousel-track')?.dataset.moving, null, { timeout: 20000 });
+// How far the card on stage has been carried off the middle of the stage: the track's own transform
+// is not zero at rest (every card keeps a place along it), so what is measured is what is seen.
+const offset = () => document.querySelector('.carousel-slide.current').getBoundingClientRect().left - document.querySelector('.carousel-stage').getBoundingClientRect().left;
 const title = (page) => page.evaluate(() => document.querySelector('.carousel-slide.current .crew-card h2')?.textContent ?? '');
 // Every wait says which step it was, so a timeout names the part of the journey that stopped.
 let stepName = '';
@@ -65,17 +68,30 @@ async function drive(era, w, h, full) {
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: x0, y: y0, id: 5 }] });
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x0 - 20, y: y0, id: 5 }] });
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x0 - 40, y: y0, id: 5 }] });
-      await until(page, () => { const m = getComputedStyle(document.querySelector('.carousel-track')).transform; return m !== 'none' && new DOMMatrix(m).m41 < -15; });
+      await until(page, `(${offset})() < -15`);
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x0 - 30, y: y0, id: 5 }] });
       await page.waitForTimeout(400); // slow enough that it is not a flick
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-      await until(page, () => new DOMMatrix(getComputedStyle(document.querySelector('.carousel-track')).transform).m41 === 0);
+      await until(page, `Math.abs((${offset})()) < 0.5 && !document.querySelector('.carousel-track').dataset.moving`);
       assert.equal(await title(page), name0, 'a short drag springs back to the same card');
     }
     stepName = 'swipe';
     // A swipe walks it, leftward to the next card, off real touches.
     const stage = await page.locator('.carousel-stage').boundingBox();
     const y = stage.y + stage.height * 0.3;
+    // Every frame of the slide and the commit after it, the card in the middle of the stage: once the
+    // new one is there, the old one must never be seen again (the flash an iPhone showed on landing).
+    await page.evaluate(() => {
+      const seen = (window.__middle = []);
+      const tick = () => {
+        const st = document.querySelector('.carousel-stage')?.getBoundingClientRect();
+        const el = st && document.elementFromPoint(st.left + st.width / 2, st.top + st.height * 0.3);
+        const name = el?.closest('.carousel-slide')?.querySelector('.crew-card h2')?.textContent;
+        if (name && seen[seen.length - 1] !== name) seen.push(name);
+        if (seen.length < 50) window.__middleRaf = requestAnimationFrame(tick);
+      };
+      tick();
+    });
     await touch(
       ['touchStart', [{ x: stage.x + stage.width * 0.8, y, id: 2 }]],
       ['touchMove', [{ x: stage.x + stage.width * 0.5, y, id: 2 }]],
@@ -83,6 +99,10 @@ async function drive(era, w, h, full) {
       ['touchEnd', []],
     );
     await until(page, (n) => document.querySelector('.carousel-slide.current .crew-card h2')?.textContent === n, name1);
+    await rest(page);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+    const middle = await page.evaluate(() => { cancelAnimationFrame(window.__middleRaf); return window.__middle; });
+    assert.deepEqual(middle.slice(middle.indexOf(name1)), [name1], `once the new card is in the middle it stays there (${middle.join(' → ')})`);
 
     stepName = 'keys';
     // The arrow keys walk it too — down included, since a list of one card has no rows.

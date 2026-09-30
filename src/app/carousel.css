@@ -111,8 +111,9 @@
    phone's compositor does on every frame of the slide, and the float cannot be seen mid-swipe anyway. */
 .carousel-track:is([data-moving='slide'], [data-moving='drag']) .hero img { animation-play-state: paused; }
 .carousel-slide { position: absolute; top: 0; bottom: 0; left: 0; width: 100%; }
-.carousel-slide.prev { left: calc(-100% - 12px); }
-.carousel-slide.next { left: calc(100% + 12px); }
+/* Each slide's `left` is its place along the track, written by the component: the card on stage and
+   its neighbours keep one place each while they are drawn, so the commit that brings a new card on
+   stage moves nothing. */
 /* No dimming: the card that slides in must look exactly as it will on stage, or it pops on arrival. */
 .carousel-slide.prev, .carousel-slide.next { cursor: pointer; }
 .carousel-slide .carousel-extra { animation: none; }

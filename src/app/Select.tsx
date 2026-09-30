@@ -569,28 +569,41 @@ function RosterCarousel({ p, grid, renderCard }: {
   const trackRef = useRef<HTMLDivElement>(null);
   const press = useRef<{ x: number; y: number; t: number; axis: 'x' | 'y' | null; id: number; trail: { x: number; t: number }[] } | null>(null);
   const swiped = useRef(false);
-  /** A slide under way: set from the lift until the row is re-seated under the card it went to. */
+  /** A slide under way: set from the lift until the card it went to is on stage. */
   const busy = useRef(false);
   /** Where the row is, in pixels, as last written: what the next slide starts from. */
   const xNow = useRef(0);
   const run = useRef<Animation | null>(null);
-  /** The card the row is seated under. When the card on stage is anything else, the row re-seats. */
+  /*
+   * Every card has a place on the track that never changes while it is drawn: the card on stage sits
+   * at `home` card-widths along, its neighbours one either side, and the track is shifted back by
+   * exactly that much. A slide moves the track one place on and the cursor then steps — and the new
+   * card is drawn *where it already was*, so the commit that puts it on stage moves nothing at all.
+   * The row used to be re-seated instead (the track snapped back to zero in the same commit that
+   * moved each card into its new slot), which is two changes the browser has to land on one frame;
+   * on an iPhone the track's arrived a frame before the cards' did and the previous animal flashed
+   * up in the middle. `home` only ever counts up or down by the steps taken, so a trip round the
+   * roster's end is one more place along rather than a jump back across the whole row.
+   */
+  const home = useRef(0);
+  /** The place a slide under way is going to, and the card that will be on stage there. */
+  const pending = useRef<{ key: string; v: number } | null>(null);
+  /** The card on stage as last committed, so a refused step (no new card) can be told apart. */
   const seated = useRef<string | null>(null);
-  /** The card on stage before the slide that is under way, so a refused step can be told apart. */
-  const leaving = useRef<string | null>(null);
   // The exact width, not `clientWidth`: that is rounded, the slides are laid out at 100% of a width
-  // that is often fractional on a phone, and the difference is a pixel the re-seat jumps by.
+  // that is often fractional on a phone, and the difference is a pixel per place along the track.
   const width = () => stageRef.current?.getBoundingClientRect().width || 1;
+  const placeX = (v: number) => -v * (width() + SLIDE_GAP);
   /*
    * The row is moved by writing its transform directly, never through React state: a finger drag
    * re-rendering three whole cards on every move is what makes a card trail the finger on a phone.
    */
-  const put = (x: number) => {
+  const put = (x: number, dragging = false) => {
     const el = trackRef.current; if (!el) return;
     run.current?.cancel(); run.current = null;
     xNow.current = x;
     el.style.transform = `translate3d(${x}px, 0, 0)`;
-    el.dataset.moving = x ? 'drag' : '';
+    el.dataset.moving = dragging ? 'drag' : '';
   };
   /*
    * The lift is animated with the Web Animations API from the exact point the finger let go, at the
@@ -626,29 +639,44 @@ function RosterCarousel({ p, grid, renderCard }: {
     a.finished.then(end, end);
   });
   const slotKey = (o: Slot) => `${o.kind}:${o.id}`;
-  /** Slide the row a whole card over, then step the cursor; the row is re-seated when the new card lands. */
+  /** Slide the row one place on, then step the cursor; the card that arrives is already in place. */
   const go = (dir: 1 | -1, speed = 0) => {
     if (busy.current) return;
     busy.current = true;
-    leaving.current = slotKey(slot);
-    void slide(-dir * (width() + SLIDE_GAP), speed).then(() => {
+    const leaving = slotKey(slot);
+    const target = order[(at + dir + order.length) % order.length];
+    const v = home.current + dir;
+    void slide(placeX(v), speed).then(() => {
+      pending.current = target ? { key: slotKey(target), v } : null;
       step(dir);
       // A step the roster refuses (a locked seat) never brings a new card: spring back instead. It is
       // decided by whether the card changed, never by how long the commit took — a timer that sprang
       // back after 400 ms raced a slow phone's commit and slid the old card home under the new one.
       window.setTimeout(() => {
-        if (busy.current && leaving.current && seated.current === leaving.current) { leaving.current = null; springBack(); }
+        if (busy.current && seated.current === leaving) { pending.current = null; springBack(); }
       }, 900);
     });
   };
-  // Re-seat the row in the same commit that puts a new card on stage, so the card the finger sent
-  // there is already in the middle when the row jumps back under it and nothing is seen to move.
+  // A new card on stage: if it is the one a slide went to, the track is already where it belongs and
+  // nothing is touched. Anything else (a key, a pad, a refused step's late answer) changes the card in
+  // place, and the track is put back under the place the card is drawn at.
   useLayoutEffect(() => {
     const k = slotKey(slot);
     if (seated.current === k) return;
-    seated.current = k; leaving.current = null;
-    put(0); busy.current = false;
+    seated.current = k;
+    const arrived = pending.current?.key === k ? pending.current : null;
+    pending.current = null;
+    if (arrived) home.current = arrived.v;
+    else put(placeX(home.current));
+    landed();
   });
+  // A change of width moves every place along the track, so the track follows it while at rest.
+  useLayoutEffect(() => {
+    const el = stageRef.current; if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => { if (!busy.current && !press.current) put(placeX(home.current)); });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
   const release = (e: ReactPointerEvent) => {
     const d = press.current; press.current = null;
     if (!d || d.axis !== 'x') return;
@@ -664,7 +692,12 @@ function RosterCarousel({ p, grid, renderCard }: {
     if (Math.abs(moved) > width() * COMMIT && (withIt || Math.abs(v) < FLICK) || (withIt && Math.abs(v) > FLICK && Math.abs(moved) > 20)) go(dir, withIt ? Math.abs(v) : 0);
     else springBack(withIt ? 0 : Math.abs(v));
   };
-  const springBack = (speed = 0) => { busy.current = true; void slide(0, speed).then(() => { put(0); busy.current = false; }); };
+  const springBack = (speed = 0) => { busy.current = true; void slide(placeX(home.current), speed).then(landed); };
+  /** The row is at rest: free for the next press. The finished slide stays held where it ended. */
+  function landed() {
+    busy.current = false;
+    if (trackRef.current) trackRef.current.dataset.moving = '';
+  }
   // A locked visitor is an animal on stage whatever the cursor says: its arrows walk the visitors.
   const showCard = slot.kind === 'creature' || (seat?.cursor === 'visitors' && seat.ready);
   const cardPl: PlayerSetup = seat ?? { creature: (slot.kind === 'creature' ? slot.id : ACTIVE_ERA.defaults.player) as CreatureId, device: 'touch', ready: false };
@@ -681,6 +714,9 @@ function RosterCarousel({ p, grid, renderCard }: {
     if (o.kind === 'extra') return <ExtraCard id={o.id as ExtraId} count={p.visitorCount} onTake={() => { if (onStage) p.onExtra(0, o.id as ExtraId); }} />;
     return renderCard({ creature: o.id as CreatureId, device: seat?.device ?? 'touch', ready: false }, 0, !seat);
   };
+  // The place the card on stage is drawn at: the slide's destination on the commit it arrives in,
+  // read here without being written so a render between the slide and that commit keeps the old one.
+  const placeAt = pending.current?.key === slotKey(slot) ? pending.current.v : home.current;
   const row: { role: 'prev' | 'current' | 'next'; slot: Slot; dir: -1 | 0 | 1 }[] = [
     { role: 'prev', slot: order[(at - 1 + order.length) % order.length], dir: -1 },
     { role: 'current', slot, dir: 0 },
@@ -708,7 +744,7 @@ function RosterCarousel({ p, grid, renderCard }: {
           if (d.axis === 'x') {
             d.trail.push({ x: e.clientX, t: e.timeStamp });
             if (d.trail.length > 12) d.trail.shift();
-            put(mx);
+            put(placeX(home.current) + mx, true);
           }
         }}
         onPointerUp={release}
@@ -718,6 +754,7 @@ function RosterCarousel({ p, grid, renderCard }: {
         <div className="carousel-track" ref={trackRef}>
           {row.map(({ role, slot: o, dir }) => (
             <div key={`${slotKey(o)}#${role === 'current' || slotKey(o) !== slotKey(slot) ? '' : role}`} className={`carousel-slide ${role}`}
+              style={{ left: `calc(${placeAt + dir} * (100% + ${SLIDE_GAP}px))` }}
               aria-hidden={role === 'current' ? undefined : true}
               onClickCapture={dir ? (e) => { e.stopPropagation(); e.preventDefault(); go(dir as 1 | -1); } : undefined}>
               {cardFor(o, role === 'current')}
