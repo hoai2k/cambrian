@@ -93,6 +93,7 @@
     "survival": "node tools/test.mjs survival",
     "views": "node tools/test.mjs views",
     "threat-frame": "node tools/test.mjs threat-frame",
+    "key-turn": "node tools/test.mjs key-turn",
     "sight": "node tools/test.mjs sight",
     "governor": "node tools/test.mjs governor",
     "hunt": "node tools/test.mjs hunt",

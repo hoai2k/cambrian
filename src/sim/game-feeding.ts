@@ -106,9 +106,11 @@ export function corpseInReach(game: Game, a: Actor): Actor | undefined {
   return best;
 }
 
-export function startEating(game: Game, a: Actor, c: Actor) {
+export function startEating(game: Game, a: Actor, c: Actor, commit = 0) {
   if (!canEat(game, a, c)) return;
-  a.state = 'eating'; a.stateT = 0; a.eatingTarget = c.id;
+  // `stateDur` is how long the meal goes on without the bite button held: nothing for a meal the
+  // button started (holding it is what keeps it going), and a mouthful for one a pounce arrived at.
+  a.state = 'eating'; a.stateT = 0; a.stateDur = commit; a.eatingTarget = c.id;
   a.lockTarget = -1;
   // The body's own bite count: whoever takes the first bite sizes it, and a carcass already
   // half eaten keeps the count it was opened with.

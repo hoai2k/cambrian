@@ -7,7 +7,7 @@ import { RULES } from './era-rules';
 import { HEAVY_SPECIALS, clearPursuit } from './concealment';
 import { beginExpansionAbility, beginHeavyStrike, specialHit, stepExpansionAbility, stepHeavyStrike } from './expansion-abilities';
 import { clamp, dist, dot, heading, len3, norm, scale as vscale, sub, wrapAngle, yawOf, type Vec3 } from '../shared/math';
-import { bandOf, bodyGap, bodyRadius, isAlive, isHidden, lengthOf, massOf, staminaCost } from './actors';
+import { bandOf, bodyGap, bodyRadius, isAlive, isHidden, targetable, lengthOf, massOf, staminaCost } from './actors';
 import { applyHit } from './combat';
 import { creature, type CreatureDef } from './creatures';
 import { type Actor, type InputFrame } from './types';
@@ -128,7 +128,7 @@ export function heavyAction(game: Game, a: Actor, def: CreatureDef, L: number, s
   // A crosshair on something too big to bite, with the grip held, is a target however far off it
   // is: the swim to it is the move. Everything else still has to be in range to be sprung at.
   const bigLock = grabbing && locked && isAlive(locked) && (bandOf(a, locked) === 'threat' || bandOf(a, locked) === 'giant');
-  const t = a.aiming && locked && isAlive(locked) ? (a.aimInRange || bigLock ? locked : undefined)
+  const t = a.aiming && locked && targetable(locked) ? (a.aimInRange || bigLock ? locked : undefined)
     : charge ? chargeTarget(game, a) ?? pounceTargetAhead(game, a, grabbing) : pounceTargetAhead(game, a, grabbing);
   if (t) startPounce(game, a, t, L, sf);
   else { const m = { ...def.heavy, lunge: def.heavy.lunge + 1.0 }; a.state = 'attack'; a.stateT = 0; a.move = m; a.moveKind = 'heavy'; a.hitDone.clear(); a.stamina -= staminaCost(a, m.stamina); a.combo = 0; a.pounceCd = 0.8; game.flag(a, 'heavy'); }

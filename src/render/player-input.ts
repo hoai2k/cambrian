@@ -14,7 +14,7 @@ import { applyTouch, TouchPlay } from '../input/touch';
 import { Edges } from '../shared/edges';
 import { clamp, damp, wrapAngle } from '../shared/math';
 import { freshStrike, stepStrike, type StrikeOut, type StrikeState } from '../shared/mouse-strike';
-import { bandOf, bodyGap, isAlive, isHidden, lengthOf, mouthReach } from '../sim/actors';
+import { bandOf, bodyGap, isAlive, isCarcass, isHidden, lengthOf, mouthReach, targetable } from '../sim/actors';
 import { creature } from '../sim/creatures';
 import type { Game } from '../sim/game';
 import { emptyInput, type Actor, type InputFrame, type PlayerSetup } from '../sim/types';
@@ -192,7 +192,7 @@ export class PlayerInput {
     if (this.pursuitTargets.has(a.player)) {
       const target = this.pursuitTargets.get(a.player) ?? -1;
       const victim = target >= 0 ? game?.byId(target) : undefined;
-      if ((a.pursuit?.target === target && a.pursuit.spent) || !isAlive(a) || !victim || !isAlive(victim) || isHidden(victim)) this.pursuitTargets.set(a.player, -1);
+      if ((a.pursuit?.target === target && a.pursuit.spent) || !isAlive(a) || !victim || !targetable(victim) || isHidden(victim)) this.pursuitTargets.set(a.player, -1);
       else { f.pursueTarget = target; f.pursueDash = touchPursuit; f.aim = true; f.aimTarget = target; }
     }
     // The right button — or a double-tap on the water — dashes at what is being pointed at: the dash
@@ -231,7 +231,7 @@ export class PlayerInput {
     const def = creature(a.creature);
     const gapTo = (id: number) => {
       const o = id >= 0 ? game.byId(id) : undefined;
-      return o && o.id !== a.id && isAlive(o) && !isHidden(o) ? Math.max(0, bodyGap(a, o)) : undefined;
+      return o && o.id !== a.id && targetable(o) && !isHidden(o) ? Math.max(0, bodyGap(a, o)) : undefined;
     };
     const alive = isAlive(a);
     if (m.pressed) this.strikeAt = m.ndc;
@@ -283,6 +283,8 @@ export class PlayerInput {
    */
   pointingAt(game: Game, p: Actor | undefined, cs: CamState): 'none' | 'edible' | 'attack' {
     const t = p && cs.aimTarget >= 0 ? game.byId(cs.aimTarget) : undefined;
+    // A carcass is food whatever it was in life: what is left of a giant is a meal, not a fight.
+    if (t && p && isCarcass(t) && targetable(t)) return 'edible';
     const band = t && p && isAlive(t) ? bandOf(p, t) : undefined;
     return !band ? 'none' : band === 'snack' || band === 'prey' ? 'edible' : 'attack';
   }
@@ -316,7 +318,9 @@ export class PlayerInput {
     const fwd = cursor ? this.tmpV.copy(cursor) : this.tmpV.copy(cs.look).sub(cs.camera.position).normalize();
     let best: Actor | undefined; let bestAng = Infinity;
     for (const o of game.nearby(p.pos, range)) {
-      if (o.id === p.id || !isAlive(o) || isHidden(o)) continue;
+      // A carcass can be pointed at and gone for like anything living — bitten where it lies, or
+      // pounced on from further off — so the crosshair finds it too.
+      if (o.id === p.id || !targetable(o) || isHidden(o)) continue;
       const band = bandOf(p, o);
       // Anything the crosshair is over. The threat and giant bands used to be skipped outright,
       // which meant a player holding the crosshair squarely on something their own size or larger
