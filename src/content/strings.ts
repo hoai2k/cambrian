@@ -834,7 +834,7 @@ export const SHARED_STRINGS: GameStrings = {
     padMenusHeading: 'Menus on a pad',
     padMenus: 'The stick and D-pad steer whatever the screen is about — the roster, a menu’s choices — and move by where the buttons actually are, so a row answers left and right. **LB** and **RB** step through every other button on the screen, one at a time, and round to the roster again: the other era on the title screen, the mode chips, and the icons in the corner from anywhere — so settings and fullscreen are reachable without a mouse. **A** takes the one you land on and **B** gives the sticks back. On a shared screen only the pad that reached for them follows; everyone else keeps picking.',
     keyboardHeading: 'Keyboard',
-    keyboardPlayerOne: 'Shift swim · X back · A/D turn · W/S turn up/down · arrows look · PgUp/PgDn zoom · B sprint · E/Q rise · C sink · F/J bite · G/K heavy · Z hide · Space dash · R guard · Tab aim · I sense · T teleport · V scoreboard · Esc pause.',
+    keyboardPlayerOne: 'W/Shift swim · X back · A/D turn · arrows look · PgUp/PgDn zoom · B sprint · E/Q rise · S/C sink · F/J bite · G/K heavy · Z hide · Space dash · R guard · Tab aim · I sense · T teleport · V scoreboard · Esc pause.',
     keyboardPlayerTwo: 'IJKL swim · Right Shift sprint · N rise · M sink · ; bite · ’ heavy · P hide · / dash · U guard · O aim · Y sense · H teleport · , scoreboard.',
     controllerHeading: 'Controller',
     controller: 'Plug an Xbox-style pad in and press a button: the game hands it the match and every prompt here changes to read **RT**, **LB**, **Y** instead. Up to four can play at once, and the mouse goes back to being a cursor.',

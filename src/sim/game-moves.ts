@@ -13,7 +13,7 @@ import { creature, type CreatureDef } from './creatures';
 import { type Actor, type InputFrame } from './types';
 import { groundHeight } from './world';
 import { flipLaunch, FLIP_STAMINA } from './locomotion';
-import { DASH_STAMINA_MULT, escapeReady, steered } from './effort';
+import { DASH_STAMINA_MULT, escapeReady, pounceCost, steered } from './effort';
 import { TEXT } from '../shared/text';
 import { CHARGE_STAMINA, DARTER_DODGE, DASH_COOLDOWN, DASH_TAP, DASH_TIME, FLIP_COOLDOWN, FLIP_TIME, dashLaunch, gripHold, type Game } from './game';
 
@@ -361,7 +361,7 @@ export function startPounce(game: Game, a: Actor, target: Actor, L: number, sf: 
   // only while free or guarding, so it cannot reach in and clear this mid-pounce.
   a.lockTarget = target.id;
   a.state = 'pounce'; a.stateT = 0; a.stateDur = clamp(dist(a.pos, target.pos) / Math.max(6, L * 3), 0.25, 0.9) + 0.15;
-  if (!free) { a.stamina -= 12; a.pounceCd = 1.4; }
+  if (!free) { a.stamina = Math.max(0, a.stamina - pounceCost(a)); a.pounceCd = 1.4; }
   a.combo = 0;
   a.move = { ...creature(a.creature).heavy, name: SAY.pounce }; a.moveKind = 'heavy';
   game.events.push({ kind: 'dodge', pos: { ...a.pos }, actor: a.id, player: a.player, strength: L });

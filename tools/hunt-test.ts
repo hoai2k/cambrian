@@ -3,6 +3,7 @@ import { kill, startSwallow } from '../src/sim/combat';
 import { emptyInput, type InputFrame } from '../src/sim/types';
 import { applyScaleStats, bandOf, bodyRadius, isAlive, lengthOf } from '../src/sim/actors';
 import { mouthPoint } from '../src/sim/game-feeding';
+import { pounceCost } from '../src/sim/effort';
 import { dist } from '../src/shared/math';
 import { sampleHeight } from '../src/sim/world';
 import { checker, finish, stepN } from './lib/test';
@@ -77,6 +78,34 @@ const run = (g: Game, f: InputFrame, steps: number) => stepN(g, steps, f);
       check('...and carried in without a leap', jump < L * 0.012, `largest step ${(jump / L).toFixed(3)} L beyond the eater's own`);
     }
   }
+}
+// --- A pounce is paid for like a dash, and nothing comes back while it runs ---
+{
+  // A held double-click chase used to cost 12 flat and then *recover* at half rate for as long as
+  // it ran, so a long chase filled the bar it was meant to be spending.
+  const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 9);
+  const p = g.players[0]; g.skipHatch(); p.pos = { ...OPEN }; p.yaw = 0; p.spawnProtect = 0;
+  const L = lengthOf(p);
+  const prey = g.spawn('waptia', 'ambient', { x: OPEN.x, y: OPEN.y, z: OPEN.z + L * 4 }, 0.3);
+  prey.brain = undefined as never;
+  p.stamina = p.staminaMax;
+  const m = new Map([[0, { ...emptyInput(), aim: true, aimTarget: prey.id, pursueTarget: prey.id } as InputFrame]]);
+  let before = p.stamina, first = -1, rose = 0, pouncing = 0, low = Infinity;
+  for (let i = 0; i < 240; i++) {
+    // keep it out of reach, so the chase is held and has to be paid for
+    prey.pos = { x: p.pos.x, y: p.pos.y, z: p.pos.z + L * 4 }; prey.vel = { x: 0, y: 0, z: 0 };
+    g.step(1 / 60, m);
+    if (p.state === 'pounce') {
+      pouncing++;
+      if (first < 0) first = before - p.stamina;
+      else rose = Math.max(rose, p.stamina - before);
+      low = Math.min(low, p.stamina);
+    }
+    before = p.stamina;
+  }
+  check('a pounce sets out at a dash\'s price', Math.abs(first - pounceCost(p)) < 0.5, `${first.toFixed(1)} against ${pounceCost(p)}`);
+  check('...recovers nothing while it runs', rose <= 1e-9, `rose ${rose.toFixed(3)}`);
+  check('...and a held chase is billed until the bar is spent, which ends it', low < 1 && pouncing > 60 && p.state !== 'pounce', `${low.toFixed(1)} left after ${pouncing} steps pouncing`);
 }
 // --- LT aims at prey; X pounces when in range and eats it ---
 {

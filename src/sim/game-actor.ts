@@ -17,7 +17,7 @@ import { emptyInput, type Actor, type InputFrame } from './types';
 import { groundHeight, microbialAt, resolveStatic, RISE_RATE, sampleCurrent, sampleHeight, shoreDistance, SURFACE_Y } from './world';
 import { DRIFT_CURRENT, driftRise, flipLaunch, PULSE_CYCLE, pulseRefilling, pulseThrust, rowWalkCurrent } from './locomotion';
 import { amphibious, ASHORE_WADE, landSpeed, onFoot, stepBeach, wadeAt, WALL_EASE, WALL_WADE } from './beach';
-import { escapeReady, healRate, PLANT_HEAL } from './effort';
+import { escapeReady, healRate, PLANT_HEAL, POUNCE_PAID, pounceCost } from './effort';
 import { TEXT } from '../shared/text';
 import { BREACH_GRAVITY, DASH_TAP, DASH_TIME, FLIP_TIME, GRASP_AT, HATCH_TIME, type Step, breachSpeed, dashLaunch, graspPoint, type Game } from './game';
 import { atMouth, attackHits, canEat, consumeSnacks, corpseInReach, gainNutrition, nutritionValue, startEating, takeWhole } from './game-feeding';
@@ -532,6 +532,10 @@ export function stepUpkeep(game: Game, a: Actor, input: InputFrame, dt: number, 
   const freeBurst = a.burstT > 0;
   if (bursting && !freeBurst) a.stamina = Math.max(0, a.stamina - BURST_STAMINA * burstIn * dt * (1 - relief));
   else if (a.state === 'guard') a.stamina -= 3 * dt;
+  // Nothing comes back while the body is throwing itself somewhere: a dash and a pounce are the
+  // effort, and a held pounce used to sit in a state that recovered at half rate, so a long
+  // double-click chase *filled* the bar it was meant to be spending.
+  else if (a.state === 'pounce' || a.state === 'dodge') { /* spending, not resting */ }
   else if (a.hideMode !== 'camouflage') a.stamina = Math.min(a.staminaMax, a.stamina + (speed < 0.4 ? 24 : 14) * dt * (a.state === 'free' ? 1 : 0.5) * (RULES.staminaRegen?.(game, a) ?? 1));
   if (a.stamina <= 0) { a.stamina = 0; if (a.exhausted === 0 && !freeClimb) a.exhausted = 1.6; }
   return { speed, burstIn, paddling, bursting, freeBurst, relief, emptyClimb, freeClimb };
@@ -799,7 +803,7 @@ export function stepActions(game: Game, a: Actor, input: InputFrame, dt: number,
     // A held pursuit springs at the one animal it names. A finger's double-tap has already paid
     // for its dash-length chase, so its pounce is free; the mouse's is an ordinary pounce and is
     // priced and cooled down like one — until it can be afforded, the pointer keeps swimming at it.
-    else if (chaseTarget != null && a.controller === 'player' && (input.pursueDash || (a.pounceCd === 0 && a.stamina >= 12 && a.exhausted === 0))) {
+    else if (chaseTarget != null && a.controller === 'player' && (input.pursueDash || (a.pounceCd === 0 && a.stamina >= pounceCost(a) && a.exhausted === 0))) {
       const target = game.idMap.get(chaseTarget);
       if (target && isAlive(target) && !isHidden(target)) startPounce(game, a, target, L, sf, !!input.pursueDash);
     }
@@ -881,7 +885,12 @@ export function stepActions(game: Game, a: Actor, input: InputFrame, dt: number,
     // turned as they close on it. While the button is down the lunge keeps its legs: it re-aims
     // at wherever the animal is now, every frame, until it arrives. Paid for once when it
     // started, because it is one act however long the swim to it takes.
-    if (t && isAlive(t) && chaseTarget === t.id) a.stateDur = a.stateT + 0.2;
+    if (t && isAlive(t) && chaseTarget === t.id) {
+      // Held past what setting out paid for, it is billed as a held dash is, and an empty bar ends it.
+      const billed = a.controller === 'player' && !input.pursueDash && a.stateT > POUNCE_PAID;
+      if (billed) a.stamina = Math.max(0, a.stamina - pounceCost(a) * (dt / DASH_TIME));
+      if (!billed || a.stamina > 0) a.stateDur = a.stateT + 0.2;
+    }
     if (t && isAlive(t) && a.graspHold && !a.graspSpent && a.grabbing < 0 && a.rideHost < 0
       && (bandOf(a, t) === 'threat' || bandOf(a, t) === 'giant')) a.stateDur = a.stateT + 0.2;
     if (t && isAlive(t) && a.stateT < a.stateDur) {

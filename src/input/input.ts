@@ -107,20 +107,18 @@ export class KeyboardInput {
       // does not, which is a thing the camera cannot say. The arrow keys still move the view
       // itself, for a hand that wants the old way.
       //
-      // **W and S turn the animal up and down, the way A and D turn it left and right**, and Shift
-      // (or the held left mouse button) is what swims it forward. Forward is camera-relative, so W
-      // tilts the view up — the arrow keys' own axis — and the body climbs along it; the follow
-      // camera leaves that pitch alone for as long as the body is being swum forward, so a turn up
-      // stays turned. Shift was the sprint, which has moved to B.
+      // W swims forward, and so does Shift (or the held left mouse button), with X back; the arrow
+      // keys tilt the view, and forward follows the view, so an arrow up and a swim is a climb.
+      // Shift was the sprint, which is on B.
       c.mx = Number(k('KeyD')) - Number(k('KeyA'));
-      c.my = Number(k('ShiftLeft')) - Number(k('KeyX'));
+      c.my = Number(k('KeyW') || k('ShiftLeft')) - Number(k('KeyX'));
       c.lookX = Number(k('ArrowRight')) - Number(k('ArrowLeft'));
-      c.lookY = Number(k('ArrowDown') || k('KeyS')) - Number(k('ArrowUp') || k('KeyW'));
-      // Rising and sinking straight up and down are a pair on each hand: E or Q lifts, C drops.
-      // Every attack has a key as well as a mouse button, because a hand already on the keys should
-      // not have to reach — J and F bite, G and K are the heavy.
+      c.lookY = Number(k('ArrowDown')) - Number(k('ArrowUp'));
+      // Up and down are a pair on each hand: E or Q lifts, S or C drops. Every attack has a key as
+      // well as a mouse button, because a hand already on the keys should not have to reach — J and
+      // F bite, G and K are the heavy.
       c.burst = k('KeyB') ? 1 : 0;
-      c.rise = k('KeyE') || k('KeyQ'); c.sink = k('KeyC');
+      c.rise = k('KeyE') || k('KeyQ'); c.sink = k('KeyS') || k('KeyC');
       c.light = k('KeyF') || k('KeyJ'); c.heavy = k('KeyG') || k('KeyK');
       c.ability = k('KeyZ'); c.dodge = k('Space'); c.dash = k('Space'); c.guard = k('KeyR'); c.lock = k('Tab'); c.aim = k('Tab'); c.sense = k('KeyI');
       if (k('PageUp') || k('PageDown')) { c.rsClick = true; c.lookY = k('PageUp') ? -1 : 1; }

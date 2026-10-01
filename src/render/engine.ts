@@ -548,9 +548,9 @@ export class Engine {
             // like it is swimming for you. A mouse holds where it was put and so does a finger: the
             // same drift under either would fight the hand every frame. Both of them get the *follow*
             // camera's gentler return instead, just below.
-            // A keyboard seat's W and S *turn* the animal up and down (`KeyboardInput`), so while it
-            // is being swum forward the pitch it was turned to is its heading and stays put; the
-            // return to level waits until the swimming stops, as a turn left with A stays turned.
+            // A keyboard seat that tilted the view with the arrows and is swimming forward is
+            // heading where it tilted: the pitch stays put until the swimming stops, as a turn left
+            // with A stays turned, rather than being levelled out from under the climb.
             const heldPitch = (s.device === 'keyboard' || s.device === 'keyboard2') && c.my > 0.3;
             if (!this.input.mouseLook && !this.input.touchPlay && Math.abs(c.lookY) < 0.05 && cs.climbHold === 0 && !heldPitch) cs.pitch = damp(cs.pitch, 0.2, 0.6, dt);
             // On a mouse or a finger the camera *follows the body* unless a hand is on it. There is
