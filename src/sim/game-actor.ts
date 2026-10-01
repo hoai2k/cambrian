@@ -8,7 +8,7 @@ import { RULES } from './era-rules';
 import { BURROWERS, HEAVY_SPECIALS, DEFENSIVE_SPECIALS, CAMOUFLAGE_DRAIN, camouflageMatch, clearPursuit, STILL_SETTLE, stillBury, stopHiding } from './concealment';
 import { abilitySpeed, stepExpansionAbility, bloomRate, grazeRate } from './expansion-abilities';
 import { clamp, damp, dist, dot, heading, len3, lerp, norm, scale as vscale, sub, v3, wrapAngle, yawOf, type Vec3 } from '../shared/math';
-import { applyScaleStats, bandOf, bodyGap, bodyRadius, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, isAlive, isHidden, lengthOf, massOf, speedFactor, staminaCost, swimCeiling } from './actors';
+import { applyScaleStats, bandOf, bodyGap, bodyRadius, isCarcass, targetable, clearanceOf, climbHeight, climbRise, floorClearance, glideOver, isAlive, isHidden, lengthOf, massOf, speedFactor, staminaCost, swimCeiling } from './actors';
 import { tierScale } from './tiers';
 import { applyHit, GRIP_BREAK, GRIP_MEAL, GRIP_STRAIN, kill, startSwallow } from './combat';
 import { creature, type CreatureDef } from './creatures';
@@ -19,7 +19,7 @@ import { DRIFT_CURRENT, driftRise, flipLaunch, PULSE_CYCLE, pulseRefilling, puls
 import { amphibious, ASHORE_WADE, landSpeed, onFoot, stepBeach, wadeAt, WALL_EASE, WALL_WADE } from './beach';
 import { escapeReady, healRate, PLANT_HEAL, POUNCE_PAID, pounceCost } from './effort';
 import { TEXT } from '../shared/text';
-import { BREACH_GRAVITY, DASH_TAP, DASH_TIME, FLIP_TIME, GRASP_AT, HATCH_TIME, type Step, breachSpeed, dashLaunch, graspPoint, type Game } from './game';
+import { BREACH_GRAVITY, DASH_TAP, DASH_TIME, FLIP_TIME, GRASP_AT, HATCH_TIME, type Step, bitesFor, breachSpeed, dashLaunch, graspPoint, type Game } from './game';
 import { atMouth, attackHits, canEat, consumeSnacks, corpseInReach, gainNutrition, nutritionValue, startEating, takeWhole } from './game-feeding';
 import { breakLoose, closeGrip, tryGrasp, updateRide } from './game-grip';
 import { inShell } from './game-life';
@@ -85,6 +85,12 @@ const PADDLE_RISE = 1.5;
 
 /** The current at a body, read and spent within its own update: one object, not one per body per step. */
 const currentScratch: Vec3 = { x: 0, y: 0, z: 0 };
+
+/** The carcass a pounce is going at, if it is going at one. */
+const carcassAt = (game: Game, a: Actor) => {
+  const t = a.lockTarget >= 0 ? game.idMap.get(a.lockTarget) : undefined;
+  return t && isCarcass(t) ? t : undefined;
+};
 
 /** The longest a pounce may run, in seconds, while it closes the last of the gap to the mouth. */
 const POUNCE_REACH_MAX = 1.6;
@@ -805,7 +811,7 @@ export function stepActions(game: Game, a: Actor, input: InputFrame, dt: number,
     // priced and cooled down like one — until it can be afforded, the pointer keeps swimming at it.
     else if (chaseTarget != null && a.controller === 'player' && (input.pursueDash || (a.pounceCd === 0 && a.stamina >= pounceCost(a) && a.exhausted === 0))) {
       const target = game.idMap.get(chaseTarget);
-      if (target && isAlive(target) && !isHidden(target)) startPounce(game, a, target, L, sf, !!input.pursueDash);
+      if (target && targetable(target) && !isHidden(target)) startPounce(game, a, target, L, sf, !!input.pursueDash);
     }
     else if (justHeavy && heavyAction(game, a, def, L, sf, locked, bursting)) { /* the button was taken */ }
     // Holding the grip button at something too big to bite keeps swimming at it until it has
@@ -860,7 +866,7 @@ export function stepActions(game: Game, a: Actor, input: InputFrame, dt: number,
     // The first tap can already be winding up a bite. A creature double-tap commits to its
     // target now, just as a water double-tap takes over immediately for the dash.
     const chase = input.pursueDash && chaseTarget != null ? game.idMap.get(chaseTarget) : undefined;
-    if (chase && isAlive(chase) && !isHidden(chase)) {
+    if (chase && targetable(chase) && !isHidden(chase)) {
       a.move = undefined;
       startPounce(game, a, chase, L, sf, true);
     } else if (justDash && input.touchDash && !a.ashore && (a.stamina >= 10 || freeClimb) && (a.exhausted === 0 || freeClimb) && a.dashCd === 0) {
@@ -877,6 +883,24 @@ export function stepActions(game: Game, a: Actor, input: InputFrame, dt: number,
         a.stateT = 0; a.move = nm; a.hitDone.clear(); a.stamina -= staminaCost(a, nm.stamina); a.combo = (a.combo + 1) % 3; a.comboT = 0.9;
       }
     }
+  } else if (a.state === 'pounce' && carcassAt(game, a)) {
+    // A pounce at a carcass swims to it like any other and, arriving, takes a mouthful there: the
+    // whole of a body small enough to go down in one, a bite out of anything bigger.
+    const t = carcassAt(game, a)!;
+    if (a.stateT < a.stateDur || chaseTarget === t.id) {
+      if (chaseTarget === t.id && a.stateT < POUNCE_REACH_MAX) a.stateDur = Math.max(a.stateDur, a.stateT + 0.2);
+      const to = sub(t.pos, a.pos);
+      const dirTo = norm(to);
+      a.vel = vscale(dirTo, Math.max(def.speed * sf * 3.2, 9 * Math.sqrt(sf)));
+      a.yaw = yawOf(dirTo); a.pitch = def.ground ? a.pitch : clamp(-Math.asin(clamp(dirTo.y, -1, 1)) * 0.8, -0.9, 0.9);
+      if (atMouth(a, t, L) || bodyGap(t, a) < L * 0.1) {
+        a.vel = vscale(a.vel, 0.25);
+        const bites = t.eatBites >= 1 && t.eaten > 0 ? t.eatBites : bitesFor(a, t);
+        const ratio = lengthOf(t) / L;
+        if (canEat(game, a, t)) startEating(game, a, t, bites <= 1 ? clamp(6 * ratio * ratio, 0.5, 4.5) + 0.05 : BITE_TIME * 0.5);
+        else { a.state = 'free'; a.stateT = 0; }
+      }
+    } else { a.state = 'free'; a.stateT = 0; a.vel = vscale(a.vel, 0.3); }
   } else if (a.state === 'pounce') {
     const t = a.lockTarget >= 0 ? game.idMap.get(a.lockTarget) : undefined;
     // Reaching for a hold on something too big to bite is a pursuit, not a single spring. A
@@ -1079,7 +1103,7 @@ export function stepActions(game: Game, a: Actor, input: InputFrame, dt: number,
     }
   } else if (a.state === 'eating') {
     const c = a.eatingTarget >= 0 ? game.idMap.get(a.eatingTarget) : undefined;
-    if (!c || c.state !== 'dead' || c.eaten >= 1 || !canEat(game, a, c) || dist(a.pos, c.pos) > L * 0.8 + lengthOf(c) * 0.6 || (a.controller === 'player' && !input.light && a.stateT > 0.3)) {
+    if (!c || c.state !== 'dead' || c.eaten >= 1 || !canEat(game, a, c) || dist(a.pos, c.pos) > L * 0.8 + lengthOf(c) * 0.6 || (a.controller === 'player' && !input.light && a.stateT > Math.max(0.3, a.stateDur))) {
       a.state = 'free'; a.stateT = 0; a.eatingTarget = -1;
     } else {
       const ratio = lengthOf(c) / L;
@@ -1167,7 +1191,7 @@ export function stepActions(game: Game, a: Actor, input: InputFrame, dt: number,
   // body's centre is half a length from its mouth and ground prey sits a drop below a swimmer,
   // so measuring middles put the one thing a player was aiming at out of range while the
   // crosshair sat on it.
-  if (a.lockTarget >= 0) { const t = game.idMap.get(a.lockTarget); if (t && isAlive(t)) a.aimInRange = bodyGap(t, a) < game.heavyMove(a).reach; }
+  if (a.lockTarget >= 0) { const t = game.idMap.get(a.lockTarget); if (t && targetable(t)) a.aimInRange = bodyGap(t, a) < game.heavyMove(a).reach; }
   // Lock target validity. An unaimed lock is dropped once whatever it is on has got well away —
   // except while the animal is crossing open water to take hold of it. That swim is the whole
   // move, and the distance it covers is the point of it: dropping the lock on range mid-pursuit
@@ -1176,7 +1200,7 @@ export function stepActions(game: Game, a: Actor, input: InputFrame, dt: number,
     const t = game.idMap.get(a.lockTarget);
     const reaching = (a.state === 'pounce' && chaseTarget === a.lockTarget) || a.state === 'pounce' && a.graspHold && !!t
       && (bandOf(a, t) === 'threat' || bandOf(a, t) === 'giant');
-    if (!t || !isAlive(t) || isHidden(t) || (!a.aiming && !reaching && dist(a.pos, t.pos) > 16 + L * 8)) a.lockTarget = -1;
+    if (!t || !(isAlive(t) || (isCarcass(t) && a.controller === 'player')) || isHidden(t) || (!a.aiming && !reaching && dist(a.pos, t.pos) > 16 + L * 8)) a.lockTarget = -1;
   }
   // Hunted meter (for players)
   if (a.controller === 'player') updateHunted(game, a);

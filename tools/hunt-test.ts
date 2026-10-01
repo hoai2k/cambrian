@@ -107,6 +107,33 @@ const run = (g: Game, f: InputFrame, steps: number) => stepN(g, steps, f);
   check('...recovers nothing while it runs', rose <= 1e-9, `rose ${rose.toFixed(3)}`);
   check('...and a held chase is billed until the bar is spent, which ends it', low < 1 && pouncing > 60 && p.state !== 'pounce', `${low.toFixed(1)} left after ${pouncing} steps pouncing`);
 }
+// --- A carcass can be gone for: a pounce reaches it and takes a mouthful where it lies ---
+{
+  for (const [label, scale] of [['small', 0.3], ['bigger', 2.2]] as const) {
+    const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 9);
+    const p = g.players[0]; g.skipHatch(); p.pos = { ...OPEN }; p.yaw = 0; p.spawnProtect = 1e9;
+    for (const o of [...g.actors]) if (o.controller !== 'player') g.remove(o);
+    const L = lengthOf(p);
+    const body = g.spawn('waptia', 'ambient', { x: OPEN.x, y: OPEN.y, z: OPEN.z + L * 3 + 2 }, scale);
+    body.brain = undefined as never;
+    kill(g.hitCtx, body);
+    const at = { ...body.pos };
+    const m = new Map([[0, { ...emptyInput(), aim: true, aimTarget: body.id, pursueTarget: body.id } as InputFrame]]);
+    let pounced = false, ate = false;
+    for (let i = 0; i < 120 && !ate; i++) {
+      g.step(1 / 60, m);
+      if (p.state === 'pounce') pounced = true;
+      if (p.state === 'eating' && p.eatingTarget === body.id) ate = true;
+    }
+    // then let go, and let the meal run its course
+    for (let i = 0; i < 300; i++) g.step(1 / 60, new Map([[0, emptyInput()]]));
+    const moved = Math.hypot(body.pos.x - at.x, body.pos.z - at.z);
+    check(`a pounce at a ${label} carcass reaches it and eats there`, pounced && ate, `pounced=${pounced} ate=${ate} state=${p.state}`);
+    if (label === 'small') check('...a small one goes down whole', body.eaten >= 1 || !g.byId(body.id), `${body.eaten.toFixed(2)} eaten`);
+    else check('...a bigger one gives up one mouthful and no more', body.eaten > 0 && body.eaten < 0.5 && moved < L * 0.2,
+      `${body.eaten.toFixed(2)} eaten (${body.eatBites} bites), carcass moved ${(moved / L).toFixed(2)} L`);
+  }
+}
 // --- LT aims at prey; X pounces when in range and eats it ---
 {
   const g = new Game('reef', [{ creature: 'anomalocaris', device: 'keyboard', ready: true }], 9);

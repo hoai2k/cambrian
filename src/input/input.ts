@@ -1,3 +1,4 @@
+import { turnAxis } from '../shared/key-turn';
 /** Raw per-device controls, before camera-relative conversion. */
 export interface RawControls {
   mx: number; my: number; lookX: number; lookY: number;
@@ -81,19 +82,27 @@ export class KeyboardInput {
   private keys = new Set<string>();
   private pressedThisFrame = new Set<string>();
   anyPress = false;
+  /** When each held key went down, for the keys whose push grows with holding (`turnAxis`). */
+  private since = new Map<string, number>();
   private onDown = (e: KeyboardEvent) => {
     if ((e.target as HTMLElement | null)?.matches?.('input,textarea,select,button,a')) return;
+    if (!this.keys.has(e.code)) this.since.set(e.code, performance.now());
     this.keys.add(e.code); this.pressedThisFrame.add(e.code); this.anyPress = true;
     if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.code)) e.preventDefault();
   };
-  private onUp = (e: KeyboardEvent) => this.keys.delete(e.code);
-  private onBlur = () => this.keys.clear();
+  private onUp = (e: KeyboardEvent) => { this.keys.delete(e.code); this.since.delete(e.code); };
+  private onBlur = () => { this.keys.clear(); this.since.clear(); };
   constructor() {
     window.addEventListener('keydown', this.onDown);
     window.addEventListener('keyup', this.onUp);
     window.addEventListener('blur', this.onBlur);
   }
   has(code: string) { return this.keys.has(code); }
+  /** A turn key's push: nothing while it is up, a nudge when it goes down, full after a hold. */
+  private turn(code: string) {
+    const t = this.since.get(code);
+    return this.keys.has(code) && t !== undefined ? turnAxis((performance.now() - t) / 1000) : 0;
+  }
   read(layout: 1 | 2): RawControls {
     const k = (c: string) => this.keys.has(c);
     const c = emptyControls();
@@ -110,7 +119,9 @@ export class KeyboardInput {
       // W swims forward, and so does Shift (or the held left mouse button), with X back; the arrow
       // keys tilt the view, and forward follows the view, so an arrow up and a swim is a climb.
       // Shift was the sprint, which is on B.
-      c.mx = Number(k('KeyD')) - Number(k('KeyA'));
+      // A tap of A or D is a nudge and a hold grows into a full turn (`turnAxis`), so a hand can
+      // turn the animal onto something on screen rather than past it.
+      c.mx = this.turn('KeyD') - this.turn('KeyA');
       c.my = Number(k('KeyW') || k('ShiftLeft')) - Number(k('KeyX'));
       c.lookX = Number(k('ArrowRight')) - Number(k('ArrowLeft'));
       c.lookY = Number(k('ArrowDown')) - Number(k('ArrowUp'));

@@ -277,7 +277,10 @@ unless the user explicitly asks for a PR. Steps:
   view somewhere the body had not been yet and left it to catch up, which reads as steering a boat
   by leaning; it also kept a creature's own agility out of the answer, and a Waptia whipping round
   where a giant does not is a thing the camera cannot say. The arrow keys still move the view
-  itself. **W, Shift or the held left button swims it forward**, and a keyboard seat's pitch — set
+  itself. **A tap of A or D is a nudge and only a hold turns hard** (`turnAxis`,
+  `src/shared/key-turn.ts`, `npm run key-turn`): a key has no "a little", so time stands in for
+  it — `TURN_TAP` of a full push the moment it goes down, growing to full over `TURN_RAMP` — and a
+  tap no longer swings the body past what it was turning onto. **W, Shift or the held left button swims it forward**, and a keyboard seat's pitch — set
   with the arrow keys — is left where it was tilted for as long as the body is being swum forward,
   rather than eased back to level the way the pad's and the follow camera's are (W and S were
   briefly a tilt up and down, and went back to forward and sink at the owner's word). Turning
@@ -1782,7 +1785,12 @@ unless the user explicitly asks for a PR. Steps:
   carries the *body* onto it at `BITE_CLOSE` rather than pulling the animal in. The pounce used to
   land at a surface gap of 0.45 of a body and yank the victim 0.16 of a body into the mouth, which
   read as prey jumping into you. `npm run hunt` measures where the catch was taken and the largest
-  step the prey moves beyond the eater's own.
+  step the prey moves beyond the eater's own. **A carcass can be gone for too** (`isCarcass`,
+  `targetable` in `src/sim/actors.ts`): the crosshair finds it, the cursor calls it food whatever
+  it was in life, and a pounce at it swims to it and takes a mouthful there — the whole of a body
+  small enough to go down in one, one bite out of anything bigger — through the ordinary
+  `startEating`, whose `commit` lets that mouthful finish without the bite button held. A downed
+  player is never one, because it is waiting on a revive.
 - **A hunt on you is framed, not only reported** (`src/render/threat-frame.ts`, pure, `npm run
   threat-frame`). While the hunt score is at the HUD's "hunting" line (`HUNT_ON`, let go at
   `HUNT_OFF`), `updateCamera` lengthens the arm along the view it already has — never turning it,

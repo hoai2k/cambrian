@@ -162,6 +162,13 @@ export function makeActor(id: number, creatureId: CreatureId, controller: Contro
 }
 
 export const isAlive = (a: Actor) => a.state !== 'dead' && a.state !== 'swallowed';
+/** A dead body with something left on it, and not in anything's mouth: food that can be gone for. */
+export const isCarcass = (a: Actor) => a.state === 'dead' && a.eaten < 1 && a.swallowedBy < 0;
+/**
+ * Whether a player can point at this body and go for it: anything alive, and a carcass that is not
+ * another player's (a downed player is waiting on a revive, not lying there to be eaten).
+ */
+export const targetable = (a: Actor) => isAlive(a) || (isCarcass(a) && a.controller !== 'player');
 export const canAct = (a: Actor) => a.state === 'free' || a.state === 'guard';
 export const isHidden = (a: Actor) => a.hideMode === 'burrowed' && a.seen <= 0;
 export const isInvulnerable = (a: Actor) => a.iframes > 0 || a.spawnProtect > 0 || a.state === 'moult';
