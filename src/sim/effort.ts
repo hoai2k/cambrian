@@ -35,3 +35,17 @@ export const WILD_ESCAPE_READY = 0.95;
 export const steered = (a: Actor) => a.controller === 'player';
 /** Whether a wild body has the escape in it right now. Steered bodies are priced per dash instead. */
 export const escapeReady = (a: Actor) => steered(a) || a.stamina >= a.staminaMax * WILD_ESCAPE_READY;
+
+/**
+ * What a pounce costs to set out on: a dash's price, for a dash is what it is — a spring across
+ * open water — and it was 12 flat while a player's dash was twice that, so the double-click chase
+ * was the cheap way to cross a gap.
+ */
+export const POUNCE_STAMINA = 12;
+export const pounceCost = (a: Actor) => POUNCE_STAMINA * (steered(a) ? DASH_STAMINA_MULT : 1);
+/**
+ * Seconds of homing a pounce's price pays for. A held pounce (a mouse button kept down on the
+ * animal) may run on after this, and from then on it is billed per second at the rate a held
+ * dash is, until the bar is empty and the spring is spent.
+ */
+export const POUNCE_PAID = 1.05;

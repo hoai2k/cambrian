@@ -277,12 +277,12 @@ unless the user explicitly asks for a PR. Steps:
   view somewhere the body had not been yet and left it to catch up, which reads as steering a boat
   by leaning; it also kept a creature's own agility out of the answer, and a Waptia whipping round
   where a giant does not is a thing the camera cannot say. The arrow keys still move the view
-  itself. **W and S turn the animal up and down the way A and D turn it left and right**, and
-  **Shift — or the held left button — is what swims it forward**: forward is camera-relative, so W
-  and S tilt the view (the arrow keys' own axis) and a keyboard seat's pitch is left where it was
-  turned for as long as the body is being swum forward, rather than eased back to level the way the
-  pad's and the follow camera's are. Turning composes with swimming (hold Shift, press D and the
-  body swims forward along a curve) — X back, E or Q straight up, C straight down, R the shield, Z
+  itself. **W, Shift or the held left button swims it forward**, and a keyboard seat's pitch — set
+  with the arrow keys — is left where it was tilted for as long as the body is being swum forward,
+  rather than eased back to level the way the pad's and the follow camera's are (W and S were
+  briefly a tilt up and down, and went back to forward and sink at the owner's word). Turning
+  composes with swimming (hold W, press D and the body swims forward along a curve) — X back, E or
+  Q up, S or C down, R the shield, Z
   camouflage, I sense, space to dash, B to sprint. Every attack has a key as well as a
   mouse button, because a hand already on the keys should not have to reach: J and F bite, G and K
   are the heavy. `npm run mouse` drives the whole of it in a real browser, where every part of it is something a headless test cannot vouch for. That harness
@@ -1796,7 +1796,11 @@ unless the user explicitly asks for a PR. Steps:
   dodge, or a tail-flip — only on a bar at least `WILD_ESCAPE_READY` full, and it empties the bar,
   so it cannot chain escapes and cannot sprint away afterwards until it has its breath back. The
   gate is inside `startDodge` rather than at its callers, because four paths reach it.
-  `npm run locomotion` holds both.
+  `npm run locomotion` holds both. **A pounce is priced as a dash** (`pounceCost`): it was 12 flat
+  while a player's dash was 24, and a body in `pounce` (or `dodge`) recovered at half rate, so a
+  held double-click chase — which runs as long as the button is down — ended with *more* stamina
+  than it started with. Nothing recovers in either state now, and a held pounce past `POUNCE_PAID`
+  is billed at a held dash's rate until the bar is empty, which ends it. `npm run hunt` holds it.
 - What lives where is the place's own business, not the player's: `src/sim/population.ts` gives every
   210-unit area a size profile and a density from a hash bent by the biome (hatcheries inshore, grown
   animals in the deep), pure in the place and the world seed so an area is the same when you return.

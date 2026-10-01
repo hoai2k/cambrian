@@ -33,12 +33,12 @@ interface Label { pad: string; kbm: string; key1: string; key2: string; touch: s
 
 /** Long names, for prose and for the diagrams. `short` overrides them inside a chip or a <kbd>. */
 const LABELS: Record<Action, Label> = {
-  swim:     { pad: 'Left stick', kbm: 'Shift or hold left click to swim, X back, A / D turn, W / S turn up / down', key1: 'Shift forward, X back, A / D turn, W / S turn up / down', key2: 'IJKL', touch: 'Swim pad', short: { touch: 'Swim' } },
-  look:     { pad: 'Right stick', kbm: 'Hold left click and move, or middle-drag', key1: 'Arrow keys (W / S tilt)', key2: 'IJKL (no camera)', touch: 'Swipe' },
+  swim:     { pad: 'Left stick', kbm: 'W, Shift or hold left click to swim, X back, A / D turn', key1: 'W or Shift forward, X back, A / D turn', key2: 'IJKL', touch: 'Swim pad', short: { touch: 'Swim' } },
+  look:     { pad: 'Right stick', kbm: 'Hold left click and move, or middle-drag', key1: 'Arrow keys', key2: 'IJKL (no camera)', touch: 'Swipe' },
   zoom:     { pad: 'Right stick click + up/down', kbm: 'Mouse wheel', key1: 'PgUp / PgDn', key2: '—', touch: 'Pinch', short: { pad: 'RS + ▲▼', kbm: 'Wheel' } },
   sprint:   { pad: 'LB', kbm: 'B', key1: 'B', key2: 'Right Shift', touch: '—', short: { key2: 'R-Shift' } },
   rise:     { pad: 'RB', kbm: 'E or Q', key1: 'E or Q', key2: 'N', touch: 'Look up and swim', short: { touch: 'Look up' } },
-  sink:     { pad: 'Left stick click', kbm: 'C', key1: 'C', key2: 'M', touch: 'Look down and swim', short: { touch: 'Look down', pad: 'LS click' } },
+  sink:     { pad: 'Left stick click', kbm: 'S or C', key1: 'S or C', key2: 'M', touch: 'Look down and swim', short: { touch: 'Look down', pad: 'LS click' } },
   light:    { pad: 'X', kbm: 'Click an animal in reach, or J', key1: 'J or F', key2: ';', touch: 'Tap', short: { kbm: 'LMB' } },
   heavy:    { pad: 'RT', kbm: 'Click an animal further off, or G', key1: 'G or K', key2: '’', touch: 'Double-tap an animal', short: { touch: 'Double-tap', kbm: 'LMB', key1: 'G' } },
   ability:  { pad: 'Y', kbm: 'Z', key1: 'Z', key2: 'P', touch: 'Pad set to hide', short: { touch: 'Pad' } },
